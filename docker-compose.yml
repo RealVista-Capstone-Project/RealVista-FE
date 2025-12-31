@@ -1,0 +1,13 @@
+services:
+  real-vista:
+    image: real-vista:${IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: 0.5

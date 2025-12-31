@@ -1,0 +1,16 @@
+{
+  "Auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "loginSuccess": "Login successful!",
+    "loginFailed": "Login failed",
+    "invalidCredentials": "Invalid email or password"
+  }
+}
