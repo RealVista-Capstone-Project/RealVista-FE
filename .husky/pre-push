@@ -1,15 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# Use printf instead of echo -e for better cross-platform color support
 RED='\033[0;31m'
 NC='\033[0m'
 
+# Get current branch name
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
-# List of protected branches
-PROTECTED_BRANCHES=("develop" "main")
+# Space-separated string (works more reliably across different Bash versions than arrays)
+PROTECTED_BRANCHES=" develop main master "
 
-if [[ " ${PROTECTED_BRANCHES[@]} " =~ " ${branch_name} " ]]; then
-  echo -e "${RED}Pushing to '${branch_name}' is not allowed! Please create a merge request.${NC}"
-  exit 1
+# Check if the current branch name exists within the protected string
+if [[ $PROTECTED_BRANCHES =~ " $branch_name " ]]; then
+    printf "${RED}Pushing to '%s' is not allowed! Please create a merge request.${NC}\n" "$branch_name"
+    exit 1
 fi
 
-echo "Push is allowed, continuing..."
+printf "Push is allowed to '%s', continuing...\n" "$branch_name"
+exit 0

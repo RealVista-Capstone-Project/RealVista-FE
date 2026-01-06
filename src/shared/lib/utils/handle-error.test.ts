@@ -1,11 +1,17 @@
 import { EntityError } from '../http/http';
 import { handleErrorApi } from './handle-error';
 
-// Mock toast from sonner
-const toastMock = { error: jest.fn() };
+// Mock toast from sonner - must be defined inline due to jest.mock hoisting
 jest.mock('sonner', () => ({
-  toast: toastMock,
+  toast: {
+    error: jest.fn(),
+  },
 }));
+
+// Import the mocked type
+import { toast } from 'sonner';
+
+const toastMock = toast as jest.Mocked<typeof toast>;
 
 describe('handleErrorApi', () => {
   const mockSetError = jest.fn();
