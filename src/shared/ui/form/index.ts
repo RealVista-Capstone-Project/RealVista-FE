@@ -6,4 +6,4 @@ export {
   FormItem,
   FormLabel,
   FormMessage,
-} from './form'
+} from './form';

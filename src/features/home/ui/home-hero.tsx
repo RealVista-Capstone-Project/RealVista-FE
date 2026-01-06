@@ -1,15 +1,22 @@
-'use client'
+'use client';
 
-import { Button } from '@/shared/ui/button'
-import { useTranslations } from 'next-intl'
-import Image from 'next/image'
+import { Button } from '@/shared/ui/button';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 export function HomeHero() {
-  const t = useTranslations('HomePage')
+  const t = useTranslations('HomePage');
 
   return (
     <div className='flex flex-col gap-[32px] items-center'>
-      <Image className='dark:invert' src='/next.svg' alt='Next.js logo' width={180} height={38} priority />
+      <Image
+        className='dark:invert'
+        src='/next.svg'
+        alt='Next.js logo'
+        width={180}
+        height={38}
+        priority
+      />
       <Button>{t('title')}</Button>
 
       <div className='flex gap-4 items-center flex-col sm:flex-row'>
@@ -19,7 +26,13 @@ export function HomeHero() {
           target='_blank'
           rel='noopener noreferrer'
         >
-          <Image className='dark:invert' src='/vercel.svg' alt='Vercel logomark' width={20} height={20} />
+          <Image
+            className='dark:invert'
+            src='/vercel.svg'
+            alt='Vercel logomark'
+            width={20}
+            height={20}
+          />
           Deploy now
         </a>
         <a
@@ -32,5 +45,5 @@ export function HomeHero() {
         </a>
       </div>
     </div>
-  )
+  );
 }

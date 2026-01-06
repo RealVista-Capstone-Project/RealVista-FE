@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from 'next/image';
 
 export function HomeFooter() {
   return (
@@ -31,5 +31,5 @@ export function HomeFooter() {
         Go to nextjs.org →
       </a>
     </footer>
-  )
+  );
 }

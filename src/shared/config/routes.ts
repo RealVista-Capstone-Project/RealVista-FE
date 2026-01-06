@@ -5,7 +5,7 @@ export const ROUTES = {
   homePage: '/',
   signIn: '/signin',
   signUp: '/signup',
-  user: '/user'
-}
+  user: '/user',
+};
 
-export const CALLBACK_URL = 'callbackUrl'
+export const CALLBACK_URL = 'callbackUrl';

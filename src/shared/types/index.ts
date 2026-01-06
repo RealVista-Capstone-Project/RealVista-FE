@@ -1,2 +1,2 @@
 // Shared type definitions
-export type Locale = 'vi' | 'en'
+export type Locale = 'vi' | 'en';

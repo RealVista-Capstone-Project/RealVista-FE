@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { userQueries } from '@/entities/user/api'
-import { useAuthStore } from '@/entities/user/model/store'
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { userQueries } from '@/entities/user/api';
+import { useAuthStore } from '@/entities/user/model/store';
 
 /**
  * useCurrentUser Hook
@@ -12,18 +12,18 @@ import { useAuthStore } from '@/entities/user/model/store'
  * const { data, isLoading, error } = useCurrentUser()
  */
 export function useCurrentUser() {
-  const setUser = useAuthStore((state) => state.setUser)
+  const setUser = useAuthStore((state) => state.setUser);
 
-  const query = useQuery(userQueries.current())
+  const query = useQuery(userQueries.current());
 
   // Update store when data changes
   useEffect(() => {
     if (query.data) {
-      setUser(query.data.payload)
+      setUser(query.data.payload);
     }
-  }, [query.data, setUser])
+  }, [query.data, setUser]);
 
-  return query
+  return query;
 }
 
 /**
@@ -34,5 +34,5 @@ export function useCurrentUser() {
  * const { data, isLoading, error } = useUserById('user-123')
  */
 export function useUserById(id: string) {
-  return useQuery(userQueries.detail(id))
+  return useQuery(userQueries.detail(id));
 }

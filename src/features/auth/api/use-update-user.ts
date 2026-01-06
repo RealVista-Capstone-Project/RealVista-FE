@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { userApi, userQueries } from '@/entities/user/api'
-import { useAuthStore } from '@/entities/user/model/store'
-import type { UpdateUserData } from '@/entities/user/model/types'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { userApi, userQueries } from '@/entities/user/api';
+import { useAuthStore } from '@/entities/user/model/store';
+import type { UpdateUserData } from '@/entities/user/model/types';
 
 /**
  * useUpdateProfile Hook
@@ -12,18 +12,18 @@ import type { UpdateUserData } from '@/entities/user/model/types'
  * mutate({ name: 'John Doe' })
  */
 export function useUpdateProfile() {
-  const queryClient = useQueryClient()
-  const updateUser = useAuthStore((state) => state.updateUser)
+  const queryClient = useQueryClient();
+  const updateUser = useAuthStore((state) => state.updateUser);
 
   return useMutation({
     mutationFn: (data: UpdateUserData) => userApi.update(data),
     onSuccess: (response) => {
       // Update Zustand store with payload
-      updateUser(response.payload)
+      updateUser(response.payload);
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey })
+      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
     },
-  })
+  });
 }
 
 /**
@@ -35,16 +35,16 @@ export function useUpdateProfile() {
  * mutate({ oldPassword: 'old', newPassword: 'new' })
  */
 export function useChangePassword() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: { oldPassword: string; newPassword: string }) =>
       userApi.changePassword(data),
     onSuccess: () => {
       // Invalidate session queries
-      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey })
+      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
     },
-  })
+  });
 }
 
 /**
@@ -56,16 +56,16 @@ export function useChangePassword() {
  * mutate(file)
  */
 export function useUploadAvatar() {
-  const queryClient = useQueryClient()
-  const updateUser = useAuthStore((state) => state.updateUser)
+  const queryClient = useQueryClient();
+  const updateUser = useAuthStore((state) => state.updateUser);
 
   return useMutation({
     mutationFn: (file: File) => userApi.uploadAvatar(file),
     onSuccess: (response) => {
       // Update user avatar in store
-      updateUser({ avatar: response.payload.url })
+      updateUser({ avatar: response.payload.url });
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey })
+      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
     },
-  })
+  });
 }

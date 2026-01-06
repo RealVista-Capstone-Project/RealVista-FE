@@ -1,33 +1,33 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useTranslations } from 'next-intl'
-import { Button } from '@/shared/ui/button'
-import { Input } from '@/shared/ui/input'
-import { Label } from '@/shared/ui/label'
-import { useLogin } from '../model/use-login'
-import type { LoginCredentials } from '@/entities/user/model/types'
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
+import { useLogin } from '../model/use-login';
+import type { LoginCredentials } from '@/entities/user/model/types';
 
 export function LoginForm() {
-  const t = useTranslations('Auth')
-  const { mutate: login, isPending } = useLogin()
-  const [error, setError] = useState<string>('')
+  const t = useTranslations('Auth');
+  const { mutate: login, isPending } = useLogin();
+  const [error, setError] = useState<string>('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginCredentials>()
+  } = useForm<LoginCredentials>();
 
   const onSubmit = (data: LoginCredentials) => {
-    setError('')
+    setError('');
     login(data, {
       onError: (err: unknown) => {
-        setError((err as any)?.message || 'Login failed')
+        setError((err as any)?.message || 'Login failed');
       },
-    })
-  }
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
@@ -39,9 +39,7 @@ export function LoginForm() {
           placeholder='john@example.com'
           {...register('email', { required: 'Email is required' })}
         />
-        {errors.email && (
-          <p className='text-sm text-red-500'>{errors.email.message}</p>
-        )}
+        {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
       </div>
 
       <div className='space-y-2'>
@@ -51,9 +49,7 @@ export function LoginForm() {
           type='password'
           {...register('password', { required: 'Password is required' })}
         />
-        {errors.password && (
-          <p className='text-sm text-red-500'>{errors.password.message}</p>
-        )}
+        {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
       </div>
 
       {error && <p className='text-sm text-red-500'>{error}</p>}
@@ -62,5 +58,5 @@ export function LoginForm() {
         {isPending ? 'Logging in...' : t('login')}
       </Button>
     </form>
-  )
+  );
 }

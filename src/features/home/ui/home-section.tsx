@@ -10,5 +10,5 @@ export function HomeSection() {
       </li>
       <li className='tracking-[-.01em]'>Save and see your changes instantly.</li>
     </ol>
-  )
+  );
 }
