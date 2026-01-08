@@ -4,6 +4,8 @@ import '@/app/styles/globals.css'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/shared/config/i18n/routing'
+import { SessionProvider } from 'next-auth/react'
+import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin']
@@ -34,7 +36,11 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <SessionProvider>
+          <AuthTokenProvider>
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          </AuthTokenProvider>
+        </SessionProvider>
       </body>
     </html>
   )

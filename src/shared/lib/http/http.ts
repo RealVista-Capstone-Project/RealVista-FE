@@ -1,4 +1,5 @@
 import { env } from '@/shared/lib/env';
+import { getAuthTokenHybrid } from '@/shared/lib/auth/get-auth-token';
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string | undefined;
@@ -58,9 +59,10 @@ const request = async <Response>(
           'Content-Type': 'application/json',
         };
   if (isClient()) {
-    const sessionToken = localStorage.getItem('sessionToken');
-    if (sessionToken) {
-      baseHeaders.Authorization = `Bearer ${sessionToken}`;
+    // Get token from NextAuth cache, with localStorage fallback for migration
+    const token = getAuthTokenHybrid();
+    if (token) {
+      baseHeaders.Authorization = `Bearer ${token}`;
     }
   }
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envClientConfig.NEXT_PUBLIC_API_ENDPOINT
