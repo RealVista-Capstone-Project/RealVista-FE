@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
 // Mock next-auth/react before importing the module
 jest.mock('next-auth/react', () => ({
@@ -8,20 +8,12 @@ jest.mock('next-auth/react', () => ({
 import {
   getAuthTokenSync,
   updateAuthTokenCache,
-  getAuthTokenHybrid,
 } from './get-auth-token';
 
 describe('getAuthToken', () => {
   // Reset cache before each test
   beforeEach(() => {
     updateAuthTokenCache(null);
-  });
-
-  // Cleanup localStorage after tests that use it
-  afterEach(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-    }
   });
 
   describe('getAuthTokenSync', () => {
@@ -84,120 +76,20 @@ describe('getAuthToken', () => {
     });
   });
 
-  describe('getAuthTokenHybrid', () => {
-    beforeEach(() => {
-      // Clear cache before each hybrid test
-      updateAuthTokenCache(null);
-      // Clear localStorage before each hybrid test
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-      }
-    });
-
-    it('should return cached token when available', () => {
-      const cachedToken = 'cached-nextauth-token';
-      updateAuthTokenCache(cachedToken);
-
-      // Even if localStorage has a token, cached token takes priority
-      localStorage.setItem('token', 'legacy-token');
-
-      expect(getAuthTokenHybrid()).toBe(cachedToken);
-
-      // Cleanup
-      localStorage.removeItem('token');
-    });
-
-    it('should fallback to localStorage when cache is empty', () => {
-      updateAuthTokenCache(null);
-      const mockToken = 'legacy-token';
-      localStorage.setItem('token', mockToken);
-
-      expect(getAuthTokenHybrid()).toBe(mockToken);
-
-      // Cleanup
-      localStorage.removeItem('token');
-    });
-
-    it('should return null when both cache and localStorage are empty', () => {
-      updateAuthTokenCache(null);
-      // Ensure localStorage is empty
-      const existing = localStorage.getItem('token');
-      if (existing) {
-        localStorage.removeItem('token');
-      }
-
-      expect(getAuthTokenHybrid()).toBeNull();
-    });
-
-    it('should prioritize cache over localStorage', () => {
-      const cached = 'next-auth-token';
-      const legacy = 'old-local-storage-token';
-
-      updateAuthTokenCache(cached);
-      localStorage.setItem('token', legacy);
-
-      expect(getAuthTokenHybrid()).toBe(cached);
-      expect(getAuthTokenHybrid()).not.toBe(legacy);
-
-      // Cleanup
-      localStorage.removeItem('token');
-    });
-
-    it('should switch from localStorage to cache when cache is updated', () => {
-      // Start with only localStorage
-      const legacyToken = 'legacy-token';
-      localStorage.setItem('token', legacyToken);
-
-      expect(getAuthTokenHybrid()).toBe(legacyToken);
-
-      // Update cache - should now return cached token
-      const nextAuthToken = 'next-auth-token';
-      updateAuthTokenCache(nextAuthToken);
-
-      expect(getAuthTokenHybrid()).toBe(nextAuthToken);
-      expect(getAuthTokenHybrid()).not.toBe(legacyToken);
-
-      // Cleanup
-      localStorage.removeItem('token');
-    });
-
-    it('should return null after cache is cleared', () => {
-      // Set cache
-      updateAuthTokenCache('some-token');
-      expect(getAuthTokenHybrid()).toBe('some-token');
-
-      // Clear cache
-      updateAuthTokenCache(null);
-
-      // Should return null (assuming localStorage is also empty)
-      const existing = localStorage.getItem('token');
-      if (existing) {
-        localStorage.removeItem('token');
-      }
-
-      expect(getAuthTokenHybrid()).toBeNull();
-    });
-  });
-
   describe('integration scenarios', () => {
     beforeEach(() => {
       updateAuthTokenCache(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-      }
     });
 
     it('should handle login flow (null -> token)', () => {
       // Initially not logged in
       expect(getAuthTokenSync()).toBeNull();
-      expect(getAuthTokenHybrid()).toBeNull();
 
       // User logs in, token is cached
       const userToken = 'user-auth-token';
       updateAuthTokenCache(userToken);
 
       expect(getAuthTokenSync()).toBe(userToken);
-      expect(getAuthTokenHybrid()).toBe(userToken);
     });
 
     it('should handle logout flow (token -> null)', () => {
@@ -210,18 +102,31 @@ describe('getAuthToken', () => {
       expect(getAuthTokenSync()).toBeNull();
     });
 
-    it('should handle token refresh flow', () => {
+    it('should handle token refresh', () => {
       const oldToken = 'old-expired-token';
       const newToken = 'new-refreshed-token';
 
-      // Initial token
       updateAuthTokenCache(oldToken);
       expect(getAuthTokenSync()).toBe(oldToken);
 
-      // Token refreshed
       updateAuthTokenCache(newToken);
       expect(getAuthTokenSync()).toBe(newToken);
-      expect(getAuthTokenSync()).not.toBe(oldToken);
+    });
+  });
+
+  describe('performance', () => {
+    it('should have O(1) access time', () => {
+      updateAuthTokenCache('perf-test-token');
+
+      // Multiple reads should be instant
+      const start = Date.now();
+      for (let i = 0; i < 10000; i++) {
+        getAuthTokenSync();
+      }
+      const end = Date.now();
+
+      // 10,000 reads should take < 10ms (O(1) access)
+      expect(end - start).toBeLessThan(10);
     });
   });
 });

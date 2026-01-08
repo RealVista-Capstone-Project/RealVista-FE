@@ -67,37 +67,3 @@ export function getAuthTokenSync(): string | null {
 export function updateAuthTokenCache(token: string | null): void {
   cachedToken = token;
 }
-
-/**
- * Hybrid token retrieval (for migration period)
- * Tries NextAuth cache first, falls back to localStorage
- *
- * @returns string | null - Access token from NextAuth or localStorage
- *
- * Migration: Use this during transition, then switch to getAuthTokenSync()
- *
- * @example
- * ```ts
- * // During migration from localStorage to NextAuth
- * const token = getAuthTokenHybrid();
- * if (token) {
- *   headers.Authorization = `Bearer ${token}`;
- * }
- * ```
- */
-export function getAuthTokenHybrid(): string | null {
-  // Try NextAuth cache first (fast path)
-  if (cachedToken) {
-    return cachedToken;
-  }
-
-  // Fallback to localStorage during migration
-  if (typeof window !== 'undefined') {
-    const legacyToken = localStorage.getItem('token');
-    if (legacyToken) {
-      return legacyToken;
-    }
-  }
-
-  return null;
-}

@@ -1,5 +1,5 @@
 import { env } from '@/shared/lib/env';
-import { getAuthTokenHybrid } from '@/shared/lib/auth/get-auth-token';
+import { getAuthTokenSync } from '@/shared/lib/auth/get-auth-token';
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string | undefined;
@@ -59,8 +59,8 @@ const request = async <Response>(
           'Content-Type': 'application/json',
         };
   if (isClient()) {
-    // Get token from NextAuth cache, with localStorage fallback for migration
-    const token = getAuthTokenHybrid();
+    // Get token from NextAuth cache (synchronous, <1ms access)
+    const token = getAuthTokenSync();
     if (token) {
       baseHeaders.Authorization = `Bearer ${token}`;
     }

@@ -5,17 +5,15 @@ import Credentials from 'next-auth/providers/credentials';
  * Backend API response types
  */
 type BackendLoginResponse = {
-  payload: {
-    token: string;
-    user: {
-      id: number | string;
-      email: string;
-      name: string;
-      role: string;
-      avatar?: string;
-    };
-    expiresIn: number;
+  success: boolean;
+  message: string;
+  data: {
+    type: string;
+    userId: number;
+    email: string;
+    access_token: string;
   };
+  timestamp: string;
 };
 
 /**
@@ -56,6 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           const data: BackendLoginResponse = await response.json();
+          console.log('data response: ', data);
 
           if (!response.ok) {
             console.error('[NextAuth] Login failed:', response.status, data);
@@ -63,21 +62,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           // Extract from nested response structure
-          const { token, user } = data.payload;
+          const { userId, email: userEmail, access_token } = data.data;
 
-          console.log('[NextAuth] Login successful for:', user.email);
+          console.log('[NextAuth] Login successful for:', userEmail);
 
           // Return flat user object with accessToken
           // Note: id must be a string for NextAuth
           // Type assertion needed because we extended the User interface
           return {
-            id: user.id.toString(),
-            email: user.email,
-            name: user.name,
-            image: user.avatar,
-            role: user.role as 'user' | 'admin' | 'moderator',
-            avatar: user.avatar,
-            accessToken: token,
+            id: userId.toString(),
+            email: userEmail,
+            accessToken: access_token,
           } as any;
         } catch (error) {
           console.error('[NextAuth] Login error:', error);

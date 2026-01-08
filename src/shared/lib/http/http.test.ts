@@ -1,24 +1,12 @@
 import { HttpError, EntityError } from './http';
 import http from './http';
 
-// Mock getAuthTokenHybrid to avoid NextAuth import issues
+// Mock getAuthTokenSync to avoid NextAuth import issues
 jest.mock('@/shared/lib/auth/get-auth-token', () => ({
-  getAuthTokenHybrid: jest.fn(),
+  getAuthTokenSync: jest.fn(),
 }));
 
-import { getAuthTokenHybrid } from '@/shared/lib/auth/get-auth-token';
-
-// Mock localStorage
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
-};
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+import { getAuthTokenSync } from '@/shared/lib/auth/get-auth-token';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -27,7 +15,6 @@ describe('HTTP Client', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (global.fetch as any).mockClear();
-    localStorageMock.getItem.mockClear();
   });
 
   describe('GET request', () => {
@@ -55,7 +42,7 @@ describe('HTTP Client', () => {
     });
 
     it('includes Authorization header when sessionToken exists', async () => {
-      (getAuthTokenHybrid as jest.Mock).mockReturnValueOnce('test-token');
+      (getAuthTokenSync as jest.Mock).mockReturnValueOnce('test-token');
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
