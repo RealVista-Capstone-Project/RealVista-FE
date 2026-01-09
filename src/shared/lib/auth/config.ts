@@ -1,5 +1,15 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { z } from 'zod';
+
+/**
+ * OAuth credentials schema for Zod validation
+ */
+const oauthSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  email: z.string().email('Invalid email format'),
+  accessToken: z.string().min(1, 'Access token is required'),
+});
 
 /**
  * Backend API response types
@@ -9,7 +19,7 @@ type BackendLoginResponse = {
   message: string;
   data: {
     type: string;
-    userId: number;
+    user_id: number;
     email: string;
     access_token: string;
   };
@@ -54,7 +64,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           const data: BackendLoginResponse = await response.json();
-          console.log('data response: ', data);
 
           if (!response.ok) {
             console.error('[NextAuth] Login failed:', response.status, data);
@@ -62,7 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           // Extract from nested response structure
-          const { userId, email: userEmail, access_token } = data.data;
+          const { user_id, email: userEmail, access_token } = data.data;
 
           console.log('[NextAuth] Login successful for:', userEmail);
 
@@ -70,12 +79,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Note: id must be a string for NextAuth
           // Type assertion needed because we extended the User interface
           return {
-            id: userId.toString(),
+            id: user_id.toString(),
             email: userEmail,
             accessToken: access_token,
           } as any;
         } catch (error) {
           console.error('[NextAuth] Login error:', error);
+          return null;
+        }
+      },
+    }),
+    Credentials({
+      id: 'oauth',
+      name: 'OAuth',
+      credentials: {
+        userId: { label: 'User ID', type: 'text' },
+        email: { label: 'Email', type: 'email' },
+        accessToken: { label: 'Access Token', type: 'password' },
+      },
+      async authorize(credentials) {
+        try {
+          // Validate credentials using Zod schema
+          const validatedCredentials = oauthSchema.parse(credentials);
+
+          console.log('[NextAuth] OAuth login successful for:', validatedCredentials.email);
+
+          // Return user object with same structure as existing provider
+          return {
+            id: validatedCredentials.userId,
+            email: validatedCredentials.email,
+            accessToken: validatedCredentials.accessToken,
+            role: 'user',
+          } as any;
+        } catch (error) {
+          console.error('[NextAuth] OAuth validation error:', error);
           return null;
         }
       },
