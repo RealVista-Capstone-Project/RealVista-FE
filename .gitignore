@@ -47,3 +47,6 @@ docs
 .beads/
 .spikes/
 history/
+
+# bv (beads viewer) local config and caches
+.bv/
