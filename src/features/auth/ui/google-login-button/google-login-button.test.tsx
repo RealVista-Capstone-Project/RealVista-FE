@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { GoogleLoginButton } from './google-login-button';
 import { useLocale } from 'next-intl';
 
@@ -61,10 +61,12 @@ describe('GoogleLoginButton', () => {
     render(<GoogleLoginButton />);
     const button = screen.getByRole('button', { name: /continue with google/i });
 
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     expect(window.location.href).toBe(
-      'http://localhost:8080/api/v1/auth/login-google?redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fvi%2Fauth%2Fcallback'
+      'https://api.test.com/auth/login-google?redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fvi%2Fauth%2Fcallback'
     );
   });
 
@@ -73,7 +75,9 @@ describe('GoogleLoginButton', () => {
     render(<GoogleLoginButton />);
     const button = screen.getByRole('button', { name: /continue with google/i });
 
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     // URL is encoded, so check for the encoded version
     expect(window.location.href).toContain('%2Fen%2Fauth%2Fcallback');
@@ -84,7 +88,9 @@ describe('GoogleLoginButton', () => {
     render(<GoogleLoginButton />);
     const button = screen.getByRole('button', { name: /continue with google/i });
 
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     // URL is encoded, so check for the encoded version
     expect(window.location.href).toContain('%2Fvi%2Fauth%2Fcallback');
@@ -95,7 +101,9 @@ describe('GoogleLoginButton', () => {
     const button = screen.getByRole('button', { name: /continue with google/i });
 
     // Click to start loading
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     // Wait for state update and check for loader
     await waitFor(() => {
@@ -114,7 +122,9 @@ describe('GoogleLoginButton', () => {
     expect(button).not.toBeDisabled();
 
     // Click to start loading
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     // Wait for state update
     await waitFor(() => {
@@ -126,10 +136,12 @@ describe('GoogleLoginButton', () => {
     render(<GoogleLoginButton />);
     const button = screen.getByRole('button', { name: /continue with google/i });
 
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     expect(window.location.href).toMatch(
-      /^http:\/\/localhost:8080\/api\/v1\/auth\/login-google/
+      /^https:\/\/api\.test\.com\/auth\/login-google/
     );
   });
 
@@ -137,7 +149,9 @@ describe('GoogleLoginButton', () => {
     render(<GoogleLoginButton />);
     const button = screen.getByRole('button', { name: /continue with google/i });
 
-    button.click();
+    act(() => {
+      button.click();
+    });
 
     // Check that special characters in redirect URI are encoded
     expect(window.location.href).toContain('redirect_uri=');
