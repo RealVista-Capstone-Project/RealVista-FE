@@ -21,7 +21,7 @@ import { Button } from '@/shared/ui/button';
  *
  * Usage:
  * ```tsx
- * import { LogoutButtonNextAuth } from '@/features/auth/ui/logout-button-nextauth';
+ * import { LogoutButtonNextAuth } from '@/features/auth/ui';
  *
  * export function Header() {
  *   return <LogoutButtonNextAuth />;

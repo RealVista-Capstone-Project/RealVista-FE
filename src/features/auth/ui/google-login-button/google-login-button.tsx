@@ -22,7 +22,7 @@ const BACKEND_OAUTH_URL = 'http://localhost:8080/api/v1/auth/login-google';
  *
  * Usage:
  * ```tsx
- * import { GoogleLoginButton } from '@/features/auth/ui/google-login-button';
+ * import { GoogleLoginButton } from '@/features/auth/ui';
  *
  * export function LoginPage() {
  *   return <GoogleLoginButton />;

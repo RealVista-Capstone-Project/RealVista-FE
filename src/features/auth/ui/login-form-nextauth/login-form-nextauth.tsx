@@ -25,7 +25,7 @@ import { Label } from '@/shared/ui/label';
  *
  * Usage:
  * ```tsx
- * import { LoginFormNextAuth } from '@/features/auth/ui/login-form-nextauth';
+ * import { LoginFormNextAuth } from '@/features/auth/ui';
  *
  * export default function LoginPage() {
  *   return <LoginFormNextAuth />;
