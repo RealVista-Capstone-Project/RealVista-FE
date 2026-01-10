@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
@@ -35,6 +35,7 @@ import { Label } from '@/shared/ui/label';
 export function LoginFormNextAuth() {
   const t = useTranslations('Auth');
   const router = useRouter();
+  const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
@@ -66,8 +67,7 @@ export function LoginFormNextAuth() {
         toast.success('Login successful!');
 
         // Redirect to dashboard with locale
-        // Note: You may want to make this dynamic based on current locale
-        router.push('/vi');
+        router.push(`/${locale}/dashboard`);
       }
     } catch {
       // Unexpected error

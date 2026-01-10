@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 
@@ -33,6 +34,7 @@ import { Button } from '@/shared/ui/button';
  */
 export function LogoutButtonNextAuth({ children }: { children?: React.ReactNode }) {
   const router = useRouter();
+  const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -46,9 +48,8 @@ export function LogoutButtonNextAuth({ children }: { children?: React.ReactNode 
       // Show success message
       toast.success('Logged out successfully');
 
-      // Redirect to login page
-      // Note: You may want to preserve the current locale
-      router.push('/vi/login');
+      // Redirect to login page with current locale
+      router.push(`/${locale}/login`);
     } catch (error) {
       // Handle any errors during logout
       console.error('Logout error:', error);
