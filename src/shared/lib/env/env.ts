@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 export const env = createEnv({
   client: {
-    NEXT_PUBLIC_URL: z.string().optional(),
-    NEXT_PUBLIC_API_ENDPOINT: z.string().optional(),
+    NEXT_PUBLIC_URL: z.string(),
+    NEXT_PUBLIC_API_ENDPOINT: z.string(),
   },
   shared: {
     NODE_ENV: z.enum(['test', 'development', 'production']).optional(),
