@@ -1,3 +1,4 @@
+import { env } from '@/shared/lib/env';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
@@ -28,7 +29,7 @@ type BackendLoginResponse = {
 
 /**
  * NextAuth configuration with Credentials provider
- * Integrates with backend API at http://localhost:8080/api/v1/auth/login
+ * Integrates with backend API at ${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -49,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = credentials.password as string;
 
         // Backend API endpoint (use absolute URL on server)
-        const apiUrl = 'http://localhost:8080/api/v1/auth/login';
+        const apiUrl = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login`;
 
         try {
           console.log('[NextAuth] Attempting login for:', email);

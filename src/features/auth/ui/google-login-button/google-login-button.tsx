@@ -5,8 +5,9 @@ import { useLocale } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
+import { env } from '@/shared/lib/env';
 
-const BACKEND_OAUTH_URL = 'http://localhost:8080/api/v1/auth/login-google';
+const BACKEND_OAUTH_URL = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login-google`;
 
 /**
  * GoogleLoginButton Component
@@ -47,12 +48,7 @@ export function GoogleLoginButton() {
   };
 
   return (
-    <Button
-      variant='outline'
-      className='w-full'
-      onClick={handleClick}
-      disabled={isLoading}
-    >
+    <Button variant='outline' className='w-full' onClick={handleClick} disabled={isLoading}>
       {isLoading ? (
         <>
           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
