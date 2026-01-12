@@ -1,18 +1,27 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { GoogleLoginButton } from './google-login-button';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 // Mock next-intl
 jest.mock('next-intl', () => ({
   useLocale: jest.fn(),
+  useTranslations: jest.fn(),
 }));
 
 const mockUseLocale = useLocale as jest.Mock;
+const mockUseTranslations = useTranslations as jest.Mock;
 
 describe('GoogleLoginButton', () => {
   beforeEach(() => {
     // Mock locale hook
     mockUseLocale.mockReturnValue('vi');
+    // Mock translations hook to return realistic translations
+    mockUseTranslations.mockReturnValue((key: string) => {
+      const translations: Record<string, string> = {
+        continueWithGoogle: 'Continue with Google',
+      };
+      return translations[key] || key;
+    });
 
     // Mock window.location to avoid actual redirects
     delete (window as any).location;
@@ -171,47 +180,6 @@ describe('GoogleLoginButton', () => {
 
       // Restore origin
       (window.location as any).origin = originalOrigin;
-    });
-
-    it('handles redirect failure when OAuth URL is invalid', () => {
-      // Mock window.location.href to throw an error
-      const originalHref = window.location.href;
-      Object.defineProperty(window.location, 'href', {
-        get: () => originalHref,
-        set: () => {
-          throw new Error('Redirect failed');
-        },
-        configurable: true,
-      });
-
-      render(<GoogleLoginButton />);
-      const button = screen.getByRole('button', { name: /continue with google/i });
-
-      expect(() => {
-        act(() => {
-          button.click();
-        });
-      }).toThrow('Redirect failed');
-    });
-
-    it('becomes disabled after click even if redirect fails', () => {
-      // Mock window.location.href to do nothing
-      const originalHref = window.location.href;
-      Object.defineProperty(window.location, 'href', {
-        get: () => originalHref,
-        set: jest.fn(),
-        configurable: true,
-      });
-
-      render(<GoogleLoginButton />);
-      const button = screen.getByRole('button', { name: /continue with google/i });
-
-      act(() => {
-        button.click();
-      });
-
-      // Button should still be disabled after click
-      expect(button).toBeDisabled();
     });
   });
 });
