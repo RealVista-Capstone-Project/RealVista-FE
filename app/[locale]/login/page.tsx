@@ -1,6 +1,9 @@
 import { LoginFormNextAuth } from '@/features/auth/ui/login-form-nextauth';
 import { GoogleLoginButton } from '@/features/auth/ui/google-login-button';
 import { Link } from '@/shared/config/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import { use } from 'react';
 
 /**
  * Login Page
@@ -13,14 +16,17 @@ import { Link } from '@/shared/config/i18n/navigation';
  * - Visual separator between login methods
  * - Locale-aware routing (supports /vi and /en)
  */
-export default function LoginPage() {
+export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = use(params);
+  setRequestLocale(locale);
+  const t = useTranslations('Auth');
   return (
     <div className='flex min-h-screen items-center justify-center'>
       <div className='w-full max-w-md space-y-8 px-4'>
         {/* Header */}
         <div className='text-center'>
-          <h1 className='text-3xl font-bold tracking-tight'>Welcome back</h1>
-          <p className='mt-2 text-sm text-muted-foreground'>Sign in to your account to continue</p>
+          <h1 className='text-3xl font-bold tracking-tight'>{t('welcomeBack')}</h1>
+          <p className='mt-2 text-sm text-muted-foreground'>{t('signInMessage')}</p>
         </div>
 
         {/* Email/Password Form */}
@@ -34,7 +40,7 @@ export default function LoginPage() {
             <span className='w-full border-t' />
           </div>
           <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>Or continue with</span>
+            <span className='bg-background px-2 text-muted-foreground'>{t('continueWith')}</span>
           </div>
         </div>
 
@@ -46,12 +52,12 @@ export default function LoginPage() {
         {/* Footer Links */}
         <div className='text-center text-sm'>
           <p className='text-muted-foreground'>
-            Don&apos;t have an account?{' '}
+            {t('noAccount')}{' '}
             <Link
               href='/register'
               className='font-medium text-primary underline-offset-4 hover:underline'
             >
-              Sign up
+              {t('signUp')}
             </Link>
           </p>
         </div>

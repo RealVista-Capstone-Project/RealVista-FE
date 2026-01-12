@@ -2,6 +2,7 @@ import { env } from '@/shared/lib/env';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
+import http from '@/shared/lib/http/http';
 
 /**
  * OAuth credentials schema for Zod validation
@@ -49,41 +50,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        // Backend API endpoint (use absolute URL on server)
-        const apiUrl = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login`;
-
         try {
-          console.log('[NextAuth] Attempting login for:', email);
+          console.log('[NextAuth] Attempting login');
 
-          // Call backend API
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
+          // Call backend API using centralized http client
+          const result = await http.post<BackendLoginResponse>(
+            '/auth/login',
+            { email, password },
+            { baseUrl: env.NEXT_PUBLIC_API_ENDPOINT }
+          );
 
-          const data: BackendLoginResponse = await response.json();
-
-          if (!response.ok) {
-            console.error('[NextAuth] Login failed:', response.status, data);
+          if (!result.payload?.data) {
+            console.error('[NextAuth] Login failed: Invalid response structure');
             return null;
           }
 
           // Extract from nested response structure
-          const { user_id, email: userEmail, access_token } = data.data;
+          const { user_id, email: userEmail, access_token } = result.payload.data;
 
-          console.log('[NextAuth] Login successful for:', userEmail);
+          console.log('[NextAuth] Login successful');
 
-          // Return flat user object with accessToken
-          // Note: id must be a string for NextAuth
-          // Type assertion needed because we extended the User interface
+          // Return user object with accessToken (type-safe, no 'as any' needed)
           return {
             id: user_id.toString(),
             email: userEmail,
             accessToken: access_token,
-          } as any;
+          };
         } catch (error) {
           console.error('[NextAuth] Login error:', error);
           return null;
@@ -103,15 +95,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Validate credentials using Zod schema
           const validatedCredentials = oauthSchema.parse(credentials);
 
-          console.log('[NextAuth] OAuth login successful for:', validatedCredentials.email);
+          console.log('[NextAuth] OAuth login successful');
 
-          // Return user object with same structure as existing provider
+          // Return user object with proper type (no 'as any' needed)
           return {
             id: validatedCredentials.userId,
             email: validatedCredentials.email,
             accessToken: validatedCredentials.accessToken,
-            role: 'user',
-          } as any;
+            role: 'user' as const,
+          };
         } catch (error) {
           console.error('[NextAuth] OAuth validation error:', error);
           return null;
@@ -120,7 +112,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   pages: {
-    signIn: '/vi/login', // Default locale, will be dynamic with middleware later
+    // Middleware will handle locale prefix dynamically
+    signIn: '/login',
   },
   session: {
     strategy: 'jwt',
@@ -131,12 +124,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
      */
     async jwt({ token, user }) {
       if (user) {
-        // First login, add user data to token
-        // Type assertions needed because user comes from our extended interface
-        token.id = user.id as string;
-        token.role = user.role as 'user' | 'admin' | 'moderator';
+        // First login, add user data to token (type-safe)
+        token.id = user.id;
+        token.role = user.role;
         // Store accessToken for use in HTTP client
-        (token as any).accessToken = (user as any).accessToken;
+        token.accessToken = user.accessToken;
       }
       return token;
     },
@@ -145,8 +137,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
      */
     async session({ session, token }) {
       if (session.user && token) {
+        // Type assertions needed because token properties are unknown
         session.user.id = token.id as string;
-        session.user.role = token.role as 'user' | 'admin' | 'moderator';
+        session.user.role = token.role as 'user' | 'admin' | 'moderator' | undefined;
+        session.user.accessToken = token.accessToken as string | undefined;
       }
       return session;
     },
