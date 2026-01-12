@@ -12,6 +12,9 @@ let cachedToken: string | null = null;
  * Async token retrieval from NextAuth session
  * Use this for initial load or when you need fresh session data
  *
+ * The Session type is already extended in src/shared/lib/auth/types.ts
+ * to include the accessToken field on the user object.
+ *
  * @returns Promise<string | null> - Access token or null
  *
  * Time: 50-200ms (network latency to NextAuth session endpoint)
@@ -26,7 +29,8 @@ let cachedToken: string | null = null;
  */
 export async function getAuthToken(): Promise<string | null> {
   const session = await getSession();
-  return (session as any)?.accessToken || null;
+  // Session type is extended via module augmentation in types.ts
+  return (session as { user?: { accessToken?: string } | null })?.user?.accessToken || null;
 }
 
 /**

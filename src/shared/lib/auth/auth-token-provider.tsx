@@ -36,7 +36,8 @@ import { updateAuthTokenCache } from './get-auth-token';
  * @returns JSX.Element - Wrapped children with token sync enabled
  *
  * Performance:
- * - useEffect runs only when session object reference changes
+ * - useEffect depends only on accessToken, not entire session object
+ * - Prevents unnecessary cache updates when session fields other than token change
  * - Cache update is O(1) synchronous operation
  * - No re-renders triggered (fragment wrapper)
  *
@@ -49,7 +50,7 @@ export function AuthTokenProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
 
   useEffect(() => {
-    // Update cache when session changes
+    // Extract accessToken from session (type-safe)
     // Session object structure from NextAuth:
     // {
     //   user: {
@@ -62,9 +63,10 @@ export function AuthTokenProvider({ children }: { children: React.ReactNode }) {
     //   },
     //   expires: string
     // }
-    const token = (session as any)?.accessToken || null;
+    const token = (session as unknown as { user?: { accessToken?: string } })?.user?.accessToken || null;
     updateAuthTokenCache(token);
-  }, [session]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.accessToken]); // Depend only on accessToken, not entire session
 
   // Use fragment to avoid unnecessary DOM nodes
   return <>{children}</>;

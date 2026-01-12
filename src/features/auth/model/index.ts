@@ -1,10 +1,18 @@
 /**
  * Auth Feature - Model Layer
  *
- * This layer previously contained Zustand-based auth hooks.
- * With NextAuth migration, auth is now handled directly via:
- * - useSession() from 'next-auth/react' for session management
- * - signIn() / signOut() from 'next-auth/react' for auth operations
+ * This layer provides business logic and custom hooks for auth.
+ * With NextAuth migration, we provide type-safe wrappers around
+ * NextAuth's useSession for better separation of concerns.
+ *
+ * Exports:
+ * - useAuthSession: Type-safe wrapper around useSession
+ * - isAuthenticated: Type guard for checking auth state
+ * - hasRole: Type guard for role-based access control
+ * - getAccessToken: Helper to extract access token
  *
  * API hooks remain in src/features/auth/api/
  */
+
+export { useAuthSession, isAuthenticated, hasRole, getAccessToken } from './use-auth-session';
+export type { AuthSession } from './use-auth-session';

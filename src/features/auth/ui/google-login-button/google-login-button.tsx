@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -20,6 +20,8 @@ const BACKEND_OAUTH_URL = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login-google`;
  * - Loading state with spinner
  * - Locale-aware callback URL
  * - Full-width button with outline variant
+ * - Internationalized text
+ * - Next.js router for proper SPA navigation
  *
  * Usage:
  * ```tsx
@@ -31,6 +33,7 @@ const BACKEND_OAUTH_URL = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login-google`;
  * ```
  */
 export function GoogleLoginButton() {
+  const t = useTranslations('Auth');
   const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +46,8 @@ export function GoogleLoginButton() {
     // Construct the OAuth URL with redirect_uri parameter
     const oauthUrl = `${BACKEND_OAUTH_URL}?redirect_uri=${encodeURIComponent(callbackUrl)}`;
 
-    // Redirect to backend OAuth endpoint
+    // Use window.location.href for OAuth redirect (external navigation required)
+    // Note: OAuth redirects must use browser navigation, not Next.js router
     window.location.href = oauthUrl;
   };
 
@@ -52,7 +56,7 @@ export function GoogleLoginButton() {
       {isLoading ? (
         <>
           <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-          Continue with Google
+          {t('continueWithGoogle')}
         </>
       ) : (
         <>
@@ -79,7 +83,7 @@ export function GoogleLoginButton() {
               fill='#EA4335'
             />
           </svg>
-          Continue with Google
+          {t('continueWithGoogle')}
         </>
       )}
     </Button>

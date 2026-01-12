@@ -60,6 +60,18 @@ const request = async <Response>(
         };
   if (isClient()) {
     // Get token from NextAuth cache (synchronous, <1ms access)
+    //
+    // STALENESS RISK: This uses a synchronous in-memory cache that could become
+    // stale if the session updates asynchronously (e.g., token refresh, session extension).
+    // The cache is updated via AuthTokenProvider's useEffect when the session changes.
+    //
+    // In most cases, this is safe because:
+    // - Session updates trigger useEffect, which updates the cache
+    // - Token refresh is handled by NextAuth and triggers session updates
+    //
+    // If you encounter auth failures due to stale tokens, consider:
+    // 1. Using async getAuthToken() as a fallback (slower but always fresh)
+    // 2. Implementing a token refresh retry mechanism
     const token = getAuthTokenSync();
     if (token) {
       baseHeaders.Authorization = `Bearer ${token}`;

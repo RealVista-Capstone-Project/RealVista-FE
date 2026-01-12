@@ -59,19 +59,21 @@ export function LoginFormNextAuth() {
 
       if (result?.error) {
         // Map NextAuth error codes to user-friendly messages
-        const errorMessage = mapAuthError(result.error);
+        // result.error can be string | undefined, validate it first
+        const errorCode = typeof result.error === 'string' ? result.error : 'Default';
+        const errorMessage = mapAuthError(errorCode);
         setError(errorMessage);
         toast.error(errorMessage);
       } else if (result?.ok) {
         // Success! Show toast and redirect
-        toast.success('Login successful!');
+        toast.success(t('loginSuccess'));
 
         // Redirect to dashboard with locale
         router.push(`/${locale}/dashboard`);
       }
     } catch {
       // Unexpected error
-      const errorMessage = 'Login failed. Please try again.';
+      const errorMessage = t('loginFailed');
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -130,7 +132,7 @@ export function LoginFormNextAuth() {
       {error && <p className='text-sm text-red-500'>{error}</p>}
 
       <Button type='submit' className='w-full' disabled={isLoading}>
-        {isLoading ? 'Logging in...' : t('login')}
+        {isLoading ? t('loggingIn') : t('login')}
       </Button>
     </form>
   );

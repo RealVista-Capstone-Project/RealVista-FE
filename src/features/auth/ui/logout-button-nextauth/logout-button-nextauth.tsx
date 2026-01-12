@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 
@@ -19,6 +19,7 @@ import { Button } from '@/shared/ui/button';
  * - Shows success toast notification
  * - Redirects to /login page
  * - Loading state during logout
+ * - Error handling with fallback redirect
  *
  * Usage:
  * ```tsx
@@ -33,6 +34,7 @@ import { Button } from '@/shared/ui/button';
  * For Phase 3, it can be conditionally rendered alongside the legacy logout button.
  */
 export function LogoutButtonNextAuth({ children }: { children?: React.ReactNode }) {
+  const t = useTranslations('Auth');
   const router = useRouter();
   const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
@@ -43,17 +45,27 @@ export function LogoutButtonNextAuth({ children }: { children?: React.ReactNode 
     try {
       // Sign out from NextAuth
       // redirect: false allows us to handle the redirect manually
-      await signOut({ redirect: false });
+      const result = await signOut({ redirect: false });
 
-      // Show success message
-      toast.success('Logged out successfully');
+      // Check if signOut was successful
+      if (result) {
+        // Show success message
+        toast.success(t('logoutSuccess'));
 
-      // Redirect to login page with current locale
-      router.push(`/${locale}/login`);
+        // Redirect to login page with current locale
+        router.push(`/${locale}/login`);
+      } else {
+        // If signOut returns undefined/null, treat as error
+        throw new Error('Logout returned undefined result');
+      }
     } catch (error) {
       // Handle any errors during logout
       console.error('Logout error:', error);
-      toast.error('Logout failed. Please try again.');
+      toast.error(t('logoutFailed'));
+
+      // Still redirect to login page even on error for UX
+      // This ensures users aren't stuck in a broken state
+      router.push(`/${locale}/login`);
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +73,7 @@ export function LogoutButtonNextAuth({ children }: { children?: React.ReactNode 
 
   return (
     <Button onClick={handleLogout} disabled={isLoading} variant='ghost'>
-      {isLoading ? 'Logging out...' : children || 'Logout'}
+      {isLoading ? 'Logging out...' : children || t('logout')}
     </Button>
   );
 }

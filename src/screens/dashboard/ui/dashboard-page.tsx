@@ -3,7 +3,7 @@
 import { UserProfileHeader } from '@/widgets/user-profile-header';
 import { DashboardStats } from '@/widgets/dashboard-stats';
 import { LogoutButtonNextAuth } from '@/features/auth/ui';
-import { useSession } from 'next-auth/react';
+import { useAuthSession } from '@/features/auth/model';
 
 /**
  * Dashboard Page
@@ -16,7 +16,7 @@ import { useSession } from 'next-auth/react';
  * - Smooth animations
  */
 export function DashboardPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
 
   if (status === 'loading') {
     return (

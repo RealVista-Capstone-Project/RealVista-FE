@@ -157,4 +157,61 @@ describe('GoogleLoginButton', () => {
     expect(window.location.href).toContain('redirect_uri=');
     expect(window.location.href).toContain('http%3A%2F%2F');
   });
+
+  // Error state tests
+  describe('Error handling', () => {
+    it('handles missing window.origin gracefully', () => {
+      // Mock window.location.origin to undefined
+      const originalOrigin = window.location.origin;
+      delete (window.location as any).origin;
+
+      expect(() => {
+        render(<GoogleLoginButton />);
+      }).not.toThrow();
+
+      // Restore origin
+      (window.location as any).origin = originalOrigin;
+    });
+
+    it('handles redirect failure when OAuth URL is invalid', () => {
+      // Mock window.location.href to throw an error
+      const originalHref = window.location.href;
+      Object.defineProperty(window.location, 'href', {
+        get: () => originalHref,
+        set: () => {
+          throw new Error('Redirect failed');
+        },
+        configurable: true,
+      });
+
+      render(<GoogleLoginButton />);
+      const button = screen.getByRole('button', { name: /continue with google/i });
+
+      expect(() => {
+        act(() => {
+          button.click();
+        });
+      }).toThrow('Redirect failed');
+    });
+
+    it('becomes disabled after click even if redirect fails', () => {
+      // Mock window.location.href to do nothing
+      const originalHref = window.location.href;
+      Object.defineProperty(window.location, 'href', {
+        get: () => originalHref,
+        set: jest.fn(),
+        configurable: true,
+      });
+
+      render(<GoogleLoginButton />);
+      const button = screen.getByRole('button', { name: /continue with google/i });
+
+      act(() => {
+        button.click();
+      });
+
+      // Button should still be disabled after click
+      expect(button).toBeDisabled();
+    });
+  });
 });
