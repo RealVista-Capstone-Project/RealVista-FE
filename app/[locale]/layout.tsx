@@ -1,9 +1,16 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google'
 import '@/app/styles/globals.css'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { routing } from '@/shared/config/i18n/routing'
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta-sans',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin']
@@ -33,7 +40,7 @@ export default async function RootLayout({
   }
   return (
     <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${plusJakartaSans.variable} ${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
