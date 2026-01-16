@@ -80,6 +80,15 @@ The project uses explicit path aliases configured in `tsconfig.json`:
 - `@/widgets/*` - Compound components
 - `@/screens/*` - Application pages
 
+### TypeScript Best Practices
+
+**Critical Rule:** Never use the `any` type. Always use proper types or `unknown` when the type is truly unknown.
+
+- Use `unknown` instead of `any` for values of uncertain type
+- Use proper type definitions, interfaces, or type inference
+- If a type cannot be determined immediately, add a `// TODO` comment with a specific type to be defined later
+- The project uses TypeScript strict mode - leverage it for type safety
+
 ### TanStack Query + FSD Architecture
 
 **Key Pattern:** Entities layer provides data sources, Features layer provides usage logic.

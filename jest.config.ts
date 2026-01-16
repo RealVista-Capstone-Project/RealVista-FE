@@ -22,7 +22,7 @@ const config: Config = {
     '^@/screens/(.*)$': '<rootDir>/src/screens/$1',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@t3-oss/env-nextjs|@tanstack|@radix-ui)/)',
+    'node_modules/(?!(@t3-oss/env-nextjs|@tanstack|@radix-ui|next-auth)/)',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
