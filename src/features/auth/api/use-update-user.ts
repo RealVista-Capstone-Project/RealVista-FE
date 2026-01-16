@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userApi, userQueries } from '@/entities/user/api';
-import { useAuthStore } from '@/entities/user/model/store';
 import type { UpdateUserData } from '@/entities/user/model/types';
 
 /**
@@ -13,14 +12,11 @@ import type { UpdateUserData } from '@/entities/user/model/types';
  */
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
-  const updateUser = useAuthStore((state) => state.updateUser);
 
   return useMutation({
     mutationFn: (data: UpdateUserData) => userApi.update(data),
     onSuccess: (response) => {
-      // Update Zustand store with payload
-      updateUser(response.payload);
-      // Invalidate and refetch
+      // Invalidate and refetch - NextAuth session will be updated via useSession
       queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
     },
   });
@@ -57,14 +53,11 @@ export function useChangePassword() {
  */
 export function useUploadAvatar() {
   const queryClient = useQueryClient();
-  const updateUser = useAuthStore((state) => state.updateUser);
 
   return useMutation({
     mutationFn: (file: File) => userApi.uploadAvatar(file),
     onSuccess: (response) => {
-      // Update user avatar in store
-      updateUser({ avatar: response.payload.url });
-      // Invalidate and refetch
+      // Invalidate and refetch - NextAuth session will be updated via useSession
       queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
     },
   });

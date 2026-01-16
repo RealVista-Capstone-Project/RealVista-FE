@@ -3,12 +3,12 @@
  * Exports all auth feature functionality
  */
 
-// UI components
-export { LoginForm } from './ui/login-form';
-export { LogoutButton } from './ui/logout-button';
+// UI components (NextAuth)
+export { LoginFormNextAuth } from './ui/login-form-nextauth';
+export { LogoutButtonNextAuth } from './ui/logout-button-nextauth';
+export { GoogleLoginButton } from './ui/google-login-button';
 
-// Hooks
-export * from './model';
+// API hooks
 export * from './api';
 
 // i18n
