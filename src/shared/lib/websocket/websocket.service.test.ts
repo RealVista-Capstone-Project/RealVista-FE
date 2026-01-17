@@ -1,5 +1,5 @@
 import { WebSocketService } from './websocket.service';
-import type { WebSocketCallbacks, WebSocketOptions } from '@/shared/types/websocket';
+import type { WebSocketCallbacks } from '@/shared/types/websocket';
 import { Client, type IMessage } from '@stomp/stompjs';
 
 // Mock @stomp/stompjs Client

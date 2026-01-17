@@ -173,8 +173,6 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      const { container } = render(<ChatRoom roomId='test-room' userName='test-user' />);
-
       const messageElement = screen.getByText('My message').closest('div');
       expect(messageElement).toHaveClass('bg-blue-500');
     });
