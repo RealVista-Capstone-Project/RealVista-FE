@@ -18,7 +18,6 @@ describe('ChatRoom Component', () => {
   let mockSendMessage: jest.Mock;
   let mockJoinRoom: jest.Mock;
   let mockLeaveRoom: jest.Mock;
-  let mockOnNewMessage: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -42,7 +41,7 @@ describe('ChatRoom Component', () => {
 
   describe('rendering', () => {
     it('should render chat room UI', () => {
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText(/chat room: test-room/i)).toBeInTheDocument();
       expect(screen.getByText(/logged in as test-user/i)).toBeInTheDocument();
@@ -60,7 +59,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText(/disconnected/i)).toBeInTheDocument();
     });
@@ -77,7 +76,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText(/connected/i)).toBeInTheDocument();
     });
@@ -94,7 +93,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText(/connecting\.\.\./i)).toBeInTheDocument();
     });
@@ -111,7 +110,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText(/no messages yet/i)).toBeInTheDocument();
     });
@@ -145,7 +144,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText('Hello world')).toBeInTheDocument();
       expect(screen.getByText('How are you?')).toBeInTheDocument();
@@ -175,7 +174,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      const { container } = render(<ChatRoom roomId="test-room" userName="test-user" />);
+      const { container } = render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const messageElement = screen.getByText('My message').closest('div');
       expect(messageElement).toHaveClass('bg-blue-500');
@@ -203,7 +202,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('Hello')).toBeInTheDocument();
@@ -223,7 +222,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const input = screen.getByPlaceholderText(/type a message/i);
       const sendButton = screen.getByRole('button', { name: /send/i });
@@ -247,7 +246,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const input = screen.getByPlaceholderText(/type a message/i);
 
@@ -269,7 +268,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const input = screen.getByPlaceholderText(/type a message/i);
       const sendButton = screen.getByRole('button', { name: /send/i });
@@ -292,7 +291,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const input = screen.getByPlaceholderText(/type a message/i);
       const sendButton = screen.getByRole('button', { name: /send/i });
@@ -313,7 +312,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const sendButton = screen.getByRole('button', { name: /send/i });
 
@@ -334,7 +333,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       await waitFor(() => {
         expect(mockJoinRoom).toHaveBeenCalledWith('test-user');
@@ -353,7 +352,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      const { unmount } = render(<ChatRoom roomId="test-room" userName="test-user" />);
+      const { unmount } = render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       unmount();
 
@@ -386,7 +385,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      render(<ChatRoom roomId="test-room" userName="test-user" />);
+      render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       // The timestamp should be displayed
       const timeString = new Date(timestamp).toLocaleTimeString();
@@ -407,7 +406,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      const { container } = render(<ChatRoom roomId="test-room" userName="test-user" />);
+      const { container } = render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const indicator = container.querySelector('.bg-green-500');
       expect(indicator).toBeInTheDocument();
@@ -425,7 +424,7 @@ describe('ChatRoom Component', () => {
         disconnect: jest.fn(),
       });
 
-      const { container } = render(<ChatRoom roomId="test-room" userName="test-user" />);
+      const { container } = render(<ChatRoom roomId='test-room' userName='test-user' />);
 
       const indicator = container.querySelector('.bg-red-500');
       expect(indicator).toBeInTheDocument();
