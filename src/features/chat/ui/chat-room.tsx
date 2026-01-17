@@ -22,24 +22,11 @@ interface ChatRoomProps {
 export function ChatRoom({ roomId, userName }: ChatRoomProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const {
-    isConnected,
-    state,
-    messages: wsMessages,
-    typingUsers,
-    sendMessage,
-    joinRoom,
-    sendTyping,
-    leaveRoom,
-  } = useChatWebSocket({
+  const { isConnected, state, sendMessage, joinRoom, leaveRoom } = useChatWebSocket({
     // Use your Spring Boot WebSocket endpoint
-    endpoint: env.NEXT_PUBLIC_API_ENDPOINT
-      ? env.NEXT_PUBLIC_API_ENDPOINT.replace('/api', '/ws')
-      : 'http://localhost:8080/ws',
+    endpoint: env.NEXT_PUBLIC_WS_ENDPOINT ?? 'http://localhost:8080/ws',
     roomId,
     onNewMessage: (message) => {
       setMessages((prev) => [...prev, message]);
@@ -67,27 +54,6 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
     };
   }, [isConnected, joinRoom, leaveRoom, userName]);
 
-  // Handle typing indicator
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
-
-    if (!isTyping) {
-      setIsTyping(true);
-      sendTyping('current-user', userName, true);
-    }
-
-    // Clear previous timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    // Set new timeout to stop typing indicator
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsTyping(false);
-      sendTyping('current-user', userName, false);
-    }, 1000);
-  };
-
   // Handle send message
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,13 +62,6 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
 
     sendMessage(inputMessage);
     setInputMessage('');
-
-    // Stop typing indicator
-    setIsTyping(false);
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    sendTyping('current-user', userName, false);
   };
 
   return (
@@ -115,12 +74,14 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
         </div>
         <div className="flex items-center gap-2">
           <div
-            className={`h-3 w-3 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
-            }`}
+            className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
           />
           <span className="text-sm text-gray-600">
-            {state === 'connected' ? 'Connected' : state === 'connecting' ? 'Connecting...' : 'Disconnected'}
+            {state === 'connected'
+              ? 'Connected'
+              : state === 'connecting'
+                ? 'Connecting...'
+                : 'Disconnected'}
           </span>
         </div>
       </div>
@@ -136,9 +97,7 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
             {messages.map((message) => (
               <li
                 key={message.id}
-                className={`flex ${
-                  message.senderName === userName ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex ${message.senderName === userName ? 'justify-end' : 'justify-start'}`}
               >
                 <div
                   className={`max-w-[70%] rounded-lg px-4 py-2 ${
@@ -164,13 +123,6 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
           </ul>
         )}
         <div ref={messagesEndRef} />
-
-        {/* Typing indicator */}
-        {typingUsers.length > 0 && (
-          <div className="mt-2 text-sm text-gray-500">
-            {typingUsers.map((user) => user.userName).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
-          </div>
-        )}
       </div>
 
       {/* Input */}
@@ -179,7 +131,7 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
           <input
             type="text"
             value={inputMessage}
-            onChange={handleInputChange}
+            onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message..."
             disabled={!isConnected}
             className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"

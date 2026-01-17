@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import type { Message } from 'stompjs';
+import type { IMessage } from '@stomp/stompjs';
 import { useWebSocket } from '@/shared/lib/websocket';
 import type { ChatMessage } from '../model/types';
 
@@ -9,10 +9,14 @@ import type { ChatMessage } from '../model/types';
  * useChatWebSocket Hook
  * Manages WebSocket connection for real-time chat with Spring Boot backend
  *
+ * Backend endpoints:
+ * - Send to: /app/public
+ * - Subscribe to: /topic/public
+ *
  * @example
  * ```tsx
  * function ChatRoom() {
- *   const { isConnected, messages, sendMessage, typingUsers } = useChatWebSocket({
+ *   const { isConnected, messages, sendMessage } = useChatWebSocket({
  *     endpoint: 'http://localhost:8080/ws',
  *     roomId: 'room-123',
  *     onNewMessage: (msg) => console.log('New message:', msg),
@@ -43,13 +47,7 @@ export function useChatWebSocket(options: {
   const messagesRef = useRef<ChatMessage[]>([]);
   const typingUsersRef = useRef<Map<string, { userName: string; isTyping: boolean }>>(new Map());
 
-  const {
-    isConnected,
-    state,
-    subscribe,
-    send,
-    disconnect,
-  } = useWebSocket({
+  const { isConnected, state, subscribe, send, disconnect } = useWebSocket({
     endpoint: options.endpoint,
     onConnect: () => {
       console.log('[Chat WebSocket] Connected to room:', options.roomId);
@@ -61,20 +59,19 @@ export function useChatWebSocket(options: {
       console.error('[Chat WebSocket] Error:', error);
       options.onError?.(error);
     },
-    onMessage: (message: Message) => {
-      // Handle messages that don't have a subscription (if any)
+    onMessage: (message: IMessage) => {
       console.log('[Chat WebSocket] Unhandled message:', message);
     },
     debug: process.env.NODE_ENV === 'development',
   });
 
-  // Subscribe to public messages (topic)
+  // Subscribe to public messages (topic) - Server broadcasts to /topic/public
   useEffect(() => {
     if (!isConnected) return;
 
     const unsubscribe = subscribe({
-      destination: `/topic/room/${options.roomId}`,
-      onMessage: (message: Message) => {
+      destination: '/topic/public',
+      onMessage: (message: IMessage) => {
         try {
           const chatMessage: ChatMessage = JSON.parse(message.body);
 
@@ -100,54 +97,7 @@ export function useChatWebSocket(options: {
     return unsubscribe;
   }, [isConnected, subscribe, options]);
 
-  // Subscribe to private messages (user-specific queue)
-  useEffect(() => {
-    if (!isConnected) return;
-
-    // For user-specific messages (e.g., errors, private notifications)
-    const unsubscribe = subscribe({
-      destination: '/user/queue/messages',
-      onMessage: (message: Message) => {
-        try {
-          const chatMessage: ChatMessage = JSON.parse(message.body);
-          console.log('[Chat WebSocket] Private message:', chatMessage);
-          options.onNewMessage?.(chatMessage);
-        } catch (error) {
-          console.error('[Chat WebSocket] Failed to parse private message:', error);
-        }
-      },
-    });
-
-    return unsubscribe;
-  }, [isConnected, subscribe, options]);
-
-  // Subscribe to typing indicators
-  useEffect(() => {
-    if (!isConnected) return;
-
-    const unsubscribe = subscribe({
-      destination: `/topic/room/${options.roomId}/typing`,
-      onMessage: (message: Message) => {
-        try {
-          const { userId, userName, isTyping } = JSON.parse(message.body);
-
-          if (isTyping) {
-            typingUsersRef.current.set(userId, { userName, isTyping });
-          } else {
-            typingUsersRef.current.delete(userId);
-          }
-
-          options.onTyping?.(userId, userName, isTyping);
-        } catch (error) {
-          console.error('[Chat WebSocket] Failed to parse typing indicator:', error);
-        }
-      },
-    });
-
-    return unsubscribe;
-  }, [isConnected, subscribe, options]);
-
-  // Send a chat message
+  // Send a chat message - Client sends to /app/public
   const sendMessage = useCallback(
     (content: string) => {
       const message = {
@@ -157,7 +107,7 @@ export function useChatWebSocket(options: {
       };
 
       send({
-        destination: '/app/chat.sendMessage',
+        destination: '/app/public',
         body: message,
       });
     },
@@ -168,7 +118,7 @@ export function useChatWebSocket(options: {
   const joinRoom = useCallback(
     (userName: string) => {
       send({
-        destination: '/app/chat.addUser',
+        destination: '/app/public',
         body: {
           userName,
           roomId: options.roomId,
@@ -179,27 +129,11 @@ export function useChatWebSocket(options: {
     [send, options.roomId]
   );
 
-  // Send typing indicator
-  const sendTyping = useCallback(
-    (userId: string, userName: string, isTyping: boolean) => {
-      send({
-        destination: '/app/chat.typing',
-        body: {
-          userId,
-          userName,
-          isTyping,
-          roomId: options.roomId,
-        },
-      });
-    },
-    [send, options.roomId]
-  );
-
   // Leave chat room
   const leaveRoom = useCallback(
     (userName: string) => {
       send({
-        destination: '/app/chat.leave',
+        destination: '/app/public',
         body: {
           userName,
           roomId: options.roomId,
@@ -223,7 +157,6 @@ export function useChatWebSocket(options: {
     sendMessage,
     joinRoom,
     leaveRoom,
-    sendTyping,
     disconnect,
   };
 }

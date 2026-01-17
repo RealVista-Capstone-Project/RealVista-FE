@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { Message } from 'stompjs';
+import type { IMessage } from '@stomp/stompjs';
 import type {
   WebSocketOptions,
   WebSocketState,
@@ -23,12 +23,14 @@ import { WebSocketService } from '@/shared/lib/websocket/websocket.service';
  *   });
  *
  *   useEffect(() => {
- *     const unsubscribe = subscribe({
- *       destination: '/topic/messages',
- *       onMessage: (msg) => console.log(JSON.parse(msg.body)),
- *     });
- *     return unsubscribe;
- *   }, [subscribe]);
+ *     if (isConnected) {
+ *       const unsubscribe = subscribe({
+ *         destination: '/topic/messages',
+ *         onMessage: (msg) => console.log(JSON.parse(msg.body)),
+ *       });
+ *       return unsubscribe;
+ *     }
+ *   }, [subscribe, isConnected]);
  *
  *   return <div>State: {state}</div>;
  * }
@@ -38,7 +40,7 @@ export function useWebSocket(options: WebSocketOptions & {
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Error | any) => void;
-  onMessage?: (message: Message) => void;
+  onMessage?: (message: IMessage) => void;
 }) {
   const serviceRef = useRef<WebSocketService | null>(null);
   const [state, setState] = useState<WebSocketState>('idle');
@@ -81,8 +83,10 @@ export function useWebSocket(options: WebSocketOptions & {
 
   const subscribe = useCallback((subscriptionOptions: SubscriptionOptions) => {
     if (!serviceRef.current) {
-      throw new Error('WebSocket service not initialized');
+      console.warn('[useWebSocket] Cannot subscribe - service not initialized');
+      return () => {};
     }
+    // The service will check if connected and handle appropriately
     return serviceRef.current.subscribe(subscriptionOptions);
   }, []);
 
@@ -92,7 +96,8 @@ export function useWebSocket(options: WebSocketOptions & {
 
   const send = useCallback((message: STOMPMessage) => {
     if (!serviceRef.current) {
-      throw new Error('WebSocket service not initialized');
+      console.warn('[useWebSocket] Cannot send - service not initialized');
+      return;
     }
     serviceRef.current.send(message);
   }, []);

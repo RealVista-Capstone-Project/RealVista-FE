@@ -1,4 +1,4 @@
-import type { Frame, Message } from 'stompjs';
+import type { Frame, IMessage } from '@stomp/stompjs';
 
 // WebSocket connection states
 export type WebSocketState =
@@ -32,7 +32,7 @@ export interface SubscriptionOptions {
   // Destination to subscribe to (e.g., '/topic/messages')
   destination: string;
   // Callback when a message is received
-  onMessage: (message: Message) => void;
+  onMessage: (message: IMessage) => void;
   // Optional subscription ID
   id?: string;
 }
@@ -54,14 +54,14 @@ export interface WebSocketCallbacks {
   // Called when connection is lost
   onDisconnect: () => void;
   // Called when an error occurs
-  onError: (error: Frame | Error) => void;
+  onError: (error: Error | Frame) => void;
   // Called when receiving a message (if not using subscriptions)
-  onMessage?: (message: Message) => void;
+  onMessage?: (message: IMessage) => void;
 }
 
 // Stored subscription info
 export interface StoredSubscription {
   destination: string;
-  callback: (message: Message) => void;
+  callback: (message: IMessage) => void;
   unsubscribe: () => void;
 }

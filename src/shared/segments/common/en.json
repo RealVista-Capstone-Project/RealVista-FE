@@ -2,5 +2,18 @@
   "Common": {
     "title": "Hello world common!",
     "about": "Go to the about page"
+  },
+  "Chat": {
+    "title": "Chat",
+    "joinRoom": "Join Chat Room",
+    "description": "Enter your name and room ID to start chatting with WebSocket",
+    "yourName": "Your Name",
+    "roomId": "Room ID",
+    "yourNamePlaceholder": "Enter your name",
+    "roomIdPlaceholder": "e.g., general, random, room-123",
+    "joinButton": "Join Room",
+    "leaveRoom": "Leave Room",
+    "demoTitle": "WebSocket Chat Demo",
+    "testingNotes": "Testing Notes"
   }
 }

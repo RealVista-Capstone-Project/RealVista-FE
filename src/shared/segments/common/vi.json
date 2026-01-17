@@ -2,5 +2,18 @@
   "Common": {
     "title": "Xin chào common!",
     "about": "Về trang chủ"
+  },
+  "Chat": {
+    "title": "Trò chuyện",
+    "joinRoom": "Tham gia phòng chat",
+    "description": "Nhập tên và ID phòng để bắt đầu trò chuyện qua WebSocket",
+    "yourName": "Tên của bạn",
+    "roomId": "ID phòng",
+    "yourNamePlaceholder": "Nhập tên của bạn",
+    "roomIdPlaceholder": "ví dụ: general, random, room-123",
+    "joinButton": "Tham gia",
+    "leaveRoom": "Rời phòng",
+    "demoTitle": "Demo Chat WebSocket",
+    "testingNotes": "Ghi chú thử nghiệm"
   }
 }

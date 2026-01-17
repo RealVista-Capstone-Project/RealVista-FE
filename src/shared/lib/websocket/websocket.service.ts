@@ -1,5 +1,5 @@
+import { Client, type IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { over, type Frame, type Message, type Client as StompClient } from 'stompjs';
 import type {
   WebSocketCallbacks,
   WebSocketOptions,
@@ -32,15 +32,12 @@ import type {
  * ```
  */
 export class WebSocketService {
-  private client: StompClient | null = null;
-  private socket: WebSocket | null = null;
+  private client: Client | null = null;
   private state: WebSocketState = 'idle';
   private options: Required<Omit<WebSocketOptions, 'headers'>> & {
     headers: WebSocketOptions['headers'];
   };
   private callbacks: WebSocketCallbacks;
-  private reconnectAttempts = 0;
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private subscriptions: Map<string, StoredSubscription> = new Map();
   private connectionTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -78,37 +75,46 @@ export class WebSocketService {
     this.state = 'connecting';
     this.log('Connecting to', this.options.endpoint);
 
-    try {
-      // Create SockJS connection
-      this.socket = new SockJS(this.options.endpoint) as unknown as WebSocket;
-
-      // Create STOMP client over SockJS
-      this.client = over(this.socket);
-
-      // Disable debug logs unless debug mode is enabled
-      if (!this.options.debug) {
-        this.client.debug = () => {};
+    // Set connection timeout
+    this.connectionTimeoutTimer = setTimeout(() => {
+      if (this.state === 'connecting') {
+        this.log('Connection timeout');
+        this.handleConnectionError(new Error('Connection timeout'));
       }
+    }, this.options.connectionTimeout);
 
-      // Set connection timeout
-      this.connectionTimeoutTimer = setTimeout(() => {
-        if (this.state === 'connecting') {
-          this.log('Connection timeout');
-          this.handleConnectionError(new Error('Connection timeout'));
-        }
-      }, this.options.connectionTimeout);
+    try {
+      // Create STOMP client with SockJS
+      this.client = new Client({
+        // Connect via SockJS for better browser compatibility
+        webSocketFactory: () => new SockJS(this.options.endpoint) as any,
 
-      // Prepare headers with auth
-      const authHeaders = this.getAuthHeaders();
-      const headers = { ...authHeaders, ...this.options.headers };
+        // STOMP connection headers
+        connectHeaders: {
+          ...this.getAuthHeaders(),
+          ...this.options.headers,
+        },
 
-      // Connect to STOMP endpoint
-      // stompjs connect method signature: connect(headers, connectCallback, errorCallback)
-      this.client.connect(
-        headers,
-        () => this.onConnected(),
-        (error: Frame | string) => this.onError(error)
-      );
+        // Automatically reconnect (built-in to @stomp/stompjs)
+        reconnectDelay: this.options.reconnectDelay,
+
+        // Enable heartbeat
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+
+        // Debug logging
+        debug: this.options.debug ? (str) => this.log(str) : undefined,
+
+        // Connection lifecycle callbacks
+        onConnect: () => this.onConnected(),
+        onDisconnect: () => this.onDisconnected(),
+        onStompError: (frame) => this.onError(frame),
+        onWebSocketClose: () => this.onDisconnected(),
+        onWebSocketError: (error) => this.onError(error),
+      });
+
+      // Activate the client
+      this.client.activate();
     } catch (error) {
       this.handleConnectionError(error as Error);
     }
@@ -120,48 +126,25 @@ export class WebSocketService {
   disconnect(): void {
     this.log('Disconnecting...');
 
-    // Clear reconnect timer
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-
     // Clear connection timeout
     if (this.connectionTimeoutTimer) {
       clearTimeout(this.connectionTimeoutTimer);
       this.connectionTimeoutTimer = null;
     }
 
-    // Disable auto-reconnect when manually disconnecting
-    const originalAutoReconnect = this.options.autoReconnect;
-    this.options.autoReconnect = false;
-
     // Unsubscribe from all subscriptions
     this.unsubscribeAll();
 
-    // Disconnect STOMP client
+    // Deactivate STOMP client
     if (this.client && this.client.connected) {
-      this.client.disconnect(() => {
-        this.log('Disconnected');
-        this.state = 'disconnected';
-        this.callbacks.onDisconnect();
-      });
-    } else {
-      this.state = 'disconnected';
-      this.callbacks.onDisconnect();
-    }
-
-    // Restore auto-reconnect setting
-    this.options.autoReconnect = originalAutoReconnect;
-
-    // Clean up socket
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
+      this.client.deactivate();
     }
 
     this.client = null;
-    this.reconnectAttempts = 0;
+    this.state = 'disconnected';
+    this.callbacks.onDisconnect();
+
+    this.log('Disconnected');
   }
 
   /**
@@ -170,7 +153,9 @@ export class WebSocketService {
    */
   subscribe(options: SubscriptionOptions): () => void {
     if (!this.client || !this.client.connected) {
-      throw new Error('WebSocket is not connected. Call connect() first.');
+      console.warn('[WebSocketService] Cannot subscribe - WebSocket is not connected yet');
+      // Return a no-op unsubscribe function
+      return () => {};
     }
 
     const { destination, onMessage, id } = options;
@@ -187,7 +172,7 @@ export class WebSocketService {
     }
 
     // Subscribe to destination
-    const subscription = this.client.subscribe(destination, (message: Message) => {
+    const subscription = this.client.subscribe(destination, (message: IMessage) => {
       this.log('Message received from', destination, message.body);
       onMessage(message);
       this.callbacks.onMessage?.(message);
@@ -235,7 +220,8 @@ export class WebSocketService {
    */
   send(message: STOMPMessage): void {
     if (!this.client || !this.client.connected) {
-      throw new Error('WebSocket is not connected. Call connect() first.');
+      console.warn('[WebSocketService] Cannot send - WebSocket is not connected yet');
+      return;
     }
 
     const { destination, body, headers = {} } = message;
@@ -243,7 +229,11 @@ export class WebSocketService {
 
     this.log('Sending message to', destination, body);
 
-    this.client.send(destination, headersWithAuth, JSON.stringify(body));
+    this.client.publish({
+      destination,
+      body: JSON.stringify(body),
+      headers: headersWithAuth,
+    });
   }
 
   /**
@@ -257,7 +247,9 @@ export class WebSocketService {
    * Check if connected
    */
   isConnected(): boolean {
-    return this.state === 'connected' && this.client?.connected === true;
+    // Only check the actual STOMP client connection status
+    // The service state might lag behind the actual connection
+    return this.client?.connected === true;
   }
 
   /**
@@ -287,7 +279,6 @@ export class WebSocketService {
     }
 
     this.state = 'connected';
-    this.reconnectAttempts = 0;
 
     // Resubscribe to all destinations
     this.resubscribeAll();
@@ -296,9 +287,25 @@ export class WebSocketService {
   }
 
   /**
+   * Called when disconnected
+   */
+  private onDisconnected(): void {
+    this.log('Disconnected from WebSocket server');
+
+    // Clear connection timeout
+    if (this.connectionTimeoutTimer) {
+      clearTimeout(this.connectionTimeoutTimer);
+      this.connectionTimeoutTimer = null;
+    }
+
+    this.state = 'disconnected';
+    this.callbacks.onDisconnect();
+  }
+
+  /**
    * Called when an error occurs
    */
-  private onError(error: Frame | string | Error): void {
+  private onError(error: any): void {
     this.log('WebSocket error', error);
     this.handleConnectionError(error);
   }
@@ -306,7 +313,7 @@ export class WebSocketService {
   /**
    * Handle connection error and attempt reconnection
    */
-  private handleConnectionError(error: Frame | string | Error): void {
+  private handleConnectionError(error: any): void {
     this.state = 'disconnected';
 
     // Clear connection timeout
@@ -318,25 +325,6 @@ export class WebSocketService {
     // Convert error to Error type for callback
     const errorObj = error instanceof Error ? error : new Error(String(error));
     this.callbacks.onError(errorObj);
-
-    // Attempt reconnection if enabled
-    if (this.options.autoReconnect) {
-      if (this.reconnectAttempts < this.options.maxReconnectAttempts) {
-        this.reconnectAttempts++;
-        this.log(
-          `Reconnecting in ${this.options.reconnectDelay}ms (attempt ${this.reconnectAttempts}/${this.options.maxReconnectAttempts})`
-        );
-
-        this.reconnectTimer = setTimeout(() => {
-          this.connect();
-        }, this.options.reconnectDelay);
-      } else {
-        this.log('Max reconnection attempts reached');
-        this.callbacks.onDisconnect();
-      }
-    } else {
-      this.callbacks.onDisconnect();
-    }
   }
 
   /**
