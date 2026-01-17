@@ -28,6 +28,7 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
     // Use your Spring Boot WebSocket endpoint
     endpoint: env.NEXT_PUBLIC_WS_ENDPOINT ?? 'http://localhost:8080/ws',
     roomId,
+    userName,
     onNewMessage: (message) => {
       setMessages((prev) => [...prev, message]);
     },

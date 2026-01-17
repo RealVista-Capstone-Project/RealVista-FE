@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { IMessage } from '@stomp/stompjs';
 import { useWebSocket } from '@/shared/lib/websocket';
-import type { ChatMessage } from '../model/types';
+import type { ChatMessage, WebSocketMessage } from '../model/types';
 
 /**
  * useChatWebSocket Hook
@@ -38,6 +38,8 @@ import type { ChatMessage } from '../model/types';
 export function useChatWebSocket(options: {
   endpoint: string;
   roomId: string;
+  userName?: string;
+  userId?: number;
   onNewMessage?: (message: ChatMessage) => void;
   onUserJoin?: (userName: string) => void;
   onUserLeave?: (userName: string) => void;
@@ -50,17 +52,17 @@ export function useChatWebSocket(options: {
   const { isConnected, state, subscribe, send, disconnect } = useWebSocket({
     endpoint: options.endpoint,
     onConnect: () => {
-      console.log('[Chat WebSocket] Connected to room:', options.roomId);
+      // Connection established
     },
     onDisconnect: () => {
-      console.log('[Chat WebSocket] Disconnected from room:', options.roomId);
+      // Connection closed
     },
     onError: (error) => {
       console.error('[Chat WebSocket] Error:', error);
       options.onError?.(error);
     },
     onMessage: (message: IMessage) => {
-      console.log('[Chat WebSocket] Unhandled message:', message);
+      // Messages are handled by subscriptions
     },
     debug: process.env.NODE_ENV === 'development',
   });
@@ -74,8 +76,6 @@ export function useChatWebSocket(options: {
       onMessage: (message: IMessage) => {
         try {
           const chatMessage: ChatMessage = JSON.parse(message.body);
-
-          console.log('[Chat WebSocket] Received message:', chatMessage);
 
           // Add to messages
           messagesRef.current = [...messagesRef.current, chatMessage];
@@ -100,48 +100,65 @@ export function useChatWebSocket(options: {
   // Send a chat message - Client sends to /app/public
   const sendMessage = useCallback(
     (content: string) => {
-      const message = {
-        content,
-        type: 'CHAT' as const,
-        roomId: options.roomId,
+      const message: WebSocketMessage = {
+        type: 'CHAT',
+        payload: content,
+        senderName: options.userName ?? 'Anonymous',
       };
+
+      // Only include senderId if it's a valid number
+      if (options.userId !== undefined) {
+        message.senderId = options.userId;
+      }
 
       send({
         destination: '/app/public',
         body: message,
       });
     },
-    [send, options.roomId]
+    [send, options.userName, options.userId]
   );
 
   // Join a chat room
   const joinRoom = useCallback(
     (userName: string) => {
+      const message: WebSocketMessage = {
+        type: 'JOIN',
+        senderName: userName,
+      };
+
+      // Only include senderId if it's a valid number
+      if (options.userId !== undefined) {
+        message.senderId = options.userId;
+      }
+
       send({
         destination: '/app/public',
-        body: {
-          userName,
-          roomId: options.roomId,
-          type: 'JOIN',
-        },
+        body: message,
       });
     },
-    [send, options.roomId]
+    [send, options.userId]
   );
 
   // Leave chat room
   const leaveRoom = useCallback(
     (userName: string) => {
+      const message: WebSocketMessage = {
+        type: 'LEAVE',
+        senderName: userName,
+      };
+
+      // Only include senderId if it's a valid number
+      if (options.userId !== undefined) {
+        message.senderId = options.userId;
+      }
+
       send({
         destination: '/app/public',
-        body: {
-          userName,
-          roomId: options.roomId,
-          type: 'LEAVE',
-        },
+        body: message,
       });
     },
-    [send, options.roomId]
+    [send, options.userId]
   );
 
   return {

@@ -153,7 +153,6 @@ export class WebSocketService {
    */
   subscribe(options: SubscriptionOptions): () => void {
     if (!this.client || !this.client.connected) {
-      console.warn('[WebSocketService] Cannot subscribe - WebSocket is not connected yet');
       // Return a no-op unsubscribe function
       return () => {};
     }
@@ -220,19 +219,18 @@ export class WebSocketService {
    */
   send(message: STOMPMessage): void {
     if (!this.client || !this.client.connected) {
-      console.warn('[WebSocketService] Cannot send - WebSocket is not connected yet');
       return;
     }
 
     const { destination, body, headers = {} } = message;
-    const headersWithAuth = { ...headers, ...this.getAuthHeaders() };
+    // const headersWithAuth = { ...headers, ...this.getAuthHeaders() };
 
     this.log('Sending message to', destination, body);
 
     this.client.publish({
       destination,
       body: JSON.stringify(body),
-      headers: headersWithAuth,
+      // headers: headersWithAuth,
     });
   }
 
