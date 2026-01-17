@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 jest.mock('@/shared/lib/env', () => ({
   env: {
     NEXT_PUBLIC_API_ENDPOINT: 'https://api.test.com',
+    NEXT_PUBLIC_WS_ENDPOINT: 'ws://localhost:8080/ws',
     NODE_ENV: 'test',
   },
 }))
