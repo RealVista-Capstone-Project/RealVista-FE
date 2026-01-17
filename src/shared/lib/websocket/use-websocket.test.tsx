@@ -24,7 +24,7 @@ describe('useWebSocket Hook', () => {
     mockDisconnect = jest.fn();
     mockSubscribe = jest.fn(() => () => {});
     mockSend = jest.fn();
-    mockGetState = jest.Mock.prototype.mockReturnValue('idle');
+    mockGetState = jest.fn().mockReturnValue('idle');
 
     // Mock WebSocketService implementation
     (WebSocketService as jest.MockedClass<typeof WebSocketService>).mockImplementation(() => {

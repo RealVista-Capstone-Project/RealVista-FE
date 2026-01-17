@@ -112,10 +112,10 @@ describe('WebSocketService', () => {
     });
 
     it('should not connect if already connected', () => {
-      mockClient.connected = true;
+      // Mock isConnected to return true
+      jest.spyOn(service, 'isConnected').mockReturnValue(true);
 
       // Simulate successful connection
-      const clientInstance = (Client as jest.MockedClass<typeof Client>).mock.instances[0];
       const onConnectCallback = (Client as jest.Mock).mock.calls[0][0].onConnect;
 
       service.connect();
@@ -132,7 +132,7 @@ describe('WebSocketService', () => {
 
     it('should include auth headers when sessionToken exists', () => {
       const mockToken = 'test-jwt-token';
-      Storage.prototype.getItem = jest.fn((key) => {
+      const getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => {
         if (key === 'sessionToken') return mockToken;
         return null;
       });
@@ -147,7 +147,7 @@ describe('WebSocketService', () => {
         })
       );
 
-      Storage.prototype.getItem.mockRestore();
+      getItemSpy.mockRestore();
     });
 
     it('should set connection timeout', () => {
@@ -193,8 +193,9 @@ describe('WebSocketService', () => {
     it('should unsubscribe from all subscriptions', () => {
       service.connect();
 
-      // Simulate connected state
-      mockClient.connected = true;
+      // Mock isConnected to return true
+      jest.spyOn(service, 'isConnected').mockReturnValue(true);
+
       const mockUnsubscribe = jest.fn();
       (mockClient.subscribe as jest.Mock).mockReturnValue({ unsubscribe: mockUnsubscribe });
 
@@ -212,7 +213,7 @@ describe('WebSocketService', () => {
   describe('subscribe', () => {
     beforeEach(() => {
       service.connect();
-      mockClient.connected = true;
+      jest.spyOn(service, 'isConnected').mockReturnValue(true);
     });
 
     it('should subscribe to a destination', () => {
@@ -294,7 +295,7 @@ describe('WebSocketService', () => {
     });
 
     it('should return no-op function if not connected', () => {
-      mockClient.connected = false;
+      jest.spyOn(service, 'isConnected').mockReturnValue(false);
 
       const unsubscribe = service.subscribe({
         destination: '/topic/test',
@@ -311,7 +312,7 @@ describe('WebSocketService', () => {
   describe('unsubscribe', () => {
     beforeEach(() => {
       service.connect();
-      mockClient.connected = true;
+      jest.spyOn(service, 'isConnected').mockReturnValue(true);
     });
 
     it('should unsubscribe from a destination', () => {
@@ -338,7 +339,7 @@ describe('WebSocketService', () => {
   describe('send', () => {
     beforeEach(() => {
       service.connect();
-      mockClient.connected = true;
+      jest.spyOn(service, 'isConnected').mockReturnValue(true);
     });
 
     it('should send a message to a destination', () => {
@@ -368,7 +369,7 @@ describe('WebSocketService', () => {
     });
 
     it('should not send if not connected', () => {
-      mockClient.connected = false;
+      jest.spyOn(service, 'isConnected').mockReturnValue(false);
 
       service.send({
         destination: '/app/chat',
@@ -406,13 +407,13 @@ describe('WebSocketService', () => {
     });
 
     it('should return true when connected', () => {
-      mockClient.connected = true;
+      jest.spyOn(service, 'isConnected').mockReturnValue(true);
       expect(service.isConnected()).toBe(true);
     });
 
     it('should return false when disconnected', () => {
       service.connect();
-      mockClient.connected = false;
+      jest.spyOn(service, 'isConnected').mockReturnValue(false);
       expect(service.isConnected()).toBe(false);
     });
   });

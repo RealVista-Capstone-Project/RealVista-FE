@@ -25,7 +25,6 @@ describe('ChatRoom Component', () => {
     mockSendMessage = jest.fn();
     mockJoinRoom = jest.fn();
     mockLeaveRoom = jest.fn();
-    mockOnNewMessage = jest.fn();
 
     (useChatWebSocket as jest.Mock).mockReturnValue({
       isConnected: false,
