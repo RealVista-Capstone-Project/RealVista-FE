@@ -3,14 +3,16 @@ import type { WebSocketCallbacks, WebSocketOptions } from '@/shared/types/websoc
 import { Client, type IMessage } from '@stomp/stompjs';
 
 // Mock @stomp/stompjs Client
+const mockClientInstance = {
+  connected: false,
+  activate: jest.fn(),
+  deactivate: jest.fn(),
+  subscribe: jest.fn(),
+  publish: jest.fn(),
+};
+
 jest.mock('@stomp/stompjs', () => ({
-  Client: jest.fn().mockImplementation(() => ({
-    connected: false,
-    activate: jest.fn(),
-    deactivate: jest.fn(),
-    subscribe: jest.fn(),
-    publish: jest.fn(),
-  })),
+  Client: jest.fn().mockImplementation(() => mockClientInstance),
 }));
 
 // Mock SockJS
@@ -22,12 +24,18 @@ jest.mock('sockjs-client', () => {
 
 describe('WebSocketService', () => {
   let service: WebSocketService;
-  let mockClient: jest.Mocked<Client>;
   let mockCallbacks: WebSocketCallbacks;
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+
+    // Reset mock instance state
+    mockClientInstance.connected = false;
+    mockClientInstance.activate.mockClear();
+    mockClientInstance.deactivate.mockClear();
+    mockClientInstance.subscribe.mockClear();
+    mockClientInstance.publish.mockClear();
 
     mockCallbacks = {
       onConnect: jest.fn(),
@@ -41,9 +49,6 @@ describe('WebSocketService', () => {
       debug: false,
       ...mockCallbacks,
     });
-
-    // Get the mocked Client instance
-    mockClient = (Client as jest.MockedClass<typeof Client>).mock.instances[0] as jest.Mocked<Client>;
   });
 
   afterEach(() => {
@@ -98,7 +103,7 @@ describe('WebSocketService', () => {
         })
       );
 
-      expect(mockClient.activate).toHaveBeenCalled();
+      expect(mockClientInstance.activate).toHaveBeenCalled();
       expect(service.getState()).toBe('connecting');
     });
 
@@ -108,18 +113,23 @@ describe('WebSocketService', () => {
       service.connect();
 
       expect(stateBefore).toBe('connecting');
-      expect(mockClient.activate).toHaveBeenCalledTimes(1);
+      expect(mockClientInstance.activate).toHaveBeenCalledTimes(1);
     });
 
     it('should not connect if already connected', () => {
       // Mock isConnected to return true
       jest.spyOn(service, 'isConnected').mockReturnValue(true);
 
-      // Simulate successful connection
-      const onConnectCallback = (Client as jest.Mock).mock.calls[0][0].onConnect;
-
       service.connect();
-      onConnectCallback();
+
+      // Simulate successful connection by calling the onConnect callback from the config
+      const calls = (Client as jest.Mock).mock.calls;
+      if (calls.length > 0) {
+        const config = calls[0][0] as any;
+        if (config.onConnect) {
+          config.onConnect();
+        }
+      }
 
       expect(service.getState()).toBe('connected');
 
@@ -127,7 +137,7 @@ describe('WebSocketService', () => {
       service.connect();
 
       // activate should only be called once
-      expect(mockClient.activate).toHaveBeenCalledTimes(1);
+      expect(mockClientInstance.activate).toHaveBeenCalledTimes(1);
     });
 
     it('should include auth headers when sessionToken exists', () => {
@@ -168,7 +178,7 @@ describe('WebSocketService', () => {
       service.connect();
       service.disconnect();
 
-      expect(mockClient.deactivate).toHaveBeenCalled();
+      expect(mockClientInstance.deactivate).toHaveBeenCalled();
       expect(service.getState()).toBe('disconnected');
     });
 
@@ -197,7 +207,7 @@ describe('WebSocketService', () => {
       jest.spyOn(service, 'isConnected').mockReturnValue(true);
 
       const mockUnsubscribe = jest.fn();
-      (mockClient.subscribe as jest.Mock).mockReturnValue({ unsubscribe: mockUnsubscribe });
+      mockClientInstance.subscribe.mockReturnValue({ unsubscribe: mockUnsubscribe });
 
       service.subscribe({
         destination: '/topic/test',
@@ -219,14 +229,14 @@ describe('WebSocketService', () => {
     it('should subscribe to a destination', () => {
       const mockOnMessage = jest.fn();
       const mockUnsubscribe = jest.fn();
-      (mockClient.subscribe as jest.Mock).mockReturnValue({ unsubscribe: mockUnsubscribe });
+      mockClientInstance.subscribe.mockReturnValue({ unsubscribe: mockUnsubscribe });
 
       const unsubscribe = service.subscribe({
         destination: '/topic/test',
         onMessage: mockOnMessage,
       });
 
-      expect(mockClient.subscribe).toHaveBeenCalledWith(
+      expect(mockClientInstance.subscribe).toHaveBeenCalledWith(
         '/topic/test',
         expect.any(Function)
       );
@@ -236,7 +246,7 @@ describe('WebSocketService', () => {
 
     it('should return unsubscribe function', () => {
       const mockUnsubscribe = jest.fn();
-      (mockClient.subscribe as jest.Mock).mockReturnValue({ unsubscribe: mockUnsubscribe });
+      mockClientInstance.subscribe.mockReturnValue({ unsubscribe: mockUnsubscribe });
 
       const unsubscribe = service.subscribe({
         destination: '/topic/test',
@@ -251,7 +261,7 @@ describe('WebSocketService', () => {
     it('should call onMessage callback when message received', () => {
       const mockOnMessage = jest.fn();
       const mockUnsubscribe = jest.fn();
-      (mockClient.subscribe as jest.Mock).mockImplementation((dest, callback) => {
+      mockClientInstance.subscribe.mockImplementation((dest, callback) => {
         // Simulate message received
         const mockMessage: IMessage = {
           body: JSON.stringify({ content: 'test message' }),
@@ -276,7 +286,7 @@ describe('WebSocketService', () => {
       const mockUnsubscribe1 = jest.fn();
       const mockUnsubscribe2 = jest.fn();
 
-      (mockClient.subscribe as jest.Mock)
+      mockClientInstance.subscribe
         .mockReturnValueOnce({ unsubscribe: mockUnsubscribe1 })
         .mockReturnValueOnce({ unsubscribe: mockUnsubscribe2 });
 
@@ -291,7 +301,7 @@ describe('WebSocketService', () => {
       });
 
       expect(mockUnsubscribe1).toHaveBeenCalled();
-      expect(mockClient.subscribe).toHaveBeenCalledTimes(2);
+      expect(mockClientInstance.subscribe).toHaveBeenCalledTimes(2);
     });
 
     it('should return no-op function if not connected', () => {
@@ -302,7 +312,7 @@ describe('WebSocketService', () => {
         onMessage: jest.fn(),
       });
 
-      expect(mockClient.subscribe).not.toHaveBeenCalled();
+      expect(mockClientInstance.subscribe).not.toHaveBeenCalled();
 
       // Should not throw
       unsubscribe();
@@ -317,7 +327,7 @@ describe('WebSocketService', () => {
 
     it('should unsubscribe from a destination', () => {
       const mockUnsubscribe = jest.fn();
-      (mockClient.subscribe as jest.Mock).mockReturnValue({ unsubscribe: mockUnsubscribe });
+      mockClientInstance.subscribe.mockReturnValue({ unsubscribe: mockUnsubscribe });
 
       service.subscribe({
         destination: '/topic/test',
@@ -348,7 +358,7 @@ describe('WebSocketService', () => {
         body: { content: 'test message' },
       });
 
-      expect(mockClient.publish).toHaveBeenCalledWith({
+      expect(mockClientInstance.publish).toHaveBeenCalledWith({
         destination: '/app/chat',
         body: JSON.stringify({ content: 'test message' }),
       });
@@ -361,7 +371,7 @@ describe('WebSocketService', () => {
         headers: { custom: 'header' },
       });
 
-      expect(mockClient.publish).toHaveBeenCalledWith({
+      expect(mockClientInstance.publish).toHaveBeenCalledWith({
         destination: '/app/chat',
         body: JSON.stringify({ content: 'test message' }),
         headers: { custom: 'header' },
@@ -376,7 +386,7 @@ describe('WebSocketService', () => {
         body: { content: 'test message' },
       });
 
-      expect(mockClient.publish).not.toHaveBeenCalled();
+      expect(mockClientInstance.publish).not.toHaveBeenCalled();
     });
   });
 
@@ -477,21 +487,21 @@ describe('WebSocketService', () => {
 
       const mockOnMessage = jest.fn();
       const mockUnsubscribe = jest.fn();
-      (mockClient.subscribe as jest.Mock).mockReturnValue({ unsubscribe: mockUnsubscribe });
+      mockClientInstance.subscribe.mockReturnValue({ unsubscribe: mockUnsubscribe });
 
       service.subscribe({
         destination: '/topic/test',
         onMessage: mockOnMessage,
       });
 
-      expect(mockClient.subscribe).toHaveBeenCalledTimes(1);
+      expect(mockClientInstance.subscribe).toHaveBeenCalledTimes(1);
 
       // Simulate reconnection
       const config = (Client as jest.Mock).mock.calls[0][0];
       config.onConnect();
 
       // Should resubscribe
-      expect(mockClient.subscribe).toHaveBeenCalledTimes(2);
+      expect(mockClientInstance.subscribe).toHaveBeenCalledTimes(2);
     });
   });
 });

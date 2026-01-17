@@ -180,7 +180,11 @@ describe('useChatWebSocket Hook', () => {
       });
 
       expect(mockOnNewMessage).toHaveBeenCalledWith(chatMessage);
-      expect(result.current.messages).toContainEqual(chatMessage);
+
+      // Wait for state update
+      await waitFor(() => {
+        expect(result.current.messages).toContainEqual(chatMessage);
+      });
     });
 
     it('should handle JOIN message', async () => {
@@ -634,7 +638,10 @@ describe('useChatWebSocket Hook', () => {
         });
       });
 
-      expect(result.current.messages).toHaveLength(2);
+      // Wait for state updates
+      await waitFor(() => {
+        expect(result.current.messages).toHaveLength(2);
+      });
       expect(result.current.messages[0]).toEqual(messages[0]);
       expect(result.current.messages[1]).toEqual(messages[1]);
     });

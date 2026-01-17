@@ -21,3 +21,6 @@ jest.mock('next-auth/react', () => ({
   signOut: jest.fn(),
   useSession: jest.fn(),
 }))
+
+// Mock scrollIntoView for React Testing Library
+Element.prototype.scrollIntoView = jest.fn()
