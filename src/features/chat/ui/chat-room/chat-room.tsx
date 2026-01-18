@@ -8,6 +8,7 @@ import { useChatWebSocket } from '@/features/chat/hooks';
 interface ChatRoomProps {
   roomId: string;
   userName: string;
+  secured?: boolean;
 }
 
 /**
@@ -16,10 +17,14 @@ interface ChatRoomProps {
  *
  * @example
  * ```tsx
- * <ChatRoom roomId="room-123" userName="John Doe" />
+ * // Unsecured endpoint (public)
+ * <ChatRoom roomId="room-123" userName="John Doe" secured={false} />
+ *
+ * // Secured endpoint (requires authentication)
+ * <ChatRoom roomId="room-123" userName="John Doe" secured={true} />
  * ```
  */
-export function ChatRoom({ roomId, userName }: ChatRoomProps) {
+export function ChatRoom({ roomId, userName, secured = false }: ChatRoomProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -29,6 +34,7 @@ export function ChatRoom({ roomId, userName }: ChatRoomProps) {
     endpoint: env.NEXT_PUBLIC_WS_ENDPOINT ?? 'http://localhost:8080/ws',
     roomId,
     userName,
+    secured, // Pass through the secured prop
     onNewMessage: (message) => {
       setMessages((prev) => [...prev, message]);
     },

@@ -42,9 +42,11 @@ export interface STOMPMessage {
   // Destination to send message to (e.g., '/app/chat')
   destination: string;
   // Message body (will be JSON.stringified)
-  body: any;
+  body: unknown;
   // Optional headers
   headers?: { [key: string]: string };
+  // Skip authentication for this message (for public endpoints)
+  skipAuth?: boolean;
 }
 
 // WebSocket event callbacks

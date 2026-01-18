@@ -9,6 +9,7 @@ export function ChatView() {
   const [userName, setUserName] = useState('');
   const [roomId, setRoomId] = useState('general');
   const [hasJoined, setHasJoined] = useState(false);
+  const [secured, setSecured] = useState(false);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +64,19 @@ export function ChatView() {
               </p>
             </div>
 
+            <div className='flex items-center gap-2'>
+              <input
+                id='secured'
+                type='checkbox'
+                checked={secured}
+                onChange={(e) => setSecured(e.target.checked)}
+                className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+              />
+              <label htmlFor='secured' className='text-sm font-medium text-gray-700'>
+                Secured (requires authentication)
+              </label>
+            </div>
+
             <button
               type='submit'
               className='w-full rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
@@ -78,6 +92,7 @@ export function ChatView() {
               <li>• Auto-reconnects on disconnect</li>
               <li>• Shows typing indicators</li>
               <li>• Default endpoint: http://localhost:8080/ws</li>
+              <li>• <strong>Secured mode:</strong> Sends JWT token, requires backend /app/secured endpoint</li>
             </ul>
           </div>
         </div>
@@ -98,7 +113,7 @@ export function ChatView() {
           </button>
         </div>
 
-        <ChatRoomComponent roomId={roomId} userName={userName} />
+        <ChatRoomComponent roomId={roomId} userName={userName} secured={secured} />
 
         <div className='mt-4 rounded-md border border-yellow-200 bg-yellow-50 p-4'>
           <h3 className='mb-2 text-sm font-semibold text-yellow-900'>{t('testingNotes')}</h3>

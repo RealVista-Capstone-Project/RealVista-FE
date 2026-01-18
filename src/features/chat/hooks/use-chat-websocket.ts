@@ -10,8 +10,8 @@ import type { ChatMessage, WebSocketMessage } from '../model/types';
  * Manages WebSocket connection for real-time chat with Spring Boot backend
  *
  * Backend endpoints:
- * - Send to: /app/public
- * - Subscribe to: /topic/public
+ * - Unsecured: Send to /app/public, Subscribe to /topic/public
+ * - Secured: Send to /app/secured, Subscribe to /topic/secured
  *
  * @example
  * ```tsx
@@ -19,6 +19,7 @@ import type { ChatMessage, WebSocketMessage } from '../model/types';
  *   const { isConnected, messages, sendMessage } = useChatWebSocket({
  *     endpoint: 'http://localhost:8080/ws',
  *     roomId: 'room-123',
+ *     secured: false, // Use true for authenticated endpoints
  *     onNewMessage: (msg) => console.log('New message:', msg),
  *   });
  *
@@ -40,6 +41,7 @@ export function useChatWebSocket(options: {
   roomId: string;
   userName?: string;
   userId?: number;
+  secured?: boolean;
   onNewMessage?: (message: ChatMessage) => void;
   onUserJoin?: (userName: string) => void;
   onUserLeave?: (userName: string) => void;
@@ -79,12 +81,14 @@ export function useChatWebSocket(options: {
     debug: process.env.NODE_ENV === 'development',
   });
 
-  // Subscribe to public messages (topic) - Server broadcasts to /topic/public
+  // Subscribe to messages (topic) - Server broadcasts to /topic/public or /topic/secured
   useEffect(() => {
     if (!isConnected) return;
 
+    const topic = options.secured ? '/topic/secured' : '/topic/public';
+
     const unsubscribe = subscribe({
-      destination: '/topic/public',
+      destination: topic,
       onMessage: (message: IMessage) => {
         try {
           const chatMessage: ChatMessage = JSON.parse(message.body);
@@ -107,9 +111,9 @@ export function useChatWebSocket(options: {
     });
 
     return unsubscribe;
-  }, [isConnected, subscribe, memoizedOptions]);
+  }, [isConnected, subscribe, memoizedOptions, options.secured]);
 
-  // Send a chat message - Client sends to /app/public
+  // Send a chat message - Client sends to /app/public or /app/secured
   const sendMessage = useCallback(
     (content: string) => {
       const message: WebSocketMessage = {
@@ -123,12 +127,15 @@ export function useChatWebSocket(options: {
         message.senderId = options.userId;
       }
 
+      const destination = options.secured ? '/app/secured' : '/app/public';
+
       send({
-        destination: '/app/public',
+        destination,
         body: message,
+        skipAuth: !options.secured, // Skip auth for public endpoints
       });
     },
-    [send, options.userName, options.userId]
+    [send, options.userName, options.userId, options.secured]
   );
 
   // Join a chat room
@@ -144,12 +151,15 @@ export function useChatWebSocket(options: {
         message.senderId = options.userId;
       }
 
+      const destination = options.secured ? '/app/secured' : '/app/public';
+
       send({
-        destination: '/app/public',
+        destination,
         body: message,
+        skipAuth: !options.secured, // Skip auth for public endpoints
       });
     },
-    [send, options.userId]
+    [send, options.userId, options.secured]
   );
 
   // Leave chat room
@@ -165,12 +175,15 @@ export function useChatWebSocket(options: {
         message.senderId = options.userId;
       }
 
+      const destination = options.secured ? '/app/secured' : '/app/public';
+
       send({
-        destination: '/app/public',
+        destination,
         body: message,
+        skipAuth: !options.secured, // Skip auth for public endpoints
       });
     },
-    [send, options.userId]
+    [send, options.userId, options.secured]
   );
 
   return {

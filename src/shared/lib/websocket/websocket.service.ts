@@ -222,15 +222,17 @@ export class WebSocketService {
       return;
     }
 
-    const { destination, body, headers = {} } = message;
-    // const headersWithAuth = { ...headers, ...this.getAuthHeaders() };
+    const { destination, body, headers = {}, skipAuth = false } = message;
+
+    // Include auth headers unless skipAuth is true
+    const headersWithAuth = skipAuth ? headers : { ...headers, ...this.getAuthHeaders() };
 
     this.log('Sending message to', destination, body);
 
     this.client.publish({
       destination,
       body: JSON.stringify(body),
-      // headers: headersWithAuth,
+      headers: headersWithAuth,
     });
   }
 

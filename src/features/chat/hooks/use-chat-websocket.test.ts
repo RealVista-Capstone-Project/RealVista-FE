@@ -319,6 +319,7 @@ describe('useChatWebSocket Hook', () => {
           payload: 'Hello world',
           senderName: 'test-user',
         },
+        skipAuth: true,
       });
     });
 
@@ -355,6 +356,7 @@ describe('useChatWebSocket Hook', () => {
           senderName: 'test-user',
           senderId: 123,
         },
+        skipAuth: true,
       });
     });
   });
@@ -390,6 +392,7 @@ describe('useChatWebSocket Hook', () => {
           type: 'JOIN',
           senderName: 'test-user',
         },
+        skipAuth: true,
       });
     });
 
@@ -425,6 +428,7 @@ describe('useChatWebSocket Hook', () => {
           senderName: 'test-user',
           senderId: 456,
         },
+        skipAuth: true,
       });
     });
   });
@@ -460,6 +464,7 @@ describe('useChatWebSocket Hook', () => {
           type: 'LEAVE',
           senderName: 'test-user',
         },
+        skipAuth: true,
       });
     });
 
@@ -495,6 +500,7 @@ describe('useChatWebSocket Hook', () => {
           senderName: 'test-user',
           senderId: 789,
         },
+        skipAuth: true,
       });
     });
   });
