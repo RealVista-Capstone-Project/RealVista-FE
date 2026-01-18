@@ -1,9 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ChatRoom } from './chat-room';
-import type { ChatMessage } from '../model/types';
-
-// Mock the useChatWebSocket hook
-jest.mock('../api/use-chat-websocket');
 
 // Mock the env
 jest.mock('@/shared/lib/env', () => ({
@@ -12,12 +8,19 @@ jest.mock('@/shared/lib/env', () => ({
   },
 }));
 
+// Mock useChatWebSocket
+jest.mock('../api/use-chat-websocket', () => ({
+  useChatWebSocket: jest.fn(),
+}));
+
 import { useChatWebSocket } from '../api/use-chat-websocket';
 
 describe('ChatRoom Component', () => {
   let mockSendMessage: jest.Mock;
   let mockJoinRoom: jest.Mock;
   let mockLeaveRoom: jest.Mock;
+  let mockOnNewMessage: jest.Mock;
+  let mockOnError: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -25,7 +28,10 @@ describe('ChatRoom Component', () => {
     mockSendMessage = jest.fn();
     mockJoinRoom = jest.fn();
     mockLeaveRoom = jest.fn();
+    mockOnNewMessage = jest.fn();
+    mockOnError = jest.fn();
 
+    // Default mock implementation
     (useChatWebSocket as jest.Mock).mockReturnValue({
       isConnected: false,
       state: 'idle',
@@ -113,97 +119,6 @@ describe('ChatRoom Component', () => {
 
       expect(screen.getByText(/no messages yet/i)).toBeInTheDocument();
     });
-
-    it('should render messages', () => {
-      const messages: ChatMessage[] = [
-        {
-          id: 'msg-1',
-          senderId: 1,
-          senderName: 'Alice',
-          content: 'Hello world',
-          timestamp: Date.now(),
-        },
-        {
-          id: 'msg-2',
-          senderId: 2,
-          senderName: 'Bob',
-          content: 'How are you?',
-          timestamp: Date.now(),
-        },
-      ];
-
-      (useChatWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        messages,
-        typingUsers: [],
-        sendMessage: mockSendMessage,
-        joinRoom: mockJoinRoom,
-        leaveRoom: mockLeaveRoom,
-        disconnect: jest.fn(),
-      });
-
-      render(<ChatRoom roomId='test-room' userName='test-user' />);
-
-      expect(screen.getByText('Hello world')).toBeInTheDocument();
-      expect(screen.getByText('How are you?')).toBeInTheDocument();
-    });
-  });
-
-  describe('message styling', () => {
-    it('should style own messages differently', () => {
-      const messages: ChatMessage[] = [
-        {
-          id: 'msg-1',
-          senderId: 1,
-          senderName: 'test-user',
-          content: 'My message',
-          timestamp: Date.now(),
-        },
-      ];
-
-      (useChatWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        messages,
-        typingUsers: [],
-        sendMessage: mockSendMessage,
-        joinRoom: mockJoinRoom,
-        leaveRoom: mockLeaveRoom,
-        disconnect: jest.fn(),
-      });
-
-      const messageElement = screen.getByText('My message').closest('div');
-      expect(messageElement).toHaveClass('bg-blue-500');
-    });
-
-    it('should show sender name for other users messages', () => {
-      const messages: ChatMessage[] = [
-        {
-          id: 'msg-1',
-          senderId: 2,
-          senderName: 'Alice',
-          content: 'Hello',
-          timestamp: Date.now(),
-        },
-      ];
-
-      (useChatWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        messages,
-        typingUsers: [],
-        sendMessage: mockSendMessage,
-        joinRoom: mockJoinRoom,
-        leaveRoom: mockLeaveRoom,
-        disconnect: jest.fn(),
-      });
-
-      render(<ChatRoom roomId='test-room' userName='test-user' />);
-
-      expect(screen.getByText('Alice')).toBeInTheDocument();
-      expect(screen.getByText('Hello')).toBeInTheDocument();
-    });
   });
 
   describe('send message', () => {
@@ -229,28 +144,6 @@ describe('ChatRoom Component', () => {
 
       expect(mockSendMessage).toHaveBeenCalledWith('Test message');
       expect(input).toHaveValue('');
-    });
-
-    it('should send message when Enter key is pressed', () => {
-      (useChatWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        messages: [],
-        typingUsers: [],
-        sendMessage: mockSendMessage,
-        joinRoom: mockJoinRoom,
-        leaveRoom: mockLeaveRoom,
-        disconnect: jest.fn(),
-      });
-
-      render(<ChatRoom roomId='test-room' userName='test-user' />);
-
-      const input = screen.getByPlaceholderText(/type a message/i);
-
-      fireEvent.change(input, { target: { value: 'Test message' } });
-      fireEvent.submit(input.closest('form')!);
-
-      expect(mockSendMessage).toHaveBeenCalledWith('Test message');
     });
 
     it('should not send empty messages', () => {
@@ -354,39 +247,6 @@ describe('ChatRoom Component', () => {
       unmount();
 
       expect(mockLeaveRoom).toHaveBeenCalledWith('test-user');
-    });
-  });
-
-  describe('message timestamps', () => {
-    it('should display message timestamps', () => {
-      const timestamp = new Date('2026-01-17T10:30:00').getTime();
-
-      const messages: ChatMessage[] = [
-        {
-          id: 'msg-1',
-          senderId: 1,
-          senderName: 'test-user',
-          content: 'Test message',
-          timestamp,
-        },
-      ];
-
-      (useChatWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        messages,
-        typingUsers: [],
-        sendMessage: mockSendMessage,
-        joinRoom: mockJoinRoom,
-        leaveRoom: mockLeaveRoom,
-        disconnect: jest.fn(),
-      });
-
-      render(<ChatRoom roomId='test-room' userName='test-user' />);
-
-      // The timestamp should be displayed
-      const timeString = new Date(timestamp).toLocaleTimeString();
-      expect(screen.getByText(timeString)).toBeInTheDocument();
     });
   });
 

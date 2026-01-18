@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { IMessage } from '@stomp/stompjs';
 import { useWebSocket } from '@/shared/lib/websocket';
 import type { ChatMessage, WebSocketMessage } from '../model/types';
@@ -46,8 +46,20 @@ export function useChatWebSocket(options: {
   onTyping?: (userId: string, userName: string, isTyping: boolean) => void;
   onError?: (error: Error) => void;
 }) {
-  const messagesRef = useRef<ChatMessage[]>([]);
-  const typingUsersRef = useRef<Map<string, { userName: string; isTyping: boolean }>>(new Map());
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [typingUsers, setTypingUsers] = useState<Map<string, { userName: string; isTyping: boolean }>>(new Map());
+
+  // Memoize callbacks to prevent unnecessary re-subscriptions
+  const memoizedOptions = useMemo(
+    () => ({
+      onNewMessage: options.onNewMessage,
+      onUserJoin: options.onUserJoin,
+      onUserLeave: options.onUserLeave,
+      onTyping: options.onTyping,
+      onError: options.onError,
+    }),
+    [options.onNewMessage, options.onUserJoin, options.onUserLeave, options.onTyping, options.onError]
+  );
 
   const { isConnected, state, subscribe, send, disconnect } = useWebSocket({
     endpoint: options.endpoint,
@@ -78,15 +90,15 @@ export function useChatWebSocket(options: {
           const chatMessage: ChatMessage = JSON.parse(message.body);
 
           // Add to messages
-          messagesRef.current = [...messagesRef.current, chatMessage];
+          setMessages((prev) => [...prev, chatMessage]);
 
           // Handle different message types
           if (chatMessage.type === 'JOIN') {
-            options.onUserJoin?.(chatMessage.senderName);
+            memoizedOptions.onUserJoin?.(chatMessage.senderName);
           } else if (chatMessage.type === 'LEAVE') {
-            options.onUserLeave?.(chatMessage.senderName);
+            memoizedOptions.onUserLeave?.(chatMessage.senderName);
           } else {
-            options.onNewMessage?.(chatMessage);
+            memoizedOptions.onNewMessage?.(chatMessage);
           }
         } catch (error) {
           console.error('[Chat WebSocket] Failed to parse message:', error);
@@ -95,7 +107,7 @@ export function useChatWebSocket(options: {
     });
 
     return unsubscribe;
-  }, [isConnected, subscribe, options]);
+  }, [isConnected, subscribe, memoizedOptions]);
 
   // Send a chat message - Client sends to /app/public
   const sendMessage = useCallback(
@@ -167,8 +179,8 @@ export function useChatWebSocket(options: {
     state,
 
     // Messages
-    messages: messagesRef.current,
-    typingUsers: Array.from(typingUsersRef.current.values()),
+    messages,
+    typingUsers: Array.from(typingUsers.values()),
 
     // Actions
     sendMessage,
