@@ -1,27 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { userQueries } from '@/entities/user/api';
-import { useAuthStore } from '@/entities/user/model/store';
 
 /**
  * useCurrentUser Hook
  * Fetches current authenticated user using TanStack Query
- * Automatically updates Zustand store when data changes
+ *
+ * Note: This hook is now used with NextAuth. The NextAuth session
+ * provides authentication state. This hook can be used to fetch
+ * additional user data from the backend API if needed.
  *
  * @example
  * const { data, isLoading, error } = useCurrentUser()
  */
 export function useCurrentUser() {
-  const setUser = useAuthStore((state) => state.setUser);
-
   const query = useQuery(userQueries.current());
-
-  // Update store when data changes
-  useEffect(() => {
-    if (query.data) {
-      setUser(query.data.payload);
-    }
-  }, [query.data, setUser]);
 
   return query;
 }

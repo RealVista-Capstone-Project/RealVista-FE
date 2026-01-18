@@ -7,3 +7,16 @@ jest.mock('@/shared/lib/env', () => ({
     NODE_ENV: 'test',
   },
 }))
+
+// Mock next-auth to avoid ES module issues
+jest.mock('next-auth', () => ({
+  default: jest.fn(),
+}))
+jest.mock('next-auth/providers/credentials', () => ({
+  default: jest.fn(),
+}))
+jest.mock('next-auth/react', () => ({
+  signIn: jest.fn(),
+  signOut: jest.fn(),
+  useSession: jest.fn(),
+}))
