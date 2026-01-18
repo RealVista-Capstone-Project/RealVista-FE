@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ChatRoom } from './chat-room';
+import { useChatWebSocket } from '@/features/chat/hooks';
 
 // Mock the env
 jest.mock('@/shared/lib/env', () => ({
@@ -9,11 +10,9 @@ jest.mock('@/shared/lib/env', () => ({
 }));
 
 // Mock useChatWebSocket
-jest.mock('../api/use-chat-websocket', () => ({
+jest.mock('@/features/chat/hooks', () => ({
   useChatWebSocket: jest.fn(),
 }));
-
-import { useChatWebSocket } from '../api/use-chat-websocket';
 
 describe('ChatRoom Component', () => {
   let mockSendMessage: jest.Mock;

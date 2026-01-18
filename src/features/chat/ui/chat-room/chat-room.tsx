@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useChatWebSocket } from '../api/use-chat-websocket';
-import type { ChatMessage } from '../model/types';
 import { env } from '@/shared/lib/env';
+import { ChatMessage } from '@/features/chat/model/types';
+import { useChatWebSocket } from '@/features/chat/hooks';
 
 interface ChatRoomProps {
   roomId: string;

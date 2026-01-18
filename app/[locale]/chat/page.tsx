@@ -1,6 +1,6 @@
+import { ChatView } from '@/features/chat/ui/chat-view/chat-view';
 import { setRequestLocale } from 'next-intl/server';
 import { use } from 'react';
-import { ChatView } from './chat-view';
 
 /**
  * Chat Page
