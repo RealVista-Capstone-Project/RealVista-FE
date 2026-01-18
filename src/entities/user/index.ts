@@ -6,6 +6,5 @@
 // API layer (data source)
 export * from './api'
 
-// Model layer (business logic)
+// Model layer (types)
 export * from './model/types'
-export * from './model/store'
