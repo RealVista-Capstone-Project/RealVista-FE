@@ -1,19 +1,16 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import '@/styles/global.css';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+import '@/styles/globals.css';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/shared/config/i18n/routing';
 import { Providers } from '@/shared/providers';
 import { setRequestLocale } from 'next-intl/server';
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta-sans',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -36,7 +33,7 @@ export default async function RootLayout({
   setRequestLocale(locale);
   return (
     <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${plusJakartaSans.variable} antialiased`}>
         <Providers>
           <NextIntlClientProvider>{children}</NextIntlClientProvider>
         </Providers>
