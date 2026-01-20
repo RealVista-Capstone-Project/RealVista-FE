@@ -3,5 +3,7 @@ export * from './card';
 export * from './input';
 export * from './label';
 export * from './form';
+export * from './profile-dropdown';
+export * from './top-nav';
 export * from './sonner';
 export * from './map';

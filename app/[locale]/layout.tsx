@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/shared/config/i18n/routing';
 import { Providers } from '@/shared/providers';
 import { setRequestLocale } from 'next-intl/server';
+import { TopNav } from '@/shared/ui';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-plus-jakarta-sans',
@@ -35,6 +36,7 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className={`${plusJakartaSans.variable} antialiased`}>
         <Providers>
+          <TopNav />
           <NextIntlClientProvider>{children}</NextIntlClientProvider>
         </Providers>
       </body>
