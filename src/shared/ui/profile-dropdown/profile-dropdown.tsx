@@ -42,39 +42,32 @@ export function ProfileDropdown({
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
         <button
-          type="button"
+          type='button'
           className={cn(
             'flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md',
             className
           )}
-          aria-label="User menu"
+          aria-label='User menu'
         >
           {/* Avatar */}
-          <div className="flex size-8 items-center justify-center rounded-full bg-main-primary">
-            <span className="text-sm font-bold leading-[1.5] text-white">
-              {user.initials}
-            </span>
+          <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
+            <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
           </div>
 
           {/* Name */}
-          <span className="text-base font-medium leading-[1.5] text-main-black">
-            {user.name}
-          </span>
+          <span className='text-base font-medium leading-[1.5] text-main-black'>{user.name}</span>
 
           {/* Chevron */}
           <svg
-            className={cn(
-              'h-4 w-4 text-main-black transition-transform',
-              open && 'rotate-180'
-            )}
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            className={cn('h-4 w-4 text-main-black transition-transform', open && 'rotate-180')}
+            viewBox='0 0 16 16'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
           >
-            <path d="M4 6l4 4 4-4" />
+            <path d='M4 6l4 4 4-4' />
           </svg>
         </button>
       </PopoverPrimitive.Trigger>
@@ -92,7 +85,7 @@ export function ProfileDropdown({
             'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2'
           )}
         >
-          <div className="flex flex-col">
+          <div className='flex flex-col'>
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               const isLast = index === menuItems.length - 1;
@@ -100,7 +93,7 @@ export function ProfileDropdown({
               return (
                 <div key={item.id}>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => {
                       item.onClick?.();
                       if (item.href) {
@@ -108,17 +101,15 @@ export function ProfileDropdown({
                       }
                       setOpen(false);
                     }}
-                    className="flex h-16 w-full items-center gap-4 px-6 opacity-70 transition-opacity hover:opacity-100"
+                    className='flex h-16 w-full items-center gap-4 px-6 opacity-70 transition-opacity hover:opacity-100'
                   >
-                    <Icon className="h-5 w-5 text-main-black" />
-                    <span className="text-base font-medium leading-[1.5] text-main-black">
+                    <Icon className='h-5 w-5 text-main-black' />
+                    <span className='text-base font-medium leading-[1.5] text-main-black'>
                       {item.label}
                     </span>
                   </button>
 
-                  {!isLast && (
-                    <div className="mx-6 h-px border-t border-border" />
-                  )}
+                  {!isLast && <div className='mx-6 h-px border-t border-border' />}
                 </div>
               );
             })}

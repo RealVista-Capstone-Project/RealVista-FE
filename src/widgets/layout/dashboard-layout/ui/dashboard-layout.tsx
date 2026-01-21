@@ -8,7 +8,6 @@ import {
   ChevronDown,
   LayoutDashboard,
   MessageCircle,
-  PanelLeft,
   TrendingUp,
   Users,
   type LucideIcon,
