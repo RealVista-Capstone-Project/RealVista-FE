@@ -37,7 +37,13 @@ export interface DashboardLayoutProps {
 }
 
 const defaultSidebarItems: SidebarMenuItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, isActive: true },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    isActive: true,
+  },
   { id: 'insight', label: 'Insight', href: '/dashboard/insight', icon: TrendingUp },
   { id: 'listings', label: 'My Listings', href: '/dashboard/listings', icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: '/dashboard/tenants', icon: Users },
@@ -58,107 +64,137 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
+  // Keyboard shortcut: Cmd/Ctrl + B to toggle sidebar
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+        e.preventDefault();
+        setIsCollapsed((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div className={cn('flex min-h-screen w-full', className)}>
       {/* Sidebar */}
       <aside
         className={cn(
           'fixed left-0 top-0 z-20 flex h-screen flex-col border-r border-purple-92/50 bg-white transition-all duration-300 ease-in-out',
-          isCollapsed ? 'w-16' : 'w-[88px]'
+          isCollapsed ? 'w-16' : 'w-56'
         )}
       >
         {/* Logo */}
-        <div className="flex h-[88px] items-center justify-center border-b border-purple-92/50">
+        <div className='flex h-16 items-center justify-center border-b border-purple-92/50 px-4'>
           <Link
             href={logoHref}
-            className="flex size-12 items-center justify-center rounded-xl bg-main-primary text-white"
+            className='flex items-center gap-3 rounded-xl bg-main-primary px-3 py-2 text-white'
           >
-            <LayoutDashboard className="h-6 w-6" strokeWidth={2.5} />
+            <LayoutDashboard className='h-6 w-6 shrink-0' strokeWidth={2.5} />
+            {!isCollapsed && <span className='text-lg font-bold'>RealVista</span>}
           </Link>
         </div>
 
         {/* Menu Items */}
-        <nav className="flex flex-1 flex-col gap-2 p-3">
+        <nav className='flex flex-1 flex-col gap-1 p-3'>
           {sidebarItems.map((item) => (
             <Link
               key={item.id}
               href={item.href}
               className={cn(
-                'flex size-10 items-center justify-center rounded-lg transition-colors',
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
                 item.isActive
                   ? 'bg-purple-96 text-main-primary'
-                  : 'text-main-secondary/40 hover:bg-purple-98 hover:text-main-secondary'
+                  : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                isCollapsed ? 'justify-center' : 'justify-start'
               )}
-              title={item.label}
+              title={isCollapsed ? item.label : undefined}
             >
-              <item.icon className="h-5 w-5" strokeWidth={2} />
+              <item.icon className='h-5 w-5 shrink-0' strokeWidth={2} />
+              {!isCollapsed && <span className='text-sm font-medium'>{item.label}</span>}
             </Link>
           ))}
         </nav>
+
+        {/* Footer */}
+        <div className='border-t border-purple-92/50 p-3'>
+          <Link
+            href='/settings'
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-main-secondary/60 transition-colors hover:bg-purple-98 hover:text-main-secondary',
+              isCollapsed ? 'justify-center' : 'justify-start'
+            )}
+            title={isCollapsed ? 'Settings' : undefined}
+          >
+            <svg
+              className='h-5 w-5 shrink-0'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth={2}
+              viewBox='0 0 24 24'
+            >
+              <path d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z' />
+              <circle cx='12' cy='12' r='3' />
+            </svg>
+            {!isCollapsed && <span className='text-sm font-medium'>Settings</span>}
+          </Link>
+        </div>
       </aside>
 
       {/* Main Content */}
       <div
         className={cn(
           'flex flex-1 flex-col transition-all duration-300 ease-in-out',
-          isCollapsed ? 'ml-16' : 'ml-[88px]'
+          isCollapsed ? 'ml-16' : 'ml-56'
         )}
       >
         {/* Top Nav */}
-        <header className="flex items-center justify-between bg-white px-8 py-4">
+        <header className='flex items-center justify-between bg-white px-8 py-4'>
           {/* Left Section */}
-          <div className="flex items-center gap-4">
-            {/* Sidebar Trigger */}
-            <button
-              type="button"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="flex size-7 items-center justify-center rounded-lg hover:bg-purple-98 transition-colors"
-              aria-label="Toggle sidebar"
-            >
-              <PanelLeft className="h-5 w-5 text-main-secondary" />
-            </button>
-
+          <div className='flex items-center gap-4'>
             {/* Logo Text */}
-            <span className="font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black">
+            <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
               RealVista
             </span>
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-6">
+          <div className='flex items-center gap-6'>
             {/* Notification Button */}
             <button
-              type="button"
-              className="flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92"
-              aria-label="Notifications"
+              type='button'
+              className='flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
+              aria-label='Notifications'
             >
-              <Bell className="h-6 w-6" strokeWidth={2} />
+              <Bell className='h-6 w-6' strokeWidth={2} />
             </button>
 
             {/* Divider */}
-            <div className="flex h-10 items-center">
-              <Separator orientation="vertical" className="h-6 bg-purple-92" />
+            <div className='flex h-10 items-center'>
+              <Separator orientation='vertical' className='h-6 bg-purple-92' />
             </div>
 
             {/* Profile Button */}
             <button
-              type="button"
-              className="flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md"
-              aria-label="Profile menu"
+              type='button'
+              className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
+              aria-label='Profile menu'
             >
-              <div className="flex size-8 items-center justify-center rounded-full bg-main-primary text-white">
-                <span className="text-base font-bold leading-[1.5]">{user.initials}</span>
+              <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
+                <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
               </div>
-              <span className="text-base font-medium leading-[1.5] text-main-black">
+              <span className='text-base font-medium leading-[1.5] text-main-black'>
                 {user.name}
               </span>
-              <ChevronDown className="h-4 w-4 shrink-0 text-main-black" strokeWidth={2} />
+              <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
             </button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 bg-purple-98 p-4 md:p-6">{children}</main>
+        <main className='flex-1 bg-purple-98 p-4 md:p-6'>{children}</main>
       </div>
     </div>
   );
