@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Bell,
   Calendar,
@@ -86,13 +87,23 @@ export function DashboardLayout({
         )}
       >
         {/* Logo */}
-        <div className='flex h-16 items-center justify-center border-b border-purple-92/50 px-4'>
+        <div
+          className={cn(
+            'flex h-16 items-center border-purple-92/50 p-5',
+            isCollapsed ? 'justify-center' : 'justify-start'
+          )}
+        >
           <Link
             href={logoHref}
-            className='flex items-center gap-3 rounded-xl bg-main-primary px-3 py-2 text-white'
+            className='flex items-center justify-center rounded-xl bg-main-primary p-2'
           >
-            <LayoutDashboard className='h-6 w-6 shrink-0' strokeWidth={2.5} />
-            {!isCollapsed && <span className='text-lg font-bold'>RealVista</span>}
+            <Image
+              src='/logo.png'
+              alt='RealVista Logo'
+              width={32}
+              height={32}
+              className='shrink-0'
+            />
           </Link>
         </div>
 
