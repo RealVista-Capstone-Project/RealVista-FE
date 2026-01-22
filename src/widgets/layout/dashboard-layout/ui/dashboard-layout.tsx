@@ -7,6 +7,7 @@ import {
   Bell,
   Calendar,
   ChevronDown,
+  Columns,
   LayoutDashboard,
   MessageCircle,
   TrendingUp,
@@ -83,28 +84,60 @@ export function DashboardLayout({
       <aside
         className={cn(
           'fixed left-0 top-0 z-20 flex h-screen flex-col border-r border-purple-92/50 bg-white transition-all duration-300 ease-in-out',
-          isCollapsed ? 'w-16' : 'w-56'
+          isCollapsed ? 'w-20' : 'w-70'
         )}
       >
         {/* Logo */}
         <div
           className={cn(
             'flex h-16 items-center border-purple-92/50 p-5',
-            isCollapsed ? 'justify-center' : 'justify-start'
+            isCollapsed ? 'justify-center' : 'justify-between'
           )}
         >
-          <Link
-            href={logoHref}
-            className='flex items-center justify-center rounded-xl bg-main-primary p-2'
-          >
-            <Image
-              src='/logo.png'
-              alt='RealVista Logo'
-              width={32}
-              height={32}
-              className='shrink-0'
-            />
-          </Link>
+          {isCollapsed ? (
+            <button
+              type='button'
+              onClick={() => setIsCollapsed(false)}
+              className='flex size-8 items-center justify-center rounded-xl bg-main-primary transition-opacity hover:opacity-90'
+              aria-label='Expand sidebar'
+            >
+              <Image
+                src='/logo.png'
+                alt='RealVista Logo'
+                width={32}
+                height={32}
+                className='shrink-0'
+              />
+            </button>
+          ) : (
+            <>
+              <Link href={logoHref} className='flex items-center gap-3'>
+                <div className='flex items-center justify-center rounded-xl bg-main-primary p-2'>
+                  <Image
+                    src='/logo.png'
+                    alt='RealVista Logo'
+                    width={32}
+                    height={32}
+                    className='shrink-0'
+                  />
+                </div>
+                <div className='flex flex-col'>
+                  <span className='text-base font-bold leading-tight text-main-black'>
+                    Estatery
+                  </span>
+                  <span className='text-xs text-main-secondary/60'>Property Manager</span>
+                </div>
+              </Link>
+              <button
+                type='button'
+                onClick={() => setIsCollapsed(true)}
+                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-main-secondary/60 transition-colors hover:bg-purple-98 hover:text-main-secondary'
+                aria-label='Collapse sidebar'
+              >
+                <Columns className='h-4 w-4' strokeWidth={2} />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Menu Items */}
@@ -157,7 +190,7 @@ export function DashboardLayout({
       <div
         className={cn(
           'flex flex-1 flex-col transition-all duration-300 ease-in-out',
-          isCollapsed ? 'ml-16' : 'ml-56'
+          isCollapsed ? 'ml-16' : 'ml-64'
         )}
       >
         {/* Top Nav */}
