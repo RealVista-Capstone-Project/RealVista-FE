@@ -1,7 +1,8 @@
 'use client';
 
 import { Bell, ChevronDown, Mail } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
 import RealVistaLogo from '@/shared/assets/logo/logo';
 import { ProfileDropdown } from '@/shared/ui';
@@ -31,10 +32,10 @@ interface TopNavProps {
 }
 
 const defaultNavItems: NavItem[] = [
-  { id: 'explore', label: 'Explore', href: '/', isActive: true },
-  { id: 'sell', label: 'Sell', href: '/sell' },
-  { id: 'favorited', label: 'Favorited', href: '/favorited' },
-  { id: 'appointments', label: 'Appointments', href: '/appointments' },
+  { id: 'explore', label: 'Explore', href: ROUTES.homePage, isActive: true },
+  { id: 'sell', label: 'Sell', href: ROUTES.sell },
+  { id: 'favorited', label: 'Favorited', href: ROUTES.favorited },
+  { id: 'appointments', label: 'Appointments', href: ROUTES.appointments },
 ];
 
 const defaultUser = {
@@ -45,7 +46,7 @@ const defaultUser = {
 export function TopNav({
   variant = 'public',
   navItems = variant === 'public' ? defaultNavItems : undefined,
-  logoHref = '/',
+  logoHref = ROUTES.homePage,
   user = defaultUser,
   profileVariant = variant === 'dashboard' ? 'inline' : 'dropdown',
   startContent,
@@ -143,9 +144,7 @@ export function TopNav({
             <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
               <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
             </div>
-            <span className='text-base font-medium leading-[1.5] text-main-black'>
-              {user.name}
-            </span>
+            <span className='text-base font-medium leading-[1.5] text-main-black'>{user.name}</span>
             <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
           </button>
         )}

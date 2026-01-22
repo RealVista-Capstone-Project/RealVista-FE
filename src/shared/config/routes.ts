@@ -6,6 +6,17 @@ export const ROUTES = {
   signIn: '/signin',
   signUp: '/signup',
   user: '/user',
-};
+  sell: '/sell',
+  favorited: '/favorited',
+  appointments: '/appointments',
+  dashboard: {
+    root: '/dashboard',
+    insight: '/dashboard/insight',
+    listings: '/dashboard/listings',
+    tenants: '/dashboard/tenants',
+    messages: '/dashboard/messages',
+  },
+  settings: '/settings',
+} as const;
 
 export const CALLBACK_URL = 'callbackUrl';

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import {
   Bell,
@@ -16,6 +15,8 @@ import {
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
+import { Link } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 
 export interface SidebarMenuItem {
   id: string;
@@ -41,14 +42,14 @@ const defaultSidebarItems: SidebarMenuItem[] = [
   {
     id: 'dashboard',
     label: 'Dashboard',
-    href: '/dashboard',
+    href: ROUTES.dashboard.root,
     icon: LayoutDashboard,
     isActive: true,
   },
-  { id: 'insight', label: 'Insight', href: '/dashboard/insight', icon: TrendingUp },
-  { id: 'listings', label: 'My Listings', href: '/dashboard/listings', icon: Calendar },
-  { id: 'tenants', label: 'Tenants', href: '/dashboard/tenants', icon: Users },
-  { id: 'messages', label: 'Message', href: '/dashboard/messages', icon: MessageCircle },
+  { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
+  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.listings, icon: Calendar },
+  { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
+  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
 const defaultUser = {
@@ -59,7 +60,7 @@ const defaultUser = {
 export function DashboardLayout({
   children,
   sidebarItems = defaultSidebarItems,
-  logoHref = '/',
+  logoHref = ROUTES.homePage,
   user = defaultUser,
   className,
 }: DashboardLayoutProps) {
@@ -164,7 +165,7 @@ export function DashboardLayout({
         {/* Footer */}
         <div className='border-t border-purple-92/50 p-3'>
           <Link
-            href='/settings'
+            href={ROUTES.settings}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 text-main-secondary/60 transition-colors hover:bg-purple-98 hover:text-main-secondary',
               isCollapsed ? 'justify-center' : 'justify-start'
