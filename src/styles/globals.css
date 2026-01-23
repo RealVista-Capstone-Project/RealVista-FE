@@ -44,11 +44,14 @@
   --color-main-black: var(--main-black);
   --color-main-white: var(--main-white);
   --color-main-primary: var(--main-primary);
+  --color-main-primary-hover: var(--main-primary-hover);
+  --color-main-primary-active: var(--main-primary-active);
   --color-main-secondary: var(--main-secondary);
 
   /* Greyscale */
   --color-grey-50: var(--grey-50);
   --color-grey-100: var(--grey-100);
+  --color-grey-150: var(--grey-150);
   --color-grey-200: var(--grey-200);
   --color-grey-300: var(--grey-300);
   --color-grey-400: var(--grey-400);
@@ -61,6 +64,8 @@
   /* Shades of Purple */
   --color-purple-90: var(--purple-90);
   --color-purple-92: var(--purple-92);
+  --color-purple-92-hover: var(--purple-92-hover);
+  --color-purple-92-active: var(--purple-92-active);
   --color-purple-94: var(--purple-94);
   --color-purple-96: var(--purple-96);
   --color-purple-98: var(--purple-98);
@@ -78,11 +83,14 @@
   --main-black: #000929;
   --main-white: #ffffff;
   --main-primary: #7065f0;
+  --main-primary-hover: #5b52d1;
+  --main-primary-active: #4a42a8;
   --main-secondary: #100a55;
 
   /* Greyscale */
   --grey-50: #f9fafb;
   --grey-100: #f4f4f6;
+  --grey-150: #f3f4f6;
   --grey-200: #e5e6eb;
   --grey-300: #d3d5da;
   --grey-400: #9ea3ae;
@@ -95,6 +103,8 @@
   /* Shades of Purple */
   --purple-90: #d8d6f5;
   --purple-92: #e0def7;
+  --purple-92-hover: #f8f7ff;
+  --purple-92-active: #f0eeff;
   --purple-94: #e8e6f9;
   --purple-96: #f0effb;
   --purple-98: #f7f7fd;
