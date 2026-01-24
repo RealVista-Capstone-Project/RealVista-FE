@@ -27,6 +27,8 @@
   "Rent": {
     "searchTitle": "Search properties to rent",
     "searchPlaceholder": "Enter address, city, or zip code",
+    "searchWithMap": "Search with Map",
+    "searchWithSearchBar": "Search with Search Bar",
     "propertyType": "Property Type",
     "priceRange": "Price Range",
     "bedrooms": "Bedrooms",

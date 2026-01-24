@@ -1,18 +1,43 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { MapPin } from 'lucide-react';
+
+type SearchMode = 'map' | 'searchBar';
 
 export function RentPage() {
   const t = useTranslations('Rent');
+  const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
 
   return (
     <div className='min-h-screen bg-white'>
       {/* Hero Section with Search */}
       <section className='bg-gradient-to-b from-purple-50 to-white px-8 py-16'>
         <div className='mx-auto max-w-7xl'>
-          <h1 className='mb-8 text-[40px] font-bold leading-[1.4] tracking-[-0.4px] text-main-black'>
-            {t('searchTitle')}
-          </h1>
+          {/* Header with Title and Search Option Toggle */}
+          <div className='mb-8 flex items-start justify-between'>
+            <h1 className='text-[40px] font-bold leading-[1.4] tracking-[-0.4px] text-main-black'>
+              {t('searchTitle')}
+            </h1>
+
+            {/* Search Option Toggle */}
+            <div className='relative'>
+              <button
+                type='button'
+                onClick={() => setSearchMode(searchMode === 'map' ? 'searchBar' : 'map')}
+                className='flex items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100'
+              >
+                <span>{searchMode === 'map' ? t('searchWithMap') : t('searchWithSearchBar')}</span>
+                <div className='relative flex h-5 w-5 items-center justify-center'>
+                  {/* Background circle */}
+                  <div className='absolute inset-0 rounded-full bg-purple-96'></div>
+                  {/* Icon */}
+                  <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+                </div>
+              </button>
+            </div>
+          </div>
 
           {/* Search Bar */}
           <div className='rounded-xl bg-white p-6 shadow-lg'>

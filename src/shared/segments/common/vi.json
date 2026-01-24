@@ -27,6 +27,8 @@
   "Rent": {
     "searchTitle": "Tìm kiếm bất động sản cho thuê",
     "searchPlaceholder": "Nhập địa chỉ, thành phố hoặc mã bưu điện",
+    "searchWithMap": "Tìm kiếm với Bản đồ",
+    "searchWithSearchBar": "Tìm kiếm với Thanh tìm kiếm",
     "propertyType": "Loại bất động sản",
     "priceRange": "Khoảng giá",
     "bedrooms": "Phòng ngủ",
