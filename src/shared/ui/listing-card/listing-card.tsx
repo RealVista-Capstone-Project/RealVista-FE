@@ -1,6 +1,6 @@
 'use client';
 
-import { Bed, Bath, Ruler, Heart } from 'lucide-react';
+import { Bath, Ruler, Heart, BedSingle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 export interface ListingCardProps {
@@ -107,10 +107,10 @@ export function ListingCard({
           >
             <Heart
               className={cn(
-                'h-5 w-5',
-                isFavorite ? 'fill-main-primary text-main-primary' : 'text-grey-500'
+                'h-5 w-5 text-main-primary',
+                isFavorite && 'fill-main-primary'
               )}
-              strokeWidth={1.5}
+              strokeWidth={2.3}
             />
           </button>
         </div>
@@ -123,11 +123,14 @@ export function ListingCard({
         {/* Address */}
         <p className='mb-4 text-base font-normal leading-[1.5] text-grey-500'>{address}</p>
 
+        {/* Divider Line */}
+        <div className='mb-4 h-[1px] bg-purple-92' />
+
         {/* Property Specs */}
         <div className='flex items-center gap-4'>
           {/* Beds */}
           <div className='flex items-center gap-1.5'>
-            <Bed className='h-5 w-5 text-grey-500' strokeWidth={1.5} />
+            <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
             <span className='text-sm font-normal leading-[1.4] text-grey-500'>
               {beds} Beds
             </span>
@@ -135,7 +138,7 @@ export function ListingCard({
 
           {/* Bathrooms */}
           <div className='flex items-center gap-1.5'>
-            <Bath className='h-5 w-5 text-grey-500' strokeWidth={1.5} />
+            <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
             <span className='text-sm font-normal leading-[1.4] text-grey-500'>
               {bathrooms} Bathrooms
             </span>
@@ -143,7 +146,7 @@ export function ListingCard({
 
           {/* Area */}
           <div className='flex items-center gap-1.5'>
-            <Ruler className='h-5 w-5 text-grey-500' strokeWidth={1.5} />
+            <Ruler className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
             <span className='text-sm font-normal leading-[1.4] text-grey-500'>
               {area}
               {areaUnit}
