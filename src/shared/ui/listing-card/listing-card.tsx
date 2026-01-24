@@ -1,6 +1,6 @@
 'use client';
 
-import { Bath, Ruler, Heart, BedSingle } from 'lucide-react';
+import { Bath, Heart, BedSingle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 export interface ListingCardProps {
@@ -62,7 +62,7 @@ export function ListingCard({
 
         {/* Popular Badge */}
         {isPopular && (
-          <div className='absolute bottom-0 -left-2 z-10'>
+          <div className='absolute -bottom-3.75 -left-2 z-10'>
             {/* Main badge body with special rounded corners */}
             <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-main-primary px-4 py-2'>
               <div className='flex items-center gap-1'>
