@@ -1,4 +1,5 @@
 import type { Property } from '@/entities/property';
+import RealVistaLogo from '@/shared/assets/logo/logo';
 
 export interface RentalFeaturesProps {
   property: Property;
@@ -37,10 +38,7 @@ export function RentalFeatures({ property }: RentalFeaturesProps) {
       </h2>
       <div className='flex flex-col gap-5'>
         {features.map((feature) => (
-          <div
-            key={feature.label}
-            className='flex items-center justify-between gap-4'
-          >
+          <div key={feature.label} className='flex items-center justify-between gap-4'>
             <div className='flex items-center gap-4'>
               <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
                 {feature.label}
@@ -48,26 +46,7 @@ export function RentalFeatures({ property }: RentalFeaturesProps) {
               {feature.showLogo && (
                 <div className='flex items-center gap-1'>
                   {/* Estatery Logo */}
-                  <svg
-                    width='16'
-                    height='16'
-                    viewBox='0 0 16 16'
-                    fill='none'
-                    xmlns='http://www.w3.org/2000/svg'
-                  >
-                    <rect
-                      width='16'
-                      height='16'
-                      rx='4'
-                      fill='#7065F0'
-                    />
-                    <path
-                      d='M4 8H12M8 4V12'
-                      stroke='white'
-                      strokeWidth='2'
-                      strokeLinecap='round'
-                    />
-                  </svg>
+                  <RealVistaLogo className='size-5' />
                   <span className='text-main-secondary text-[16px] font-bold leading-[1.5]'>
                     {feature.value}
                   </span>

@@ -12,11 +12,6 @@ export interface ListingDetailScreenProps {
 }
 
 export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
-  const handleBack = () => {
-    // Navigate back to map
-    console.log('Back to map');
-  };
-
   const handleShare = () => {
     // Share property
     console.log('Share property');
@@ -69,7 +64,6 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}
-          onBack={handleBack}
           onShare={handleShare}
           onFavorite={handleFavorite}
           isFavorite={false}

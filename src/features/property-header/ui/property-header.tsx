@@ -1,11 +1,11 @@
 import { ArrowLeft, Heart, Share2, Search } from 'lucide-react';
 import type { Property } from '@/entities/property';
-
 import { RealVistaButton } from '@/shared/ui/realvista-button';
+import { Link } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 
 export interface PropertyHeaderProps {
   property: Property;
-  onBack?: () => void;
   onShare?: () => void;
   onFavorite?: () => void;
   isFavorite?: boolean;
@@ -14,7 +14,6 @@ export interface PropertyHeaderProps {
 
 export function PropertyHeader({
   property,
-  onBack,
   onShare,
   onFavorite,
   isFavorite = false,
@@ -23,16 +22,14 @@ export function PropertyHeader({
   return (
     <div className='flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between'>
       <div className='flex flex-col gap-2 min-w-0'>
-        {/* Back to dashboard link */}
-        {onBack && (
-          <button
-            onClick={onBack}
-            className='flex items-center gap-2 text-main-primary hover:text-main-primary-hover transition-colors font-medium text-sm mb-2 sm:mb-0'
-          >
-            <ArrowLeft className='size-4' />
-            <span className='truncate'>Back to map</span>
-          </button>
-        )}
+        {/* Back to homepage link */}
+        <Link
+          href={ROUTES.homePage}
+          className='flex items-center gap-2 text-main-primary hover:text-main-primary-hover transition-colors font-medium text-sm'
+        >
+          <ArrowLeft className='size-4' />
+          <span>Back to homepage</span>
+        </Link>
 
         {/* Property title and address */}
         <div className='flex flex-col gap-1'>
