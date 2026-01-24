@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 interface RealVistaPropertyListingSearchBarProps {
@@ -95,101 +95,125 @@ export function RealVistaPropertyListingSearchBar({
   className,
 }: RealVistaPropertyListingSearchBarProps) {
   return (
-    <div
-      className={cn(
-        'flex flex-col lg:flex-row lg:h-[104px] w-full lg:items-center rounded-lg bg-white shadow-sm lg:shadow-none',
-        className
-      )}
-    >
-      {/* Location Field */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:py-6 lg:pl-8 lg:pr-7'>
-        <FieldLabel>{locationLabel}</FieldLabel>
-        <input
-          type='text'
-          value={location}
-          onChange={(e) => onLocationChange?.(e.target.value)}
-          className='h-7 min-w-0 bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none'
-        />
+    <>
+      {/* Mobile Search Bar - Single Field */}
+      <div className='flex lg:hidden w-full flex-col gap-4'>
+        <div className='relative w-full'>
+          <input
+            type='text'
+            placeholder='Search location'
+            value={location}
+            onChange={(e) => onLocationChange?.(e.target.value)}
+            className='h-16 w-full rounded-lg border border-grey-200 bg-white px-4 pr-16 text-base font-medium leading-[1.5] text-main-black placeholder:text-grey-400 outline-none focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+          />
+          <button
+            type='button'
+            onClick={onSearch}
+            className='absolute right-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-lg bg-main-primary text-white transition-colors hover:bg-main-primary/90'
+            aria-label='Search'
+          >
+            <Search className='h-5 w-5' strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
-      <div className='hidden lg:block'>
-        <Divider />
-      </div>
+      {/* Desktop Search Bar - Multi-Field */}
+      <div
+        className={cn(
+          'hidden lg:flex lg:flex-row lg:h-[104px] w-full lg:items-center rounded-lg bg-white shadow-sm lg:shadow-none',
+          className
+        )}
+      >
+        {/* Location Field */}
+        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:py-6 lg:pl-8 lg:pr-7'>
+          <FieldLabel>{locationLabel}</FieldLabel>
+          <input
+            type='text'
+            value={location}
+            onChange={(e) => onLocationChange?.(e.target.value)}
+            className='h-7 min-w-0 bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none'
+          />
+        </div>
 
-      {/* When (Date Picker) */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
-        <FieldLabel>{whenLabel}</FieldLabel>
-        <button
-          type='button'
-          onClick={() => {
-            // TODO: Implement date picker
-            onDateChange?.(undefined);
-            console.log('Date clicked');
-          }}
-          className='flex h-7 items-center gap-3 text-left'
-        >
-          <FieldValue className='min-w-0 truncate'>{whenPlaceholder}</FieldValue>
-          <CalendarIcon />
-        </button>
-      </div>
+        <div className='hidden lg:block'>
+          <Divider />
+        </div>
 
-      <div className='hidden lg:block'>
-        <Divider />
-      </div>
+        {/* When (Date Picker) */}
+        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
+          <FieldLabel>{whenLabel}</FieldLabel>
+          <button
+            type='button'
+            onClick={() => {
+              // TODO: Implement date picker
+              onDateChange?.(undefined);
+              console.log('Date clicked');
+            }}
+            className='flex h-7 items-center gap-3 text-left'
+          >
+            <FieldValue className='min-w-0 truncate'>{whenPlaceholder}</FieldValue>
+            <CalendarIcon />
+          </button>
+        </div>
 
-      {/* Price Range */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
-        <FieldLabel>{priceLabel}</FieldLabel>
-        <button
-          type='button'
-          onClick={() => {
-            // TODO: Implement price selector
-            onPriceChange?.('');
-            console.log('Price clicked');
-          }}
-          className='flex h-7 items-center gap-3 text-left'
-        >
-          <FieldValue className='min-w-0 truncate'>{priceValue}</FieldValue>
-          <DropdownIcon />
-        </button>
-      </div>
+        <div className='hidden lg:block'>
+          <Divider />
+        </div>
 
-      <div className='hidden lg:block'>
-        <Divider />
-      </div>
+        {/* Price Range */}
+        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
+          <FieldLabel>{priceLabel}</FieldLabel>
+          <button
+            type='button'
+            onClick={() => {
+              // TODO: Implement price selector
+              onPriceChange?.('');
+              console.log('Price clicked');
+            }}
+            className='flex h-7 items-center gap-3 text-left'
+          >
+            <FieldValue className='min-w-0 truncate'>{priceValue}</FieldValue>
+            <DropdownIcon />
+          </button>
+        </div>
 
-      {/* Property Type */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
-        <FieldLabel>{propertyTypeLabel}</FieldLabel>
-        <button
-          type='button'
-          onClick={() => {
-            // TODO: Implement property type selector
-            onPropertyTypeChange?.('');
-            console.log('Property type clicked');
-          }}
-          className='flex h-7 items-center gap-3 text-left'
-        >
-          <FieldValue className='min-w-0 truncate'>{propertyTypeValue}</FieldValue>
-          <DropdownIcon />
-        </button>
-      </div>
+        <div className='hidden lg:block'>
+          <Divider />
+        </div>
 
-      <div className='hidden lg:block'>
-        <Divider />
-      </div>
+        {/* Property Type */}
+        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
+          <FieldLabel>{propertyTypeLabel}</FieldLabel>
+          <button
+            type='button'
+            onClick={() => {
+              // TODO: Implement property type selector
+              onPropertyTypeChange?.('');
+              console.log('Property type clicked');
+            }}
+            className='flex h-7 items-center gap-3 text-left'
+          >
+            <FieldValue className='min-w-0 truncate'>{propertyTypeValue}</FieldValue>
+            <DropdownIcon />
+          </button>
+        </div>
 
-      {/* Search Button */}
-      <div className='flex h-full shrink-0 items-center justify-center lg:justify-end px-4 py-4 lg:py-6'>
-        <button
-          type='button'
-          onClick={onSearch}
-          className='flex w-full lg:min-w-fit items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
-          style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
-        >
-          {searchButtonLabel}
-        </button>
+        <div className='hidden lg:block'>
+          <Divider />
+        </div>
+
+        {/* Search Button */}
+        <div className='flex h-full shrink-0 items-center justify-center lg:justify-end px-4 py-4 lg:py-6'>
+          <button
+            type='button'
+            onClick={onSearch}
+            className='flex w-full lg:min-w-fit items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
+            style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
+          >
+            {searchButtonLabel}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

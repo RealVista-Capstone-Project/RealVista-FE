@@ -31,11 +31,11 @@ export function BuyPage() {
   return (
     <div className='min-h-screen bg-purple-98'>
       {/* Hero Section with Search */}
-      <section className='px-4 pb-8 pt-16 sm:px-6 lg:px-8'>
+      <section className='px-6 pb-6 pt-8 sm:px-6 sm:pb-8 sm:pt-16 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Header with Title and Search Option Toggle */}
-          <div className='mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0'>
-            <h1 className='text-3xl font-bold leading-[1.2] tracking-[-0.4px] text-main-black sm:text-[40px] sm:leading-[1.4]'>
+          <div className='mb-6 flex flex-col items-start justify-between gap-4 sm:mb-8 sm:flex-row sm:items-center sm:gap-6'>
+            <h1 className='text-2xl font-bold leading-[1.2] tracking-[-0.4px] text-main-black sm:text-3xl lg:text-[40px] sm:leading-[1.4]'>
               {t('searchTitle')}
             </h1>
 
@@ -74,7 +74,7 @@ export function BuyPage() {
       </section>
 
       {/* Results Section */}
-      <section className='px-4 pb-12 pt-8 sm:px-6 lg:px-8'>
+      <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Property Grid */}
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
