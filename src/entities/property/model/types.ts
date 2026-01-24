@@ -1,4 +1,4 @@
-export interface Property {
+export interface PropertyListingCardType {
   id: string;
   image: string;
   title: string;

@@ -1,6 +1,6 @@
-import { Property } from './types';
+import { PropertyListingCardType } from './types';
 
-export const mockProperties: Property[] = [
+export const mockProperties: PropertyListingCardType[] = [
   {
     id: '1',
     image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
