@@ -79,13 +79,82 @@ const mockProperties = [
     area: 5,
     areaUnit: 'x7 m²',
   },
+  {
+    id: '7',
+    image: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800',
+    title: 'Sunset Villa',
+    address: '456 Ocean Drive, Miami Beach, FL',
+    price: 3200,
+    beds: 5,
+    bathrooms: 3,
+    area: 9,
+    areaUnit: 'x12 m²',
+    isPopular: true,
+  },
+  {
+    id: '8',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800',
+    title: 'Modern Loft',
+    address: '789 Downtown Ave, Seattle, WA',
+    price: 2900,
+    beds: 2,
+    bathrooms: 2,
+    area: 6,
+    areaUnit: 'x8.5 m²',
+  },
+  {
+    id: '9',
+    image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800',
+    title: 'Garden Retreat',
+    address: '321 Maple Street, Portland, OR',
+    price: 2100,
+    beds: 3,
+    bathrooms: 2,
+    area: 7,
+    areaUnit: 'x9 m²',
+  },
+  {
+    id: '10',
+    image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800',
+    title: 'Riverside Manor',
+    address: '555 River Road, Austin, TX',
+    price: 3800,
+    beds: 4,
+    bathrooms: 3,
+    area: 8,
+    areaUnit: 'x11 m²',
+    isPopular: true,
+  },
+  {
+    id: '11',
+    image: 'https://images.unsplash.com/photo-1599427303058-f04cbcf4756f?w=800',
+    title: 'Urban Heights',
+    address: '888 Skyline Blvd, Denver, CO',
+    price: 2650,
+    beds: 3,
+    bathrooms: 2,
+    area: 6,
+    areaUnit: 'x8 m²',
+  },
+  {
+    id: '12',
+    image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800',
+    title: 'Lakefront Estate',
+    address: '999 Lakeside Drive, Minneapolis, MN',
+    price: 4200,
+    beds: 5,
+    bathrooms: 4,
+    area: 10,
+    areaUnit: 'x13 m²',
+    isPopular: true,
+  },
 ];
 
 export function RentPage() {
   const t = useTranslations('Rent');
   const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Show 3 properties per page to demonstrate pagination
+  const itemsPerPage = 9; // Show 6 properties per page to demonstrate pagination
 
   // Calculate pagination
   const totalPages = Math.ceil(mockProperties.length / itemsPerPage);
