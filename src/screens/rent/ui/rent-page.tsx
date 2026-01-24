@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin } from 'lucide-react';
-
-type SearchMode = 'map' | 'searchBar';
+import { SearchMode } from '@/shared/types/searchMode';
 
 export function RentPage() {
   const t = useTranslations('Rent');
