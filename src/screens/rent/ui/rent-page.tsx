@@ -13,7 +13,7 @@ export function RentPage() {
   return (
     <div className='min-h-screen'>
       {/* Hero Section with Search */}
-      <section className='bg-gradient-to-b from-purple-50 to-white px-8 py-16'>
+      <section className='bg-gradient-to-b from-purple-50 to-white px-4 py-16 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Header with Title and Search Option Toggle */}
           <div className='mb-8 flex items-start justify-between'>
@@ -56,24 +56,13 @@ export function RentPage() {
       </section>
 
       {/* Results Section */}
-      <section className='px-8 py-12'>
+      <section className='px-4 py-12 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
-          <div className='mb-6 flex items-center justify-between'>
-            <p className='text-lg text-gray-700'>
-              <span className='font-semibold text-main-black'>1,234</span> {t('results')}
-            </p>
-            <select className='rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-main-primary focus:outline-none focus:ring-2 focus:ring-main-primary/20'>
-              <option>{t('sortBy')}: Mới nhất</option>
-              <option>Giá thấp đến cao</option>
-              <option>Giá cao đến thấp</option>
-              <option>Diện tích lớn nhất</option>
-            </select>
-          </div>
 
           {/* Property Grid */}
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {/* Placeholder cards - These would be populated with real data */}
-            {[1, 2, 3, 4, 5, 6].map((item) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
               <div
                 key={item}
                 className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md'
@@ -98,6 +87,7 @@ export function RentPage() {
               </div>
             ))}
           </div>
+
         </div>
       </section>
     </div>

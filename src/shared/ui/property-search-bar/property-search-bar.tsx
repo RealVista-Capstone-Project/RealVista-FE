@@ -97,35 +97,36 @@ export function PropertySearchBar({
   return (
     <div
       className={cn(
-        'flex h-[104px] w-full max-w-[1120px] items-center rounded-br-lg rounded-bl-lg rounded-tr-lg bg-white',
+        'flex h-[104px] w-full items-center rounded-br-lg rounded-bl-lg rounded-tr-lg bg-white',
         className
       )}
     >
       {/* Location Field */}
-      <div className='flex flex-col gap-1 py-6 pl-8 pr-7'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 py-6 pl-8 pr-7'>
         <FieldLabel>{locationLabel}</FieldLabel>
         <input
           type='text'
           value={location}
           onChange={(e) => onLocationChange?.(e.target.value)}
-          className='h-7 w-[180px] bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none'
+          className='h-7 min-w-0 bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none'
         />
       </div>
 
       <Divider />
 
       {/* When (Date Picker) */}
-      <div className='flex flex-col gap-1 px-7 py-6'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-7 py-6'>
         <FieldLabel>{whenLabel}</FieldLabel>
         <button
           type='button'
           onClick={() => {
             // TODO: Implement date picker
             onDateChange?.(undefined);
+            console.log('Date clicked')
           }}
           className='flex h-7 items-center gap-3 text-left'
         >
-          <FieldValue className='w-[180px]'>{whenPlaceholder}</FieldValue>
+          <FieldValue className='min-w-0 truncate'>{whenPlaceholder}</FieldValue>
           <CalendarIcon />
         </button>
       </div>
@@ -133,17 +134,18 @@ export function PropertySearchBar({
       <Divider />
 
       {/* Price Range */}
-      <div className='flex flex-col gap-1 px-7 py-6'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-7 py-6'>
         <FieldLabel>{priceLabel}</FieldLabel>
         <button
           type='button'
           onClick={() => {
             // TODO: Implement price selector
             onPriceChange?.('');
+            console.log('Price clicked');
           }}
           className='flex h-7 items-center gap-3 text-left'
         >
-          <FieldValue>{priceValue}</FieldValue>
+          <FieldValue className='min-w-0 truncate'>{priceValue}</FieldValue>
           <DropdownIcon />
         </button>
       </div>
@@ -151,17 +153,18 @@ export function PropertySearchBar({
       <Divider />
 
       {/* Property Type */}
-      <div className='flex flex-col gap-1 px-7 py-6'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-7 py-6'>
         <FieldLabel>{propertyTypeLabel}</FieldLabel>
         <button
           type='button'
           onClick={() => {
             // TODO: Implement property type selector
             onPropertyTypeChange?.('');
+            console.log('Property type clicked');
           }}
           className='flex h-7 items-center gap-3 text-left'
         >
-          <FieldValue>{propertyTypeValue}</FieldValue>
+          <FieldValue className='min-w-0 truncate'>{propertyTypeValue}</FieldValue>
           <DropdownIcon />
         </button>
       </div>
@@ -169,11 +172,11 @@ export function PropertySearchBar({
       <Divider />
 
       {/* Search Button */}
-      <div className='flex h-full flex-1 items-center justify-end px-4 py-6'>
+      <div className='flex h-full shrink-0 items-center justify-end px-4 py-6'>
         <button
           type='button'
           onClick={onSearch}
-          className='flex w-[125px] items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
+          className='flex min-w-fit items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
           style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
         >
           {searchButtonLabel}
