@@ -2,7 +2,7 @@
 
 import { Bath, Bed, CheckCircle, Ruler, Wrench } from 'lucide-react';
 import { Property } from '@/entities/property';
-import { RealVistaButton } from '@/shared/ui/real-vista-button';
+import { RealVistaButton } from '@/shared/ui/realvista-button';
 
 export interface PropertyAboutProps {
   property: Property;

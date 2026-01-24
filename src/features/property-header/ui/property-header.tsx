@@ -1,7 +1,7 @@
 import { ArrowLeft, Heart, Share2, Search } from 'lucide-react';
 import type { Property } from '@/entities/property';
 
-import { RealVistaButton } from '@/shared/ui/real-vista-button';
+import { RealVistaButton } from '@/shared/ui/realvista-button';
 
 export interface PropertyHeaderProps {
   property: Property;
