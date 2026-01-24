@@ -176,6 +176,7 @@ The project uses Prettier with specific rules (configured in `.prettierrc`):
 Always run Prettier before committing to ensure consistent formatting.
 
 - When creating Pull Requests, always use 'develop' as the base branch.
+- When creating Pull Requests, follow the template in '.github/pull_request_template.md'
 
 ### WebSocket/STOMP Integration
 
