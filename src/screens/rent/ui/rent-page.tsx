@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
+import { PropertySearchBar } from '@/shared/ui';
 
 export function RentPage() {
   const t = useTranslations('Rent');
@@ -38,57 +39,19 @@ export function RentPage() {
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className='rounded-xl bg-white p-6 shadow-lg'>
-            <div className='flex gap-4'>
-              <input
-                type='text'
-                placeholder={t('searchPlaceholder')}
-                className='flex-1 rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-main-primary focus:outline-none focus:ring-2 focus:ring-main-primary/20'
-              />
-              <button
-                type='button'
-                className='rounded-lg bg-main-primary px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-main-primary/90'
-              >
-                {t('searchButton')}
-              </button>
-            </div>
-
-            {/* Quick Filters */}
-            <div className='mt-4 flex flex-wrap gap-4'>
-              <select className='rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-main-primary focus:outline-none focus:ring-2 focus:ring-main-primary/20'>
-                <option>{t('propertyType')}</option>
-                <option>Căn hộ</option>
-                <option>Nhà riêng</option>
-                <option>Studio</option>
-                <option>Penthouse</option>
-              </select>
-
-              <select className='rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-main-primary focus:outline-none focus:ring-2 focus:ring-main-primary/20'>
-                <option>{t('bedrooms')}</option>
-                <option>1+</option>
-                <option>2+</option>
-                <option>3+</option>
-                <option>4+</option>
-              </select>
-
-              <select className='rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-main-primary focus:outline-none focus:ring-2 focus:ring-main-primary/20'>
-                <option>{t('bathrooms')}</option>
-                <option>1+</option>
-                <option>2+</option>
-                <option>3+</option>
-              </select>
-
-              <select className='rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-main-primary focus:outline-none focus:ring-2 focus:ring-main-primary/20'>
-                <option>{t('priceRange')}</option>
-                <option>Dưới 5 triệu</option>
-                <option>5 - 10 triệu</option>
-                <option>10 - 20 triệu</option>
-                <option>20 - 30 triệu</option>
-                <option>Trên 30 triệu</option>
-              </select>
-            </div>
-          </div>
+          {/* Property Search Bar - Reusable Component */}
+          <PropertySearchBar
+            locationLabel={t('location')}
+            location={t('locationDefault')}
+            whenLabel={t('when')}
+            whenPlaceholder={t('selectMoveInDate')}
+            priceLabel={t('price')}
+            priceValue={t('priceDefault')}
+            propertyTypeLabel={t('propertyType')}
+            propertyTypeValue={t('propertyTypeDefault')}
+            searchButtonLabel={t('searchButton')}
+            onSearch={() => console.log('Search clicked')}
+          />
         </div>
       </section>
 

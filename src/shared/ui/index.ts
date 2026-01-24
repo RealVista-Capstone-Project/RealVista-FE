@@ -7,6 +7,7 @@ export * from './label';
 export * from './map';
 export * from './popover';
 export * from './profile-dropdown';
+export * from './property-search-bar';
 export * from './separator';
 export * from './sheet';
 export * from './sidebar';
