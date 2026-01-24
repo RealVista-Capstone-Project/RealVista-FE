@@ -76,7 +76,7 @@ export function PriceAndTour({ price, onContact, onRequestTour }: PriceAndTourPr
             <RealVistaButton
               variant='primary'
               size='medium'
-              className='w-full'
+              className='w-full bg-main-secondary'
               disabled={!tourDate}
               onClick={handleRequestTour}
             >
@@ -85,7 +85,7 @@ export function PriceAndTour({ price, onContact, onRequestTour }: PriceAndTourPr
 
             {/* Disclaimer */}
             <p className='text-grey-500 text-[12px] font-normal leading-[1.35]'>
-              It's free, with no obligation — cancel anytime.
+              It&apos;s free, with no obligation — cancel anytime.
             </p>
           </div>
         </div>

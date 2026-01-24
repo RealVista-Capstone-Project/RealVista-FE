@@ -5,6 +5,7 @@ import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
 import { PropertyAbout } from '@/features/property-about';
 import type { Property } from '@/entities/property';
+import { RealVistaButton } from '@/shared/ui/realvista-button';
 
 export interface ListingDetailScreenProps {
   property: Property;
@@ -56,9 +57,16 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
     console.log('Request tour for:', date);
   };
 
+  const formattedPrice = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(property.price);
+
   return (
-    <div className='min-h-screen bg-background'>
-      <div className='max-w-[1200px] mx-auto px-6 py-8'>
+    <div className='min-h-screen bg-background pb-24 md:pb-8'>
+      <div className='max-w-[1200px] mx-auto px-4 md:px-6 py-4 md:py-8'>
         <PropertyHeader
           property={property}
           onBack={handleBack}
@@ -69,7 +77,7 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
         />
 
         {/* Gallery Section */}
-        <div className='mt-8'>
+        <div className='mt-4 md:mt-8'>
           <PropertyGallery
             images={property.images}
             onViewAllPhotos={handleViewAllPhotos}
@@ -78,19 +86,56 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
           />
         </div>
 
-        <div className='mt-10 md:flex md:gap-10'>
-          {/* About Section */}
-          <div className='mt-12'>
+        {/* Mobile: Price & Tour inline, Desktop: Sidebar layout */}
+        <div className='mt-6 md:mt-10 md:flex md:gap-10'>
+          {/* Main Content */}
+          <div className='flex-1'>
+            {/* Mobile: Price & Tour Section (shown inline) */}
+            <div className='md:hidden mb-6'>
+              <PriceAndTour
+                price={property.price}
+                onContact={handleContact}
+                onRequestTour={handleRequestTour}
+              />
+            </div>
+
+            {/* About Section */}
             <PropertyAbout property={property} />
           </div>
-          {/* Price & Tour Section */}
-          <div className='mt-6 max-w-[380px]'>
-            <PriceAndTour
-              price={property.price}
-              onContact={handleContact}
-              onRequestTour={handleRequestTour}
-            />
+
+          {/* Desktop: Price & Tour Sidebar */}
+          <div className='hidden md:block mt-6 max-w-[380px] shrink-0'>
+            <div className='md:sticky md:top-8'>
+              <PriceAndTour
+                price={property.price}
+                onContact={handleContact}
+                onRequestTour={handleRequestTour}
+              />
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Sticky Footer */}
+      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-purple-92 p-4 md:hidden z-50'>
+        <div className='max-w-[1200px] mx-auto flex items-center justify-between gap-4'>
+          <div>
+            <p className='text-main-black/50 text-[12px] font-medium leading-[1.4]'>Rent price</p>
+            <div className='flex items-baseline gap-0.5'>
+              <p className='text-main-primary text-[20px] font-extrabold leading-[1.5] tracking-[-1px]'>
+                {formattedPrice}
+              </p>
+              <span className='text-main-black/50 text-[14px] font-medium'>/month</span>
+            </div>
+          </div>
+          <RealVistaButton
+            variant='primary'
+            size='medium'
+            className='flex-1 max-w-[200px]'
+            onClick={handleContact}
+          >
+            Apply Now
+          </RealVistaButton>
         </div>
       </div>
     </div>
