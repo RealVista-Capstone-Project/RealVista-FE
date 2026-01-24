@@ -15,5 +15,28 @@
     "leaveRoom": "Rời phòng",
     "demoTitle": "Demo Chat WebSocket",
     "testingNotes": "Ghi chú thử nghiệm"
+  },
+  "Navigation": {
+    "explore": "Khám phá",
+    "rent": "Thuê nhà",
+    "buy": "Mua nhà",
+    "sell": "Bán nhà",
+    "favorited": "Yêu thích",
+    "appointments": "Lịch hẹn"
+  },
+  "Rent": {
+    "searchTitle": "Tìm kiếm bất động sản cho thuê",
+    "searchPlaceholder": "Nhập địa chỉ, thành phố hoặc mã bưu điện",
+    "propertyType": "Loại bất động sản",
+    "priceRange": "Khoảng giá",
+    "bedrooms": "Phòng ngủ",
+    "bathrooms": "Phòng tắm",
+    "minPrice": "Giá tối thiểu",
+    "maxPrice": "Giá tối đa",
+    "searchButton": "Tìm kiếm",
+    "filters": "Bộ lọc",
+    "sortBy": "Sắp xếp theo",
+    "results": "kết quả",
+    "perMonth": "/ tháng"
   }
 }

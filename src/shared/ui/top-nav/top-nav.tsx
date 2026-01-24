@@ -1,6 +1,8 @@
 'use client';
 
 import { Bell, ChevronDown, Mail } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import { Link } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
@@ -10,9 +12,8 @@ import { Separator } from '@/shared/ui';
 
 export type NavItem = {
   id: string;
-  label: string;
+  translationKey: string;
   href: string;
-  isActive?: boolean;
 };
 
 type ProfileVariant = 'dropdown' | 'inline';
@@ -32,10 +33,12 @@ interface TopNavProps {
 }
 
 const defaultNavItems: NavItem[] = [
-  { id: 'explore', label: 'Explore', href: ROUTES.homePage, isActive: true },
-  { id: 'sell', label: 'Sell', href: ROUTES.sell },
-  { id: 'favorited', label: 'Favorited', href: ROUTES.favorited },
-  { id: 'appointments', label: 'Appointments', href: ROUTES.appointments },
+  { id: 'explore', translationKey: 'explore', href: ROUTES.homePage },
+  { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
+  { id: 'buy', translationKey: 'buy', href: ROUTES.buy },
+  { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
+  { id: 'favorited', translationKey: 'favorited', href: ROUTES.favorited },
+  { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
 ];
 
 const defaultUser = {
@@ -52,8 +55,17 @@ export function TopNav({
   startContent,
   className,
 }: TopNavProps) {
+  const t = useTranslations('Navigation');
+  const pathname = usePathname();
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
   const showMessageButton = variant === 'public';
+
+  // Helper function to check if a route is active
+  const isRouteActive = (href: string): boolean => {
+    // Remove locale prefix (e.g., /vi or /en) from pathname for comparison
+    const cleanPathname = pathname.replace(/^\/(vi|en)/, '') || '/';
+    return cleanPathname === href;
+  };
 
   return (
     <header
@@ -87,19 +99,22 @@ export function TopNav({
           {/* Nav Items - only for public variant */}
           {showNavItems && (
             <nav className='flex items-center gap-12' aria-label='Main navigation'>
-              {navItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={cn(
-                    'text-base leading-[1.5] transition-colors hover:text-main-primary',
-                    item.isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
-                  )}
-                  aria-current={item.isActive ? 'page' : undefined}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                const isActive = isRouteActive(item.href);
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className={cn(
+                      'text-base leading-[1.5] transition-colors hover:text-main-primary',
+                      isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+                    )}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {t(item.translationKey)}
+                  </Link>
+                );
+              })}
             </nav>
           )}
         </div>

@@ -15,5 +15,28 @@
     "leaveRoom": "Leave Room",
     "demoTitle": "WebSocket Chat Demo",
     "testingNotes": "Testing Notes"
+  },
+  "Navigation": {
+    "explore": "Explore",
+    "rent": "Rent",
+    "buy": "Buy",
+    "sell": "Sell",
+    "favorited": "Favorited",
+    "appointments": "Appointments"
+  },
+  "Rent": {
+    "searchTitle": "Search properties to rent",
+    "searchPlaceholder": "Enter address, city, or zip code",
+    "propertyType": "Property Type",
+    "priceRange": "Price Range",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "searchButton": "Search",
+    "filters": "Filters",
+    "sortBy": "Sort by",
+    "results": "results",
+    "perMonth": "/ month"
   }
 }
