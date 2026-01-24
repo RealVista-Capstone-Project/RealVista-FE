@@ -26,9 +26,9 @@ export function PropertyGallery({
   const videoCount = images.filter((img) => img.type === 'video').length;
 
   return (
-    <div className='grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 h-[400px] lg:h-[500px]'>
+    <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
       {/* Hero Image */}
-      <div className='relative rounded-xl overflow-hidden h-full'>
+      <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full'>
         <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
 
         {/* Overlay Action Buttons */}
@@ -88,14 +88,14 @@ export function PropertyGallery({
         </div>
       </div>
 
-      {/* Thumbnail Sidebar */}
-      <div className='flex flex-col gap-3 h-full'>
+      {/* Thumbnail row on mobile, sidebar on desktop */}
+      <div className='flex flex-row gap-3 mt-2 sm:mt-0 sm:flex-col sm:gap-3 sm:h-full'>
         {thumbnailImages.map((image) => (
           <button
             key={image.id}
             onClick={() => setMainImage(image)}
             className={`
-              group relative rounded-xl overflow-hidden flex-1
+              group relative rounded-xl overflow-hidden w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1
               border-2 border-transparent
               hover:border-main-primary hover:p-1
               transition-all duration-200 ease-out
@@ -119,7 +119,7 @@ export function PropertyGallery({
           Array.from({ length: 2 - thumbnailImages.length }).map((_, index) => (
             <div
               key={`placeholder-${index}`}
-              className='flex-1 rounded-xl border-2 border-dashed border-grey-300 bg-grey-100 flex items-center justify-center hover:border-main-primary hover:p-1 transition-all duration-200'
+              className='w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 rounded-xl border-2 border-dashed border-grey-300 bg-grey-100 flex items-center justify-center hover:border-main-primary hover:p-1 transition-all duration-200'
             >
               <span className='text-sm text-grey-500'>No image</span>
             </div>
