@@ -68,7 +68,7 @@ export function PropertyGallery({
         <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
 
         {/* Overlay Action Buttons */}
-        <div className='absolute bottom-4 left-4 flex gap-2'>
+        <div className='absolute bottom-4 right-4 flex gap-2'>
           {photoCount > 0 && (
             <button
               onClick={handleOpenPhotos}
@@ -79,6 +79,7 @@ export function PropertyGallery({
                 hover:border-purple-92 hover:p-1.5
                 transition-all duration-200 ease-out
                 shadow-sm hover:shadow-md
+                sm:static sm:bottom-auto sm:right-auto
               '
             >
               <Camera className='size-4' />
@@ -88,39 +89,42 @@ export function PropertyGallery({
             </button>
           )}
 
-          {tourCount > 0 && (
-            <button
-              onClick={handleOpen3DTour}
-              className='
-                group flex items-center gap-2 px-3 py-2
-                bg-white/95 backdrop-blur-sm rounded-lg
-                border-2 border-transparent
-                hover:border-main-primary hover:p-1.5
-                transition-all duration-200 ease-out
-                shadow-sm hover:shadow-md
-              '
-            >
-              <Box className='size-4' />
-              <span className='text-sm font-medium text-main-black'>3D Tour ({tourCount})</span>
-            </button>
-          )}
+          {/* 3D Tour và Video chỉ hiện trên sm trở lên */}
+          <div className='hidden sm:flex gap-2'>
+            {tourCount > 0 && (
+              <button
+                onClick={handleOpen3DTour}
+                className='
+                  group flex items-center gap-2 px-3 py-2
+                  bg-white/95 backdrop-blur-sm rounded-lg
+                  border-2 border-transparent
+                  hover:border-main-primary hover:p-1.5
+                  transition-all duration-200 ease-out
+                  shadow-sm hover:shadow-md
+                '
+              >
+                <Box className='size-4' />
+                <span className='text-sm font-medium text-main-black'>3D Tour ({tourCount})</span>
+              </button>
+            )}
 
-          {videoCount > 0 && (
-            <button
-              onClick={handleOpenVideo}
-              className='
-                group flex items-center gap-2 px-3 py-2
-                bg-white/95 backdrop-blur-sm rounded-lg
-                border-2 border-transparent
-                hover:border-main-primary hover:p-1.5
-                transition-all duration-200 ease-out
-                shadow-sm hover:shadow-md
-              '
-            >
-              <Video className='size-4' />
-              <span className='text-sm font-medium text-main-black'>Video ({videoCount})</span>
-            </button>
-          )}
+            {videoCount > 0 && (
+              <button
+                onClick={handleOpenVideo}
+                className='
+                  group flex items-center gap-2 px-3 py-2
+                  bg-white/95 backdrop-blur-sm rounded-lg
+                  border-2 border-transparent
+                  hover:border-main-primary hover:p-1.5
+                  transition-all duration-200 ease-out
+                  shadow-sm hover:shadow-md
+                '
+              >
+                <Video className='size-4' />
+                <span className='text-sm font-medium text-main-black'>Video ({videoCount})</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
