@@ -38,5 +38,20 @@
     "sortBy": "Sort by",
     "results": "results",
     "perMonth": "/ month"
+  },
+  "Buy": {
+    "searchTitle": "Search properties to buy",
+    "searchPlaceholder": "Enter address, city, or zip code",
+    "propertyType": "Property Type",
+    "priceRange": "Price Range",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "searchButton": "Search",
+    "filters": "Filters",
+    "sortBy": "Sort by",
+    "results": "results",
+    "totalPrice": "Total Price"
   }
 }

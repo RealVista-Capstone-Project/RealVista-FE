@@ -38,5 +38,20 @@
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
     "perMonth": "/ tháng"
+  },
+  "Buy": {
+    "searchTitle": "Tìm kiếm bất động sản để mua",
+    "searchPlaceholder": "Nhập địa chỉ, thành phố hoặc mã bưu điện",
+    "propertyType": "Loại bất động sản",
+    "priceRange": "Khoảng giá",
+    "bedrooms": "Phòng ngủ",
+    "bathrooms": "Phòng tắm",
+    "minPrice": "Giá tối thiểu",
+    "maxPrice": "Giá tối đa",
+    "searchButton": "Tìm kiếm",
+    "filters": "Bộ lọc",
+    "sortBy": "Sắp xếp theo",
+    "results": "kết quả",
+    "totalPrice": "Tổng giá"
   }
 }
