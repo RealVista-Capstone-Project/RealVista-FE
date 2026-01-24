@@ -3,7 +3,7 @@
 import { Calendar, ChevronDown } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-interface PropertySearchBarProps {
+interface PropertyListingSearchBarProps {
   location?: string;
   locationLabel?: string;
   whenLabel?: string;
@@ -77,7 +77,7 @@ function FieldValue({ children, className }: { children: React.ReactNode; classN
   );
 }
 
-export function PropertySearchBar({
+export function PropertyListingSearchBar({
   location = 'New York, USA',
   locationLabel = 'Location',
   whenLabel = 'When',
@@ -93,7 +93,7 @@ export function PropertySearchBar({
   onPropertyTypeChange,
   onSearch,
   className,
-}: PropertySearchBarProps) {
+}: PropertyListingSearchBarProps) {
   return (
     <div
       className={cn(

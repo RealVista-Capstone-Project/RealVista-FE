@@ -4,7 +4,80 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
-import { PropertySearchBar } from '@/shared/ui';
+import { PropertySearchBar, PropertyCard } from '@/shared/ui';
+
+// Mock data for property listings
+const mockProperties = [
+  {
+    id: '1',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
+    title: 'Palm Harbor',
+    address: '2699 Green Valley, Highland Lake, FL',
+    price: 2095,
+    beds: 3,
+    bathrooms: 2,
+    area: 5,
+    areaUnit: 'x7 m²',
+    isPopular: true,
+  },
+  {
+    id: '2',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
+    title: 'Beverly Springfield',
+    address: '2821 Lake Sevilla, Palm Harbor, TX',
+    price: 2700,
+    beds: 4,
+    bathrooms: 2,
+    area: 6,
+    areaUnit: 'x7.5 m²',
+    isPopular: true,
+  },
+  {
+    id: '3',
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800',
+    title: 'Faulkner Ave',
+    address: '909 Woodland St, Michigan, IN',
+    price: 4550,
+    beds: 4,
+    bathrooms: 3,
+    area: 8,
+    areaUnit: 'x10 m²',
+    isPopular: true,
+  },
+  {
+    id: '4',
+    image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800',
+    title: 'St. Crystal',
+    address: '210 US Highway, Highland Lake, FL',
+    price: 2400,
+    beds: 4,
+    bathrooms: 2,
+    area: 6,
+    areaUnit: 'x8 m²',
+  },
+  {
+    id: '5',
+    image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800',
+    title: 'Cove Red',
+    address: '243 Curlew Road, Palm Harbor, TX',
+    price: 1500,
+    beds: 2,
+    bathrooms: 1,
+    area: 5,
+    areaUnit: 'x7.5 m²',
+  },
+  {
+    id: '6',
+    image: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=800',
+    title: 'The Old Steele',
+    address: '103 Lake Shores, Michigan, IN',
+    price: 1600,
+    beds: 3,
+    bathrooms: 1,
+    area: 5,
+    areaUnit: 'x7 m²',
+  },
+];
 
 export function RentPage() {
   const t = useTranslations('Rent');
@@ -61,30 +134,13 @@ export function RentPage() {
 
           {/* Property Grid */}
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-            {/* Placeholder cards - These would be populated with real data */}
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
-              <div
-                key={item}
-                className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md'
-              >
-                <div className='aspect-video bg-gray-200'></div>
-                <div className='p-4'>
-                  <h3 className='mb-2 text-lg font-semibold text-main-black'>
-                    Căn hộ hiện đại {item}
-                  </h3>
-                  <p className='mb-2 text-sm text-gray-600'>Quận 1, TP. Hồ Chí Minh</p>
-                  <div className='mb-3 flex items-center gap-4 text-sm text-gray-600'>
-                    <span>2 phòng ngủ</span>
-                    <span>•</span>
-                    <span>2 phòng tắm</span>
-                    <span>•</span>
-                    <span>80m²</span>
-                  </div>
-                  <p className='text-xl font-bold text-main-primary'>
-                    {(10 + item * 2).toLocaleString('vi-VN')} triệu {t('perMonth')}
-                  </p>
-                </div>
-              </div>
+            {mockProperties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                {...property}
+                onToggleFavorite={(id) => console.log('Toggle favorite:', id)}
+                onClick={(id) => console.log('Property clicked:', id)}
+              />
             ))}
           </div>
 
