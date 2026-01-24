@@ -2,6 +2,8 @@
 
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
+import { PriceAndTour } from '@/features/price-and-tour';
+import { PropertyAbout } from '@/features/property-about';
 import type { Property } from '@/entities/property';
 
 export interface ListingDetailScreenProps {
@@ -44,6 +46,16 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
     console.log('Play video');
   };
 
+  const handleContact = () => {
+    // Contact agent
+    console.log('Contact agent');
+  };
+
+  const handleRequestTour = (date: string) => {
+    // Request tour with date
+    console.log('Request tour for:', date);
+  };
+
   return (
     <div className='min-h-screen bg-background'>
       <div className='max-w-[1200px] mx-auto px-6 py-8'>
@@ -56,6 +68,7 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
           onBrowseNearby={handleBrowseNearby}
         />
 
+        {/* Gallery Section */}
         <div className='mt-8'>
           <PropertyGallery
             images={property.images}
@@ -63,6 +76,21 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             on3DTour={handle3DTour}
             onVideo={handleVideo}
           />
+        </div>
+
+        <div className='mt-10 md:flex md:gap-10'>
+          {/* About Section */}
+          <div className='mt-12'>
+            <PropertyAbout property={property} />
+          </div>
+          {/* Price & Tour Section */}
+          <div className='mt-6 max-w-[380px]'>
+            <PriceAndTour
+              price={property.price}
+              onContact={handleContact}
+              onRequestTour={handleRequestTour}
+            />
+          </div>
         </div>
       </div>
     </div>
