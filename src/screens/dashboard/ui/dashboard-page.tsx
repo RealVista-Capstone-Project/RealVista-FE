@@ -4,6 +4,7 @@ import { UserProfileHeader } from '@/widgets/user-profile-header';
 import { DashboardStats } from '@/widgets/dashboard-stats';
 import { LogoutButtonNextAuth } from '@/features/auth/ui';
 import { useAuthSession } from '@/features/auth/model';
+import { useFCMToken } from '@/features/auth/hooks/use-fcm-token';
 
 /**
  * Dashboard Page
@@ -17,6 +18,7 @@ import { useAuthSession } from '@/features/auth/model';
  */
 export function DashboardPage() {
   const { data: session, status } = useAuthSession();
+  const { token, error } = useFCMToken();
 
   if (status === 'loading') {
     return (
@@ -29,9 +31,9 @@ export function DashboardPage() {
   if (!session) {
     return (
       <div className='flex min-h-screen items-center justify-center'>
-        <div className='text-center'>
-          <p className='text-lg text-slate-600 dark:text-slate-400'>Please sign in to access the dashboard</p>
-        </div>
+        <p className='text-lg text-slate-600 dark:text-slate-400'>
+          Please sign in to access the dashboard
+        </p>
       </div>
     );
   }
@@ -40,7 +42,7 @@ export function DashboardPage() {
 
   return (
     <div className='space-y-6'>
-      {/* Header Section */}
+      {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-semibold tracking-tight text-main-black sm:text-3xl'>
@@ -50,47 +52,63 @@ export function DashboardPage() {
             Welcome back, {user?.name || user?.email?.split('@')[0]}
           </p>
         </div>
+
+        <LogoutButtonNextAuth>Logout</LogoutButtonNextAuth>
       </div>
 
-      {/* User Profile Section */}
-      <div className='mb-4'>
-        <UserProfileHeader user={user} />
-      </div>
+      {/* User Profile */}
+      <UserProfileHeader user={user} />
 
-      {/* Stats Section */}
+      {/* Stats */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <DashboardStats />
       </div>
 
-      {/* Additional Dashboard Content */}
+      {/* Main Content */}
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
         {/* Activity Card */}
-        <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md'>
+        <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
           <div className='mb-4 flex items-center justify-between'>
             <h2 className='text-lg font-semibold text-main-black'>Recent Activity</h2>
-            <div className='h-2 w-2 rounded-full bg-emerald-500' />
+            <span className='h-2 w-2 rounded-full bg-emerald-500' />
           </div>
-          <p className='text-sm text-main-secondary/60'>
+
+          <p className='mb-4 text-sm text-main-secondary/60'>
             Your recent account activity and updates will appear here.
           </p>
+
+          {/* FCM Token */}
+          <div className='rounded-xl border border-slate-200/60 bg-white/70 p-3 text-xs shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-900/60'>
+            <p className='mb-1 font-semibold text-slate-900 dark:text-slate-50'>
+              Push Notification (FCM)
+            </p>
+
+            {error ? (
+              <p className='text-red-600'>FCM Error: {error}</p>
+            ) : token ? (
+              <p className='break-all text-emerald-700 dark:text-emerald-400'>Token: {token}</p>
+            ) : (
+              <p className='text-slate-600 dark:text-slate-400'>Getting token...</p>
+            )}
+          </div>
         </div>
 
-        {/* Quick Actions Card */}
-        <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md'>
+        {/* Quick Actions */}
+        <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
           <div className='mb-4 flex items-center justify-between'>
             <h2 className='text-lg font-semibold text-main-black'>Quick Actions</h2>
-            <div className='h-2 w-2 rounded-full bg-main-primary' />
+            <span className='h-2 w-2 rounded-full bg-main-primary' />
           </div>
+
           <div className='flex flex-wrap gap-2'>
-            <button className='rounded-lg bg-purple-98 px-3 py-1.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-96'>
-              Profile Settings
-            </button>
-            <button className='rounded-lg bg-purple-98 px-3 py-1.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-96'>
-              Security
-            </button>
-            <button className='rounded-lg bg-purple-98 px-3 py-1.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-96'>
-              Billing
-            </button>
+            {['Profile Settings', 'Security', 'Billing'].map((label) => (
+              <button
+                key={label}
+                className='rounded-lg bg-purple-98 px-3 py-1.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-96'
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
