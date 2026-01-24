@@ -17,6 +17,7 @@ export interface MediaViewerProps {
   defaultTab?: MediaType;
   onFavorite?: () => void;
   onShare?: () => void;
+  onRequestTour?: () => void;
   isFavorite?: boolean;
 }
 
@@ -55,6 +56,7 @@ export function MediaViewer({
   defaultTab = 'photos',
   onFavorite,
   onShare,
+  onRequestTour,
   isFavorite = false,
 }: MediaViewerProps) {
   const [activeTab, setActiveTab] = React.useState<MediaType>(defaultTab);
@@ -89,64 +91,64 @@ export function MediaViewer({
       <DialogPrimitive.Portal>
         <MediaViewerOverlay />
         <MediaViewerContent
-          className='fixed left-0 right-0 top-0 bottom-0 z-50 flex flex-col bg-main-black/40'
+          className='fixed left-0 right-0 top-0 bottom-0 z-50 flex flex-col bg-main-black/50'
           onKeyDown={handleKeyDown}
         >
           {/* Top Navigation */}
-          <div className='relative px-6 py-4 border-b border-white/10'>
-            <div className='flex items-center justify-between'>
-              {/* Logo */}
-              <div className='flex items-center gap-2'>
-                <RealVistaLogo className='h-8 w-8' />
-                <span className='text-white text-xl font-bold'>RealVista</span>
-              </div>
-
-              {/* Navigation Tabs */}
-              <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12'>
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={cn(
-                      'relative text-base font-medium transition-colors',
-                      activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
-                    )}
-                  >
-                    {tab.label}
-                    {activeTab === tab.id && (
-                      <div className='absolute -right-6 top-0 bottom-0 w-1 bg-main-primary rounded-full' />
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {/* Action Buttons */}
-              <div className='flex items-center gap-3'>
-                <RealVistaButton
-                  variant='secondary'
-                  size='small'
-                  onClick={onShare}
-                  className='!bg-main-primary !border-main-primary !text-white hover:!bg-main-primary-hover'
-                >
-                  Share
-                </RealVistaButton>
-
-                <RealVistaButton
-                  variant='secondary'
-                  size='small'
-                  onClick={onFavorite}
-                  className={cn(isFavorite && 'bg-main-primary !border-main-primary !text-white')}
-                >
-                  Favorite
-                </RealVistaButton>
-
+          <div className='relative h-24 px-6 flex items-center justify-between'>
+            {/* Navigation Tabs */}
+            <div className='flex items-center gap-12'>
+              <RealVistaButton
+                size='small'
+                onClick={() => onOpenChange(false)}
+                className={cn('!border-transparent !bg-transparent !text-white')}
+              >
+                <X className='size-4' />
+              </RealVistaButton>
+              {tabs.map((tab) => (
                 <button
-                  onClick={() => onOpenChange(false)}
-                  className='flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 p-2 transition-colors'
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    'relative text-base font-medium transition-colors py-3',
+                    activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
+                  )}
                 >
-                  <X className='size-5 text-white' />
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-main-primary rounded-full' />
+                  )}
                 </button>
-              </div>
+              ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className='flex items-center gap-3'>
+              <RealVistaButton
+                variant='secondary'
+                size='small'
+                onClick={onRequestTour}
+                className='!bg-main-primary !border-main-primary !text-white hover:!bg-main-primary-hover'
+              >
+                Request a tour
+              </RealVistaButton>
+
+              <RealVistaButton
+                size='small'
+                onClick={onFavorite}
+                className={cn('!border-transparent !bg-transparent !text-white')}
+              >
+                <Heart className='size-4' />
+                Favorite
+              </RealVistaButton>
+              <RealVistaButton
+                size='small'
+                onClick={onFavorite}
+                className={cn('!border-transparent !bg-transparent !text-white')}
+              >
+                <Share2 className='size-4' />
+                Share
+              </RealVistaButton>
             </div>
           </div>
 
