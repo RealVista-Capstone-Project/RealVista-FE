@@ -62,28 +62,42 @@ export function ListingCard({
 
         {/* Popular Badge */}
         {isPopular && (
-          <div className='absolute left-4 top-4 flex items-center gap-1.5 rounded-md bg-main-primary px-3 py-1.5'>
-            <svg
-              width='12'
-              height='12'
-              viewBox='0 0 12 12'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M6 1L7.545 4.13L11 4.635L8.5 7.07L9.09 10.51L6 8.885L2.91 10.51L3.5 7.07L1 4.635L4.455 4.13L6 1Z'
-                fill='white'
-                stroke='white'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
-            <span
-              className='text-xs font-bold uppercase leading-[1.4] tracking-[0.5px] text-white'
-              style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
-            >
-              Popular
-            </span>
+          <div className='absolute bottom-0 left-0'>
+            {/* Main badge body with special rounded corners */}
+            <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-main-primary px-4 py-2'>
+              <div className='flex items-center gap-1'>
+                {/* Star Icon - 16x16 */}
+                <svg
+                  width='16'
+                  height='16'
+                  viewBox='0 0 16 16'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M8 1.33334L10.06 5.50667L14.6667 6.18001L11.3333 9.42668L12.12 14.0133L8 11.8467L3.88 14.0133L4.66667 9.42668L1.33334 6.18001L5.94 5.50667L8 1.33334Z'
+                    fill='white'
+                    stroke='white'
+                    strokeWidth='1.5'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+                {/* Text */}
+                <span
+                  className='text-xs font-bold uppercase leading-4 tracking-[0.5px] text-white'
+                  style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
+                >
+                  POPULAR
+                </span>
+              </div>
+            </div>
+            {/* Decorative cutout at bottom-left corner */}
+            <div className='absolute left-0 top-8 h-2 w-2'>
+              <svg width='8' height='8' viewBox='0 0 8 8' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                <path d='M0 8V0C0 4.41828 3.58172 8 8 8H0Z' fill='#7065F0' />
+              </svg>
+            </div>
           </div>
         )}
       </div>
