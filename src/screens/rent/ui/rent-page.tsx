@@ -34,17 +34,17 @@ export function RentPage() {
       <section className='px-4 pb-8 pt-16 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Header with Title and Search Option Toggle */}
-          <div className='mb-8 flex items-start justify-between'>
-            <h1 className='text-[40px] font-bold leading-[1.4] tracking-[-0.4px] text-main-black'>
+          <div className='mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0'>
+            <h1 className='text-3xl font-bold leading-[1.2] tracking-[-0.4px] text-main-black sm:text-[40px] sm:leading-[1.4]'>
               {t('searchTitle')}
             </h1>
 
             {/* Search Option Toggle */}
-            <div className='relative'>
+            <div className='w-full sm:w-auto'>
               <button
                 type='button'
                 onClick={() => setSearchMode(searchMode === 'map' ? 'searchBar' : 'map')}
-                className='flex items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100'
+                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto'
               >
                 <span>{searchMode === 'map' ? t('searchWithMap') : t('searchWithSearchBar')}</span>
                 <div className='relative flex h-5 w-5 items-center justify-center'>

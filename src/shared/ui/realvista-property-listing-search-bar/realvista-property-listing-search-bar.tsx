@@ -97,12 +97,12 @@ export function RealVistaPropertyListingSearchBar({
   return (
     <div
       className={cn(
-        'flex h-[104px] w-full items-center rounded-br-lg rounded-bl-lg rounded-tr-lg bg-white',
+        'flex flex-col lg:flex-row lg:h-[104px] w-full lg:items-center rounded-lg bg-white shadow-sm lg:shadow-none',
         className
       )}
     >
       {/* Location Field */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 py-6 pl-8 pr-7'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:py-6 lg:pl-8 lg:pr-7'>
         <FieldLabel>{locationLabel}</FieldLabel>
         <input
           type='text'
@@ -112,10 +112,12 @@ export function RealVistaPropertyListingSearchBar({
         />
       </div>
 
-      <Divider />
+      <div className='hidden lg:block'>
+        <Divider />
+      </div>
 
       {/* When (Date Picker) */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-7 py-6'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
         <FieldLabel>{whenLabel}</FieldLabel>
         <button
           type='button'
@@ -131,10 +133,12 @@ export function RealVistaPropertyListingSearchBar({
         </button>
       </div>
 
-      <Divider />
+      <div className='hidden lg:block'>
+        <Divider />
+      </div>
 
       {/* Price Range */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-7 py-6'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
         <FieldLabel>{priceLabel}</FieldLabel>
         <button
           type='button'
@@ -150,10 +154,12 @@ export function RealVistaPropertyListingSearchBar({
         </button>
       </div>
 
-      <Divider />
+      <div className='hidden lg:block'>
+        <Divider />
+      </div>
 
       {/* Property Type */}
-      <div className='flex min-w-0 flex-1 flex-col gap-1 px-7 py-6'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
         <FieldLabel>{propertyTypeLabel}</FieldLabel>
         <button
           type='button'
@@ -169,14 +175,16 @@ export function RealVistaPropertyListingSearchBar({
         </button>
       </div>
 
-      <Divider />
+      <div className='hidden lg:block'>
+        <Divider />
+      </div>
 
       {/* Search Button */}
-      <div className='flex h-full shrink-0 items-center justify-end px-4 py-6'>
+      <div className='flex h-full shrink-0 items-center justify-center lg:justify-end px-4 py-4 lg:py-6'>
         <button
           type='button'
           onClick={onSearch}
-          className='flex min-w-fit items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
+          className='flex w-full lg:min-w-fit items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
           style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
         >
           {searchButtonLabel}
