@@ -65,8 +65,8 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
   }).format(property.price);
 
   return (
-    <div className='min-h-screen bg-background pb-24 md:pb-8'>
-      <div className='max-w-[1200px] mx-auto px-4 md:px-6 py-4 md:py-8'>
+    <div className='min-h-screen bg-background pb-[88px] md:pb-8'>
+      <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}
           onBack={handleBack}
@@ -77,7 +77,7 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
         />
 
         {/* Gallery Section */}
-        <div className='mt-4 md:mt-8'>
+        <div className='mt-4 sm:mt-8'>
           <PropertyGallery
             images={property.images}
             onViewAllPhotos={handleViewAllPhotos}
@@ -86,10 +86,10 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
           />
         </div>
 
-        {/* Mobile: Price & Tour inline, Desktop: Sidebar layout */}
-        <div className='mt-6 md:mt-10 md:flex md:gap-10'>
+        {/* Responsive layout: mobile column, desktop row */}
+        <div className='mt-6 sm:mt-10 flex flex-col md:flex-row md:gap-10'>
           {/* Main Content */}
-          <div className='flex-1'>
+          <div className='flex-1 min-w-0'>
             {/* Mobile: Price & Tour Section (shown inline) */}
             <div className='md:hidden mb-6'>
               <PriceAndTour
@@ -104,7 +104,7 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
           </div>
 
           {/* Desktop: Price & Tour Sidebar */}
-          <div className='hidden md:block mt-6 max-w-[380px] shrink-0'>
+          <div className='hidden md:block mt-6 md:mt-0 w-full max-w-[380px] shrink-0'>
             <div className='md:sticky md:top-8'>
               <PriceAndTour
                 price={property.price}
@@ -117,21 +117,21 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
       </div>
 
       {/* Mobile Sticky Footer */}
-      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-purple-92 p-4 md:hidden z-50'>
-        <div className='max-w-[1200px] mx-auto flex items-center justify-between gap-4'>
-          <div>
-            <p className='text-main-black/50 text-[12px] font-medium leading-[1.4]'>Rent price</p>
-            <div className='flex items-baseline gap-0.5'>
-              <p className='text-main-primary text-[20px] font-extrabold leading-[1.5] tracking-[-1px]'>
+      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-purple-92 px-4 py-3 sm:px-6 md:hidden z-50'>
+        <div className='max-w-[1200px] mx-auto flex flex-col xs:flex-row items-center justify-between gap-3 xs:gap-4'>
+          <div className='w-full xs:w-auto mb-2 xs:mb-0'>
+            <p className='text-main-black/50 text-xs font-medium leading-[1.4]'>Rent price</p>
+            <div className='flex items-baseline gap-1'>
+              <p className='text-main-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
-              <span className='text-main-black/50 text-[14px] font-medium'>/month</span>
+              <span className='text-main-black/50 text-sm font-medium'>/month</span>
             </div>
           </div>
           <RealVistaButton
             variant='primary'
             size='medium'
-            className='flex-1 max-w-[200px]'
+            className='w-full xs:w-auto max-w-[200px]'
             onClick={handleContact}
           >
             Apply Now
