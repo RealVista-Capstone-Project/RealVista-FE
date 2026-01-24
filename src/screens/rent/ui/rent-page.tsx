@@ -6,6 +6,7 @@ import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
 import { ListingCard } from '@/shared/ui/listing-card/listing-card';
 import { PropertyListingSearchBar } from '@/shared/ui/property-listing-search-bar/property-listing-search-bar';
+import { Pagination } from '@/shared/ui/pagination';
 
 // Mock data for property listings
 const mockProperties = [
@@ -83,6 +84,21 @@ const mockProperties = [
 export function RentPage() {
   const t = useTranslations('Rent');
   const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3; // Show 3 properties per page to demonstrate pagination
+
+  // Calculate pagination
+  const totalPages = Math.ceil(mockProperties.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProperties = mockProperties.slice(startIndex, endIndex);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of results section
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className='min-h-screen bg-purple-98'>
@@ -132,10 +148,9 @@ export function RentPage() {
       {/* Results Section */}
       <section className='px-4 pb-12 pt-8 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
-
           {/* Property Grid */}
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-            {mockProperties.map((property) => (
+            {currentProperties.map((property) => (
               <ListingCard
                 key={property.id}
                 {...property}
@@ -145,6 +160,16 @@ export function RentPage() {
             ))}
           </div>
 
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className='mt-12'>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
       </section>
     </div>
