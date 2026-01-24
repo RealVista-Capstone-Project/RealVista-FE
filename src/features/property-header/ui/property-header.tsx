@@ -62,7 +62,7 @@ export function PropertyHeader({
           <span>{isFavorite ? 'Saved' : 'Save'}</span>
         </RealVistaButton>
 
-        {/* Nút Browse nearby chỉ hiện trên sm trở lên */}
+        {/* Browse Button nearby on sm and up */}
         <div className='hidden sm:block'>
           <RealVistaButton
             variant='secondary'
