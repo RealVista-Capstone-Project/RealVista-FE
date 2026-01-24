@@ -3,7 +3,7 @@
 import { Bath, Heart, BedSingle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-export interface ListingCardProps {
+export interface RealVistaListingCardProps {
   id: string;
   image: string;
   title: string;
@@ -21,7 +21,7 @@ export interface ListingCardProps {
   className?: string;
 }
 
-export function ListingCard({
+export function RealVistaListingCard({
   id,
   image,
   title,
@@ -37,7 +37,7 @@ export function ListingCard({
   onToggleFavorite,
   onClick,
   className,
-}: ListingCardProps) {
+}: RealVistaListingCardProps) {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleFavorite?.(id);

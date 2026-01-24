@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
-import { ListingCard } from '@/shared/ui/listing-card/listing-card';
-import { PropertyListingSearchBar } from '@/shared/ui/property-listing-search-bar/property-listing-search-bar';
+import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import { RealVistaPropertyListingSearchBar } from '@/shared/ui/realvista-property-listing-search-bar/realvista-property-listing-search-bar';
 import { Pagination } from '@/shared/ui/pagination';
 
 // Mock data for property listings
@@ -199,7 +199,7 @@ export function RentPage() {
           </div>
 
           {/* Property Search Bar - Reusable Component */}
-          <PropertyListingSearchBar
+          <RealVistaPropertyListingSearchBar
             locationLabel={t('location')}
             location={t('locationDefault')}
             whenLabel={t('when')}
@@ -220,7 +220,7 @@ export function RentPage() {
           {/* Property Grid */}
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {currentProperties.map((property) => (
-              <ListingCard
+              <RealVistaListingCard
                 key={property.id}
                 {...property}
                 onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}

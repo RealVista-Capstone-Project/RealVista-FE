@@ -3,7 +3,7 @@
 import { Calendar, ChevronDown } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-interface PropertyListingSearchBarProps {
+interface RealVistaPropertyListingSearchBarProps {
   location?: string;
   locationLabel?: string;
   whenLabel?: string;
@@ -77,7 +77,7 @@ function FieldValue({ children, className }: { children: React.ReactNode; classN
   );
 }
 
-export function PropertyListingSearchBar({
+export function RealVistaPropertyListingSearchBar({
   location = 'New York, USA',
   locationLabel = 'Location',
   whenLabel = 'When',
@@ -93,7 +93,7 @@ export function PropertyListingSearchBar({
   onPropertyTypeChange,
   onSearch,
   className,
-}: PropertyListingSearchBarProps) {
+}: RealVistaPropertyListingSearchBarProps) {
   return (
     <div
       className={cn(
@@ -122,7 +122,7 @@ export function PropertyListingSearchBar({
           onClick={() => {
             // TODO: Implement date picker
             onDateChange?.(undefined);
-            console.log('Date clicked')
+            console.log('Date clicked');
           }}
           className='flex h-7 items-center gap-3 text-left'
         >
