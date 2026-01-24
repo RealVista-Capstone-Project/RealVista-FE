@@ -50,19 +50,19 @@ export function ListingCard({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md',
+        'rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md',
         onClick && 'cursor-pointer',
         className
       )}
       onClick={handleCardClick}
     >
       {/* Property Image */}
-      <div className='relative aspect-[16/10] overflow-hidden'>
+      <div className='relative aspect-[16/10] rounded-t-lg'>
         <img src={image} alt={title} className='size-full object-cover' />
 
         {/* Popular Badge */}
         {isPopular && (
-          <div className='absolute bottom-0 left-0'>
+          <div className='absolute bottom-0 -left-2 z-10'>
             {/* Main badge body with special rounded corners */}
             <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-main-primary px-4 py-2'>
               <div className='flex items-center gap-1'>
@@ -91,12 +91,25 @@ export function ListingCard({
                   POPULAR
                 </span>
               </div>
-            </div>
-            {/* Decorative cutout at bottom-left corner */}
-            <div className='absolute left-0 top-8 h-2 w-2'>
-              <svg width='8' height='8' viewBox='0 0 8 8' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                <path d='M0 8V0C0 4.41828 3.58172 8 8 8H0Z' fill='#7065F0' />
-              </svg>
+
+              {/* Decorative cutout at bottom-left corner - creates paper wrap effect */}
+              <div className='absolute left-0 top-full h-1 w-1'>
+                <svg
+                  width='8'
+                  height='8'
+                  viewBox='0 0 8 8'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                  preserveAspectRatio='none'
+                  className='block'
+                  style={{ overflow: 'visible' }}
+                >
+                  <path
+                    d='M8 8L0 0H8V8Z'
+                    fill='#7065F0'
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         )}
