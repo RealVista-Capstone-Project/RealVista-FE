@@ -58,7 +58,7 @@ export function ListingCard({
     >
       {/* Property Image */}
       <div className='relative aspect-[16/10] rounded-t-lg'>
-        <img src={image} alt={title} className='size-full object-cover' />
+        <img src={image} alt={title} className='size-full rounded-t-lg object-cover' />
 
         {/* Popular Badge */}
         {isPopular && (
