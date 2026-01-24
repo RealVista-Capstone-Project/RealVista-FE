@@ -11,7 +11,7 @@ export function RentPage() {
   const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='min-h-screen'>
       {/* Hero Section with Search */}
       <section className='bg-gradient-to-b from-purple-50 to-white px-8 py-16'>
         <div className='mx-auto max-w-7xl'>
