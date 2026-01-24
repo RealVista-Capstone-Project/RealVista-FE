@@ -41,6 +41,20 @@ const mockProperty: Property = {
       type: 'photo',
       isPrimary: false,
     },
+    {
+      id: '5',
+      url: 'https://my-3dtour.com/tour/123',
+      alt: '3D Tour',
+      type: '3d-tour',
+      isPrimary: false,
+    },
+    {
+      id: '6',
+      url: 'https://my-videos.com/video/456.mp4',
+      alt: 'Property Video',
+      type: 'video',
+      isPrimary: false,
+    },
   ],
   amenities: ['Pool', 'Garage', 'Garden', 'Air Conditioning'],
   location: {

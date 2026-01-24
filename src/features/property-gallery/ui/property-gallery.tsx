@@ -4,12 +4,16 @@ import { Box, Camera, Video } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import type { PropertyImage } from '@/entities/property';
+import { MediaViewer } from './media-viewer';
 
 export interface PropertyGalleryProps {
   images: PropertyImage[];
   onViewAllPhotos?: () => void;
   on3DTour?: () => void;
   onVideo?: () => void;
+  onFavorite?: () => void;
+  onShare?: () => void;
+  isFavorite?: boolean;
 }
 
 export function PropertyGallery({
@@ -17,13 +21,45 @@ export function PropertyGallery({
   onViewAllPhotos,
   on3DTour,
   onVideo,
+  onFavorite,
+  onShare,
+  isFavorite = false,
 }: PropertyGalleryProps) {
   const [mainImage, setMainImage] = useState(images[0]);
   const thumbnailImages = images.slice(1, 3);
 
+  const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
+  const [mediaViewerTab, setMediaViewerTab] = useState<'photos' | '3d-tour' | 'video'>('photos');
+
   const photoCount = images.filter((img) => img.type === 'photo').length;
   const tourCount = images.filter((img) => img.type === '3d-tour').length;
   const videoCount = images.filter((img) => img.type === 'video').length;
+
+  const handleOpenPhotos = () => {
+    if (onViewAllPhotos) {
+      onViewAllPhotos();
+    }
+    setMediaViewerTab('photos');
+    setMediaViewerOpen(true);
+  };
+
+  const handleOpen3DTour = () => {
+    if (on3DTour) {
+      on3DTour();
+    }
+    setMediaViewerTab('3d-tour');
+    setMediaViewerOpen(true);
+  };
+
+  const handleOpenVideo = () => {
+    if (onVideo) {
+      onVideo();
+    }
+    setMediaViewerTab('video');
+    setMediaViewerOpen(true);
+  };
+
+  const imageUrls = images.map((img) => img.url);
 
   return (
     <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
@@ -33,9 +69,9 @@ export function PropertyGallery({
 
         {/* Overlay Action Buttons */}
         <div className='absolute bottom-4 left-4 flex gap-2'>
-          {onViewAllPhotos && photoCount > 0 && (
+          {photoCount > 0 && (
             <button
-              onClick={onViewAllPhotos}
+              onClick={handleOpenPhotos}
               className='
                 group flex items-center gap-2 px-3 py-2
                 bg-white/95 backdrop-blur-sm rounded-lg
@@ -52,9 +88,9 @@ export function PropertyGallery({
             </button>
           )}
 
-          {on3DTour && tourCount > 0 && (
+          {tourCount > 0 && (
             <button
-              onClick={on3DTour}
+              onClick={handleOpen3DTour}
               className='
                 group flex items-center gap-2 px-3 py-2
                 bg-white/95 backdrop-blur-sm rounded-lg
@@ -69,9 +105,9 @@ export function PropertyGallery({
             </button>
           )}
 
-          {onVideo && videoCount > 0 && (
+          {videoCount > 0 && (
             <button
-              onClick={onVideo}
+              onClick={handleOpenVideo}
               className='
                 group flex items-center gap-2 px-3 py-2
                 bg-white/95 backdrop-blur-sm rounded-lg
@@ -125,6 +161,17 @@ export function PropertyGallery({
             </div>
           ))}
       </div>
+
+      {/* Fullscreen Media Viewer */}
+      <MediaViewer
+        open={mediaViewerOpen}
+        onOpenChange={setMediaViewerOpen}
+        images={imageUrls}
+        defaultTab={mediaViewerTab}
+        onFavorite={onFavorite}
+        onShare={onShare}
+        isFavorite={isFavorite}
+      />
     </div>
   );
 }

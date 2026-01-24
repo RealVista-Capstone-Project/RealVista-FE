@@ -77,6 +77,9 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             onViewAllPhotos={handleViewAllPhotos}
             on3DTour={handle3DTour}
             onVideo={handleVideo}
+            onFavorite={handleFavorite}
+            onShare={handleShare}
+            isFavorite={false}
           />
         </div>
 
