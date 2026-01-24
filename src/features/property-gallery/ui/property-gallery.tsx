@@ -68,7 +68,7 @@ export function PropertyGallery({
         <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
 
         {/* Overlay Action Buttons */}
-        <div className='absolute bottom-4 right-4 flex gap-2'>
+        <div className='absolute bottom-4 right-4 md:left-4 md:right-auto flex gap-2'>
           {photoCount > 0 && (
             <button
               onClick={handleOpenPhotos}
