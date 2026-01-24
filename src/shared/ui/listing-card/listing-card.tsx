@@ -146,7 +146,7 @@ export function ListingCard({
         <div className='mb-4 h-[1px] bg-purple-92' />
 
         {/* Property Specs */}
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center justify-center gap-4'>
           {/* Beds */}
           <div className='flex items-center gap-1.5'>
             <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
