@@ -11,9 +11,9 @@ export function RentPage() {
   const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
 
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen bg-purple-98'>
       {/* Hero Section with Search */}
-      <section className='bg-gradient-to-b from-purple-50 to-white px-4 py-16 sm:px-6 lg:px-8'>
+      <section className='px-4 pb-8 pt-16 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Header with Title and Search Option Toggle */}
           <div className='mb-8 flex items-start justify-between'>
@@ -56,7 +56,7 @@ export function RentPage() {
       </section>
 
       {/* Results Section */}
-      <section className='px-4 py-12 sm:px-6 lg:px-8'>
+      <section className='px-4 pb-12 pt-8 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
 
           {/* Property Grid */}
