@@ -1,4 +1,1 @@
-export {
-  PropertyCard,
-  type RealVistaListingCardProps as PropertyCardProps,
-} from './realvista-listing-card';
+export { type RealVistaListingCardProps as PropertyCardProps } from './realvista-listing-card';
