@@ -1,1 +1,1 @@
-export { PropertySearchBar } from './property-search-bar';
+export { PropertyListingSearchBar } from './property-listing-search-bar';

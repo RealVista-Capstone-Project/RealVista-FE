@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
-import { PropertySearchBar, PropertyCard } from '@/shared/ui';
+import { ListingCard } from '@/shared/ui/listing-card/listing-card';
+import { PropertyListingSearchBar } from '@/shared/ui/property-listing-search-bar/property-listing-search-bar';
 
 // Mock data for property listings
 const mockProperties = [
@@ -113,7 +114,7 @@ export function RentPage() {
           </div>
 
           {/* Property Search Bar - Reusable Component */}
-          <PropertySearchBar
+          <PropertyListingSearchBar
             locationLabel={t('location')}
             location={t('locationDefault')}
             whenLabel={t('when')}
@@ -135,11 +136,11 @@ export function RentPage() {
           {/* Property Grid */}
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {mockProperties.map((property) => (
-              <PropertyCard
+              <ListingCard
                 key={property.id}
                 {...property}
-                onToggleFavorite={(id) => console.log('Toggle favorite:', id)}
-                onClick={(id) => console.log('Property clicked:', id)}
+                onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
+                onClick={(id: string) => console.log('Property clicked:', id)}
               />
             ))}
           </div>
