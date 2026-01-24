@@ -1,6 +1,7 @@
 'use client';
 
-import { Bell, ChevronDown, Mail, Menu } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, ChevronDown, Mail, Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/shared/config/i18n/navigation';
@@ -57,6 +58,7 @@ export function TopNav({
 }: TopNavProps) {
   const t = useTranslations('Navigation');
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
   const showMessageButton = variant === 'public';
 
@@ -173,6 +175,7 @@ export function TopNav({
         {variant === 'public' && (
           <button
             type='button'
+            onClick={() => setIsMobileMenuOpen(true)}
             className='flex lg:hidden size-10 items-center justify-center text-main-black'
             aria-label='Open menu'
           >
@@ -180,6 +183,74 @@ export function TopNav({
           </button>
         )}
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {variant === 'public' && isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className='fixed inset-0 z-40 bg-black/50 lg:hidden'
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden='true'
+          />
+
+          {/* Mobile Menu Panel */}
+          <div className='fixed inset-y-0 right-0 z-50 w-[280px] bg-white shadow-xl lg:hidden'>
+            {/* Header */}
+            <div className='flex items-center justify-between border-b border-border px-6 py-4'>
+              <span className='text-lg font-bold text-main-black'>Menu</span>
+              <button
+                type='button'
+                onClick={() => setIsMobileMenuOpen(false)}
+                className='flex size-10 items-center justify-center text-main-black'
+                aria-label='Close menu'
+              >
+                <X className='h-6 w-6' strokeWidth={2} />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            {showNavItems && navItems && (
+              <nav className='flex flex-col px-6 py-6' aria-label='Mobile navigation'>
+                {navItems.map((item) => {
+                  const isActive = isRouteActive(item.href);
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'py-3 text-base leading-[1.5] transition-colors',
+                        isActive
+                          ? 'font-bold text-main-primary'
+                          : 'font-medium text-main-black hover:text-main-primary'
+                      )}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {t(item.translationKey)}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+
+            {/* Profile Section */}
+            <div className='border-t border-border px-6 py-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex size-10 items-center justify-center rounded-full bg-main-primary text-white'>
+                  <span className='text-sm font-bold leading-[1.5]'>{user.initials}</span>
+                </div>
+                <div className='flex flex-col'>
+                  <span className='text-sm font-medium leading-[1.4] text-main-black'>
+                    {user.name}
+                  </span>
+                  <span className='text-xs leading-[1.4] text-grey-500'>View Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 }
