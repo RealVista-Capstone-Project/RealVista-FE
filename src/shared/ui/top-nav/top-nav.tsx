@@ -1,6 +1,9 @@
 'use client';
 
-import { Bell, ChevronDown, Mail } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, ChevronDown, Mail, Menu, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import { Link } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
@@ -10,9 +13,8 @@ import { Separator } from '@/shared/ui';
 
 export type NavItem = {
   id: string;
-  label: string;
+  translationKey: string;
   href: string;
-  isActive?: boolean;
 };
 
 type ProfileVariant = 'dropdown' | 'inline';
@@ -32,10 +34,12 @@ interface TopNavProps {
 }
 
 const defaultNavItems: NavItem[] = [
-  { id: 'explore', label: 'Explore', href: ROUTES.homePage, isActive: true },
-  { id: 'sell', label: 'Sell', href: ROUTES.sell },
-  { id: 'favorited', label: 'Favorited', href: ROUTES.favorited },
-  { id: 'appointments', label: 'Appointments', href: ROUTES.appointments },
+  { id: 'explore', translationKey: 'explore', href: ROUTES.homePage },
+  { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
+  { id: 'buy', translationKey: 'buy', href: ROUTES.buy },
+  { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
+  { id: 'favorited', translationKey: 'favorited', href: ROUTES.favorited },
+  { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
 ];
 
 const defaultUser = {
@@ -52,13 +56,23 @@ export function TopNav({
   startContent,
   className,
 }: TopNavProps) {
+  const t = useTranslations('Navigation');
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
   const showMessageButton = variant === 'public';
+
+  // Helper function to check if a route is active
+  const isRouteActive = (href: string): boolean => {
+    // Remove locale prefix (e.g., /vi or /en) from pathname for comparison
+    const cleanPathname = pathname.replace(/^\/(vi|en)/, '') || '/';
+    return cleanPathname === href;
+  };
 
   return (
     <header
       className={cn(
-        'flex items-center justify-between bg-white px-8 py-4',
+        'flex items-center justify-between bg-white px-6 py-4 lg:px-8',
         variant === 'public' && 'border-b border-border',
         className
       )}
@@ -72,34 +86,37 @@ export function TopNav({
         <div className={cn('flex items-center', showNavItems ? 'gap-8' : 'gap-4')}>
           {/* Logo - hide logo text for dashboard variant */}
           {variant === 'dashboard' ? (
-            <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
+            <span className='font-bold text-xl lg:text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
               RealVista
             </span>
           ) : (
             <Link href={logoHref} className='flex items-center gap-2'>
               <RealVistaLogo />
-              <span className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
+              <span className='text-lg lg:text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
                 RealVista
               </span>
             </Link>
           )}
 
-          {/* Nav Items - only for public variant */}
+          {/* Nav Items - only for public variant, hidden on mobile */}
           {showNavItems && (
-            <nav className='flex items-center gap-12' aria-label='Main navigation'>
-              {navItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={cn(
-                    'text-base leading-[1.5] transition-colors hover:text-main-primary',
-                    item.isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
-                  )}
-                  aria-current={item.isActive ? 'page' : undefined}
-                >
-                  {item.label}
-                </Link>
-              ))}
+            <nav className='hidden lg:flex items-center gap-12' aria-label='Main navigation'>
+              {navItems.map((item) => {
+                const isActive = isRouteActive(item.href);
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className={cn(
+                      'text-base leading-[1.5] transition-colors hover:text-main-primary',
+                      isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+                    )}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {t(item.translationKey)}
+                  </Link>
+                );
+              })}
             </nav>
           )}
         </div>
@@ -107,34 +124,39 @@ export function TopNav({
 
       {/* Right Actions */}
       <div className='flex items-center gap-6'>
-        {/* Notification Button */}
+        {/* Notification Button - hidden on mobile for public variant */}
         <button
           type='button'
-          className='flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
+          className={cn(
+            'flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92',
+            variant === 'public' && 'hidden lg:flex'
+          )}
           aria-label='Notifications'
         >
           <Bell className='h-6 w-6' strokeWidth={2} />
         </button>
 
-        {/* Message Button - only for public variant */}
+        {/* Message Button - only for public variant, hidden on mobile */}
         {showMessageButton && (
           <button
             type='button'
-            className='flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
+            className='hidden lg:flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
             aria-label='Messages'
           >
             <Mail className='h-5 w-5' />
           </button>
         )}
 
-        {/* Divider */}
-        <div className='flex h-10 items-center'>
+        {/* Divider - hidden on mobile for public variant */}
+        <div className={cn('flex h-10 items-center', variant === 'public' && 'hidden lg:flex')}>
           <Separator orientation='vertical' className='h-6' />
         </div>
 
-        {/* Profile - Dropdown or Inline */}
+        {/* Profile - Dropdown or Inline, hidden on mobile for public variant */}
         {profileVariant === 'dropdown' ? (
-          <ProfileDropdown user={user} align='end' />
+          <div className='hidden lg:block'>
+            <ProfileDropdown user={user} align='end' />
+          </div>
         ) : (
           <button
             type='button'
@@ -148,7 +170,87 @@ export function TopNav({
             <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
           </button>
         )}
+
+        {/* Hamburger Menu - only for public variant, visible on mobile */}
+        {variant === 'public' && (
+          <button
+            type='button'
+            onClick={() => setIsMobileMenuOpen(true)}
+            className='flex lg:hidden size-10 items-center justify-center text-main-black'
+            aria-label='Open menu'
+          >
+            <Menu className='h-6 w-6' strokeWidth={2} />
+          </button>
+        )}
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {variant === 'public' && isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className='fixed inset-0 z-40 bg-black/50 lg:hidden'
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden='true'
+          />
+
+          {/* Mobile Menu Panel */}
+          <div className='fixed inset-y-0 right-0 z-50 w-[280px] bg-white shadow-xl lg:hidden'>
+            {/* Header */}
+            <div className='flex items-center justify-between border-b border-border px-6 py-4'>
+              <span className='text-lg font-bold text-main-black'>Menu</span>
+              <button
+                type='button'
+                onClick={() => setIsMobileMenuOpen(false)}
+                className='flex size-10 items-center justify-center text-main-black'
+                aria-label='Close menu'
+              >
+                <X className='h-6 w-6' strokeWidth={2} />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            {showNavItems && navItems && (
+              <nav className='flex flex-col px-6 py-6' aria-label='Mobile navigation'>
+                {navItems.map((item) => {
+                  const isActive = isRouteActive(item.href);
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'py-3 text-base leading-[1.5] transition-colors',
+                        isActive
+                          ? 'font-bold text-main-primary'
+                          : 'font-medium text-main-black hover:text-main-primary'
+                      )}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {t(item.translationKey)}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+
+            {/* Profile Section */}
+            <div className='border-t border-border px-6 py-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex size-10 items-center justify-center rounded-full bg-main-primary text-white'>
+                  <span className='text-sm font-bold leading-[1.5]'>{user.initials}</span>
+                </div>
+                <div className='flex flex-col'>
+                  <span className='text-sm font-medium leading-[1.4] text-main-black'>
+                    {user.name}
+                  </span>
+                  <span className='text-xs leading-[1.4] text-grey-500'>View Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 }
