@@ -3,14 +3,19 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-export interface PaginationProps {
+export interface RealVistaPaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   className?: string;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange, className }: PaginationProps) {
+export function RealVistaPagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  className,
+}: RealVistaPaginationProps) {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5; // Maximum number of page buttons to show

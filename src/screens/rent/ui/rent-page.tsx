@@ -6,7 +6,7 @@ import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { RealVistaPropertyListingSearchBar } from '@/shared/ui/realvista-property-listing-search-bar/realvista-property-listing-search-bar';
-import { Pagination } from '@/shared/ui/pagination';
+import { Pagination } from '@/shared/ui/realvista-pagination';
 import { mockProperties } from '@/entities/property';
 import { Button } from '@/shared/ui/button/button';
 
