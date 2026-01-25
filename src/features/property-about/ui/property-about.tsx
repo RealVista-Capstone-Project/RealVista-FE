@@ -24,7 +24,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
           <div className='flex flex-col gap-4 min-w-[100px]'>
             <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Square Area</p>
             <div className='flex items-center gap-2'>
-              <Ruler className='size-6 text-main-black' strokeWidth={2} />
+              <Ruler className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 {property.area} m²
               </p>
@@ -35,7 +35,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
           <div className='flex flex-col gap-4 min-w-[100px]'>
             <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Bedrooms</p>
             <div className='flex items-center gap-2'>
-              <Bed className='size-6 text-main-black' strokeWidth={2} />
+              <Bed className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 {property.bedrooms}
               </p>
@@ -46,7 +46,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
           <div className='flex flex-col gap-4 min-w-[100px]'>
             <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Bathrooms</p>
             <div className='flex items-center gap-2'>
-              <Bath className='size-6 text-main-black' strokeWidth={2} />
+              <Bath className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 {property.bathrooms}
               </p>
@@ -57,7 +57,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
           <div className='flex flex-col gap-4 min-w-[100px]'>
             <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Status</p>
             <div className='flex items-center gap-2'>
-              <CheckCircle className='size-6 text-main-black' strokeWidth={2} />
+              <CheckCircle className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 Active
               </p>
@@ -70,7 +70,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
               Repair Quality
             </p>
             <div className='flex items-center gap-2'>
-              <Wrench className='size-6 text-main-black' strokeWidth={2} />
+              <Wrench className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 Modern Loft
               </p>
