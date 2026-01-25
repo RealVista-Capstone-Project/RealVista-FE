@@ -1,0 +1,11 @@
+{
+  "PriceAndTour": {
+    "rentPrice": "Giá thuê",
+    "perMonth": "/tháng",
+    "contactAgent": "Liên hệ đại lý",
+    "requestHomeTour": "Đặt lịch xem nhà",
+    "selectTourDate": "Chọn ngày xem",
+    "requestTour": "Đặt lịch",
+    "disclaimer": "Miễn phí, không bắt buộc — có thể hủy anytime."
+  }
+}

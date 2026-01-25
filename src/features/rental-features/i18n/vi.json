@@ -1,0 +1,25 @@
+{
+  "RentalFeatures": {
+    "title": "Tính năng cho thuê",
+    "listedOn": "Đăng vào",
+    "estatery": "Estatery",
+    "oneWeek": "1 tuần",
+    "dateAvailable": "Ngày có sẵn",
+    "availableNow": "Có sẵn ngay",
+    "type": "Loại",
+    "home": "Nhà",
+    "laundry": "Giặt ủi",
+    "inUnit": "Trong căn hộ",
+    "cooling": "Làm mát",
+    "airConditioner": "Điều hòa",
+    "heating": "Sưởi ấm",
+    "forcedAir": "Gió cưỡng bức",
+    "city": "Thành phố",
+    "yearBuilt": "Năm xây",
+    "size": "Kích thước",
+    "lotSize": "Diện tích đất",
+    "parkingArea": "Chỗ để xe",
+    "yes": "Có",
+    "depositAndFees": "Tiền đặt cọc & Phí"
+  }
+}

@@ -3,6 +3,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import http from '@/shared/lib/http/http';
+import { mapBackendRole } from './rbac';
 
 /**
  * OAuth credentials schema for Zod validation
@@ -24,6 +25,7 @@ type BackendLoginResponse = {
     user_id: number;
     email: string;
     access_token: string;
+    roles?: string[]; // Roles from backend
   };
   timestamp: string;
 };
@@ -66,15 +68,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           // Extract from nested response structure
-          const { user_id, email: userEmail, access_token } = result.payload.data;
+          const { user_id, email: userEmail, access_token, roles } = result.payload.data;
 
           console.log('[NextAuth] Login successful');
 
-          // Return user object with accessToken (type-safe, no 'as any' needed)
+          // Map first backend role to frontend role
+          const backendRole = roles?.[0];
+          const mappedRole = mapBackendRole(backendRole);
+
+          // Return user object with accessToken and role
           return {
             id: user_id.toString(),
             email: userEmail,
             accessToken: access_token,
+            role: mappedRole || 'user',
           };
         } catch (error) {
           console.error('[NextAuth] Login error:', error);

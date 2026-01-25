@@ -1,6 +1,4 @@
-import React from 'react';
-
-export default function RealVistaLogo() {
+export default function RealVistaLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none'>
       <g clipPath='url(#clip0_6373_20110)'>

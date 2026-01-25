@@ -1,10 +1,29 @@
 /**
  * Role-Based Access Control (RBAC) utilities
  *
- * Implements role hierarchy: user < moderator < admin
+ * Maps backend roles (ADMIN, AGENT, VERIFIER, BUYER, OWNER, TENANT)
+ * to frontend role hierarchy for access control.
+ *
+ * Role hierarchy:
+ * - ADMIN -> admin (level 3)
+ * - AGENT, VERIFIER -> moderator (level 2)
+ * - BUYER, OWNER, TENANT -> user (level 1)
  */
 
+export type BackendRole = 'ADMIN' | 'AGENT' | 'VERIFIER' | 'BUYER' | 'OWNER' | 'TENANT';
 export type UserRole = 'user' | 'moderator' | 'admin';
+
+/**
+ * Map backend roles from authentication response to frontend roles
+ */
+export const BACKEND_ROLE_MAP: Record<BackendRole, UserRole> = {
+  ADMIN: 'admin',
+  AGENT: 'moderator',
+  VERIFIER: 'moderator',
+  BUYER: 'user',
+  OWNER: 'user',
+  TENANT: 'user',
+};
 
 /**
  * Role hierarchy for access control
@@ -15,6 +34,25 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   moderator: 2,
   admin: 3,
 };
+
+/**
+ * Map a backend role to frontend role
+ *
+ * @param backendRole - Role from authentication response (ADMIN, BUYER, etc)
+ * @returns Frontend role (admin, moderator, user) or undefined
+ *
+ * @example
+ * ```ts
+ * mapBackendRole('ADMIN') // 'admin'
+ * mapBackendRole('BUYER') // 'user'
+ * mapBackendRole('AGENT') // 'moderator'
+ * mapBackendRole(undefined) // undefined
+ * ```
+ */
+export function mapBackendRole(backendRole: string | undefined): UserRole | undefined {
+  if (!backendRole) return undefined;
+  return BACKEND_ROLE_MAP[backendRole as BackendRole];
+}
 
 /**
  * Check if user has required role based on hierarchy
@@ -30,10 +68,7 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
  * hasRole(undefined, 'user') // false (no role)
  * ```
  */
-export function hasRole(
-  userRole: string | undefined,
-  requiredRole: UserRole
-): boolean {
+export function hasRole(userRole: string | undefined, requiredRole: UserRole): boolean {
   if (!userRole) return false;
 
   // Ensure userRole is valid
