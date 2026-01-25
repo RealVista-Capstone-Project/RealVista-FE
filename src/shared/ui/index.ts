@@ -7,6 +7,8 @@ export * from './label';
 export * from './map';
 export * from './popover';
 export * from './profile-dropdown';
+export * from './realvista-listing-card';
+export * from './realvista-property-listing-search-bar';
 export * from './separator';
 export * from './sheet';
 export * from './sidebar';
