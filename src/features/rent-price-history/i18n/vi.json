@@ -1,0 +1,20 @@
+{
+  "RentPriceHistory": {
+    "title": "Lịch sử giá thuê cho {title}",
+    "date": "Ngày",
+    "price": "Giá",
+    "event": "Sự kiện",
+    "source": "Nguồn",
+    "perMonth": "/tháng",
+    "events": {
+      "listedForSale": "Đăng bán",
+      "blackFriday": "Black Friday",
+      "rented": "Đã thuê",
+      "priceChange": "Thay đổi giá"
+    },
+    "sources": {
+      "publicRecords": "Hồ sơ công khai",
+      "estatery": "Estatery"
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import type { Property } from '@/entities/property';
 
 export interface RentPriceHistoryProps {
@@ -12,11 +13,11 @@ export interface PriceHistoryEntry {
 }
 
 const defaultPriceHistory: PriceHistoryEntry[] = [
-  { date: '09/02/2019', price: 1800, event: 'Listed for Sale', source: 'Public Records' },
-  { date: '25/11/2019', price: 1900, event: 'Black Friday', source: 'Public Records' },
-  { date: '03/04/2020', price: 2000, event: 'Rented', source: 'Public Records' },
-  { date: '10/10/2021', price: 2600, event: 'Price Change', source: 'Estatery' },
-  { date: '28/12/2021', price: 2700, event: 'Listed for Sale', source: 'Estatery' },
+  { date: '09/02/2019', price: 1800, event: 'listedForSale', source: 'publicRecords' },
+  { date: '25/11/2019', price: 1900, event: 'blackFriday', source: 'publicRecords' },
+  { date: '03/04/2020', price: 2000, event: 'rented', source: 'publicRecords' },
+  { date: '10/10/2021', price: 2600, event: 'priceChange', source: 'estatery' },
+  { date: '28/12/2021', price: 2700, event: 'listedForSale', source: 'estatery' },
 ];
 
 /**
@@ -24,22 +25,23 @@ const defaultPriceHistory: PriceHistoryEntry[] = [
  * with responsive table (desktop) and card (mobile) layouts
  */
 export function RentPriceHistory({ property }: RentPriceHistoryProps) {
+  const t = useTranslations('RentPriceHistory');
   const priceHistory = defaultPriceHistory;
 
   return (
     <div className='flex flex-col gap-8'>
       <h2 className='text-main-black text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
-        Rent Price History for {property.title}
+        {t('title', { title: property.title })}
       </h2>
       <div className='bg-purple-98/84 rounded-lg p-4'>
         {/* Desktop Table */}
         <div className='hidden md:block'>
           {/* Table Header */}
           <div className='grid grid-cols-[220px_1fr_1fr_1fr] gap-4 mb-4'>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>Date</p>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>Price</p>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>Event</p>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>Source</p>
+            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('date')}</p>
+            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('price')}</p>
+            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('event')}</p>
+            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('source')}</p>
           </div>
           {/* Table Body */}
           {priceHistory.map((item, index) => (
@@ -49,10 +51,15 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
             >
               <p className='text-grey-500 text-[16px] font-medium leading-[1.5]'>{item.date}</p>
               <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
-                ${item.price.toLocaleString()}/mo
+                ${item.price.toLocaleString()}
+                {t('perMonth')}
               </p>
-              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>{item.event}</p>
-              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>{item.source}</p>
+              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+                {t(`events.${item.event}` as any)}
+              </p>
+              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+                {t(`sources.${item.source}` as any)}
+              </p>
             </div>
           ))}
         </div>
@@ -66,12 +73,17 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
             >
               <p className='text-grey-500 text-xs font-medium leading-[1.4]'>{item.date}</p>
               <div className='flex items-center justify-between gap-2'>
-                <p className='text-main-black text-[16px] font-medium leading-[1.5]'>{item.event}</p>
+                <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+                  {t(`events.${item.event}` as any)}
+                </p>
                 <p className='text-main-black text-[16px] font-bold leading-[1.5]'>
-                  ${item.price.toLocaleString()}/mo
+                  ${item.price.toLocaleString()}
+                  {t('perMonth')}
                 </p>
               </div>
-              <p className='text-grey-500 text-xs font-medium leading-[1.4]'>{item.source}</p>
+              <p className='text-grey-500 text-xs font-medium leading-[1.4]'>
+                {t(`sources.${item.source}` as any)}
+              </p>
             </div>
           ))}
         </div>
