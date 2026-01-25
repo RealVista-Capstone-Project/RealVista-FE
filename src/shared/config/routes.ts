@@ -6,6 +6,8 @@ export const ROUTES = {
   signIn: '/signin',
   signUp: '/signup',
   user: '/user',
+  rent: '/rent',
+  buy: '/buy',
   sell: '/sell',
   favorited: '/favorited',
   appointments: '/appointments',
