@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "atlassian": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.13", "https://mcp.atlassian.com/v1/sse"]
+    },
+    "mcp-agent-mail": {
+      "env": {
+        "AGENT_MAIL_URL": "http://127.0.0.1:8765/mcp/",
+        "AGENT_MAIL_TOKEN": "1636475833812b9b9cd2005503d78491281236bce6f48dd7d1001bc05fe8c55d",
+        "AGENT_MAIL_PROJECT": "fe"
+      }
+    }
+  }
+}
