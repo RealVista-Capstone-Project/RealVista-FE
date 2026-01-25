@@ -2,6 +2,7 @@
 
 import { Bath, Heart, BedSingle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button/button';
 
 export interface RealVistaListingCardProps {
   id: string;
@@ -122,16 +123,18 @@ export function RealVistaListingCard({
             <span className='text-base font-normal leading-[1.5] text-grey-500'>/month</span>
           </div>
 
-          <button
+          <Button
             onClick={handleFavoriteClick}
             className='flex size-10 items-center justify-center rounded-full border-[1.5px] border-purple-92 bg-white transition-colors hover:bg-purple-98'
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            variant='outline'
+            size='icon'
           >
             <Heart
               className={cn('h-5 w-5 text-main-primary', isFavorite && 'fill-main-primary')}
               strokeWidth={2.3}
             />
-          </button>
+          </Button>
         </div>
 
         {/* Title */}
