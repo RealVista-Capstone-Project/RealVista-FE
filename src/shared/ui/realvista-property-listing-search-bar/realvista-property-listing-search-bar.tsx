@@ -134,7 +134,7 @@ export function RealVistaPropertyListingSearchBar({
             type='text'
             value={location}
             onChange={(e) => onLocationChange?.(e.target.value)}
-            className='h-7 min-w-0 bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none border-none shadow-none focus-visible:ring-0 p-0'
+            className='h-7 min-w-0 bg-transparent text-lg md:text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none border-none shadow-none focus-visible:ring-0 p-0'
           />
         </div>
 
