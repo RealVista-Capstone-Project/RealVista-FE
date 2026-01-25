@@ -45,7 +45,7 @@ export function RentPage() {
               <Button
                 type='button'
                 onClick={() => setSearchMode(searchMode === 'map' ? 'searchBar' : 'map')}
-                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto'
+                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
                 variant='outline'
               >
                 <span>{searchMode === 'map' ? t('searchWithMap') : t('searchWithSearchBar')}</span>

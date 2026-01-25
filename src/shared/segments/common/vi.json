@@ -24,6 +24,11 @@
     "favorited": "Yêu thích",
     "appointments": "Lịch hẹn"
   },
+  "PropertyCard": {
+    "beds": "Phòng ngủ",
+    "bathrooms": "Phòng tắm",
+    "perMonth": "/tháng"
+  },
   "Rent": {
     "searchTitle": "Tìm kiếm bất động sản cho thuê",
     "searchPlaceholder": "Nhập địa chỉ, thành phố hoặc mã bưu điện",

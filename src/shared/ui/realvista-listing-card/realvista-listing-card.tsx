@@ -1,6 +1,7 @@
 'use client';
 
 import { Bath, Heart, BedSingle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
 
@@ -39,6 +40,8 @@ export function RealVistaListingCard({
   onClick,
   className,
 }: RealVistaListingCardProps) {
+  const t = useTranslations('PropertyCard');
+
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleFavorite?.(id);
@@ -120,7 +123,9 @@ export function RealVistaListingCard({
               {currency}
               {price.toLocaleString()}
             </span>
-            <span className='text-base font-normal leading-[1.5] text-grey-500'>/month</span>
+            <span className='text-base font-normal leading-[1.5] text-grey-500'>
+              {t('perMonth')}
+            </span>
           </div>
 
           <Button
@@ -153,14 +158,16 @@ export function RealVistaListingCard({
           {/* Beds */}
           <div className='flex items-center gap-1.5'>
             <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
-            <span className='text-sm font-normal leading-[1.4] text-grey-500'>{beds} Beds</span>
+            <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+              {beds} {t('beds')}
+            </span>
           </div>
 
           {/* Bathrooms */}
           <div className='flex items-center gap-1.5'>
             <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
             <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-              {bathrooms} Bathrooms
+              {bathrooms} {t('bathrooms')}
             </span>
           </div>
 
