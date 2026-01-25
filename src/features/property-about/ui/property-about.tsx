@@ -5,6 +5,7 @@ import { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { RentPriceHistory } from '@/features/rent-price-history';
 import { RentalFeatures } from '@/features/rental-features';
+import { PropertyMapSection } from '@/widgets/property-map-section';
 
 export interface PropertyAboutProps {
   property: Property;
@@ -12,7 +13,7 @@ export interface PropertyAboutProps {
 
 /**
  * PropertyAbout component displays detailed property information
- * including specifications, description, owner info, features, and price history
+ * including specifications, description, owner info, features, price history, and map
  */
 export function PropertyAbout({ property }: PropertyAboutProps) {
   return (
@@ -136,6 +137,11 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
       {/* Rent Price History */}
       <RentPriceHistory property={property} />
+
+      <div className='h-px w-full bg-purple-92' />
+
+      {/* Map Section */}
+      <PropertyMapSection location={property.location} />
 
       {/* Legal Disclaimer */}
       <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>

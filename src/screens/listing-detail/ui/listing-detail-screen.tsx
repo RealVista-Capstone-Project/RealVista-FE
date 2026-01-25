@@ -6,6 +6,7 @@ import { PriceAndTour } from '@/features/price-and-tour';
 import { PropertyAbout } from '@/features/property-about';
 import type { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
+import { SimilarListings } from '@/widgets/similar-listings';
 
 export interface ListingDetailScreenProps {
   property: Property;
@@ -111,6 +112,11 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Similar Listings Section - Full Width */}
+      <div className='mt-12 sm:mt-16'>
+        <SimilarListings propertyId={property.id} />
       </div>
 
       {/* Mobile Sticky Footer */}
