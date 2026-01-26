@@ -3,14 +3,19 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-export interface PaginationProps {
+export interface RealVistaPaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   className?: string;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange, className }: PaginationProps) {
+export function RealVistaPagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  className,
+}: RealVistaPaginationProps) {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5; // Maximum number of page buttons to show
@@ -58,7 +63,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-main-secondary opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30'
+        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-main-secondary opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
         aria-label='Previous page'
       >
         <ChevronLeft className='h-5 w-5' strokeWidth={2} />
@@ -85,7 +90,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             key={pageNum}
             onClick={() => onPageChange(pageNum)}
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold transition-all',
+              'flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold transition-all cursor-pointer',
               isActive
                 ? 'bg-[#100A55] text-white'
                 : 'bg-white text-grey-400 opacity-50 hover:opacity-100'
@@ -102,7 +107,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-main-secondary opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30'
+        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-main-secondary opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
         aria-label='Next page'
       >
         <ChevronRight className='h-5 w-5' strokeWidth={2} />

@@ -2,6 +2,7 @@
 
 import { Calendar, ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button/button';
 
 interface RealVistaPropertyListingSearchBarProps {
   location?: string;
@@ -68,7 +69,7 @@ function FieldValue({ children, className }: { children: React.ReactNode; classN
   return (
     <span
       className={cn(
-        'text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black',
+        'text-lg font-bold leading-[1.45] tracking-[-0.5px] text-main-black',
         className
       )}
     >
@@ -106,14 +107,15 @@ export function RealVistaPropertyListingSearchBar({
             onChange={(e) => onLocationChange?.(e.target.value)}
             className='h-16 w-full rounded-lg border border-grey-200 bg-white px-4 pr-16 text-base font-medium leading-[1.5] text-main-black placeholder:text-grey-400 outline-none focus:border-main-primary focus:ring-1 focus:ring-main-primary'
           />
-          <button
+          <Button
             type='button'
             onClick={onSearch}
             className='absolute right-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-lg bg-main-primary text-white transition-colors hover:bg-main-primary/90'
             aria-label='Search'
+            size='icon'
           >
             <Search className='h-5 w-5' strokeWidth={2.5} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -124,14 +126,14 @@ export function RealVistaPropertyListingSearchBar({
           className
         )}
       >
-        {/* Location Field */}
-        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:py-6 lg:pl-8 lg:pr-7'>
+        {/* Location Field - ~180px base width */}
+        <div className='flex min-w-0 flex-[1.43] flex-col gap-1 px-4 py-4 lg:py-6 lg:pl-8 lg:pr-7'>
           <FieldLabel>{locationLabel}</FieldLabel>
           <input
             type='text'
             value={location}
             onChange={(e) => onLocationChange?.(e.target.value)}
-            className='h-7 min-w-0 bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black outline-none'
+            className='h-7 min-w-0 w-full bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.5px] text-main-black outline-none border-none shadow-none p-0 focus:outline-none focus:ring-0'
           />
         </div>
 
@@ -139,8 +141,8 @@ export function RealVistaPropertyListingSearchBar({
           <Divider />
         </div>
 
-        {/* When (Date Picker) */}
-        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
+        {/* When (Date Picker) - ~180px base width */}
+        <div className='flex min-w-0 flex-[1.43] flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
           <FieldLabel>{whenLabel}</FieldLabel>
           <button
             type='button'
@@ -149,9 +151,9 @@ export function RealVistaPropertyListingSearchBar({
               onDateChange?.(undefined);
               console.log('Date clicked');
             }}
-            className='flex h-7 items-center gap-3 text-left'
+            className='flex h-7 items-center gap-3 text-left w-full bg-transparent border-none p-0 cursor-pointer'
           >
-            <FieldValue className='min-w-0 truncate'>{whenPlaceholder}</FieldValue>
+            <FieldValue className='min-w-0 truncate flex-1'>{whenPlaceholder}</FieldValue>
             <CalendarIcon />
           </button>
         </div>
@@ -160,7 +162,7 @@ export function RealVistaPropertyListingSearchBar({
           <Divider />
         </div>
 
-        {/* Price Range */}
+        {/* Price Range - ~126px base width */}
         <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
           <FieldLabel>{priceLabel}</FieldLabel>
           <button
@@ -170,9 +172,9 @@ export function RealVistaPropertyListingSearchBar({
               onPriceChange?.('');
               console.log('Price clicked');
             }}
-            className='flex h-7 items-center gap-3 text-left'
+            className='flex h-7 items-center gap-3 text-left w-full bg-transparent border-none p-0 cursor-pointer'
           >
-            <FieldValue className='min-w-0 truncate'>{priceValue}</FieldValue>
+            <FieldValue className='min-w-0 truncate flex-1'>{priceValue}</FieldValue>
             <DropdownIcon />
           </button>
         </div>
@@ -181,8 +183,8 @@ export function RealVistaPropertyListingSearchBar({
           <Divider />
         </div>
 
-        {/* Property Type */}
-        <div className='flex min-w-0 flex-1 flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
+        {/* Property Type - ~108px base width */}
+        <div className='flex min-w-0 flex-[0.86] flex-col gap-1 px-4 py-4 lg:px-7 lg:py-6'>
           <FieldLabel>{propertyTypeLabel}</FieldLabel>
           <button
             type='button'
@@ -191,9 +193,9 @@ export function RealVistaPropertyListingSearchBar({
               onPropertyTypeChange?.('');
               console.log('Property type clicked');
             }}
-            className='flex h-7 items-center gap-3 text-left'
+            className='flex h-7 items-center gap-3 text-left w-full bg-transparent border-none p-0 cursor-pointer'
           >
-            <FieldValue className='min-w-0 truncate'>{propertyTypeValue}</FieldValue>
+            <FieldValue className='min-w-0 truncate flex-1'>{propertyTypeValue}</FieldValue>
             <DropdownIcon />
           </button>
         </div>
@@ -203,15 +205,15 @@ export function RealVistaPropertyListingSearchBar({
         </div>
 
         {/* Search Button */}
-        <div className='flex h-full shrink-0 items-center justify-center lg:justify-end px-4 py-4 lg:py-6'>
-          <button
+        <div className='flex h-full flex-shrink-0 items-center justify-center lg:justify-end py-6 lg:pr-6 lg:pl-7'>
+          <Button
             type='button'
             onClick={onSearch}
-            className='flex w-full lg:min-w-fit items-center justify-center overflow-hidden rounded-lg bg-main-primary px-8 py-4 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
+            className='w-[125px] h-[56px] flex items-center justify-center rounded-lg bg-main-primary text-base font-bold leading-[1.5] text-white hover:bg-main-primary/90 focus-visible:ring-2 focus-visible:ring-main-primary focus-visible:ring-offset-2'
             style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
           >
             {searchButtonLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </>

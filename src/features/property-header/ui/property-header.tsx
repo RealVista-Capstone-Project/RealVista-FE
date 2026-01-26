@@ -1,4 +1,5 @@
 import { ArrowLeft, Heart, Share2, Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Link } from '@/shared/config/i18n/navigation';
@@ -19,6 +20,8 @@ export function PropertyHeader({
   isFavorite = false,
   onBrowseNearby,
 }: PropertyHeaderProps) {
+  const t = useTranslations('PropertyHeader');
+
   return (
     <div className='flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between'>
       <div className='flex flex-col gap-2 min-w-0'>
@@ -28,7 +31,7 @@ export function PropertyHeader({
           className='flex items-center gap-2 text-main-primary hover:text-main-primary-hover transition-colors font-medium text-sm'
         >
           <ArrowLeft className='size-4' />
-          <span>Back to homepage</span>
+          <span>{t('backToHomepage')}</span>
         </Link>
 
         {/* Property title and address */}
@@ -49,7 +52,7 @@ export function PropertyHeader({
           className='gap-2 w-full sm:w-auto'
         >
           <Share2 className='size-4' />
-          Share
+          {t('share')}
         </RealVistaButton>
 
         <RealVistaButton
@@ -59,7 +62,7 @@ export function PropertyHeader({
           className={`gap-2 w-full sm:w-auto ${isFavorite ? 'bg-purple-92-hover' : ''}`}
         >
           <Heart className={`size-4 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
-          <span>{isFavorite ? 'Saved' : 'Save'}</span>
+          <span>{isFavorite ? t('saved') : t('save')}</span>
         </RealVistaButton>
 
         {/* Browse Button nearby on sm and up */}
@@ -71,7 +74,7 @@ export function PropertyHeader({
             className='gap-2 w-full sm:w-auto'
           >
             <Search className='size-4' />
-            <span className='truncate'>Browse nearby listings</span>
+            <span className='truncate'>{t('browseNearbyListings')}</span>
           </RealVistaButton>
         </div>
       </div>

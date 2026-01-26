@@ -1,6 +1,7 @@
 'use client';
 
 import { Bath, Bed, CheckCircle, InfoIcon, Ruler, Wrench } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { RentPriceHistory } from '@/features/rent-price-history';
@@ -13,9 +14,11 @@ export interface PropertyAboutProps {
 
 /**
  * PropertyAbout component displays detailed property information
- * including specifications, description, owner info, features, price history, and map
+ * including specifications, description, owner info, features, and price history
  */
 export function PropertyAbout({ property }: PropertyAboutProps) {
+  const t = useTranslations('PropertyAbout');
+
   return (
     <div className='flex flex-col gap-12 w-full max-w-[782px]'>
       {/* Specifications */}
@@ -23,9 +26,11 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
         <div className='flex flex-wrap gap-x-8 gap-y-6 justify-between'>
           {/* Square Area */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Square Area</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+              {t('squareArea')}
+            </p>
             <div className='flex items-center gap-2'>
-              <Ruler className='size-6 text-main-black' strokeWidth={2} />
+              <Ruler className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 {property.area} m²
               </p>
@@ -34,9 +39,9 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
           {/* Bedrooms */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Bedrooms</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>{t('bedrooms')}</p>
             <div className='flex items-center gap-2'>
-              <Bed className='size-6 text-main-black' strokeWidth={2} />
+              <Bed className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 {property.bedrooms}
               </p>
@@ -45,9 +50,9 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
           {/* Bathrooms */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Bathrooms</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>{t('bathrooms')}</p>
             <div className='flex items-center gap-2'>
-              <Bath className='size-6 text-main-black' strokeWidth={2} />
+              <Bath className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                 {property.bathrooms}
               </p>
@@ -56,11 +61,11 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
           {/* Status */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>Status</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>{t('status')}</p>
             <div className='flex items-center gap-2'>
-              <CheckCircle className='size-6 text-main-black' strokeWidth={2} />
+              <CheckCircle className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
-                Active
+                {t('active')}
               </p>
             </div>
           </div>
@@ -68,12 +73,12 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
           {/* Repair Quality */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
             <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
-              Repair Quality
+              {t('repairQuality')}
             </p>
             <div className='flex items-center gap-2'>
-              <Wrench className='size-6 text-main-black' strokeWidth={2} />
+              <Wrench className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
-                Modern Loft
+                {t('modernLoft')}
               </p>
             </div>
           </div>
@@ -83,7 +88,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       {/* About this home */}
       <div className='flex flex-col gap-8'>
         <h2 className='text-main-black text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
-          About this home
+          {t('aboutThisHome')}
         </h2>
         <p className='text-main-black/70 text-[16px] font-medium leading-[1.6]'>
           {property.description}
@@ -94,7 +99,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       <div className='bg-purple-98 border border-purple-92 rounded-lg p-6'>
         <div className='flex flex-col gap-6'>
           <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
-            Listed by property owner
+            {t('listedByPropertyOwner')}
           </p>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
             <div className='flex items-center gap-4'>
@@ -111,17 +116,17 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
                   {property.agent.name}
                 </p>
                 <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>
-                  Real Estate Agency
+                  {t('realEstateAgency')}
                 </p>
               </div>
             </div>
             <div className='flex gap-2'>
               <RealVistaButton variant='secondary' size='small'>
-                Ask a question
+                {t('askAQuestion')}
               </RealVistaButton>
               <RealVistaButton variant='secondary' size='small'>
                 <InfoIcon className='size-4' />
-                Get more info
+                {t('getMoreInfo')}
               </RealVistaButton>
             </div>
           </div>
@@ -138,19 +143,13 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       {/* Rent Price History */}
       <RentPriceHistory property={property} />
 
-      <div className='h-px w-full bg-purple-92' />
-
+      
       {/* Map Section */}
       <PropertyMapSection location={property.location} />
 
       {/* Legal Disclaimer */}
       <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>
-        You agree to Estatery&apos;s Terms of Use & Privacy Policy. By choosing to contact a
-        property, you also agree that Estatery Group, landlords, and property managers may call or
-        text you about any inquiries you submit through our services, which may involve use of
-        automated means and prerecorded/artificial voices. You don&apos;t need to consent as a
-        condition of renting any property, or buying any other goods or services. Message/data rates
-        may apply.
+        {t('legalDisclaimer')}
       </p>
     </div>
   );

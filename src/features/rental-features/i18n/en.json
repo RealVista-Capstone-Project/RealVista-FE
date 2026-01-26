@@ -1,0 +1,25 @@
+{
+  "RentalFeatures": {
+    "title": "Rental features",
+    "listedOn": "Listed on",
+    "estatery": "Estatery",
+    "oneWeek": "1 week",
+    "dateAvailable": "Date available",
+    "availableNow": "Available now",
+    "type": "Type",
+    "home": "Home",
+    "laundry": "Laundry",
+    "inUnit": "In unit",
+    "cooling": "Cooling",
+    "airConditioner": "Air Conditioner",
+    "heating": "Heating",
+    "forcedAir": "Forced Air",
+    "city": "City",
+    "yearBuilt": "Year Built",
+    "size": "Size",
+    "lotSize": "Lot Size",
+    "parkingArea": "Parking Area",
+    "yes": "Yes",
+    "depositAndFees": "Deposit & Fees"
+  }
+}

@@ -3,6 +3,7 @@
 import { Box, Camera, Video } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { PropertyImage } from '@/entities/property';
 import { MediaViewer } from './media-viewer';
 
@@ -25,6 +26,7 @@ export function PropertyGallery({
   onShare,
   isFavorite = false,
 }: PropertyGalleryProps) {
+  const t = useTranslations('PropertyGallery');
   const [mainImage, setMainImage] = useState(images[0]);
   const thumbnailImages = images.slice(1, 3);
 
@@ -84,7 +86,7 @@ export function PropertyGallery({
             >
               <Camera className='size-4' />
               <span className='text-sm font-medium text-main-black'>
-                View all photos ({photoCount})
+                {t('viewAllPhotos')} ({photoCount})
               </span>
             </button>
           )}
@@ -104,7 +106,9 @@ export function PropertyGallery({
                 '
               >
                 <Box className='size-4' />
-                <span className='text-sm font-medium text-main-black'>3D Tour ({tourCount})</span>
+                <span className='text-sm font-medium text-main-black'>
+                  {t('tour3D')} ({tourCount})
+                </span>
               </button>
             )}
 
@@ -121,7 +125,9 @@ export function PropertyGallery({
                 '
               >
                 <Video className='size-4' />
-                <span className='text-sm font-medium text-main-black'>Video ({videoCount})</span>
+                <span className='text-sm font-medium text-main-black'>
+                  {t('video')} ({videoCount})
+                </span>
               </button>
             )}
           </div>
@@ -161,7 +167,7 @@ export function PropertyGallery({
               key={`placeholder-${index}`}
               className='w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 rounded-xl border-2 border-dashed border-grey-300 bg-grey-100 flex items-center justify-center hover:border-main-primary hover:p-1 transition-all duration-200'
             >
-              <span className='text-sm text-grey-500'>No image</span>
+              <span className='text-sm text-grey-500'>{t('noImage')}</span>
             </div>
           ))}
       </div>

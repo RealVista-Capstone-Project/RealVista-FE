@@ -24,6 +24,11 @@
     "favorited": "Favorited",
     "appointments": "Appointments"
   },
+  "PropertyCard": {
+    "beds": "Beds",
+    "bathrooms": "Bathrooms",
+    "perMonth": "/month"
+  },
   "Rent": {
     "searchTitle": "Search properties to rent",
     "searchPlaceholder": "Enter address, city, or zip code",

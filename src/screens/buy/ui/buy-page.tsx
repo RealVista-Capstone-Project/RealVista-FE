@@ -6,8 +6,9 @@ import { MapPin } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { RealVistaPropertyListingSearchBar } from '@/shared/ui/realvista-property-listing-search-bar/realvista-property-listing-search-bar';
-import { Pagination } from '@/shared/ui/pagination';
+import { Pagination } from '@/shared/ui/realvista-pagination';
 import { mockProperties } from '@/entities/property';
+import { Button } from '@/shared/ui/button/button';
 
 export function BuyPage() {
   const t = useTranslations('Buy');
@@ -41,10 +42,11 @@ export function BuyPage() {
 
             {/* Search Option Toggle */}
             <div className='w-full sm:w-auto'>
-              <button
+              <Button
                 type='button'
                 onClick={() => setSearchMode(searchMode === 'map' ? 'searchBar' : 'map')}
-                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto'
+                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
+                variant='outline'
               >
                 <span>{searchMode === 'map' ? t('searchWithMap') : t('searchWithSearchBar')}</span>
                 <div className='relative flex h-5 w-5 items-center justify-center'>
@@ -53,7 +55,7 @@ export function BuyPage() {
                   {/* Icon */}
                   <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
                 </div>
-              </button>
+              </Button>
             </div>
           </div>
 
