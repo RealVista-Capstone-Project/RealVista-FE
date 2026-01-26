@@ -143,7 +143,6 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       {/* Rent Price History */}
       <RentPriceHistory property={property} />
 
-      
       {/* Map Section */}
       <PropertyMapSection location={property.location} />
 
