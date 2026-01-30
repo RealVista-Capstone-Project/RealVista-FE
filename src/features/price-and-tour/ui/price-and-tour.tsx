@@ -26,12 +26,9 @@ export function PriceAndTour({ price, onContact, onRequestTour }: PriceAndTourPr
     }
   };
 
-  const formattedPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
+  // Convert price to millions (tr) for Vietnamese format
+  const priceInMillions = price / 1000000;
+  const formattedPrice = `${priceInMillions.toFixed(1).replace('.', ',')}`;
 
   return (
     <div className='bg-white border border-purple-92 rounded-lg p-6 w-full'>
