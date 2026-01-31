@@ -51,7 +51,10 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
         <div className='overflow-x-auto sm:overflow-x-visible -mx-4 px-4 sm:mx-0 sm:px-0'>
           <div className='flex gap-6 sm:gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3 min-w-min sm:min-w-0'>
             {mockSimilarProperties.map((property) => (
-              <div key={property.id} className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink'>
+              <div
+                key={property.id}
+                className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
+              >
                 <RealVistaListingCard
                   {...property}
                   isFavorite={favorites.has(property.id)}
