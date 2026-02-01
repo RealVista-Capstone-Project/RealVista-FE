@@ -78,5 +78,17 @@
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
     "totalPrice": "Tổng giá"
+  },
+  "PropertyDetail": {
+    "map": "Bản đồ",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Thu nhỏ",
+    "openGoogleMaps": "Mở Google Maps",
+    "openMaps": "Bản đồ",
+    "streetView": "Street View",
+    "streetViewShort": "Street",
+    "seeMoreListings": "Xem thêm danh sách tại Houston",
+    "similarListings": "Danh sách tương tự",
+    "legalDisclaimer": "Bạn đồng ý với Điều khoản sử dụng và Chính sách bảo mật của Estatery. Bằng cách chọn liên hệ với bất động sản, bạn cũng đồng ý rằng Tập đoàn Estatery, chủ nhà và người quản lý bất động sản có thể gọi điện hoặc nhắn tin cho bạn về bất kỳ yêu cầu nào bạn gửi thông qua dịch vụ của chúng tôi, có thể liên quan đến việc sử dụng phương tiện tự động và giọng nói được ghi sẵn/nhân tạo. Bạn không cần phải đồng ý như một điều kiện để thuê bất kỳ bất động sản nào hoặc mua bất kỳ hàng hóa hoặc dịch vụ nào khác. Có thể áp dụng phí tin nhắn/dữ liệu."
   }
 }
