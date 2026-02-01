@@ -97,7 +97,6 @@ export function BookmarksFilter({
               >
                 <div className='flex flex-col py-1'>
                   {[
-                    { value: 'all' as ListingTypeFilter, label: 'Showing all' },
                     { value: 'buy' as ListingTypeFilter, label: t('buy') },
                     { value: 'rent' as ListingTypeFilter, label: t('rent') },
                   ].map((option) => (
