@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Heart } from 'lucide-react';
-import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { BookmarkCardContainer } from './bookmark-card-container';
 import {
@@ -14,7 +13,6 @@ import {
   type PropertyTypeFilter,
 } from './bookmarks-filter';
 import { mockProperties } from '@/entities/property';
-import type { PropertyListingCardType } from '@/entities/property/model/types';
 
 export function FavoritedPage() {
   const t = useTranslations('Favorited');
@@ -144,7 +142,6 @@ export function FavoritedPage() {
         onCancel={handleCancel}
         hasListings={favoritedProperties.length > 0}
         isSelectionMode={isSelectionMode}
-        selectedCount={selectedItems.size}
       />
 
       {/* Results Section */}
