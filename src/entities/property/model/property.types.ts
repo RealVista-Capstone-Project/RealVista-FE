@@ -25,6 +25,7 @@ export interface Property {
 export interface PropertyImage {
   id: string;
   url: string;
+  thumbnailUrl?: string; // Optional thumbnail for video/3D tour previews
   alt: string;
   type: 'photo' | '3d-tour' | 'video';
   isPrimary: boolean;

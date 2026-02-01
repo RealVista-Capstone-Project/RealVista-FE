@@ -1,5 +1,5 @@
-import { NextConfig } from 'next'
-import createNextIntlPlugin from 'next-intl/plugin'
+import { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   images: {
@@ -34,9 +34,21 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.youtube.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.pexels.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
-}
+};
 
-const withNextIntl = createNextIntlPlugin('./src/shared/config/i18n/request.ts')
-export default withNextIntl(nextConfig)
+const withNextIntl = createNextIntlPlugin('./src/shared/config/i18n/request.ts');
+export default withNextIntl(nextConfig);

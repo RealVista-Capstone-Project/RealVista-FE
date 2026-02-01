@@ -70,6 +70,7 @@ export interface Agent {
   full_name: string;
   business_name: string;
   is_verified: boolean;
+  avatar_url: string;
 }
 
 // ============ Attribute ============

@@ -20,6 +20,7 @@ export function mapListingToProperty(listing: Listing): Property {
     return {
       id: media.media_id,
       url: media.media_url,
+      thumbnailUrl: media.thumbnail_url,
       alt: `${listing.slug}-${media.media_type}`,
       type,
       isPrimary: media.is_primary,
@@ -53,7 +54,7 @@ export function mapListingToProperty(listing: Listing): Property {
     agent: {
       id: listing.agent.user_id,
       name: listing.agent.full_name,
-      avatar: listing.agent.company || '', // Using company as avatar placeholder
+      avatar: listing.agent.avatar_url,
       phone: listing.agent.phone,
       email: listing.agent.email,
     },

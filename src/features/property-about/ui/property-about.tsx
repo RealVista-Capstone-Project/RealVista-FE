@@ -6,6 +6,7 @@ import { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { RentPriceHistory } from '@/features/rent-price-history';
 import { RentalFeatures } from '@/features/rental-features';
+import Image from 'next/image';
 
 export interface PropertyAboutProps {
   property: Property;
@@ -17,6 +18,7 @@ export interface PropertyAboutProps {
  */
 export function PropertyAbout({ property }: PropertyAboutProps) {
   const t = useTranslations('PropertyAbout');
+  console.log(property);
 
   return (
     <div className='flex flex-col gap-12 w-full max-w-[782px]'>
@@ -38,7 +40,9 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
           {/* Bedrooms */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>{t('bedrooms')}</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+              {t('bedrooms')}
+            </p>
             <div className='flex items-center gap-2'>
               <Bed className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
@@ -49,7 +53,9 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
           {/* Bathrooms */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>{t('bathrooms')}</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+              {t('bathrooms')}
+            </p>
             <div className='flex items-center gap-2'>
               <Bath className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
@@ -60,7 +66,9 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
           {/* Status */}
           <div className='flex flex-col gap-4 min-w-[100px]'>
-            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>{t('status')}</p>
+            <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+              {t('status')}
+            </p>
             <div className='flex items-center gap-2'>
               <CheckCircle className='size-6 text-main-black/50' strokeWidth={2} />
               <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
@@ -102,13 +110,38 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
           </p>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
             <div className='flex items-center gap-4'>
-              <div className='size-[64px] rounded-full overflow-hidden bg-grey-200'>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={property.agent.avatar}
-                  alt={property.agent.name}
-                  className='size-full object-cover'
-                />
+              <div className='size-[64px] rounded-full overflow-hidden bg-grey-200 flex items-center justify-center'>
+                {property.agent.avatar ? (
+                  <Image
+                    src={property.agent.avatar}
+                    alt={property.agent.name}
+                    width={64}
+                    height={64}
+                    className='size-full object-cover'
+                    onError={(e) => {
+                      // Fallback to initials if image fails
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.textContent = property.agent.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join('')
+                          .toUpperCase();
+                      }
+                    }}
+                  />
+                ) : (
+                  <span className='text-main-black/50 text-lg font-semibold'>
+                    {property.agent.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join('')
+                      .toUpperCase()}
+                  </span>
+                )}
               </div>
               <div className='flex flex-col gap-[2px]'>
                 <p className='text-main-black text-[16px] font-bold leading-[1.5]'>
