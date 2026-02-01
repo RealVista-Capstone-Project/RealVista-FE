@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Bell, ChevronDown, Mail, Menu, X } from 'lucide-react';
+import { Bell, ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Link } from '@/shared/config/i18n/navigation';
@@ -58,9 +59,11 @@ export function TopNav({
 }: TopNavProps) {
   const t = useTranslations('Navigation');
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
   const showMessageButton = variant === 'public';
+  const isUserLoggedIn = !!session?.user;
 
   // Helper function to check if a route is active
   const isRouteActive = (href: string): boolean => {
@@ -124,20 +127,42 @@ export function TopNav({
 
       {/* Right Actions */}
       <div className='flex items-center gap-6'>
-        {/* Notification Button - hidden on mobile for public variant */}
-        <button
-          type='button'
-          className={cn(
-            'flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92',
-            variant === 'public' && 'hidden lg:flex'
-          )}
-          aria-label='Notifications'
-        >
-          <Bell className='h-6 w-6' strokeWidth={2} />
-        </button>
+        {/* Notification Button - only shown when logged in, hidden on mobile for public variant */}
+        {isUserLoggedIn && (
+          <button
+            type='button'
+            className={cn(
+              'flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92',
+              variant === 'public' && 'hidden lg:flex'
+            )}
+            aria-label='Notifications'
+          >
+            <Bell className='h-6 w-6' strokeWidth={2} />
+          </button>
+        )}
 
-        {/* Message Button - only for public variant, hidden on mobile */}
-        {showMessageButton && (
+        {/* Bookmark Button - only for public variant, shown when user is logged in, hidden on mobile */}
+        {showMessageButton && isUserLoggedIn && (
+          <Link
+            href={ROUTES.favorited}
+            className={cn(
+              'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
+              isRouteActive('/favorited')
+                ? 'bg-main-primary text-white'
+                : 'bg-purple-98 text-main-black hover:bg-purple-92'
+            )}
+            aria-label='Bookmarks'
+            title='View bookmarks'
+          >
+            <Heart
+              className='h-5 w-5'
+              fill={isRouteActive('/favorited') ? 'currentColor' : 'none'}
+            />
+          </Link>
+        )}
+
+        {/* Message Button - only for public variant and when logged in, hidden on mobile */}
+        {showMessageButton && isUserLoggedIn && (
           <button
             type='button'
             className='hidden lg:flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
@@ -152,23 +177,43 @@ export function TopNav({
           <Separator orientation='vertical' className='h-6' />
         </div>
 
-        {/* Profile - Dropdown or Inline, hidden on mobile for public variant */}
-        {profileVariant === 'dropdown' ? (
-          <div className='hidden lg:block'>
-            <ProfileDropdown user={user} align='end' />
-          </div>
-        ) : (
-          <button
-            type='button'
-            className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
-            aria-label='Profile menu'
-          >
-            <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
-              <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
+        {/* Profile - Dropdown or Inline when logged in, hidden on mobile for public variant */}
+        {isUserLoggedIn ? (
+          profileVariant === 'dropdown' ? (
+            <div className='hidden lg:block'>
+              <ProfileDropdown user={user} align='end' />
             </div>
-            <span className='text-base font-medium leading-[1.5] text-main-black'>{user.name}</span>
-            <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
-          </button>
+          ) : (
+            <button
+              type='button'
+              className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
+              aria-label='Profile menu'
+            >
+              <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
+                <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
+              </div>
+              <span className='text-base font-medium leading-[1.5] text-main-black'>
+                {user.name}
+              </span>
+              <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
+            </button>
+          )
+        ) : (
+          /* Login and Sign up buttons - shown only when not logged in, public variant */
+          <div className='hidden lg:flex items-center gap-3'>
+            <Link
+              href={ROUTES.login}
+              className='flex h-12 items-center justify-center px-6 rounded-lg border border-purple-92 bg-white font-medium text-main-primary transition-colors hover:bg-purple-98'
+            >
+              {t('login')}
+            </Link>
+            <Link
+              href={ROUTES.register}
+              className='flex h-12 items-center justify-center px-6 rounded-lg bg-main-primary text-white font-medium transition-colors hover:bg-main-primary-hover'
+            >
+              {t('signup')}
+            </Link>
+          </div>
         )}
 
         {/* Hamburger Menu - only for public variant, visible on mobile */}

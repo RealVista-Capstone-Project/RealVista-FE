@@ -22,7 +22,9 @@
     "buy": "Mua nhà",
     "sell": "Bán nhà",
     "favorited": "Yêu thích",
-    "appointments": "Lịch hẹn"
+    "appointments": "Lịch hẹn",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký"
   },
   "PropertyCard": {
     "beds": "Phòng ngủ",

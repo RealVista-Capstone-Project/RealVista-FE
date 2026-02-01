@@ -22,7 +22,9 @@
     "buy": "Buy",
     "sell": "Sell",
     "favorited": "Favorited",
-    "appointments": "Appointments"
+    "appointments": "Appointments",
+    "login": "Login",
+    "signup": "Sign up"
   },
   "PropertyCard": {
     "beds": "Beds",
