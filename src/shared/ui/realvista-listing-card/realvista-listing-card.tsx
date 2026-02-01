@@ -1,6 +1,7 @@
 'use client';
 
 import { Bath, Heart, BedSingle } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
@@ -54,7 +55,7 @@ export function RealVistaListingCard({
   return (
     <div
       className={cn(
-        'rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md',
+        'rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md flex flex-col h-full',
         onClick && 'cursor-pointer',
         className
       )}
@@ -62,7 +63,13 @@ export function RealVistaListingCard({
     >
       {/* Property Image */}
       <div className='relative aspect-[16/10] rounded-t-lg'>
-        <img src={image} alt={title} className='size-full rounded-t-lg object-cover' />
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className='rounded-t-lg object-cover'
+          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+        />
 
         {/* Popular Badge */}
         {isPopular && (
@@ -115,7 +122,7 @@ export function RealVistaListingCard({
       </div>
 
       {/* Property Details */}
-      <div className='p-6'>
+      <div className='p-6 flex-1 flex flex-col'>
         {/* Price and Favorite */}
         <div className='mb-3 flex items-center justify-between'>
           <div className='flex items-baseline gap-1'>
@@ -143,15 +150,17 @@ export function RealVistaListingCard({
         </div>
 
         {/* Title */}
-        <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-black'>
+        <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-black truncate'>
           {title}
         </h3>
 
         {/* Address */}
-        <p className='mb-4 text-base font-normal leading-[1.5] text-grey-500'>{address}</p>
+        <p className='mb-4 text-base font-normal leading-[1.5] text-grey-500 line-clamp-2 min-h-[48px]'>
+          {address}
+        </p>
 
         {/* Divider Line */}
-        <div className='mb-4 h-[1px] bg-purple-92' />
+        <div className='mb-4 h-[1px] bg-purple-92 mt-auto' />
 
         {/* Property Specs */}
         <div className='flex items-center justify-center gap-4'>
