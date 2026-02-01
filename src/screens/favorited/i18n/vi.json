@@ -1,0 +1,28 @@
+{
+  "Favorited": {
+    "byCategory": "Theo danh mục",
+    "all": "Tất cả",
+    "apartment": "Căn hộ",
+    "house": "Nhà",
+    "townhouse": "Nhà phố",
+    "condo": "Chung cư",
+    "land": "Đất",
+    "byDateAdded": "Theo ngày thêm",
+    "newest": "Mới nhất",
+    "oldest": "Cũ nhất",
+    "search": "Tìm kiếm...",
+    "buy": "Mua",
+    "rent": "Thuê",
+    "select": "Chọn",
+    "remove": "Xóa",
+    "confirmRemoveTitle": "Xóa các mục đã chọn?",
+    "confirmRemoveMessage": "Xóa {count} listing ra khỏi favorited list",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "noResults": "Không tìm thấy kết quả",
+    "noSearchResults": "Không có dấu trang nào khớp với \"{searchQuery}\"",
+    "emptyTitle": "Chưa có dấu trang nào",
+    "emptyDescription": "Bắt đầu thêm các bất động sản yêu thích của bạn bằng cách nhấp vào biểu tượng trái tim trên các thẻ danh sách.",
+    "browseListing": "Duyệt danh sách"
+  }
+}
