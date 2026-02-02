@@ -4,6 +4,7 @@ import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
 import { PropertyAbout } from '@/features/property-about';
+import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import type { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
@@ -98,7 +99,32 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             </div>
 
             {/* About Section */}
-            <PropertyAbout property={property} />
+            <div className='mb-6'>
+              <PropertyAbout property={property} />
+            </div>
+
+            {/* Monthly Cost Breakdown Section */}
+            <MonthlyCostBreakdown
+              items={[
+                {
+                  labelKey: 'principalAndInterest',
+                  amount: 5148,
+                },
+                {
+                  labelKey: 'propertyTax',
+                  amount: 2433,
+                },
+                {
+                  labelKey: 'homeInsurance',
+                  amount: 102,
+                },
+                {
+                  labelKey: 'estimatedFees',
+                  amount: 650,
+                },
+              ]}
+              total={8333}
+            />
           </div>
 
           {/* Desktop: Price & Tour Sidebar */}

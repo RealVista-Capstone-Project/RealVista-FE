@@ -1,0 +1,11 @@
+{
+  "MonthlyCostBreakdown": {
+    "title": "Monthly Breakdown",
+    "principalAndInterest": "Principal & Interest",
+    "propertyTax": "Property Tax",
+    "homeInsurance": "Home Insurance",
+    "estimatedFees": "Estimated Fees",
+    "hoaFees": "HOA Fees",
+    "totalMonthlyPayment": "Total monthly payment"
+  }
+}
