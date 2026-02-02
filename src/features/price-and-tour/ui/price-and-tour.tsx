@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
+import { formatVND } from '@/shared/lib/utils';
 
 export interface PriceAndTourProps {
   price: number;
@@ -26,19 +27,17 @@ export function PriceAndTour({ price, onContact, onRequestTour }: PriceAndTourPr
     }
   };
 
-  // Convert price to millions (tr) for Vietnamese format
-  const priceInMillions = price / 1000000;
-  const formattedPrice = `${priceInMillions.toFixed(1).replace('.', ',')}`;
-
   return (
     <div className='bg-white border border-purple-92 rounded-lg p-6 w-full'>
       <div className='flex flex-col gap-6'>
         {/* Rent Price Section */}
         <div className='flex flex-col gap-1'>
-          <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>{t('rentPrice')}</p>
+          <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>
+            {t('rentPrice')}
+          </p>
           <div className='flex items-baseline gap-0.5'>
             <p className='text-main-primary text-[24px] font-extrabold leading-[1.5] tracking-[-1px]'>
-              {formattedPrice}
+              {formatVND(price)}
             </p>
             <span className='text-main-black/50 text-[14px] font-medium h-8 flex items-center'>
               {t('perMonth')}
