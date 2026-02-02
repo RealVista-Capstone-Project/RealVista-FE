@@ -8,6 +8,7 @@ import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
+import { SimilarListings } from '@/widgets/similar-listings';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -116,6 +117,11 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Similar Listings Section - Full Width */}
+      <div className='mt-12 sm:mt-16'>
+        <SimilarListings propertyId={property.id} />
       </div>
 
       {/* Mobile Sticky Footer */}

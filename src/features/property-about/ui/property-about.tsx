@@ -7,6 +7,8 @@ import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { RentPriceHistory } from '@/features/rent-price-history';
 import { RentalFeatures } from '@/features/rental-features';
 import Image from 'next/image';
+import { PropertyMapSection } from '@/widgets/property-map-section';
+
 
 export interface PropertyAboutProps {
   property: Property;
@@ -174,6 +176,9 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
       {/* Rent Price History */}
       <RentPriceHistory property={property} />
+
+      {/* Map Section */}
+      <PropertyMapSection location={property.location} />
 
       {/* Legal Disclaimer */}
       <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>
