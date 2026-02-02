@@ -1,6 +1,7 @@
 {
   "MonthlyCostBreakdown": {
     "title": "Monthly Breakdown",
+    "description": "See how your monthly payment is distributed",
     "principalAndInterest": "Principal & Interest",
     "propertyTax": "Property Tax",
     "homeInsurance": "Home Insurance",

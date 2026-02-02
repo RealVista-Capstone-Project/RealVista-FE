@@ -108,22 +108,22 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
               items={[
                 {
                   labelKey: 'principalAndInterest',
-                  amount: 5148,
+                  amount: 514800,
                 },
                 {
                   labelKey: 'propertyTax',
-                  amount: 2433,
+                  amount: 243300,
                 },
                 {
                   labelKey: 'homeInsurance',
-                  amount: 102,
+                  amount: 102000,
                 },
                 {
                   labelKey: 'estimatedFees',
-                  amount: 650,
+                  amount: 65000,
                 },
               ]}
-              total={8333}
+              total={833300}
             />
           </div>
 
