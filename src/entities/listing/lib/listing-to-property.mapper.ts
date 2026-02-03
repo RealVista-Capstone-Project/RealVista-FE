@@ -41,8 +41,6 @@ export function mapListingToProperty(listing: Listing): Property {
     title: listing.name, // Using the new name field from API
     address: fullAddress,
     price: listing.price,
-    bedrooms: listing.property.bedrooms,
-    bathrooms: listing.property.bathrooms,
     area: listing.property.usable_size_m2,
     description: listing.property.description,
     attributes: listing.attributes,

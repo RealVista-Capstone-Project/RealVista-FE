@@ -9,8 +9,6 @@ export interface Property {
   title: string;
   address: string;
   price: number;
-  bedrooms: number;
-  bathrooms: number;
   area: number;
   description: string;
   images: PropertyImage[];
