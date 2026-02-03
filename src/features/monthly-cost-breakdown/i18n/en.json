@@ -2,11 +2,7 @@
   "MonthlyCostBreakdown": {
     "title": "Monthly Breakdown",
     "description": "See how your monthly payment is distributed",
-    "principalAndInterest": "Principal & Interest",
-    "propertyTax": "Property Tax",
-    "homeInsurance": "Home Insurance",
-    "estimatedFees": "Estimated Fees",
-    "hoaFees": "HOA Fees",
+    "basePrice": "Base Price",
     "totalMonthlyPayment": "Total monthly payment"
   }
 }

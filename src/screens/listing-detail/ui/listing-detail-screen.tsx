@@ -104,27 +104,7 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             </div>
 
             {/* Monthly Cost Breakdown Section */}
-            <MonthlyCostBreakdown
-              items={[
-                {
-                  labelKey: 'principalAndInterest',
-                  amount: 514800,
-                },
-                {
-                  labelKey: 'propertyTax',
-                  amount: 243300,
-                },
-                {
-                  labelKey: 'homeInsurance',
-                  amount: 102000,
-                },
-                {
-                  labelKey: 'estimatedFees',
-                  amount: 65000,
-                },
-              ]}
-              total={833300}
-            />
+            {property.costBreakdown && <MonthlyCostBreakdown costBreakdown={property.costBreakdown} />}
           </div>
 
           {/* Desktop: Price & Tour Sidebar */}

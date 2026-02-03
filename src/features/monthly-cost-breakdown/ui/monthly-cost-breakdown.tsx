@@ -13,18 +13,18 @@ import {
   PolarRadiusAxis,
   Label,
 } from '@/shared/ui/chart';
-
-export interface CostItem {
-  labelKey: string;
-  amount: number;
-  description?: string;
-}
+import type { CostBreakdown } from '@/entities/property/model/property.types';
 
 export interface MonthlyCostBreakdownProps {
-  items: CostItem[];
-  total: number;
+  costBreakdown: CostBreakdown;
   currency?: string;
   locale?: string;
+}
+
+interface ChartItem {
+  name: string;
+  amount: number;
+  category: 'base' | 'required' | 'optional';
 }
 
 /**
@@ -32,8 +32,7 @@ export interface MonthlyCostBreakdownProps {
  * with a radial stacked bar chart and colored legend
  */
 export function MonthlyCostBreakdown({
-  items,
-  total,
+  costBreakdown,
   currency = 'VND',
   locale = 'vi-VN',
 }: MonthlyCostBreakdownProps) {
@@ -50,9 +49,28 @@ export function MonthlyCostBreakdown({
     return currency === 'VND' ? `${formatted} đ` : formatted;
   };
 
+  // Prepare chart items: base price + required fees + optional fees
+  const chartItems: ChartItem[] = [
+    {
+      name: t('basePrice'),
+      amount: costBreakdown.basePrice,
+      category: 'base',
+    },
+    ...costBreakdown.requiredFees.map((fee) => ({
+      name: fee.name,
+      amount: fee.amount,
+      category: 'required' as const,
+    })),
+    ...costBreakdown.optionalFees.map((fee) => ({
+      name: fee.name,
+      amount: fee.amount,
+      category: 'optional' as const,
+    })),
+  ];
+
   // Prepare chart data - stack all items into a single data point
   const chartData = [
-    items.reduce(
+    chartItems.reduce(
       (acc, item, index) => {
         const key = `item${index}`;
         return {
@@ -65,7 +83,7 @@ export function MonthlyCostBreakdown({
   ];
 
   // Build chart config dynamically
-  const chartConfig: ChartConfig = items.reduce((config, item, index) => {
+  const chartConfig: ChartConfig = chartItems.reduce((config, item, index) => {
     const key = `item${index}`;
     const colors = [
       'var(--chart-1)',
@@ -77,7 +95,7 @@ export function MonthlyCostBreakdown({
     return {
       ...config,
       [key]: {
-        label: t(item.labelKey),
+        label: item.name,
         color: colors[index % colors.length],
       },
     };
@@ -129,7 +147,7 @@ export function MonthlyCostBreakdown({
                             y={(viewBox.cy || 0) - 16}
                             className='fill-main-primary text-2xl font-bold'
                           >
-                            {formatCurrency(total)}
+                            {formatCurrency(costBreakdown.totalCost)}
                           </tspan>
                           <tspan
                             x={viewBox.cx}
@@ -144,7 +162,7 @@ export function MonthlyCostBreakdown({
                   }}
                 />
               </PolarRadiusAxis>
-              {items.map((item, index) => {
+              {chartItems.map((item, index) => {
                 const key = `item${index}`;
                 return (
                   <RadialBar
@@ -162,9 +180,8 @@ export function MonthlyCostBreakdown({
         </div>
 
         {/* Legend Items - Right side */}
-        <div className='flex flex-col gap-2 flex-1 w-full'>
-          {items.map((item, index) => {
-            const key = `item${index}`;
+        <div className='flex flex-col gap-3 flex-1 w-full'>
+          {chartItems.map((item, index) => {
             const color = getDirectColor(index);
 
             return (
@@ -177,7 +194,7 @@ export function MonthlyCostBreakdown({
                   />
                   {/* Label */}
                   <span className='text-main-black text-[14px] sm:text-[16px] font-medium leading-[1.5] truncate'>
-                    {t(item.labelKey)}
+                    {item.name}
                   </span>
                 </div>
                 {/* Amount */}
@@ -187,6 +204,11 @@ export function MonthlyCostBreakdown({
               </div>
             );
           })}
+
+          {/* Disclaimer */}
+          {costBreakdown.disclaimer && (
+            <p className='text-grey-500 text-xs italic mt-2'>{costBreakdown.disclaimer}</p>
+          )}
         </div>
       </CardContent>
     </Card>

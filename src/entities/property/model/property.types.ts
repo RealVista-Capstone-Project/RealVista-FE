@@ -20,6 +20,7 @@ export interface Property {
   agent: Agent;
   createdAt: string;
   updatedAt: string;
+  costBreakdown?: CostBreakdown;
 }
 
 export interface PropertyImage {
@@ -41,3 +42,33 @@ export interface Agent {
 export interface PropertyDetailProps {
   property: Property;
 }
+
+/**
+ * Cost breakdown types from API
+ */
+export interface CostBreakdown {
+  basePrice: number;
+  basePriceUnit: string;
+  requiredFees: CostFee[];
+  requiredFeesSubtotal: number;
+  optionalFees: CostFee[];
+  optionalFeesSubtotal: number;
+  totalCost: number;
+  disclaimer: string;
+}
+
+export interface CostFee {
+  name: string;
+  amount: number;
+  feeType: FeeType;
+}
+
+export type FeeType =
+  | 'GARBAGE'
+  | 'MANAGEMENT'
+  | 'SECURITY'
+  | 'WATER'
+  | 'INTERNET'
+  | 'PARKING'
+  | 'ELECTRICITY'
+  | 'OTHER';

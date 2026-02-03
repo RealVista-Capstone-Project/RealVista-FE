@@ -2,11 +2,7 @@
   "MonthlyCostBreakdown": {
     "title": "Chi tiết hàng tháng",
     "description": "Xem các khoản chi phí hàng tháng của bạn",
-    "principalAndInterest": "Gốc và Lãi",
-    "propertyTax": "Thuế bất động sản",
-    "homeInsurance": "Bảo hiểm nhà",
-    "estimatedFees": "Phí ước tính",
-    "hoaFees": "Phí hoa",
+    "basePrice": "Giá cơ bản",
     "totalMonthlyPayment": "Hàng tháng"
   }
 }
