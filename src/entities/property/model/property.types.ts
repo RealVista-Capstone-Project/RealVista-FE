@@ -2,6 +2,8 @@
  * Property entity types
  */
 
+import type { Attribute } from '@/entities/listing';
+
 export interface Property {
   id: string;
   title: string;
@@ -13,6 +15,7 @@ export interface Property {
   description: string;
   images: PropertyImage[];
   amenities: string[];
+  attributes: Attribute[]; // Optional: for dynamic property specifications from backend
   location: {
     lat: number;
     lng: number;

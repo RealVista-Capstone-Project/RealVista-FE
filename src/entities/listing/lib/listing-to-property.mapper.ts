@@ -45,6 +45,7 @@ export function mapListingToProperty(listing: Listing): Property {
     bathrooms: listing.property.bathrooms,
     area: listing.property.usable_size_m2,
     description: listing.property.description,
+    attributes: listing.attributes,
     images,
     amenities,
     location: {

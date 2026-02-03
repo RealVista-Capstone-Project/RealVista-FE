@@ -79,7 +79,7 @@ export interface Attribute {
   text: boolean;
   number: boolean;
   boolean: boolean;
-  displayValue: string;
+  display_value: string;
   attribute_id: string;
   attribute_code: string;
   attribute_name: string;

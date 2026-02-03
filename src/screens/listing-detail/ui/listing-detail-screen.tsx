@@ -17,6 +17,8 @@ export interface ListingDetailScreenProps {
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
+  console.log('[Listing]: ', listing);
+  console.log('property:', property);
 
   const handleShare = () => {
     // Share property
