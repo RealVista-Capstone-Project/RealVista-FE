@@ -21,9 +21,6 @@ export interface PropertyNested {
   usable_size_m2: number;
   width_m: number;
   length_m: number;
-  bedrooms: number;
-  bathrooms: number;
-  area_sqft: number;
 }
 
 // ============ Location ============
