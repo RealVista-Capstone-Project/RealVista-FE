@@ -13,10 +13,10 @@ import {
   PolarRadiusAxis,
   Label,
 } from '@/shared/ui/chart';
-import type { CostBreakdown } from '@/entities/property/model/property.types';
+import type { CostBreakdown } from '@/shared/types';
 
 export interface MonthlyCostBreakdownProps {
-  costBreakdown: CostBreakdown;
+  costBreakdown?: CostBreakdown | null;
   currency?: string;
   locale?: string;
 }
@@ -38,6 +38,11 @@ export function MonthlyCostBreakdown({
 }: MonthlyCostBreakdownProps) {
   const t = useTranslations('MonthlyCostBreakdown');
 
+  // Guard clause: return null if costBreakdown is not available
+  if (!costBreakdown) {
+    return null;
+  }
+
   // Format currency with Vietnamese style (e.g., 20.000.000 đ)
   const formatCurrency = (amount: number) => {
     const formatted = new Intl.NumberFormat(locale, {
@@ -56,12 +61,12 @@ export function MonthlyCostBreakdown({
       amount: costBreakdown.basePrice,
       category: 'base',
     },
-    ...costBreakdown.requiredFees.map((fee) => ({
+    ...(costBreakdown.requiredFees || []).map((fee) => ({
       name: fee.name,
       amount: fee.amount,
       category: 'required' as const,
     })),
-    ...costBreakdown.optionalFees.map((fee) => ({
+    ...(costBreakdown.optionalFees || []).map((fee) => ({
       name: fee.name,
       amount: fee.amount,
       category: 'optional' as const,
@@ -132,7 +137,7 @@ export function MonthlyCostBreakdown({
               data={chartData}
               startAngle={90}
               endAngle={-270}
-              innerRadius={80}
+              innerRadius={85}
               outerRadius={130}
             >
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />

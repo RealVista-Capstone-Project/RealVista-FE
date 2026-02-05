@@ -3,6 +3,7 @@
  */
 
 import type { Attribute } from '@/entities/listing';
+import type { CostBreakdown } from '@/shared/types';
 
 export interface Property {
   id: string;
@@ -36,7 +37,7 @@ export interface PropertyImage {
 export interface Agent {
   id: string;
   name: string;
-  avatar: string;
+  avatar?: string; // Optional - not always provided by API
   phone: string;
   email: string;
 }
@@ -45,32 +46,5 @@ export interface PropertyDetailProps {
   property: Property;
 }
 
-/**
- * Cost breakdown types from API
- */
-export interface CostBreakdown {
-  basePrice: number;
-  basePriceUnit: string;
-  requiredFees: CostFee[];
-  requiredFeesSubtotal: number;
-  optionalFees: CostFee[];
-  optionalFeesSubtotal: number;
-  totalCost: number;
-  disclaimer: string;
-}
-
-export interface CostFee {
-  name: string;
-  amount: number;
-  feeType: FeeType;
-}
-
-export type FeeType =
-  | 'GARBAGE'
-  | 'MANAGEMENT'
-  | 'SECURITY'
-  | 'WATER'
-  | 'INTERNET'
-  | 'PARKING'
-  | 'ELECTRICITY'
-  | 'OTHER';
+// Re-export cost breakdown types for convenience
+export type { CostBreakdown, CostFee, FeeType } from '@/shared/types';

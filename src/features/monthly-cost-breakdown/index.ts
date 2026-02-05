@@ -3,4 +3,5 @@ export {
   type MonthlyCostBreakdownProps,
 } from './ui/monthly-cost-breakdown';
 
-export type { CostBreakdown, CostFee, FeeType } from '@/entities/property/model/property.types';
+// Re-export cost breakdown types from shared layer for convenience
+export type { CostBreakdown, CostFee, FeeType } from '@/shared/types';
