@@ -6,14 +6,21 @@ import { PriceAndTour } from '@/features/price-and-tour';
 import { PropertyAbout } from '@/features/property-about';
 import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import type { Property } from '@/entities/property';
+import type { Listing } from '@/entities/listing';
+import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 
 export interface ListingDetailScreenProps {
-  property: Property;
+  listing: Listing;
 }
 
-export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
+export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
+  // Map Listing to Property for compatibility with existing components
+  const property: Property = mapListingToProperty(listing);
+  console.log('[Listing]: ', listing);
+  console.log('property:', property);
+
   const handleShare = () => {
     // Share property
     console.log('Share property');
