@@ -1,0 +1,18 @@
+{
+  "PropertySearch": {
+    "home": "Home",
+    "search": "Search",
+    "searchTitle": "Search properties",
+    "propertiesAvailable": "properties available to rent",
+    "searchPlaceholder": "Search...",
+    "moreFilters": "More filters",
+    "anyPrice": "Any Price",
+    "beds": "Beds",
+    "allTypes": "All Types",
+    "newest": "Newest",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "map": "Map",
+    "satellite": "Satellite"
+  }
+}
