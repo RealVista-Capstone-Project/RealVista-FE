@@ -13,6 +13,24 @@
     "gridView": "Xem lưới",
     "listView": "Xem danh sách",
     "map": "Bản đồ",
-    "satellite": "Vệ tinh"
+    "satellite": "Vệ tinh",
+    "moreFiltersTitle": "Thêm bộ lọc",
+    "categories": {
+      "houses": "Nhà",
+      "rooms": "Phòng",
+      "apartment": "Căn hộ"
+    },
+    "priceRange": "Khoảng giá",
+    "bedroom": "Phòng ngủ",
+    "bathroom": "Phòng tắm",
+    "rentalPeriod": {
+      "label": "Thời gian thuê",
+      "any": "Bất kỳ",
+      "1-12": "1 - 12 tháng",
+      "13-24": "13 - 24 tháng",
+      "24+": "24+ tháng"
+    },
+    "reset": "Đặt lại",
+    "apply": "Áp dụng"
   }
 }

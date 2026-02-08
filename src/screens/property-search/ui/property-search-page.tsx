@@ -7,6 +7,10 @@ import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { mockProperties } from '@/entities/property';
+import {
+  PropertyFiltersModal,
+  type PropertyFilters as PropertyFilterValues,
+} from '@/shared/ui/property-filters-modal';
 
 // Convert mock properties to map locations
 function convertToMapLocations(properties: typeof mockProperties): PropertyLocation[] {
@@ -20,12 +24,23 @@ function convertToMapLocations(properties: typeof mockProperties): PropertyLocat
   }));
 }
 
+// Default filter values
+const DEFAULT_FILTERS: PropertyFilterValues = {
+  category: 'houses',
+  priceRange: { min: 1000, max: 1234567 },
+  bedrooms: 4,
+  bathrooms: 2,
+  rentalPeriod: 'any',
+};
+
 export function PropertySearchPage() {
   const t = useTranslations('PropertySearch');
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | undefined>();
   const [searchValue, setSearchValue] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [filtersModalOpen, setFiltersModalOpen] = useState(false);
+  const [filters, setFilters] = useState<PropertyFilterValues>(DEFAULT_FILTERS);
 
   const propertyLocations = convertToMapLocations(mockProperties);
 
@@ -34,6 +49,17 @@ export function PropertySearchPage() {
     // Scroll to property card in the list
     const element = document.getElementById(`property-${id}`);
     element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  const handleApplyFilters = (newFilters: PropertyFilterValues) => {
+    setFilters(newFilters);
+    console.log('Filters applied:', newFilters);
+    // TODO: Apply filters to property list
+  };
+
+  const handleResetFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+    console.log('Filters reset to defaults');
   };
 
   return (
@@ -58,7 +84,7 @@ export function PropertySearchPage() {
             searchPlaceholder={t('searchPlaceholder')}
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onMoreFilters={() => console.log('Open filters modal')}
+            onMoreFilters={() => setFiltersModalOpen(true)}
             homeLabel={t('home')}
             searchLabel={t('search')}
             moreFiltersLabel={t('moreFilters')}
@@ -114,6 +140,35 @@ export function PropertySearchPage() {
             ))}
           </div>
         </div>
+
+        {/* Filters Modal */}
+        <PropertyFiltersModal
+          open={filtersModalOpen}
+          onOpenChange={setFiltersModalOpen}
+          filters={filters}
+          onApply={handleApplyFilters}
+          onReset={handleResetFilters}
+          translations={{
+            title: t('moreFiltersTitle'),
+            categories: {
+              houses: t('categories.houses'),
+              rooms: t('categories.rooms'),
+              apartment: t('categories.apartment'),
+            },
+            priceRange: t('priceRange'),
+            bedroom: t('bedroom'),
+            bathroom: t('bathroom'),
+            rentalPeriod: {
+              label: t('rentalPeriod.label'),
+              any: t('rentalPeriod.any'),
+              '1-12': t('rentalPeriod.1-12'),
+              '13-24': t('rentalPeriod.13-24'),
+              '24+': t('rentalPeriod.24+'),
+            },
+            reset: t('reset'),
+            apply: t('apply'),
+          }}
+        />
       </div>
     </div>
   );
