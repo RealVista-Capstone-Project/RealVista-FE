@@ -200,7 +200,7 @@ export function PropertyFiltersModal({
         {/* Scrollable content area */}
         <div className='flex-1 overflow-y-auto px-6 pb-6 space-y-6'>
           {/* Category Selection */}
-          <div className='space-y-3'>
+          <div className='space-y-3 pb-6 border-b border-grey-100'>
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.category}</h3>
             <div className='flex gap-3'>
               <CategoryButton
@@ -225,7 +225,7 @@ export function PropertyFiltersModal({
           </div>
 
           {/* Price Range */}
-          <div className='space-y-3'>
+          <div className='space-y-3 pb-6 border-b border-grey-100'>
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.priceRange}</h3>
             <div className='space-y-4'>
               {/* Histogram placeholder - simple bars for visual representation */}
@@ -286,7 +286,7 @@ export function PropertyFiltersModal({
           </div>
 
           {/* Features */}
-          <div className='space-y-4'>
+          <div className='space-y-4 pb-6 border-b border-grey-100'>
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
             <div className='flex items-center justify-between'>
               <span className='text-base font-normal text-main-black'>{translations.bedroom}</span>
