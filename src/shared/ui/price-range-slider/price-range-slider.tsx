@@ -1,14 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-
-// VND Currency Formatter
-function formatVND(value: number): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(value);
-}
+import { formatVND } from '@/shared/lib/utils/format-currency';
 
 export interface PriceRangeSliderProps {
   minValue: number;
