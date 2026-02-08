@@ -5,6 +5,7 @@ import { Minus, Plus } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
+import { PriceRangeSlider } from '@/shared/ui/price-range-slider';
 
 export type PropertyCategory = 'houses' | 'rooms' | 'apartment';
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
@@ -225,61 +226,18 @@ export function PropertyFiltersModal({
           </div>
 
           {/* Price Range */}
-          <div className='space-y-3 pb-6 border-b border-grey-100'>
-            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.priceRange}</h3>
-            <div className='space-y-4'>
-              {/* Histogram with fixed pattern */}
-              <div className='flex items-end justify-between gap-0.5 h-14'>
-                {[6, 8, 8, 12, 21, 35, 38, 56, 48, 32, 23, 48, 23, 17, 12, 6].map((height, i) => (
-                  <div
-                    key={i}
-                    className='flex-1 bg-[#E5E7EB] rounded-t-sm'
-                    style={{ height: `${height}px` }}
-                  />
-                ))}
-              </div>
-
-              {/* Dual Range Slider */}
-              <div className='relative px-2'>
-                <div className='relative h-1 bg-[#E5E7EB] rounded-full'>
-                  <div
-                    className='absolute h-1 bg-main-primary rounded-full'
-                    style={{
-                      left: `${(priceMin / 2000000) * 100}%`,
-                      right: `${100 - (priceMax / 2000000) * 100}%`,
-                    }}
-                  />
-                </div>
-                <input
-                  type='range'
-                  min='0'
-                  max='2000000'
-                  step='10000'
-                  value={priceMin}
-                  onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax - 10000))}
-                  className='absolute top-0 w-full h-1 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-main-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-main-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer'
-                />
-                <input
-                  type='range'
-                  min='0'
-                  max='2000000'
-                  step='10000'
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin + 10000))}
-                  className='absolute top-0 w-full h-1 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-main-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-main-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer'
-                />
-              </div>
-
-              {/* Price Labels */}
-              <div className='flex justify-between px-2'>
-                <span className='text-lg font-bold text-main-black'>
-                  ${priceMin.toLocaleString()}
-                </span>
-                <span className='text-lg font-bold text-main-black'>
-                  ${priceMax.toLocaleString()}
-                </span>
-              </div>
-            </div>
+          <div className='pb-6 border-b border-grey-100'>
+            <PriceRangeSlider
+              minValue={0}
+              maxValue={2000000}
+              currentMin={priceMin}
+              currentMax={priceMax}
+              onMinChange={setPriceMin}
+              onMaxChange={setPriceMax}
+              histogramData={[6, 8, 8, 12, 21, 35, 38, 56, 48, 32, 23, 48, 23, 17, 12, 6]}
+              title={translations.priceRange}
+              step={10000}
+            />
           </div>
 
           {/* Features */}
