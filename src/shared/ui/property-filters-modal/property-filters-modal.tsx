@@ -95,8 +95,8 @@ function Stepper({
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
           value <= min
-            ? 'bg-grey-200 text-grey-400 cursor-not-allowed'
-            : 'bg-[#F3F3F3] text-grey-600 hover:bg-grey-300'
+            ? 'bg-grey-200 text-grey-400 cursor-not-allowed opacity-50'
+            : 'bg-main-primary text-white hover:bg-main-primary/90 cursor-pointer'
         )}
       >
         <Minus className='h-4 w-4' strokeWidth={2} />
@@ -109,8 +109,8 @@ function Stepper({
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
           value >= max
-            ? 'bg-grey-200 text-grey-400 cursor-not-allowed'
-            : 'bg-main-primary text-white hover:bg-main-primary/90'
+            ? 'bg-grey-200 text-grey-400 cursor-not-allowed opacity-50'
+            : 'bg-main-primary text-white hover:bg-main-primary/90 cursor-pointer'
         )}
       >
         <Plus className='h-4 w-4' strokeWidth={2} />
@@ -228,25 +228,22 @@ export function PropertyFiltersModal({
           <div className='space-y-3 pb-6 border-b border-grey-100'>
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.priceRange}</h3>
             <div className='space-y-4'>
-              {/* Histogram placeholder - simple bars for visual representation */}
-              <div className='flex items-end justify-between gap-1 h-16 px-2'>
-                {Array.from({ length: 20 }).map((_, i) => {
-                  const height = Math.random() * 100;
-                  return (
-                    <div
-                      key={i}
-                      className='flex-1 bg-purple-92 rounded-t-sm'
-                      style={{ height: `${height}%` }}
-                    />
-                  );
-                })}
+              {/* Histogram with fixed pattern */}
+              <div className='flex items-end justify-between gap-0.5 h-14'>
+                {[6, 8, 8, 12, 21, 35, 38, 56, 48, 32, 23, 48, 23, 17, 12, 6].map((height, i) => (
+                  <div
+                    key={i}
+                    className='flex-1 bg-[#E5E7EB] rounded-t-sm'
+                    style={{ height: `${height}px` }}
+                  />
+                ))}
               </div>
 
               {/* Dual Range Slider */}
               <div className='relative px-2'>
-                <div className='relative h-2 bg-purple-92 rounded-full'>
+                <div className='relative h-1 bg-[#E5E7EB] rounded-full'>
                   <div
-                    className='absolute h-2 bg-main-primary rounded-full'
+                    className='absolute h-1 bg-main-primary rounded-full'
                     style={{
                       left: `${(priceMin / 2000000) * 100}%`,
                       right: `${100 - (priceMax / 2000000) * 100}%`,
@@ -260,7 +257,7 @@ export function PropertyFiltersModal({
                   step='10000'
                   value={priceMin}
                   onChange={(e) => setPriceMin(Math.min(Number(e.target.value), priceMax - 10000))}
-                  className='absolute top-0 w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-main-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-main-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer'
+                  className='absolute top-0 w-full h-1 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-main-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-main-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer'
                 />
                 <input
                   type='range'
@@ -269,16 +266,16 @@ export function PropertyFiltersModal({
                   step='10000'
                   value={priceMax}
                   onChange={(e) => setPriceMax(Math.max(Number(e.target.value), priceMin + 10000))}
-                  className='absolute top-0 w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-main-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-main-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer'
+                  className='absolute top-0 w-full h-1 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-main-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-main-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer'
                 />
               </div>
 
               {/* Price Labels */}
               <div className='flex justify-between px-2'>
-                <span className='text-sm font-bold text-main-black'>
+                <span className='text-lg font-bold text-main-black'>
                   ${priceMin.toLocaleString()}
                 </span>
-                <span className='text-sm font-bold text-main-black'>
+                <span className='text-lg font-bold text-main-black'>
                   ${priceMax.toLocaleString()}
                 </span>
               </div>
