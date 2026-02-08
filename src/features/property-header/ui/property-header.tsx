@@ -44,7 +44,7 @@ export function PropertyHeader({
       </div>
 
       {/* Action buttons */}
-      <div className='grid grid-cols-2 gap-3 pt-3 sm:pt-0 sm:flex sm:flex-row sm:flex-wrap sm:gap-3 w-full sm:w-auto'>
+      <div className='grid grid-cols-2 gap-3 pt-3 sm:pt-0 sm:flex sm:flex-row sm:justify-end sm:flex-wrap sm:gap-3 w-full sm:w-auto'>
         <RealVistaButton
           variant='secondary'
           size='medium'
