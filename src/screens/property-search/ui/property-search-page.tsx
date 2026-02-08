@@ -150,12 +150,14 @@ export function PropertySearchPage() {
           onReset={handleResetFilters}
           translations={{
             title: t('moreFiltersTitle'),
+            category: t('category'),
             categories: {
               houses: t('categories.houses'),
               rooms: t('categories.rooms'),
               apartment: t('categories.apartment'),
             },
             priceRange: t('priceRange'),
+            features: t('features'),
             bedroom: t('bedroom'),
             bathroom: t('bathroom'),
             rentalPeriod: {

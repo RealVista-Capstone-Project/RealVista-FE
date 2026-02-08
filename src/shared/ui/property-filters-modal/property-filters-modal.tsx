@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
 
 export type PropertyCategory = 'houses' | 'rooms' | 'apartment';
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
@@ -28,12 +28,14 @@ export interface PropertyFiltersModalProps {
   onReset: () => void;
   translations: {
     title: string;
+    category: string;
     categories: {
       houses: string;
       rooms: string;
       apartment: string;
     };
     priceRange: string;
+    features: string;
     bedroom: string;
     bathroom: string;
     rentalPeriod: {
@@ -91,24 +93,24 @@ function Stepper({
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
         className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-full border-[1.5px] transition-colors',
+          'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
           value <= min
-            ? 'border-grey-300 text-grey-300 cursor-not-allowed'
-            : 'border-main-primary text-main-primary hover:bg-purple-96'
+            ? 'bg-grey-200 text-grey-400 cursor-not-allowed'
+            : 'bg-[#F3F3F3] text-grey-600 hover:bg-grey-300'
         )}
       >
         <Minus className='h-4 w-4' strokeWidth={2} />
       </button>
-      <span className='w-8 text-center text-base font-medium text-main-black'>{value}</span>
+      <span className='w-8 text-center text-base font-bold text-main-black'>{value}</span>
       <button
         type='button'
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
         className={cn(
-          'flex h-8 w-8 items-center justify-center rounded-full border-[1.5px] transition-colors',
+          'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
           value >= max
-            ? 'border-grey-300 text-grey-300 cursor-not-allowed'
-            : 'border-main-primary text-main-primary hover:bg-purple-96'
+            ? 'bg-grey-200 text-grey-400 cursor-not-allowed'
+            : 'bg-main-primary text-white hover:bg-main-primary/90'
         )}
       >
         <Plus className='h-4 w-4' strokeWidth={2} />
@@ -183,17 +185,23 @@ export function PropertyFiltersModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='max-w-[480px] max-h-[90vh] overflow-y-auto'>
-        <DialogHeader>
-          <DialogTitle className='text-2xl font-bold text-main-black'>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetContent
+        side='right'
+        className='flex flex-col p-0 gap-0 w-full max-w-[480px] rounded-l-2xl'
+      >
+        {/* Header */}
+        <SheetHeader className='px-6 pt-6 pb-4'>
+          <SheetTitle className='text-2xl font-bold text-main-black'>
             {translations.title}
-          </DialogTitle>
-        </DialogHeader>
+          </SheetTitle>
+        </SheetHeader>
 
-        <div className='space-y-6'>
+        {/* Scrollable content area */}
+        <div className='flex-1 overflow-y-auto px-6 pb-6 space-y-6'>
           {/* Category Selection */}
           <div className='space-y-3'>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.category}</h3>
             <div className='flex gap-3'>
               <CategoryButton
                 selected={localFilters.category === 'houses'}
@@ -218,7 +226,7 @@ export function PropertyFiltersModal({
 
           {/* Price Range */}
           <div className='space-y-3'>
-            <h3 className='text-base font-semibold text-main-black'>{translations.priceRange}</h3>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.priceRange}</h3>
             <div className='space-y-4'>
               {/* Histogram placeholder - simple bars for visual representation */}
               <div className='flex items-end justify-between gap-1 h-16 px-2'>
@@ -267,10 +275,10 @@ export function PropertyFiltersModal({
 
               {/* Price Labels */}
               <div className='flex justify-between px-2'>
-                <span className='text-sm font-medium text-grey-500'>
+                <span className='text-sm font-bold text-main-black'>
                   ${priceMin.toLocaleString()}
                 </span>
-                <span className='text-sm font-medium text-grey-500'>
+                <span className='text-sm font-bold text-main-black'>
                   ${priceMax.toLocaleString()}
                 </span>
               </div>
@@ -279,6 +287,7 @@ export function PropertyFiltersModal({
 
           {/* Features */}
           <div className='space-y-4'>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
             <div className='flex items-center justify-between'>
               <span className='text-base font-normal text-main-black'>{translations.bedroom}</span>
               <Stepper
@@ -301,7 +310,7 @@ export function PropertyFiltersModal({
 
           {/* Rental Period */}
           <div className='space-y-3'>
-            <h3 className='text-base font-semibold text-main-black'>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>
               {translations.rentalPeriod.label}
             </h3>
             <div className='space-y-1'>
@@ -333,11 +342,12 @@ export function PropertyFiltersModal({
           </div>
         </div>
 
-        <DialogFooter className='gap-3 pt-4'>
+        {/* Sticky footer */}
+        <SheetFooter className='sticky bottom-0 bg-white border-t border-grey-100 px-6 py-4 gap-3'>
           <Button
             type='button'
             onClick={handleReset}
-            className='flex-1 rounded-lg border-[1.5px] border-purple-92 bg-white px-6 py-3 text-base font-bold text-main-primary hover:bg-purple-98'
+            className='flex-1 rounded-lg bg-[#F4F3FF] px-6 py-3 text-base font-bold text-main-primary hover:bg-[#E9E7FF] border-none'
           >
             {translations.reset}
           </Button>
@@ -348,8 +358,8 @@ export function PropertyFiltersModal({
           >
             {translations.apply}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

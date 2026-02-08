@@ -15,12 +15,14 @@
     "map": "Bản đồ",
     "satellite": "Vệ tinh",
     "moreFiltersTitle": "Thêm bộ lọc",
+    "category": "Danh mục",
     "categories": {
       "houses": "Nhà",
       "rooms": "Phòng",
       "apartment": "Căn hộ"
     },
     "priceRange": "Khoảng giá",
+    "features": "Tiện nghi",
     "bedroom": "Phòng ngủ",
     "bathroom": "Phòng tắm",
     "rentalPeriod": {
