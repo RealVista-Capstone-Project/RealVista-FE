@@ -15,6 +15,7 @@ export interface PropertySearchHeaderProps {
   homeLabel?: string;
   searchLabel?: string;
   moreFiltersLabel?: string;
+  action?: React.ReactNode;
   className?: string;
 }
 
@@ -28,6 +29,7 @@ export function PropertySearchHeader({
   homeLabel = 'Home',
   searchLabel = 'Search',
   moreFiltersLabel = 'More filters',
+  action,
   className,
 }: PropertySearchHeaderProps) {
   return (
@@ -42,13 +44,16 @@ export function PropertySearchHeader({
       </nav>
 
       {/* Title and Property Count */}
-      <div>
-        <h1 className='mb-1 text-3xl font-bold leading-[1.25] tracking-[-1px] text-main-black'>
-          {title}
-        </h1>
-        <p className='text-base font-normal leading-[1.5] text-grey-500'>
-          {propertyCount.toLocaleString()} properties available to rent
-        </p>
+      <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
+        <div>
+          <h1 className='mb-1 text-3xl font-bold leading-[1.25] tracking-[-1px] text-main-black'>
+            {title}
+          </h1>
+          <p className='text-base font-normal leading-[1.5] text-grey-500'>
+            {propertyCount.toLocaleString()} properties available to rent
+          </p>
+        </div>
+        {action && <div>{action}</div>}
       </div>
 
       {/* Search Bar with More Filters */}
