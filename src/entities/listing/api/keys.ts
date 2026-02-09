@@ -1,0 +1,16 @@
+/**
+ * Listing Query Keys
+ * Centralized query keys for TanStack Query
+ * Provides type-safe query keys for invalidation and caching
+ */
+export const listingKeys = {
+  // Base key for all listing queries
+  all: ['listings'] as const,
+
+  // All listing lists (with optional filters)
+  lists: () => [...listingKeys.all, 'list'] as const,
+  list: (filters: string) => [...listingKeys.lists(), filters] as const,
+
+  // Single listing queries
+  detail: (id: string) => [...listingKeys.all, 'detail', id] as const,
+} as const;
