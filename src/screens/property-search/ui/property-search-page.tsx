@@ -2,27 +2,16 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
-import { mockProperties } from '@/entities/property';
+import { propertyQueries, type PropertyListingDto } from '@/entities/property';
 import {
   PropertyFiltersModal,
   type PropertyFilters as PropertyFilterValues,
 } from '@/shared/ui/property-filters-modal';
-
-// Convert mock properties to map locations
-function convertToMapLocations(properties: typeof mockProperties): PropertyLocation[] {
-  return properties.map((property) => ({
-    id: property.id,
-    // Mock coordinates - in real app, these would come from property data
-    lat: 21.0285 + (Math.random() - 0.5) * 0.1,
-    lng: 105.8542 + (Math.random() - 0.5) * 0.1,
-    price: property.price,
-    currency: '$',
-  }));
-}
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
@@ -42,7 +31,28 @@ export function PropertySearchPage() {
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [filters, setFilters] = useState<PropertyFilterValues>(DEFAULT_FILTERS);
 
-  const propertyLocations = convertToMapLocations(mockProperties);
+  const { data: searchResponse, isLoading } = useQuery(
+    propertyQueries.search({
+      search_text: searchValue,
+      category: filters.category,
+      min_price: filters.priceRange.min,
+      max_price: filters.priceRange.max,
+      bedrooms: filters.bedrooms,
+      bathrooms: filters.bathrooms,
+      rental_period: filters.rentalPeriod,
+      page: 1, // TODO: Implement pagination state
+      size: 50,
+    })
+  );
+
+  const properties = searchResponse?.payload.data.content || [];
+  const propertyLocations: PropertyLocation[] = properties.map((p: PropertyListingDto) => ({
+    id: p.listing_id,
+    lat: p.coordinates.latitude,
+    lng: p.coordinates.longitude,
+    price: p.price,
+    currency: '$', // TODO: backend should provide currency or use locale
+  }));
 
   const handlePropertyClick = (id: string) => {
     setSelectedPropertyId(id);
@@ -53,13 +63,10 @@ export function PropertySearchPage() {
 
   const handleApplyFilters = (newFilters: PropertyFilterValues) => {
     setFilters(newFilters);
-    console.log('Filters applied:', newFilters);
-    // TODO: Apply filters to property list
   };
 
   const handleResetFilters = () => {
     setFilters(DEFAULT_FILTERS);
-    console.log('Filters reset to defaults');
   };
 
   return (
@@ -80,7 +87,7 @@ export function PropertySearchPage() {
           {/* Search Header */}
           <PropertySearchHeader
             title={t('searchTitle')}
-            propertyCount={mockProperties.length}
+            propertyCount={searchResponse?.payload.data.total_elements || 0}
             searchPlaceholder={t('searchPlaceholder')}
             searchValue={searchValue}
             onSearchChange={setSearchValue}
@@ -122,22 +129,40 @@ export function PropertySearchPage() {
           <div
             className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col gap-4'}`}
           >
-            {mockProperties.map((property) => (
-              <div
-                key={property.id}
-                id={`property-${property.id}`}
-                onMouseEnter={() => setHoveredPropertyId(property.id)}
-                onMouseLeave={() => setHoveredPropertyId(undefined)}
-                onClick={() => setSelectedPropertyId(property.id)}
-              >
-                <RealVistaListingCard
-                  {...property}
-                  onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
-                  onClick={(id: string) => console.log('Property clicked:', id)}
-                  className={selectedPropertyId === property.id ? 'ring-2 ring-main-primary' : ''}
-                />
+            {isLoading ? (
+              <div className='col-span-full flex justify-center py-10'>
+                {/* TODO: Add proper loading skeleton */}
+                <span className='loading loading-spinner loading-lg'>Loading...</span>
               </div>
-            ))}
+            ) : (
+              properties.map((property: PropertyListingDto) => (
+                <div
+                  key={property.listing_id}
+                  id={`property-${property.listing_id}`}
+                  onMouseEnter={() => setHoveredPropertyId(property.listing_id)}
+                  onMouseLeave={() => setHoveredPropertyId(undefined)}
+                  onClick={() => setSelectedPropertyId(property.listing_id)}
+                >
+                  <RealVistaListingCard
+                    id={property.listing_id}
+                    title={property.name}
+                    address={property.street_address}
+                    price={property.price}
+                    image={property.thumbnail_url}
+                    beds={property.bedrooms || 0}
+                    bathrooms={property.bathrooms || 0}
+                    area={property.size_m2}
+                    areaUnit='m²'
+                    isFavorite={property.is_favorite}
+                    onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
+                    onClick={(id: string) => console.log('Property clicked:', id)}
+                    className={
+                      selectedPropertyId === property.listing_id ? 'ring-2 ring-main-primary' : ''
+                    }
+                  />
+                </div>
+              ))
+            )}
           </div>
         </div>
 
