@@ -19,6 +19,7 @@ interface PropertyMapProps {
   selectedPropertyId?: string;
   hoveredPropertyId?: string;
   onPropertyClick?: (propertyId: string) => void;
+  onBoundsChange?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   apiKey?: string;
   defaultCenter?: google.maps.LatLngLiteral;
   defaultZoom?: number;
@@ -38,12 +39,14 @@ export function PropertyMap({
   selectedPropertyId,
   hoveredPropertyId,
   onPropertyClick,
+  onBoundsChange,
   apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   defaultCenter,
   defaultZoom = MAP_CONFIG.DEFAULT_ZOOM,
   className,
 }: PropertyMapProps) {
   const [mapType, setMapType] = useState<MapType>('roadmap');
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
   if (!apiKey) {
     return (
@@ -63,7 +66,7 @@ export function PropertyMap({
 
   return (
     <div className={cn('relative h-full w-full', className)}>
-      <APIProvider apiKey={apiKey}>
+      <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API loaded')}>
         <Map
           style={{ width: '100%', height: '100%', borderRadius: MAP_CONFIG.BORDER_RADIUS }}
           defaultCenter={center}
@@ -72,6 +75,23 @@ export function PropertyMap({
           gestureHandling={'greedy'}
           disableDefaultUI={true}
           mapId='property-search-map'
+          onCenterChanged={(ev) => setMap(ev.map)}
+          onZoomChanged={(ev) => setMap(ev.map)}
+          onIdle={() => {
+            if (map && onBoundsChange) {
+              const bounds = map.getBounds();
+              if (bounds) {
+                const ne = bounds.getNorthEast();
+                const sw = bounds.getSouthWest();
+                onBoundsChange({
+                  north: ne.lat(),
+                  south: sw.lat(),
+                  east: ne.lng(),
+                  west: sw.lng(),
+                });
+              }
+            }
+          }}
         >
           {/* Render property markers */}
           {properties.map((property) => (

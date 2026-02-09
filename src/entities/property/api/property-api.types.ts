@@ -1,8 +1,8 @@
 export interface PropertySearchRequest {
-  north_lat?: number;
-  south_lat?: number;
-  east_lng?: number;
-  west_lng?: number;
+  north_lat: number;
+  south_lat: number;
+  east_lng: number;
+  west_lng: number;
   listing_type?: 'RENT' | 'BUY';
   min_price?: number;
   max_price?: number;

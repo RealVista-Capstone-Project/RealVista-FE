@@ -7,7 +7,11 @@ import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
-import { propertyQueries, type PropertyListingDto } from '@/entities/property';
+import {
+  propertyQueries,
+  type PropertyListingDto,
+  type PropertySearchRequest,
+} from '@/entities/property';
 import {
   PropertyFiltersModal,
   type PropertyFilters as PropertyFilterValues,
@@ -30,19 +34,31 @@ export function PropertySearchPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [filters, setFilters] = useState<PropertyFilterValues>(DEFAULT_FILTERS);
+  const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
+
+  // Initial center: Ho Chi Minh City
+  const initialCenter = {
+    lat: 10.762622,
+    lng: 106.660172,
+  };
 
   const { data: searchResponse, isLoading } = useQuery(
-    propertyQueries.search({
-      search_text: searchValue,
-      category: filters.category,
-      min_price: filters.priceRange.min,
-      max_price: filters.priceRange.max,
-      bedrooms: filters.bedrooms,
-      bathrooms: filters.bathrooms,
-      rental_period: filters.rentalPeriod,
-      page: 1, // TODO: Implement pagination state
-      size: 50,
-    })
+    propertyQueries.search(
+      mapBounds
+        ? {
+            ...mapBounds,
+            search_text: searchValue,
+            category: filters.category,
+            min_price: filters.priceRange.min,
+            max_price: filters.priceRange.max,
+            bedrooms: filters.bedrooms,
+            bathrooms: filters.bathrooms,
+            rental_period: filters.rentalPeriod,
+            page: 1, // TODO: Implement pagination state
+            size: 50,
+          }
+        : ({} as PropertySearchRequest) // Skip query until map bounds are ready
+    )
   );
 
   const properties = searchResponse?.payload.data.content || [];
@@ -78,6 +94,19 @@ export function PropertySearchPage() {
           selectedPropertyId={selectedPropertyId}
           hoveredPropertyId={hoveredPropertyId}
           onPropertyClick={handlePropertyClick}
+          defaultCenter={initialCenter}
+          onBoundsChange={(bounds) => {
+            setMapBounds(
+              (prev) =>
+                ({
+                  ...prev,
+                  north_lat: bounds.north,
+                  south_lat: bounds.south,
+                  east_lng: bounds.east,
+                  west_lng: bounds.west,
+                }) as PropertySearchRequest
+            );
+          }}
         />
       </div>
 

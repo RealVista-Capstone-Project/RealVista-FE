@@ -7,5 +7,6 @@ export const propertyQueries = {
     queryOptions({
       queryKey: ['properties', 'search', request],
       queryFn: () => propertyApi.search(request),
+      enabled: !!(request.north_lat && request.south_lat && request.east_lng && request.west_lng),
     }),
 };
