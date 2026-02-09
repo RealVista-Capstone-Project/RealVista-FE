@@ -2,9 +2,10 @@
 
 import { cn } from '@/shared/lib/utils';
 
+import { formatVND } from '@/shared/lib/utils/format-currency';
+
 export interface PropertyMapMarkerProps {
   price: number;
-  currency?: string;
   isSelected?: boolean;
   isHovered?: boolean;
   onClick?: () => void;
@@ -13,7 +14,6 @@ export interface PropertyMapMarkerProps {
 
 export function PropertyMapMarker({
   price,
-  currency = '$',
   isSelected = false,
   isHovered = false,
   onClick,
@@ -37,8 +37,7 @@ export function PropertyMapMarker({
           isSelected || isHovered ? 'text-white' : 'text-main-black'
         )}
       >
-        {currency}
-        {price >= 1000 ? `${(price / 1000).toFixed(1)}k` : price.toLocaleString()}
+        {formatVND(price)}
       </span>
     </button>
   );

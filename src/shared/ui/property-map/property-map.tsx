@@ -102,7 +102,6 @@ export function PropertyMap({
             >
               <PropertyMapMarker
                 price={property.price}
-                currency={property.currency}
                 isSelected={selectedPropertyId === property.id}
                 isHovered={hoveredPropertyId === property.id}
                 onClick={() => onPropertyClick?.(property.id)}
