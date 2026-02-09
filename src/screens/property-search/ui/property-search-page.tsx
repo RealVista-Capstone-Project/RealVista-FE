@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
+import { MapPin } from 'lucide-react';
+import { Button } from '@/shared/ui/button/button';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
@@ -26,7 +28,12 @@ const DEFAULT_FILTERS: PropertyFilterValues = {
   rentalPeriod: 'any',
 };
 
-export function PropertySearchPage() {
+export interface PropertySearchPageProps {
+  initialListingType?: 'RENT' | 'BUY';
+  onBack?: () => void;
+}
+
+export function PropertySearchPage({ initialListingType, onBack }: PropertySearchPageProps) {
   const t = useTranslations('PropertySearch');
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | undefined>();
@@ -48,6 +55,7 @@ export function PropertySearchPage() {
         ? {
             ...mapBounds,
             search_text: searchValue,
+            listing_type: initialListingType,
             category: filters.category,
             min_price: filters.priceRange.min,
             max_price: filters.priceRange.max,
@@ -114,6 +122,24 @@ export function PropertySearchPage() {
       <div className='w-full lg:w-1/2 overflow-y-auto bg-purple-98'>
         <div className='mx-auto max-w-4xl p-6'>
           {/* Search Header */}
+          {onBack && (
+            <div className='mb-6'>
+              <Button
+                type='button'
+                onClick={onBack}
+                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
+                variant='outline'
+              >
+                <span>{t('searchWithSearchBar')}</span>
+                <div className='relative flex h-5 w-5 items-center justify-center'>
+                  {/* Background circle */}
+                  <div className='absolute inset-0 rounded-full bg-purple-96'></div>
+                  {/* Icon */}
+                  <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+                </div>
+              </Button>
+            </div>
+          )}
           <PropertySearchHeader
             title={t('searchTitle')}
             propertyCount={searchResponse?.payload.data.total_elements || 0}
