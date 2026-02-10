@@ -176,7 +176,7 @@ export function MonthlyCostBreakdown({
                     stackId='a'
                     cornerRadius={5}
                     fill={`var(--color-${key})`}
-                    className='stroke-transparent stroke-2'
+                    className='stroke-background stroke-2'
                   />
                 );
               })}
