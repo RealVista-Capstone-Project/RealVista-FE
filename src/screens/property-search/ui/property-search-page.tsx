@@ -9,6 +9,7 @@ import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import { Pagination } from '@/shared/ui/realvista-pagination';
 import {
   propertyQueries,
   type PropertyListingDto,
@@ -42,6 +43,8 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [filters, setFilters] = useState<PropertyFilterValues>(DEFAULT_FILTERS);
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // Initial center: Ho Chi Minh City
   const initialCenter = {
@@ -62,14 +65,16 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
             bedrooms: filters.bedrooms,
             bathrooms: filters.bathrooms,
             rental_period: filters.rentalPeriod,
-            page: 1, // TODO: Implement pagination state
-            size: 50,
+            page: currentPage,
+            size: pageSize,
           }
         : ({} as PropertySearchRequest) // Skip query until map bounds are ready
     )
   );
 
   const properties = searchResponse?.payload.data.content || [];
+  const totalPages = searchResponse?.payload.data.total_pages || 0;
+  const totalElements = searchResponse?.payload.data.total_elements || 0;
   const propertyLocations: PropertyLocation[] = properties.map((p: PropertyListingDto) => ({
     id: p.listing_id,
     lat: p.coordinates.latitude,
@@ -87,10 +92,23 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
 
   const handleApplyFilters = (newFilters: PropertyFilterValues) => {
     setFilters(newFilters);
+    setCurrentPage(1);
   };
 
   const handleResetFilters = () => {
     setFilters(DEFAULT_FILTERS);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of listings
+    document.getElementById('property-listings-top')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    setCurrentPage(1);
   };
 
   return (
@@ -104,6 +122,7 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
           onPropertyClick={handlePropertyClick}
           defaultCenter={initialCenter}
           onBoundsChange={(bounds) => {
+            setCurrentPage(1);
             setMapBounds(
               (prev) =>
                 ({
@@ -123,10 +142,10 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
         <div className='mx-auto max-w-4xl p-6'>
           <PropertySearchHeader
             title={t('searchTitle')}
-            propertyCount={searchResponse?.payload.data.total_elements || 0}
+            propertyCount={totalElements}
             searchPlaceholder={t('searchPlaceholder')}
             searchValue={searchValue}
-            onSearchChange={setSearchValue}
+            onSearchChange={handleSearchChange}
             onMoreFilters={() => setFiltersModalOpen(true)}
             homeLabel={t('home')}
             searchLabel={t('search')}
@@ -180,6 +199,7 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
           </div>
 
           {/* Property Grid/List */}
+          <div id='property-listings-top' />
           <div
             className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col gap-4'}`}
           >
@@ -218,6 +238,17 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
               ))
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className='mt-8 pb-4'>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
 
         {/* Filters Modal */}
