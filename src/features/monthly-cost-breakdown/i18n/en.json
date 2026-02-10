@@ -1,0 +1,8 @@
+{
+  "MonthlyCostBreakdown": {
+    "title": "Monthly Breakdown",
+    "description": "See how your monthly payment is distributed",
+    "basePrice": "Base Price",
+    "totalMonthlyPayment": "Total monthly payment"
+  }
+}
