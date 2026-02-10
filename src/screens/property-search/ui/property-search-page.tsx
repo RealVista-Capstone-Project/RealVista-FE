@@ -171,6 +171,7 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
           />
 
           {/* Filters */}
+          {/* TODO: Please implement filters */}
           <div className='mt-6'>
             <PropertyFilters
               priceFilter={{
@@ -228,6 +229,7 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
                     area={property.size_m2}
                     areaUnit='m²'
                     isFavorite={property.is_favorite}
+                    variant={viewMode}
                     onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
                     onClick={(id: string) => console.log('Property clicked:', id)}
                     className={
