@@ -9,9 +9,9 @@ function mapCostBreakdown(apiBreakdown: CostBreakdownAPI): CostBreakdown {
   return {
     basePrice: apiBreakdown.base_price,
     basePriceUnit: apiBreakdown.base_price_unit,
-    requiredFees: apiBreakdown.required_fees.map(mapCostFee),
+    requiredFees: (apiBreakdown.required_fees || []).map(mapCostFee),
     requiredFeesSubtotal: apiBreakdown.required_fees_subtotal,
-    optionalFees: apiBreakdown.optional_fees.map(mapCostFee),
+    optionalFees: (apiBreakdown.optional_fees || []).map(mapCostFee),
     optionalFeesSubtotal: apiBreakdown.optional_fees_subtotal,
     totalCost: apiBreakdown.total_cost,
     disclaimer: apiBreakdown.disclaimer,
