@@ -149,14 +149,14 @@ export function MonthlyCostBreakdown({
                         <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle'>
                           <tspan
                             x={viewBox.cx}
-                            y={(viewBox.cy || 0) - 16}
+                            y={(viewBox.cy || 0) - 10}
                             className='fill-main-primary text-2xl font-bold'
                           >
                             {formatCurrency(costBreakdown.totalCost)}
                           </tspan>
                           <tspan
                             x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 4}
+                            y={(viewBox.cy || 0) + 12}
                             className='fill-grey-500 text-sm'
                           >
                             {t('totalMonthlyPayment')}
