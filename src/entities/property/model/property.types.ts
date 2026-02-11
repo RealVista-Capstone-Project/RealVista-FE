@@ -2,17 +2,19 @@
  * Property entity types
  */
 
+import type { Attribute } from '@/entities/listing';
+import type { CostBreakdown } from '@/shared/types';
+
 export interface Property {
   id: string;
   title: string;
   address: string;
   price: number;
-  bedrooms: number;
-  bathrooms: number;
   area: number;
   description: string;
   images: PropertyImage[];
   amenities: string[];
+  attributes: Attribute[]; // Optional: for dynamic property specifications from backend
   location: {
     lat: number;
     lng: number;
@@ -20,11 +22,13 @@ export interface Property {
   agent: Agent;
   createdAt: string;
   updatedAt: string;
+  costBreakdown?: CostBreakdown;
 }
 
 export interface PropertyImage {
   id: string;
   url: string;
+  thumbnailUrl?: string; // Optional thumbnail for video/3D tour previews
   alt: string;
   type: 'photo' | '3d-tour' | 'video';
   isPrimary: boolean;
@@ -33,7 +37,7 @@ export interface PropertyImage {
 export interface Agent {
   id: string;
   name: string;
-  avatar: string;
+  avatar?: string; // Optional - not always provided by API
   phone: string;
   email: string;
 }
@@ -41,3 +45,6 @@ export interface Agent {
 export interface PropertyDetailProps {
   property: Property;
 }
+
+// Re-export cost breakdown types for convenience
+export type { CostBreakdown, CostFee, FeeType } from '@/shared/types';

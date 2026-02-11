@@ -4,15 +4,21 @@ import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
 import { PropertyAbout } from '@/features/property-about';
+import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import type { Property } from '@/entities/property';
+import type { Listing } from '@/entities/listing';
+import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 
 export interface ListingDetailScreenProps {
-  property: Property;
+  listing: Listing;
 }
 
-export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
+export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
+  // Map Listing to Property for compatibility with existing components
+  const property: Property = mapListingToProperty(listing);
+
   const handleShare = () => {
     // Share property
     console.log('Share property');
@@ -92,13 +98,21 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             <div className='md:hidden mb-6'>
               <PriceAndTour
                 price={property.price}
+                listingType={listing.listing_type}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
               />
             </div>
 
             {/* About Section */}
-            <PropertyAbout property={property} />
+            <div className='mb-6'>
+              <PropertyAbout property={property} />
+            </div>
+
+            {/* Monthly Cost Breakdown Section */}
+            {property.costBreakdown && (
+              <MonthlyCostBreakdown costBreakdown={property.costBreakdown} />
+            )}
           </div>
 
           {/* Desktop: Price & Tour Sidebar */}
@@ -106,6 +120,7 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
             <div className='md:sticky md:top-8'>
               <PriceAndTour
                 price={property.price}
+                listingType={listing.listing_type}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
               />
@@ -123,12 +138,16 @@ export function ListingDetailScreen({ property }: ListingDetailScreenProps) {
       <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-purple-92 px-4 py-3 sm:px-6 md:hidden z-50'>
         <div className='max-w-[1200px] mx-auto flex flex-col xs:flex-row items-center justify-between gap-3 xs:gap-4'>
           <div className='w-full xs:w-auto mb-2 xs:mb-0'>
-            <p className='text-main-black/50 text-xs font-medium leading-[1.4]'>Rent price</p>
+            <p className='text-main-black/50 text-xs font-medium leading-[1.4]'>
+              {listing.listing_type === 'RENT' ? 'Rent price' : 'Sale price'}
+            </p>
             <div className='flex items-baseline gap-1'>
               <p className='text-main-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
-              <span className='text-main-black/50 text-sm font-medium'>/month</span>
+              {listing.listing_type === 'RENT' && (
+                <span className='text-main-black/50 text-sm font-medium'>/month</span>
+              )}
             </div>
           </div>
           <RealVistaButton

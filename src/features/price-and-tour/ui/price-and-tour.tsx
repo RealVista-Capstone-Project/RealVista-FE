@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
+import { formatVND } from '@/shared/lib/utils';
 
 export interface PriceAndTourProps {
   price: number;
+  listingType: 'RENT' | 'SALE';
   onContact?: () => void;
   onRequestTour?: (date: string) => void;
 }
@@ -16,9 +18,12 @@ export interface PriceAndTourProps {
  *
  * Shows monthly rent price, contact button, and a home tour request form with date picker
  */
-export function PriceAndTour({ price, onContact, onRequestTour }: PriceAndTourProps) {
+export function PriceAndTour({ price, listingType, onContact, onRequestTour }: PriceAndTourProps) {
   const t = useTranslations('PriceAndTour');
   const [tourDate, setTourDate] = useState('');
+
+  const priceLabel = listingType === 'RENT' ? t('rentPrice') : t('buyPrice');
+  const priceSuffix = listingType === 'RENT' ? t('perMonth') : '';
 
   const handleRequestTour = () => {
     if (tourDate && onRequestTour) {
@@ -26,26 +31,21 @@ export function PriceAndTour({ price, onContact, onRequestTour }: PriceAndTourPr
     }
   };
 
-  const formattedPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-
   return (
     <div className='bg-white border border-purple-92 rounded-lg p-6 w-full'>
       <div className='flex flex-col gap-6'>
-        {/* Rent Price Section */}
+        {/* Price Section */}
         <div className='flex flex-col gap-1'>
-          <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>{t('rentPrice')}</p>
+          <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>{priceLabel}</p>
           <div className='flex items-baseline gap-0.5'>
             <p className='text-main-primary text-[24px] font-extrabold leading-[1.5] tracking-[-1px]'>
-              {formattedPrice}
+              {formatVND(price)}
             </p>
-            <span className='text-main-black/50 text-[14px] font-medium h-8 flex items-center'>
-              {t('perMonth')}
-            </span>
+            {priceSuffix && (
+              <span className='text-main-black/50 text-[14px] font-medium h-8 flex items-center'>
+                {priceSuffix}
+              </span>
+            )}
           </div>
         </div>
 
