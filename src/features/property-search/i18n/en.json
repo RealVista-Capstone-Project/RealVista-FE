@@ -16,6 +16,27 @@
     "gridView": "Grid view",
     "listView": "List view",
     "map": "Map",
-    "satellite": "Satellite"
+    "satellite": "Satellite",
+    "moreFiltersTitle": "More filters",
+    "category": "Category",
+    "categories": {
+      "residential": "Residential",
+      "commercial": "Commercial",
+      "industrial": "Industrial",
+      "land": "Land"
+    },
+    "priceRange": "Price Range",
+    "features": "Features",
+    "bedroom": "Bedroom",
+    "bathroom": "Bathroom",
+    "rentalPeriod": {
+      "label": "Rental Period",
+      "any": "Any",
+      "1-12": "1 - 12 months",
+      "13-24": "13 - 24 months",
+      "24+": "24+ months"
+    },
+    "reset": "Reset",
+    "apply": "Apply"
   }
 }

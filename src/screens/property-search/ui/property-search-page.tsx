@@ -22,7 +22,7 @@ import {
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
-  category: 'houses',
+  category: 'RESIDENTIAL',
   priceRange: { min: 1000, max: 1234567 },
   bedrooms: 4,
   bathrooms: 2,
@@ -270,9 +270,10 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
             title: t('moreFiltersTitle'),
             category: t('category'),
             categories: {
-              houses: t('categories.houses'),
-              rooms: t('categories.rooms'),
-              apartment: t('categories.apartment'),
+              residential: t('categories.residential'),
+              commercial: t('categories.commercial'),
+              industrial: t('categories.industrial'),
+              land: t('categories.land'),
             },
             priceRange: t('priceRange'),
             features: t('features'),

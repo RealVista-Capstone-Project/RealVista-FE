@@ -20,9 +20,10 @@
     "moreFiltersTitle": "Thêm bộ lọc",
     "category": "Danh mục",
     "categories": {
-      "houses": "Nhà",
-      "rooms": "Phòng",
-      "apartment": "Căn hộ"
+      "residential": "Nhà ở",
+      "commercial": "Thương mại",
+      "industrial": "Công nghiệp",
+      "land": "Đất"
     },
     "priceRange": "Khoảng giá",
     "features": "Tiện nghi",

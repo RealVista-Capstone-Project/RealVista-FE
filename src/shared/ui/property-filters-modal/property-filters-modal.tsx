@@ -7,7 +7,7 @@ import { Button } from '@/shared/ui/button/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
 import { PriceRangeSlider } from '@/shared/ui/price-range-slider';
 
-export type PropertyCategory = 'houses' | 'rooms' | 'apartment';
+export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND';
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
 
 export interface PropertyFilters {
@@ -31,9 +31,10 @@ export interface PropertyFiltersModalProps {
     title: string;
     category: string;
     categories: {
-      houses: string;
-      rooms: string;
-      apartment: string;
+      residential: string;
+      commercial: string;
+      industrial: string;
+      land: string;
     };
     priceRange: string;
     features: string;
@@ -203,24 +204,30 @@ export function PropertyFiltersModal({
           {/* Category Selection */}
           <div className='space-y-3 pb-6 border-b border-grey-100'>
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.category}</h3>
-            <div className='flex gap-3'>
+            <div className='flex flex-wrap gap-3'>
               <CategoryButton
-                selected={localFilters.category === 'houses'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'houses' })}
+                selected={localFilters.category === 'RESIDENTIAL'}
+                onClick={() => setLocalFilters({ ...localFilters, category: 'RESIDENTIAL' })}
               >
-                {translations.categories.houses}
+                {translations.categories.residential}
               </CategoryButton>
               <CategoryButton
-                selected={localFilters.category === 'rooms'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'rooms' })}
+                selected={localFilters.category === 'COMMERCIAL'}
+                onClick={() => setLocalFilters({ ...localFilters, category: 'COMMERCIAL' })}
               >
-                {translations.categories.rooms}
+                {translations.categories.commercial}
               </CategoryButton>
               <CategoryButton
-                selected={localFilters.category === 'apartment'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'apartment' })}
+                selected={localFilters.category === 'INDUSTRIAL'}
+                onClick={() => setLocalFilters({ ...localFilters, category: 'INDUSTRIAL' })}
               >
-                {translations.categories.apartment}
+                {translations.categories.industrial}
+              </CategoryButton>
+              <CategoryButton
+                selected={localFilters.category === 'LAND'}
+                onClick={() => setLocalFilters({ ...localFilters, category: 'LAND' })}
+              >
+                {translations.categories.land}
               </CategoryButton>
             </div>
           </div>
