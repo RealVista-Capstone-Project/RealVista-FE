@@ -37,8 +37,8 @@ export interface PropertySearchPageProps {
 
 export function PropertySearchPage({ initialListingType, onBack }: PropertySearchPageProps) {
   const t = useTranslations('PropertySearch');
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>();
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | undefined>();
+  const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
+  const [hoveredPropertyIds, setHoveredPropertyIds] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
@@ -117,11 +117,13 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
     };
   });
 
-  const handlePropertyClick = (id: string) => {
-    setSelectedPropertyId(id);
-    // Scroll to property card in the list
-    const element = document.getElementById(`property-${id}`);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const handlePropertyClick = (ids: string[]) => {
+    setSelectedPropertyIds(ids);
+    // Scroll to the first property in the list
+    if (ids.length > 0) {
+      const element = document.getElementById(`property-${ids[0]}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   };
 
   const handleApplyFilters = (newFilters: PropertyFilterValues) => {
@@ -151,8 +153,8 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
       <div className='hidden lg:block lg:w-1/2'>
         <PropertyMap
           properties={propertyLocations}
-          selectedPropertyId={selectedPropertyId}
-          hoveredPropertyId={hoveredPropertyId}
+          selectedPropertyIds={selectedPropertyIds}
+          hoveredPropertyIds={hoveredPropertyIds}
           onPropertyClick={handlePropertyClick}
           defaultCenter={initialCenter}
           onBoundsChange={(bounds) => {
@@ -253,9 +255,9 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
                 <div
                   key={property.listing_id}
                   id={`property-${property.listing_id}`}
-                  onMouseEnter={() => setHoveredPropertyId(property.listing_id)}
-                  onMouseLeave={() => setHoveredPropertyId(undefined)}
-                  onClick={() => setSelectedPropertyId(property.listing_id)}
+                  onMouseEnter={() => setHoveredPropertyIds([property.listing_id])}
+                  onMouseLeave={() => setHoveredPropertyIds([])}
+                  onClick={() => setSelectedPropertyIds([property.listing_id])}
                 >
                   <RealVistaListingCard
                     id={property.listing_id}
@@ -271,9 +273,11 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
-                    onClick={(id: string) => console.log('Property clicked:', id)}
+                    onClick={(id: string) => handlePropertyClick([id])}
                     className={
-                      selectedPropertyId === property.listing_id ? 'ring-2 ring-main-primary' : ''
+                      selectedPropertyIds.includes(property.listing_id)
+                        ? 'ring-2 ring-main-primary'
+                        : ''
                     }
                   />
                 </div>

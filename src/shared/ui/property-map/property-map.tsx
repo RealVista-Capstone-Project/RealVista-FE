@@ -18,9 +18,9 @@ export interface PropertyLocation {
 
 interface PropertyMapProps {
   properties: PropertyLocation[];
-  selectedPropertyId?: string;
-  hoveredPropertyId?: string;
-  onPropertyClick?: (propertyId: string) => void;
+  selectedPropertyIds?: string[];
+  hoveredPropertyIds?: string[];
+  onPropertyClick?: (propertyIds: string[]) => void;
   onBoundsChange?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   apiKey?: string;
   defaultCenter?: google.maps.LatLngLiteral;
@@ -38,8 +38,8 @@ const MapErrorFallback = ({ message }: { message: string }) => (
 
 export function PropertyMap({
   properties,
-  selectedPropertyId,
-  hoveredPropertyId,
+  selectedPropertyIds,
+  hoveredPropertyIds,
   onPropertyClick,
   onBoundsChange,
   apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
@@ -100,23 +100,22 @@ export function PropertyMap({
             <AdvancedMarker
               key={property.id}
               position={{ lat: property.lat, lng: property.lng }}
-              onClick={() => onPropertyClick?.(property.id)}
+              onClick={() => onPropertyClick?.(property.ids || [property.id])}
             >
               <PropertyMapMarker
                 price={property.price}
                 label={property.label}
                 isSelected={
-                  selectedPropertyId
-                    ? property.ids?.includes(selectedPropertyId) ||
-                      property.id === selectedPropertyId
+                  selectedPropertyIds
+                    ? (property.ids || [property.id]).some((id) => selectedPropertyIds.includes(id))
                     : false
                 }
                 isHovered={
-                  hoveredPropertyId
-                    ? property.ids?.includes(hoveredPropertyId) || property.id === hoveredPropertyId
+                  hoveredPropertyIds
+                    ? (property.ids || [property.id]).some((id) => hoveredPropertyIds.includes(id))
                     : false
                 }
-                onClick={() => onPropertyClick?.(property.id)}
+                onClick={() => onPropertyClick?.(property.ids || [property.id])}
               />
             </AdvancedMarker>
           ))}
