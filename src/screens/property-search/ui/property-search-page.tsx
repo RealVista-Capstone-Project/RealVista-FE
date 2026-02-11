@@ -15,6 +15,7 @@ import {
   type PropertyListingDto,
   type PropertySearchRequest,
 } from '@/entities/property';
+import { formatVND } from '@/shared/lib/utils/format-currency';
 import {
   PropertyFiltersModal,
   type PropertyFilters as PropertyFilterValues,
@@ -75,13 +76,46 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
   const properties = searchResponse?.payload.data.content || [];
   const totalPages = searchResponse?.payload.data.total_pages || 0;
   const totalElements = searchResponse?.payload.data.total_elements || 0;
-  const propertyLocations: PropertyLocation[] = properties.map((p: PropertyListingDto) => ({
-    id: p.listing_id,
-    lat: p.coordinates.latitude,
-    lng: p.coordinates.longitude,
-    price: p.price,
-    currency: '$', // TODO: backend should provide currency or use locale
-  }));
+
+  // Group properties by coordinates to handle duplicates
+  const groupedProperties = properties.reduce(
+    (acc, property) => {
+      const key = `${property.coordinates.latitude},${property.coordinates.longitude}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(property);
+      return acc;
+    },
+    {} as Record<string, PropertyListingDto[]>
+  );
+
+  const propertyLocations: PropertyLocation[] = Object.values(groupedProperties).map((group) => {
+    const firstProperty = group[0];
+    const propertyIds = group.map((p) => p.listing_id);
+
+    // If there are multiple properties at the same location, calculate price range
+    let label: string | undefined;
+    if (group.length > 1) {
+      const prices = group.map((p) => p.price);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
+      if (minPrice !== maxPrice) {
+        label = `${formatVND(minPrice)} - ${formatVND(maxPrice)}`;
+      }
+    }
+
+    return {
+      id: firstProperty.listing_id,
+      ids: propertyIds,
+      lat: firstProperty.coordinates.latitude,
+      lng: firstProperty.coordinates.longitude,
+      price: firstProperty.price,
+      currency: '$', // TODO: backend should provide currency or use locale
+      label,
+    };
+  });
 
   const handlePropertyClick = (id: string) => {
     setSelectedPropertyId(id);

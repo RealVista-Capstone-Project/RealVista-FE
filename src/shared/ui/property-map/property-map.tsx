@@ -7,11 +7,13 @@ import { cn } from '@/shared/lib/utils';
 import { PropertyMapMarker } from '@/shared/ui/property-map-marker';
 
 export interface PropertyLocation {
-  id: string;
+  id: string; // This will be the ID of the first property in the group
+  ids?: string[]; // IDs of all properties in this group
   lat: number;
   lng: number;
   price: number;
   currency?: string;
+  label?: string;
 }
 
 interface PropertyMapProps {
@@ -102,8 +104,18 @@ export function PropertyMap({
             >
               <PropertyMapMarker
                 price={property.price}
-                isSelected={selectedPropertyId === property.id}
-                isHovered={hoveredPropertyId === property.id}
+                label={property.label}
+                isSelected={
+                  selectedPropertyId
+                    ? property.ids?.includes(selectedPropertyId) ||
+                      property.id === selectedPropertyId
+                    : false
+                }
+                isHovered={
+                  hoveredPropertyId
+                    ? property.ids?.includes(hoveredPropertyId) || property.id === hoveredPropertyId
+                    : false
+                }
                 onClick={() => onPropertyClick?.(property.id)}
               />
             </AdvancedMarker>

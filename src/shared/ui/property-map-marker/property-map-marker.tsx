@@ -5,7 +5,8 @@ import { cn } from '@/shared/lib/utils';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 
 export interface PropertyMapMarkerProps {
-  price: number;
+  price?: number;
+  label?: string;
   isSelected?: boolean;
   isHovered?: boolean;
   onClick?: () => void;
@@ -13,7 +14,8 @@ export interface PropertyMapMarkerProps {
 }
 
 export function PropertyMapMarker({
-  price,
+  price = 0,
+  label,
   isSelected = false,
   isHovered = false,
   onClick,
@@ -37,7 +39,7 @@ export function PropertyMapMarker({
           isSelected || isHovered ? 'text-white' : 'text-main-black'
         )}
       >
-        {formatVND(price)}
+        {label || formatVND(price ?? 0)}
       </span>
     </button>
   );
