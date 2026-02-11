@@ -23,10 +23,10 @@ import {
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
-  category: 'RESIDENTIAL',
+  category: [],
   priceRange: { min: 1000, max: 1234567 },
-  bedrooms: 4,
-  bathrooms: 2,
+  bedrooms: 0,
+  bathrooms: 0,
   rentalPeriod: 'any',
 };
 
@@ -60,11 +60,11 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
             ...mapBounds,
             search_text: searchValue,
             listing_type: initialListingType,
-            category: filters.category,
+            category: filters.category.length > 0 ? filters.category.join(',') : undefined,
             min_price: filters.priceRange.min,
             max_price: filters.priceRange.max,
-            bedrooms: filters.bedrooms,
-            bathrooms: filters.bathrooms,
+            bedrooms: filters.bedrooms > 0 ? filters.bedrooms : undefined,
+            bathrooms: filters.bathrooms > 0 ? filters.bathrooms : undefined,
             rental_period: filters.rentalPeriod,
             page: currentPage,
             size: pageSize,

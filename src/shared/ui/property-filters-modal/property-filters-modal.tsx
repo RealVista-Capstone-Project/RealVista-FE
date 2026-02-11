@@ -12,7 +12,7 @@ export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LA
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
 
 export interface PropertyFilters {
-  category: PropertyCategory;
+  category: PropertyCategory[];
   priceRange: {
     min: number;
     max: number;
@@ -207,26 +207,58 @@ export function PropertyFiltersModal({
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.category}</h3>
             <div className='flex flex-wrap gap-3'>
               <CategoryButton
-                selected={localFilters.category === 'RESIDENTIAL'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'RESIDENTIAL' })}
+                selected={localFilters.category.includes('RESIDENTIAL')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('RESIDENTIAL')
+                    ? localFilters.category.filter((c) => c !== 'RESIDENTIAL')
+                    : [...localFilters.category, 'RESIDENTIAL'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
               >
                 {translations.categories.residential}
               </CategoryButton>
               <CategoryButton
-                selected={localFilters.category === 'COMMERCIAL'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'COMMERCIAL' })}
+                selected={localFilters.category.includes('COMMERCIAL')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('COMMERCIAL')
+                    ? localFilters.category.filter((c) => c !== 'COMMERCIAL')
+                    : [...localFilters.category, 'COMMERCIAL'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
               >
                 {translations.categories.commercial}
               </CategoryButton>
               <CategoryButton
-                selected={localFilters.category === 'INDUSTRIAL'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'INDUSTRIAL' })}
+                selected={localFilters.category.includes('INDUSTRIAL')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('INDUSTRIAL')
+                    ? localFilters.category.filter((c) => c !== 'INDUSTRIAL')
+                    : [...localFilters.category, 'INDUSTRIAL'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
               >
                 {translations.categories.industrial}
               </CategoryButton>
               <CategoryButton
-                selected={localFilters.category === 'LAND'}
-                onClick={() => setLocalFilters({ ...localFilters, category: 'LAND' })}
+                selected={localFilters.category.includes('LAND')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('LAND')
+                    ? localFilters.category.filter((c) => c !== 'LAND')
+                    : [...localFilters.category, 'LAND'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
               >
                 {translations.categories.land}
               </CategoryButton>
@@ -249,6 +281,7 @@ export function PropertyFiltersModal({
           </div>
 
           {/* Features */}
+          {/* TODO: those attributes should be fetched dynamically from the backend based on the property cateogry */}
           <div className='space-y-4 pb-6 border-b border-grey-100'>
             <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
             <div className='flex items-center justify-between'>
