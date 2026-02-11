@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Bath, Heart, BedSingle } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -43,6 +44,8 @@ export function RealVistaListingCard({
 }: RealVistaListingCardProps) {
   const t = useTranslations('PropertyCard');
 
+  const [imgError, setImgError] = useState(false);
+
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleFavorite?.(id);
@@ -62,13 +65,14 @@ export function RealVistaListingCard({
       onClick={handleCardClick}
     >
       {/* Property Image */}
-      <div className='relative aspect-[16/10] rounded-t-lg'>
+      <div className='relative aspect-[16/10] rounded-t-lg bg-gray-100'>
         <Image
-          src={image}
+          src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image' : image}
           alt={title}
           fill
           className='rounded-t-lg object-cover'
           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+          onError={() => setImgError(true)}
         />
 
         {/* Popular Badge */}
