@@ -141,8 +141,13 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
       <div className='w-full lg:w-1/2 overflow-y-auto bg-purple-98'>
         <div className='mx-auto max-w-4xl p-6'>
           <PropertySearchHeader
-            title={t('searchTitle')}
+            title={initialListingType === 'SALE' ? t('searchTitleSale') : t('searchTitleRent')}
             propertyCount={totalElements}
+            propertyCountLabel={
+              initialListingType === 'SALE'
+                ? t('propertiesAvailableSale')
+                : t('propertiesAvailableRent')
+            }
             searchPlaceholder={t('searchPlaceholder')}
             searchValue={searchValue}
             onSearchChange={handleSearchChange}

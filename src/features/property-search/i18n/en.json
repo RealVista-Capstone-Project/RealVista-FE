@@ -2,8 +2,11 @@
   "PropertySearch": {
     "home": "Home",
     "search": "Search",
-    "searchTitle": "Search properties",
-    "propertiesAvailable": "properties available to rent",
+    "searchTitleRent": "Search properties to rent",
+    "searchTitleSale": "Search properties for sale",
+    "propertiesAvailableRent": "properties available to rent",
+    "propertiesAvailableSale": "properties available for sale",
+    "searchWithSearchBar": "Search with Search Bar",
     "searchPlaceholder": "Search...",
     "moreFilters": "More filters",
     "anyPrice": "Any Price",

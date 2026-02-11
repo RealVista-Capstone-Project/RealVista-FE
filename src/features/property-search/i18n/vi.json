@@ -2,8 +2,10 @@
   "PropertySearch": {
     "home": "Trang chủ",
     "search": "Tìm kiếm",
-    "searchTitle": "Tìm kiếm bất động sản",
-    "propertiesAvailable": "bất động sản có sẵn để thuê",
+    "searchTitleRent": "Tìm kiếm bất động sản cho thuê",
+    "searchTitleSale": "Tìm kiếm bất động sản mua bán",
+    "propertiesAvailableRent": "bất động sản có sẵn cho thuê",
+    "propertiesAvailableSale": "bất động sản có sẵn mua bán",
     "searchPlaceholder": "Tìm kiếm...",
     "searchWithSearchBar": "Tìm kiếm với Thanh tìm kiếm",
     "moreFilters": "Thêm bộ lọc",

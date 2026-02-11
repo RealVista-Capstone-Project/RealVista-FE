@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui/button/button';
 export interface PropertySearchHeaderProps {
   title?: string;
   propertyCount?: number;
+  propertyCountLabel?: string;
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
@@ -22,6 +23,7 @@ export interface PropertySearchHeaderProps {
 export function PropertySearchHeader({
   title = 'Search properties',
   propertyCount = 0,
+  propertyCountLabel = 'properties available to rent',
   searchPlaceholder = 'Search...',
   searchValue = '',
   onSearchChange,
@@ -50,7 +52,7 @@ export function PropertySearchHeader({
             {title}
           </h1>
           <p className='text-base font-normal leading-[1.5] text-grey-500'>
-            {propertyCount.toLocaleString()} properties available to rent
+            {propertyCount.toLocaleString()} {propertyCountLabel}
           </p>
         </div>
         {action && <div>{action}</div>}
