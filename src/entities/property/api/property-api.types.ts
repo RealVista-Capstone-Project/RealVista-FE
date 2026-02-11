@@ -3,7 +3,7 @@ export interface PropertySearchRequest {
   south_lat: number;
   east_lng: number;
   west_lng: number;
-  listing_type?: 'RENT' | 'BUY';
+  listing_type?: 'RENT' | 'SALE';
   min_price?: number;
   max_price?: number;
   limit?: number;
@@ -27,7 +27,7 @@ export interface PropertyListingDto {
   };
   street_address: string;
   price: number;
-  listing_type: 'RENT' | 'BUY';
+  listing_type: 'RENT' | 'SALE';
   name: string;
   thumbnail_url: string;
   size_m2: number;

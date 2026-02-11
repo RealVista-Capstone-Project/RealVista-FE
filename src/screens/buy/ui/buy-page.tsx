@@ -3,16 +3,16 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin } from 'lucide-react';
-import { SearchMode } from '@/shared/types/searchMode';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { RealVistaPropertyListingSearchBar } from '@/shared/ui/realvista-property-listing-search-bar/realvista-property-listing-search-bar';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { mockProperties } from '@/entities/property';
 import { Button } from '@/shared/ui/button/button';
+import { PropertySearchPage } from '@/screens/property-search/ui/property-search-page';
 
 export function BuyPage() {
   const t = useTranslations('Buy');
-  const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
+  const [isMapView, setIsMapView] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
@@ -29,6 +29,14 @@ export function BuyPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  if (isMapView) {
+    return (
+      <div className='h-screen w-full bg-white'>
+        <PropertySearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen bg-purple-98'>
       {/* Hero Section with Search */}
@@ -44,11 +52,11 @@ export function BuyPage() {
             <div className='w-full sm:w-auto'>
               <Button
                 type='button'
-                onClick={() => setSearchMode(searchMode === 'map' ? 'searchBar' : 'map')}
+                onClick={() => setIsMapView(!isMapView)}
                 className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
                 variant='outline'
               >
-                <span>{searchMode === 'map' ? t('searchWithMap') : t('searchWithSearchBar')}</span>
+                <span>{isMapView ? t('searchWithSearchBar') : t('searchWithMap')}</span>
                 <div className='relative flex h-5 w-5 items-center justify-center'>
                   {/* Background circle */}
                   <div className='absolute inset-0 rounded-full bg-purple-96'></div>

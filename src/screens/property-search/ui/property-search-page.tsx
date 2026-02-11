@@ -30,7 +30,7 @@ const DEFAULT_FILTERS: PropertyFilterValues = {
 };
 
 export interface PropertySearchPageProps {
-  initialListingType?: 'RENT' | 'BUY';
+  initialListingType?: 'RENT' | 'SALE';
   onBack?: () => void;
 }
 
