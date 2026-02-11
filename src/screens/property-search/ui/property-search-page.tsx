@@ -235,6 +235,7 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
                     areaUnit='m²'
                     isFavorite={property.is_favorite}
                     variant={viewMode}
+                    listingType={initialListingType}
                     onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
                     onClick={(id: string) => console.log('Property clicked:', id)}
                     className={

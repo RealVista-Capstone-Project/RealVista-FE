@@ -92,6 +92,7 @@ export function BuyPage() {
               <RealVistaListingCard
                 key={property.id}
                 {...property}
+                listingType='SALE'
                 onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
                 onClick={(id: string) => console.log('Property clicked:', id)}
               />

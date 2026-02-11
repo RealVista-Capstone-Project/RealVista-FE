@@ -21,6 +21,7 @@ export interface RealVistaListingCardProps {
   isPopular?: boolean;
   isFavorite?: boolean;
   variant?: 'grid' | 'list';
+  listingType?: 'RENT' | 'SALE';
   onToggleFavorite?: (id: string) => void;
   onClick?: (id: string) => void;
   className?: string;
@@ -39,6 +40,7 @@ export function RealVistaListingCard({
   isPopular = false,
   isFavorite = false,
   variant = 'grid',
+  listingType = 'RENT',
   onToggleFavorite,
   onClick,
   className,
@@ -200,9 +202,11 @@ export function RealVistaListingCard({
                 <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
                   {formatVND(price)}
                 </span>
-                <span className='text-sm font-normal leading-[1.5] text-grey-500'>
-                  {t('perMonth')}
-                </span>
+                {listingType === 'RENT' && (
+                  <span className='text-sm font-normal leading-[1.5] text-grey-500'>
+                    {t('perMonth')}
+                  </span>
+                )}
               </div>
               <FavoriteButton />
             </div>
@@ -257,9 +261,11 @@ export function RealVistaListingCard({
             <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
               {formatVND(price)}
             </span>
-            <span className='text-base font-normal leading-[1.5] text-grey-500'>
-              {t('perMonth')}
-            </span>
+            {listingType === 'RENT' && (
+              <span className='text-base font-normal leading-[1.5] text-grey-500'>
+                {t('perMonth')}
+              </span>
+            )}
           </div>
           <FavoriteButton />
         </div>
