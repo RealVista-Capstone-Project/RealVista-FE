@@ -7,6 +7,7 @@ import { Button } from '@/shared/ui/button/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
 import { PriceRangeSlider } from '@/shared/ui/price-range-slider';
 
+// TODO: The property category should be fetched from the GET API for property categories
 export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND';
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
 
