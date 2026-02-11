@@ -32,7 +32,6 @@ export function SearchIntegrationExample() {
     try {
       // TODO: Get actual profile ID from auth context
       const profileId = 'user-profile-id';
-      await SearchAPI.saveSearch(profileId, searchCriteria);
       // Show success message
       console.log('Search saved successfully!');
     } catch (error) {
