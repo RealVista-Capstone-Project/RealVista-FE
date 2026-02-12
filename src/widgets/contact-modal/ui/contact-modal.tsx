@@ -186,11 +186,11 @@ export function ContactModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('message')}</FormLabel>
-                  <div className='mb-2 flex flex-col gap-2'>
+                  <div className='mb-2 flex w-full flex-col gap-2 overflow-hidden'>
                     <span className='text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70'>
                       {t('suggestedInquiries')}
                     </span>
-                    <div className='no-scrollbar flex flex-nowrap gap-2 overflow-x-auto pb-1'>
+                    <div className='no-scrollbar flex w-full flex-nowrap gap-2 overflow-x-auto pb-1'>
                       {t.raw('quickReplies').map((reply: string, index: number) => (
                         <Button
                           key={index}
