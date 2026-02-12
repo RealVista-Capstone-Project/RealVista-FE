@@ -1,15 +1,22 @@
 import http from '@/shared/lib/http';
 import type {
+  ConversationListItemResponse,
   ConversationResponse,
   MessagePaginationResponse,
   SendMessageRequest,
   SendMessageResponse,
 } from '../model/types';
+import type { ApiResponse } from '@/shared/types/api';
 
 /**
  * Conversation API - HTTP methods for conversation management
  */
 export const conversationApi = {
+  /**
+   * List all conversations for the current user
+   */
+  listConversations: () => http.get<ConversationListItemResponse[]>('/conversations'),
+
   /**
    * Get conversation between current user and another user
    */
@@ -38,5 +45,5 @@ export const conversationApi = {
    * Creates conversation automatically if none exists
    */
   sendMessage: (request: SendMessageRequest) =>
-    http.post<SendMessageResponse>('/conversations/messages', request),
+    http.post<ApiResponse<SendMessageResponse>>('/conversations/messages', request),
 } as const;
