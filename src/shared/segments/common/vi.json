@@ -31,6 +31,7 @@
     "title": "Liên hệ đại lý",
     "description": "Gửi tin nhắn về bất động sản này",
     "descriptionWithAgent": "Gửi tin nhắn cho {agent} về bất động sản này",
+    "suggestedInquiries": "Gợi ý cho bạn",
     "fullName": "Họ và tên",
     "fullNamePlaceholder": "Nhập họ và tên của bạn",
     "email": "Email",

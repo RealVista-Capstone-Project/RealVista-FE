@@ -31,6 +31,7 @@
     "title": "Contact Agent",
     "description": "Send a message about this property",
     "descriptionWithAgent": "Send a message to {agent} about this property",
+    "suggestedInquiries": "Suggested inquiries",
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
     "email": "Email",

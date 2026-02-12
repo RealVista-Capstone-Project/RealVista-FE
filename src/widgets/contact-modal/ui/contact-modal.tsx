@@ -186,19 +186,24 @@ export function ContactModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('message')}</FormLabel>
-                  <div className='mb-2 flex flex-wrap gap-2'>
-                    {t.raw('quickReplies').map((reply: string, index: number) => (
-                      <Button
-                        key={index}
-                        type='button'
-                        variant='outline'
-                        size='sm'
-                        className='h-auto rounded-full px-3 py-1 text-xs font-normal transition-colors hover:bg-main-primary hover:text-white'
-                        onClick={() => form.setValue('message', reply, { shouldValidate: true })}
-                      >
-                        {reply}
-                      </Button>
-                    ))}
+                  <div className='mb-2 flex flex-col gap-2'>
+                    <span className='text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70'>
+                      {t('suggestedInquiries')}
+                    </span>
+                    <div className='no-scrollbar flex flex-nowrap gap-2 overflow-x-auto pb-1'>
+                      {t.raw('quickReplies').map((reply: string, index: number) => (
+                        <Button
+                          key={index}
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-auto shrink-0 rounded-full border-border bg-background px-3 py-1.5 text-xs font-normal text-muted-foreground transition-all hover:border-main-primary hover:bg-main-primary/5 hover:text-main-primary'
+                          onClick={() => form.setValue('message', reply, { shouldValidate: true })}
+                        >
+                          {reply}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                   <FormControl>
                     <Textarea
