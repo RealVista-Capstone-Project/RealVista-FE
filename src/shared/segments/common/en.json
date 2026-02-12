@@ -39,6 +39,12 @@
     "phonePlaceholder": "Enter your phone number",
     "message": "Message",
     "messagePlaceholder": "Hi, I'm interested in this property and would like to schedule a viewing...",
+    "quickReplies": [
+      "I need more advice on this property!",
+      "Is the price negotiable?",
+      "I want to schedule a viewing!",
+      "Are there any other similar properties?"
+    ],
     "send": "Send Message",
     "sending": "Sending...",
     "sent": "Message Sent!",

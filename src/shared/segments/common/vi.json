@@ -39,6 +39,12 @@
     "phonePlaceholder": "Nhập số điện thoại của bạn",
     "message": "Tin nhắn",
     "messagePlaceholder": "Xin chào, tôi quan tâm đến bất động sản này và muốn đặt lịch xem...",
+    "quickReplies": [
+      "Tôi cần tư vấn thêm về bất động sản này!",
+      "Giá cả có thể thương lượng không?",
+      "Tôi muốn đặt lịch xem nhà!",
+      "Còn căn nào tương tự không?"
+    ],
     "send": "Gửi tin nhắn",
     "sending": "Đang gửi...",
     "sent": "Đã gửi tin nhắn!",

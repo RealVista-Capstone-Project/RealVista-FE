@@ -186,6 +186,20 @@ export function ContactModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('message')}</FormLabel>
+                  <div className='mb-2 flex flex-wrap gap-2'>
+                    {t.raw('quickReplies').map((reply: string, index: number) => (
+                      <Button
+                        key={index}
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        className='h-auto rounded-full px-3 py-1 text-xs font-normal transition-colors hover:bg-main-primary hover:text-white'
+                        onClick={() => form.setValue('message', reply, { shouldValidate: true })}
+                      >
+                        {reply}
+                      </Button>
+                    ))}
+                  </div>
                   <FormControl>
                     <Textarea
                       {...field}
