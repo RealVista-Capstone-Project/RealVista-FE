@@ -87,7 +87,7 @@ export function mapListingToProperty(listing: Listing): Property {
     agent: {
       id: listing.agent.user_id,
       name: listing.agent.full_name,
-      avatar: listing.agent.avatar_url || '/images/default-avatar.png', // Fallback avatar
+      avatar: listing.agent.avatar_url,
       phone: listing.agent.phone,
       email: listing.agent.email,
     },
