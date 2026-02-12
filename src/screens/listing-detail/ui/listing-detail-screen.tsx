@@ -16,7 +16,10 @@ import type { ContactFormData } from '@/entities/contact';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 import { useRouter, useParams } from 'next/navigation';
+import { useChatWindows } from '@/shared/context/chat-window-context';
 import { useAuthSession, isAuthenticated } from '@/features/auth/model';
+import { unwrapApiResponse } from '@/shared/types/api';
+import type { SendMessageResponse } from '@/entities/conversation/model/types';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 
 export interface ListingDetailScreenProps {
@@ -32,6 +35,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const router = useRouter();
   const params = useParams();
   const { data: session } = useAuthSession();
+  const { openWindow } = useChatWindows();
 
   const handleShare = () => {
     // Share property
@@ -74,12 +78,25 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleSendContact = async (data: ContactFormData) => {
-    await sendMessage.mutateAsync({
+    const response = await sendMessage.mutateAsync({
       recipient_user_id: listing.agent.user_id,
       message_type: 'LISTING_CARD',
       content: data.message,
       metadata: JSON.stringify(chatListingData),
     });
+
+    if (response) {
+      const sendResult = unwrapApiResponse<SendMessageResponse>(response);
+      const conversationId = sendResult.conversation_id;
+
+      if (conversationId) {
+        openWindow(conversationId, {
+          id: listing.agent.user_id,
+          name: listing.agent.full_name,
+          avatar: listing.agent.avatar_url,
+        });
+      }
+    }
   };
 
   const handleRequestTour = (date: string) => {
