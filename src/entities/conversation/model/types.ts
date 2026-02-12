@@ -67,3 +67,13 @@ export interface MessagePaginationResponse {
   messages: MessageResponse[];
   pagination: CursorBasedPaginationMetadata;
 }
+
+export interface ConversationListItemResponse {
+  conversation_id: string;
+  other_user: SenderInfo;
+  last_message?: string;
+  last_message_type?: string;
+  last_message_time?: string;
+  unread_count: number;
+  created_at: string;
+}

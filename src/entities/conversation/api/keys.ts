@@ -5,6 +5,8 @@
 export const conversationKeys = {
   all: ['conversations'] as const,
 
+  list: () => [...conversationKeys.all, 'list'] as const,
+
   detail: (otherUserId: string) => [...conversationKeys.all, 'detail', otherUserId] as const,
 
   messages: (conversationId: string) =>
