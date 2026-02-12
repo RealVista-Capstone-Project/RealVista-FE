@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { IMessage } from '@stomp/stompjs';
+import type { IMessage, IFrame } from '@stomp/stompjs';
 import type {
   WebSocketOptions,
   WebSocketState,
@@ -36,19 +36,32 @@ import { WebSocketService } from '@/shared/lib/websocket/websocket.service';
  * }
  * ```
  */
-export function useWebSocket(options: WebSocketOptions & {
-  onConnect?: () => void;
-  onDisconnect?: () => void;
-  onError?: (error: Error | any) => void;
-  onMessage?: (message: IMessage) => void;
-}) {
+export function useWebSocket(
+  options: WebSocketOptions & {
+    onConnect?: () => void;
+    onDisconnect?: () => void;
+    onError?: (error: Error | IFrame) => void;
+    onMessage?: (message: IMessage) => void;
+    token?: string;
+  }
+) {
   const serviceRef = useRef<WebSocketService | null>(null);
   const [state, setState] = useState<WebSocketState>('idle');
   const [isConnected, setIsConnected] = useState(false);
 
-  // Initialize service
+  // Initialize service AND connect — both in same effect
+  // When token changes (undefined → real token after login), service
+  // needs to be recreated with the new token AND reconnected.
   useEffect(() => {
-    serviceRef.current = new WebSocketService({
+    // CRITICAL: Don't connect without auth token
+    // If we connect unauthenticated, subscriptions won't work properly
+    // because Spring Security won't know which user to route messages to
+    if (!options.token) {
+      console.log('[useWebSocket] Waiting for auth token before connecting');
+      return;
+    }
+
+    const service = new WebSocketService({
       ...options,
       onConnect: () => {
         setState('connected');
@@ -68,18 +81,16 @@ export function useWebSocket(options: WebSocketOptions & {
       onMessage: options.onMessage,
     });
 
+    serviceRef.current = service;
+    service.connect();
+
     return () => {
-      serviceRef.current?.disconnect();
+      service.disconnect();
       serviceRef.current = null;
     };
-    // Only run once on mount
+    // Re-initialize AND reconnect when token changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Connect to WebSocket server
-  useEffect(() => {
-    serviceRef.current?.connect();
-  }, []);
+  }, [options.token]);
 
   const subscribe = useCallback((subscriptionOptions: SubscriptionOptions) => {
     if (!serviceRef.current) {
