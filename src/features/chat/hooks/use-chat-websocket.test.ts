@@ -1,22 +1,27 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useChatWebSocket } from './use-chat-websocket';
 import type { IMessage } from '@stomp/stompjs';
-import type { ChatMessage } from '../model/types';
+import { useWebSocket } from '@/shared/lib/websocket';
 
 // Mock the useWebSocket hook
 jest.mock('@/shared/lib/websocket', () => ({
   useWebSocket: jest.fn(),
 }));
 
-import { useWebSocket } from '@/shared/lib/websocket';
+// Mock auth session
+jest.mock('@/features/auth/model/use-auth-session', () => ({
+  useAuthSession: jest.fn(),
+}));
+
+import { useAuthSession } from '@/features/auth/model/use-auth-session';
 
 describe('useChatWebSocket Hook', () => {
   let mockSubscribe: jest.Mock;
   let mockSend: jest.Mock;
   let mockDisconnect: jest.Mock;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockOnNewMessage: jest.Mock;
-  let mockOnUserJoin: jest.Mock;
-  let mockOnUserLeave: jest.Mock;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockOnError: jest.Mock;
 
   beforeEach(() => {
@@ -24,8 +29,6 @@ describe('useChatWebSocket Hook', () => {
     jest.useFakeTimers();
 
     mockOnNewMessage = jest.fn();
-    mockOnUserJoin = jest.fn();
-    mockOnUserLeave = jest.fn();
     mockOnError = jest.fn();
 
     // Create mock subscribe function
@@ -46,6 +49,11 @@ describe('useChatWebSocket Hook', () => {
       disconnect: mockDisconnect,
       getState: () => 'idle',
     });
+
+    // Mock useAuthSession
+    (useAuthSession as jest.Mock).mockReturnValue({
+      data: { user: { id: 'test-user-id', accessToken: 'test-token' } },
+    });
   });
 
   afterEach(() => {
@@ -63,48 +71,24 @@ describe('useChatWebSocket Hook', () => {
         getState: () => 'disconnected',
       });
 
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
+      const { result } = renderHook(() => useChatWebSocket());
 
       expect(result.current.isConnected).toBe(false);
-      expect(result.current.state).toBe('disconnected');
-      expect(result.current.messages).toEqual([]);
     });
 
-    it('should initialize with userName and userId', () => {
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
+    it('should use token from session', () => {
+      renderHook(() => useChatWebSocket());
 
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          userId: 123,
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
+      expect(useWebSocket).toHaveBeenCalledWith(
+        expect.objectContaining({
+          token: 'test-token',
         })
       );
-
-      expect(result.current.isConnected).toBe(true);
     });
   });
 
   describe('subscription', () => {
-    it('should subscribe to /topic/public when connected', async () => {
+    it('should subscribe to queues when connected', async () => {
       (useWebSocket as jest.Mock).mockReturnValue({
         isConnected: true,
         state: 'connected',
@@ -114,181 +98,23 @@ describe('useChatWebSocket Hook', () => {
         getState: () => 'connected',
       });
 
-      renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
+      renderHook(() => useChatWebSocket());
 
       await waitFor(() => {
         expect(mockSubscribe).toHaveBeenCalledWith({
-          destination: '/topic/public',
+          destination: '/user/queue/messages',
+          onMessage: expect.any(Function),
+        });
+        expect(mockSubscribe).toHaveBeenCalledWith({
+          destination: '/user/queue/typing',
           onMessage: expect.any(Function),
         });
       });
     });
-
-    it('should handle incoming CHAT message', async () => {
-      const chatMessage: ChatMessage = {
-        id: 'msg-1',
-        senderId: 123,
-        senderName: 'Alice',
-        content: 'Hello world',
-        timestamp: Date.now(),
-        type: 'CHAT',
-      };
-
-      let messageCallback: ((msg: IMessage) => void) | null = null;
-
-      mockSubscribe.mockImplementation((options) => {
-        messageCallback = options.onMessage;
-        return jest.fn();
-      });
-
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
-
-      await waitFor(() => {
-        expect(mockSubscribe).toHaveBeenCalled();
-      });
-
-      // Simulate receiving a CHAT message
-      act(() => {
-        if (messageCallback) {
-          messageCallback({
-            body: JSON.stringify(chatMessage),
-          } as IMessage);
-        }
-      });
-
-      expect(mockOnNewMessage).toHaveBeenCalledWith(chatMessage);
-    });
-
-    it('should handle JOIN message', async () => {
-      const joinMessage: ChatMessage = {
-        id: 'msg-2',
-        senderId: 456,
-        senderName: 'Bob',
-        content: '',
-        timestamp: Date.now(),
-        type: 'JOIN',
-      };
-
-      let messageCallback: ((msg: IMessage) => void) | null = null;
-
-      mockSubscribe.mockImplementation((options) => {
-        messageCallback = options.onMessage;
-        return jest.fn();
-      });
-
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onUserJoin: mockOnUserJoin,
-          onError: mockOnError,
-        })
-      );
-
-      await waitFor(() => {
-        expect(mockSubscribe).toHaveBeenCalled();
-      });
-
-      act(() => {
-        if (messageCallback) {
-          messageCallback({
-            body: JSON.stringify(joinMessage),
-          } as IMessage);
-        }
-      });
-
-      expect(mockOnUserJoin).toHaveBeenCalledWith('Bob');
-    });
-
-    it('should handle LEAVE message', async () => {
-      const leaveMessage: ChatMessage = {
-        id: 'msg-3',
-        senderId: 789,
-        senderName: 'Charlie',
-        content: '',
-        timestamp: Date.now(),
-        type: 'LEAVE',
-      };
-
-      let messageCallback: ((msg: IMessage) => void) | null = null;
-
-      mockSubscribe.mockImplementation((options) => {
-        messageCallback = options.onMessage;
-        return jest.fn();
-      });
-
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onUserLeave: mockOnUserLeave,
-          onError: mockOnError,
-        })
-      );
-
-      await waitFor(() => {
-        expect(mockSubscribe).toHaveBeenCalled();
-      });
-
-      act(() => {
-        if (messageCallback) {
-          messageCallback({
-            body: JSON.stringify(leaveMessage),
-          } as IMessage);
-        }
-      });
-
-      expect(mockOnUserLeave).toHaveBeenCalledWith('Charlie');
-    });
   });
 
   describe('sendMessage', () => {
-    it('should send a CHAT message', () => {
+    it('should send a message to /app/chat.send', () => {
       (useWebSocket as jest.Mock).mockReturnValue({
         isConnected: true,
         state: 'connected',
@@ -298,71 +124,31 @@ describe('useChatWebSocket Hook', () => {
         getState: () => 'connected',
       });
 
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
+      const { result } = renderHook(() => useChatWebSocket());
 
       act(() => {
-        result.current.sendMessage('Hello world');
+        result.current.sendMessage({
+          conversation_id: 'conv-1',
+          recipientUserId: 'user-2',
+          message_type: 'TEXT',
+          content: 'Hello world',
+        });
       });
 
       expect(mockSend).toHaveBeenCalledWith({
-        destination: '/app/public',
+        destination: '/app/chat.send',
         body: {
-          type: 'CHAT',
-          payload: 'Hello world',
-          senderName: 'test-user',
+          conversation_id: 'conv-1',
+          recipient_user_id: 'user-2',
+          message_type: 'TEXT',
+          content: 'Hello world',
         },
-        skipAuth: true,
-      });
-    });
-
-    it('should include senderId when provided', () => {
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          userId: 123,
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
-
-      act(() => {
-        result.current.sendMessage('Hello world');
-      });
-
-      expect(mockSend).toHaveBeenCalledWith({
-        destination: '/app/public',
-        body: {
-          type: 'CHAT',
-          payload: 'Hello world',
-          senderName: 'test-user',
-          senderId: 123,
-        },
-        skipAuth: true,
       });
     });
   });
 
-  describe('joinRoom', () => {
-    it('should send a JOIN message', () => {
+  describe('typing', () => {
+    it('should send typing indicator', () => {
       (useWebSocket as jest.Mock).mockReturnValue({
         isConnected: true,
         state: 'connected',
@@ -372,135 +158,20 @@ describe('useChatWebSocket Hook', () => {
         getState: () => 'connected',
       });
 
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
+      const { result } = renderHook(() => useChatWebSocket());
 
       act(() => {
-        result.current.joinRoom('test-user');
+        result.current.sendTyping('conv-1', 'user-2');
       });
 
       expect(mockSend).toHaveBeenCalledWith({
-        destination: '/app/public',
+        destination: '/app/chat.typing',
         body: {
-          type: 'JOIN',
-          senderName: 'test-user',
+          conversation_id: 'conv-1',
+          recipient_user_id: 'user-2',
+          message_type: 'SYSTEM',
+          content: 'TYPING',
         },
-        skipAuth: true,
-      });
-    });
-
-    it('should include senderId when provided', () => {
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          userId: 456,
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
-
-      act(() => {
-        result.current.joinRoom('test-user');
-      });
-
-      expect(mockSend).toHaveBeenCalledWith({
-        destination: '/app/public',
-        body: {
-          type: 'JOIN',
-          senderName: 'test-user',
-          senderId: 456,
-        },
-        skipAuth: true,
-      });
-    });
-  });
-
-  describe('leaveRoom', () => {
-    it('should send a LEAVE message', () => {
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
-
-      act(() => {
-        result.current.leaveRoom('test-user');
-      });
-
-      expect(mockSend).toHaveBeenCalledWith({
-        destination: '/app/public',
-        body: {
-          type: 'LEAVE',
-          senderName: 'test-user',
-        },
-        skipAuth: true,
-      });
-    });
-
-    it('should include senderId when provided', () => {
-      (useWebSocket as jest.Mock).mockReturnValue({
-        isConnected: true,
-        state: 'connected',
-        subscribe: mockSubscribe,
-        send: mockSend,
-        disconnect: mockDisconnect,
-        getState: () => 'connected',
-      });
-
-      const { result } = renderHook(() =>
-        useChatWebSocket({
-          endpoint: 'ws://localhost:8080/ws',
-          roomId: 'test-room',
-          userName: 'test-user',
-          userId: 789,
-          onNewMessage: mockOnNewMessage,
-          onError: mockOnError,
-        })
-      );
-
-      act(() => {
-        result.current.leaveRoom('test-user');
-      });
-
-      expect(mockSend).toHaveBeenCalledWith({
-        destination: '/app/public',
-        body: {
-          type: 'LEAVE',
-          senderName: 'test-user',
-          senderId: 789,
-        },
-        skipAuth: true,
       });
     });
   });
