@@ -30,12 +30,15 @@ const DEFAULT_FILTERS: PropertyFilterValues = {
   rentalPeriod: 'any',
 };
 
-export interface PropertySearchPageProps {
+export interface PropertyMapBasedSearchPageProps {
   initialListingType?: 'RENT' | 'SALE';
   onBack?: () => void;
 }
 
-export function PropertySearchPage({ initialListingType, onBack }: PropertySearchPageProps) {
+export function PropertyMapBasedSearchPage({
+  initialListingType,
+  onBack,
+}: PropertyMapBasedSearchPageProps) {
   const t = useTranslations('PropertySearch');
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
   const [hoveredPropertyIds, setHoveredPropertyIds] = useState<string[]>([]);
@@ -333,4 +336,4 @@ export function PropertySearchPage({ initialListingType, onBack }: PropertySearc
   );
 }
 
-export default PropertySearchPage;
+export default PropertyMapBasedSearchPage;

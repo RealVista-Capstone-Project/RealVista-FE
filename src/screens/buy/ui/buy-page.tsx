@@ -8,7 +8,7 @@ import { RealVistaPropertyListingSearchBar } from '@/shared/ui/realvista-propert
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { mockProperties } from '@/entities/property';
 import { Button } from '@/shared/ui/button/button';
-import { PropertySearchPage } from '@/screens/property-search/ui/property-search-page';
+import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
 
 export function BuyPage() {
   const t = useTranslations('Buy');
@@ -32,7 +32,7 @@ export function BuyPage() {
   if (isMapView) {
     return (
       <div className='h-screen w-full bg-white'>
-        <PropertySearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
+        <PropertyMapBasedSearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
       </div>
     );
   }
