@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 import { cn } from '@/shared/lib/utils';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import {
@@ -59,6 +60,7 @@ export function ContactModal({
   onSend,
 }: ContactModalProps) {
   const t = useTranslations('Contact');
+  const constraintRef = useRef<HTMLDivElement>(null);
   const [isSent, setIsSent] = useState(false);
 
   const { form, handleSubmit, isSubmitting } = useContactForm({
@@ -190,20 +192,41 @@ export function ContactModal({
                     <span className='text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70'>
                       {t('suggestedInquiries')}
                     </span>
-                    <div className='no-scrollbar flex w-full flex-nowrap gap-2 overflow-x-auto pb-1'>
-                      {t.raw('quickReplies').map((reply: string, index: number) => (
-                        <Button
-                          key={index}
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          className='h-auto shrink-0 rounded-full border-border bg-background px-3 py-1.5 text-xs font-normal text-muted-foreground transition-all hover:border-main-primary hover:bg-main-primary/5 hover:text-main-primary'
-                          onClick={() => form.setValue('message', reply, { shouldValidate: true })}
-                        >
-                          {reply}
-                        </Button>
-                      ))}
-                    </div>
+                    <motion.div
+                      ref={constraintRef}
+                      className='flex w-full overflow-hidden'
+                      style={{
+                        maskImage:
+                          'linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent)',
+                        WebkitMaskImage:
+                          'linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent)',
+                      }}
+                    >
+                      <motion.div
+                        drag='x'
+                        dragConstraints={constraintRef}
+                        className='flex gap-2 px-1'
+                        whileTap={{ cursor: 'grabbing' }}
+                        style={{ cursor: 'grab' }}
+                      >
+                        {t.raw('quickReplies').map((reply: string, index: number) => (
+                          <Button
+                            key={index}
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            className='h-auto shrink-0 rounded-full border-border bg-background px-3 py-1.5 text-xs font-normal text-muted-foreground transition-all hover:border-main-primary hover:bg-main-primary/5 hover:text-main-primary'
+                            onClick={() =>
+                              form.setValue('message', reply, { shouldValidate: true })
+                            }
+                            // Prevent drag from triggering click immediately if needed, but usually Button handles click fine.
+                            // Framer motion drag sometimes eats clicks. We can add a check if dragged.
+                          >
+                            {reply}
+                          </Button>
+                        ))}
+                      </motion.div>
+                    </motion.div>
                   </div>
                   <FormControl>
                     <Textarea
