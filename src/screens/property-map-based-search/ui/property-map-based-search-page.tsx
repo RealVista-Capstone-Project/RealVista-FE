@@ -61,6 +61,7 @@ export function PropertyMapBasedSearchPage({
             category: filters.category.length > 0 ? filters.category.join(',') : undefined,
             min_price: filters.priceRange.min,
             max_price: filters.priceRange.max,
+            // TODO: will be refactored with generic Attribute filters
             bedrooms: filters.bedrooms > 0 ? filters.bedrooms : undefined,
             bathrooms: filters.bathrooms > 0 ? filters.bathrooms : undefined,
             rental_period: filters.rentalPeriod,
