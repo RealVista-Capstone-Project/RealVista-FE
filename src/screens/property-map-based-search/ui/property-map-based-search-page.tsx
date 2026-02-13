@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin } from 'lucide-react';
-import { Button } from '@/shared/ui/button/button';
+import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
@@ -191,11 +191,11 @@ export function PropertyMapBasedSearchPage({
             moreFiltersLabel={t('moreFilters')}
             action={
               onBack && (
-                <Button
+                <RealVistaButton
                   type='button'
                   onClick={onBack}
-                  className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
-                  variant='outline'
+                  variant='secondary'
+                  className='w-full justify-between gap-3 border-[1.5px] bg-white px-4 py-3 h-auto text-base font-medium text-main-secondary opacity-70 hover:bg-white hover:opacity-100 sm:w-auto cursor-pointer'
                 >
                   <span>{t('searchWithSearchBar')}</span>
                   <div className='relative flex h-5 w-5 items-center justify-center'>
@@ -204,7 +204,7 @@ export function PropertyMapBasedSearchPage({
                     {/* Icon */}
                     <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
                   </div>
-                </Button>
+                </RealVistaButton>
               )
             }
           />
