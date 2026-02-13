@@ -20,6 +20,7 @@ import {
   PropertyFiltersModal,
   type PropertyFilters as PropertyFilterValues,
 } from '@/shared/ui/property-filters-modal';
+import { HCM_CITY_CENTER } from '@/shared/constants';
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
@@ -49,12 +50,6 @@ export function PropertyMapBasedSearchPage({
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-
-  // Initial center: Ho Chi Minh City
-  const initialCenter = {
-    lat: 10.762622,
-    lng: 106.660172,
-  };
 
   const { data: searchResponse, isLoading } = useQuery(
     propertyQueries.search(
@@ -159,7 +154,7 @@ export function PropertyMapBasedSearchPage({
           selectedPropertyIds={selectedPropertyIds}
           hoveredPropertyIds={hoveredPropertyIds}
           onPropertyClick={handlePropertyClick}
-          defaultCenter={initialCenter}
+          defaultCenter={HCM_CITY_CENTER}
           onBoundsChange={(bounds) => {
             setCurrentPage(1);
             setMapBounds(
