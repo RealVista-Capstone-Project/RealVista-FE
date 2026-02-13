@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { MapPin } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
@@ -51,8 +51,8 @@ export function PropertyMapBasedSearchPage({
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  const { data: searchResponse, isLoading } = useQuery(
-    propertyQueries.search(
+  const { data: searchResponse, isLoading } = useQuery({
+    ...propertyQueries.search(
       mapBounds
         ? {
             ...mapBounds,
@@ -69,8 +69,9 @@ export function PropertyMapBasedSearchPage({
             size: pageSize,
           }
         : ({} as PropertySearchRequest) // Skip query until map bounds are ready
-    )
-  );
+    ),
+    placeholderData: keepPreviousData, // Keep previous data while fetching new page for better UX
+  });
 
   const properties = searchResponse?.payload.data.content || [];
   const totalPages = searchResponse?.payload.data.total_pages || 0;
@@ -111,7 +112,6 @@ export function PropertyMapBasedSearchPage({
       lat: firstProperty.coordinates.latitude,
       lng: firstProperty.coordinates.longitude,
       price: firstProperty.price,
-      currency: '$', // TODO: backend should provide currency or use locale
       label,
     };
   });
