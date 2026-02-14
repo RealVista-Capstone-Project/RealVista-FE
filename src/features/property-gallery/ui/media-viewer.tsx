@@ -2,11 +2,10 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
-import { Heart, Share2 } from 'lucide-react';
+import { X, Heart } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
-import RealVistaLogo from '@/shared/assets/logo/logo';
+import { SharePopover } from '@/features/property-header/ui/share-popover';
 
 export type MediaType = 'photos' | '3d-tour' | 'video';
 
@@ -16,9 +15,7 @@ export interface MediaViewerProps {
   images?: string[];
   defaultTab?: MediaType;
   onFavorite?: () => void;
-  onShare?: () => void;
   onRequestTour?: () => void;
-  isFavorite?: boolean;
 }
 
 const MediaViewerContent = React.forwardRef<
@@ -55,9 +52,7 @@ export function MediaViewer({
   images = [],
   defaultTab = 'photos',
   onFavorite,
-  onShare,
   onRequestTour,
-  isFavorite = false,
 }: MediaViewerProps) {
   const [activeTab, setActiveTab] = React.useState<MediaType>(defaultTab);
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -141,14 +136,11 @@ export function MediaViewer({
                 <Heart className='size-4' />
                 Favorite
               </RealVistaButton>
-              <RealVistaButton
-                size='small'
-                onClick={onFavorite}
-                className={cn('!border-transparent !bg-transparent !text-white')}
-              >
-                <Share2 className='size-4' />
-                Share
-              </RealVistaButton>
+
+              <SharePopover
+                url={typeof window !== 'undefined' ? window.location.href : ''}
+                title=''
+              />
             </div>
           </div>
 

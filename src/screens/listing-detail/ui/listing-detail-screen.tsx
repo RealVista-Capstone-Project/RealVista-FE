@@ -19,11 +19,6 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
 
-  const handleShare = () => {
-    // Share property
-    console.log('Share property');
-  };
-
   const handleFavorite = () => {
     // Toggle favorite
     console.log('Toggle favorite');
@@ -71,7 +66,6 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}
-          onShare={handleShare}
           onFavorite={handleFavorite}
           isFavorite={false}
           onBrowseNearby={handleBrowseNearby}
@@ -85,7 +79,6 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             on3DTour={handle3DTour}
             onVideo={handleVideo}
             onFavorite={handleFavorite}
-            onShare={handleShare}
             isFavorite={false}
           />
         </div>
