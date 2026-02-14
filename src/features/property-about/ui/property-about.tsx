@@ -10,6 +10,7 @@ import { RentalFeatures } from '@/features/rental-features';
 import Image from 'next/image';
 import { PropertyMapSection } from '@/widgets/property-map-section';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
+import { ChartLineDots } from '@/shared/ui/chart-line-dot';
 
 export interface PropertyAboutProps {
   property: Property;
@@ -208,6 +209,8 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       {/* Rental Features */}
       <RentalFeatures property={property} />
 
+      <div className='h-px w-full bg-purple-92' />
+      <ChartLineDots />
       <div className='h-px w-full bg-purple-92' />
 
       {/* Rent Price History */}
