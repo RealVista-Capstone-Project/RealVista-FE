@@ -2,10 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MapPin, DollarSign, Search } from 'lucide-react';
+import { MapPin, DollarSign, Search, SlidersHorizontal } from 'lucide-react';
 import { SearchMode } from '@/shared/types/searchMode';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
-import { InlineAdvancedFilters } from '@/shared/ui/inline-advanced-filters';
+import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
 import { SearchAPI } from '@/shared/api/search.api';
@@ -23,6 +23,7 @@ function RentPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const itemsPerPage = 9;
 
   // Initialize state from URL params
@@ -219,12 +220,21 @@ function RentPageContent() {
                 />
               </div>
 
-              {/* Search Button */}
-              <div className='flex items-end'>
+              {/* Search Button & Filters */}
+              <div className='flex items-end gap-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => setIsFiltersOpen(true)}
+                  className='border-main-primary text-main-primary hover:bg-purple-96 px-4 py-2 flex items-center justify-center gap-2'
+                  title='Bộ lọc nâng cao'
+                >
+                  <SlidersHorizontal className='w-4 h-4' />
+                </Button>
                 <Button
                   type='button'
                   onClick={handleBasicSearch}
-                  className='w-full bg-main-primary hover:bg-main-primary/90 text-white px-6 py-2 flex items-center justify-center gap-2'
+                  className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white px-6 py-2 flex items-center justify-center gap-2'
                 >
                   <Search className='w-4 h-4' />
                   Tìm kiếm
@@ -233,11 +243,12 @@ function RentPageContent() {
             </div>
           </div>
 
-          {/* Inline Advanced Filters */}
-          <InlineAdvancedFilters
+          {/* Advanced Search Filters Side Sheet */}
+          <AdvancedSearchFilters
+            open={isFiltersOpen}
+            onOpenChange={setIsFiltersOpen}
             onApplyFilters={handleAdvancedFiltersApply}
             initialFilters={searchCriteria}
-            listingType='RENT'
           />
         </div>
       </section>

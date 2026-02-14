@@ -1,21 +1,50 @@
 'use client';
 
-import { useState } from 'react';
-import { Bookmark, X } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/shared/ui/button/button';
 import { AdvancedSearchRequest } from '@/shared/types/search';
 import { cn } from '@/shared/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/shared/ui/sheet/sheet';
+import { Input } from '@/shared/ui/input/input';
+import { Checkbox } from '@/shared/ui/checkbox/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+  SelectLabel as SelectGroupLabel,
+} from '@/shared/ui/select/select';
+import { Label } from '@/shared/ui/label/label';
+import { Slider } from '@/shared/ui/slider/slider';
+import { Switch } from '@/shared/ui/switch/switch';
+import {
+  PROPERTY_TYPES,
+  ATTRIBUTE_LABELS,
+  ATTRIBUTE_TYPES,
+  PropertyAttribute,
+} from '@/shared/config/property-types';
 
 interface AdvancedSearchFiltersProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onApplyFilters: (filters: AdvancedSearchRequest) => void;
-  onClose: () => void;
   initialFilters?: AdvancedSearchRequest;
   className?: string;
 }
 
 export function AdvancedSearchFilters({
+  open,
+  onOpenChange,
   onApplyFilters,
-  onClose,
   initialFilters,
   className,
 }: AdvancedSearchFiltersProps) {
@@ -26,145 +55,244 @@ export function AdvancedSearchFilters({
     }
   );
 
+  // Sync state with props when opening
+  useEffect(() => {
+    if (open && initialFilters) {
+      setFilters(initialFilters);
+    }
+  }, [open, initialFilters]);
+
   const handleApply = () => {
     onApplyFilters(filters);
-    onClose();
+    onOpenChange(false);
   };
 
   const handleReset = () => {
     setFilters({
-      listingType: 'SALE',
+      listingType: filters.listingType || 'SALE',
       sortBy: 'PRIORITY',
     });
   };
 
-  return (
-    <div
-      className={cn(
-        'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4',
-        className
-      )}
-      onClick={onClose}
-    >
-      <div
-        className='bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto'
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className='flex items-center justify-between p-6 border-b'>
-          <h2 className='text-2xl font-bold text-main-black'>Advanced Filters</h2>
-          <button
-            onClick={onClose}
-            className='p-2 hover:bg-grey-100 rounded-lg transition-colors'
-            aria-label='Close'
-          >
-            <X className='h-5 w-5' />
-          </button>
-        </div>
+  // Derive the selected property type from state
+  const selectedPropertyType = useMemo(() => {
+    return (filters as any).propertyType as string | undefined;
+  }, [filters]);
 
-        {/* Content */}
-        <div className='p-6 space-y-6'>
-          {/* Listing Type */}
-          <div>
-            <label className='block text-sm font-medium text-main-black mb-2'>
-              Listing Type
-            </label>
-            <div className='flex gap-3'>
-              <Button
-                type='button'
-                variant={filters.listingType === 'SALE' ? 'default' : 'outline'}
-                onClick={() => setFilters({ ...filters, listingType: 'SALE' })}
-                className='flex-1'
-              >
-                Buy
-              </Button>
-              <Button
-                type='button'
-                variant={filters.listingType === 'RENT' ? 'default' : 'outline'}
-                onClick={() => setFilters({ ...filters, listingType: 'RENT' })}
-                className='flex-1'
-              >
-                Rent
-              </Button>
-            </div>
+  // Find attributes for the selected type
+  const activeAttributes = useMemo(() => {
+    if (!selectedPropertyType) return [];
+
+    for (const category of PROPERTY_TYPES) {
+      const type = category.types.find((t) => t.code === selectedPropertyType);
+      if (type) return type.attributes;
+    }
+    return [];
+  }, [selectedPropertyType]);
+
+  // Helper to render dynamic input
+  const renderDynamicField = (attrCode: PropertyAttribute) => {
+    const label = ATTRIBUTE_LABELS[attrCode];
+    const type = ATTRIBUTE_TYPES[attrCode];
+
+    if (type === 'boolean') {
+      return (
+        <div
+          key={attrCode}
+          className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'
+        >
+          <span className='text-sm text-main-black'>{label}</span>
+          <Switch
+            checked={!!(filters as any)[attrCode]}
+            onCheckedChange={(checked) =>
+              setFilters({ ...filters, [attrCode]: checked })
+            }
+          />
+        </div>
+      );
+    }
+
+    if (type === 'number') {
+      return (
+        <div key={attrCode} className='space-y-1.5'>
+          <Label className='text-sm font-medium text-main-black'>{label}</Label>
+          <Input
+            type='number'
+            min='0'
+            placeholder='Any'
+            value={(filters as any)[attrCode] || ''}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                [attrCode]: e.target.value ? Number(e.target.value) : undefined,
+              })
+            }
+          />
+        </div>
+      );
+    }
+
+    // Text / Select
+    return (
+      <div key={attrCode} className='space-y-1.5'>
+        <Label className='text-sm font-medium text-main-black'>{label}</Label>
+        <Input
+          type='text'
+          placeholder='Any'
+          value={(filters as any)[attrCode] || ''}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              [attrCode]: e.target.value || undefined,
+            })
+          }
+        />
+      </div>
+    );
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side='right'
+        className={cn('w-full sm:w-[540px] flex flex-col p-0', className)}
+      >
+        <SheetHeader className='px-6 py-6 border-b'>
+          <SheetTitle>Bộ lọc nâng cao</SheetTitle>
+          <SheetDescription>
+            Tùy chỉnh tìm kiếm để tìm bất động sản ưng ý của bạn.
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className='flex-1 overflow-y-auto p-6 space-y-6'>
+
+            {/* Property Type Selector */}
+          <div className='space-y-3'>
+            <Label>Loại bất động sản</Label>
+            <Select
+              value={(filters as any).propertyType || undefined}
+              onValueChange={(value) =>
+                setFilters({ ...filters, propertyType: value || undefined } as any)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder='Tất cả' />
+              </SelectTrigger>
+              <SelectContent>
+                {PROPERTY_TYPES.map((cat) => (
+                  <SelectGroup key={cat.code}>
+                    <SelectGroupLabel>{cat.label}</SelectGroupLabel>
+                    {cat.types.map((type) => (
+                      <SelectItem key={type.code} value={type.code}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Price Range */}
-          <div>
-            <label className='block text-sm font-medium text-main-black mb-2'>
-              Price Range
-            </label>
+          <div className='space-y-3'>
+            <Label>Khoảng giá</Label>
             <div className='grid grid-cols-2 gap-3'>
-              <input
-                type='number'
-                placeholder='Min Price'
-                value={filters.price?.[0] || ''}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    price: [e.target.value ? Number(e.target.value) : null, filters.price?.[1] || null],
-                  })
-                }
-                className='px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-              />
-              <input
-                type='number'
-                placeholder='Max Price'
-                value={filters.price?.[1] || ''}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    price: [filters.price?.[0] || null, e.target.value ? Number(e.target.value) : null],
-                  })
-                }
-                className='px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-              />
+              <div className='space-y-1.5'>
+                <Input
+                  type='number'
+                  placeholder='Giá tối thiểu'
+                  value={filters.price?.[0] || ''}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      price: [
+                        e.target.value ? Number(e.target.value) : null,
+                        filters.price?.[1] || null,
+                      ],
+                    })
+                  }
+                />
+              </div>
+              <div className='space-y-1.5'>
+                <Input
+                  type='number'
+                  placeholder='Giá tối đa'
+                  value={filters.price?.[1] || ''}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      price: [
+                        filters.price?.[0] || null,
+                        e.target.value ? Number(e.target.value) : null,
+                      ],
+                    })
+                  }
+                />
+              </div>
             </div>
           </div>
 
-          {/* Area Range */}
-          <div>
-            <label className='block text-sm font-medium text-main-black mb-2'>
-              Area (m²)
-            </label>
+          {/* Area Range Slider */}
+          <div className='space-y-3'>
+            <div className='flex justify-between'>
+              <Label>Diện tích (m²)</Label>
+              <span className='text-sm text-muted-foreground'>
+                {filters.area?.[0] || 0}m² - {filters.area?.[1] || 500}m²
+              </span>
+            </div>
+            <Slider
+              min={0}
+              max={500}
+              step={10}
+              value={[filters.area?.[0] || 0, filters.area?.[1] || 500]}
+              onValueChange={([min, max]: number[]) =>
+                setFilters({
+                  ...filters,
+                  area: [min, max],
+                })
+              }
+              className='py-4'
+            />
             <div className='grid grid-cols-2 gap-3'>
-              <input
+              <Input
                 type='number'
-                placeholder='Min Area'
+                placeholder='Tối thiểu'
                 value={filters.area?.[0] || ''}
                 onChange={(e) =>
                   setFilters({
                     ...filters,
-                    area: [e.target.value ? Number(e.target.value) : null, filters.area?.[1] || null],
+                    area: [
+                      e.target.value ? Number(e.target.value) : 0,
+                      filters.area?.[1] || 500,
+                    ],
                   })
                 }
-                className='px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
               />
-              <input
+              <Input
                 type='number'
-                placeholder='Max Area'
+                placeholder='Tối đa'
                 value={filters.area?.[1] || ''}
                 onChange={(e) =>
                   setFilters({
                     ...filters,
-                    area: [filters.area?.[0] || null, e.target.value ? Number(e.target.value) : null],
+                    area: [
+                      filters.area?.[0] || 0,
+                      e.target.value ? Number(e.target.value) : 500,
+                    ],
                   })
                 }
-                className='px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
               />
             </div>
           </div>
 
           {/* Bedrooms & Bathrooms */}
           <div className='grid grid-cols-2 gap-4'>
-            <div>
-              <label className='block text-sm font-medium text-main-black mb-2'>
-                Bedrooms (min)
-              </label>
-              <input
+            <div className='space-y-3'>
+              <Label>Phòng ngủ (tối thiểu)</Label>
+              <Input
                 type='number'
-                min='0'
-                placeholder='Any'
+                min={0}
+                placeholder='Bất kỳ'
                 value={filters.bedrooms || ''}
                 onChange={(e) =>
                   setFilters({
@@ -172,17 +300,14 @@ export function AdvancedSearchFilters({
                     bedrooms: e.target.value ? Number(e.target.value) : undefined,
                   })
                 }
-                className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
               />
             </div>
-            <div>
-              <label className='block text-sm font-medium text-main-black mb-2'>
-                Bathrooms (min)
-              </label>
-              <input
+            <div className='space-y-3'>
+              <Label>Phòng tắm (tối thiểu)</Label>
+              <Input
                 type='number'
-                min='0'
-                placeholder='Any'
+                min={0}
+                placeholder='Bất kỳ'
                 value={filters.bathrooms || ''}
                 onChange={(e) =>
                   setFilters({
@@ -190,94 +315,109 @@ export function AdvancedSearchFilters({
                     bathrooms: e.target.value ? Number(e.target.value) : undefined,
                   })
                 }
-                className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
               />
             </div>
           </div>
 
+          {/* Dynamic Attributes Section */}
+          {activeAttributes.filter(
+            (attr) => attr !== 'BEDROOMS' && attr !== 'BATHROOMS'
+          ).length > 0 && (
+            <div className='space-y-4 pt-2'>
+              <h4 className='text-sm font-semibold text-main-black'>
+                Đặc điểm bổ sung
+              </h4>
+
+              {/* Number and Text Inputs */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {activeAttributes
+                  .filter(
+                    (attr) => attr !== 'BEDROOMS' && attr !== 'BATHROOMS'
+                  )
+                  .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
+                  .map((attr) => renderDynamicField(attr))}
+              </div>
+
+              {/* Boolean Switches */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {activeAttributes
+                  .filter(
+                    (attr) => attr !== 'BEDROOMS' && attr !== 'BATHROOMS'
+                  )
+                  .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
+                  .map((attr) => renderDynamicField(attr))}
+              </div>
+            </div>
+          )}
+
           {/* Media Filters */}
-          <div>
-            <label className='block text-sm font-medium text-main-black mb-2'>
-              Media
-            </label>
-            <div className='flex gap-4'>
-              <label className='flex items-center gap-2 cursor-pointer'>
-                <input
-                  type='checkbox'
+          <div className='space-y-3'>
+            <Label>Phương tiện</Label>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
+                <span className='text-sm text-main-black'>Có Video</span>
+                <Switch
                   checked={filters.hasVideo || false}
-                  onChange={(e) =>
-                    setFilters({ ...filters, hasVideo: e.target.checked })
+                  onCheckedChange={(checked) =>
+                    setFilters({ ...filters, hasVideo: checked })
                   }
-                  className='w-4 h-4 text-main-primary border-grey-300 rounded focus:ring-main-primary'
                 />
-                <span className='text-sm text-main-black'>Has Video</span>
-              </label>
-              <label className='flex items-center gap-2 cursor-pointer'>
-                <input
-                  type='checkbox'
+              </div>
+              <div className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
+                <span className='text-sm text-main-black'>Có 3D Tour</span>
+                <Switch
                   checked={filters.has3D || false}
-                  onChange={(e) =>
-                    setFilters({ ...filters, has3D: e.target.checked })
+                  onCheckedChange={(checked) =>
+                    setFilters({ ...filters, has3D: checked })
                   }
-                  className='w-4 h-4 text-main-primary border-grey-300 rounded focus:ring-main-primary'
                 />
-                <span className='text-sm text-main-black'>Has 3D Tour</span>
-              </label>
+              </div>
             </div>
           </div>
 
           {/* Sort By */}
-          <div>
-            <label className='block text-sm font-medium text-main-black mb-2'>
-              Sort By
-            </label>
-            <select
+          <div className='space-y-3'>
+            <Label>Sắp xếp theo</Label>
+            <Select
               value={filters.sortBy || 'PRIORITY'}
-              onChange={(e) =>
+              onValueChange={(value) =>
                 setFilters({
                   ...filters,
-                  sortBy: e.target.value as AdvancedSearchRequest['sortBy'],
+                  sortBy: value as AdvancedSearchRequest['sortBy'],
                 })
               }
-              className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
             >
-              <option value='PRIORITY'>Priority (Featured First)</option>
-              <option value='DATE_DESC'>Newest First</option>
-              <option value='PRICE_ASC'>Price: Low to High</option>
-              <option value='PRICE_DESC'>Price: High to Low</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder='Chọn thứ tự sắp xếp' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='PRIORITY'>Ưu tiên (Nổi bật trước)</SelectItem>
+                <SelectItem value='DATE_DESC'>Mới nhất trước</SelectItem>
+                <SelectItem value='PRICE_ASC'>Giá: Thấp đến Cao</SelectItem>
+                <SelectItem value='PRICE_DESC'>Giá: Cao đến Thấp</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className='flex items-center justify-between p-6 border-t bg-grey-50'>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={handleReset}
-            className='px-6'
-          >
-            Reset Filters
+        <SheetFooter className='p-6 border-t bg-grey-50 sm:flex-row sm:justify-between sm:space-x-0'>
+          <Button type='button' variant='ghost' onClick={handleReset}>
+            Đặt lại
           </Button>
           <div className='flex gap-3'>
             <Button
               type='button'
               variant='outline'
-              onClick={onClose}
-              className='px-6'
+              onClick={() => onOpenChange(false)}
             >
-              Cancel
+              Hủy
             </Button>
-            <Button
-              type='button'
-              onClick={handleApply}
-              className='px-6 bg-main-primary hover:bg-main-primary/90'
-            >
-              Apply Filters
+            <Button type='button' onClick={handleApply}>
+              Áp dụng
             </Button>
           </div>
-        </div>
-      </div>
-    </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

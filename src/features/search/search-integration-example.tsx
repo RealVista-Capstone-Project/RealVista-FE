@@ -62,13 +62,12 @@ export function SearchIntegrationExample() {
         showAdvancedFilters={true}
       />
 
-      {showFilters && (
-        <AdvancedSearchFilters
-          initialFilters={searchCriteria}
-          onApplyFilters={handleApplyFilters}
-          onClose={() => setShowFilters(false)}
-        />
-      )}
+      <AdvancedSearchFilters
+        open={showFilters}
+        onOpenChange={setShowFilters}
+        initialFilters={searchCriteria}
+        onApplyFilters={handleApplyFilters}
+      />
 
       {/* Results Display */}
       {loading && (

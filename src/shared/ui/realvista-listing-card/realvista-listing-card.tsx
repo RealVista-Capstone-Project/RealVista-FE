@@ -31,7 +31,7 @@ export function RealVistaListingCard({
   title,
   address,
   price,
-  currency = '$',
+  currency = '₫',
   beds,
   bathrooms,
   area,
@@ -131,8 +131,8 @@ export function RealVistaListingCard({
         <div className='mb-3 flex items-center justify-between'>
           <div className='flex items-baseline gap-1'>
             <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
-              {currency}
               {price.toLocaleString()}
+              {currency}
             </span>
             <span className='text-base font-normal leading-[1.5] text-grey-500'>
               {t('perMonth')}
