@@ -1,0 +1,11 @@
+{
+  "PriceHistoryChart": {
+    "title": "Price History",
+    "description": "Track the price changes of this property over time",
+    "priceHistory": "Price Trend",
+    "priceChanges": "price changes recorded",
+    "price": "Price",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price"
+  }
+}

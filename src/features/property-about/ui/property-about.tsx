@@ -7,10 +7,10 @@ import type { Listing } from '@/entities/listing';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { RentPriceHistory } from '@/features/rent-price-history';
 import { RentalFeatures } from '@/features/rental-features';
+import { PriceHistoryChart } from '@/features/listing';
 import Image from 'next/image';
 import { PropertyMapSection } from '@/widgets/property-map-section';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
-import { ChartLineDots } from '@/shared/ui/chart-line-dot';
 
 export interface PropertyAboutProps {
   property: Property;
@@ -210,7 +210,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       <RentalFeatures property={property} />
 
       <div className='h-px w-full bg-purple-92' />
-      <ChartLineDots />
+      <PriceHistoryChart listingId={property.id} />
       <div className='h-px w-full bg-purple-92' />
 
       {/* Rent Price History */}

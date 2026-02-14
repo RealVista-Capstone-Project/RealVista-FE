@@ -13,4 +13,7 @@ export const listingKeys = {
 
   // Single listing queries
   detail: (id: string) => [...listingKeys.all, 'detail', id] as const,
+
+  // Price history for a listing
+  priceHistory: (id: string) => [...listingKeys.all, 'price-history', id] as const,
 } as const;

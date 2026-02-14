@@ -136,5 +136,26 @@ export interface CostFeeAPI {
   fee_type: FeeType;
 }
 
+// ============ Price History ============
+export type ChangeType = 'INCREASED' | 'DECREASED' | 'UNCHANGED';
+
+export interface PriceHistoryEntry {
+  price: number;
+  price_history_id: string;
+  min_price: number;
+  max_price: number;
+  changed_at: string;
+  price_change: number;
+  price_change_percent: number;
+  change_type: ChangeType;
+}
+
+export interface PriceHistoryData {
+  listing_id: string;
+  current_price: number;
+  price_history: PriceHistoryEntry[];
+}
+
 // ============ Main Listing Type (what we export) ============
 export type Listing = ListingData;
+export type PriceHistory = PriceHistoryData;

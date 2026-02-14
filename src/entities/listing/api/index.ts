@@ -1,5 +1,5 @@
 import http from '@/shared/lib/http';
-import type { Listing, ApiResponse } from '../model/types';
+import type { Listing, ApiResponse, PriceHistory } from '../model/types';
 
 /**
  * Listing API - All listing-related HTTP methods
@@ -11,6 +11,13 @@ export const listingApi = {
    * Returns the full API response with success, message, data, and timestamp
    */
   getById: (listingId: string) => http.get<ApiResponse<Listing>>(`/listings/${listingId}`),
+
+  /**
+   * Get price history for a listing
+   * Returns the price history with all price changes including calculated differences and percentages
+   */
+  getPriceHistory: (listingId: string) =>
+    http.get<ApiResponse<PriceHistory>>(`/listings/${listingId}/price-history`),
 } as const;
 
 // Re-export query keys and queries

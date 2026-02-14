@@ -18,4 +18,15 @@ export const listingQueries = {
       staleTime: 5 * 60 * 1000, // 5 minutes
       enabled: !!listingId,
     }),
+
+  /**
+   * Get price history for a listing
+   */
+  priceHistory: (listingId: string) =>
+    queryOptions({
+      queryKey: listingKeys.priceHistory(listingId),
+      queryFn: () => listingApi.getPriceHistory(listingId),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      enabled: !!listingId,
+    }),
 } as const;
