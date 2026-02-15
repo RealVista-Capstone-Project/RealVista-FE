@@ -10,6 +10,8 @@ import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
+import { BookTourModal } from '@/features/price-and-tour/ui/book-tour-modal';
+import { useState } from 'react';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -18,6 +20,7 @@ export interface ListingDetailScreenProps {
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
+  const [isBookTourOpen, setIsBookTourOpen] = useState(false);
 
   const handleShare = () => {
     // Share property
@@ -54,9 +57,8 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
     console.log('Contact agent');
   };
 
-  const handleRequestTour = (date: string) => {
-    // Request tour with date
-    console.log('Request tour for:', date);
+  const handleRequestTour = () => {
+    setIsBookTourOpen(true);
   };
 
   const formattedPrice = new Intl.NumberFormat('en-US', {
@@ -160,6 +162,12 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
           </RealVistaButton>
         </div>
       </div>
+
+      <BookTourModal
+        listingId={property.id}
+        isOpen={isBookTourOpen}
+        onClose={() => setIsBookTourOpen(false)}
+      />
     </div>
   );
 }
