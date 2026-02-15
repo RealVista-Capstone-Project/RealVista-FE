@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronDown, Search } from 'lucide-react';
+import { Calendar, ChevronDown, Search, Bookmark, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
 
@@ -19,6 +19,10 @@ interface RealVistaPropertyListingSearchBarProps {
   onPriceChange?: (value: string) => void;
   onPropertyTypeChange?: (value: string) => void;
   onSearch?: () => void;
+  onSaveSearch?: () => void;
+  onAdvancedFilters?: () => void;
+  showSaveButton?: boolean;
+  showAdvancedFilters?: boolean;
   className?: string;
 }
 
@@ -93,6 +97,10 @@ export function RealVistaPropertyListingSearchBar({
   onPriceChange,
   onPropertyTypeChange,
   onSearch,
+  onSaveSearch,
+  onAdvancedFilters,
+  showSaveButton = true,
+  showAdvancedFilters = true,
   className,
 }: RealVistaPropertyListingSearchBarProps) {
   return (
@@ -204,8 +212,35 @@ export function RealVistaPropertyListingSearchBar({
           <Divider />
         </div>
 
-        {/* Search Button */}
-        <div className='flex h-full flex-shrink-0 items-center justify-center lg:justify-end py-6 lg:pr-6 lg:pl-7'>
+        {/* Action Buttons */}
+        <div className='flex h-full flex-shrink-0 items-center gap-3 py-6 lg:pr-6 lg:pl-7'>
+          {showAdvancedFilters && (
+            <Button
+              type='button'
+              variant='outline'
+              onClick={onAdvancedFilters}
+              className='h-[56px] px-4 flex items-center gap-2 border-grey-300 hover:border-main-primary hover:bg-purple-96'
+              title='Advanced Filters'
+            >
+              <SlidersHorizontal className='h-5 w-5' />
+              <span className='hidden xl:inline'>Filters</span>
+            </Button>
+          )}
+
+          {showSaveButton && (
+            <Button
+              type='button'
+              variant='outline'
+              onClick={onSaveSearch}
+              className='h-[56px] px-4 flex items-center gap-2 border-grey-300 hover:border-main-primary hover:bg-purple-96'
+              title='Save Search'
+            >
+              <Bookmark className='h-5 w-5' />
+              <span className='hidden xl:inline'>Save</span>
+            </Button>
+          )}
+
+          {/* Search Button */}
           <Button
             type='button'
             onClick={onSearch}
