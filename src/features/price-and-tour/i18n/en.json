@@ -8,5 +8,17 @@
     "selectTourDate": "Select tour date",
     "requestTour": "Request Tour",
     "disclaimer": "It's free, with no obligation — cancel anytime."
+  },
+  "BookTour": {
+    "scheduleTour": "Schedule a Tour",
+    "availableSlots": "Available slots",
+    "loadingSlots": "Loading slots",
+    "noSlotsAvailable": "No slots available for this date",
+    "selectedCount": "Selected {count} of {max} slots",
+    "maxSlotsReached": "You can select up to 3 slots",
+    "booking": "Booking...",
+    "confirmBooking": "Confirm Booking",
+    "bookingSuccess": "Tour booked successfully!",
+    "bookingError": "Failed to book tour. Please try again."
   }
 }
