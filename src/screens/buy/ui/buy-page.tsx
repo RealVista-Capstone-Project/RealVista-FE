@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, Search, DollarSign, SlidersHorizontal } from 'lucide-react';
-import { SearchMode } from '@/shared/types/searchMode';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
