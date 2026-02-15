@@ -1,0 +1,42 @@
+{
+  "PropertySearch": {
+    "home": "Trang chủ",
+    "search": "Tìm kiếm",
+    "searchTitleRent": "Tìm kiếm bất động sản cho thuê",
+    "searchTitleSale": "Tìm kiếm bất động sản mua bán",
+    "propertiesAvailableRent": "bất động sản có sẵn cho thuê",
+    "propertiesAvailableSale": "bất động sản có sẵn mua bán",
+    "searchPlaceholder": "Tìm kiếm...",
+    "searchWithSearchBar": "Tìm kiếm với Thanh tìm kiếm",
+    "moreFilters": "Thêm bộ lọc",
+    "anyPrice": "Mọi giá",
+    "beds": "Phòng ngủ",
+    "allTypes": "Tất cả loại",
+    "newest": "Mới nhất",
+    "gridView": "Xem lưới",
+    "listView": "Xem danh sách",
+    "map": "Bản đồ",
+    "satellite": "Vệ tinh",
+    "moreFiltersTitle": "Thêm bộ lọc",
+    "category": "Danh mục",
+    "categories": {
+      "residential": "Nhà ở",
+      "commercial": "Thương mại",
+      "industrial": "Công nghiệp",
+      "land": "Đất"
+    },
+    "priceRange": "Khoảng giá",
+    "features": "Tiện nghi",
+    "bedroom": "Phòng ngủ",
+    "bathroom": "Phòng tắm",
+    "rentalPeriod": {
+      "label": "Thời gian thuê",
+      "any": "Bất kỳ",
+      "1-12": "1 - 12 tháng",
+      "13-24": "13 - 24 tháng",
+      "24+": "24+ tháng"
+    },
+    "reset": "Đặt lại",
+    "apply": "Áp dụng"
+  }
+}
