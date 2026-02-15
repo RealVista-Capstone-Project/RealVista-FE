@@ -1,48 +1,63 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
 
 export function HomeHero() {
   const t = useTranslations('HomePage');
+  const router = useRouter();
+  const [location, setLocation] = useState('');
+
+  const handleSearch = () => {
+    if (location.trim()) {
+      router.push(`/buy?location=${encodeURIComponent(location)}`);
+    } else {
+      router.push('/buy');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
-    <div className='flex flex-col gap-[32px] items-center'>
-      <Image
-        className='dark:invert'
-        src='/next.svg'
-        alt='Next.js logo'
-        width={180}
-        height={38}
-        priority
-      />
-      <Button>{t('title')}</Button>
+    <div className='flex flex-col gap-[32px] items-center w-full max-w-2xl mx-auto'>
+      <h1 className='text-3xl md:text-5xl font-bold text-center'>{t('title')}</h1>
+      <p className='text-lg text-center text-gray-600 dark:text-gray-300'>
+        Find your dream home with RealVista.
+      </p>
 
-      <div className='flex gap-4 items-center flex-col sm:flex-row'>
-        <a
-          className='rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto'
-          href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image
-            className='dark:invert'
-            src='/vercel.svg'
-            alt='Vercel logomark'
-            width={20}
-            height={20}
+      <div className='w-full flex flex-col md:flex-row gap-2 items-center p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700'>
+        <div className='flex-1 flex items-center px-4 w-full'>
+          <Search className='w-5 h-5 text-gray-400 mr-2' />
+          <input
+            type='text'
+            placeholder="Search by location (e.g., 'Hanoi', 'District 1')"
+            className='w-full py-3 bg-transparent outline-none text-gray-900 dark:text-white placeholder-gray-400'
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
-          Deploy now
-        </a>
-        <a
-          className='rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]'
-          href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
+        </div>
+        <Button
+          className='w-full md:w-auto h-12 px-8 rounded-md bg-main-primary hover:bg-main-primary/90 text-white font-medium'
+          onClick={handleSearch}
         >
-          Read our docs
-        </a>
+          Search
+        </Button>
+      </div>
+
+      <div className='flex gap-4 text-sm text-gray-500'>
+        <span>Popular:</span>
+        <button onClick={() => router.push('/buy?location=Hanoi')} className='hover:underline'>Hanoi</button>
+        <button onClick={() => router.push('/buy?location=HCM')} className='hover:underline'>Ho Chi Minh</button>
+        <button onClick={() => router.push('/buy?location=Da+Nang')} className='hover:underline'>Da Nang</button>
       </div>
     </div>
   );
