@@ -62,11 +62,11 @@ export const useMyApplications = () => {
 
     // Filter logic
     const filteredApps = useMemo(() => {
-        return applications?.filter(app => {
-            const matchesSearch = 
+        return applications?.filter((app) => {
+            const matchesSearch =
                 app.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 app.propertyAddress?.toLowerCase().includes(searchQuery.toLowerCase());
-            
+
             let matchesDate = true;
             if (date) {
                 try {
