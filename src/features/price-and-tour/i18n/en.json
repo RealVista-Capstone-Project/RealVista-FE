@@ -14,11 +14,20 @@
     "availableSlots": "Available slots",
     "loadingSlots": "Loading slots",
     "noSlotsAvailable": "No slots available for this date",
-    "selectedCount": "Selected {count} of {max} slots",
-    "maxSlotsReached": "You can select up to 3 slots",
+    "startTime": "Start time",
+    "selectDuration": "Select duration",
+    "duration": "Duration",
+    "endTime": "End time",
     "booking": "Booking...",
     "confirmBooking": "Confirm Booking",
     "bookingSuccess": "Tour booked successfully!",
-    "bookingError": "Failed to book tour. Please try again."
+    "bookingError": "Failed to book tour. Please try again.",
+    "reviewBooking": "Review Booking",
+    "back": "Back",
+    "confirmDetails": "Confirm Details",
+    "selectedDate": "Selected Date",
+    "note": "Note",
+    "hour": "h",
+    "minute": "m"
   }
 }

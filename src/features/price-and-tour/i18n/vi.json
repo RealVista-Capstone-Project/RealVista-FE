@@ -14,11 +14,20 @@
     "availableSlots": "Các khung giờ còn trống",
     "loadingSlots": "Đang tải...",
     "noSlotsAvailable": "Không có lịch trống cho ngày này",
-    "selectedCount": "Đã chọn {count}/{max} khung giờ",
-    "maxSlotsReached": "Bạn chỉ có thể chọn tối đa 3 khung giờ",
+    "startTime": "Giờ bắt đầu",
+    "selectDuration": "Chọn thời lượng",
+    "duration": "Thời lượng",
+    "endTime": "Giờ kết thúc",
     "booking": "Đang đặt...",
     "confirmBooking": "Xác nhận đặt lịch",
     "bookingSuccess": "Đặt lịch xem nhà thành công!",
-    "bookingError": "Đặt lịch thất bại. Vui lòng thử lại."
+    "bookingError": "Đặt lịch thất bại. Vui lòng thử lại.",
+    "reviewBooking": "Xem lại thông tin",
+    "back": "Quay lại",
+    "confirmDetails": "Xác nhận thông tin",
+    "selectedDate": "Ngày đã chọn",
+    "note": "Ghi chú",
+    "hour": "giờ",
+    "minute": "phút"
   }
 }

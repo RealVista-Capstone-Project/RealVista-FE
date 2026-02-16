@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { vi, enUS } from 'date-fns/locale';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { Calendar } from '@/shared/ui/calendar';
-import { format } from 'date-fns';
+import { format, addMinutes } from 'date-fns';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { appointmentQueries, appointmentKeys, useBookTour } from '@/features/price-and-tour/api';
 import { toast } from 'sonner';
+import { Clock, Calendar as CalendarIcon, Hourglass, Check, ChevronDown } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 
 interface BookTourModalProps {
   listingId: string;
@@ -16,8 +20,15 @@ interface BookTourModalProps {
 
 export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps) {
   const t = useTranslations('BookTour');
+  const locale = useLocale();
+  const dateLocale = locale === 'vi' ? vi : enUS;
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+
+  // New state for duration-based booking
+  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
+
+  const [step, setStep] = useState<'selection' | 'confirmation'>('selection');
 
   const { mutate: bookTour, isPending: submitting } = useBookTour();
   const queryClient = useQueryClient();
@@ -26,7 +37,9 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
   useEffect(() => {
     if (isOpen) {
       setDate(new Date());
-      setSelectedSlots([]);
+      setSelectedStartTime(null);
+      setSelectedDuration(null);
+      setStep('selection');
     }
   }, [isOpen]);
 
@@ -43,41 +56,84 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
     return slots.map((s: string) => s.substring(0, 5));
   }, [slots]);
 
+  // Reset selection when date changes
   useEffect(() => {
     if (date && isOpen) {
-      if (selectedSlots.length > 0) {
-        setSelectedSlots([]);
-      }
+      setSelectedStartTime(null);
+      setSelectedDuration(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, isOpen]);
 
-  const toggleSlot = (slot: string) => {
-    if (selectedSlots.includes(slot)) {
-      setSelectedSlots((prev) => prev.filter((s) => s !== slot));
-    } else {
-      if (selectedSlots.length >= 3) {
-        toast.warning(t('maxSlotsReached'));
-        return;
+  // Calculate available durations for the selected start time
+  const availableDurations = useMemo(() => {
+    if (!selectedStartTime) return [];
+
+    const durations = [30]; // 30 mins is always an option if the slot exists (which it does if selected)
+
+    // Helper to check if a specific time slot exists in available slots
+    const isSlotAvailable = (timeStr: string) => availableSlots.includes(timeStr);
+
+    // Parse start time to add minutes
+    const baseDate = new Date(`2000-01-01T${selectedStartTime}:00`);
+
+    // Check for 60 mins (needs start + 30m)
+    const nextSlot30 = format(addMinutes(baseDate, 30), 'HH:mm');
+    if (isSlotAvailable(nextSlot30)) {
+      durations.push(60);
+
+      // Check for 90 mins (needs start + 30m AND start + 60m)
+      const nextSlot60 = format(addMinutes(baseDate, 60), 'HH:mm');
+      if (isSlotAvailable(nextSlot60)) {
+        durations.push(90);
       }
-      setSelectedSlots((prev) => [...prev, slot]);
     }
+
+    return durations;
+  }, [selectedStartTime, availableSlots]);
+
+  // Handler for selecting a start time
+  const handleStartTimeSelect = (time: string, setOpen: (open: boolean) => void) => {
+    setSelectedStartTime(time);
+    setSelectedDuration(null); // Reset duration when changing start time
+    setOpen(false);
+  };
+
+  const handleReview = () => {
+    if (!date || !selectedStartTime || !selectedDuration) return;
+    setStep('confirmation');
+  };
+
+  const handleBack = () => {
+    setStep('selection');
   };
 
   const handleBook = () => {
-    if (!date || selectedSlots.length === 0) return;
+    if (!date || !selectedStartTime || !selectedDuration) return;
 
     const formattedDateForBooking = format(date, 'yyyy-MM-dd');
-    const fullTimestamps = selectedSlots.map((time) => {
-      // time is "HH:mm", we need to append ":00" for seconds if backend expects it
-      // or standard ISO format. Previous implementation used T${time}:00
-      return `${formattedDateForBooking}T${time}:00`;
-    });
+
+    // Generate the list of slots based on duration
+    const slotsToBook: string[] = [];
+    const baseDate = new Date(`${formattedDateForBooking}T${selectedStartTime}:00`);
+
+    // Add start slot
+    slotsToBook.push(`${formattedDateForBooking}T${selectedStartTime}:00`);
+
+    // Add additional slots based on duration
+    if (selectedDuration >= 60) {
+      const nextSlot1 = format(addMinutes(baseDate, 30), 'HH:mm');
+      slotsToBook.push(`${formattedDateForBooking}T${nextSlot1}:00`);
+    }
+
+    if (selectedDuration >= 90) {
+      const nextSlot2 = format(addMinutes(baseDate, 60), 'HH:mm');
+      slotsToBook.push(`${formattedDateForBooking}T${nextSlot2}:00`);
+    }
 
     bookTour(
       {
         listing_id: listingId,
-        selected_slots: fullTimestamps,
+        selected_slots: slotsToBook,
         notes: '',
       },
       {
@@ -86,8 +142,10 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
           queryClient.invalidateQueries({
             queryKey: appointmentKeys.slots(listingId, formattedDateForBooking),
           });
-          onClose(); // Close modal on success
-          setSelectedSlots([]);
+          onClose();
+          setSelectedStartTime(null);
+          setSelectedDuration(null);
+          setStep('selection');
         },
         onError: (error) => {
           console.error(error);
@@ -97,76 +155,257 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
     );
   };
 
+  // Helper to format duration display
+  const formatDuration = (mins: number) => {
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    const hUnit = t('hour');
+    const mUnit = t('minute');
+
+    if (hours > 0) {
+      return remainingMins > 0 ? `${hours}${hUnit} ${remainingMins}${mUnit}` : `${hours}${hUnit}`;
+    }
+    return `${mins}${mUnit}`;
+  };
+
+  const [timeOpen, setTimeOpen] = useState(false);
+  const [durationOpen, setDurationOpen] = useState(false);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-[425px]'>
-        <DialogHeader>
-          <DialogTitle>{t('scheduleTour')}</DialogTitle>
+      <DialogContent className='sm:max-w-[400px] p-0 overflow-hidden'>
+        <DialogHeader className='px-6 pt-6 pb-2'>
+          <DialogTitle className='text-xl flex items-center gap-2'>
+            <CalendarIcon className='w-5 h-5 text-main-primary' />
+            {t('scheduleTour')}
+          </DialogTitle>
         </DialogHeader>
 
-        <div className='flex flex-col gap-4 py-4'>
-          {/* Date Selection */}
-          <div className='flex justify-center'>
-            <Calendar
-              mode='single'
-              selected={date}
-              onSelect={setDate}
-              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              initialFocus
-              className='rounded-md border'
-            />
-          </div>
+        <div className='flex flex-col'>
+          {step === 'selection' ? (
+            <div className='px-6 pb-6 space-y-5'>
+              {/* Date Selection */}
+              <div className='space-y-1.5'>
+                <label className='text-sm font-medium text-gray-700 block'>
+                  {t('selectedDate')}
+                </label>
+                <DatePickerInput
+                  value={date ? date.toISOString() : ''}
+                  onChange={(_, d) => setDate(d)}
+                  variant='tour'
+                  placeholder={t('selectedDate')}
+                  minDate={new Date()}
+                  className='w-full'
+                  locale={dateLocale}
+                />
+              </div>
 
-          {/* Slots Selection */}
-          {date && (
-            <div className='space-y-3'>
-              <h4 className='text-sm font-medium'>
-                {t('availableSlots')} ({format(date, 'MMM dd')})
-              </h4>
-              {loading ? (
-                <div className='text-center text-sm py-4 text-muted-foreground'>
-                  {t('loadingSlots')}...
-                </div>
-              ) : availableSlots.length > 0 ? (
-                <div className='grid grid-cols-3 gap-2 max-h-[200px] overflow-y-auto p-1'>
-                  {availableSlots.map((slot: string) => (
+              {/* Time Slot Selection */}
+              <div className='space-y-1.5'>
+                <label className='text-sm font-medium text-gray-700 block'>{t('startTime')}</label>
+                <Popover open={timeOpen} onOpenChange={setTimeOpen}>
+                  <PopoverTrigger asChild>
                     <button
-                      key={slot}
-                      onClick={() => toggleSlot(slot)}
-                      className={`
-                                        text-xs py-2 px-1 rounded-md border transition-colors
-                                        ${
-                                          selectedSlots.includes(slot)
-                                            ? 'bg-main-primary text-white border-main-primary'
-                                            : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200'
-                                        }
-                                    `}
+                      type='button'
+                      disabled={!date}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-lg border border-purple-92 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-purple-92-hover transition-colors',
+                        !selectedStartTime && 'text-muted-foreground'
+                      )}
                     >
-                      {slot}
+                      <span
+                        className={cn(
+                          'flex items-center gap-2',
+                          !selectedStartTime && 'opacity-50'
+                        )}
+                      >
+                        <Clock className='w-5 h-5' />
+                        <span className='text-[14px] font-medium leading-[1.4]'>
+                          {selectedStartTime || t('availableSlots')}
+                        </span>
+                      </span>
+                      <ChevronDown className='h-4 w-4 opacity-50' />
                     </button>
-                  ))}
-                </div>
-              ) : (
-                <div className='text-center text-sm py-4 text-muted-foreground'>
-                  {t('noSlotsAvailable')}
-                </div>
-              )}
+                  </PopoverTrigger>
+                  <PopoverContent className='p-0 w-[350px]' align='center'>
+                    <div className='p-2 max-h-[200px] overflow-y-auto'>
+                      {loading ? (
+                        <div className='flex py-6 items-center justify-center text-sm text-muted-foreground'>
+                          <div className='animate-pulse'>{t('loadingSlots')}...</div>
+                        </div>
+                      ) : availableSlots.length > 0 ? (
+                        <div className='grid grid-cols-4 gap-2'>
+                          {availableSlots.map((slot) => (
+                            <button
+                              key={slot}
+                              onClick={() => handleStartTimeSelect(slot, setTimeOpen)}
+                              className={cn(
+                                'text-sm py-2 px-1 rounded-md border transition-all duration-200 font-medium',
+                                selectedStartTime === slot
+                                  ? 'bg-main-primary text-white border-main-primary shadow-sm'
+                                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200 hover:border-main-primary/50'
+                              )}
+                            >
+                              {slot}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className='flex py-6 items-center justify-center text-sm text-muted-foreground'>
+                          {t('noSlotsAvailable')}
+                        </div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-              {selectedSlots.length > 0 && (
-                <div className='text-xs text-muted-foreground text-center'>
-                  {t('selectedCount', { count: selectedSlots.length, max: 3 })}
+              {/* Duration Selection */}
+              <div className='space-y-1.5'>
+                <label className='text-sm font-medium text-gray-700 block'>{t('duration')}</label>
+                <Popover open={durationOpen} onOpenChange={setDurationOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type='button'
+                      disabled={!selectedStartTime}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-lg border border-purple-92 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-purple-92-hover transition-colors',
+                        !selectedDuration && 'text-muted-foreground'
+                      )}
+                    >
+                      <span
+                        className={cn('flex items-center gap-2', !selectedDuration && 'opacity-50')}
+                      >
+                        <Hourglass className='w-5 h-5' />
+                        <span className='text-[14px] font-medium leading-[1.4]'>
+                          {selectedDuration
+                            ? formatDuration(selectedDuration)
+                            : t('selectDuration')}
+                        </span>
+                      </span>
+                      <ChevronDown className='h-4 w-4 opacity-50' />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className='p-1 w-[350px]' align='center'>
+                    <div className='space-y-1'>
+                      {[30, 60, 90].map((duration) => {
+                        const isAvailable = availableDurations.includes(duration);
+                        return (
+                          <button
+                            key={duration}
+                            onClick={() => {
+                              if (isAvailable) {
+                                setSelectedDuration(duration);
+                                setDurationOpen(false);
+                              }
+                            }}
+                            disabled={!isAvailable}
+                            className={cn(
+                              'w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm transition-colors',
+                              selectedDuration === duration
+                                ? 'bg-main-secondary/10 text-main-primary font-medium'
+                                : isAvailable
+                                  ? 'hover:bg-gray-100 text-gray-900'
+                                  : 'text-gray-400 cursor-not-allowed opacity-50'
+                            )}
+                          >
+                            <span>{formatDuration(duration)}</span>
+                            {selectedDuration === duration && (
+                              <Check className='w-4 h-4 text-main-primary' />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className='pt-2'>
+                <RealVistaButton
+                  onClick={handleReview}
+                  disabled={!date || !selectedStartTime || !selectedDuration}
+                  className='w-full shadow-md'
+                  size='large'
+                >
+                  {t('reviewBooking')}
+                </RealVistaButton>
+              </div>
+            </div>
+          ) : (
+            <div className='space-y-4 px-6 pb-6'>
+              <div className='bg-gray-50/80 rounded-xl border border-gray-100 p-5 space-y-4 animate-in fade-in zoom-in-95 duration-300'>
+                <h4 className='font-semibold text-center text-lg text-gray-800 pb-2 border-b border-gray-200'>
+                  {t('confirmDetails')}
+                </h4>
+
+                <div className='grid grid-cols-1 gap-4'>
+                  <div className='flex justify-between items-center group'>
+                    <span className='text-muted-foreground flex items-center gap-2'>
+                      <CalendarIcon className='w-4 h-4 text-gray-400' />
+                      {t('selectedDate')}
+                    </span>
+                    <span className='font-medium text-gray-900 bg-white px-3 py-1 rounded-md border border-gray-100 shadow-sm'>
+                      {date ? format(date, 'PP', { locale: dateLocale }) : ''}
+                    </span>
+                  </div>
+
+                  <div className='flex justify-between items-center'>
+                    <span className='text-muted-foreground flex items-center gap-2'>
+                      <Clock className='w-4 h-4 text-gray-400' />
+                      {t('startTime')}
+                    </span>
+                    <span className='font-medium text-gray-900 bg-white px-3 py-1 rounded-md border border-gray-100 shadow-sm'>
+                      {selectedStartTime}
+                    </span>
+                  </div>
+
+                  <div className='flex justify-between items-center'>
+                    <span className='text-muted-foreground flex items-center gap-2'>
+                      <Hourglass className='w-4 h-4 text-gray-400' />
+                      {t('duration')}
+                    </span>
+                    <span className='font-medium text-gray-900 bg-white px-3 py-1 rounded-md border border-gray-100 shadow-sm'>
+                      {selectedDuration ? formatDuration(selectedDuration) : '-'}
+                    </span>
+                  </div>
+
+                  <div className='border-t border-dashed border-gray-200 my-1'></div>
+
+                  <div className='flex justify-between items-center'>
+                    <span className='text-main-primary font-medium flex items-center gap-2'>
+                      {t('endTime')}
+                    </span>
+                    <span className='font-bold text-main-primary bg-main-secondary/10 px-3 py-1 rounded-md border border-main-secondary/20'>
+                      {selectedStartTime && selectedDuration
+                        ? format(
+                            addMinutes(
+                              new Date(`2000-01-01T${selectedStartTime}:00`),
+                              selectedDuration
+                            ),
+                            'HH:mm'
+                          )
+                        : '-'}
+                    </span>
+                  </div>
                 </div>
-              )}
+              </div>
+
+              <div className='flex gap-3'>
+                <RealVistaButton
+                  variant='secondary'
+                  onClick={handleBack}
+                  disabled={submitting}
+                  className='flex-1'
+                >
+                  {t('back')}
+                </RealVistaButton>
+                <RealVistaButton onClick={handleBook} disabled={submitting} className='flex-1'>
+                  {submitting ? t('booking') : t('confirmBooking')}
+                </RealVistaButton>
+              </div>
             </div>
           )}
-
-          <RealVistaButton
-            onClick={handleBook}
-            disabled={submitting || selectedSlots.length === 0}
-            className='w-full mt-2'
-          >
-            {submitting ? t('booking') : t('confirmBooking')}
-          </RealVistaButton>
         </div>
       </DialogContent>
     </Dialog>
