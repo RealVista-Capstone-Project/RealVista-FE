@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, Search, DollarSign, SlidersHorizontal } from 'lucide-react';
-import { SearchMode } from '@/shared/types/searchMode';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
@@ -11,6 +10,7 @@ import { Button } from '@/shared/ui/button/button';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -18,7 +18,7 @@ function BuyPageContent() {
   const locale = useLocale();
   const searchParams = useSearchParams();
 
-  const [searchMode, setSearchMode] = useState<SearchMode>('searchBar');
+  const [isMapView, setIsMapView] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
@@ -45,10 +45,13 @@ function BuyPageContent() {
     return {
       listingType: 'SALE' as const,
       location: searchParams?.get('location') || undefined,
-      price: (searchParams?.get('minPrice') || searchParams?.get('maxPrice')) ? [
-        searchParams?.get('minPrice') ? Number(searchParams?.get('minPrice')) : null,
-        searchParams?.get('maxPrice') ? Number(searchParams?.get('maxPrice')) : null
-      ] : undefined,
+      price:
+        searchParams?.get('minPrice') || searchParams?.get('maxPrice')
+          ? [
+              searchParams?.get('minPrice') ? Number(searchParams?.get('minPrice')) : null,
+              searchParams?.get('maxPrice') ? Number(searchParams?.get('maxPrice')) : null,
+            ]
+          : undefined,
       propertyType: searchParams?.get('propertyType') || undefined,
       propertyCategory: searchParams?.get('propertyCategory') || undefined,
       dynamicAttributes: Object.keys(dynamicAttributes).length > 0 ? dynamicAttributes : undefined,
@@ -83,11 +86,7 @@ function BuyPageContent() {
   const performSearch = async (criteria: AdvancedSearchRequest, page: number) => {
     setIsLoading(true);
     try {
-      const response = await SearchAPI.searchListings(
-        criteria,
-        page - 1,
-        itemsPerPage
-      );
+      const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
       setListings(response.content);
       setTotalPages(response.total_pages);
     } catch (error) {
@@ -104,8 +103,10 @@ function BuyPageContent() {
     if (page > 1) params.set('page', page.toString());
 
     if (criteria.location) params.set('location', criteria.location);
-    if (criteria.price && criteria.price[0] !== null) params.set('minPrice', criteria.price[0].toString());
-    if (criteria.price && criteria.price[1] !== null) params.set('maxPrice', criteria.price[1].toString());
+    if (criteria.price && criteria.price[0] !== null)
+      params.set('minPrice', criteria.price[0].toString());
+    if (criteria.price && criteria.price[1] !== null)
+      params.set('maxPrice', criteria.price[1].toString());
 
     // Add all filter parameters
     if (criteria.propertyType) params.set('propertyType', criteria.propertyType.toString());
@@ -131,10 +132,10 @@ function BuyPageContent() {
       ...searchCriteria,
       listingType: 'SALE' as const,
       location: location || undefined,
-      price: (minPrice || maxPrice) ? [
-        minPrice ? Number(minPrice) : null,
-        maxPrice ? Number(maxPrice) : null
-      ] : undefined,
+      price:
+        minPrice || maxPrice
+          ? [minPrice ? Number(minPrice) : null, maxPrice ? Number(maxPrice) : null]
+          : undefined,
     };
 
 
@@ -159,6 +160,14 @@ function BuyPageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  if (isMapView) {
+    return (
+      <div className='h-screen w-full bg-white'>
+        <PropertyMapBasedSearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen bg-purple-98'>
       {/* Hero Section with Search */}
@@ -174,11 +183,11 @@ function BuyPageContent() {
             <div className='w-full sm:w-auto'>
               <Button
                 type='button'
-                onClick={() => setSearchMode(searchMode === 'map' ? 'searchBar' : 'map')}
+                onClick={() => setIsMapView(!isMapView)}
                 className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
                 variant='outline'
               >
-                <span>{searchMode === 'map' ? t('searchWithMap') : t('searchWithSearchBar')}</span>
+                <span>{isMapView ? t('searchWithSearchBar') : t('searchWithMap')}</span>
                 <div className='relative flex h-5 w-5 items-center justify-center'>
                   <div className='absolute inset-0 rounded-full bg-purple-96'></div>
                   <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
@@ -285,10 +294,14 @@ function BuyPageContent() {
                 {listings.map((listing, index) => (
                   <RealVistaListingCard
                     key={listing.listing_id || index}
+                    listingType='SALE'
                     id={listing.listing_id}
                     title={listing.name}
                     price={listing.price || 0}
-                    image={listing.thumbnail || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'}
+                    image={
+                      listing.thumbnail ||
+                      'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
+                    }
                     address={listing.location || 'Unknown'}
                     beds={listing.bedrooms || 0}
                     bathrooms={listing.bathrooms || 0}
@@ -303,7 +316,9 @@ function BuyPageContent() {
               {/* No Results */}
               {listings.length === 0 && (
                 <div className='py-12 text-center'>
-                  <p className='text-lg text-main-secondary'>No properties found. Try adjusting your search criteria.</p>
+                  <p className='text-lg text-main-secondary'>
+                    No properties found. Try adjusting your search criteria.
+                  </p>
                 </div>
               )}
 
