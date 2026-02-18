@@ -124,20 +124,20 @@ function BuyPageContent() {
       ] : undefined,
     };
 
-    console.log('🔍 Basic Search - Updated Criteria:', updatedCriteria);
+    console.log('Basic Search - Updated Criteria:', updatedCriteria);
     // This will trigger the useEffect
     updateUrl(updatedCriteria, 1);
   };
 
   const handleAdvancedFiltersApply = (filters: Partial<AdvancedSearchRequest>) => {
-    console.log('🎯 Advanced Filters Applied:', filters);
-    console.log('📋 Current Search Criteria:', searchCriteria);
+    console.log('Advanced Filters Applied:', filters);
+    console.log('Current Search Criteria:', searchCriteria);
     const updatedCriteria = {
       ...searchCriteria,
       ...filters,
       listingType: 'SALE' as const,
     };
-    console.log('✅ Merged Criteria:', updatedCriteria);
+    console.log('Merged Criteria:', updatedCriteria);
     // This will trigger the useEffect
     updateUrl(updatedCriteria, 1);
   };
