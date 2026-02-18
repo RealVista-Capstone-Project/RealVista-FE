@@ -137,20 +137,19 @@ function BuyPageContent() {
       ] : undefined,
     };
 
-    console.log('Basic Search - Updated Criteria:', updatedCriteria);
+
     // This will trigger the useEffect
     updateUrl(updatedCriteria, 1);
   };
 
   const handleAdvancedFiltersApply = (filters: Partial<AdvancedSearchRequest>) => {
-    console.log('Advanced Filters Applied:', filters);
-    console.log('Current Search Criteria:', searchCriteria);
+
     const updatedCriteria = {
       ...searchCriteria,
       ...filters,
       listingType: 'SALE' as const,
     };
-    console.log('Merged Criteria:', updatedCriteria);
+
     // This will trigger the useEffect
     updateUrl(updatedCriteria, 1);
   };
@@ -295,8 +294,8 @@ function BuyPageContent() {
                     bathrooms={listing.bathrooms || 0}
                     area={listing.area || 0}
                     isFavorite={false}
-                    onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
-                    onClick={(id: string) => console.log('Property clicked:', id)}
+                    onToggleFavorite={(id: string) => {}}
+                    onClick={(id: string) => {}}
                   />
                 ))}
               </div>

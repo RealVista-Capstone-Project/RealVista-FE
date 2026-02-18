@@ -289,8 +289,8 @@ function RentPageContent() {
                     bathrooms={listing.bathrooms || 0}
                     area={listing.area || 0}
                     isFavorite={false}
-                    onToggleFavorite={(id: string) => console.log('Toggle favorite:', id)}
-                    onClick={(id: string) => console.log('Property clicked:', id)}
+                    onToggleFavorite={(id: string) => {}}
+                    onClick={(id: string) => {}}
                   />
                 ))}
               </div>

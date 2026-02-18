@@ -12,7 +12,7 @@ export class SearchAPI {
     page: number = 0,
     size: number = 12
   ): Promise<PageResponse<ListingSearchResponse>> {
-    console.log('Searching with:', { API_BASE_URL, request, page, size });
+
 
     try {
       // Build query params from request
@@ -53,7 +53,7 @@ export class SearchAPI {
       if (request.sortBy) params.append('sortBy', request.sortBy);
 
       const url = `${API_BASE_URL}/listings/search?${params.toString()}`;
-      console.log('GET:', url);
+
 
       const response = await fetch(url, {
         method: 'GET',
@@ -62,7 +62,7 @@ export class SearchAPI {
         },
       });
 
-      console.log('Response status:', response.status, response.statusText);
+
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -71,8 +71,6 @@ export class SearchAPI {
       }
 
       const data = await response.json();
-      console.log('Search successful:', data);
-      console.log('First listing:', data.content?.[0]);
       return data;
     } catch (error) {
       console.error('Search error:', error);
