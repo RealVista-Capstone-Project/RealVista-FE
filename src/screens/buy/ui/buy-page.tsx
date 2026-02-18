@@ -33,6 +33,15 @@ function BuyPageContent() {
 
   // Construct initial criteria from URL
   const getInitialCriteria = (): AdvancedSearchRequest => {
+    // Rebuild dynamicAttributes from URL params (attr_BEDROOMS, attr_BATHROOMS, etc.)
+    const dynamicAttributes: Record<string, string> = {};
+    searchParams?.forEach((value, key) => {
+      if (key.startsWith('attr_')) {
+        const attrKey = key.slice(5).toUpperCase();
+        dynamicAttributes[attrKey] = value;
+      }
+    });
+
     return {
       listingType: 'SALE' as const,
       location: searchParams?.get('location') || undefined,
@@ -42,8 +51,7 @@ function BuyPageContent() {
       ] : undefined,
       propertyType: searchParams?.get('propertyType') || undefined,
       propertyCategory: searchParams?.get('propertyCategory') || undefined,
-      bedrooms: searchParams?.get('bedrooms') ? Number(searchParams?.get('bedrooms')) : undefined,
-      bathrooms: searchParams?.get('bathrooms') ? Number(searchParams?.get('bathrooms')) : undefined,
+      dynamicAttributes: Object.keys(dynamicAttributes).length > 0 ? dynamicAttributes : undefined,
       area: (searchParams?.get('minArea') || searchParams?.get('maxArea')) ? [
         searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
         searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null
@@ -102,13 +110,18 @@ function BuyPageContent() {
     // Add all filter parameters
     if (criteria.propertyType) params.set('propertyType', criteria.propertyType.toString());
     if (criteria.propertyCategory) params.set('propertyCategory', criteria.propertyCategory.toString());
-    if (criteria.bedrooms) params.set('bedrooms', criteria.bedrooms.toString());
-    if (criteria.bathrooms) params.set('bathrooms', criteria.bathrooms.toString());
     if (criteria.area && criteria.area[0] !== null) params.set('minArea', criteria.area[0].toString());
     if (criteria.area && criteria.area[1] !== null) params.set('maxArea', criteria.area[1].toString());
     if (criteria.hasVideo) params.set('hasVideo', 'true');
     if (criteria.has3D) params.set('has3D', 'true');
     if (criteria.sortBy && criteria.sortBy !== 'PRIORITY') params.set('sortBy', criteria.sortBy);
+
+    // Serialize dynamicAttributes as attr_KEY=value in URL
+    if (criteria.dynamicAttributes) {
+      Object.entries(criteria.dynamicAttributes).forEach(([key, value]) => {
+        if (value) params.set(`attr_${key.toLowerCase()}`, value);
+      });
+    }
 
     router.push(`/${locale}/buy?${params.toString()}`);
   };

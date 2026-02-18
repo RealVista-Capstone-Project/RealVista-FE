@@ -39,27 +39,16 @@ export class SearchAPI {
       }
 
       // Standard property filters
-      if (request.bedrooms !== undefined && request.bedrooms !== null) {
-        params.append('bedrooms', request.bedrooms.toString());
-      }
-      if (request.bathrooms !== undefined && request.bathrooms !== null) {
-        params.append('bathrooms', request.bathrooms.toString());
-      }
+      // (bedrooms and bathrooms are now sent via dynamicAttributes)
 
-      // Dynamic attributes - use attr_ prefix
-      // Check for any property that's not a standard filter
-      const standardFilters = ['listingType', 'propertyType', 'propertyCategory', 'location',
-                               'price', 'area', 'bedrooms', 'bathrooms', 'sortBy',
-                               'hasVideo', 'has3D', 'page', 'size'];
-
-      Object.entries(request).forEach(([key, value]) => {
-        if (!standardFilters.includes(key) && value !== undefined && value !== null && value !== '') {
-          // Convert to lowercase for backend (e.g., DIRECTION -> direction)
-          const attrKey = key.toLowerCase();
-          params.append(`attr_${attrKey}`, value.toString());
-          console.log(`Adding dynamic attribute: attr_${attrKey}=${value}`);
-        }
-      });
+      // Dynamic attributes - send as dynamicAttributes[KEY]=value
+      if (request.dynamicAttributes && Object.keys(request.dynamicAttributes).length > 0) {
+        Object.entries(request.dynamicAttributes).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(`dynamicAttributes[${key}]`, value.toString());
+          }
+        });
+      }
 
       if (request.sortBy) params.append('sortBy', request.sortBy);
 
