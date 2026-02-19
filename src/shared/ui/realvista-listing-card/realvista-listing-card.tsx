@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
-import { formatVND } from '@/shared/lib/utils/format-currency';
 
 export interface RealVistaListingCardProps {
   id: string;
@@ -263,7 +262,6 @@ export function RealVistaListingCard({
         <div className='mb-3 flex items-center justify-between'>
           <div className='flex items-baseline gap-1'>
             <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
-              {currency}
               {formatVND(price)}
             </span>
             {listingType === 'RENT' && (
