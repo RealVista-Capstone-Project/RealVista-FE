@@ -1,0 +1,361 @@
+'use client';
+
+import { useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/button/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
+import { PriceRangeSlider } from '@/shared/ui/price-range-slider';
+
+// TODO: The property category should be fetched from the GET API for property categories
+export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND';
+export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
+
+export interface PropertyFilters {
+  category: PropertyCategory[];
+  priceRange: {
+    min: number;
+    max: number;
+  };
+  bedrooms: number;
+  bathrooms: number;
+  rentalPeriod: RentalPeriod;
+}
+
+export interface PropertyFiltersModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  filters: PropertyFilters;
+  onApply: (filters: PropertyFilters) => void;
+  onReset: () => void;
+  translations: {
+    title: string;
+    category: string;
+    categories: {
+      residential: string;
+      commercial: string;
+      industrial: string;
+      land: string;
+    };
+    priceRange: string;
+    features: string;
+    bedroom: string;
+    bathroom: string;
+    rentalPeriod: {
+      label: string;
+      any: string;
+      '1-12': string;
+      '13-24': string;
+      '24+': string;
+    };
+    reset: string;
+    apply: string;
+  };
+}
+
+function CategoryButton({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      className={cn(
+        'rounded-lg px-6 py-2.5 text-sm font-medium transition-colors',
+        selected
+          ? 'bg-main-primary text-white'
+          : 'border-[1.5px] border-purple-92 bg-white text-main-black hover:bg-purple-98'
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Stepper({
+  value,
+  onChange,
+  min = 0,
+  max = 10,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+}) {
+  return (
+    <div className='flex items-center gap-3'>
+      <button
+        type='button'
+        onClick={() => onChange(Math.max(min, value - 1))}
+        disabled={value <= min}
+        className={cn(
+          'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
+          value <= min
+            ? 'bg-grey-200 text-grey-400 cursor-not-allowed opacity-50'
+            : 'bg-main-primary text-white hover:bg-main-primary/90 cursor-pointer'
+        )}
+      >
+        <Minus className='h-4 w-4' strokeWidth={2} />
+      </button>
+      <span className='w-8 text-center text-base font-bold text-main-black'>{value}</span>
+      <button
+        type='button'
+        onClick={() => onChange(Math.min(max, value + 1))}
+        disabled={value >= max}
+        className={cn(
+          'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
+          value >= max
+            ? 'bg-grey-200 text-grey-400 cursor-not-allowed opacity-50'
+            : 'bg-main-primary text-white hover:bg-main-primary/90 cursor-pointer'
+        )}
+      >
+        <Plus className='h-4 w-4' strokeWidth={2} />
+      </button>
+    </div>
+  );
+}
+
+function RadioOption({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      className='flex items-center gap-3 py-2 text-left transition-colors hover:text-main-primary'
+    >
+      <div
+        className={cn(
+          'flex h-5 w-5 items-center justify-center rounded-full border-[1.5px] transition-colors',
+          selected ? 'border-main-primary' : 'border-purple-92'
+        )}
+      >
+        {selected && <div className='h-3 w-3 rounded-full bg-main-primary' />}
+      </div>
+      <span className={cn('text-sm font-normal', selected ? 'text-main-black' : 'text-grey-500')}>
+        {children}
+      </span>
+    </button>
+  );
+}
+
+export function PropertyFiltersModal({
+  open,
+  onOpenChange,
+  filters,
+  onApply,
+  onReset,
+  translations,
+}: PropertyFiltersModalProps) {
+  const [localFilters, setLocalFilters] = useState<PropertyFilters>(filters);
+  const [priceMin, setPriceMin] = useState(filters.priceRange.min);
+  const [priceMax, setPriceMax] = useState(filters.priceRange.max);
+
+  // Reset local state when modal opens or filters change
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      setLocalFilters(filters);
+      setPriceMin(filters.priceRange.min);
+      setPriceMax(filters.priceRange.max);
+    }
+    onOpenChange(newOpen);
+  };
+
+  const handleApply = () => {
+    onApply({
+      ...localFilters,
+      priceRange: { min: priceMin, max: priceMax },
+    });
+    onOpenChange(false);
+  };
+
+  const handleReset = () => {
+    onReset();
+    onOpenChange(false);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetContent
+        side='right'
+        className='flex flex-col p-0 gap-0 w-full max-w-[480px] rounded-l-2xl'
+      >
+        {/* Header */}
+        <SheetHeader className='px-6 pt-6 pb-4'>
+          <SheetTitle className='text-2xl font-bold text-main-black'>
+            {translations.title}
+          </SheetTitle>
+        </SheetHeader>
+
+        {/* Scrollable content area */}
+        <div className='flex-1 overflow-y-auto px-6 pb-6 space-y-6'>
+          {/* Category Selection */}
+          <div className='space-y-3 pb-6 border-b border-grey-100'>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.category}</h3>
+            <div className='flex flex-wrap gap-3'>
+              <CategoryButton
+                selected={localFilters.category.includes('RESIDENTIAL')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('RESIDENTIAL')
+                    ? localFilters.category.filter((c) => c !== 'RESIDENTIAL')
+                    : [...localFilters.category, 'RESIDENTIAL'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
+              >
+                {translations.categories.residential}
+              </CategoryButton>
+              <CategoryButton
+                selected={localFilters.category.includes('COMMERCIAL')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('COMMERCIAL')
+                    ? localFilters.category.filter((c) => c !== 'COMMERCIAL')
+                    : [...localFilters.category, 'COMMERCIAL'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
+              >
+                {translations.categories.commercial}
+              </CategoryButton>
+              <CategoryButton
+                selected={localFilters.category.includes('INDUSTRIAL')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('INDUSTRIAL')
+                    ? localFilters.category.filter((c) => c !== 'INDUSTRIAL')
+                    : [...localFilters.category, 'INDUSTRIAL'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
+              >
+                {translations.categories.industrial}
+              </CategoryButton>
+              <CategoryButton
+                selected={localFilters.category.includes('LAND')}
+                onClick={() => {
+                  const newCategories = localFilters.category.includes('LAND')
+                    ? localFilters.category.filter((c) => c !== 'LAND')
+                    : [...localFilters.category, 'LAND'];
+                  setLocalFilters({
+                    ...localFilters,
+                    category: newCategories as PropertyCategory[],
+                  });
+                }}
+              >
+                {translations.categories.land}
+              </CategoryButton>
+            </div>
+          </div>
+
+          {/* Price Range */}
+          <div className='pb-6 border-b border-grey-100'>
+            <PriceRangeSlider
+              minValue={0}
+              maxValue={2000000}
+              currentMin={priceMin}
+              currentMax={priceMax}
+              onMinChange={setPriceMin}
+              onMaxChange={setPriceMax}
+              histogramData={[6, 8, 8, 12, 21, 35, 38, 56, 48, 32, 23, 48, 23, 17, 12, 6]}
+              title={translations.priceRange}
+              step={10000}
+            />
+          </div>
+
+          {/* Features */}
+          {/* TODO: those attributes should be fetched dynamically from the backend based on the property cateogry */}
+          <div className='space-y-4 pb-6 border-b border-grey-100'>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
+            <div className='flex items-center justify-between'>
+              <span className='text-base font-normal text-main-black'>{translations.bedroom}</span>
+              <Stepper
+                value={localFilters.bedrooms}
+                onChange={(value) => setLocalFilters({ ...localFilters, bedrooms: value })}
+                min={0}
+                max={10}
+              />
+            </div>
+            <div className='flex items-center justify-between'>
+              <span className='text-base font-normal text-main-black'>{translations.bathroom}</span>
+              <Stepper
+                value={localFilters.bathrooms}
+                onChange={(value) => setLocalFilters({ ...localFilters, bathrooms: value })}
+                min={0}
+                max={10}
+              />
+            </div>
+          </div>
+
+          {/* Rental Period */}
+          <div className='space-y-3'>
+            <h3 className='text-sm font-semibold text-[#4D5461]'>
+              {translations.rentalPeriod.label}
+            </h3>
+            <div className='space-y-1'>
+              <RadioOption
+                selected={localFilters.rentalPeriod === 'any'}
+                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: 'any' })}
+              >
+                {translations.rentalPeriod.any}
+              </RadioOption>
+              <RadioOption
+                selected={localFilters.rentalPeriod === '1-12'}
+                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '1-12' })}
+              >
+                {translations.rentalPeriod['1-12']}
+              </RadioOption>
+              <RadioOption
+                selected={localFilters.rentalPeriod === '13-24'}
+                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '13-24' })}
+              >
+                {translations.rentalPeriod['13-24']}
+              </RadioOption>
+              <RadioOption
+                selected={localFilters.rentalPeriod === '24+'}
+                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '24+' })}
+              >
+                {translations.rentalPeriod['24+']}
+              </RadioOption>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky footer */}
+        <SheetFooter className='sticky bottom-0 bg-white border-t border-grey-100 px-6 py-4 gap-3'>
+          <Button
+            type='button'
+            onClick={handleReset}
+            className='flex-1 rounded-lg bg-[#F4F3FF] px-6 py-3 text-base font-bold text-main-primary hover:bg-[#E9E7FF] border-none'
+          >
+            {translations.reset}
+          </Button>
+          <Button
+            type='button'
+            onClick={handleApply}
+            className='flex-1 rounded-lg bg-main-primary px-6 py-3 text-base font-bold text-white hover:bg-main-primary/90'
+          >
+            {translations.apply}
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}

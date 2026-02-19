@@ -157,7 +157,7 @@ export function RealVistaPropertyListingSearchBar({
             onClick={() => {
               // TODO: Implement date picker
               onDateChange?.(undefined);
-              console.log('Date clicked');
+              onDateChange?.(undefined);
             }}
             className='flex h-7 items-center gap-3 text-left w-full bg-transparent border-none p-0 cursor-pointer'
           >
@@ -178,7 +178,7 @@ export function RealVistaPropertyListingSearchBar({
             onClick={() => {
               // TODO: Implement price selector
               onPriceChange?.('');
-              console.log('Price clicked');
+              onPriceChange?.('');
             }}
             className='flex h-7 items-center gap-3 text-left w-full bg-transparent border-none p-0 cursor-pointer'
           >
@@ -199,7 +199,7 @@ export function RealVistaPropertyListingSearchBar({
             onClick={() => {
               // TODO: Implement property type selector
               onPropertyTypeChange?.('');
-              console.log('Property type clicked');
+              onPropertyTypeChange?.('');
             }}
             className='flex h-7 items-center gap-3 text-left w-full bg-transparent border-none p-0 cursor-pointer'
           >
