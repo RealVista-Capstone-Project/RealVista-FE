@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { Bath, Heart, BedSingle } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { cn } from '@/shared/lib/utils';
+import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
-import { formatVND } from '@/shared/lib/utils/format-currency';
 
 export interface RealVistaListingCardProps {
   id: string;
