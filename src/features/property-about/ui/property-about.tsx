@@ -213,9 +213,6 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       <PriceHistoryChart listingId={property.id} />
       <div className='h-px w-full bg-purple-92' />
 
-      {/* Rent Price History */}
-      <RentPriceHistory property={property} />
-
       {/* Map Section */}
       <PropertyMapSection
         location={
