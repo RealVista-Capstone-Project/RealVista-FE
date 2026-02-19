@@ -89,6 +89,16 @@ export interface Attribute {
   unit?: string;
 }
 
+// ============ Amenity ============
+export interface Amenity {
+  amenity_id: string;
+  amenity_name: string;
+  amenity_type: string;
+  is_onsite: boolean;
+  is_offsite: boolean;
+  description?: string;
+}
+
 // ============ Listing Data (main response object) ============
 export interface ListingData {
   status: string;
@@ -101,6 +111,7 @@ export interface ListingData {
   media: MediaItem[];
   agent: Agent;
   attributes: Attribute[];
+  amenities: Amenity[];
   listing_id: string;
   property_id: string;
   user_id: string;

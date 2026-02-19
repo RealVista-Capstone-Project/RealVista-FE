@@ -2,7 +2,7 @@
  * Property entity types
  */
 
-import type { Attribute } from '@/entities/listing';
+import type { Attribute, Amenity } from '@/entities/listing';
 import type { CostBreakdown } from '@/shared/types';
 
 export interface Property {
@@ -13,7 +13,7 @@ export interface Property {
   area: number;
   description: string;
   images: PropertyImage[];
-  amenities: string[];
+  amenities: Amenity[]; // Full amenity objects from API
   attributes: Attribute[]; // Optional: for dynamic property specifications from backend
   location: {
     lat: number;
