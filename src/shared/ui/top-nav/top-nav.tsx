@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
 import { Bell, ChevronDown, Mail, Menu, X } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
-import { Link } from '@/shared/config/i18n/navigation';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
 import RealVistaLogo from '@/shared/assets/logo/logo';
@@ -57,6 +59,7 @@ export function TopNav({
   className,
 }: TopNavProps) {
   const t = useTranslations('Navigation');
+  const locale = useLocale();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
@@ -64,6 +67,7 @@ export function TopNav({
 
   // Helper function to check if a route is active
   const isRouteActive = (href: string): boolean => {
+    if (!pathname) return false;
     // Remove locale prefix (e.g., /vi or /en) from pathname for comparison
     const cleanPathname = pathname.replace(/^\/(vi|en)/, '') || '/';
     return cleanPathname === href;
@@ -98,11 +102,17 @@ export function TopNav({
             </Link>
           )}
 
-          {/* Nav Items - only for public variant, hidden on mobile */}
+          {/* Nav Items */}
           {showNavItems && (
-            <nav className='hidden lg:flex items-center gap-12' aria-label='Main navigation'>
+            <nav className='hidden lg:flex items-center gap-6' aria-label='Main navigation'>
               {navItems.map((item) => {
                 const isActive = isRouteActive(item.href);
+                // Check if item has dropdown
+                const hasDropdown = item.id === 'buy' || item.id === 'rent';
+
+                if (hasDropdown) {
+                  return <NavItemDropdown key={item.id} item={item} isActive={isActive} t={t} locale={locale} />;
+                }
                 return (
                   <Link
                     key={item.id}
@@ -252,5 +262,90 @@ export function TopNav({
         </>
       )}
     </header>
+  );
+}
+
+function NavItemDropdown({ item, isActive, t, locale }: { item: NavItem; isActive: boolean; t: any; locale: string }) {
+  const [open, setOpen] = useState(false);
+
+  if (item.id !== 'buy' && item.id !== 'rent') {
+    return (
+      <Link
+        href={`/${locale}${item.href}`}
+        className={cn(
+          'text-base leading-[1.5] transition-colors hover:text-main-primary',
+          isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+        )}
+        aria-current={isActive ? 'page' : undefined}
+      >
+        {t(item.translationKey)}
+      </Link>
+    );
+  }
+
+  return (
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Trigger
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        asChild
+      >
+        <Link
+          href={`/${locale}${item.href}`}
+          className={cn(
+            'flex items-center gap-1 text-base leading-[1.5] transition-colors hover:text-main-primary outline-none',
+            isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black',
+            open && 'text-main-primary'
+          )}
+        >
+          {t(item.translationKey)}
+          <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', open && 'rotate-180')} strokeWidth={2} />
+        </Link>
+      </PopoverPrimitive.Trigger>
+
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+          align='start'
+          sideOffset={20}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          className={cn(
+            'z-50 w-[600px] rounded-xl border border-purple-92 bg-white p-6 shadow-xl',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+            'data-[side=bottom]:slide-in-from-top-2'
+          )}
+        >
+          <div className='grid grid-cols-2 gap-8'>
+            {PROPERTY_TYPES.map((category) => (
+              <div key={category.code} className='space-y-4'>
+                <Link
+                  href={`/${locale}${item.href}?propertyCategory=${category.code}`}
+                  className='flex items-center gap-2 pb-2 border-b border-purple-92 hover:border-main-primary transition-colors group'
+                  onClick={() => setOpen(false)}
+                >
+                  <span className='text-sm font-bold uppercase tracking-wider text-main-primary/80 group-hover:text-main-primary transition-colors'>
+                    {category.label}
+                  </span>
+                </Link>
+                <div className='grid grid-cols-2 gap-2'>
+                  {category.types.map((type) => (
+                    <Link
+                      key={type.code}
+                      href={`/${locale}${item.href}?propertyType=${type.code}`}
+                      className='text-sm text-grey-600 hover:text-main-primary hover:bg-purple-98 px-3 py-2 rounded-lg transition-colors capitalize'
+                      onClick={() => setOpen(false)}
+                    >
+                      {type.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   );
 }
