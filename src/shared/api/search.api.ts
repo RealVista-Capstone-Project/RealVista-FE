@@ -12,7 +12,7 @@ export class SearchAPI {
     page: number = 0,
     size: number = 12
   ): Promise<PageResponse<ListingSearchResponse>> {
-    console.log('🔍 Searching with:', { API_BASE_URL, request, page, size });
+
 
     try {
       // Build query params from request
@@ -39,32 +39,21 @@ export class SearchAPI {
       }
 
       // Standard property filters
-      if (request.bedrooms !== undefined && request.bedrooms !== null) {
-        params.append('bedrooms', request.bedrooms.toString());
-      }
-      if (request.bathrooms !== undefined && request.bathrooms !== null) {
-        params.append('bathrooms', request.bathrooms.toString());
-      }
+      // (bedrooms and bathrooms are now sent via dynamicAttributes)
 
-      // Dynamic attributes - use attr_ prefix
-      // Check for any property that's not a standard filter
-      const standardFilters = ['listingType', 'propertyType', 'propertyCategory', 'location',
-                               'price', 'area', 'bedrooms', 'bathrooms', 'sortBy',
-                               'hasVideo', 'has3D', 'page', 'size'];
-
-      Object.entries(request).forEach(([key, value]) => {
-        if (!standardFilters.includes(key) && value !== undefined && value !== null && value !== '') {
-          // Convert to lowercase for backend (e.g., DIRECTION -> direction)
-          const attrKey = key.toLowerCase();
-          params.append(`attr_${attrKey}`, value.toString());
-          console.log(`🔧 Adding dynamic attribute: attr_${attrKey}=${value}`);
-        }
-      });
+      // Dynamic attributes - send as dynamicAttributes[KEY]=value
+      if (request.dynamicAttributes && Object.keys(request.dynamicAttributes).length > 0) {
+        Object.entries(request.dynamicAttributes).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(`dynamicAttributes[${key}]`, value.toString());
+          }
+        });
+      }
 
       if (request.sortBy) params.append('sortBy', request.sortBy);
 
       const url = `${API_BASE_URL}/listings/search?${params.toString()}`;
-      console.log('📡 GET:', url);
+
 
       const response = await fetch(url, {
         method: 'GET',
@@ -73,20 +62,18 @@ export class SearchAPI {
         },
       });
 
-      console.log('📥 Response status:', response.status, response.statusText);
+
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Error response:', errorText);
+        console.error('Error response:', errorText);
         throw new Error(`Search failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('✅ Search successful:', data);
-      console.log('📋 First listing:', data.content?.[0]);
       return data;
     } catch (error) {
-      console.error('❌ Search error:', error);
+      console.error('Search error:', error);
       throw error;
     }
   }

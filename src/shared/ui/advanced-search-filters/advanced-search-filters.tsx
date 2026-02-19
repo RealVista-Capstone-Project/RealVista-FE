@@ -90,10 +90,29 @@ export function AdvancedSearchFilters({
     return [];
   }, [selectedPropertyType]);
 
-  // Helper to render dynamic input
+  /** Strip non-integer / negative input: keep only digits, return undefined if empty */
+  const sanitizePositiveInt = (raw: string): string | undefined => {
+    const digits = raw.replace(/[^0-9]/g, '');
+    return digits === '' ? undefined : String(parseInt(digits, 10));
+  };
+
+  /** Update a single key inside filters.dynamicAttributes */
+  const setDynamicAttr = (attrCode: string, value: string | undefined) => {
+    const prev = filters.dynamicAttributes || {};
+    if (value === undefined || value === '') {
+      const next = { ...prev };
+      delete next[attrCode];
+      setFilters({ ...filters, dynamicAttributes: Object.keys(next).length > 0 ? next : undefined });
+    } else {
+      setFilters({ ...filters, dynamicAttributes: { ...prev, [attrCode]: value } });
+    }
+  };
+
+  // Helper to render dynamic input — stores into dynamicAttributes
   const renderDynamicField = (attrCode: PropertyAttribute) => {
     const label = ATTRIBUTE_LABELS[attrCode];
     const type = ATTRIBUTE_TYPES[attrCode];
+    const currentValue = filters.dynamicAttributes?.[attrCode];
 
     if (type === 'boolean') {
       return (
@@ -103,10 +122,8 @@ export function AdvancedSearchFilters({
         >
           <span className='text-sm text-main-black'>{label}</span>
           <Switch
-            checked={!!(filters as any)[attrCode]}
-            onCheckedChange={(checked) =>
-              setFilters({ ...filters, [attrCode]: checked })
-            }
+            checked={currentValue === 'true'}
+            onCheckedChange={(checked) => setDynamicAttr(attrCode, checked ? 'true' : undefined)}
           />
         </div>
       );
@@ -119,14 +136,11 @@ export function AdvancedSearchFilters({
           <Input
             type='number'
             min='0'
-            placeholder='Any'
-            value={(filters as any)[attrCode] || ''}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                [attrCode]: e.target.value ? Number(e.target.value) : undefined,
-              })
-            }
+            step='1'
+            placeholder='Bất kỳ'
+            value={currentValue || ''}
+            onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
+            onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
           />
         </div>
       );
@@ -138,14 +152,9 @@ export function AdvancedSearchFilters({
         <Label className='text-sm font-medium text-main-black'>{label}</Label>
         <Input
           type='text'
-          placeholder='Any'
-          value={(filters as any)[attrCode] || ''}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              [attrCode]: e.target.value || undefined,
-            })
-          }
+          placeholder='Nhập giá trị'
+          value={currentValue || ''}
+          onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
         />
       </div>
     );
@@ -285,44 +294,9 @@ export function AdvancedSearchFilters({
             </div>
           </div>
 
-          {/* Bedrooms & Bathrooms */}
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-3'>
-              <Label>Phòng ngủ (tối thiểu)</Label>
-              <Input
-                type='number'
-                min={0}
-                placeholder='Bất kỳ'
-                value={filters.bedrooms || ''}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    bedrooms: e.target.value ? Number(e.target.value) : undefined,
-                  })
-                }
-              />
-            </div>
-            <div className='space-y-3'>
-              <Label>Phòng tắm (tối thiểu)</Label>
-              <Input
-                type='number'
-                min={0}
-                placeholder='Bất kỳ'
-                value={filters.bathrooms || ''}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    bathrooms: e.target.value ? Number(e.target.value) : undefined,
-                  })
-                }
-              />
-            </div>
-          </div>
-
-          {/* Dynamic Attributes Section */}
-          {activeAttributes.filter(
-            (attr) => attr !== 'BEDROOMS' && attr !== 'BATHROOMS'
-          ).length > 0 && (
+          {/* Dynamic Attributes Section — shown only when a property type is selected.
+               BEDROOMS/BATHROOMS appear here automatically if the type supports them. */}
+          {activeAttributes.length > 0 && (
             <div className='space-y-4 pt-2'>
               <h4 className='text-sm font-semibold text-main-black'>
                 Đặc điểm bổ sung
@@ -331,9 +305,6 @@ export function AdvancedSearchFilters({
               {/* Number and Text Inputs */}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {activeAttributes
-                  .filter(
-                    (attr) => attr !== 'BEDROOMS' && attr !== 'BATHROOMS'
-                  )
                   .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
                   .map((attr) => renderDynamicField(attr))}
               </div>
@@ -341,9 +312,6 @@ export function AdvancedSearchFilters({
               {/* Boolean Switches */}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {activeAttributes
-                  .filter(
-                    (attr) => attr !== 'BEDROOMS' && attr !== 'BATHROOMS'
-                  )
                   .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
                   .map((attr) => renderDynamicField(attr))}
               </div>
