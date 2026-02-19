@@ -29,4 +29,14 @@ export const listingQueries = {
       staleTime: 5 * 60 * 1000, // 5 minutes
       enabled: !!listingId,
     }),
+  /**
+   * Get similar listings by listing ID
+   */
+  similar: (listingId: string, limit: number = 3) =>
+    queryOptions({
+      queryKey: listingKeys.similar(listingId, limit),
+      queryFn: () => listingApi.getSimilar(listingId, limit),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      enabled: !!listingId,
+    }),
 } as const;

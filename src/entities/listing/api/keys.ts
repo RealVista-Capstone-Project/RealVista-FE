@@ -16,4 +16,7 @@ export const listingKeys = {
 
   // Price history for a listing
   priceHistory: (id: string) => [...listingKeys.all, 'price-history', id] as const,
+
+  // Similar listings queries
+  similar: (id: string, limit: number) => [...listingKeys.all, 'similar', id, limit] as const,
 } as const;

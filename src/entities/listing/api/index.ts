@@ -1,5 +1,5 @@
 import http from '@/shared/lib/http';
-import type { Listing, ApiResponse, PriceHistory } from '../model/types';
+import type { Listing, ApiResponse, PriceHistory, SimilarListingsResponse } from '../model/types';
 
 /**
  * Listing API - All listing-related HTTP methods
@@ -18,6 +18,13 @@ export const listingApi = {
    */
   getPriceHistory: (listingId: string) =>
     http.get<ApiResponse<PriceHistory>>(`/listings/${listingId}/price-history`),
+
+  /**
+   * Get similar listings by listing ID
+   * Returns paginated similar listings
+   */
+  getSimilar: (listingId: string, limit: number = 5) =>
+    http.get<ApiResponse<SimilarListingsResponse>>(`/listings/${listingId}/similar?limit=${limit}`),
 } as const;
 
 // Re-export query keys and queries

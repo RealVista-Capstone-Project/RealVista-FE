@@ -156,6 +156,30 @@ export interface PriceHistoryData {
   price_history: PriceHistoryEntry[];
 }
 
+// ============ Similar Listing Types ============
+export interface SimilarListing {
+  listing_id: string;
+  slug: string;
+  name: string;
+  listing_type: 'RENT' | 'SALE';
+  property_type_name: string;
+  price: number;
+  area: number;
+  location_name: string;
+  thumbnail_url: string;
+  similarity_score: number;
+  published_at: string;
+  attributes: Attribute[];
+  display_price: string;
+  display_area: string;
+}
+
+export interface SimilarListingsResponse {
+  listings: SimilarListing[];
+  total: number;
+  limit: number;
+}
+
 // ============ Main Listing Type (what we export) ============
 export type Listing = ListingData;
 export type PriceHistory = PriceHistoryData;
