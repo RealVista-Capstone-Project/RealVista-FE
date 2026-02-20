@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Trash2 } from 'lucide-react';
 import { Badge } from '@/shared/ui/badge'; // Assuming Badge component exists, or I will use a simple div
 import { format } from 'date-fns';
+import { formatCurrency } from '../lib/utils';
 
 interface ApplicationCardProps {
   application: TenantApplication;
@@ -34,7 +35,7 @@ export const ApplicationCard = ({ application, onDelete }: ApplicationCardProps)
              <div className='flex justify-between'>
                 <span>Monthly Income:</span>
                 <span className='font-medium text-gray-900'>
-                    {application.monthlyIncome ? `$${application.monthlyIncome.toLocaleString()}` : 'N/A'}
+                    {formatCurrency(application.monthlyIncome)}
                 </span>
             </div>
         </div>

@@ -47,10 +47,10 @@ export const OverviewCards = ({ applications }: OverviewCardsProps) => {
                         <div className='text-sm font-medium text-gray-500 mb-1'>Tổng đơn đăng ký</div>
                         <div className='text-2xl font-bold text-gray-900'>{totalRecent}</div>
                     </div>
-                    <div className='p-6'>
+                     <div className='p-6'>
                          <div className='text-sm font-medium text-gray-500 mb-1'>Phí ứng tuyển</div>
-                         {/* Tính phí ứng tuyển cho các đơn đã nộp (giả sử 50$/đơn) */}
-                         <div className='text-2xl font-bold text-gray-900'>{formatCurrency(totalSubmitted * 50)}</div>
+                         {/* Tính phí ứng tuyển cho các đơn đã nộp (giả sử 50.000 VNĐ/đơn) */}
+                         <div className='text-2xl font-bold text-gray-900'>{formatCurrency(totalSubmitted * 50000)}</div>
                     </div>
                      <div className='p-6'>
                          <div className='text-sm font-medium text-gray-500 mb-1'>Phản hồi</div>
