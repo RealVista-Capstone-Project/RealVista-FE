@@ -33,7 +33,8 @@ export function SearchIntegrationExample() {
       // TODO: Get actual profile ID from auth context
       const profileId = 'user-profile-id';
       // Show success message
-      console.log('Search saved successfully!');
+      // Show success message
+
     } catch (error) {
       console.error('Failed to save search:', error);
       // Handle error

@@ -7,14 +7,10 @@ export interface AdvancedSearchRequest {
   location?: string;
   price?: [number | null, number | null];
   area?: [number | null, number | null];
-  bedrooms?: number;
-  bathrooms?: number;
-  direction?: string;
-  balconyDirection?: string;
-  legal?: string;
-  furniture?: string;
-  availableFrom?: string;
-  dynamic?: Record<string, any>;
+  /** Dynamic attributes sent as { BEDROOMS: '2', DIRECTION: 'North', ... }
+   *  BEDROOMS and BATHROOMS use >= semantics on the backend.
+   */
+  dynamicAttributes?: Record<string, string>;
   hasVideo?: boolean;
   has3D?: boolean;
   sortBy?: 'PRIORITY' | 'DATE_DESC' | 'PRICE_ASC' | 'PRICE_DESC';
