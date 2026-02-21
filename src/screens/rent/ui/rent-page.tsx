@@ -87,8 +87,8 @@ function RentPageContent() {
     setIsLoading(true);
     try {
       const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
-      setListings(response.content);
-      setTotalPages(response.total_pages);
+      setListings(response?.content || []);
+      setTotalPages(response?.total_pages || 1);
     } catch (error) {
       console.error('Search failed:', error);
       setListings([]);

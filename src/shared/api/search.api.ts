@@ -71,7 +71,7 @@ export class SearchAPI {
       }
 
       const data = await response.json();
-      return data;
+      return data.data || data;
     } catch (error) {
       console.error('Search error:', error);
       throw error;
