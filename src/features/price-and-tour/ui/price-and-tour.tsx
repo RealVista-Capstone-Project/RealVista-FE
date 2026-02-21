@@ -11,6 +11,7 @@ export interface PriceAndTourProps {
   listingType: 'RENT' | 'SALE';
   onContact?: () => void;
   onRequestTour?: (date: string) => void;
+  onSubmitApplication?: () => void;
 }
 
 /**
@@ -18,7 +19,7 @@ export interface PriceAndTourProps {
  *
  * Shows monthly rent price, contact button, and a home tour request form with date picker
  */
-export function PriceAndTour({ price, listingType, onContact, onRequestTour }: PriceAndTourProps) {
+export function PriceAndTour({ price, listingType, onContact, onRequestTour, onSubmitApplication }: PriceAndTourProps) {
   const t = useTranslations('PriceAndTour');
   const [tourDate, setTourDate] = useState('');
 
@@ -74,21 +75,36 @@ export function PriceAndTour({ price, listingType, onContact, onRequestTour }: P
               variant='tour'
             />
 
-            {/* Request Tour Button */}
-            <RealVistaButton
-              variant='primary'
-              size='medium'
-              className='w-full bg-main-secondary'
-              disabled={!tourDate}
-              onClick={handleRequestTour}
-            >
-              {t('requestTour')}
-            </RealVistaButton>
+    {/* Action Buttons */}
+    <div className='flex flex-col gap-3'>
+      {/* Request Tour Button */}
+      <RealVistaButton
+        variant='primary'
+        size='medium'
+        className='w-full bg-main-secondary'
+        disabled={!tourDate}
+        onClick={handleRequestTour}
+      >
+        {t('requestTour')}
+      </RealVistaButton>
 
-            {/* Disclaimer */}
-            <p className='text-grey-500 text-[12px] font-normal leading-[1.35]'>
-              {t('disclaimer')}
-            </p>
+      {/* Submit Application Button (Only for Rent) */}
+      {listingType === 'RENT' && onSubmitApplication && (
+        <RealVistaButton
+          variant='secondary'
+          size='medium'
+          className='w-full'
+          onClick={onSubmitApplication}
+        >
+          {t('submitApplication')}
+        </RealVistaButton>
+      )}
+
+      {/* Disclaimer */}
+      <p className='text-grey-500 text-[12px] font-normal leading-[1.35] text-center mt-2'>
+        {t('disclaimer')}
+      </p>
+    </div>
           </div>
         </div>
       </div>

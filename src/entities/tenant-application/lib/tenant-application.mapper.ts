@@ -4,6 +4,7 @@ export function mapToTenantApplication(item: any): TenantApplication {
   return {
     tenantApplicationId: item.tenant_application_id || item.tenantApplicationId,
     userId: item.user_id || item.userId,
+    rentalProfileId: item.rental_profile_id || item.rentalProfileId,
     listingId: item.listing_id || item.listingId,
     title: item.title,
     propertyAddress: item.property_address || item.propertyAddress,

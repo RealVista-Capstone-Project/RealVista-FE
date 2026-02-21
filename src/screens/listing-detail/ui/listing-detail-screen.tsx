@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
@@ -11,13 +13,19 @@ import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 
+import { SubmitApplicationModal } from '@/features/tenant-application/ui/submit-application-modal';
+
 export interface ListingDetailScreenProps {
   listing: Listing;
 }
 
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
+  const t = useTranslations('PriceAndTour');
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+
+  // ... (inside component)
 
   const handleShare = () => {
     // Share property
@@ -57,6 +65,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const handleRequestTour = (date: string) => {
     // Request tour with date
     console.log('Request tour for:', date);
+  };
+
+  const handleSubmitApplication = () => {
+    setIsSubmitModalOpen(true);
   };
 
   const formattedPrice = new Intl.NumberFormat('en-US', {
@@ -101,6 +113,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 listingType={listing.listing_type}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                onSubmitApplication={handleSubmitApplication}
               />
             </div>
 
@@ -123,6 +136,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 listingType={listing.listing_type}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                onSubmitApplication={handleSubmitApplication}
               />
             </div>
           </div>
@@ -139,27 +153,45 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         <div className='max-w-[1200px] mx-auto flex flex-col xs:flex-row items-center justify-between gap-3 xs:gap-4'>
           <div className='w-full xs:w-auto mb-2 xs:mb-0'>
             <p className='text-main-black/50 text-xs font-medium leading-[1.4]'>
-              {listing.listing_type === 'RENT' ? 'Rent price' : 'Sale price'}
+              {listing.listing_type === 'RENT' ? t('rentPrice') : t('buyPrice')}
             </p>
             <div className='flex items-baseline gap-1'>
               <p className='text-main-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
               {listing.listing_type === 'RENT' && (
-                <span className='text-main-black/50 text-sm font-medium'>/month</span>
+                <span className='text-main-black/50 text-sm font-medium'>{t('perMonth')}</span>
               )}
             </div>
           </div>
-          <RealVistaButton
-            variant='primary'
-            size='medium'
-            className='w-full xs:w-auto max-w-[200px]'
-            onClick={handleContact}
-          >
-            Apply Now
-          </RealVistaButton>
+          <div className='flex gap-2 w-full xs:w-auto max-w-[300px]'>
+            {listing.listing_type === 'RENT' && (
+              <RealVistaButton
+                variant='secondary'
+                size='small'
+                className='w-full'
+                onClick={handleSubmitApplication}
+              >
+                {t('submitApplication')}
+              </RealVistaButton>
+            )}
+            <RealVistaButton
+              variant='primary'
+              size='small'
+              className='w-full xs:max-w-max'
+              onClick={handleContact}
+            >
+              {t('contactAgent')}
+            </RealVistaButton>
+          </div>
         </div>
       </div>
+
+      <SubmitApplicationModal
+        isOpen={isSubmitModalOpen}
+        onClose={() => setIsSubmitModalOpen(false)}
+        listingId={listing.listing_id}
+      />
     </div>
   );
 }

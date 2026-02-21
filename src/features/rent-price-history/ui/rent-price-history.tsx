@@ -51,7 +51,7 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
             >
               <p className='text-grey-500 text-[16px] font-medium leading-[1.5]'>{item.date}</p>
               <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
-                ${item.price.toLocaleString()}
+                ${item.price.toLocaleString('en-US')}
                 {t('perMonth')}
               </p>
               <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
@@ -77,7 +77,7 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
                   {t(`events.${item.event}` as any)}
                 </p>
                 <p className='text-main-black text-[16px] font-bold leading-[1.5]'>
-                  ${item.price.toLocaleString()}
+                  ${item.price.toLocaleString('en-US')}
                   {t('perMonth')}
                 </p>
               </div>

@@ -11,6 +11,7 @@ export enum TenantApplicationStatus {
 export interface TenantApplication {
   tenantApplicationId: string;
   userId: string;
+  rentalProfileId: string;
   listingId: string;
 
   // DTO fields from backend
@@ -24,6 +25,19 @@ export interface TenantApplication {
   status: TenantApplicationStatus;
   note?: string;
 
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TenantRentalProfile {
+  profileId: string;
+  userId: string;
+  title: string;
+  monthlyIncome?: number;
+  moveInDate?: string;
+  leaseTermMonths?: number;
+  note?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }

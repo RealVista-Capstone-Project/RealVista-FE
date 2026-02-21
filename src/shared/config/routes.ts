@@ -17,6 +17,7 @@ export const ROUTES = {
     listings: '/dashboard/listings',
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
+    tenantApplications: '/dashboard/my-applications',
   },
   settings: '/settings',
 } as const;
