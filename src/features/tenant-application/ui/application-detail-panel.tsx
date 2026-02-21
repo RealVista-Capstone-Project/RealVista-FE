@@ -2,8 +2,18 @@ import { TenantApplication } from '@/entities/tenant-application/model/types';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
-import { FileText, Download, X } from 'lucide-react';
+import { FileText, Download, X, AlertCircle } from 'lucide-react';
 import { formatCurrency, formatDate } from '../lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from '@/shared/ui/dialog';
 
 interface ApplicationDetailPanelProps {
     application: TenantApplication;
@@ -127,13 +137,40 @@ export const ApplicationDetailPanel = ({
                     </div>
 
                      <div className='pt-2'>
-                        <Button
-                            variant='destructive'
-                            className='w-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-transparent transition-all shadow-none hover:shadow-md'
-                            onClick={() => onDelete(application.tenantApplicationId)}
-                        >
-                            Xóa đơn đăng ký
-                        </Button>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant='destructive'
+                                    className='w-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-transparent transition-all shadow-none hover:shadow-md'
+                                >
+                                    Xóa đơn đăng ký
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle className='flex items-center gap-2 text-destructive'>
+                                        <AlertCircle className='h-5 w-5' />
+                                        Xác nhận xóa đơn
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        Bạn có chắc chắn muốn xóa đơn đăng ký này? Thao tác này không thể hoàn tác.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button variant='outline'>Hủy</Button>
+                                    </DialogClose>
+                                    <DialogClose asChild>
+                                        <Button
+                                            variant='destructive'
+                                            onClick={() => onDelete(application.tenantApplicationId)}
+                                        >
+                                            Xóa
+                                        </Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                      </div>
                 </div>
             </CardContent>

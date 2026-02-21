@@ -1,10 +1,20 @@
 import { TenantApplication } from '@/shared/types/tenant-application';
 import { Card, CardContent, CardFooter, CardHeader } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, AlertCircle } from 'lucide-react';
 import { Badge } from '@/shared/ui/badge'; // Assuming Badge component exists, or I will use a simple div
 import { format } from 'date-fns';
 import { formatCurrency } from '../lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from '@/shared/ui/dialog';
 
 interface ApplicationCardProps {
   application: TenantApplication;
@@ -41,18 +51,39 @@ export const ApplicationCard = ({ application, onDelete }: ApplicationCardProps)
         </div>
       </CardContent>
       <CardFooter className='flex justify-end'>
-        <Button
-            variant='destructive'
-            size='sm'
-            onClick={() => {
-                if (window.confirm('Are you sure you want to delete this application?')) {
-                    onDelete(application.tenantApplicationId);
-                }
-            }}
-        >
-          <Trash2 className='h-4 w-4 mr-2' />
-          Delete
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant='destructive' size='sm'>
+              <Trash2 className='h-4 w-4 mr-2' />
+              Delete
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className='flex items-center gap-2 text-destructive'>
+                <AlertCircle className='h-5 w-5' />
+                Delete Application
+              </DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete <span className='font-medium text-foreground'>{application.title}</span>?
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant='outline'>Cancel</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  variant='destructive'
+                  onClick={() => onDelete(application.tenantApplicationId)}
+                >
+                  Delete
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardFooter>
     </Card>
   );

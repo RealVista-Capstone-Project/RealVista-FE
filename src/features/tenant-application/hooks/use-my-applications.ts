@@ -35,9 +35,7 @@ export const useMyApplications = () => {
     });
 
     const handleDelete = (id: string) => {
-        if (confirm('Bạn có chắc chắn muốn xóa đơn này không?')) {
-            deleteMutation.mutate(id);
-        }
+        deleteMutation.mutate(id);
     };
 
     const getAppId = (app: TenantApplication) => app.tenantApplicationId;
