@@ -72,11 +72,7 @@ const request = async <Response>(
     // If you encounter auth failures due to stale tokens, consider:
     // 1. Using async getAuthToken() as a fallback (slower but always fresh)
     // 2. Implementing a token refresh retry mechanism
-    let token = getAuthTokenSync();
-    if (!token) {
-      const { getAuthToken } = await import('@/shared/lib/auth/get-auth-token');
-      token = await getAuthToken();
-    }
+    const token = getAuthTokenSync();
     if (token) {
       baseHeaders.Authorization = `Bearer ${token}`;
     }

@@ -1,6 +1,6 @@
 import { TenantApplication } from '@/shared/types/tenant-application';
 import { Card, CardContent, CardFooter, CardHeader } from '@/shared/ui/card';
-import { Button } from '@/shared/ui/button';
+import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { Badge } from '@/shared/ui/badge'; // Assuming Badge component exists, or I will use a simple div
 import { format } from 'date-fns';
@@ -53,15 +53,15 @@ export const ApplicationCard = ({ application, onDelete }: ApplicationCardProps)
       <CardFooter className='flex justify-end'>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant='destructive' size='sm'>
+            <RealVistaButton variant='secondary' size='small' className='text-red-500 border-red-200 hover:bg-red-50 focus:ring-red-500 h-9 px-3'>
               <Trash2 className='h-4 w-4 mr-2' />
               Delete
-            </Button>
+            </RealVistaButton>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className='flex items-center gap-2 text-destructive'>
-                <AlertCircle className='h-5 w-5' />
+                <AlertCircle className='h-5 w-5 fill-red-100 text-red-600' />
                 Delete Application
               </DialogTitle>
               <DialogDescription>
@@ -69,17 +69,19 @@ export const ApplicationCard = ({ application, onDelete }: ApplicationCardProps)
                 This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <DialogFooter className='mt-4'>
               <DialogClose asChild>
-                <Button variant='outline'>Cancel</Button>
+                <RealVistaButton variant='secondary' size='small'>Cancel</RealVistaButton>
               </DialogClose>
               <DialogClose asChild>
-                <Button
-                  variant='destructive'
+                <RealVistaButton
+                  variant='primary'
+                  size='small'
+                  className='bg-red-600 hover:bg-red-700 focus:ring-red-500'
                   onClick={() => onDelete(application.tenantApplicationId)}
                 >
                   Delete
-                </Button>
+                </RealVistaButton>
               </DialogClose>
             </DialogFooter>
           </DialogContent>

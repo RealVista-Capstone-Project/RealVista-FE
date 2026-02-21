@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { useMyApplications } from '@/features/tenant-application/hooks/use-my-applications';
+import { MyApplicationsProvider, useMyApplicationsContext } from '@/features/tenant-application/model/my-applications-context';
 import { OverviewCards } from '@/features/tenant-application/ui/overview-cards';
 import { ApplicationDetailPanel } from '@/features/tenant-application/ui/application-detail-panel';
 import { ApplicationListItem } from '@/features/tenant-application/ui/application-list-item';
@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, FileText, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-export default function MyApplicationsPage() {
+function MyApplicationsContent() {
     const {
         applications,
         isLoading,
@@ -31,7 +31,7 @@ export default function MyApplicationsPage() {
         ITEMS_PER_PAGE,
         handleDelete,
         handleAppClick
-    } = useMyApplications();
+    } = useMyApplicationsContext();
 
     if (isLoading) return <div className='p-8 text-center text-gray-500'>Đang tải dữ liệu...</div>;
     if (isError) return <div className='p-8 text-center text-red-500'>Lỗi không tải được dữ liệu</div>;
@@ -169,5 +169,13 @@ export default function MyApplicationsPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function MyApplicationsPage() {
+    return (
+        <MyApplicationsProvider>
+            <MyApplicationsContent />
+        </MyApplicationsProvider>
     );
 }
