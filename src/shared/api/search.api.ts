@@ -71,7 +71,9 @@ export class SearchAPI {
       }
 
       const data = await response.json();
-      return data;
+      // Most backend endpoints return ApiResponse wrapper: { success, message, data: { ... } }
+      // We want to return the actual PageResponse which is inside 'data'
+      return data.data || data;
     } catch (error) {
       console.error('Search error:', error);
       throw error;

@@ -19,7 +19,7 @@ export function SearchIntegrationExample() {
     setLoading(true);
     try {
       const response = await SearchAPI.searchListings(searchCriteria, 0, 12);
-      setResults(response.content);
+      setResults(response?.content || []);
     } catch (error) {
       console.error('Search failed:', error);
       // Handle error (show toast, etc.)
