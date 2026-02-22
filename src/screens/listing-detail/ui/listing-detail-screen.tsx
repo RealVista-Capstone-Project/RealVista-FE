@@ -21,6 +21,7 @@ import { useAuthSession, isAuthenticated } from '@/features/auth/model';
 import { unwrapApiResponse } from '@/shared/types/api';
 import type { SendMessageResponse } from '@/entities/conversation/model/types';
 import { formatVND } from '@/shared/lib/utils/format-currency';
+import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -36,6 +37,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const params = useParams();
   const { data: session } = useAuthSession();
   const { openWindow } = useChatWindows();
+  const isMobile = useIsMobile();
 
   const handleShare = () => {
     // Share property
@@ -90,11 +92,16 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
       const conversationId = sendResult.conversation_id;
 
       if (conversationId) {
-        openWindow(conversationId, {
-          id: listing.agent.user_id,
-          name: listing.agent.full_name,
-          avatar: listing.agent.avatar_url,
-        });
+        if (isMobile) {
+          const locale = params.locale;
+          router.push(`/${locale}/messages/${conversationId}`);
+        } else {
+          openWindow(conversationId, {
+            id: listing.agent.user_id,
+            name: listing.agent.full_name,
+            avatar: listing.agent.avatar_url,
+          });
+        }
       }
     }
   };

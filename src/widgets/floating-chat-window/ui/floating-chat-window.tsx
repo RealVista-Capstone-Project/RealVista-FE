@@ -116,9 +116,11 @@ export function FloatingChatWindow({
   return (
     <div
       className={cn(
-        'fixed bottom-0 z-40 flex flex-col rounded-t-xl border border-b-0 border-border bg-white shadow-xl',
+        'fixed bottom-0 z-[60] flex flex-col rounded-t-xl border border-b-0 border-border bg-white shadow-xl',
         'transition-all duration-200',
         isMinimized ? 'h-12' : 'h-[420px]',
+        'bottom-0 md:bottom-0 max-md:bottom-0',
+        'max-md:hidden',
         className
       )}
       style={{

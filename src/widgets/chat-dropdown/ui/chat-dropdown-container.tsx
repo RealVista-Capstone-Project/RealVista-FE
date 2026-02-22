@@ -6,6 +6,8 @@ import type { ConversationListItemResponse } from '@/entities/conversation';
 import type { Conversation } from '@/entities/contact';
 import { ChatDropdown } from './chat-dropdown';
 import { useChatWindows } from '@/shared/context/chat-window-context';
+import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { useRouter, useParams } from 'next/navigation';
 
 /**
  * Maps API response to the UI Conversation type
@@ -33,6 +35,9 @@ function mapToConversation(item: ConversationListItemResponse): Conversation {
 export function ChatDropdownContainer() {
   const { data, isLoading } = useQuery(conversationQueries.list());
   const { openWindow } = useChatWindows();
+  const isMobile = useIsMobile();
+  const router = useRouter();
+  const params = useParams();
 
   // http returns { status, payload } where payload is ApiResponse { success, message, data }
   const items = (data?.payload as any)?.data ?? [];
@@ -56,7 +61,12 @@ export function ChatDropdownContainer() {
       conversations={conversations}
       unreadCount={totalUnread}
       onConversationClick={(conversation) => {
-        openWindow(conversation.id, conversation.participant);
+        if (isMobile) {
+          const locale = params.locale;
+          router.push(`/${locale}/messages/${conversation.id}`);
+        } else {
+          openWindow(conversation.id, conversation.participant);
+        }
       }}
     />
   );
