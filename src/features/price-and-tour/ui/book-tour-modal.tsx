@@ -49,10 +49,10 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
     appointmentQueries.slots(listingId, formattedDate)
   );
 
-  const slots = useMemo(() => response?.payload?.data || [], [response]);
+  const slots: string[] = useMemo(() => response?.payload?.data || [], [response]);
 
   // Derived state for display
-  const availableSlots = useMemo(() => {
+  const availableSlots: string[] = useMemo(() => {
     return slots.map((s: string) => s.substring(0, 5));
   }, [slots]);
 
@@ -235,7 +235,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                         </div>
                       ) : availableSlots.length > 0 ? (
                         <div className='grid grid-cols-4 gap-2'>
-                          {availableSlots.map((slot) => (
+                          {availableSlots.map((slot: string) => (
                             <button
                               key={slot}
                               onClick={() => handleStartTimeSelect(slot, setTimeOpen)}
