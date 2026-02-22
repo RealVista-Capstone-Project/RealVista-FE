@@ -13,4 +13,8 @@ export const listingKeys = {
 
   // Single listing queries
   detail: (id: string) => [...listingKeys.all, 'detail', id] as const,
+
+  // Similar listings queries
+  similar: (id: string, limit: number) =>
+    [...listingKeys.all, 'similar', id, limit] as const,
 } as const;
