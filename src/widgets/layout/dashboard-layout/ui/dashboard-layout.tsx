@@ -143,6 +143,7 @@ export function DashboardLayout({
 
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3'>
+          {/* TODO: Implement mapping to determine active state based on current route/screen name */}
           {sidebarItems.map((item) => (
             <Link
               key={item.id}

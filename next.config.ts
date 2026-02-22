@@ -7,46 +7,50 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
-        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'sample-videos.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'my.matterport.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: '**.ufileos.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: '**.youtube.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: '**.pexels.com',
-        port: '',
         pathname: '/**',
       },
     ],
+    dangerouslyAllowSVG: true,
   },
 };
 
