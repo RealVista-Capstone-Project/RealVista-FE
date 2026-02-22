@@ -54,6 +54,7 @@
       "emailRequired": "Vui lòng nhập email",
       "emailInvalid": "Vui lòng nhập email hợp lệ",
       "phoneRequired": "Vui lòng nhập số điện thoại",
+      "phoneInvalid": "Số điện thoại không hợp lệ",
       "messageRequired": "Vui lòng nhập tin nhắn",
       "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
     }

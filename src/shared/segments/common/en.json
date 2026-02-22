@@ -54,6 +54,7 @@
       "emailRequired": "Email is required",
       "emailInvalid": "Please enter a valid email",
       "phoneRequired": "Phone number is required",
+      "phoneInvalid": "Please enter a valid phone number",
       "messageRequired": "Message is required",
       "messageMinLength": "Message must be at least 10 characters"
     }

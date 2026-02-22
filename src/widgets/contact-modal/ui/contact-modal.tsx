@@ -107,7 +107,6 @@ export function ContactModal({
             <FormField
               control={form.control}
               name='fullName'
-              rules={{ required: t('validation.fullNameRequired') }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('fullName')}</FormLabel>
@@ -128,13 +127,6 @@ export function ContactModal({
             <FormField
               control={form.control}
               name='email'
-              rules={{
-                required: t('validation.emailRequired'),
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: t('validation.emailInvalid'),
-                },
-              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('email')}</FormLabel>
@@ -156,7 +148,6 @@ export function ContactModal({
             <FormField
               control={form.control}
               name='phone'
-              rules={{ required: t('validation.phoneRequired') }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('phone')}</FormLabel>
@@ -178,13 +169,6 @@ export function ContactModal({
             <FormField
               control={form.control}
               name='message'
-              rules={{
-                required: t('validation.messageRequired'),
-                minLength: {
-                  value: 10,
-                  message: t('validation.messageMinLength'),
-                },
-              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('message')}</FormLabel>

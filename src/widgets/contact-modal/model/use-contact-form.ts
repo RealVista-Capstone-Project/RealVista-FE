@@ -2,7 +2,10 @@
 
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import type { ContactFormData, UserContactInfo } from '@/entities/contact';
+import { getContactFormSchema } from '@/entities/contact';
 
 /**
  * Props for useContactForm hook
@@ -26,7 +29,9 @@ interface UseContactFormProps {
  * Hook to manage contact form state and submission
  */
 export function useContactForm({ listingId, userInfo, onSubmit }: UseContactFormProps) {
+  const t = useTranslations('Contact');
   const form = useForm<ContactFormData>({
+    resolver: zodResolver(getContactFormSchema(t)),
     defaultValues: {
       fullName: userInfo?.fullName ?? '',
       email: userInfo?.email ?? '',
