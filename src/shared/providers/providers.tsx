@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
+import { Toaster } from '@/shared/ui/sonner';
 
 /**
  * App Providers Component
@@ -12,6 +13,7 @@ import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
  * - SessionProvider: NextAuth authentication state
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
+ * - Toaster: Displays toast notifications across the application
  *
  * @example
  * ```tsx
@@ -40,7 +42,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <AuthTokenProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <Toaster />
+        </QueryClientProvider>
       </AuthTokenProvider>
     </SessionProvider>
   );
