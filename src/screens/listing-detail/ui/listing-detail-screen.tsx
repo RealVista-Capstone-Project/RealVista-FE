@@ -12,6 +12,9 @@ import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 import { BookTourModal } from '@/features/price-and-tour/ui/book-tour-modal';
 import { useState } from 'react';
+import { useAuthSession } from '@/features/auth/model/use-auth-session';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -21,6 +24,8 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
+  const { data: session } = useAuthSession();
+  const t = useTranslations('PriceAndTour');
 
   const handleShare = () => {
     // Share property
@@ -58,6 +63,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleRequestTour = () => {
+    if (!session) {
+      toast.error(t('loginRequired'));
+      return;
+    }
     setIsBookTourOpen(true);
   };
 
