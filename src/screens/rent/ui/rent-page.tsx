@@ -323,7 +323,7 @@ function RentPageContent() {
                     area={listing.area || 0}
                     isFavorite={listing.is_favorite ?? false}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={(id: string) => {}}
+                    onClick={() => router.push(`/${locale}/listing/${listing.listing_id}`)}
                   />
                 ))}
               </div>

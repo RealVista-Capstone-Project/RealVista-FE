@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Heart } from 'lucide-react';
@@ -49,6 +50,7 @@ function toCardProps(item: BookmarkListingCardDTO) {
 export function FavoritedPage() {
   const t = useTranslations('Favorited');
   const locale = useLocale();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,7 +146,7 @@ export function FavoritedPage() {
                     key={item.listing_id}
                     {...toCardProps(item)}
                     onToggleFavorite={(id) => toggleBookmark(id)}
-                    onClick={(id: string) => console.log('Property clicked:', id)}
+                    onClick={(id: string) => router.push(`/${locale}/listing/${id}`)}
                   />
                 ))}
               </div>
