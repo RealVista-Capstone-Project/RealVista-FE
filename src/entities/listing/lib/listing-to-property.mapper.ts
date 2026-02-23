@@ -34,11 +34,6 @@ function mapCostFee(apiFee: CostFeeAPI): CostFee {
  * This adapter transforms the backend listing structure to the frontend Property model
  */
 export function mapListingToProperty(listing: Listing): Property {
-  // Extract amenity names from attributes
-  const amenities = listing.attributes
-    .filter((attr) => attr.value_boolean === true || attr.value_number || attr.value_text)
-    .map((attr) => attr.attribute_name);
-
   // Map media items to PropertyImage format
   const images = listing.media.map((media) => {
     let type: 'photo' | '3d-tour' | 'video' = 'photo';
@@ -79,7 +74,7 @@ export function mapListingToProperty(listing: Listing): Property {
     attributes: listing.attributes,
     costBreakdown,
     images,
-    amenities,
+    amenities: listing.amenities || [], // Use amenities directly from API
     location: {
       lat: listing.location.latitude,
       lng: listing.location.longitude,

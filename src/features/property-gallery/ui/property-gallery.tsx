@@ -13,7 +13,6 @@ export interface PropertyGalleryProps {
   on3DTour?: () => void;
   onVideo?: () => void;
   onFavorite?: () => void;
-  onShare?: () => void;
   isFavorite?: boolean;
 }
 
@@ -23,7 +22,6 @@ export function PropertyGallery({
   on3DTour,
   onVideo,
   onFavorite,
-  onShare,
   isFavorite = false,
 }: PropertyGalleryProps) {
   const t = useTranslations('PropertyGallery');
@@ -179,8 +177,6 @@ export function PropertyGallery({
         images={imageUrls}
         defaultTab={mediaViewerTab}
         onFavorite={onFavorite}
-        onShare={onShare}
-        isFavorite={isFavorite}
       />
     </div>
   );
