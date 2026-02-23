@@ -6,6 +6,18 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
+import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
+
+export interface ListingAttribute {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  icon: string | null;
+  unit: string | null;
+  value_number: number | null;
+  value_text: string | null;
+  value_boolean: boolean | null;
+}
 
 export interface RealVistaListingCardProps {
   id: string;
@@ -14,12 +26,14 @@ export interface RealVistaListingCardProps {
   address: string;
   price: number;
   currency?: string;
-  beds: number;
-  bathrooms: number;
-  area: number;
+  beds?: number;
+  bathrooms?: number;
+  area?: number;
   areaUnit?: string;
   isPopular?: boolean;
   isFavorite?: boolean;
+  statusTag?: 'SOLD' | 'RENTED';
+  attributes?: ListingAttribute[];
   variant?: 'grid' | 'list';
   listingType?: 'RENT' | 'SALE';
   onToggleFavorite?: (id: string) => void;
@@ -33,12 +47,14 @@ export function RealVistaListingCard({
   title,
   address,
   price,
-  beds,
-  bathrooms,
-  area,
+  beds = 0,
+  bathrooms = 0,
+  area = 0,
   areaUnit = 'm²',
   isPopular = false,
   isFavorite = false,
+  statusTag,
+  attributes,
   variant = 'grid',
   listingType = 'RENT',
   onToggleFavorite,
@@ -49,12 +65,15 @@ export function RealVistaListingCard({
 
   const [imgError, setImgError] = useState(false);
 
+  const isUnavailable = !!statusTag;
+
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggleFavorite?.(id);
   };
 
   const handleCardClick = () => {
+    if (isUnavailable) return;
     onClick?.(id);
   };
 
@@ -92,32 +111,71 @@ export function RealVistaListingCard({
     </svg>
   );
 
-  // Shared Property Specs row
-  const PropertySpecs = () => (
-    <div className='flex items-center gap-4'>
-      <div className='flex items-center gap-1.5'>
-        <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
-        <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-          {beds} {t('beds')}
-        </span>
-      </div>
-      <div className='flex items-center gap-1.5'>
-        <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
-        <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-          {bathrooms} {t('bathrooms')}
-        </span>
-      </div>
-      <div className='flex items-center gap-1.5'>
-        <AreaIcon />
-        <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-          {area}
-          {areaUnit}
-        </span>
-      </div>
-    </div>
-  );
+  // Shared Property Specs row — dynamic attrs when available, fallback to beds/bath/area
+  const PropertySpecs = () => {
+    if (attributes && attributes.length > 0) {
+      const visible = attributes
+        .filter((attr) => {
+          if (attr.value_boolean !== null && attr.value_boolean !== undefined)
+            return attr.value_boolean === true;
+          if (attr.value_number !== null && attr.value_number !== undefined) return true;
+          if (attr.value_text !== null && attr.value_text !== undefined) return true;
+          return false;
+        })
+        .slice(0, 3);
 
-  // Shared Favorite Button
+      return (
+        <div className='flex flex-wrap items-center gap-3'>
+          {visible.map((attr) => (
+            <div key={attr.attribute_id} className='flex items-center gap-1.5'>
+              {attr.icon && (
+                <AttributeIcon
+                  iconName={attr.icon}
+                  className='h-5 w-5 text-main-primary'
+                  strokeWidth={2.3}
+                />
+              )}
+              <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+                {attr.value_boolean === true
+                  ? attr.attribute_name
+                  : attr.value_text !== null && attr.value_text !== undefined
+                  ? attr.value_text
+                  : [attr.value_number, attr.attribute_name].filter(Boolean).join(' ')}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Fallback: fixed beds / bathrooms / area — only shown when values are explicitly provided
+    if (!beds && !bathrooms && !area) return null;
+    return (
+      <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-1.5'>
+          <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+          <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            {beds} {t('beds')}
+          </span>
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+          <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            {bathrooms} {t('bathrooms')}
+          </span>
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <AreaIcon />
+          <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            {area}
+            {areaUnit}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  // Shared Favorite Button — red heart when favorited
   const FavoriteButton = () => (
     <Button
       onClick={handleFavoriteClick}
@@ -127,10 +185,44 @@ export function RealVistaListingCard({
       size='icon'
     >
       <Heart
-        className={cn('h-5 w-5 text-main-primary', isFavorite && 'fill-main-primary')}
+        className={cn('h-5 w-5', isFavorite ? 'fill-red-500 text-red-500' : 'text-main-primary')}
         strokeWidth={2.3}
       />
     </Button>
+  );
+
+  // Shared Status Tag (SOLD / RENTED)
+  const StatusTag = ({
+    marginClass,
+    paddingClass,
+  }: {
+    marginClass: string;
+    paddingClass: string;
+  }) => (
+    <div className={cn('relative', marginClass)}>
+      <div
+        className={cn(
+          'bg-red-500 rounded-tl-lg rounded-tr-lg rounded-br-lg text-xl font-bold text-white py-1.5 pr-5',
+          paddingClass
+        )}
+      >
+        {statusTag}
+      </div>
+      <div className='absolute left-0 top-full h-1 w-1'>
+        <svg
+          width='8'
+          height='8'
+          viewBox='0 0 8 8'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+          preserveAspectRatio='none'
+          className='block'
+          style={{ overflow: 'visible' }}
+        >
+          <path d='M8 8L0 0H8V8Z' fill='#991b1b' />
+        </svg>
+      </div>
+    </div>
   );
 
   // Shared Popular Badge
@@ -183,12 +275,18 @@ export function RealVistaListingCard({
     return (
       <div
         className={cn(
-          'flex rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md overflow-hidden',
-          onClick && 'cursor-pointer',
+          'relative flex rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md overflow-hidden',
+          !isUnavailable && onClick && 'cursor-pointer',
+          isUnavailable && 'cursor-default',
           className
         )}
         onClick={handleCardClick}
       >
+        {/* Unavailable overlay */}
+        {isUnavailable && (
+          <div className='absolute inset-0 rounded-lg bg-white/60 z-[5] pointer-events-none' />
+        )}
+
         {/* Image – fixed width */}
         <div className='relative w-[280px] min-h-[200px] shrink-0'>
           <Image src={image} alt={title} fill className='object-cover' sizes='280px' />
@@ -196,20 +294,29 @@ export function RealVistaListingCard({
         </div>
 
         {/* Details */}
-        <div className='flex flex-1 flex-col justify-between p-5'>
+        <div
+          className={cn(
+            'flex flex-1 flex-col justify-between p-5',
+            isUnavailable && 'relative z-[6]'
+          )}
+        >
           {/* Top: Price + Favorite */}
           <div>
             <div className='mb-2 flex items-start justify-between'>
-              <div className='flex items-baseline gap-1'>
-                <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
-                  {formatVND(price)}
-                </span>
-                {listingType === 'RENT' && (
-                  <span className='text-sm font-normal leading-[1.5] text-grey-500'>
-                    {t('perMonth')}
+              {isUnavailable ? (
+                <StatusTag marginClass='-ml-5' paddingClass='pl-6' />
+              ) : (
+                <div className='flex items-baseline gap-1'>
+                  <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
+                    {formatVND(price)}
                   </span>
-                )}
-              </div>
+                  {listingType === 'RENT' && (
+                    <span className='text-sm font-normal leading-[1.5] text-grey-500'>
+                      {t('perMonth')}
+                    </span>
+                  )}
+                </div>
+              )}
               <FavoriteButton />
             </div>
 
@@ -237,12 +344,18 @@ export function RealVistaListingCard({
   return (
     <div
       className={cn(
-        'rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md flex flex-col h-full',
-        onClick && 'cursor-pointer',
+        'relative rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md flex flex-col h-full',
+        !isUnavailable && onClick && 'cursor-pointer',
+        isUnavailable && 'cursor-default',
         className
       )}
       onClick={handleCardClick}
     >
+      {/* Unavailable overlay */}
+      {isUnavailable && (
+        <div className='absolute inset-0 rounded-lg bg-white/60 z-[5] pointer-events-none' />
+      )}
+
       {/* Property Image */}
       <div className='relative aspect-[16/10] rounded-t-lg bg-gray-100'>
         <Image
@@ -257,19 +370,23 @@ export function RealVistaListingCard({
       </div>
 
       {/* Property Details */}
-      <div className='p-6 flex-1 flex flex-col'>
+      <div className={cn('p-6 flex-1 flex flex-col', isUnavailable && 'relative z-[6]')}>
         {/* Price and Favorite */}
         <div className='mb-3 flex items-center justify-between'>
-          <div className='flex items-baseline gap-1'>
-            <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
-              {formatVND(price)}
-            </span>
-            {listingType === 'RENT' && (
-              <span className='text-base font-normal leading-[1.5] text-grey-500'>
-                {t('perMonth')}
+          {isUnavailable ? (
+            <StatusTag marginClass='-ml-8' paddingClass='pl-9' />
+          ) : (
+            <div className='flex items-baseline gap-1'>
+              <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
+                {formatVND(price)}
               </span>
-            )}
-          </div>
+              {listingType === 'RENT' && (
+                <span className='text-base font-normal leading-[1.5] text-grey-500'>
+                  {t('perMonth')}
+                </span>
+              )}
+            </div>
+          )}
           <FavoriteButton />
         </div>
 

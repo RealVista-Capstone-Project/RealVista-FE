@@ -30,6 +30,7 @@ export interface BookmarkListingCardDTO {
   bookmarked_at: string;
   area_sqft: number | null;
   usable_size_m2: number | null;
+  status?: string;
 }
 
 export interface BookmarkPageResponse {

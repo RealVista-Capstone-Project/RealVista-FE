@@ -1,46 +1,44 @@
 import type { SimilarListing } from '../model/types';
-import type { RealVistaListingCardProps } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import type {
+  RealVistaListingCardProps,
+  ListingAttribute,
+} from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 
-export interface SimilarListingCardProps extends Omit<RealVistaListingCardProps, 'onToggleFavorite' | 'onClick'> {
+export interface SimilarListingCardProps extends Omit<
+  RealVistaListingCardProps,
+  'onToggleFavorite' | 'onClick'
+> {
   slug: string; // Include slug for navigation
 }
 
 /**
  * Map SimilarListing from API to RealVistaListingCardProps
- * Extracts bedroom and bathroom counts from attributes array
+ * Passes dynamic attributes array for generic display
  */
-export function mapSimilarListingToCardProps(
-  listing: SimilarListing
-): SimilarListingCardProps {
-  // Extract bedrooms and bathrooms from attributes
-  const bedroomsAttr = listing.attributes.find(
-    (attr) => attr.attribute_code === 'BEDROOMS'
-  );
-  const bathroomsAttr = listing.attributes.find(
-    (attr) => attr.attribute_code === 'BATHROOMS'
-  );
-
-  const beds = bedroomsAttr?.value_number ?? 0;
-  const bathrooms = bathroomsAttr?.value_number ?? 0;
-
-  // Extract numeric price from display_price (remove dots and currency)
-  // API returns price in smallest currency unit (like VND), need to format properly
-  // For display, we'll use the raw price number and format it
+export function mapSimilarListingToCardProps(listing: SimilarListing): SimilarListingCardProps {
+  const attributes: ListingAttribute[] = listing.attributes.map((attr) => ({
+    attribute_id: attr.attribute_id,
+    attribute_code: attr.attribute_code,
+    attribute_name: attr.attribute_name,
+    icon: attr.icon ?? null,
+    unit: attr.unit ?? null,
+    value_number: attr.value_number ?? null,
+    value_text: attr.value_text ?? null,
+    value_boolean: attr.value_boolean ?? null,
+  }));
 
   return {
     id: listing.listing_id,
-    slug: listing.slug, // Include slug for navigation
+    slug: listing.slug,
     image: listing.thumbnail_url,
     title: listing.name,
     address: listing.location_name,
     price: listing.price,
-    currency: '', // Currency is already included in display_price formatting
-    beds,
-    bathrooms,
-    area: listing.area,
+    currency: '',
+    attributes,
     areaUnit: 'm²',
-    isPopular: false, // API doesn't provide popularity
-    isFavorite: false, // Favorites are managed locally
+    isPopular: false,
+    isFavorite: false,
   };
 }
 

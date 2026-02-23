@@ -3,7 +3,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, Search, DollarSign, SlidersHorizontal } from 'lucide-react';
-import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import {
+  RealVistaListingCard,
+  type ListingAttribute,
+} from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
@@ -322,9 +325,7 @@ function BuyPageContent() {
                       'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
                     }
                     address={listing.location || 'Unknown'}
-                    beds={listing.bedrooms || 0}
-                    bathrooms={listing.bathrooms || 0}
-                    area={listing.area || 0}
+                    attributes={listing.attributes as ListingAttribute[]}
                     isFavorite={listing.is_favorite ?? false}
                     onToggleFavorite={handleToggleFavorite}
                     onClick={() => router.push(`/${locale}/listing/${listing.listing_id}`)}

@@ -25,13 +25,6 @@ import {
 
 const ITEMS_PER_PAGE = 9;
 
-function getAttributeNumber(
-  attributes: BookmarkListingCardDTO['attributes'],
-  code: string
-): number {
-  return attributes?.find((a) => a.attribute_code === code)?.value_number ?? 0;
-}
-
 function toCardProps(item: BookmarkListingCardDTO) {
   return {
     id: item.listing_id,
@@ -39,11 +32,15 @@ function toCardProps(item: BookmarkListingCardDTO) {
     title: item.title,
     address: item.full_address,
     price: item.price,
-    beds: getAttributeNumber(item.attributes, 'BEDROOM'),
-    bathrooms: getAttributeNumber(item.attributes, 'BATHROOM'),
-    area: item.usable_size_m2 ?? 0,
     listingType: item.listing_type,
     isFavorite: true,
+    statusTag:
+      item.status === 'SOLD'
+        ? ('SOLD' as const)
+        : item.status === 'RENTED'
+          ? ('RENTED' as const)
+          : undefined,
+    attributes: item.attributes,
   };
 }
 

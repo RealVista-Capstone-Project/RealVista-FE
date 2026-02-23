@@ -8,7 +8,10 @@ import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
-import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import {
+  RealVistaListingCard,
+  type ListingAttribute,
+} from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import {
   propertyQueries,
@@ -35,6 +38,7 @@ export interface PropertyMapBasedSearchPageProps {
   initialListingType?: 'RENT' | 'SALE';
   onBack?: () => void;
 }
+
 
 export function PropertyMapBasedSearchPage({
   initialListingType,
@@ -264,9 +268,7 @@ export function PropertyMapBasedSearchPage({
                     address={property.street_address}
                     price={property.price}
                     image={property.thumbnail_url}
-                    beds={property.bedrooms || 0}
-                    bathrooms={property.bathrooms || 0}
-                    area={property.size_m2}
+                    attributes={property.attributes as ListingAttribute[]}
                     areaUnit='m²'
                     isFavorite={property.is_favorite}
                     variant={viewMode}

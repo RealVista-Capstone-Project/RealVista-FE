@@ -33,6 +33,16 @@ export interface ListingSearchResponse {
   boost_package?: string;
   user_type: string;
   is_favorite?: boolean;
+  attributes?: Array<{
+    attribute_id: string;
+    attribute_code: string;
+    attribute_name: string;
+    icon: string | null;
+    unit: string | null;
+    value_number: number | null;
+    value_text: string | null;
+    value_boolean: boolean | null;
+  }>;
 }
 
 export interface PageResponse<T> {
