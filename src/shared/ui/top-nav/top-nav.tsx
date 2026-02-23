@@ -36,11 +36,9 @@ interface TopNavProps {
 }
 
 const defaultNavItems: NavItem[] = [
-  { id: 'explore', translationKey: 'explore', href: ROUTES.homePage },
-  { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
   { id: 'buy', translationKey: 'buy', href: ROUTES.buy },
+  { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
   { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
-  { id: 'favorited', translationKey: 'favorited', href: ROUTES.favorited },
   { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
 ];
 
@@ -52,7 +50,7 @@ const defaultUser = {
 export function TopNav({
   variant = 'public',
   navItems = variant === 'public' ? defaultNavItems : undefined,
-  logoHref = ROUTES.homePage,
+  logoHref = ROUTES.buy,
   user = defaultUser,
   profileVariant = variant === 'dashboard' ? 'inline' : 'dropdown',
   startContent,
@@ -96,7 +94,7 @@ export function TopNav({
               RealVista
             </span>
           ) : (
-            <Link href={logoHref} className='flex items-center gap-2'>
+            <Link href={`/${locale}${logoHref}`} className='flex items-center gap-2'>
               <RealVistaLogo />
               <span className='text-lg lg:text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
                 RealVista
@@ -145,6 +143,7 @@ export function TopNav({
               variant === 'public' && 'hidden lg:flex'
             )}
             aria-label='Notifications'
+            title='Notifications'
           >
             <Bell className='h-6 w-6' strokeWidth={2} />
           </button>
@@ -153,7 +152,7 @@ export function TopNav({
         {/* Bookmark Button - only for public variant, shown when user is logged in, hidden on mobile */}
         {showMessageButton && isUserLoggedIn && (
           <Link
-            href={ROUTES.favorited}
+            href={`/${locale}${ROUTES.favorited}`}
             className={cn(
               'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
               isRouteActive('/favorited')
@@ -176,6 +175,7 @@ export function TopNav({
             type='button'
             className='hidden lg:flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
             aria-label='Messages'
+            title='Messages'
           >
             <Mail className='h-5 w-5' />
           </button>
