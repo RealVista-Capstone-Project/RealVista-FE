@@ -32,6 +32,7 @@ export interface ListingSearchResponse {
   is_boosted: boolean;
   boost_package?: string;
   user_type: string;
+  is_favorite?: boolean;
 }
 
 export interface PageResponse<T> {

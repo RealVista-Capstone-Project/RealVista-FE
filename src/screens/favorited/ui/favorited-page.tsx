@@ -4,67 +4,101 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { Heart } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { BookmarkCardContainer } from './bookmark-card-container';
 import {
   BookmarksFilter,
+  allTypeCodes,
   type SortOrder,
   type ListingTypeFilter,
   type PropertyTypeFilter,
 } from './bookmarks-filter';
-import { mockProperties } from '@/entities/property';
+import {
+  bookmarkApi,
+  bookmarkKeys,
+  bookmarkQueries,
+  type BookmarkListingCardDTO,
+  type GetBookmarksParams,
+} from '@/entities/bookmark';
+
+const ITEMS_PER_PAGE = 9;
+
+function getAttributeNumber(
+  attributes: BookmarkListingCardDTO['attributes'],
+  code: string
+): number {
+  return attributes?.find((a) => a.attribute_code === code)?.value_number ?? 0;
+}
+
+function toCardProps(item: BookmarkListingCardDTO) {
+  return {
+    id: item.listing_id,
+    image: item.primary_image_url ?? '',
+    title: item.title,
+    address: item.full_address,
+    price: item.price,
+    beds: getAttributeNumber(item.attributes, 'BEDROOM'),
+    bathrooms: getAttributeNumber(item.attributes, 'BATHROOM'),
+    area: item.usable_size_m2 ?? 0,
+    listingType: item.listing_type,
+    isFavorite: true,
+  };
+}
 
 export function FavoritedPage() {
   const t = useTranslations('Favorited');
   const locale = useLocale();
+  const queryClient = useQueryClient();
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [favorites, setFavorites] = useState<string[]>(mockProperties.map((p) => p.id));
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [listingType, setListingType] = useState<ListingTypeFilter>('buy');
-  const [propertyType, setPropertyType] = useState<PropertyTypeFilter>('all');
-  const itemsPerPage = 9;
+  const [propertyType, setPropertyType] = useState<PropertyTypeFilter>([...allTypeCodes]);
 
-  // Get favorited properties
-  let favoritedProperties = mockProperties.filter((p) => favorites.includes(p.id));
+  const isAllSelected = propertyType.length === allTypeCodes.length;
 
-  // Apply filters
-  if (listingType !== 'all') {
-    favoritedProperties = favoritedProperties.filter((p) => {
-      if (listingType === 'buy') return !p.id.includes('rent');
-      if (listingType === 'rent') return p.id.includes('rent');
-      return true;
-    });
-  }
-
-  // Apply sorting
-  const sortedProperties = [...favoritedProperties].sort((a, b) => {
-    if (sortOrder === 'newest') {
-      return b.id.localeCompare(a.id);
-    }
-    if (sortOrder === 'oldest') {
-      return a.id.localeCompare(b.id);
-    }
-    return 0;
-  });
-
-  // Calculate pagination
-  const totalPages = Math.ceil(sortedProperties.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProperties = sortedProperties.slice(startIndex, endIndex);
-
-  // Handle remove from favorites
-  const handleRemoveFavorite = (id: string) => {
-    setFavorites((prev) => prev.filter((favId) => favId !== id));
-    if (currentPage > 1 && startIndex >= sortedProperties.length - 1) {
-      setCurrentPage(1);
-    }
+  const apiParams: GetBookmarksParams = {
+    propertyTypes: propertyType.length > 0 && !isAllSelected ? propertyType : undefined,
+    listingType: listingType === 'buy' ? 'SALE' : 'RENT',
+    sortDirection: sortOrder === 'oldest' ? 'OLDEST' : 'NEWEST',
+    page: currentPage - 1,
+    size: ITEMS_PER_PAGE,
   };
 
-  // Handle page change
+  const { data, isLoading } = useQuery(bookmarkQueries.list(apiParams));
+
+  const { mutate: toggleBookmark } = useMutation({
+    mutationFn: (listingId: string) => bookmarkApi.toggleBookmark(listingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookmarkKeys.lists() });
+    },
+  });
+
+  const bookmarkPage = data?.payload?.data;
+  const items = bookmarkPage?.content ?? [];
+  const totalPages = bookmarkPage?.total_pages ?? 0;
+
+  const resetPage = () => setCurrentPage(1);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSortOrderChange = (sort: SortOrder) => {
+    setSortOrder(sort);
+    resetPage();
+  };
+
+  const handleListingTypeChange = (type: ListingTypeFilter) => {
+    setListingType(type);
+    resetPage();
+  };
+
+  const handlePropertyTypeChange = (types: PropertyTypeFilter) => {
+    setPropertyType(types);
+    resetPage();
   };
 
   return (
@@ -72,17 +106,21 @@ export function FavoritedPage() {
       {/* Filter Section */}
       <BookmarksFilter
         sortOrder={sortOrder}
-        onSortOrderChange={setSortOrder}
+        onSortOrderChange={handleSortOrderChange}
         listingType={listingType}
-        onListingTypeChange={setListingType}
+        onListingTypeChange={handleListingTypeChange}
         propertyType={propertyType}
-        onPropertyTypeChange={setPropertyType}
+        onPropertyTypeChange={handlePropertyTypeChange}
       />
 
       {/* Results Section */}
       <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
-          {favoritedProperties.length === 0 ? (
+          {isLoading ? (
+            <div className='flex justify-center py-16'>
+              <div className='h-8 w-8 animate-spin rounded-full border-4 border-main-primary border-t-transparent' />
+            </div>
+          ) : items.length === 0 ? (
             // Empty State
             <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-white py-16 px-6'>
               <Heart className='mb-4 h-12 w-12 text-grey-400' strokeWidth={1.5} />
@@ -101,12 +139,11 @@ export function FavoritedPage() {
             <>
               {/* Property Grid */}
               <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {currentProperties.map((property) => (
+                {items.map((item) => (
                   <BookmarkCardContainer
-                    key={property.id}
-                    {...property}
-                    isFavorite={favorites.includes(property.id)}
-                    onToggleFavorite={(id) => handleRemoveFavorite(id)}
+                    key={item.listing_id}
+                    {...toCardProps(item)}
+                    onToggleFavorite={(id) => toggleBookmark(id)}
                     onClick={(id: string) => console.log('Property clicked:', id)}
                   />
                 ))}
