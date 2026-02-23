@@ -4,6 +4,8 @@
  * Based on the backend API response structure
  */
 
+import { FeeType } from '@/shared/types';
+
 // ============ API Response Wrapper ============
 export interface ApiResponse<T> {
   success: boolean;
@@ -67,7 +69,7 @@ export interface Agent {
   full_name: string;
   business_name: string;
   is_verified: boolean;
-  avatar_url: string;
+  avatar_url?: string; // Optional - not always provided by API
 }
 
 // ============ Attribute ============
@@ -95,7 +97,7 @@ export interface ListingData {
   price: number;
   property: PropertyNested;
   location: Location;
-  propertyType: PropertyType;
+  property_type: PropertyType;
   media: MediaItem[];
   agent: Agent;
   attributes: Attribute[];
@@ -105,6 +107,7 @@ export interface ListingData {
   listing_type: 'RENT' | 'SALE';
   min_price?: number;
   max_price?: number;
+  cost_breakdown?: CostBreakdownAPI;
   is_negotiable: boolean;
   available_from: string;
   published_at: string;
@@ -113,6 +116,48 @@ export interface ListingData {
   total_photos: number;
   total_videos: number;
   total_3d_tours: number;
+}
+
+// ============ Cost Breakdown (API format - snake_case) ============
+export interface CostBreakdownAPI {
+  base_price: number;
+  base_price_unit: string;
+  required_fees: CostFeeAPI[];
+  required_fees_subtotal: number;
+  optional_fees: CostFeeAPI[];
+  optional_fees_subtotal: number;
+  total_cost: number;
+  disclaimer: string;
+}
+
+export interface CostFeeAPI {
+  name: string;
+  amount: number;
+  fee_type: FeeType;
+}
+
+// ============ Similar Listing Types ============
+export interface SimilarListing {
+  listing_id: string;
+  slug: string;
+  name: string;
+  listing_type: 'RENT' | 'SALE';
+  property_type_name: string;
+  price: number;
+  area: number;
+  location_name: string;
+  thumbnail_url: string;
+  similarity_score: number;
+  published_at: string;
+  attributes: Attribute[];
+  display_price: string;
+  display_area: string;
+}
+
+export interface SimilarListingsResponse {
+  listings: SimilarListing[];
+  total: number;
+  limit: number;
 }
 
 // ============ Main Listing Type (what we export) ============

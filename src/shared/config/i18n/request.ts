@@ -25,6 +25,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/rental-features/i18n/${locale}.json`)).default,
       // Screen segments
       ...(await import(`@/screens/favorited/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/property-search/i18n/${locale}.json`)).default,
     },
   };
 });

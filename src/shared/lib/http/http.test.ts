@@ -1,12 +1,13 @@
 import { HttpError, EntityError } from './http';
 import http from './http';
 
-// Mock getAuthTokenSync to avoid NextAuth import issues
+// Mock getAuthTokenSync and getAuthToken to avoid NextAuth import issues
 jest.mock('@/shared/lib/auth/get-auth-token', () => ({
   getAuthTokenSync: jest.fn(),
+  getAuthToken: jest.fn(),
 }));
 
-import { getAuthTokenSync } from '@/shared/lib/auth/get-auth-token';
+import { getAuthTokenSync, getAuthToken } from '@/shared/lib/auth/get-auth-token';
 
 // Mock fetch
 global.fetch = jest.fn();

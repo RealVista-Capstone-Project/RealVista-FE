@@ -1,6 +1,7 @@
 {
   "PriceAndTour": {
     "rentPrice": "Giá thuê",
+    "buyPrice": "Giá bán",
     "perMonth": "/tháng",
     "contactAgent": "Liên hệ đại lý",
     "requestHomeTour": "Đặt lịch xem nhà",
