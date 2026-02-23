@@ -9,6 +9,7 @@ import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
+import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
 
@@ -55,10 +56,13 @@ function RentPageContent() {
       propertyType: searchParams?.get('propertyType') || undefined,
       propertyCategory: searchParams?.get('propertyCategory') || undefined,
       dynamicAttributes: Object.keys(dynamicAttributes).length > 0 ? dynamicAttributes : undefined,
-      area: (searchParams?.get('minArea') || searchParams?.get('maxArea')) ? [
-        searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
-        searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null
-      ] : undefined,
+      area:
+        searchParams?.get('minArea') || searchParams?.get('maxArea')
+          ? [
+              searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
+              searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null,
+            ]
+          : undefined,
       hasVideo: searchParams?.get('hasVideo') === 'true',
       has3D: searchParams?.get('has3D') === 'true',
       sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
@@ -110,9 +114,12 @@ function RentPageContent() {
 
     // Advanced Filters
     if (criteria.propertyType) params.set('propertyType', criteria.propertyType.toString());
-    if (criteria.propertyCategory) params.set('propertyCategory', criteria.propertyCategory.toString());
-    if (criteria.area && criteria.area[0] !== null) params.set('minArea', criteria.area[0]!.toString());
-    if (criteria.area && criteria.area[1] !== null) params.set('maxArea', criteria.area[1]!.toString());
+    if (criteria.propertyCategory)
+      params.set('propertyCategory', criteria.propertyCategory.toString());
+    if (criteria.area && criteria.area[0] !== null)
+      params.set('minArea', criteria.area[0]!.toString());
+    if (criteria.area && criteria.area[1] !== null)
+      params.set('maxArea', criteria.area[1]!.toString());
     if (criteria.hasVideo) params.set('hasVideo', 'true');
     if (criteria.has3D) params.set('has3D', 'true');
     if (criteria.sortBy && criteria.sortBy !== 'PRIORITY') params.set('sortBy', criteria.sortBy);
@@ -153,6 +160,20 @@ function RentPageContent() {
   const handlePageChange = (page: number) => {
     updateUrl(searchCriteria, page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    setListings((prev) =>
+      prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
+    );
+    try {
+      await bookmarkApi.toggleBookmark(id);
+    } catch {
+      // revert optimistic update on failure
+      setListings((prev) =>
+        prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
+      );
+    }
   };
 
   if (isMapView) {
@@ -300,8 +321,8 @@ function RentPageContent() {
                     beds={listing.bedrooms || 0}
                     bathrooms={listing.bathrooms || 0}
                     area={listing.area || 0}
-                    isFavorite={false}
-                    onToggleFavorite={(id: string) => {}}
+                    isFavorite={listing.is_favorite ?? false}
+                    onToggleFavorite={handleToggleFavorite}
                     onClick={(id: string) => {}}
                   />
                 ))}
