@@ -6,12 +6,14 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
 import { Bell, ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
 import RealVistaLogo from '@/shared/assets/logo/logo';
 import { ProfileDropdown, Separator } from '@/shared/ui';
+import { bookmarkKeys } from '@/entities/bookmark';
 
 export type NavItem = {
   id: string;
@@ -60,6 +62,7 @@ export function TopNav({
   const locale = useLocale();
   const pathname = usePathname();
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
   const showMessageButton = variant === 'public';
@@ -161,6 +164,7 @@ export function TopNav({
         {showMessageButton && isUserLoggedIn && (
           <Link
             href={`/${locale}${ROUTES.favorited}`}
+            onClick={() => queryClient.invalidateQueries({ queryKey: bookmarkKeys.lists() })}
             className={cn(
               'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
               isRouteActive('/favorited')
