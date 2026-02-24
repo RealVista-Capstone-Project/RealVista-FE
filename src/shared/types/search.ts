@@ -24,7 +24,11 @@ export interface ListingSearchResponse {
   status: string;
   price: number;
   area: number;
-  location: string;
+  street_address: string | null;
+  ward_name: string | null;
+  district_name: string | null;
+  city_name: string | null;
+  full_address: string;
   bedrooms?: number;
   bathrooms?: number;
   thumbnail?: string;

@@ -324,7 +324,7 @@ function BuyPageContent() {
                       listing.thumbnail ||
                       'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
                     }
-                    address={listing.location || 'Unknown'}
+                    address={listing.full_address || 'Unknown'}
                     attributes={listing.attributes as ListingAttribute[]}
                     isFavorite={listing.is_favorite ?? false}
                     onToggleFavorite={handleToggleFavorite}

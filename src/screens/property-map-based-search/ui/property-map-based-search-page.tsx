@@ -41,7 +41,6 @@ export interface PropertyMapBasedSearchPageProps {
   onBack?: () => void;
 }
 
-
 export function PropertyMapBasedSearchPage({
   initialListingType,
   onBack,
@@ -156,7 +155,8 @@ export function PropertyMapBasedSearchPage({
   };
 
   const handleToggleFavorite = async (id: string) => {
-    const currentFavorite = favoriteOverrides[id] ?? properties.find((p) => p.listing_id === id)?.is_favorite ?? false;
+    const currentFavorite =
+      favoriteOverrides[id] ?? properties.find((p) => p.listing_id === id)?.is_favorite ?? false;
     setFavoriteOverrides((prev) => ({ ...prev, [id]: !currentFavorite }));
     try {
       await bookmarkApi.toggleBookmark(id);
@@ -281,7 +281,7 @@ export function PropertyMapBasedSearchPage({
                   <RealVistaListingCard
                     id={property.listing_id}
                     title={property.name}
-                    address={property.street_address}
+                    address={property.full_address}
                     price={property.price}
                     image={property.thumbnail_url}
                     attributes={property.attributes as ListingAttribute[]}
