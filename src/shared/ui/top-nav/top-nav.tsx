@@ -223,13 +223,13 @@ export function TopNav({
           /* Login and Sign up buttons - shown only when not logged in, public variant */
           <div className='hidden lg:flex items-center gap-3'>
             <Link
-              href={ROUTES.login}
+              href={`/${locale}${ROUTES.login}`}
               className='flex h-12 items-center justify-center px-6 rounded-lg border border-purple-92 bg-white font-medium text-main-primary transition-colors hover:bg-purple-98'
             >
               {t('login')}
             </Link>
             <Link
-              href={ROUTES.register}
+              href={`/${locale}${ROUTES.register}`}
               className='flex h-12 items-center justify-center px-6 rounded-lg bg-main-primary text-white font-medium transition-colors hover:bg-main-primary-hover'
             >
               {t('signup')}

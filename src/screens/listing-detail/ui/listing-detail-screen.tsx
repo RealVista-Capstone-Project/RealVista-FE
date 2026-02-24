@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
@@ -8,6 +10,8 @@ import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
+import { bookmarkApi } from '@/entities/bookmark/api/bookmark.api';
+import { getAuthToken } from '@/shared/lib/auth/get-auth-token';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 
@@ -19,9 +23,40 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
 
+  const [isFavorite, setIsFavorite] = useState<boolean>(listing.is_favorite ?? false);
+
+  // The listing is fetched server-side (no auth token) so is_favorite is always false
+  // from SSR. Re-fetch on client mount using async getAuthToken() to get a fresh token
+  // (getAuthTokenSync() may be null on first mount since AuthTokenProvider hasn't run yet).
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getAuthToken();
+        if (!token) return; // Not logged in, keep isFavorite = false
+        const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8080/api/v1';
+        const res = await fetch(`${apiUrl}/listings/${listing.listing_id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.data?.is_favorite !== undefined) {
+          setIsFavorite(data.data.is_favorite);
+        }
+      } catch {
+        /* ignore – user may be unauthenticated */
+      }
+    })();
+  }, [listing.listing_id]);
+
+  const { mutate: toggleFavorite } = useMutation({
+    mutationFn: () => bookmarkApi.toggleBookmark(listing.listing_id),
+    onSuccess: () => {
+      setIsFavorite((prev) => !prev);
+    },
+  });
+
   const handleFavorite = () => {
-    // Toggle favorite
-    console.log('Toggle favorite');
+    toggleFavorite();
   };
 
   const handleBrowseNearby = () => {
@@ -67,7 +102,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         <PropertyHeader
           property={property}
           onFavorite={handleFavorite}
-          isFavorite={false}
+          isFavorite={isFavorite}
           onBrowseNearby={handleBrowseNearby}
         />
 
@@ -79,7 +114,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             on3DTour={handle3DTour}
             onVideo={handleVideo}
             onFavorite={handleFavorite}
-            isFavorite={false}
+            isFavorite={isFavorite}
           />
         </div>
 
