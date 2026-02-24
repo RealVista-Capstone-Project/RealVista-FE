@@ -15,6 +15,8 @@ import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/sea
 import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
+import { useAuthSession } from '@/features/auth/model';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 
 function RentPageContent() {
   const t = useTranslations('Rent');
@@ -28,6 +30,8 @@ function RentPageContent() {
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: session } = useAuthSession();
   const itemsPerPage = 9;
 
   // Initialize state from URL params
@@ -166,6 +170,10 @@ function RentPageContent() {
   };
 
   const handleToggleFavorite = async (id: string) => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
     setListings((prev) =>
       prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
     );
@@ -352,6 +360,7 @@ function RentPageContent() {
           )}
         </div>
       </section>
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }

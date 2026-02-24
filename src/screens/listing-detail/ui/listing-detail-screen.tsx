@@ -12,8 +12,10 @@ import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
 import { bookmarkApi } from '@/entities/bookmark/api/bookmark.api';
 import { getAuthToken } from '@/shared/lib/auth/get-auth-token';
+import { useAuthSession } from '@/features/auth/model';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -24,6 +26,8 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const property: Property = mapListingToProperty(listing);
 
   const [isFavorite, setIsFavorite] = useState<boolean>(listing.is_favorite ?? false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: session } = useAuthSession();
 
   // The listing is fetched server-side (no auth token) so is_favorite is always false
   // from SSR. Re-fetch on client mount using async getAuthToken() to get a fresh token
@@ -56,6 +60,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   });
 
   const handleFavorite = () => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
     toggleFavorite();
   };
 
@@ -80,11 +88,19 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleContact = () => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
     // Contact agent
     console.log('Contact agent');
   };
 
   const handleRequestTour = (date: string) => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
     // Request tour with date
     console.log('Request tour for:', date);
   };
@@ -188,6 +204,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
           </RealVistaButton>
         </div>
       </div>
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }

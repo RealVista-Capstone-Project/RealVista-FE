@@ -7,6 +7,8 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
 import { MapPin } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
+import { useAuthSession } from '@/features/auth/model';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
@@ -57,6 +59,8 @@ export function PropertyMapBasedSearchPage({
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: session } = useAuthSession();
   const pageSize = 10;
 
   const { data: searchResponse, isLoading } = useQuery({
@@ -155,6 +159,10 @@ export function PropertyMapBasedSearchPage({
   };
 
   const handleToggleFavorite = async (id: string) => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
     const currentFavorite =
       favoriteOverrides[id] ?? properties.find((p) => p.listing_id === id)?.is_favorite ?? false;
     setFavoriteOverrides((prev) => ({ ...prev, [id]: !currentFavorite }));
@@ -346,6 +354,7 @@ export function PropertyMapBasedSearchPage({
           }}
         />
       </div>
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }
