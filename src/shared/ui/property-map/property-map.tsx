@@ -48,7 +48,6 @@ export function PropertyMap({
   className,
 }: PropertyMapProps) {
   const [mapType, setMapType] = useState<MapType>('roadmap');
-  const [map, setMap] = useState<google.maps.Map | null>(null);
 
   if (!apiKey) {
     return (
@@ -77,11 +76,9 @@ export function PropertyMap({
           gestureHandling={'greedy'}
           disableDefaultUI={true}
           mapId='property-search-map'
-          onCenterChanged={(ev) => setMap(ev.map)}
-          onZoomChanged={(ev) => setMap(ev.map)}
-          onIdle={() => {
-            if (map && onBoundsChange) {
-              const bounds = map.getBounds();
+          onIdle={(ev) => {
+            if (ev.map && onBoundsChange) {
+              const bounds = ev.map.getBounds();
               if (bounds) {
                 const ne = bounds.getNorthEast();
                 const sw = bounds.getSouthWest();
