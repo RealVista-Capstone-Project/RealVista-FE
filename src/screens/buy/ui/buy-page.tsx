@@ -11,6 +11,7 @@ import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
+import { useHideFooter } from '@/widgets/layout';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -19,6 +20,7 @@ function BuyPageContent() {
   const searchParams = useSearchParams();
 
   const [isMapView, setIsMapView] = useState(false);
+  useHideFooter(isMapView);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
