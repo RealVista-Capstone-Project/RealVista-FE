@@ -57,10 +57,13 @@ function RentPageContent() {
       propertyType: searchParams?.get('propertyType') || undefined,
       propertyCategory: searchParams?.get('propertyCategory') || undefined,
       dynamicAttributes: Object.keys(dynamicAttributes).length > 0 ? dynamicAttributes : undefined,
-      area: (searchParams?.get('minArea') || searchParams?.get('maxArea')) ? [
-        searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
-        searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null
-      ] : undefined,
+      area:
+        searchParams?.get('minArea') || searchParams?.get('maxArea')
+          ? [
+              searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
+              searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null,
+            ]
+          : undefined,
       hasVideo: searchParams?.get('hasVideo') === 'true',
       has3D: searchParams?.get('has3D') === 'true',
       sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
@@ -112,9 +115,12 @@ function RentPageContent() {
 
     // Advanced Filters
     if (criteria.propertyType) params.set('propertyType', criteria.propertyType.toString());
-    if (criteria.propertyCategory) params.set('propertyCategory', criteria.propertyCategory.toString());
-    if (criteria.area && criteria.area[0] !== null) params.set('minArea', criteria.area[0]!.toString());
-    if (criteria.area && criteria.area[1] !== null) params.set('maxArea', criteria.area[1]!.toString());
+    if (criteria.propertyCategory)
+      params.set('propertyCategory', criteria.propertyCategory.toString());
+    if (criteria.area && criteria.area[0] !== null)
+      params.set('minArea', criteria.area[0]!.toString());
+    if (criteria.area && criteria.area[1] !== null)
+      params.set('maxArea', criteria.area[1]!.toString());
     if (criteria.hasVideo) params.set('hasVideo', 'true');
     if (criteria.has3D) params.set('has3D', 'true');
     if (criteria.sortBy && criteria.sortBy !== 'PRIORITY') params.set('sortBy', criteria.sortBy);
