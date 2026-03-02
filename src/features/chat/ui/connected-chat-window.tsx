@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useChatWindowStore } from '@/entities/contact';
 import { useAuthSession } from '@/features/auth/model';
 import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import { conversationKeys } from '@/entities/conversation/api/keys';
@@ -42,7 +43,7 @@ export function ConnectedChatWindow({
   const { data: messagesData } = useQuery(conversationQueries.messages(chatWindow.conversationId));
 
   // HTTP mutation for sending
-  const { mutateAsync: sendHttp } = useSendMessage();
+  const { mutateAsync: sendMessageMutation } = useSendMessage();
 
   const messagesResponse = messagesData as
     | HttpResponse<ApiResponse<MessagePaginationResponse>>
@@ -72,7 +73,7 @@ export function ConnectedChatWindow({
     // Always use HTTP for reliable delivery
     // WebSocket send() silently fails when disconnected
     try {
-      await sendHttp({
+      await sendMessageMutation({
         recipient_user_id: chatWindow.participant.id,
         message_type: 'TEXT',
         content,
