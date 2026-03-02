@@ -2,5 +2,34 @@
   "HomePage": {
     "title": "Hello world!",
     "about": "Go to the about page"
+  },
+  "Footer": {
+    "sellAHome": "Sell a Home",
+    "requestAnOffer": "Request an offer",
+    "pricing": "Pricing",
+    "reviews": "Reviews",
+    "stories": "Stories",
+    "buyAHome": "Buy a Home",
+    "buy": "Buy",
+    "finance": "Finance",
+    "buyRentAndSell": "Buy, Rent and Sell",
+    "buyAndSellProperties": "Buy and sell properties",
+    "rentHome": "Rent home",
+    "builderTradeUp": "Builder trade-up",
+    "termsAndPrivacy": "Terms & Privacy",
+    "trustAndSafety": "Trust & Safety",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "about": "About",
+    "company": "Company",
+    "howItWorks": "How it works",
+    "contact": "Contact",
+    "investors": "Investors",
+    "resources": "Resources",
+    "blog": "Blog",
+    "guides": "Guides",
+    "faq": "FAQ",
+    "helpCenter": "Help Center",
+    "copyright": "©2024 RealVista. All rights reserved"
   }
 }
