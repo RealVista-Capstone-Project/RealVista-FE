@@ -1,6 +1,6 @@
 'use client';
 
-import { useChatWindows } from '@/shared/context/chat-window-context';
+import { useChatWindowStore } from '@/entities/contact';
 import { useChatWebSocket } from '@/features/chat';
 import { ConnectedChatWindow } from '@/features/chat/ui/connected-chat-window';
 
@@ -12,7 +12,7 @@ import { ConnectedChatWindow } from '@/features/chat/ui/connected-chat-window';
  * Should be placed once in the main layout (e.g., PublicLayout).
  */
 export function ChatWindowRenderer() {
-  const { windows, closeWindow, toggleMinimize } = useChatWindows();
+  const { windows, closeWindow, toggleMinimize } = useChatWindowStore();
   const { isConnected, sendMessage, typingState } = useChatWebSocket();
 
   if (windows.length === 0) return null;

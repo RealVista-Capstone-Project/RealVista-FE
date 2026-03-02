@@ -5,7 +5,7 @@ import { conversationQueries } from '@/entities/conversation';
 import type { ConversationListItemResponse } from '@/entities/conversation';
 import type { Conversation } from '@/entities/contact';
 import { ChatDropdown } from './chat-dropdown';
-import { useChatWindows } from '@/shared/context/chat-window-context';
+import { useChatWindowStore } from '@/entities/contact';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -34,7 +34,7 @@ function mapToConversation(item: ConversationListItemResponse): Conversation {
  */
 export function ChatDropdownContainer() {
   const { data, isLoading } = useQuery(conversationQueries.list());
-  const { openWindow } = useChatWindows();
+  const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
   const router = useRouter();
   const params = useParams();

@@ -16,7 +16,7 @@ import type { ContactFormData } from '@/entities/contact';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
 import { useRouter, useParams } from 'next/navigation';
-import { useChatWindows } from '@/shared/context/chat-window-context';
+import { useChatWindowStore } from '@/entities/contact';
 import { useAuthSession, isAuthenticated } from '@/features/auth/model';
 import { unwrapApiResponse } from '@/shared/types/api';
 import type { SendMessageResponse } from '@/entities/conversation/model/types';
@@ -36,7 +36,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const router = useRouter();
   const params = useParams();
   const { data: session } = useAuthSession();
-  const { openWindow } = useChatWindows();
+  const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
 
   const handleShare = () => {
