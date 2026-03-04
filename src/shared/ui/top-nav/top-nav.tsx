@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
-import { Bell, ChevronDown, Mail, Menu, X } from 'lucide-react';
+import { Bell, ChevronDown, Menu, X } from 'lucide-react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { ROUTES } from '@/shared/config/routes';
@@ -12,6 +12,7 @@ import { cn } from '@/shared/lib/utils';
 import RealVistaLogo from '@/shared/assets/logo/logo';
 import { ProfileDropdown } from '@/shared/ui';
 import { Separator } from '@/shared/ui';
+import { ChatDropdownContainer } from '@/widgets/chat-dropdown';
 
 export type NavItem = {
   id: string;
@@ -146,15 +147,11 @@ export function TopNav({
           <Bell className='h-6 w-6' strokeWidth={2} />
         </button>
 
-        {/* Message Button - only for public variant, hidden on mobile */}
+        {/* Chat Dropdown - only for public variant, hidden on mobile */}
         {showMessageButton && (
-          <button
-            type='button'
-            className='hidden lg:flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
-            aria-label='Messages'
-          >
-            <Mail className='h-5 w-5' />
-          </button>
+          <div className='hidden lg:block'>
+            <ChatDropdownContainer />
+          </div>
         )}
 
         {/* Divider - hidden on mobile for public variant */}

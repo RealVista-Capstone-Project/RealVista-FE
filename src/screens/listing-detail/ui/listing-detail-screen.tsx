@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
@@ -8,8 +9,19 @@ import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
+import { useSendMessage } from '@/entities/conversation';
+import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
+import { ContactModal } from '@/widgets/contact-modal';
+import type { ContactFormData } from '@/entities/contact';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SimilarListings } from '@/widgets/similar-listings';
+import { useRouter, useParams } from 'next/navigation';
+import { useChatWindowStore } from '@/entities/contact';
+import { useAuthSession, isAuthenticated } from '@/features/auth/model';
+import { unwrapApiResponse } from '@/shared/types/api';
+import type { SendMessageResponse } from '@/entities/conversation/model/types';
+import { formatVND } from '@/shared/lib/utils/format-currency';
+import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -18,6 +30,14 @@ export interface ListingDetailScreenProps {
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const sendMessage = useSendMessage();
+  const chatListingData = mapListingToChatData(listing);
+  const router = useRouter();
+  const params = useParams();
+  const { data: session } = useAuthSession();
+  const { openWindow } = useChatWindowStore();
+  const isMobile = useIsMobile();
 
   const handleFavorite = () => {
     // Toggle favorite
@@ -45,8 +65,40 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleContact = () => {
-    // Contact agent
-    console.log('Contact agent');
+    if (!isAuthenticated(session)) {
+      const locale = params.locale;
+      router.push(`/${locale}/login`);
+      return;
+    }
+    setIsContactModalOpen(true);
+    // console.log('Contact agent (disabled for debug)');
+  };
+
+  const handleSendContact = async (data: ContactFormData) => {
+    const response = await sendMessage.mutateAsync({
+      recipient_user_id: listing.agent.user_id,
+      message_type: 'LISTING_CARD',
+      content: data.message,
+      metadata: JSON.stringify(chatListingData),
+    });
+
+    if (response) {
+      const sendResult = unwrapApiResponse<SendMessageResponse>(response);
+      const conversationId = sendResult.conversation_id;
+
+      if (conversationId) {
+        if (isMobile) {
+          const locale = params.locale;
+          router.push(`/${locale}/messages/${conversationId}`);
+        } else {
+          openWindow(conversationId, {
+            id: listing.agent.user_id,
+            name: listing.agent.full_name,
+            avatar: listing.agent.avatar_url,
+          });
+        }
+      }
+    }
   };
 
   const handleRequestTour = (date: string) => {
@@ -54,12 +106,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
     console.log('Request tour for:', date);
   };
 
-  const formattedPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(property.price);
+  const formattedPrice = formatVND(property.price);
 
   return (
     <div className='min-h-screen bg-background pb-[88px] md:pb-8'>
@@ -126,6 +173,24 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
       <div className='mt-12 sm:mt-16'>
         <SimilarListings propertyId={property.id} />
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        open={isContactModalOpen}
+        onOpenChange={setIsContactModalOpen}
+        listing={chatListingData}
+        agentName={listing.agent.full_name}
+        onSend={handleSendContact}
+        userInfo={
+          session?.user
+            ? {
+                fullName: session.user.name || '',
+                email: session.user.email,
+                phone: '',
+              }
+            : undefined
+        }
+      />
 
       {/* Mobile Sticky Footer */}
       <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-purple-92 px-4 py-3 sm:px-6 md:hidden z-50'>
