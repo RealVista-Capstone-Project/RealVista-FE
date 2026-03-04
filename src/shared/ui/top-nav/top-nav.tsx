@@ -42,6 +42,7 @@ const defaultNavItems: NavItem[] = [
   { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
   { id: 'favorited', translationKey: 'favorited', href: ROUTES.favorited },
   { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
+  { id: 'myEngagements', translationKey: 'myEngagements', href: ROUTES.myEngagements },
 ];
 
 const defaultUser = {
@@ -111,7 +112,15 @@ export function TopNav({
                 const hasDropdown = item.id === 'buy' || item.id === 'rent';
 
                 if (hasDropdown) {
-                  return <NavItemDropdown key={item.id} item={item} isActive={isActive} t={t} locale={locale} />;
+                  return (
+                    <NavItemDropdown
+                      key={item.id}
+                      item={item}
+                      isActive={isActive}
+                      t={t}
+                      locale={locale}
+                    />
+                  );
                 }
                 return (
                   <Link
@@ -265,7 +274,17 @@ export function TopNav({
   );
 }
 
-function NavItemDropdown({ item, isActive, t, locale }: { item: NavItem; isActive: boolean; t: any; locale: string }) {
+function NavItemDropdown({
+  item,
+  isActive,
+  t,
+  locale,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  t: any;
+  locale: string;
+}) {
   const [open, setOpen] = useState(false);
 
   if (item.id !== 'buy' && item.id !== 'rent') {
@@ -299,7 +318,10 @@ function NavItemDropdown({ item, isActive, t, locale }: { item: NavItem; isActiv
           )}
         >
           {t(item.translationKey)}
-          <ChevronDown className={cn('h-4 w-4 transition-transform duration-200', open && 'rotate-180')} strokeWidth={2} />
+          <ChevronDown
+            className={cn('h-4 w-4 transition-transform duration-200', open && 'rotate-180')}
+            strokeWidth={2}
+          />
         </Link>
       </PopoverPrimitive.Trigger>
 

@@ -11,6 +11,7 @@ export const ROUTES = {
   sell: '/sell',
   favorited: '/favorited',
   appointments: '/appointments',
+  myEngagements: '/my-engagements',
   dashboard: {
     root: '/dashboard',
     insight: '/dashboard/insight',
