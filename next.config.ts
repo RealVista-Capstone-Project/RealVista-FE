@@ -2,6 +2,7 @@ import { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
@@ -47,6 +48,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '**.pexels.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
     ],
