@@ -1,0 +1,74 @@
+{
+  "Engagement": {
+    "page": {
+      "title": "Engagement Management",
+      "subtitle": "Track the status of your rental requests",
+      "viewApplications": "View Applications",
+      "loading": "Loading...",
+      "loadError": "Failed to load data"
+    },
+    "filter": {
+      "allStatuses": "All statuses",
+      "all": "All",
+      "searchPlaceholder": "Search by property name or address...",
+      "pickDate": "Pick a date",
+      "clearDate": "Clear date filter"
+    },
+    "table": {
+      "dateColumn": "Date Submitted",
+      "propertyColumn": "Property / Address",
+      "statusColumn": "Status",
+      "empty": "No engagements found.",
+      "clearDateFilter": "Clear date filter"
+    },
+    "status": {
+      "SUBMITTED": "Submitted",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled"
+    },
+    "listItem": {
+      "noTitle": "No title",
+      "viewDetail": "Details",
+      "cancelTooltip": "Cancel request"
+    },
+    "cancel": {
+      "button": "Cancel Request",
+      "dialogTitle": "Confirm cancellation",
+      "dialogDescription": "Are you sure you want to cancel this rental request? This action cannot be undone.",
+      "no": "No",
+      "confirm": "Confirm cancel"
+    },
+    "overview": {
+      "title": "Overview",
+      "last30Days": "Last 30 days",
+      "total": "Total engagements",
+      "accepted": "Accepted",
+      "pendingRejected": "Pending / Rejected",
+      "pending": "pending",
+      "rejected": "rejected"
+    },
+    "detail": {
+      "panelTitle": "Rental Request Detail",
+      "noTitle": "No title",
+      "statusLabel": "Status",
+      "submittedDate": "Submitted",
+      "updatedDate": "Updated",
+      "requestType": "Request Type",
+      "applicationTitle": "Application Title",
+      "income": "Income",
+      "incomePerMonth": "/mo",
+      "leaseTerm": "Lease Term",
+      "leaseTermMonths": "{months} months",
+      "moveInDate": "Move-in Date",
+      "tenants": "Tenants",
+      "tenantNote": "Tenant Note",
+      "acceptedMessage": "Congratulations! Your request has been accepted by the landlord.",
+      "rejectedMessage": "Unfortunately, your request has been rejected.",
+      "statusSubmitted": "Submitted",
+      "statusAccepted": "Accepted",
+      "statusRejected": "Rejected",
+      "statusCancelled": "Cancelled"
+    }
+  }
+}

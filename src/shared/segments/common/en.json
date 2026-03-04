@@ -22,7 +22,8 @@
     "buy": "Buy",
     "sell": "Sell",
     "favorited": "Favorited",
-    "appointments": "Appointments"
+    "appointments": "Appointments",
+    "myEngagements": "My Engagements"
   },
   "PropertyCard": {
     "beds": "Beds",

@@ -1,0 +1,74 @@
+{
+  "Engagement": {
+    "page": {
+      "title": "Quản lý Engagement",
+      "subtitle": "Theo dõi trạng thái các yêu cầu thuê nhà bạn đã gửi",
+      "viewApplications": "Xem đơn đăng ký",
+      "loading": "Đang tải dữ liệu...",
+      "loadError": "Lỗi không tải được dữ liệu"
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái",
+      "all": "Tất cả",
+      "searchPlaceholder": "Tìm kiếm theo tên nhà hoặc địa chỉ...",
+      "pickDate": "Chọn ngày",
+      "clearDate": "Xóa lọc ngày"
+    },
+    "table": {
+      "dateColumn": "Ngày gửi",
+      "propertyColumn": "Nhà / Địa chỉ",
+      "statusColumn": "Trạng thái",
+      "empty": "Không tìm thấy engagement nào.",
+      "clearDateFilter": "Xóa bộ lọc ngày"
+    },
+    "status": {
+      "SUBMITTED": "Đã gửi",
+      "ACCEPTED": "Chấp nhận",
+      "REJECTED": "Từ chối",
+      "CANCELLED": "Đã hủy"
+    },
+    "listItem": {
+      "noTitle": "Chưa có tiêu đề",
+      "viewDetail": "Chi tiết",
+      "cancelTooltip": "Hủy yêu cầu"
+    },
+    "cancel": {
+      "button": "Hủy yêu cầu",
+      "dialogTitle": "Xác nhận hủy yêu cầu",
+      "dialogDescription": "Bạn có chắc chắn muốn hủy yêu cầu thuê này? Thao tác này không thể hoàn tác.",
+      "no": "Không",
+      "confirm": "Xác nhận hủy"
+    },
+    "overview": {
+      "title": "Tổng quan",
+      "last30Days": "30 ngày qua",
+      "total": "Tổng engagements",
+      "accepted": "Được chấp nhận",
+      "pendingRejected": "Đang chờ / Từ chối",
+      "pending": "chờ",
+      "rejected": "từ chối"
+    },
+    "detail": {
+      "panelTitle": "Chi tiết yêu cầu thuê",
+      "noTitle": "Chưa có tiêu đề",
+      "statusLabel": "Trạng thái",
+      "submittedDate": "Ngày gửi",
+      "updatedDate": "Cập nhật",
+      "requestType": "Loại yêu cầu",
+      "applicationTitle": "Tiêu đề đơn",
+      "income": "Thu nhập",
+      "incomePerMonth": "/th",
+      "leaseTerm": "Thời hạn thuê",
+      "leaseTermMonths": "{months} tháng",
+      "moveInDate": "Ngày chuyển vào",
+      "tenants": "Số người thuê",
+      "tenantNote": "Ghi chú từ người thuê",
+      "acceptedMessage": "Chúc mừng! Yêu cầu của bạn đã được chủ nhà chấp nhận.",
+      "rejectedMessage": "Rất tiếc, yêu cầu của bạn đã bị từ chối.",
+      "statusSubmitted": "Đã gửi",
+      "statusAccepted": "Được chấp nhận",
+      "statusRejected": "Từ chối",
+      "statusCancelled": "Đã hủy"
+    }
+  }
+}
