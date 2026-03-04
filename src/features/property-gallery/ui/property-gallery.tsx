@@ -13,7 +13,6 @@ export interface PropertyGalleryProps {
   on3DTour?: () => void;
   onVideo?: () => void;
   onFavorite?: () => void;
-  onShare?: () => void;
   isFavorite?: boolean;
 }
 
@@ -23,19 +22,19 @@ export function PropertyGallery({
   on3DTour,
   onVideo,
   onFavorite,
-  onShare,
   isFavorite = false,
 }: PropertyGalleryProps) {
   const t = useTranslations('PropertyGallery');
-  const [mainImage, setMainImage] = useState(images[0]);
-  const thumbnailImages = images.slice(1, 3);
+  const safeImages = images || [];
+  const [mainImage, setMainImage] = useState(safeImages[0]);
+  const thumbnailImages = safeImages.slice(1, 3);
 
   const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
   const [mediaViewerTab, setMediaViewerTab] = useState<'photos' | '3d-tour' | 'video'>('photos');
 
-  const photoCount = images.filter((img) => img.type === 'photo').length;
-  const tourCount = images.filter((img) => img.type === '3d-tour').length;
-  const videoCount = images.filter((img) => img.type === 'video').length;
+  const photoCount = safeImages.filter((img) => img.type === 'photo').length;
+  const tourCount = safeImages.filter((img) => img.type === '3d-tour').length;
+  const videoCount = safeImages.filter((img) => img.type === 'video').length;
 
   const handleOpenPhotos = () => {
     if (onViewAllPhotos) {
@@ -61,7 +60,15 @@ export function PropertyGallery({
     setMediaViewerOpen(true);
   };
 
-  const imageUrls = images.map((img) => img.url);
+  const imageUrls = safeImages.map((img) => img.url);
+
+  if (!mainImage) {
+    return (
+      <div className='flex items-center justify-center aspect-[4/3] rounded-xl border-2 border-dashed border-grey-300 bg-grey-100'>
+        <span className='text-sm text-grey-500'>{t('noImage')}</span>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
@@ -179,8 +186,6 @@ export function PropertyGallery({
         images={imageUrls}
         defaultTab={mediaViewerTab}
         onFavorite={onFavorite}
-        onShare={onShare}
-        isFavorite={isFavorite}
       />
     </div>
   );

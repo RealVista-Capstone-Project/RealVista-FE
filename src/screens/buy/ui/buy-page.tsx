@@ -11,6 +11,7 @@ import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
+import { useHideFooter } from '@/widgets/layout';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -19,6 +20,7 @@ function BuyPageContent() {
   const searchParams = useSearchParams();
 
   const [isMapView, setIsMapView] = useState(false);
+  useHideFooter(isMapView);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
@@ -55,10 +57,13 @@ function BuyPageContent() {
       propertyType: searchParams?.get('propertyType') || undefined,
       propertyCategory: searchParams?.get('propertyCategory') || undefined,
       dynamicAttributes: Object.keys(dynamicAttributes).length > 0 ? dynamicAttributes : undefined,
-      area: (searchParams?.get('minArea') || searchParams?.get('maxArea')) ? [
-        searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
-        searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null
-      ] : undefined,
+      area:
+        searchParams?.get('minArea') || searchParams?.get('maxArea')
+          ? [
+              searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
+              searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null,
+            ]
+          : undefined,
       hasVideo: searchParams?.get('hasVideo') === 'true',
       has3D: searchParams?.get('has3D') === 'true',
       sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
@@ -110,9 +115,12 @@ function BuyPageContent() {
 
     // Add all filter parameters
     if (criteria.propertyType) params.set('propertyType', criteria.propertyType.toString());
-    if (criteria.propertyCategory) params.set('propertyCategory', criteria.propertyCategory.toString());
-    if (criteria.area && criteria.area[0] !== null) params.set('minArea', criteria.area[0].toString());
-    if (criteria.area && criteria.area[1] !== null) params.set('maxArea', criteria.area[1].toString());
+    if (criteria.propertyCategory)
+      params.set('propertyCategory', criteria.propertyCategory.toString());
+    if (criteria.area && criteria.area[0] !== null)
+      params.set('minArea', criteria.area[0].toString());
+    if (criteria.area && criteria.area[1] !== null)
+      params.set('maxArea', criteria.area[1].toString());
     if (criteria.hasVideo) params.set('hasVideo', 'true');
     if (criteria.has3D) params.set('has3D', 'true');
     if (criteria.sortBy && criteria.sortBy !== 'PRIORITY') params.set('sortBy', criteria.sortBy);
@@ -138,13 +146,11 @@ function BuyPageContent() {
           : undefined,
     };
 
-
     // This will trigger the useEffect
     updateUrl(updatedCriteria, 1);
   };
 
   const handleAdvancedFiltersApply = (filters: Partial<AdvancedSearchRequest>) => {
-
     const updatedCriteria = {
       ...searchCriteria,
       ...filters,

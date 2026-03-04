@@ -1,13 +1,16 @@
-import { ArrowLeft, Heart, Share2, Search } from 'lucide-react';
+'use client';
+
+import { ArrowLeft, Heart, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Link } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
+import { SharePopover } from './share-popover';
+import { useMemo } from 'react';
 
 export interface PropertyHeaderProps {
   property: Property;
-  onShare?: () => void;
   onFavorite?: () => void;
   isFavorite?: boolean;
   onBrowseNearby?: () => void;
@@ -15,12 +18,19 @@ export interface PropertyHeaderProps {
 
 export function PropertyHeader({
   property,
-  onShare,
   onFavorite,
   isFavorite = false,
   onBrowseNearby,
 }: PropertyHeaderProps) {
   const t = useTranslations('PropertyHeader');
+
+  // Get the share URL (current page URL)
+  const shareUrl = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.href;
+    }
+    return '';
+  }, []);
 
   return (
     <div className='flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between'>
@@ -45,15 +55,7 @@ export function PropertyHeader({
 
       {/* Action buttons */}
       <div className='grid grid-cols-2 gap-3 pt-3 sm:pt-0 sm:flex sm:flex-row sm:justify-end sm:flex-wrap sm:gap-3 w-full sm:w-auto'>
-        <RealVistaButton
-          variant='secondary'
-          size='medium'
-          onClick={onShare}
-          className='gap-2 w-full sm:w-auto'
-        >
-          <Share2 className='size-4' />
-          {t('share')}
-        </RealVistaButton>
+        <SharePopover url={shareUrl} title={property.title} />
 
         <RealVistaButton
           variant='secondary'

@@ -14,7 +14,50 @@
     "joinButton": "Tham gia",
     "leaveRoom": "Rời phòng",
     "demoTitle": "Demo Chat WebSocket",
-    "testingNotes": "Ghi chú thử nghiệm"
+    "testingNotes": "Ghi chú thử nghiệm",
+    "messages": "Tin nhắn",
+    "new": "mới",
+    "noMessages": "Chưa có tin nhắn nào",
+    "markAsRead": "Đánh dấu đã đọc",
+    "viewAllMessages": "Xem tất cả tin nhắn",
+    "typeMessage": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "minimize": "Thu nhỏ",
+    "expand": "Mở rộng",
+    "close": "Đóng",
+    "startConversation": "Bắt đầu cuộc trò chuyện"
+  },
+  "Contact": {
+    "title": "Liên hệ đại lý",
+    "description": "Gửi tin nhắn về bất động sản này",
+    "descriptionWithAgent": "Gửi tin nhắn cho {agent} về bất động sản này",
+    "suggestedInquiries": "Gợi ý cho bạn",
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Nhập họ và tên của bạn",
+    "email": "Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại của bạn",
+    "message": "Tin nhắn",
+    "messagePlaceholder": "Xin chào, tôi quan tâm đến bất động sản này và muốn đặt lịch xem...",
+    "quickReplies": [
+      "Tôi cần tư vấn thêm về bất động sản này!",
+      "Giá cả có thể thương lượng không?",
+      "Tôi muốn đặt lịch xem nhà!",
+      "Còn căn nào tương tự không?"
+    ],
+    "send": "Gửi tin nhắn",
+    "sending": "Đang gửi...",
+    "sent": "Đã gửi tin nhắn!",
+    "validation": {
+      "fullNameRequired": "Vui lòng nhập họ và tên",
+      "emailRequired": "Vui lòng nhập email",
+      "emailInvalid": "Vui lòng nhập email hợp lệ",
+      "phoneRequired": "Vui lòng nhập số điện thoại",
+      "phoneInvalid": "Số điện thoại không hợp lệ",
+      "messageRequired": "Vui lòng nhập tin nhắn",
+      "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
+    }
   },
   "Navigation": {
     "explore": "Khám phá",

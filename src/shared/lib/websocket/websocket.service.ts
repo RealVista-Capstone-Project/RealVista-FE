@@ -9,6 +9,11 @@ import type {
   StoredSubscription,
 } from '@/shared/types/websocket';
 
+// Extended options for the service
+interface WebSocketServiceOptions extends WebSocketOptions {
+  token?: string;
+}
+
 /**
  * WebSocket Service for Spring Boot with SockJS and STOMP
  *
@@ -36,14 +41,20 @@ export class WebSocketService {
   private state: WebSocketState = 'idle';
   private options: Required<Omit<WebSocketOptions, 'headers'>> & {
     headers: WebSocketOptions['headers'];
+    token?: string;
   };
   private callbacks: WebSocketCallbacks;
   private subscriptions: Map<string, StoredSubscription> = new Map();
   private connectionTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(options: WebSocketOptions & WebSocketCallbacks) {
+  constructor(
+    options:
+      | (WebSocketOptions & WebSocketCallbacks)
+      | (WebSocketServiceOptions & WebSocketCallbacks)
+  ) {
     this.options = {
       endpoint: options.endpoint,
+      token: (options as WebSocketServiceOptions).token,
       useSTOMP: options.useSTOMP ?? true,
       connectionTimeout: options.connectionTimeout ?? 5000,
       autoReconnect: options.autoReconnect ?? true,
@@ -328,9 +339,16 @@ export class WebSocketService {
   }
 
   /**
-   * Get authentication headers from localStorage
+   * Get authentication headers
+   * Prioritizes token from options, then localStorage
    */
   private getAuthHeaders(): { [key: string]: string } {
+    // 1. Use token from options if provided
+    if (this.options.token) {
+      return { Authorization: `Bearer ${this.options.token}` };
+    }
+
+    // 2. Fallback to localStorage (for backward compatibility)
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sessionToken');
       if (token) {

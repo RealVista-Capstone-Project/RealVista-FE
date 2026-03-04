@@ -89,6 +89,16 @@ export interface Attribute {
   unit?: string;
 }
 
+// ============ Amenity ============
+export interface Amenity {
+  amenity_id: string;
+  amenity_name: string;
+  amenity_type: string;
+  is_onsite: boolean;
+  is_offsite: boolean;
+  description?: string;
+}
+
 // ============ Listing Data (main response object) ============
 export interface ListingData {
   status: string;
@@ -101,6 +111,7 @@ export interface ListingData {
   media: MediaItem[];
   agent: Agent;
   attributes: Attribute[];
+  amenities: Amenity[];
   listing_id: string;
   property_id: string;
   user_id: string;
@@ -136,6 +147,26 @@ export interface CostFeeAPI {
   fee_type: FeeType;
 }
 
+// ============ Price History ============
+export type ChangeType = 'INCREASED' | 'DECREASED' | 'UNCHANGED';
+
+export interface PriceHistoryEntry {
+  price: number;
+  price_history_id: string;
+  min_price: number;
+  max_price: number;
+  changed_at: string;
+  price_change: number;
+  price_change_percent: number;
+  change_type: ChangeType;
+}
+
+export interface PriceHistoryData {
+  listing_id: string;
+  current_price: number;
+  price_history: PriceHistoryEntry[];
+}
+
 // ============ Similar Listing Types ============
 export interface SimilarListing {
   listing_id: string;
@@ -162,3 +193,4 @@ export interface SimilarListingsResponse {
 
 // ============ Main Listing Type (what we export) ============
 export type Listing = ListingData;
+export type PriceHistory = PriceHistoryData;

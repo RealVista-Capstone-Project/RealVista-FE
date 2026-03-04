@@ -2,5 +2,34 @@
   "HomePage": {
     "title": "Xin chào!",
     "about": "Về trang chủ"
+  },
+  "Footer": {
+    "sellAHome": "Bán nhà",
+    "requestAnOffer": "Yêu cầu báo giá",
+    "pricing": "Bảng giá",
+    "reviews": "Đánh giá",
+    "stories": "Câu chuyện",
+    "buyAHome": "Mua nhà",
+    "buy": "Mua",
+    "finance": "Tài chính",
+    "buyRentAndSell": "Mua, Thuê và Bán",
+    "buyAndSellProperties": "Mua và bán bất động sản",
+    "rentHome": "Thuê nhà",
+    "builderTradeUp": "Nâng cấp với chủ đầu tư",
+    "termsAndPrivacy": "Điều khoản & Riêng tư",
+    "trustAndSafety": "Tin cậy & An toàn",
+    "termsOfService": "Điều khoản dịch vụ",
+    "privacyPolicy": "Chính sách bảo mật",
+    "about": "Về chúng tôi",
+    "company": "Công ty",
+    "howItWorks": "Cách hoạt động",
+    "contact": "Liên hệ",
+    "investors": "Nhà đầu tư",
+    "resources": "Tài nguyên",
+    "blog": "Blog",
+    "guides": "Hướng dẫn",
+    "faq": "Câu hỏi thường gặp",
+    "helpCenter": "Trung tâm hỗ trợ",
+    "copyright": "©2024 RealVista. Bảo lưu mọi quyền"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "PriceHistoryChart": {
+    "title": "Lịch sử giá",
+    "description": "Theo dõi lịch sử thay đổi giá của bất động sản này",
+    "priceHistory": "Xu hướng giá",
+    "priceChanges": "lần thay đổi giá",
+    "price": "Giá",
+    "minPrice": "Giá tối thiểu",
+    "maxPrice": "Giá tối đa"
+  }
+}
