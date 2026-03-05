@@ -1,205 +1,166 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { IMessage } from '@stomp/stompjs';
 import { useWebSocket } from '@/shared/lib/websocket';
-import type { ChatMessage, WebSocketMessage } from '../model/types';
+import { useAuthSession } from '@/features/auth/model/use-auth-session';
+import { conversationKeys } from '@/entities/conversation';
+import type { ChatWebSocketMessage, WebSocketMessage, SendMessageResponse } from '../model/types';
 
 /**
  * useChatWebSocket Hook
- * Manages WebSocket connection for real-time chat with Spring Boot backend
+ * Manages WebSocket connection for real-time chat
  *
- * Backend endpoints:
- * - Unsecured: Send to /app/public, Subscribe to /topic/public
- * - Secured: Send to /app/secured, Subscribe to /topic/secured
+ * Subscribes to:
+ * - /user/queue/messages (Personal message queue)
+ * - /user/queue/typing (Personal typing events)
  *
- * @example
- * ```tsx
- * function ChatRoom() {
- *   const { isConnected, messages, sendMessage } = useChatWebSocket({
- *     endpoint: 'http://localhost:8080/ws',
- *     roomId: 'room-123',
- *     secured: false, // Use true for authenticated endpoints
- *     onNewMessage: (msg) => console.log('New message:', msg),
- *   });
- *
- *   return (
- *     <div>
- *       <div>Status: {isConnected ? 'Connected' : 'Disconnected'}</div>
- *       <ul>
- *         {messages.map((msg) => (
- *           <li key={msg.id}>{msg.senderName}: {msg.content}</li>
- *         ))}
- *       </ul>
- *     </div>
- *   );
- * }
- * ```
+ * Sends to:
+ * - /app/chat.send
+ * - /app/chat.typing
  */
-export function useChatWebSocket(options: {
-  endpoint: string;
-  roomId: string;
-  userName?: string;
-  userId?: number;
-  secured?: boolean;
-  onNewMessage?: (message: ChatMessage) => void;
-  onUserJoin?: (userName: string) => void;
-  onUserLeave?: (userName: string) => void;
-  onTyping?: (userId: string, userName: string, isTyping: boolean) => void;
-  onError?: (error: Error) => void;
-}) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [typingUsers, setTypingUsers] = useState<Map<string, { userName: string; isTyping: boolean }>>(new Map());
+export function useChatWebSocket() {
+  const { data: session } = useAuthSession();
+  const queryClient = useQueryClient();
 
-  // Memoize callbacks to prevent unnecessary re-subscriptions
-  const memoizedOptions = useMemo(
-    () => ({
-      onNewMessage: options.onNewMessage,
-      onUserJoin: options.onUserJoin,
-      onUserLeave: options.onUserLeave,
-      onTyping: options.onTyping,
-      onError: options.onError,
-    }),
-    [options.onNewMessage, options.onUserJoin, options.onUserLeave, options.onTyping, options.onError]
+  // Local state for typing indicators (conversationId -> Set of userIds)
+  // We expose a helper to check if a specific user is typing in a conversation
+  const [typingState, setTypingState] = useState<Record<string, Record<string, string>>>(
+    {} // conversationId -> { userId: userName }
   );
 
-  const { isConnected, state, subscribe, send, disconnect } = useWebSocket({
-    endpoint: options.endpoint,
-    onConnect: () => {
-      // Connection established
-    },
-    onDisconnect: () => {
-      // Connection closed
-    },
-    onError: (error) => {
-      console.error('[Chat WebSocket] Error:', error);
-      options.onError?.(error);
-    },
-    onMessage: (message: IMessage) => {
-      // Messages are handled by subscriptions
-    },
+  const { isConnected, send, subscribe } = useWebSocket({
+    endpoint: process.env.NEXT_PUBLIC_WS_ENDPOINT || 'http://localhost:8080/ws',
     debug: process.env.NODE_ENV === 'development',
+    token: session?.user?.accessToken,
+    onConnect: () => {
+      console.log('[Chat] Connected to WebSocket');
+    },
   });
 
-  // Subscribe to messages (topic) - Server broadcasts to /topic/public or /topic/secured
+  // Subscribe to personal queues when connected and authenticated
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected || !session?.user?.id) return;
 
-    const topic = options.secured ? '/topic/secured' : '/topic/public';
-
-    const unsubscribe = subscribe({
-      destination: topic,
+    // 1. Subscribe to new messages
+    const msgSub = subscribe({
+      destination: '/user/queue/messages',
       onMessage: (message: IMessage) => {
         try {
-          const chatMessage: ChatMessage = JSON.parse(message.body);
+          const response: SendMessageResponse = JSON.parse(message.body);
 
-          // Add to messages
-          setMessages((prev) => [...prev, chatMessage]);
+          // Update conversation list (for unread count/last message preview)
+          queryClient.invalidateQueries({ queryKey: conversationKeys.list() });
 
-          // Handle different message types
-          if (chatMessage.type === 'JOIN') {
-            memoizedOptions.onUserJoin?.(chatMessage.senderName);
-          } else if (chatMessage.type === 'LEAVE') {
-            memoizedOptions.onUserLeave?.(chatMessage.senderName);
-          } else {
-            memoizedOptions.onNewMessage?.(chatMessage);
+          // Refresh messages for the affected conversation
+          if (response.conversation_id) {
+            queryClient.invalidateQueries({
+              queryKey: conversationKeys.messages(response.conversation_id),
+            });
           }
         } catch (error) {
-          console.error('[Chat WebSocket] Failed to parse message:', error);
+          console.error('[Chat] Failed to parse message:', error);
         }
       },
     });
 
-    return unsubscribe;
-  }, [isConnected, subscribe, memoizedOptions, options.secured]);
+    // 2. Subscribe to typing indicators
+    const typingSub = subscribe({
+      destination: '/user/queue/typing',
+      onMessage: (message: IMessage) => {
+        try {
+          const event: WebSocketMessage = JSON.parse(message.body);
+          if (event.type === 'TYPING' && event.payload) {
+            // payload is conversationId
+            const conversationId = String(event.payload);
+            const userId = String(event.senderId || 'unknown');
+            const userName = event.senderName || 'Someone';
 
-  // Send a chat message - Client sends to /app/public or /app/secured
+            // Update typing state
+            setTypingState((prev) => ({
+              ...prev,
+              [conversationId]: {
+                ...(prev[conversationId] || {}),
+                [userId]: userName,
+              },
+            }));
+
+            // Clear typing status after 3 seconds
+            setTimeout(() => {
+              setTypingState((prev) => {
+                const newState = { ...prev };
+                if (newState[conversationId]) {
+                  const newUsers = { ...newState[conversationId] };
+                  delete newUsers[userId];
+                  if (Object.keys(newUsers).length === 0) {
+                    delete newState[conversationId];
+                  } else {
+                    newState[conversationId] = newUsers;
+                  }
+                  return newState;
+                }
+                return prev;
+              });
+            }, 3000);
+          }
+        } catch (error) {
+          console.error('[Chat] Failed to parse typing event:', error);
+        }
+      },
+    });
+
+    return () => {
+      msgSub();
+      typingSub();
+    };
+  }, [isConnected, session, subscribe, queryClient]);
+
+  // Send a chat message
   const sendMessage = useCallback(
-    (content: string) => {
-      const message: WebSocketMessage = {
-        type: 'CHAT',
-        payload: content,
-        senderName: options.userName ?? 'Anonymous',
+    (message: Omit<ChatWebSocketMessage, 'recipient_user_id'> & { recipientUserId: string }) => {
+      if (!session?.user?.id) return;
+
+      const payload: ChatWebSocketMessage = {
+        conversation_id: message.conversation_id,
+        recipient_user_id: message.recipientUserId,
+        message_type: message.message_type,
+        content: message.content,
+        metadata: message.metadata,
+        reply_to_message_id: message.reply_to_message_id,
       };
 
-      // Only include senderId if it's a valid number
-      if (options.userId !== undefined) {
-        message.senderId = options.userId;
-      }
-
-      const destination = options.secured ? '/app/secured' : '/app/public';
-
       send({
-        destination,
-        body: message,
-        skipAuth: !options.secured, // Skip auth for public endpoints
+        destination: '/app/chat.send',
+        body: payload,
       });
     },
-    [send, options.userName, options.userId, options.secured]
+    [send, session]
   );
 
-  // Join a chat room
-  const joinRoom = useCallback(
-    (userName: string) => {
-      const message: WebSocketMessage = {
-        type: 'JOIN',
-        senderName: userName,
+  // Send typing indicator
+  const sendTyping = useCallback(
+    (conversationId: string, recipientUserId: string) => {
+      const payload: ChatWebSocketMessage = {
+        conversation_id: conversationId,
+        recipient_user_id: recipientUserId,
+        message_type: 'SYSTEM', // Using SYSTEM type for typing indicators if needed, or just dummy
+        content: 'TYPING',
       };
 
-      // Only include senderId if it's a valid number
-      if (options.userId !== undefined) {
-        message.senderId = options.userId;
-      }
-
-      const destination = options.secured ? '/app/secured' : '/app/public';
-
       send({
-        destination,
-        body: message,
-        skipAuth: !options.secured, // Skip auth for public endpoints
+        destination: '/app/chat.typing',
+        body: payload,
       });
     },
-    [send, options.userId, options.secured]
-  );
-
-  // Leave chat room
-  const leaveRoom = useCallback(
-    (userName: string) => {
-      const message: WebSocketMessage = {
-        type: 'LEAVE',
-        senderName: userName,
-      };
-
-      // Only include senderId if it's a valid number
-      if (options.userId !== undefined) {
-        message.senderId = options.userId;
-      }
-
-      const destination = options.secured ? '/app/secured' : '/app/public';
-
-      send({
-        destination,
-        body: message,
-        skipAuth: !options.secured, // Skip auth for public endpoints
-      });
-    },
-    [send, options.userId, options.secured]
+    [send]
   );
 
   return {
-    // Connection state
     isConnected,
-    state,
-
-    // Messages
-    messages,
-    typingUsers: Array.from(typingUsers.values()),
-
-    // Actions
     sendMessage,
-    joinRoom,
-    leaveRoom,
-    disconnect,
+    sendTyping,
+    typingState,
   };
 }
 

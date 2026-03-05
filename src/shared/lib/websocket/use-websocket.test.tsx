@@ -50,6 +50,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -64,6 +65,7 @@ describe('useWebSocket Hook', () => {
       renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -81,6 +83,7 @@ describe('useWebSocket Hook', () => {
       renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -88,6 +91,25 @@ describe('useWebSocket Hook', () => {
       );
 
       expect(mockConnect).toHaveBeenCalled();
+    });
+
+    it('should pass token to WebSocketService', () => {
+      renderHook(() =>
+        useWebSocket({
+          endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
+          onConnect: jest.fn(),
+          onDisconnect: jest.fn(),
+          onError: jest.fn(),
+        })
+      );
+
+      expect(WebSocketService).toHaveBeenCalledWith(
+        expect.objectContaining({
+          endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
+        })
+      );
     });
   });
 
@@ -98,6 +120,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: mockOnConnect,
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -123,6 +146,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: mockOnDisconnect,
           onError: jest.fn(),
@@ -149,6 +173,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: mockOnError,
@@ -176,6 +201,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -202,6 +228,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -236,6 +263,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -259,6 +287,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -306,6 +335,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -329,6 +359,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -350,6 +381,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -365,6 +397,7 @@ describe('useWebSocket Hook', () => {
       const { unmount } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -390,6 +423,7 @@ describe('useWebSocket Hook', () => {
       const { result } = renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: jest.fn(),
           onDisconnect: jest.fn(),
           onError: jest.fn(),
@@ -412,6 +446,7 @@ describe('useWebSocket Hook', () => {
       renderHook(() =>
         useWebSocket({
           endpoint: 'ws://localhost:8080/ws',
+          token: 'test-token',
           onConnect: mockCustomOnConnect,
           onDisconnect: jest.fn(),
           onError: jest.fn(),

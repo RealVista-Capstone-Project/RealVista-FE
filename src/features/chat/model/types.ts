@@ -1,30 +1,48 @@
-/**
- * Chat feature - Domain types for real-time messaging with Spring Boot WebSocket
- */
+import type { SendMessageResponse } from '@/entities/conversation/model/types';
+
+export type { SendMessageResponse };
 
 /**
- * WebSocket message DTO matching the server-side WebSocketMessage class
- * @see WebSocketMessage.java
+ * Outgoing WebSocket message DTO
+ * Matches ChatWebSocketMessage.java (snake_case)
  */
-export interface WebSocketMessage {
-  type?: 'CHAT' | 'JOIN' | 'LEAVE';
-  payload?: unknown;
-  senderId?: number;
-  senderName?: string;
-  timestamp?: string; // ISO 8601 format from server
-  metadata?: unknown;
+export interface ChatWebSocketMessage {
+  conversation_id: string;
+  recipient_user_id: string;
+  message_type: 'TEXT' | 'LISTING_CARD' | 'CONTRACT_CARD' | 'SYSTEM';
+  content?: string;
+  metadata?: string;
+  reply_to_message_id?: string;
 }
 
 /**
- * Parsed chat message for UI display
+ * Incoming WebSocket message envelope (e.g. for typing indicators)
+ * Matches WebSocketMessage.java (camelCase)
+ */
+export interface WebSocketMessage {
+  type: string;
+  payload: any;
+  senderId?: number;
+  senderName?: string;
+  timestamp?: string; // ISO 8601
+  metadata?: any;
+}
+
+/**
+ * UI Chat Message model (camelCase)
+ * Normalized from SendMessageResponse
  */
 export interface ChatMessage {
   id: string;
-  senderId: number;
+  conversationId: string;
+  senderId: string;
   senderName: string;
+  senderAvatar?: string;
   content: string;
-  timestamp: number;
-  type?: 'CHAT' | 'JOIN' | 'LEAVE';
+  type: 'TEXT' | 'LISTING_CARD' | 'CONTRACT_CARD' | 'SYSTEM';
+  timestamp: Date;
+  isOwn: boolean;
+  metadata?: any;
 }
 
 export interface ChatRoom {
@@ -37,4 +55,5 @@ export interface TypingIndicator {
   userId: string;
   userName: string;
   isTyping: boolean;
+  conversationId: string;
 }

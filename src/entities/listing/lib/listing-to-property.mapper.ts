@@ -35,7 +35,7 @@ function mapCostFee(apiFee: CostFeeAPI): CostFee {
  */
 export function mapListingToProperty(listing: Listing): Property {
   // Map media items to PropertyImage format
-  const images = listing.media.map((media) => {
+  const images = (listing.media || []).map((media) => {
     let type: 'photo' | '3d-tour' | 'video' = 'photo';
     if (media.media_type === 'VIDEO') type = 'video';
     if (media.media_type === 'THREE_D') type = '3d-tour';
@@ -71,10 +71,10 @@ export function mapListingToProperty(listing: Listing): Property {
     price: listing.price,
     area: listing.property.usable_size_m2,
     description: listing.property.description,
-    attributes: listing.attributes,
+    attributes: listing.attributes || [],
     costBreakdown,
     images,
-    amenities: listing.amenities || [], // Use amenities directly from API
+    amenities: listing.amenities || [],
     location: {
       lat: listing.location.latitude,
       lng: listing.location.longitude,
@@ -82,7 +82,7 @@ export function mapListingToProperty(listing: Listing): Property {
     agent: {
       id: listing.agent.user_id,
       name: listing.agent.full_name,
-      avatar: listing.agent.avatar_url || '/images/default-avatar.png', // Fallback avatar
+      avatar: listing.agent.avatar_url,
       phone: listing.agent.phone,
       email: listing.agent.email,
     },

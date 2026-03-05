@@ -14,7 +14,50 @@
     "joinButton": "Join Room",
     "leaveRoom": "Leave Room",
     "demoTitle": "WebSocket Chat Demo",
-    "testingNotes": "Testing Notes"
+    "testingNotes": "Testing Notes",
+    "messages": "Messages",
+    "new": "new",
+    "noMessages": "No messages yet",
+    "markAsRead": "Mark all as read",
+    "viewAllMessages": "View all messages",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "minimize": "Minimize",
+    "expand": "Expand",
+    "close": "Close",
+    "startConversation": "Start a conversation"
+  },
+  "Contact": {
+    "title": "Contact Agent",
+    "description": "Send a message about this property",
+    "descriptionWithAgent": "Send a message to {agent} about this property",
+    "suggestedInquiries": "Suggested inquiries",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "message": "Message",
+    "messagePlaceholder": "Hi, I'm interested in this property and would like to schedule a viewing...",
+    "quickReplies": [
+      "I need more advice on this property!",
+      "Is the price negotiable?",
+      "I want to schedule a viewing!",
+      "Are there any other similar properties?"
+    ],
+    "send": "Send Message",
+    "sending": "Sending...",
+    "sent": "Message Sent!",
+    "validation": {
+      "fullNameRequired": "Full name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "phoneRequired": "Phone number is required",
+      "phoneInvalid": "Please enter a valid phone number",
+      "messageRequired": "Message is required",
+      "messageMinLength": "Message must be at least 10 characters"
+    }
   },
   "Navigation": {
     "explore": "Explore",
