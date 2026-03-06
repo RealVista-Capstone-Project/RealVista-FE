@@ -25,7 +25,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     }
   }, [status, locale, router]);
 
-  if (status === 'loading' || (status === 'unauthenticated' && !session?.user)) {
+  if (status === 'loading') {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-main-primary' />

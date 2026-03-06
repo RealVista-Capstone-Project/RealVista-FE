@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import http from '@/shared/lib/http/http';
-import { mapBackendRole } from './rbac';
+import { determineUserRole } from './rbac';
 
 /**
  * OAuth credentials schema for Zod validation
@@ -72,16 +72,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           console.log('[NextAuth] Login successful');
 
-          // Map first backend role to frontend role
-          const backendRole = roles?.[0];
-          const mappedRole = mapBackendRole(backendRole);
+          // Determine primary role from all backend roles
+          // If user has ANY of [BUYER, TENANT, OWNER] → public layout ('user')
+          // If user ONLY has ADMIN or AGENT → dashboard layout ('admin' or 'moderator')
+          const mappedRole = determineUserRole(roles);
 
           // Return user object with accessToken and role
           return {
             id: user_id.toString(),
             email: userEmail,
             accessToken: access_token,
-            role: mappedRole || 'user',
+            role: mappedRole,
           };
         } catch (error) {
           console.error('[NextAuth] Login error:', error);
