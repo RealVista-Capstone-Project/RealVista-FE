@@ -23,8 +23,9 @@
   },
   "unauthorized": {
     "title": "Unauthorized Access",
-    "description": "You do not have permission to view this page.",
-    "backToHome": "Back to Home",
+    "description": "You need to log in to view this page.",
+    "login": "Login",
+    "backToHome": "Back to Homepage",
     "backToDashboard": "Back to Dashboard",
     "message": "You do not have permission to view this page.",
     "goBack": "Go back to Home"

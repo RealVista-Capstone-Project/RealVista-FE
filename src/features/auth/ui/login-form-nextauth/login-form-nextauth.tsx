@@ -68,8 +68,8 @@ export function LoginFormNextAuth() {
         // Success! Show toast and redirect
         toast.success(t('loginSuccess'));
 
-        // Redirect to dashboard with locale
-        router.push(`/${locale}/dashboard`);
+        // Redirect to buy page with locale
+        router.push(`/${locale}/buy`);
       }
     } catch {
       // Unexpected error

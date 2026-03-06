@@ -23,8 +23,9 @@
   },
   "unauthorized": {
     "title": "Truy cập không được phép",
-    "description": "Bạn không có quyền xem trang này.",
-    "backToHome": "Quay lại Trang chủ",
+    "description": "Bạn cần đăng nhập để xem trang này.",
+    "login": "Đăng nhập",
+    "backToHome": "Về trang chủ",
     "backToDashboard": "Quay lại Bảng điều khiển",
     "message": "Bạn không có quyền xem trang này.",
     "goBack": "Quay lại Trang chủ"

@@ -3,15 +3,21 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, DollarSign, Search, SlidersHorizontal } from 'lucide-react';
-import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import {
+  RealVistaListingCard,
+  type ListingAttribute,
+} from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
+import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
 import { useHideFooter } from '@/widgets/layout';
+import { useAuthSession } from '@/features/auth/model';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 
 function RentPageContent() {
   const t = useTranslations('Rent');
@@ -26,6 +32,8 @@ function RentPageContent() {
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: session } = useAuthSession();
   const itemsPerPage = 9;
 
   // Initialize state from URL params
@@ -161,6 +169,24 @@ function RentPageContent() {
   const handlePageChange = (page: number) => {
     updateUrl(searchCriteria, page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
+    setListings((prev) =>
+      prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
+    );
+    try {
+      await bookmarkApi.toggleBookmark(id);
+    } catch {
+      // revert optimistic update on failure
+      setListings((prev) =>
+        prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
+      );
+    }
   };
 
   if (isMapView) {
@@ -304,13 +330,11 @@ function RentPageContent() {
                       listing.thumbnail ||
                       'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
                     }
-                    address={listing.location || 'Unknown'}
-                    beds={listing.bedrooms || 0}
-                    bathrooms={listing.bathrooms || 0}
-                    area={listing.area || 0}
-                    isFavorite={false}
-                    onToggleFavorite={(id: string) => {}}
-                    onClick={(id: string) => {}}
+                    address={listing.full_address || 'Unknown'}
+                    attributes={listing.attributes as ListingAttribute[]}
+                    isFavorite={listing.is_favorite ?? false}
+                    onToggleFavorite={handleToggleFavorite}
+                    onClick={() => router.push(`/${locale}/listing/${listing.listing_id}`)}
                   />
                 ))}
               </div>
@@ -338,6 +362,7 @@ function RentPageContent() {
           )}
         </div>
       </section>
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }

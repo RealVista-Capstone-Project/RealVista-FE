@@ -43,10 +43,12 @@ export async function GET(request: NextRequest) {
 
   // Validate required parameters
   if (!userId || !accessToken || !email) {
-    console.error('[OAuth Callback] Missing parameters:', { userId, hasToken: !!accessToken, email });
-    return NextResponse.redirect(
-      new URL(`/${locale}/login?error=missing_params`, request.url)
-    );
+    console.error('[OAuth Callback] Missing parameters:', {
+      userId,
+      hasToken: !!accessToken,
+      email,
+    });
+    return NextResponse.redirect(new URL(`/${locale}/login?error=missing_params`, request.url));
   }
 
   try {
@@ -62,19 +64,15 @@ export async function GET(request: NextRequest) {
 
     if (result?.error) {
       console.error('[OAuth Callback] NextAuth error:', result.error);
-      return NextResponse.redirect(
-        new URL(`/${locale}/login?error=session_failed`, request.url)
-      );
+      return NextResponse.redirect(new URL(`/${locale}/login?error=session_failed`, request.url));
     }
 
     console.log('[OAuth Callback] Session created successfully for:', email);
 
-    // Success! Redirect to dashboard with locale
-    return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+    // Success! Redirect to buy page with locale
+    return NextResponse.redirect(new URL(`/${locale}/buy`, request.url));
   } catch (error) {
     console.error('[OAuth Callback] Unexpected error:', error);
-    return NextResponse.redirect(
-      new URL(`/${locale}/login?error=callback_error`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url));
   }
 }

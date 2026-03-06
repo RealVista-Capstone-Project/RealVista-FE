@@ -4,8 +4,7 @@ import { ArrowLeft, Heart, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
-import { Link } from '@/shared/config/i18n/navigation';
-import { ROUTES } from '@/shared/config/routes';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import { SharePopover } from './share-popover';
 import { useMemo } from 'react';
 
@@ -23,6 +22,7 @@ export function PropertyHeader({
   onBrowseNearby,
 }: PropertyHeaderProps) {
   const t = useTranslations('PropertyHeader');
+  const router = useRouter();
 
   // Get the share URL (current page URL)
   const shareUrl = useMemo(() => {
@@ -35,14 +35,15 @@ export function PropertyHeader({
   return (
     <div className='flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between'>
       <div className='flex flex-col gap-2 min-w-0'>
-        {/* Back to homepage link */}
-        <Link
-          href={ROUTES.homePage}
+        {/* Back button */}
+        <button
+          type='button'
+          onClick={() => router.back()}
           className='flex items-center gap-2 text-main-primary hover:text-main-primary-hover transition-colors font-medium text-sm'
         >
           <ArrowLeft className='size-4' />
           <span>{t('backToHomepage')}</span>
-        </Link>
+        </button>
 
         {/* Property title and address */}
         <div className='flex flex-col gap-1'>

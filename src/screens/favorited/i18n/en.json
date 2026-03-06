@@ -1,0 +1,31 @@
+{
+  "Favorited": {
+    "byCategory": "By Category",
+    "all": "All",
+    "apartment": "Apartment",
+    "house": "House",
+    "townhouse": "Townhouse",
+    "condo": "Condo",
+    "land": "Land",
+    "byDateAdded": "By date added",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "search": "Search...",
+    "buy": "Buy",
+    "rent": "Rent",
+    "select": "Select",
+    "remove": "Remove",
+    "confirmRemoveTitle": "Remove selected items?",
+    "confirmRemoveMessage": "Remove {count} listing from favorited list",
+    "confirmUnfavoriteTitle": "Remove from favorites?",
+    "confirmUnfavoriteMessage": "Are you sure you want to remove this property from your favorites?",
+    "unfavorite": "Remove from favorites",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "noResults": "No results found",
+    "noSearchResults": "No bookmarks match \"{searchQuery}\"",
+    "emptyTitle": "No bookmarks yet",
+    "emptyDescription": "Start adding your favorite properties by clicking the heart icon on listing cards.",
+    "browseListing": "Browse listings"
+  }
+}
