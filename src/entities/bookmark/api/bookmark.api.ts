@@ -30,5 +30,5 @@ export const bookmarkApi = {
     http.get<ApiResponse<BookmarkPageResponse>>(buildBookmarksUrl(params)),
 
   toggleBookmark: (listingId: string) =>
-    http.post<ApiResponse<unknown>>(`/listings/bookmark/${listingId}`, {}),
+    http.post<ApiResponse<unknown>>(`/listings/bookmark/${listingId}`, undefined),
 } as const;
