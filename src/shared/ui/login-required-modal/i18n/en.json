@@ -1,6 +1,8 @@
 {
-  "title": "Login to continue",
-  "description": "You need to login to use this feature.",
-  "loginButton": "Login",
-  "cancelButton": "Cancel"
+  "LoginRequiredModal": {
+    "title": "Login to continue",
+    "description": "You need to login to use this feature.",
+    "loginButton": "Login",
+    "cancelButton": "Cancel"
+  }
 }
