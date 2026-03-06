@@ -13,6 +13,7 @@ import { Skeleton } from '@/shared/ui/skeleton/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import { buildListingDetailUrl } from '@/shared/lib/utils';
 
 export interface SimilarListingsProps {
   propertyId?: string;
@@ -48,11 +49,11 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
     });
   };
 
-  const handlePropertyClick = (id: string) => {
+  const handlePropertyClick = (slug: string) => {
     if (onPropertyClick) {
-      onPropertyClick(id);
+      onPropertyClick(slug);
     } else {
-      router.push(`/${locale}/listing/${id}`);
+      router.push(buildListingDetailUrl(locale, slug));
     }
   };
 
@@ -105,23 +106,19 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
         {!isLoading && !isError && listings.length > 0 && (
           <div className='overflow-x-auto sm:overflow-x-visible -mx-4 px-4 sm:mx-0 sm:px-0'>
             <div className='flex gap-6 sm:gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3 min-w-min sm:min-w-0'>
-              {listings.map((property) => {
-                // Exclude slug from props passed to RealVistaListingCard
-                const {...cardProps } = property;
-                return (
-                  <div
-                    key={property.id}
-                    className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
-                  >
-                    <RealVistaListingCard
-                      {...cardProps}
-                      isFavorite={favorites.has(property.id)}
-                      onToggleFavorite={handleToggleFavorite}
-                      onClick={() => handlePropertyClick(property.id)}
-                    />
-                  </div>
-                );
-              })}
+              {listings.map((property) => (
+                <div
+                  key={property.id}
+                  className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
+                >
+                  <RealVistaListingCard
+                    {...property}
+                    isFavorite={favorites.has(property.id)}
+                    onToggleFavorite={handleToggleFavorite}
+                    onClick={() => handlePropertyClick(property.slug)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}
