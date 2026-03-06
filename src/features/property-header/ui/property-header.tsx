@@ -42,7 +42,6 @@ export function PropertyHeader({
           className='flex items-center gap-2 text-main-primary hover:text-main-primary-hover transition-colors font-medium text-sm'
         >
           <ArrowLeft className='size-4' />
-          <span>{t('backToHomepage')}</span>
         </button>
 
         {/* Property title and address */}
