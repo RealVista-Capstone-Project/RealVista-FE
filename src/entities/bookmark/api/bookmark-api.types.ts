@@ -14,6 +14,7 @@ export type BookmarkListingType = 'SALE' | 'RENT';
 
 export interface BookmarkListingCardDTO {
   listing_id: string;
+  slug: string;
   title: string;
   price: number;
   listing_type: BookmarkListingType;

@@ -21,6 +21,7 @@ export interface PropertySearchRequest {
 
 export interface PropertyListingDto {
   listing_id: string;
+  slug: string;
   coordinates: {
     latitude: number;
     longitude: number;
