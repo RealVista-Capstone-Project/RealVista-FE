@@ -14,6 +14,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/shared/segments/common/${locale}.json`)).default,
       // UI components
       ...(await import(`@/shared/ui/profile-dropdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/shared/ui/login-required-modal/i18n/${locale}.json`)).default,
       // Feature segments
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
       ...(await import(`@/features/auth/i18n/${locale}.json`)).default,
