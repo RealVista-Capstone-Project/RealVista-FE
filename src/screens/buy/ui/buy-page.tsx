@@ -18,6 +18,7 @@ import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/
 import { useHideFooter } from '@/widgets/layout';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { useToggleBookmark } from '@/shared/lib/hooks';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -35,6 +36,23 @@ function BuyPageContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const itemsPerPage = 9;
+
+  const { toggleBookmark } = useToggleBookmark({
+    onLoginRequired: () => setShowLoginModal(true),
+    onSuccess: (listingId) => {
+      // Optimistic update was successful, update local state
+      setListings((prev) =>
+        prev.map((l) => (l.listing_id === listingId ? { ...l, is_favorite: !l.is_favorite } : l))
+      );
+    },
+    onError: (listingId) => {
+      // Error already logged and toast shown by the hook
+      // Revert optimistic update
+      setListings((prev) =>
+        prev.map((l) => (l.listing_id === listingId ? { ...l, is_favorite: !l.is_favorite } : l))
+      );
+    },
+  });
 
   // Initialize state from URL params
   const [location, setLocation] = useState(searchParams?.get('location') || '');
@@ -174,27 +192,17 @@ function BuyPageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleToggleFavorite = async (id: string) => {
-    if (!session?.user) {
-      setShowLoginModal(true);
-      return;
-    }
+  const handleToggleFavorite = (id: string) => {
+    // Optimistically update UI before API call
     setListings((prev) =>
       prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
     );
-    try {
-      await bookmarkApi.toggleBookmark(id);
-    } catch {
-      // revert optimistic update on failure
-      setListings((prev) =>
-        prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
-      );
-    }
+    toggleBookmark(id);
   };
 
   if (isMapView) {
     return (
-      <div className='h-screen w-full bg-white'>
+      <div className='fixed inset-0 top-[72px] w-full bg-white z-10'>
         <PropertyMapBasedSearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
       </div>
     );
@@ -338,7 +346,7 @@ function BuyPageContent() {
                     attributes={listing.attributes as ListingAttribute[]}
                     isFavorite={listing.is_favorite ?? false}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={() => router.push(`/${locale}/listing/${listing.listing_id}`)}
+                    onClick={() => router.push(`/${locale}/listing/${listing.slug}`)}
                   />
                 ))}
               </div>
