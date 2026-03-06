@@ -50,16 +50,12 @@ export function ProfileDropdown({
     setIsLoggingOut(true);
 
     try {
-      // Sign out from NextAuth
-      const result = await signOut({ redirect: false });
+      // Sign out from NextAuth (returns void when redirect: false)
+      await signOut({ redirect: false });
 
-      if (result) {
-        toast.success(t('logoutSuccess'));
-        setOpen(false);
-        router.push(`/${locale}/login`);
-      } else {
-        throw new Error('Logout returned undefined result');
-      }
+      toast.success(t('logoutSuccess'));
+      setOpen(false);
+      router.push(`/${locale}/login`);
     } catch (error) {
       console.error('Logout error:', error);
       toast.error(t('logoutFailed'));

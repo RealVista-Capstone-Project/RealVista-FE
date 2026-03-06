@@ -2,7 +2,7 @@
 
 import { LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ interface LoginRequiredModalProps {
 export function LoginRequiredModal({ open, onClose }: LoginRequiredModalProps) {
   const locale = useLocale();
   const router = useRouter();
+  const t = useTranslations('LoginRequiredModal');
 
   const handleLogin = () => {
     onClose();
@@ -35,17 +36,17 @@ export function LoginRequiredModal({ open, onClose }: LoginRequiredModalProps) {
           <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-purple-96 mx-auto'>
             <LogIn className='h-7 w-7 text-main-primary' />
           </div>
-          <DialogTitle className='text-center text-[18px]'>Đăng nhập để tiếp tục</DialogTitle>
+          <DialogTitle className='text-center text-[18px]'>{t('title')}</DialogTitle>
           <DialogDescription className='text-center'>
-            Bạn cần đăng nhập để sử dụng tính năng này.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className='mt-2 flex flex-col gap-2 sm:flex-col'>
           <RealVistaButton variant='primary' size='medium' className='w-full' onClick={handleLogin}>
-            Đăng nhập
+            {t('loginButton')}
           </RealVistaButton>
           <RealVistaButton variant='secondary' size='medium' className='w-full' onClick={onClose}>
-            Hủy
+            {t('cancelButton')}
           </RealVistaButton>
         </DialogFooter>
       </DialogContent>
