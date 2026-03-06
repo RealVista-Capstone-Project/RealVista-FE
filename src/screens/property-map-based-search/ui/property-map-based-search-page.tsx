@@ -175,9 +175,9 @@ export function PropertyMapBasedSearchPage({
   };
 
   return (
-    <div className='flex h-screen w-full'>
+    <div className='flex h-full w-full'>
       {/* Left Side - Map */}
-      <div className='hidden lg:block lg:w-1/2'>
+      <div className='hidden lg:block lg:w-1/2 h-full'>
         <PropertyMap
           properties={propertyLocations}
           selectedPropertyIds={selectedPropertyIds}
@@ -201,7 +201,7 @@ export function PropertyMapBasedSearchPage({
       </div>
 
       {/* Right Side - Property Listings */}
-      <div className='w-full lg:w-1/2 overflow-y-auto bg-purple-98'>
+      <div className='w-full lg:w-1/2 overflow-y-auto bg-purple-98 h-full'>
         <div className='mx-auto max-w-4xl p-6'>
           <PropertySearchHeader
             title={initialListingType === 'SALE' ? t('searchTitleSale') : t('searchTitleRent')}
@@ -298,7 +298,7 @@ export function PropertyMapBasedSearchPage({
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={(id: string) => router.push(`/${locale}/listing/${id}`)}
+                    onClick={() => router.push(`/${locale}/listing/${property.slug}`)}
                     className={
                       selectedPropertyIds.includes(property.listing_id)
                         ? 'ring-2 ring-main-primary'

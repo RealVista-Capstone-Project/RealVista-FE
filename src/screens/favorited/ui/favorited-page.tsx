@@ -25,9 +25,13 @@ import {
 
 const ITEMS_PER_PAGE = 9;
 
-function toCardProps(item: BookmarkListingCardDTO) {
+/**
+ * Transforms a bookmark listing DTO to card props format
+ */
+function mapBookmarkListingToCardProps(item: BookmarkListingCardDTO) {
   return {
     id: item.listing_id,
+    slug: item.slug,
     image: item.primary_image_url ?? '',
     title: item.title,
     address: item.full_address,
@@ -138,14 +142,17 @@ export function FavoritedPage() {
             <>
               {/* Property Grid */}
               <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {items.map((item) => (
-                  <BookmarkCardContainer
-                    key={item.listing_id}
-                    {...toCardProps(item)}
-                    onToggleFavorite={(id) => toggleBookmark(id)}
-                    onClick={(id: string) => router.push(`/${locale}/listing/${id}`)}
-                  />
-                ))}
+                {items.map((item) => {
+                  const cardProps = mapBookmarkListingToCardProps(item);
+                  return (
+                    <BookmarkCardContainer
+                      key={item.listing_id}
+                      {...cardProps}
+                      onToggleFavorite={(id) => toggleBookmark(id)}
+                      onClick={() => router.push(`/${locale}/listing/${cardProps.slug}`)}
+                    />
+                  );
+                })}
               </div>
 
               {/* Pagination */}
