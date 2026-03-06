@@ -26,6 +26,9 @@
     "noSearchResults": "Không có dấu trang nào khớp với \"{searchQuery}\"",
     "emptyTitle": "Chưa có dấu trang nào",
     "emptyDescription": "Bắt đầu thêm các bất động sản yêu thích của bạn bằng cách nhấp vào biểu tượng trái tim trên các thẻ danh sách.",
-    "browseListing": "Duyệt danh sách"
+    "browseListing": "Duyệt danh sách",
+    "selectedTypes": "{count} loại đã chọn",
+    "allTypes": "Tất cả",
+    "compare": "So sánh"
   }
 }

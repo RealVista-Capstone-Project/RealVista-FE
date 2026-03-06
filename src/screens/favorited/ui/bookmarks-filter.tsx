@@ -108,7 +108,7 @@ export function BookmarksFilter({
         if (found) return found.label;
       }
     }
-    return `${propertyType.length} loại đã chọn`;
+    return t('selectedTypes', { count: propertyType.length });
   };
 
   const getSortLabel = () =>
@@ -235,9 +235,10 @@ export function BookmarksFilter({
                       type='button'
                       onClick={toggleAll}
                       className='flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-main-black hover:bg-purple-98 transition-colors'
+                      aria-label={t('allTypes')}
                     >
                       <CheckboxIcon checked={isAllSelected} />
-                      Tất cả
+                      {t('allTypes')}
                     </button>
 
                     {/* Categories + Types */}
@@ -248,6 +249,7 @@ export function BookmarksFilter({
                           type='button'
                           onClick={() => toggleCategory(cat.code)}
                           className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-semibold text-main-black hover:bg-purple-98 transition-colors'
+                          aria-label={cat.label}
                         >
                           <CheckboxIcon
                             checked={isCategoryFullyChecked(cat.code)}
@@ -263,6 +265,7 @@ export function BookmarksFilter({
                             type='button'
                             onClick={() => toggleType(type.code)}
                             className='flex w-full items-center gap-3 py-2 pl-10 pr-4 text-left text-sm font-medium text-grey-600 hover:bg-purple-98 transition-colors'
+                            aria-label={type.label}
                           >
                             <CheckboxIcon checked={propertyType.includes(type.code)} />
                             {type.label}
@@ -277,13 +280,15 @@ export function BookmarksFilter({
           </div>
 
           {/* Right: So sánh Button */}
-          <button
-            type='button'
-            onClick={onCompare}
-            className='flex items-center gap-2 rounded-lg border border-main-primary bg-main-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-main-primary-hover'
-          >
-            So sánh
-          </button>
+          {onCompare && (
+            <button
+              type='button'
+              onClick={onCompare}
+              className='flex items-center gap-2 rounded-lg border border-main-primary bg-main-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-main-primary-hover'
+            >
+              {t('compare')}
+            </button>
+          )}
         </div>
       </div>
     </section>
