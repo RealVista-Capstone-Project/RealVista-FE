@@ -45,7 +45,7 @@ export function ChatListingCard({ listing, onClick, className }: ChatListingCard
 
         <p className='text-base font-bold text-main-primary'>
           {currency ?? '$'}
-          {price.toLocaleString()}
+          {price !== undefined && price !== null ? price.toLocaleString() : '0'}
         </p>
 
         {/* Property details */}
