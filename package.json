@@ -50,6 +50,7 @@
     "react-hook-form": "^7.55.0",
     "react-share": "^5.2.2",
     "recharts": "^2.15.4",
+    "sharp": "^0.34.5",
     "sockjs-client": "^1.6.1",
     "sonner": "^2.0.2",
     "tailwind-merge": "^3.0.2",
