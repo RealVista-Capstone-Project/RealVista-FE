@@ -3,7 +3,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { vi, enUS } from 'date-fns/locale';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { format, addMinutes } from 'date-fns';
+import { format, addMinutes, addDays } from 'date-fns';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { appointmentQueries, appointmentKeys, useBookTour } from '@/features/price-and-tour/api';
 import { toast } from 'sonner';
@@ -22,7 +22,10 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
   const t = useTranslations('BookTour');
   const locale = useLocale();
   const dateLocale = locale === 'vi' ? vi : enUS;
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(() => {
+    const now = new Date();
+    return now.getHours() >= 17 ? addDays(now, 1) : now;
+  });
 
   // New state for duration-based booking
   const [selectedStartTime, setSelectedStartTime] = useState<string | null>(null);
@@ -36,7 +39,8 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setDate(new Date());
+      const now = new Date();
+      setDate(now.getHours() >= 17 ? addDays(now, 1) : now);
       setSelectedStartTime(null);
       setSelectedDuration(null);
       setStep('selection');
@@ -53,8 +57,17 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
 
   // Derived state for display
   const availableSlots: string[] = useMemo(() => {
-    return slots.map((s: string) => s.substring(0, 5));
-  }, [slots]);
+    const allSlots = slots.map((s: string) => s.substring(0, 5));
+    if (!date) return allSlots;
+
+    const isToday = format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+    if (!isToday) return allSlots;
+
+    const now = new Date();
+    const currentHourMin = format(now, 'HH:mm');
+
+    return allSlots.filter((slot) => slot > currentHourMin);
+  }, [slots, date]);
 
   // Reset selection when date changes
   useEffect(() => {
