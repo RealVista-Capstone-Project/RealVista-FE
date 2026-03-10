@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { CalendarIcon } from 'lucide-react';
-import { format, Locale } from 'date-fns';
+import { format, Locale, startOfDay } from 'date-fns';
 import {
   InputGroup,
   InputGroupAddon,
@@ -152,7 +152,7 @@ export function DatePickerInput({
               handleDateChange(selectedDate);
               setOpen(false);
             }}
-            disabled={(date) => (minDate ? date < minDate : false)}
+            disabled={(date) => (minDate ? date < startOfDay(minDate) : false)}
             initialFocus
             locale={locale}
           />
@@ -201,7 +201,7 @@ export function DatePickerInput({
               month={month}
               onMonthChange={setMonth}
               onSelect={handleDateChange}
-              disabled={(date) => (minDate ? date < minDate : false)}
+              disabled={(date) => (minDate ? date < startOfDay(minDate) : false)}
               initialFocus
               locale={locale}
             />
