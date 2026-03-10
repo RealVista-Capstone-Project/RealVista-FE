@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useChatWindowStore } from '@/entities/contact';
 import { useAuthSession } from '@/features/auth/model';
 import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import { conversationKeys } from '@/entities/conversation/api/keys';
@@ -109,7 +108,18 @@ export function ConnectedChatWindow({
 
 function tryParseMetadata(metadata: string) {
   try {
-    return JSON.parse(metadata);
+    const parsed = JSON.parse(metadata);
+    // Sanitize listing metadata to ensure required fields exist
+    if (parsed && typeof parsed === 'object') {
+      return {
+        ...parsed,
+        price: typeof parsed.price === 'number' ? parsed.price : 0,
+        title: parsed.title || 'Property',
+        image: parsed.image || '',
+        address: parsed.address || '',
+      };
+    }
+    return undefined;
   } catch {
     return undefined;
   }
