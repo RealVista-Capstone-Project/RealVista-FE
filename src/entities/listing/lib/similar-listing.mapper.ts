@@ -29,7 +29,7 @@ export function mapSimilarListingToCardProps(listing: SimilarListing): SimilarLi
 
   return {
     id: listing.listing_id,
-    slug: listing.slug,
+    slug: listing.slug || listing.listing_id,
     image: listing.thumbnail_url,
     title: listing.name,
     address: listing.location_name,

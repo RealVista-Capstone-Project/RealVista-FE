@@ -149,7 +149,7 @@ export function FavoritedPage() {
                       key={item.listing_id}
                       {...cardProps}
                       onToggleFavorite={(id) => toggleBookmark(id)}
-                      onClick={() => router.push(`/${locale}/listing/${cardProps.slug}`)}
+                      onClick={() => router.push(`/${locale}/listing/${cardProps.slug || cardProps.id}`)}
                     />
                   );
                 })}

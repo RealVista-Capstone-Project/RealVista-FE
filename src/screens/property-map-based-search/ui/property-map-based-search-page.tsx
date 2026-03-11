@@ -298,7 +298,7 @@ export function PropertyMapBasedSearchPage({
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={() => router.push(`/${locale}/listing/${property.slug}`)}
+                    onClick={() => router.push(`/${locale}/listing/${property.slug || property.listing_id}`)}
                     className={
                       selectedPropertyIds.includes(property.listing_id)
                         ? 'ring-2 ring-main-primary'
