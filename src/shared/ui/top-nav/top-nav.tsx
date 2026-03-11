@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
 import { Bell, ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
@@ -60,6 +60,7 @@ export function TopNav({
   const t = useTranslations('Navigation');
   const locale = useLocale();
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
@@ -160,8 +161,12 @@ export function TopNav({
 
         {/* Bookmark Button - only for public variant, shown when user is logged in, hidden on mobile */}
         {showMessageButton && isUserLoggedIn && (
-          <Link
-            href={`/${locale}${ROUTES.favorited}`}
+          <button
+            type='button'
+            onClick={() => {
+              router.push(`/${locale}${ROUTES.favorited}`);
+              router.refresh();
+            }}
             className={cn(
               'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
               isRouteActive('/favorited')
@@ -175,7 +180,7 @@ export function TopNav({
               className='h-5 w-5'
               fill={isRouteActive('/favorited') ? 'currentColor' : 'none'}
             />
-          </Link>
+          </button>
         )}
 
         {/* Chat Dropdown - only for public variant, hidden on mobile */}
