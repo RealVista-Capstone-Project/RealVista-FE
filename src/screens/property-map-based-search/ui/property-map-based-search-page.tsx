@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
 import { MapPin } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
@@ -61,6 +61,7 @@ export function PropertyMapBasedSearchPage({
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
+  const queryClient = useQueryClient();
   const pageSize = 10;
 
   const { data: searchResponse, isLoading } = useQuery({
@@ -168,6 +169,7 @@ export function PropertyMapBasedSearchPage({
     setFavoriteOverrides((prev) => ({ ...prev, [id]: !currentFavorite }));
     try {
       await bookmarkApi.toggleBookmark(id);
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
     } catch {
       // revert optimistic update on failure
       setFavoriteOverrides((prev) => ({ ...prev, [id]: currentFavorite }));

@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
 import { Bell, ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { ROUTES } from '@/shared/config/routes';
@@ -62,6 +63,7 @@ export function TopNav({
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
   const showMessageButton = variant === 'public';
@@ -164,8 +166,8 @@ export function TopNav({
           <button
             type='button'
             onClick={() => {
+              void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
               router.push(`/${locale}${ROUTES.favorited}`);
-              router.refresh();
             }}
             className={cn(
               'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',

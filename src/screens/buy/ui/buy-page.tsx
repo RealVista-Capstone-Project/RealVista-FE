@@ -12,6 +12,7 @@ import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
+import { useQueryClient } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
@@ -34,6 +35,7 @@ function BuyPageContent() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
+  const queryClient = useQueryClient();
   const itemsPerPage = 9;
 
   const handleToggleFavorite = async (id: string) => {
@@ -49,6 +51,7 @@ function BuyPageContent() {
 
     try {
       await bookmarkApi.toggleBookmark(id);
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
     } catch (error) {
       // Revert on error
       setListings((prev) =>
