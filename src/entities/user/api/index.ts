@@ -1,11 +1,22 @@
 import http from '@/shared/lib/http'
-import type { User, LoginCredentials, LoginResponse, UpdateUserData } from '../model/types'
+import type { ApiResponse } from '@/shared/types/api'
+import type { User, UserProfile, LoginCredentials, LoginResponse, UpdateUserData, UpdateMeData } from '../model/types'
 
 /**
  * User API - All user-related HTTP methods
  * This is the data source layer - pure functions that make HTTP requests
  */
 export const userApi = {
+  /**
+   * Get current authenticated user (from /me endpoint)
+   */
+  getMe: () => http.get<ApiResponse<UserProfile>>('/me'),
+
+  /**
+   * Update current authenticated user
+   */
+  updateMe: (data: UpdateMeData) => http.patch<ApiResponse<UserProfile>>('/me', data),
+
   /**
    * Get current authenticated user
    */
@@ -49,8 +60,15 @@ export const userApi = {
   /**
    * Change password
    */
-  changePassword: (data: { oldPassword: string; newPassword: string }) =>
-    http.post('/user/change-password', data, {}),
+  changePassword: (userId: string, data: { current_password: string; new_password: string }) =>
+    http.put<ApiResponse<void>>(`/users/${userId}/password`, data),
+
+  /**
+   * Delete (soft-delete) current user account
+   */
+  deleteAccount: (userId: string) =>
+    http.delete<ApiResponse<void>>(`/users/${userId}`),
+
 
   /**
    * Upload avatar

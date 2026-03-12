@@ -41,6 +41,17 @@ export const userQueries = {
     }),
 
   /**
+   * Get current user full profile from /me endpoint
+   */
+  me: () =>
+    queryOptions({
+      queryKey: userKeys.me(),
+      queryFn: () => userApi.getMe(),
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    }),
+
+  /**
    * Get user sessions
    */
   sessions: () =>
