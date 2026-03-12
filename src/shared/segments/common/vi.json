@@ -59,6 +59,11 @@
       "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
     }
   },
+  "ProfileDropdown": {
+    "myProfile": "Hồ sơ của tôi",
+    "help": "Trợ giúp",
+    "logout": "Đăng xuất"
+  },
   "Navigation": {
     "explore": "Khám phá",
     "rent": "Thuê nhà",

@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { User, HelpCircle, LogOut } from 'lucide-react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
+import { ROUTES } from '@/shared/config/routes';
 
 export interface ProfileMenuItem {
   id: string;
@@ -24,19 +26,21 @@ interface ProfileDropdownProps {
   className?: string;
 }
 
-const defaultMenuItems: ProfileMenuItem[] = [
-  { id: 'profile', label: 'My Profile', icon: User },
-  { id: 'help', label: 'Help', icon: HelpCircle },
-  { id: 'logout', label: 'Logout', icon: LogOut },
-];
-
 export function ProfileDropdown({
   user = { name: 'Giovanni', initials: 'GI' },
-  menuItems = defaultMenuItems,
+  menuItems,
   align = 'end',
   className,
 }: ProfileDropdownProps) {
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
+  const t = useTranslations('ProfileDropdown');
+
+  const resolvedMenuItems = menuItems ?? [
+    { id: 'profile', label: t('myProfile'), icon: User, href: `/${locale}${ROUTES.settings}` },
+    { id: 'help', label: t('help'), icon: HelpCircle },
+    { id: 'logout', label: t('logout'), icon: LogOut },
+  ];
 
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -86,9 +90,9 @@ export function ProfileDropdown({
           )}
         >
           <div className='flex flex-col'>
-            {menuItems.map((item, index) => {
+            {resolvedMenuItems.map((item, index) => {
               const Icon = item.icon;
-              const isLast = index === menuItems.length - 1;
+              const isLast = index === resolvedMenuItems.length - 1;
 
               return (
                 <div key={item.id}>

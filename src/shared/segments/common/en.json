@@ -59,6 +59,11 @@
       "messageMinLength": "Message must be at least 10 characters"
     }
   },
+  "ProfileDropdown": {
+    "myProfile": "My Profile",
+    "help": "Help",
+    "logout": "Logout"
+  },
   "Navigation": {
     "explore": "Explore",
     "rent": "Rent",
