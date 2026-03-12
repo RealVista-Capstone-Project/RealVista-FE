@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -17,7 +17,6 @@ import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to
 import { ContactModal } from '@/widgets/contact-modal';
 import type { ContactFormData } from '@/entities/contact';
 import { bookmarkApi } from '@/entities/bookmark/api/bookmark.api';
-import { getAuthToken } from '@/shared/lib/auth/get-auth-token';
 import { useAuthSession } from '@/features/auth/model';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Button } from '@/shared/ui/button';
@@ -46,7 +45,6 @@ export interface ListingDetailScreenProps {
 }
 
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
-  // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
   const { data: session } = useAuthSession();
