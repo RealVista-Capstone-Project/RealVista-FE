@@ -64,6 +64,113 @@
     "help": "Trợ giúp",
     "logout": "Đăng xuất"
   },
+  "Settings": {
+    "tabs": {
+      "profile": "Tài khoản của tôi",
+      "settings": "Cài đặt",
+      "subscription": "Gói dịch vụ"
+    },
+    "profileManagement": {
+      "title": "Quản lý hồ sơ",
+      "description": "Mỗi hồ sơ lưu riêng tìm kiếm và tuỳ chọn của bạn.",
+      "loading": "Đang tải hồ sơ...",
+      "defaultName": "Hồ sơ mặc định",
+      "activeBadge": "Đang dùng",
+      "switchButton": "Chuyển",
+      "addButton": "Thêm hồ sơ",
+      "namePlaceholder": "Tên hồ sơ mới",
+      "addConfirm": "Thêm",
+      "cancel": "Huỷ"
+    },
+    "myAccount": {
+      "title": "Tài khoản của tôi",
+      "updateButton": "Cập nhật hồ sơ",
+      "loading": "Đang tải...",
+      "avatar": "Ảnh đại diện",
+      "upload": "Tải lên",
+      "remove": "Xoá",
+      "firstName": "Họ",
+      "firstNamePlaceholder": "Nhập họ",
+      "lastName": "Tên",
+      "lastNamePlaceholder": "Nhập tên",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "+84 000-000-0000",
+      "verify": "Xác minh",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "changePassword": "Đổi mật khẩu",
+      "currentPassword": "Mật khẩu hiện tại",
+      "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordPlaceholder": "Tối thiểu 8 ký tự, chữ hoa, chữ thường, số",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "cancel": "Huỷ",
+      "confirm": "Xác nhận",
+      "saving": "Đang lưu...",
+      "saveChanges": "Lưu thay đổi"
+    },
+    "linkedAccounts": {
+      "title": "Tài khoản liên kết",
+      "description": "Dùng để đăng nhập nhanh hơn.",
+      "google": "Đăng nhập bằng Google",
+      "remove": "Huỷ liên kết"
+    },
+    "deleteAccount": {
+      "title": "Xoá tài khoản",
+      "description": "Xoá tài khoản và toàn bộ dữ liệu của bạn",
+      "button": "Xoá tài khoản",
+      "dialogTitle": "Xoá tài khoản",
+      "dialogDescription": "Hành động này không thể hoàn tác. Tài khoản và toàn bộ dữ liệu của bạn sẽ bị xoá vĩnh viễn.",
+      "cancel": "Huỷ",
+      "confirm": "Xoá tài khoản",
+      "deleting": "Đang xoá..."
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "loading": "Đang tải...",
+      "inApp": "Thông báo trong ứng dụng",
+      "inAppDesc": "Nhận thông báo ngay trong ứng dụng",
+      "email": "Thông báo qua Email",
+      "emailDesc": "Nhận thông báo qua email",
+      "push": "Thông báo đẩy",
+      "pushDesc": "Nhận thông báo đẩy trên thiết bị của bạn"
+    },
+    "contactPreferences": {
+      "title": "Tuỳ chọn liên hệ",
+      "viaEmail": "Liên hệ qua Email",
+      "viaEmailDesc": "Cho phép người khác liên hệ qua email",
+      "viaPhone": "Liên hệ qua điện thoại",
+      "viaPhoneDesc": "Cho phép người khác liên hệ qua điện thoại",
+      "hidePhone": "Ẩn số điện thoại",
+      "hidePhoneDesc": "Ẩn số điện thoại với người dùng khác",
+      "hideEmail": "Ẩn Email",
+      "hideEmailDesc": "Ẩn địa chỉ email với người dùng khác"
+    },
+    "saveChanges": "Lưu thay đổi",
+    "saving": "Đang lưu...",
+    "subscription": {
+      "title": "Gói dịch vụ",
+      "comingSoon": "Các gói dịch vụ sắp ra mắt."
+    },
+    "toast": {
+      "profileUpdated": "Cập nhật hồ sơ thành công",
+      "profileUpdateFailed": "Cập nhật hồ sơ thất bại",
+      "settingsSaved": "Đã lưu cài đặt",
+      "settingsFailed": "Lưu cài đặt thất bại",
+      "profileCreated": "Tạo hồ sơ thành công",
+      "profileCreateFailed": "Tạo hồ sơ thất bại",
+      "profileDeleted": "Đã xoá hồ sơ",
+      "profileDeleteFailed": "Xoá hồ sơ thất bại",
+      "profileSwitched": "Đã chuyển hồ sơ hoạt động",
+      "profileSwitchFailed": "Chuyển hồ sơ thất bại",
+      "passwordChanged": "Đổi mật khẩu thành công",
+      "passwordChangeFailed": "Mật khẩu hiện tại không đúng hoặc không hợp lệ",
+      "accountDeleted": "Đã xoá tài khoản",
+      "accountDeleteFailed": "Xoá tài khoản thất bại"
+    }
+  },
   "Navigation": {
     "explore": "Khám phá",
     "rent": "Thuê nhà",

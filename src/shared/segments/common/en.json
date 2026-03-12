@@ -64,6 +64,113 @@
     "help": "Help",
     "logout": "Logout"
   },
+  "Settings": {
+    "tabs": {
+      "profile": "My Account",
+      "settings": "Settings",
+      "subscription": "Subscription"
+    },
+    "profileManagement": {
+      "title": "Profile management",
+      "description": "Each profile keeps its own saved searches and preferences.",
+      "loading": "Loading profiles...",
+      "defaultName": "Default Profile",
+      "activeBadge": "Active",
+      "switchButton": "Switch",
+      "addButton": "Add profile",
+      "namePlaceholder": "New profile name",
+      "addConfirm": "Add",
+      "cancel": "Cancel"
+    },
+    "myAccount": {
+      "title": "My Account",
+      "updateButton": "Update Profile",
+      "loading": "Loading...",
+      "avatar": "Avatar",
+      "upload": "Upload",
+      "remove": "Remove",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "First name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Last name",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+84 000-000-0000",
+      "verify": "Verify",
+      "email": "Email",
+      "password": "Password",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Min 8 chars, uppercase, lowercase, number",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Re-enter new password",
+      "passwordMismatch": "Passwords do not match",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "saving": "Saving...",
+      "saveChanges": "Save changes"
+    },
+    "linkedAccounts": {
+      "title": "Linked Accounts",
+      "description": "We use this to let you sign in easily.",
+      "google": "Sign in with Google",
+      "remove": "Remove"
+    },
+    "deleteAccount": {
+      "title": "Delete Account",
+      "description": "Delete your account and all the data",
+      "button": "Delete Account",
+      "dialogTitle": "Delete Account",
+      "dialogDescription": "This action cannot be undone. Your account and all associated data will be permanently deleted.",
+      "cancel": "Cancel",
+      "confirm": "Delete Account",
+      "deleting": "Deleting..."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "loading": "Loading...",
+      "inApp": "In-App Notifications",
+      "inAppDesc": "Receive notifications inside the app",
+      "email": "Email Notifications",
+      "emailDesc": "Receive notifications via email",
+      "push": "Push Notifications",
+      "pushDesc": "Receive push notifications on your device"
+    },
+    "contactPreferences": {
+      "title": "Contact Preferences",
+      "viaEmail": "Contact via Email",
+      "viaEmailDesc": "Allow others to contact you via email",
+      "viaPhone": "Contact via Phone",
+      "viaPhoneDesc": "Allow others to contact you via phone",
+      "hidePhone": "Hide Phone Number",
+      "hidePhoneDesc": "Hide your phone number from other users",
+      "hideEmail": "Hide Email",
+      "hideEmailDesc": "Hide your email address from other users"
+    },
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "subscription": {
+      "title": "Subscription",
+      "comingSoon": "Subscription plans coming soon."
+    },
+    "toast": {
+      "profileUpdated": "Profile updated successfully",
+      "profileUpdateFailed": "Failed to update profile",
+      "settingsSaved": "Settings saved",
+      "settingsFailed": "Failed to save settings",
+      "profileCreated": "Profile created",
+      "profileCreateFailed": "Failed to create profile",
+      "profileDeleted": "Profile deleted",
+      "profileDeleteFailed": "Failed to delete profile",
+      "profileSwitched": "Active profile switched",
+      "profileSwitchFailed": "Failed to switch profile",
+      "passwordChanged": "Password changed successfully",
+      "passwordChangeFailed": "Current password is incorrect or invalid",
+      "accountDeleted": "Account deleted",
+      "accountDeleteFailed": "Failed to delete account"
+    }
+  },
   "Navigation": {
     "explore": "Explore",
     "rent": "Rent",
