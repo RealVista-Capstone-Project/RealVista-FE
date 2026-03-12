@@ -7,6 +7,28 @@
     "requestHomeTour": "Request a home tour",
     "selectTourDate": "Select tour date",
     "requestTour": "Request Tour",
+    "loginRequired": "Please login to book a tour",
     "disclaimer": "It's free, with no obligation — cancel anytime."
+  },
+  "BookTour": {
+    "scheduleTour": "Schedule a Tour",
+    "availableSlots": "Available slots",
+    "loadingSlots": "Loading slots",
+    "noSlotsAvailable": "No slots available for this date",
+    "startTime": "Start time",
+    "selectDuration": "Select duration",
+    "duration": "Duration",
+    "endTime": "End time",
+    "booking": "Booking...",
+    "confirmBooking": "Confirm Booking",
+    "bookingSuccess": "Tour booked successfully!",
+    "bookingError": "Failed to book tour. Please try again.",
+    "reviewBooking": "Review Booking",
+    "back": "Back",
+    "confirmDetails": "Confirm Details",
+    "selectedDate": "Selected Date",
+    "note": "Note",
+    "hour": "h",
+    "minute": "m"
   }
 }
