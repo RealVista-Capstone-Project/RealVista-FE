@@ -1,11 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthSession } from '@/features/auth/model';
 import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import { conversationKeys } from '@/entities/conversation/api/keys';
 import { FloatingChatWindow } from '@/widgets/floating-chat-window';
+import { generateListingSlug } from '@/entities/listing/lib/slug.utils';
 import type { ChatWindowState, ChatMessageData } from '@/entities/contact';
 import type { ChatWebSocketMessage } from '../model/types';
 import type { ApiResponse, HttpResponse } from '@/shared/types/api';
@@ -37,6 +40,8 @@ export function ConnectedChatWindow({
   const { data: session } = useAuthSession();
   const userId = session?.user?.id;
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const locale = useLocale();
 
   // Fetch messages
   const { data: messagesData } = useQuery(conversationQueries.messages(chatWindow.conversationId));
@@ -90,6 +95,16 @@ export function ConnectedChatWindow({
     }
   };
 
+  const handleListingClick = (listingId: string) => {
+    // Find the listing in messages to get its slug or title
+    const message = messages.find((msg) => msg.listing?.id === listingId);
+    if (message?.listing) {
+      // Prefer slug from metadata, fallback to generating from title if not available
+      const slug = message.listing.slug || generateListingSlug(message.listing.title, listingId);
+      router.push(`/${locale}/listing/${slug}`);
+    }
+  };
+
   return (
     <FloatingChatWindow
       id={chatWindow.id}
@@ -101,6 +116,7 @@ export function ConnectedChatWindow({
       onClose={() => onClose(chatWindow.id)}
       onMinimize={() => onMinimize(chatWindow.id)}
       onSendMessage={handleSendMessage}
+      onListingClick={handleListingClick}
       className={typingUserName ? 'border-main-primary' : undefined}
     />
   );

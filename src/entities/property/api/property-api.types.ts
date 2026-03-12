@@ -21,22 +21,35 @@ export interface PropertySearchRequest {
 
 export interface PropertyListingDto {
   listing_id: string;
+  slug: string;
   coordinates: {
     latitude: number;
     longitude: number;
   };
-  street_address: string;
+  street_address: string | null;
+  ward_name: string | null;
+  district_name: string | null;
+  city_name: string | null;
+  full_address: string;
   price: number;
   listing_type: 'RENT' | 'SALE';
   name: string;
   thumbnail_url: string;
   size_m2: number;
   property_type: string;
-  location_name: string;
   is_favorite: boolean;
-  // Optional fields as per user example (missing in sample but likely needed)
   bedrooms?: number;
   bathrooms?: number;
+  attributes?: Array<{
+    attribute_id: string;
+    attribute_code: string;
+    attribute_name: string;
+    icon: string | null;
+    unit: string | null;
+    value_number: number | null;
+    value_text: string | null;
+    value_boolean: boolean | null;
+  }>;
 }
 
 export interface PropertySearchResponse {

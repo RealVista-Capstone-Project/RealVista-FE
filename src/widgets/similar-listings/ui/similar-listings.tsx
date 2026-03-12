@@ -4,12 +4,16 @@ import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvis
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { listingQueries, mapSimilarListingsToCardProps, type SimilarListingCardProps } from '@/entities/listing';
+import {
+  listingQueries,
+  mapSimilarListingsToCardProps,
+  type SimilarListingCardProps,
+} from '@/entities/listing';
 import { Skeleton } from '@/shared/ui/skeleton/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import type { SimilarListing } from '@/entities/listing';
+import { buildListingDetailUrl } from '@/shared/lib/utils';
 
 export interface SimilarListingsProps {
   propertyId?: string;
@@ -49,8 +53,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
     if (onPropertyClick) {
       onPropertyClick(slug);
     } else {
-      // Navigate to listing detail page using slug with locale
-      router.push(`/${locale}/listing/${slug}`);
+      router.push(buildListingDetailUrl(locale, slug));
     }
   };
 
@@ -74,10 +77,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
         {isLoading && (
           <div className='flex gap-6 sm:gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3'>
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
-              >
+              <div key={i} className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'>
                 <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6 h-full'>
                   <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
                   <Skeleton className='h-8 w-3/4 mb-3' />
@@ -106,23 +106,19 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
         {!isLoading && !isError && listings.length > 0 && (
           <div className='overflow-x-auto sm:overflow-x-visible -mx-4 px-4 sm:mx-0 sm:px-0'>
             <div className='flex gap-6 sm:gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3 min-w-min sm:min-w-0'>
-              {listings.map((property) => {
-                // Exclude slug from props passed to RealVistaListingCard
-                const { slug, ...cardProps } = property;
-                return (
-                  <div
-                    key={property.id}
-                    className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
-                  >
-                    <RealVistaListingCard
-                      {...cardProps}
-                      isFavorite={favorites.has(property.id)}
-                      onToggleFavorite={handleToggleFavorite}
-                      onClick={() => handlePropertyClick(slug)}
-                    />
-                  </div>
-                );
-              })}
+              {listings.map((property) => (
+                <div
+                  key={property.id}
+                  className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
+                >
+                  <RealVistaListingCard
+                    {...property}
+                    isFavorite={favorites.has(property.id)}
+                    onToggleFavorite={handleToggleFavorite}
+                    onClick={() => handlePropertyClick(property.slug)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}
