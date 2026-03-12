@@ -1,0 +1,12 @@
+{
+  "PriceAndTour": {
+    "rentPrice": "Rent price",
+    "buyPrice": "Sale price",
+    "perMonth": "/month",
+    "contactAgent": "Contact Agent",
+    "requestHomeTour": "Request a home tour",
+    "selectTourDate": "Select tour date",
+    "requestTour": "Request Tour",
+    "disclaimer": "It's free, with no obligation — cancel anytime."
+  }
+}

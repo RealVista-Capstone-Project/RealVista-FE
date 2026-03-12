@@ -3,9 +3,24 @@
 
 export const ROUTES = {
   homePage: '/',
+  login: '/login',
+  register: '/register',
   signIn: '/signin',
   signUp: '/signup',
   user: '/user',
-};
+  rent: '/rent',
+  buy: '/buy',
+  sell: '/sell',
+  favorited: '/favorited',
+  appointments: '/appointments',
+  dashboard: {
+    root: '/dashboard',
+    insight: '/dashboard/insight',
+    listings: '/dashboard/listings',
+    tenants: '/dashboard/tenants',
+    messages: '/dashboard/messages',
+  },
+  settings: '/settings',
+} as const;
 
 export const CALLBACK_URL = 'callbackUrl';

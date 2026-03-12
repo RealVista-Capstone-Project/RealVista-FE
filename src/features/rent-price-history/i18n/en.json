@@ -1,0 +1,20 @@
+{
+  "RentPriceHistory": {
+    "title": "Rent Price History for {title}",
+    "date": "Date",
+    "price": "Price",
+    "event": "Event",
+    "source": "Source",
+    "perMonth": "/mo",
+    "events": {
+      "listedForSale": "Listed for Sale",
+      "blackFriday": "Black Friday",
+      "rented": "Rented",
+      "priceChange": "Price Change"
+    },
+    "sources": {
+      "publicRecords": "Public Records",
+      "estatery": "Estatery"
+    }
+  }
+}

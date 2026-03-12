@@ -12,9 +12,23 @@ export default getRequestConfig(async ({ requestLocale }) => {
     messages: {
       // Shared segments
       ...(await import(`@/shared/segments/common/${locale}.json`)).default,
+      // UI components
+      ...(await import(`@/shared/ui/profile-dropdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/shared/ui/login-required-modal/i18n/${locale}.json`)).default,
       // Feature segments
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
       ...(await import(`@/features/auth/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/price-and-tour/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/property-about/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/property-gallery/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/property-header/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/rent-price-history/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/rental-features/i18n/${locale}.json`)).default,
+      // Screen segments
+      ...(await import(`@/screens/favorited/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/property-search/i18n/${locale}.json`)).default,
     },
   };
 });

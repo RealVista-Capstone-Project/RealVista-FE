@@ -11,6 +11,23 @@
     "signUp": "Đăng ký",
     "loginSuccess": "Đăng nhập thành công!",
     "loginFailed": "Đăng nhập thất bại",
-    "invalidCredentials": "Email hoặc mật khẩu không chính xác"
+    "invalidCredentials": "Email hoặc mật khẩu không chính xác",
+    "continueWithGoogle": "Tiếp tục với Google",
+    "loggingIn": "Đang đăng nhập...",
+    "welcomeBack": "Chào mừng trở lại",
+    "signInMessage": "Đăng nhập vào tài khoản của bạn để tiếp tục",
+    "logoutSuccess": "Đăng xuất thành công",
+    "logoutFailed": "Đăng xuất thất bại. Vui lòng thử lại.",
+    "sessionRequired": "Vui lòng đăng nhập để truy cập bảng điều khiển",
+    "continueWith": "Hoặc tiếp tục với"
+  },
+  "unauthorized": {
+    "title": "Truy cập không được phép",
+    "description": "Bạn cần đăng nhập để xem trang này.",
+    "login": "Đăng nhập",
+    "backToHome": "Về trang chủ",
+    "backToDashboard": "Quay lại Bảng điều khiển",
+    "message": "Bạn không có quyền xem trang này.",
+    "goBack": "Quay lại Trang chủ"
   }
 }

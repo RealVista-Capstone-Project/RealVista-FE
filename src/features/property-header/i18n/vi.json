@@ -1,0 +1,17 @@
+{
+  "PropertyHeader": {
+    "backToHomepage": "Về trang chủ",
+    "share": "Chia sẻ",
+    "save": "Lưu",
+    "saved": "Đã lưu",
+    "browseNearbyListings": "Xem tương tự"
+  },
+  "SharePopover": {
+    "share": "Chia sẻ",
+    "facebook": "Facebook",
+    "copyLink": "Sao chép đường dẫn",
+    "copied": "Đã sao chép!",
+    "copySuccess": "Đã sao chép đường dẫn",
+    "copyError": "Không thể sao chép đường dẫn"
+  }
+}

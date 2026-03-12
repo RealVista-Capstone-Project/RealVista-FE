@@ -1,0 +1,17 @@
+{
+  "PropertyHeader": {
+    "backToHomepage": "Back to homepage",
+    "share": "Share",
+    "save": "Save",
+    "saved": "Saved",
+    "browseNearbyListings": "Browse nearby listings"
+  },
+  "SharePopover": {
+    "share": "Share",
+    "facebook": "Facebook",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "copySuccess": "Link copied to clipboard",
+    "copyError": "Failed to copy link"
+  }
+}

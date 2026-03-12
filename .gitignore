@@ -42,5 +42,11 @@ yarn-error.log*
 next-env.d.ts
 
 /.claude 
-/docs
+docs
+.bead/
+.beads/
+.spikes/
+history/
 
+# bv (beads viewer) local config and caches
+.bv/

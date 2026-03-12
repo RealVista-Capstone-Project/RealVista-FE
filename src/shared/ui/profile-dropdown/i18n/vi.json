@@ -1,0 +1,10 @@
+{
+  "Profile": {
+    "profile": "Hồ sơ của tôi",
+    "help": "Trợ giúp",
+    "logout": "Đăng xuất",
+    "loggingOut": "Đang đăng xuất...",
+    "logoutSuccess": "Đăng xuất thành công",
+    "logoutFailed": "Lỗi đăng xuất. Vui lòng thử lại"
+  }
+}

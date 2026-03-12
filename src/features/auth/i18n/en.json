@@ -11,6 +11,23 @@
     "signUp": "Sign up",
     "loginSuccess": "Login successful!",
     "loginFailed": "Login failed",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "continueWithGoogle": "Continue with Google",
+    "loggingIn": "Logging in...",
+    "welcomeBack": "Welcome back",
+    "signInMessage": "Sign in to your account to continue",
+    "logoutSuccess": "Logged out successfully",
+    "logoutFailed": "Logout failed. Please try again.",
+    "sessionRequired": "Please sign in to access the dashboard",
+    "continueWith": "Or continue with"
+  },
+  "unauthorized": {
+    "title": "Unauthorized Access",
+    "description": "You need to log in to view this page.",
+    "login": "Login",
+    "backToHome": "Back to Homepage",
+    "backToDashboard": "Back to Dashboard",
+    "message": "You do not have permission to view this page.",
+    "goBack": "Go back to Home"
   }
 }
