@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
@@ -16,7 +15,7 @@ import { useSendMessage } from '@/entities/conversation';
 import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
 import { ContactModal } from '@/widgets/contact-modal';
 import type { ContactFormData } from '@/entities/contact';
-import { bookmarkApi } from '@/entities/bookmark/api/bookmark.api';
+import { useListingFavorite } from '@/features/bookmark';
 import { useAuthSession } from '@/features/auth/model';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Button } from '@/shared/ui/button';
@@ -57,16 +56,12 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
 
-  const [isFavorite, setIsFavorite] = useState<boolean>(listing.is_favorite ?? false);
+  const { isFavorite, toggleFavorite } = useListingFavorite(
+    listing.listing_id,
+    listing.is_favorite ?? false,
+  );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
-
-  const { mutate: toggleFavorite } = useMutation({
-    mutationFn: () => bookmarkApi.toggleBookmark(listing.listing_id),
-    onSuccess: () => {
-      setIsFavorite((prev) => !prev);
-    },
-  });
 
   const handleFavorite = () => {
     if (!session?.user) {
