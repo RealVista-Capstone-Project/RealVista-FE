@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { Heart } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
@@ -13,18 +16,32 @@ import { useSendMessage } from '@/entities/conversation';
 import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
 import { ContactModal } from '@/widgets/contact-modal';
 import type { ContactFormData } from '@/entities/contact';
+import { bookmarkApi } from '@/entities/bookmark/api/bookmark.api';
+import { getAuthToken } from '@/shared/lib/auth/get-auth-token';
+import { useAuthSession } from '@/features/auth/model';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
+import { Button } from '@/shared/ui/button';
 import { SimilarListings } from '@/widgets/similar-listings';
 import { BookTourModal } from '@/features/price-and-tour/ui/book-tour-modal';
 import { useRouter, useParams } from 'next/navigation';
 import { useChatWindowStore } from '@/entities/contact';
-import { useAuthSession, isAuthenticated } from '@/features/auth/model';
+import { isAuthenticated } from '@/features/auth/model';
 import { unwrapApiResponse } from '@/shared/types/api';
 import type { SendMessageResponse } from '@/entities/conversation/model/types';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/shared/ui/dialog/dialog';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -44,9 +61,56 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
 
+  const [isFavorite, setIsFavorite] = useState<boolean>(listing.is_favorite ?? false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
+  const t = useTranslations('PropertyCard');
+
+  // The listing is fetched server-side (no auth token) so is_favorite is always false
+  // from SSR. Re-fetch on client mount using async getAuthToken() to get a fresh token
+  // (getAuthTokenSync() may be null on first mount since AuthTokenProvider hasn't run yet).
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getAuthToken();
+        if (!token) return; // Not logged in, keep isFavorite = false
+        const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8080/api/v1';
+        const res = await fetch(`${apiUrl}/listings/${listing.listing_id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.data?.is_favorite !== undefined) {
+          setIsFavorite(data.data.is_favorite);
+        }
+      } catch {
+        /* ignore – user may be unauthenticated */
+      }
+    })();
+  }, [listing.listing_id]);
+
+  const { mutate: toggleFavorite } = useMutation({
+    mutationFn: () => bookmarkApi.toggleBookmark(listing.listing_id),
+    onSuccess: () => {
+      setIsFavorite((prev) => !prev);
+    },
+  });
+
   const handleFavorite = () => {
-    // Toggle favorite
-    console.log('Toggle favorite');
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
+    if (isFavorite) {
+      setShowUnfavoriteConfirm(true);
+    } else {
+      toggleFavorite();
+    }
+  };
+
+  const handleConfirmUnfavorite = () => {
+    setShowUnfavoriteConfirm(false);
+    toggleFavorite();
   };
 
   const handleBrowseNearby = () => {
@@ -107,10 +171,11 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const handleRequestTour = () => {
     if (!session) {
-      toast.error(t('loginRequired'));
+      setShowLoginModal(true);
       return;
     }
     setIsBookTourOpen(true);
+    
   };
 
   const formattedPrice = formatVND(property.price);
@@ -121,7 +186,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         <PropertyHeader
           property={property}
           onFavorite={handleFavorite}
-          isFavorite={false}
+          isFavorite={isFavorite}
           onBrowseNearby={handleBrowseNearby}
         />
 
@@ -133,7 +198,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             on3DTour={handle3DTour}
             onVideo={handleVideo}
             onFavorite={handleFavorite}
-            isFavorite={false}
+            isFavorite={isFavorite}
           />
         </div>
 
@@ -231,6 +296,31 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         isOpen={isBookTourOpen}
         onClose={() => setIsBookTourOpen(false)}
       />
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <Dialog open={showUnfavoriteConfirm} onOpenChange={setShowUnfavoriteConfirm}>
+        <DialogContent className='max-w-sm p-8'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2'>
+              <Heart className='h-5 w-5 fill-purple-100 text-main-primary' strokeWidth={2} />
+              {t('confirmUnfavoriteTitle')}
+            </DialogTitle>
+            <DialogDescription>{t('confirmUnfavoriteMessage')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='mt-6 gap-2'>
+            <DialogClose asChild>
+              <Button variant='outline' className='flex-1 pt-2'>
+                {t('cancel')}
+              </Button>
+            </DialogClose>
+            <Button
+              onClick={handleConfirmUnfavorite}
+              className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white border-0'
+            >
+              {t('unfavorite')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { AdvancedSearchRequest, ListingSearchResponse, PageResponse } from '@/shared/types/search';
+import { getAuthToken } from '@/shared/lib/auth/get-auth-token';
 
 // Configured via environment variable
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8080/api/v1';
@@ -12,8 +13,6 @@ export class SearchAPI {
     page: number = 0,
     size: number = 12
   ): Promise<PageResponse<ListingSearchResponse>> {
-
-
     try {
       // Build query params from request
       const params = new URLSearchParams();
@@ -54,15 +53,14 @@ export class SearchAPI {
 
       const url = `${API_BASE_URL}/listings/search?${params.toString()}`;
 
+      const token = await getAuthToken();
+      const headers: Record<string, string> = { Accept: 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers,
       });
-
-
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -90,7 +88,7 @@ export class SearchAPI {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ ...request, name }),
     });
@@ -106,7 +104,7 @@ export class SearchAPI {
   static async getSavedSearches(token: string): Promise<any[]> {
     const response = await fetch(`${API_BASE_URL}/saved-searches`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -124,7 +122,7 @@ export class SearchAPI {
     const response = await fetch(`${API_BASE_URL}/saved-searches/${id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 

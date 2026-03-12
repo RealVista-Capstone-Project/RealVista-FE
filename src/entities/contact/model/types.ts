@@ -20,6 +20,7 @@ export interface ContactFormData {
 export interface ChatListingData {
   id: string;
   title: string;
+  slug?: string;
   image: string;
   price: number;
   currency?: string;

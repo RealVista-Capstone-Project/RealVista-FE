@@ -6,6 +6,27 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
+import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/shared/ui/dialog/dialog';
+
+export interface ListingAttribute {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  icon: string | null;
+  unit: string | null;
+  value_number: number | null;
+  value_text: string | null;
+  value_boolean: boolean | null;
+}
 
 export interface RealVistaListingCardProps {
   id: string;
@@ -14,12 +35,14 @@ export interface RealVistaListingCardProps {
   address: string;
   price: number;
   currency?: string;
-  beds: number;
-  bathrooms: number;
-  area: number;
+  beds?: number;
+  bathrooms?: number;
+  area?: number;
   areaUnit?: string;
   isPopular?: boolean;
   isFavorite?: boolean;
+  statusTag?: 'SOLD' | 'RENTED';
+  attributes?: ListingAttribute[];
   variant?: 'grid' | 'list';
   listingType?: 'RENT' | 'SALE';
   onToggleFavorite?: (id: string) => void;
@@ -33,12 +56,14 @@ export function RealVistaListingCard({
   title,
   address,
   price,
-  beds,
-  bathrooms,
-  area,
+  beds = 0,
+  bathrooms = 0,
+  area = 0,
   areaUnit = 'm²',
   isPopular = false,
   isFavorite = false,
+  statusTag,
+  attributes,
   variant = 'grid',
   listingType = 'RENT',
   onToggleFavorite,
@@ -48,13 +73,26 @@ export function RealVistaListingCard({
   const t = useTranslations('PropertyCard');
 
   const [imgError, setImgError] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const isUnavailable = !!statusTag;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isFavorite) {
+      setIsConfirmOpen(true);
+    } else {
+      onToggleFavorite?.(id);
+    }
+  };
+
+  const handleConfirmUnfavorite = () => {
+    setIsConfirmOpen(false);
     onToggleFavorite?.(id);
   };
 
   const handleCardClick = () => {
+    if (isUnavailable) return;
     onClick?.(id);
   };
 
@@ -92,32 +130,71 @@ export function RealVistaListingCard({
     </svg>
   );
 
-  // Shared Property Specs row
-  const PropertySpecs = () => (
-    <div className='flex items-center gap-4'>
-      <div className='flex items-center gap-1.5'>
-        <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
-        <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-          {beds} {t('beds')}
-        </span>
-      </div>
-      <div className='flex items-center gap-1.5'>
-        <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
-        <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-          {bathrooms} {t('bathrooms')}
-        </span>
-      </div>
-      <div className='flex items-center gap-1.5'>
-        <AreaIcon />
-        <span className='text-sm font-normal leading-[1.4] text-grey-500'>
-          {area}
-          {areaUnit}
-        </span>
-      </div>
-    </div>
-  );
+  // Shared Property Specs row — dynamic attrs when available, fallback to beds/bath/area
+  const PropertySpecs = () => {
+    if (attributes && attributes.length > 0) {
+      const visible = attributes
+        .filter((attr) => {
+          if (attr.value_boolean !== null && attr.value_boolean !== undefined)
+            return attr.value_boolean === true;
+          if (attr.value_number !== null && attr.value_number !== undefined) return true;
+          if (attr.value_text !== null && attr.value_text !== undefined) return true;
+          return false;
+        })
+        .slice(0, 3);
 
-  // Shared Favorite Button
+      return (
+        <div className='flex flex-wrap items-center gap-3'>
+          {visible.map((attr) => (
+            <div key={attr.attribute_id} className='flex items-center gap-1.5'>
+              {attr.icon && (
+                <AttributeIcon
+                  iconName={attr.icon}
+                  className='h-5 w-5 text-main-primary'
+                  strokeWidth={2.3}
+                />
+              )}
+              <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+                {attr.value_boolean === true
+                  ? attr.attribute_name
+                  : attr.value_text !== null && attr.value_text !== undefined
+                    ? attr.value_text
+                    : [attr.value_number, attr.attribute_name].filter(Boolean).join(' ')}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Fallback: fixed beds / bathrooms / area — only shown when values are explicitly provided
+    if (!beds && !bathrooms && !area) return null;
+    return (
+      <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-1.5'>
+          <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+          <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            {beds} {t('beds')}
+          </span>
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+          <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            {bathrooms} {t('bathrooms')}
+          </span>
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <AreaIcon />
+          <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            {area}
+            {areaUnit}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  // Shared Favorite Button — red heart when favorited
   const FavoriteButton = () => (
     <Button
       onClick={handleFavoriteClick}
@@ -127,10 +204,44 @@ export function RealVistaListingCard({
       size='icon'
     >
       <Heart
-        className={cn('h-5 w-5 text-main-primary', isFavorite && 'fill-main-primary')}
+        className={cn('h-5 w-5', isFavorite ? 'fill-red-500 text-red-500' : 'text-main-primary')}
         strokeWidth={2.3}
       />
     </Button>
+  );
+
+  // Shared Status Tag (SOLD / RENTED)
+  const StatusTag = ({
+    marginClass,
+    paddingClass,
+  }: {
+    marginClass: string;
+    paddingClass: string;
+  }) => (
+    <div className={cn('relative', marginClass)}>
+      <div
+        className={cn(
+          'bg-red-500 rounded-tl-lg rounded-tr-lg rounded-br-lg text-xl font-bold text-white py-1.5 pr-5',
+          paddingClass
+        )}
+      >
+        {statusTag}
+      </div>
+      <div className='absolute left-0 top-full h-1 w-1'>
+        <svg
+          width='8'
+          height='8'
+          viewBox='0 0 8 8'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+          preserveAspectRatio='none'
+          className='block'
+          style={{ overflow: 'visible' }}
+        >
+          <path d='M8 8L0 0H8V8Z' fill='#991b1b' />
+        </svg>
+      </div>
+    </div>
   );
 
   // Shared Popular Badge
@@ -178,119 +289,178 @@ export function RealVistaListingCard({
       </div>
     ) : null;
 
+  // ── Confirm unfavorite dialog (shared between variants) ──
+  const confirmDialog = (
+    <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+      <DialogContent className='max-w-sm p-8' onClick={(e) => e.stopPropagation()}>
+        <DialogHeader>
+          <DialogTitle className='flex items-center gap-2'>
+            <Heart className='h-5 w-5 fill-purple-100 text-main-primary' strokeWidth={2} />
+            {t('confirmUnfavoriteTitle')}
+          </DialogTitle>
+          <DialogDescription>{t('confirmUnfavoriteMessage')}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className='mt-6 gap-2'>
+          <DialogClose asChild>
+            <Button variant='outline' className='flex-1 pt-2'>
+              {t('cancel')}
+            </Button>
+          </DialogClose>
+          <Button
+            onClick={handleConfirmUnfavorite}
+            className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white border-0'
+          >
+            {t('unfavorite')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   // ── List variant ──
   if (variant === 'list') {
     return (
-      <div
-        className={cn(
-          'flex rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md overflow-hidden',
-          onClick && 'cursor-pointer',
-          className
-        )}
-        onClick={handleCardClick}
-      >
-        {/* Image – fixed width */}
-        <div className='relative w-[280px] min-h-[200px] shrink-0'>
-          <Image src={image} alt={title} fill className='object-cover' sizes='280px' />
-          <PopularBadge />
-        </div>
+      <>
+        <div
+          className={cn(
+            'relative flex rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md overflow-hidden',
+            !isUnavailable && onClick && 'cursor-pointer',
+            isUnavailable && 'cursor-default',
+            className
+          )}
+          onClick={handleCardClick}
+        >
+          {/* Unavailable overlay */}
+          {isUnavailable && (
+            <div className='absolute inset-0 rounded-lg bg-white/60 z-[5] pointer-events-none' />
+          )}
 
-        {/* Details */}
-        <div className='flex flex-1 flex-col justify-between p-5'>
-          {/* Top: Price + Favorite */}
-          <div>
-            <div className='mb-2 flex items-start justify-between'>
-              <div className='flex items-baseline gap-1'>
-                <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
-                  {formatVND(price)}
-                </span>
-                {listingType === 'RENT' && (
-                  <span className='text-sm font-normal leading-[1.5] text-grey-500'>
-                    {t('perMonth')}
-                  </span>
+          {/* Image – fixed width */}
+          <div className='relative w-[280px] min-h-[200px] shrink-0'>
+            <Image src={image} alt={title} fill className='object-cover' sizes='280px' />
+            <PopularBadge />
+          </div>
+
+          {/* Details */}
+          <div
+            className={cn(
+              'flex flex-1 flex-col justify-between p-5',
+              isUnavailable && 'relative z-[6]'
+            )}
+          >
+            {/* Top: Price + Favorite */}
+            <div>
+              <div className='mb-2 flex items-start justify-between'>
+                {isUnavailable ? (
+                  <StatusTag marginClass='-ml-5' paddingClass='pl-6' />
+                ) : (
+                  <div className='flex items-baseline gap-1'>
+                    <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
+                      {formatVND(price)}
+                    </span>
+                    {listingType === 'RENT' && (
+                      <span className='text-sm font-normal leading-[1.5] text-grey-500'>
+                        {t('perMonth')}
+                      </span>
+                    )}
+                  </div>
                 )}
+                <FavoriteButton />
               </div>
-              <FavoriteButton />
+
+              {/* Title */}
+              <h3 className='mb-1 text-lg font-bold leading-[1.4] tracking-[-0.5px] text-main-black truncate'>
+                {title}
+              </h3>
+
+              {/* Address */}
+              <p className='text-sm font-normal leading-[1.5] text-grey-500 line-clamp-1'>
+                {address}
+              </p>
             </div>
 
-            {/* Title */}
-            <h3 className='mb-1 text-lg font-bold leading-[1.4] tracking-[-0.5px] text-main-black truncate'>
-              {title}
-            </h3>
-
-            {/* Address */}
-            <p className='text-sm font-normal leading-[1.5] text-grey-500 line-clamp-1'>
-              {address}
-            </p>
-          </div>
-
-          {/* Bottom: Specs */}
-          <div className='mt-3 border-t border-purple-92 pt-3'>
-            <PropertySpecs />
+            {/* Bottom: Specs */}
+            <div className='mt-3 border-t border-purple-92 pt-3'>
+              <PropertySpecs />
+            </div>
           </div>
         </div>
-      </div>
+        {confirmDialog}
+      </>
     );
   }
 
   // ── Grid variant (default) ──
   return (
-    <div
-      className={cn(
-        'rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md flex flex-col h-full',
-        onClick && 'cursor-pointer',
-        className
-      )}
-      onClick={handleCardClick}
-    >
-      {/* Property Image */}
-      <div className='relative aspect-[16/10] rounded-t-lg bg-gray-100'>
-        <Image
-          src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image' : image}
-          alt={title}
-          fill
-          className='rounded-t-lg object-cover'
-          sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-          onError={() => setImgError(true)}
-        />
-        <PopularBadge />
-      </div>
+    <>
+      <div
+        className={cn(
+          'relative rounded-lg border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md flex flex-col h-full',
+          !isUnavailable && onClick && 'cursor-pointer',
+          isUnavailable && 'cursor-default',
+          className
+        )}
+        onClick={handleCardClick}
+      >
+        {/* Unavailable overlay */}
+        {isUnavailable && (
+          <div className='absolute inset-0 rounded-lg bg-white/60 z-[5] pointer-events-none' />
+        )}
 
-      {/* Property Details */}
-      <div className='p-6 flex-1 flex flex-col'>
-        {/* Price and Favorite */}
-        <div className='mb-3 flex items-center justify-between'>
-          <div className='flex items-baseline gap-1'>
-            <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
-              {formatVND(price)}
-            </span>
-            {listingType === 'RENT' && (
-              <span className='text-base font-normal leading-[1.5] text-grey-500'>
-                {t('perMonth')}
-              </span>
+        {/* Property Image */}
+        <div className='relative aspect-[16/10] rounded-t-lg bg-gray-100'>
+          <Image
+            src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image' : image}
+            alt={title}
+            fill
+            className='rounded-t-lg object-cover'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+            onError={() => setImgError(true)}
+          />
+          <PopularBadge />
+        </div>
+
+        {/* Property Details */}
+        <div className={cn('p-6 flex-1 flex flex-col', isUnavailable && 'relative z-[6]')}>
+          {/* Price and Favorite */}
+          <div className='mb-3 flex items-center justify-between'>
+            {isUnavailable ? (
+              <StatusTag marginClass='-ml-8' paddingClass='pl-9' />
+            ) : (
+              <div className='flex items-baseline gap-1'>
+                <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
+                  {formatVND(price)}
+                </span>
+                {listingType === 'RENT' && (
+                  <span className='text-base font-normal leading-[1.5] text-grey-500'>
+                    {t('perMonth')}
+                  </span>
+                )}
+              </div>
             )}
+            <FavoriteButton />
           </div>
-          <FavoriteButton />
-        </div>
 
-        {/* Title */}
-        <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-black truncate'>
-          {title}
-        </h3>
+          {/* Title */}
+          <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-black truncate'>
+            {title}
+          </h3>
 
-        {/* Address */}
-        <p className='mb-4 text-base font-normal leading-[1.5] text-grey-500 line-clamp-2 min-h-[48px]'>
-          {address}
-        </p>
+          {/* Address */}
+          <p className='mb-4 text-base font-normal leading-[1.5] text-grey-500 line-clamp-2 min-h-[48px]'>
+            {address}
+          </p>
 
-        {/* Divider Line */}
-        <div className='mb-4 h-[1px] bg-purple-92 mt-auto' />
+          {/* Divider Line */}
+          <div className='mb-4 h-[1px] bg-purple-92 mt-auto' />
 
-        {/* Property Specs */}
-        <div className='flex items-center justify-center'>
-          <PropertySpecs />
+          {/* Property Specs */}
+          <div className='flex items-center justify-center'>
+            <PropertySpecs />
+          </div>
         </div>
       </div>
-    </div>
+      {confirmDialog}
+    </>
   );
 }
