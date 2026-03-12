@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings, User, CreditCard, Trash2, Plus, ChevronRight, ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Settings, User, CreditCard, Trash2, Plus, ChevronRight, ChevronDown, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
@@ -22,6 +23,7 @@ import type { CustomerProfile } from '@/entities/customer-profile/model/types';
 type Tab = 'profile' | 'settings' | 'subscription';
 
 export function SettingsPage() {
+  const t = useTranslations('Settings');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -104,18 +106,18 @@ export function SettingsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userQueries.me().queryKey });
       setIsEditingProfile(false);
-      toast.success('Profile updated successfully');
+      toast.success(t('toast.profileUpdated'));
     },
-    onError: () => toast.error('Failed to update profile'),
+    onError: () => toast.error(t('toast.profileUpdateFailed')),
   });
 
   const updateSettingsMutation = useMutation({
     mutationFn: (data: UpdateSettingPreferenceData) => settingPreferenceApi.update(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: settingPreferenceQueries.me().queryKey });
-      toast.success('Settings saved');
+      toast.success(t('toast.settingsSaved'));
     },
-    onError: () => toast.error('Failed to save settings'),
+    onError: () => toast.error(t('toast.settingsFailed')),
   });
 
   const createProfileMutation = useMutation({
@@ -124,27 +126,27 @@ export function SettingsPage() {
       queryClient.invalidateQueries({ queryKey: customerProfileQueries.me().queryKey });
       setShowAddProfile(false);
       setNewProfileName('');
-      toast.success('Profile created');
+      toast.success(t('toast.profileCreated'));
     },
-    onError: () => toast.error('Failed to create profile'),
+    onError: () => toast.error(t('toast.profileCreateFailed')),
   });
 
   const deleteProfileMutation = useMutation({
     mutationFn: (profileId: string) => customerProfileApi.delete(profileId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: customerProfileQueries.me().queryKey });
-      toast.success('Profile deleted');
+      toast.success(t('toast.profileDeleted'));
     },
-    onError: () => toast.error('Failed to delete profile'),
+    onError: () => toast.error(t('toast.profileDeleteFailed')),
   });
 
   const switchProfileMutation = useMutation({
     mutationFn: (profileId: string) => customerProfileApi.switchActive(profileId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: customerProfileQueries.me().queryKey });
-      toast.success('Active profile switched');
+      toast.success(t('toast.profileSwitched'));
     },
-    onError: () => toast.error('Failed to switch profile'),
+    onError: () => toast.error(t('toast.profileSwitchFailed')),
   });
 
   const changePasswordMutation = useMutation({
@@ -153,18 +155,18 @@ export function SettingsPage() {
     onSuccess: () => {
       setIsChangingPassword(false);
       setChangePasswordForm({ current: '', next: '', confirm: '' });
-      toast.success('Password changed successfully');
+      toast.success(t('toast.passwordChanged'));
     },
-    onError: () => toast.error('Current password is incorrect or invalid'),
+    onError: () => toast.error(t('toast.passwordChangeFailed')),
   });
 
   const deleteAccountMutation = useMutation({
     mutationFn: () => userApi.deleteAccount(me!.user_id),
     onSuccess: () => {
-      toast.success('Account deleted');
+      toast.success(t('toast.accountDeleted'));
       signOut({ callbackUrl: '/' });
     },
-    onError: () => toast.error('Failed to delete account'),
+    onError: () => toast.error(t('toast.accountDeleteFailed')),
   });
 
   const handleSaveProfile = () => {
@@ -188,9 +190,9 @@ export function SettingsPage() {
   };
 
   const tabs: { id: Tab; label: string; icon: typeof User }[] = [
-    { id: 'profile', label: 'My Account', icon: User },
-    { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'subscription', label: 'Subscription', icon: CreditCard },
+    { id: 'profile', label: t('tabs.profile'), icon: User },
+    { id: 'settings', label: t('tabs.settings'), icon: Settings },
+    { id: 'subscription', label: t('tabs.subscription'), icon: CreditCard },
   ];
 
   return (
@@ -223,23 +225,23 @@ export function SettingsPage() {
             {/* Profile Management */}
             <section className='bg-white rounded-xl border border-border p-6'>
               <div className='flex items-center justify-between mb-2'>
-                <h2 className='text-base font-semibold text-main-black'>Profile management</h2>
+                <h2 className='text-base font-semibold text-main-black'>{t('profileManagement.title')}</h2>
                 {!showAddProfile && (
                   <Button
                     size='sm'
                     onClick={() => setShowAddProfile(true)}
                     className='bg-main-primary text-white hover:bg-main-primary/90 h-8 px-3 text-xs'
                   >
-                    Add profile
+                    {t('profileManagement.addButton')}
                   </Button>
                 )}
               </div>
               <p className='text-sm text-grey-500 mb-4'>
-                Each profile keeps its own saved searches and preferences.
+                {t('profileManagement.description')}
               </p>
 
               {profilesLoading ? (
-                <div className='text-sm text-grey-400'>Loading profiles...</div>
+                <div className='text-sm text-grey-400'>{t('profileManagement.loading')}</div>
               ) : (
                 <div className='space-y-2'>
                   {profiles.map((profile: CustomerProfile) => (
@@ -253,11 +255,11 @@ export function SettingsPage() {
                         </div>
                         <div className='flex items-center gap-2'>
                           <span className='text-sm font-medium text-main-black'>
-                            {profile.profile_name?.trim() || 'Default Profile'}
+                            {profile.profile_name?.trim() || t('profileManagement.defaultName')}
                           </span>
                           {profile.is_active && (
                             <span className='text-xs text-main-primary font-medium bg-purple-98 px-2 py-0.5 rounded-full'>
-                              Active
+                              {t('profileManagement.activeBadge')}
                             </span>
                           )}
                         </div>
@@ -265,14 +267,15 @@ export function SettingsPage() {
                       <div className='flex items-center gap-2'>
                         {!profile.is_active && (
                           <>
-                            <Button
-                              variant='outline'
-                              size='sm'
+                            <button
+                              type='button'
                               onClick={() => switchProfileMutation.mutate(profile.customer_profile_id)}
                               disabled={switchProfileMutation.isPending}
+                              className='text-grey-400 hover:text-main-primary transition-colors disabled:opacity-50'
+                              aria-label={t('profileManagement.switchButton')}
                             >
-                              Switch
-                            </Button>
+                              <RefreshCw className='h-4 w-4' />
+                            </button>
                             <button
                               type='button'
                               onClick={() => deleteProfileMutation.mutate(profile.customer_profile_id)}
@@ -293,7 +296,7 @@ export function SettingsPage() {
               {showAddProfile && (
                 <div className='mt-4 flex items-center gap-2'>
                   <Input
-                    placeholder='New profile name'
+                    placeholder={t('profileManagement.namePlaceholder')}
                     value={newProfileName}
                     onChange={(e) => setNewProfileName(e.target.value)}
                     onKeyDown={(e) => {
@@ -310,14 +313,14 @@ export function SettingsPage() {
                     disabled={!newProfileName.trim() || createProfileMutation.isPending}
                   >
                     <Plus className='h-4 w-4' />
-                    Add
+                    {t('profileManagement.addConfirm')}
                   </Button>
                   <Button
                     size='sm'
                     variant='ghost'
                     onClick={() => { setShowAddProfile(false); setNewProfileName(''); }}
                   >
-                    Cancel
+                    {t('profileManagement.cancel')}
                   </Button>
                 </div>
               )}
@@ -326,26 +329,26 @@ export function SettingsPage() {
             {/* My Account */}
             <section className='bg-white rounded-xl border border-border p-6'>
               <div className='flex items-center justify-between mb-6'>
-                <h2 className='text-base font-semibold text-main-black'>My Account</h2>
+                <h2 className='text-base font-semibold text-main-black'>{t('myAccount.title')}</h2>
                 {!isEditingProfile && (
                   <Button
                     size='sm'
                     className='bg-main-primary text-white hover:bg-main-primary/90 h-8 px-3 text-xs'
                     onClick={() => setIsEditingProfile(true)}
                   >
-                    Update Profile
+                    {t('myAccount.updateButton')}
                   </Button>
                 )}
               </div>
 
               {meLoading ? (
-                <div className='text-sm text-grey-400'>Loading...</div>
+                <div className='text-sm text-grey-400'>{t('myAccount.loading')}</div>
               ) : (
                 <div className='space-y-5'>
                   {/* Avatar */}
                   <div className='flex items-start gap-6'>
                     <div className='flex flex-col gap-2'>
-                      <Label className='text-sm text-grey-500'>Avatar</Label>
+                      <Label className='text-sm text-grey-500'>{t('myAccount.avatar')}</Label>
                       <div className='flex size-[72px] items-center justify-center rounded-full bg-grey-100'>
                         {me?.avatar_url ? (
                           <Image
@@ -361,10 +364,10 @@ export function SettingsPage() {
                       </div>
                       <div className='flex gap-2'>
                         <Button variant='default' size='sm' className='bg-main-primary text-white hover:bg-main-primary/90'>
-                          Upload
+                          {t('myAccount.upload')}
                         </Button>
                         <Button variant='outline' size='sm'>
-                          Remove
+                          {t('myAccount.remove')}
                         </Button>
                       </div>
                     </div>
@@ -372,26 +375,26 @@ export function SettingsPage() {
                     <div className='flex-1 grid grid-cols-2 gap-4'>
                       <div className='space-y-2'>
                         <Label htmlFor='firstName' className='text-sm text-grey-500'>
-                          First Name
+                          {t('myAccount.firstName')}
                         </Label>
                         <Input
                           id='firstName'
                           value={profileForm.firstName}
                           onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
-                          placeholder='First name'
+                          placeholder={t('myAccount.firstNamePlaceholder')}
                           readOnly={!isEditingProfile}
                           className={!isEditingProfile ? 'bg-grey-50' : ''}
                         />
                       </div>
                       <div className='space-y-2'>
                         <Label htmlFor='lastName' className='text-sm text-grey-500'>
-                          Last Name
+                          {t('myAccount.lastName')}
                         </Label>
                         <Input
                           id='lastName'
                           value={profileForm.lastName}
                           onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
-                          placeholder='Last name'
+                          placeholder={t('myAccount.lastNamePlaceholder')}
                           readOnly={!isEditingProfile}
                           className={!isEditingProfile ? 'bg-grey-50' : ''}
                         />
@@ -402,14 +405,14 @@ export function SettingsPage() {
                   {/* Phone */}
                   <div className='space-y-2'>
                     <Label htmlFor='phone' className='text-sm text-grey-500'>
-                      Phone Number
+                      {t('myAccount.phone')}
                     </Label>
                     <div className='relative'>
                       <Input
                         id='phone'
                         value={profileForm.phone}
                         onChange={(e) => setProfileForm((p) => ({ ...p, phone: e.target.value }))}
-                        placeholder='+1 000-000-0000'
+                        placeholder={t('myAccount.phonePlaceholder')}
                         readOnly={!isEditingProfile}
                         className={`pr-16 ${!isEditingProfile ? 'bg-grey-50' : ''}`}
                       />
@@ -417,7 +420,7 @@ export function SettingsPage() {
                         type='button'
                         className='absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-main-primary hover:underline'
                       >
-                        Verify
+                        {t('myAccount.verify')}
                       </button>
                     </div>
                   </div>
@@ -425,7 +428,7 @@ export function SettingsPage() {
                   {/* Email */}
                   <div className='space-y-2'>
                     <Label htmlFor='email' className='text-sm text-grey-500'>
-                      Email
+                      {t('myAccount.email')}
                     </Label>
                     <div className='relative'>
                       <Input
@@ -438,20 +441,20 @@ export function SettingsPage() {
                         type='button'
                         className='absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-main-primary hover:underline'
                       >
-                        Verify
+                        {t('myAccount.verify')}
                       </button>
                     </div>
                   </div>
 
                   {/* Password */}
                   <div className='space-y-2'>
-                    <Label className='text-sm text-grey-500'>Password</Label>
+                    <Label className='text-sm text-grey-500'>{t('myAccount.password')}</Label>
                     <button
                       type='button'
                       onClick={() => setIsChangingPassword((v) => !v)}
                       className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-main-black hover:bg-grey-50 transition-colors'
                     >
-                      <span>Change Password</span>
+                      <span>{t('myAccount.changePassword')}</span>
                       {isChangingPassword
                         ? <ChevronDown className='h-4 w-4 text-grey-400' />
                         : <ChevronRight className='h-4 w-4 text-grey-400' />
@@ -460,34 +463,34 @@ export function SettingsPage() {
                     {isChangingPassword && (
                       <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
                         <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>Current Password</Label>
+                          <Label className='text-sm text-grey-500'>{t('myAccount.currentPassword')}</Label>
                           <Input
                             type='password'
                             value={changePasswordForm.current}
                             onChange={(e) => setChangePasswordForm((f) => ({ ...f, current: e.target.value }))}
-                            placeholder='Enter current password'
+                            placeholder={t('myAccount.currentPasswordPlaceholder')}
                           />
                         </div>
                         <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>New Password</Label>
+                          <Label className='text-sm text-grey-500'>{t('myAccount.newPassword')}</Label>
                           <Input
                             type='password'
                             value={changePasswordForm.next}
                             onChange={(e) => setChangePasswordForm((f) => ({ ...f, next: e.target.value }))}
-                            placeholder='Min 8 chars, uppercase, lowercase, number'
+                            placeholder={t('myAccount.newPasswordPlaceholder')}
                           />
                         </div>
                         <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>Confirm New Password</Label>
+                          <Label className='text-sm text-grey-500'>{t('myAccount.confirmPassword')}</Label>
                           <Input
                             type='password'
                             value={changePasswordForm.confirm}
                             onChange={(e) => setChangePasswordForm((f) => ({ ...f, confirm: e.target.value }))}
-                            placeholder='Re-enter new password'
+                            placeholder={t('myAccount.confirmPasswordPlaceholder')}
                           />
                         </div>
                         {changePasswordForm.next && changePasswordForm.confirm && changePasswordForm.next !== changePasswordForm.confirm && (
-                          <p className='text-xs text-red-500'>Passwords do not match</p>
+                          <p className='text-xs text-red-500'>{t('myAccount.passwordMismatch')}</p>
                         )}
                         <div className='flex justify-end gap-2 pt-1'>
                           <Button
@@ -495,7 +498,7 @@ export function SettingsPage() {
                             variant='ghost'
                             onClick={() => { setIsChangingPassword(false); setChangePasswordForm({ current: '', next: '', confirm: '' }); }}
                           >
-                            Cancel
+                            {t('myAccount.cancel')}
                           </Button>
                           <Button
                             size='sm'
@@ -508,7 +511,7 @@ export function SettingsPage() {
                             }
                             className='bg-main-primary text-white hover:bg-main-primary/90'
                           >
-                            {changePasswordMutation.isPending ? 'Saving...' : 'Confirm'}
+                            {changePasswordMutation.isPending ? t('myAccount.saving') : t('myAccount.confirm')}
                           </Button>
                         </div>
                       </div>
@@ -525,14 +528,14 @@ export function SettingsPage() {
                           if (me) setProfileForm({ firstName: me.first_name ?? '', lastName: me.last_name ?? '', phone: me.phone ?? '' });
                         }}
                       >
-                        Cancel
+                        {t('myAccount.cancel')}
                       </Button>
                       <Button
                         onClick={handleSaveProfile}
                         disabled={updateMeMutation.isPending}
                         className='bg-main-primary text-white hover:bg-main-primary/90 px-8'
                       >
-                        {updateMeMutation.isPending ? 'Saving...' : 'Save changes'}
+                        {updateMeMutation.isPending ? t('myAccount.saving') : t('myAccount.saveChanges')}
                       </Button>
                     </div>
                   )}
@@ -542,8 +545,8 @@ export function SettingsPage() {
 
             {/* Linked Accounts */}
             <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-1'>Linked Accounts</h2>
-              <p className='text-sm text-grey-500 mb-4'>We use this to let you sign in easily.</p>
+              <h2 className='text-base font-semibold text-main-black mb-1'>{t('linkedAccounts.title')}</h2>
+              <p className='text-sm text-grey-500 mb-4'>{t('linkedAccounts.description')}</p>
               <div className='flex items-center justify-between py-3 border-b border-border'>
                 <div className='flex items-center gap-3'>
                   <svg className='h-5 w-5' viewBox='0 0 24 24'>
@@ -564,21 +567,21 @@ export function SettingsPage() {
                       fill='#EA4335'
                     />
                   </svg>
-                  <span className='text-sm text-main-black'>Sign in with Google</span>
+                  <span className='text-sm text-main-black'>{t('linkedAccounts.google')}</span>
                 </div>
                 <Button variant='outline' size='sm'>
-                  Remove
+                  {t('linkedAccounts.remove')}
                 </Button>
               </div>
             </section>
 
             {/* Delete Account */}
             <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-1'>Delete Account</h2>
-              <p className='text-sm text-grey-500 mb-4'>Delete your account and all the data</p>
+              <h2 className='text-base font-semibold text-main-black mb-1'>{t('deleteAccount.title')}</h2>
+              <p className='text-sm text-grey-500 mb-4'>{t('deleteAccount.description')}</p>
               <div className='flex justify-end'>
-                <Button variant='destructive' size='sm' onClick={() => setShowDeleteDialog(true)}>
-                  Delete Account
+                <Button variant='outline' size='sm' className='border-destructive text-destructive hover:bg-destructive/5' onClick={() => setShowDeleteDialog(true)}>
+                  {t('deleteAccount.button')}
                 </Button>
               </div>
             </section>
@@ -586,21 +589,21 @@ export function SettingsPage() {
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
               <DialogContent className='max-w-sm'>
                 <DialogHeader className='space-y-3'>
-                  <DialogTitle>Delete Account</DialogTitle>
+                  <DialogTitle>{t('deleteAccount.dialogTitle')}</DialogTitle>
                   <DialogDescription className='leading-relaxed'>
-                    This action cannot be undone. Your account and all associated data will be permanently deleted.
+                    {t('deleteAccount.dialogDescription')}
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className='mt-2'>
                   <Button variant='ghost' onClick={() => setShowDeleteDialog(false)}>
-                    Cancel
+                    {t('deleteAccount.cancel')}
                   </Button>
                   <Button
                     variant='destructive'
                     onClick={() => deleteAccountMutation.mutate()}
                     disabled={deleteAccountMutation.isPending}
                   >
-                    {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete Account'}
+                    {deleteAccountMutation.isPending ? t('deleteAccount.deleting') : t('deleteAccount.confirm')}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -611,16 +614,16 @@ export function SettingsPage() {
         {activeTab === 'settings' && (
           <div className='space-y-6'>
             <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-6'>Notifications</h2>
+              <h2 className='text-base font-semibold text-main-black mb-6'>{t('notifications.title')}</h2>
 
               {settingsLoading ? (
-                <div className='text-sm text-grey-400'>Loading...</div>
+                <div className='text-sm text-grey-400'>{t('notifications.loading')}</div>
               ) : (
                 <div className='space-y-5'>
                   {[
-                    { key: 'inAppEnabled' as const, label: 'In-App Notifications', desc: 'Receive notifications inside the app' },
-                    { key: 'emailEnabled' as const, label: 'Email Notifications', desc: 'Receive notifications via email' },
-                    { key: 'pushEnabled' as const, label: 'Push Notifications', desc: 'Receive push notifications on your device' },
+                    { key: 'inAppEnabled' as const, label: t('notifications.inApp'), desc: t('notifications.inAppDesc') },
+                    { key: 'emailEnabled' as const, label: t('notifications.email'), desc: t('notifications.emailDesc') },
+                    { key: 'pushEnabled' as const, label: t('notifications.push'), desc: t('notifications.pushDesc') },
                   ].map(({ key, label, desc }) => (
                     <div key={key} className='flex items-center justify-between py-3 border-b border-border last:border-0'>
                       <div>
@@ -638,13 +641,13 @@ export function SettingsPage() {
             </section>
 
             <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-6'>Contact Preferences</h2>
+              <h2 className='text-base font-semibold text-main-black mb-6'>{t('contactPreferences.title')}</h2>
               <div className='space-y-5'>
                 {[
-                  { key: 'contactViaEmail' as const, label: 'Contact via Email', desc: 'Allow others to contact you via email' },
-                  { key: 'contactViaPhone' as const, label: 'Contact via Phone', desc: 'Allow others to contact you via phone' },
-                  { key: 'hidePhoneNumber' as const, label: 'Hide Phone Number', desc: 'Hide your phone number from other users' },
-                  { key: 'hideEmail' as const, label: 'Hide Email', desc: 'Hide your email address from other users' },
+                  { key: 'contactViaEmail' as const, label: t('contactPreferences.viaEmail'), desc: t('contactPreferences.viaEmailDesc') },
+                  { key: 'contactViaPhone' as const, label: t('contactPreferences.viaPhone'), desc: t('contactPreferences.viaPhoneDesc') },
+                  { key: 'hidePhoneNumber' as const, label: t('contactPreferences.hidePhone'), desc: t('contactPreferences.hidePhoneDesc') },
+                  { key: 'hideEmail' as const, label: t('contactPreferences.hideEmail'), desc: t('contactPreferences.hideEmailDesc') },
                 ].map(({ key, label, desc }) => (
                   <div key={key} className='flex items-center justify-between py-3 border-b border-border last:border-0'>
                     <div>
@@ -666,7 +669,7 @@ export function SettingsPage() {
                 disabled={updateSettingsMutation.isPending}
                 className='bg-main-primary text-white hover:bg-main-primary/90 px-8'
               >
-                {updateSettingsMutation.isPending ? 'Saving...' : 'Save changes'}
+                {updateSettingsMutation.isPending ? t('saving') : t('saveChanges')}
               </Button>
             </div>
           </div>
@@ -674,8 +677,8 @@ export function SettingsPage() {
 
         {activeTab === 'subscription' && (
           <div className='bg-white rounded-xl border border-border p-6'>
-            <h2 className='text-base font-semibold text-main-black mb-2'>Subscription</h2>
-            <p className='text-sm text-grey-500'>Subscription plans coming soon.</p>
+            <h2 className='text-base font-semibold text-main-black mb-2'>{t('subscription.title')}</h2>
+            <p className='text-sm text-grey-500'>{t('subscription.comingSoon')}</p>
           </div>
         )}
         </div>
