@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
+import { Toaster } from '@/shared/ui/sonner';
 
 /**
  * App Providers Component
@@ -40,7 +41,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <AuthTokenProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <Toaster richColors position='top-right' />
+        </QueryClientProvider>
       </AuthTokenProvider>
     </SessionProvider>
   );
