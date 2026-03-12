@@ -26,11 +26,17 @@ interface ChatMessageItemProps {
 export function ChatMessageItem({ message, onListingClick, className }: ChatMessageItemProps) {
   const { content, senderName, timestamp, isOwn, listing } = message;
 
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const formatTime = (date: Date | string | number) => {
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return '';
+    }
   };
 
   return (
