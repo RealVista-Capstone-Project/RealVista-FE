@@ -14,6 +14,7 @@ import { AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { buildListingDetailUrl } from '@/shared/lib/utils';
+import { behaviorTracker } from '@/shared/lib/analytics';
 
 export interface SimilarListingsProps {
   propertyId?: string;
@@ -49,7 +50,8 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
     });
   };
 
-  const handlePropertyClick = (slug: string) => {
+  const handlePropertyClick = (slug: string, listingId: string) => {
+    behaviorTracker.trackClick(listingId, { source_page: 'similar' });
     if (onPropertyClick) {
       onPropertyClick(slug);
     } else {
@@ -115,7 +117,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
                     {...property}
                     isFavorite={favorites.has(property.id)}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={() => handlePropertyClick(property.slug)}
+                    onClick={() => handlePropertyClick(property.slug, property.id)}
                   />
                 </div>
               ))}

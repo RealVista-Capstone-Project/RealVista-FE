@@ -19,6 +19,7 @@ import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/
 import { useHideFooter } from '@/widgets/layout';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { behaviorTracker } from '@/shared/lib/analytics';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -345,7 +346,14 @@ function BuyPageContent() {
                     attributes={listing.attributes as ListingAttribute[]}
                     isFavorite={listing.is_favorite ?? false}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={() => router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`)}
+                    onClick={() => {
+                      behaviorTracker.trackClick(listing.listing_id, {
+                        listing_type: 'SALE',
+                        price: listing.price,
+                        source_page: 'buy',
+                      });
+                      router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`);
+                    }}
                   />
                 ))}
               </div>
