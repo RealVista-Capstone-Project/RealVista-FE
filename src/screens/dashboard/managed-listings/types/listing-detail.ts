@@ -82,7 +82,7 @@ export interface ListingDetail {
   published_at?: string;
   created_at: string;
   updated_at: string;
-  
+
   property: PropertyInfo;
   location: LocationInfo;
   propertyType: PropertyTypeInfo;
@@ -90,11 +90,11 @@ export interface ListingDetail {
   agent: AgentInfo;
   attributes?: PropertyAttribute[];
   amenities?: Amenity[];
-  
+
   total_photos: number;
   total_videos: number;
   total_3d_tours: number;
-  
+
   costBreakdown?: CostBreakdown;
   is_favorite: boolean;
 }

@@ -28,6 +28,12 @@ export interface ManagedListing {
   published_at?: string;
   created_at: string;
   updated_at: string;
+  // Address fields
+  street_address?: string;
+  ward_name?: string;
+  district_name?: string;
+  city_name?: string;
+  full_address?: string;
   // Additional fields from property for display
   property?: {
     property_id: string;

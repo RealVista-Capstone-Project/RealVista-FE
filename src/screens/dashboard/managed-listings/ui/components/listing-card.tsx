@@ -38,7 +38,7 @@ const statusConfig: Record<ListingStatus, { label: string; className: string }> 
 
 export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) {
   const status = statusConfig[listing.status];
-  const address = listing.property?.location?.address || 'No address available';
+  const address = listing.full_address || 'No address available';
   const area = listing.property?.total_area ? `${listing.property.total_area} sq m` : '';
 
   return (
