@@ -47,7 +47,7 @@ const defaultSidebarItems: SidebarMenuItem[] = [
     isActive: true,
   },
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
-  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.listings, icon: Calendar },
+  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
