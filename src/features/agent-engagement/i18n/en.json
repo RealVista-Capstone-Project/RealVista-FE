@@ -1,0 +1,35 @@
+{
+  "AgentEngagement": {
+    "detailPanel": {
+      "title": "Agent Details",
+      "contactInfo": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "serviceAreas": "Service Areas",
+      "professionalInfo": "Professional Info",
+      "experience": "Experience",
+      "yearsUnit": "{count} years",
+      "propertiesSold": "Properties Sold",
+      "engagementType": "Engagement Type",
+      "hiredDate": "Hired Date",
+      "specialties": "Specialties",
+      "about": "About",
+      "assignedProperty": "Assigned Property"
+    },
+    "listItem": {
+      "noEmail": "No email"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "common": {
+      "na": "N/A"
+    }
+  }
+}

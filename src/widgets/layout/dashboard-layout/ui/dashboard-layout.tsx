@@ -35,6 +35,8 @@ export interface DashboardLayoutProps {
     initials: string;
     avatar?: string;
   };
+  headerTitle?: string;
+  headerSubtitle?: string;
   className?: string;
 }
 
@@ -62,6 +64,8 @@ export function DashboardLayout({
   sidebarItems = defaultSidebarItems,
   logoHref = ROUTES.homePage,
   user = defaultUser,
+  headerTitle,
+  headerSubtitle,
   className,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -196,13 +200,25 @@ export function DashboardLayout({
         )}
       >
         {/* Top Nav */}
-        <header className='flex items-center justify-between bg-white px-8 py-4'>
+        <header className='flex items-center justify-between bg-white px-10 py-4'>
           {/* Left Section */}
-          <div className='flex items-center gap-4'>
-            {/* Logo Text */}
-            <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
-              RealVista
-            </span>
+          <div className='flex flex-col'>
+            {headerTitle ? (
+              <>
+                <h1 className='text-3xl font-bold leading-tight text-main-black'>
+                  {headerTitle}
+                </h1>
+                {headerSubtitle && (
+                  <p className='text-sm text-main-secondary/60 mt-0.5'>
+                    {headerSubtitle}
+                  </p>
+                )}
+              </>
+            ) : (
+              <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
+                Estatery
+              </span>
+            )}
           </div>
 
           {/* Right Actions */}

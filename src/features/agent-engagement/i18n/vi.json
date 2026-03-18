@@ -1,0 +1,35 @@
+{
+  "AgentEngagement": {
+    "detailPanel": {
+      "title": "Chi ti\u1EBFt \u0111\u1EA1i l\u00FD",
+      "contactInfo": "Th\u00F4ng tin li\u00EAn h\u1EC7",
+      "email": "Email",
+      "phone": "\u0110i\u1EC7n tho\u1EA1i",
+      "serviceAreas": "Khu v\u1EF1c ph\u1EE5c v\u1EE5",
+      "professionalInfo": "Th\u00F4ng tin chuy\u00EAn m\u00F4n",
+      "experience": "Kinh nghi\u1EC7m",
+      "yearsUnit": "{count} n\u0103m",
+      "propertiesSold": "B\u0110S \u0111\u00E3 b\u00E1n",
+      "engagementType": "Lo\u1EA1i h\u1EE3p \u0111\u1ED3ng",
+      "hiredDate": "Ng\u00E0y thu\u00EA",
+      "specialties": "Chuy\u00EAn m\u00F4n",
+      "about": "Gi\u1EDBi thi\u1EC7u",
+      "assignedProperty": "B\u0110S \u0111\u01B0\u1EE3c giao"
+    },
+    "listItem": {
+      "noEmail": "Ch\u01B0a c\u00F3 email"
+    },
+    "status": {
+      "active": "\u0110ang ho\u1EA1t \u0111\u1ED9ng",
+      "pending": "Ch\u1EDD duy\u1EC7t",
+      "completed": "Ho\u00E0n th\u00E0nh",
+      "cancelled": "\u0110\u00E3 h\u1EE7y",
+      "accepted": "\u0110\u00E3 ch\u1EA5p nh\u1EADn",
+      "rejected": "T\u1EEB ch\u1ED1i",
+      "expired": "H\u1EBFt h\u1EA1n"
+    },
+    "common": {
+      "na": "N/A"
+    }
+  }
+}

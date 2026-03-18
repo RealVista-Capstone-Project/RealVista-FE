@@ -20,6 +20,9 @@ export const ROUTES = {
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
   },
+  manageAgent: {
+    root: '/manage-agent',
+  },
   settings: '/settings',
 } as const;
 
