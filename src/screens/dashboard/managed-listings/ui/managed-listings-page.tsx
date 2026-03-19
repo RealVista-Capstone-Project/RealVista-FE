@@ -2,10 +2,12 @@
 
 import * as React from 'react';
 import { Search, Filter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useManagedListings } from '../model/use-managed-listings';
 import { ListingCard } from './components/listing-card';
-import { useListingDetail } from '../model/use-listing-detail';
+import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
+import type { ListingDetail } from '../types/listing-detail';
 
 /**
  * Managed Listings Page
@@ -23,7 +25,15 @@ export function ManagedListingsPage() {
   const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
 
   const { data: listings, isLoading, error } = useManagedListings();
-  const { data: listingDetail, isLoading: isDetailLoading } = useListingDetail(selectedListingId);
+
+  // Use centralized listing query
+  const { data: listingResponse, isLoading: isDetailLoading } = useQuery({
+    ...listingQueries.detail(selectedListingId || ''),
+    enabled: !!selectedListingId,
+  });
+
+  // Extract listing detail from response
+  const listingDetail = listingResponse?.payload.data as unknown as ListingDetail | undefined;
 
   // Filter listings based on search query
   const filteredListings = React.useMemo(() => {
