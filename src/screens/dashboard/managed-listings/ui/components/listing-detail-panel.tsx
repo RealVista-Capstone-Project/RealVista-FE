@@ -2,17 +2,17 @@ import * as React from 'react';
 import { Calendar } from 'lucide-react';
 import { PropertyGallery } from '@/features/property-gallery';
 import type { PropertyImage } from '@/entities/property';
-import type { ListingDetail } from '../../types/listing-detail';
+import type { Listing } from '@/entities/listing';
 
 interface ListingDetailPanelProps {
-  listing: ListingDetail;
+  listing: Listing;
 }
 
 export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
   const bedrooms =
-    listing.attributes?.find((a) => a.name?.toLowerCase() === 'bedrooms')?.value || '0';
+    listing.attributes?.find((a) => a.attribute_name?.toLowerCase() === 'bedrooms')?.display_value || '0';
 
-  // Map MediaDTO to PropertyImage format for PropertyGallery component
+  // Map MediaItem to PropertyImage format for PropertyGallery component
   const images: PropertyImage[] = React.useMemo(() => {
     if (!listing.media || listing.media.length === 0) return [];
 
@@ -20,9 +20,9 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
       .sort((a, b) => a.display_order - b.display_order)
       .map((media) => ({
         id: media.media_id,
-        url: media.url,
+        url: media.media_url,
         alt: listing.name,
-        type: media.media_type === 'PHOTO'
+        type: media.media_type === 'IMAGE'
           ? 'photo'
           : media.media_type === 'VIDEO'
           ? 'video'
@@ -47,7 +47,7 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
               {listing.name}
             </h1>
             <p className='text-base font-medium leading-[1.6] text-main-black/50'>
-              {listing.location?.address || 'Address not available'}
+              {listing.property?.street_address || 'Address not available'}
             </p>
           </div>
 
@@ -65,18 +65,18 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
           <div className='grid grid-cols-6 gap-6'>
             <FeatureStat
               label='Properties'
-              value={listing.property?.floors?.toString() || '46'}
+              value='46'
               icon='🏠'
             />
             <FeatureStat label='Rooms' value={bedrooms} icon='🛏️' />
             <FeatureStat
               label='Living Space'
-              value={`${listing.property?.total_area || 0} m²`}
+              value={`${listing.property?.usable_size_m2 || 0} m²`}
               icon='📐'
             />
             <FeatureStat
               label='Year Built'
-              value={listing.property?.year_built?.toString() || 'N/A'}
+              value='N/A'
               icon='📅'
             />
             <FeatureStat label='Tenants' value='12' icon='👥' />

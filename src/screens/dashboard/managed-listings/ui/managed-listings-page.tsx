@@ -7,7 +7,7 @@ import { useManagedListings } from '../model/use-managed-listings';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
-import type { ListingDetail } from '../types/listing-detail';
+import type { Listing } from '@/entities/listing';
 
 /**
  * Managed Listings Page
@@ -33,7 +33,7 @@ export function ManagedListingsPage() {
   });
 
   // Extract listing detail from response
-  const listingDetail = listingResponse?.payload.data as unknown as ListingDetail | undefined;
+  const listingDetail = listingResponse?.payload.data as Listing | undefined;
 
   // Filter listings based on search query
   const filteredListings = React.useMemo(() => {
