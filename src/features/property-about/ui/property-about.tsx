@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
-import { RentPriceHistory } from '@/features/rent-price-history';
 import { RentalFeatures } from '@/features/rental-features';
 import { PriceHistoryChart } from '@/features/listing';
 import Image from 'next/image';

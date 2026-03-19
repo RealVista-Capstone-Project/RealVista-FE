@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Calendar } from 'lucide-react';
 import { PropertyGallery } from '@/features/property-gallery';
-import type { PropertyImage } from '@/entities/property';
+import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
+import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
 
 interface ListingDetailPanelProps {
   listing: Listing;
@@ -10,32 +11,16 @@ interface ListingDetailPanelProps {
 
 export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
   const bedrooms =
-    listing.attributes?.find((a) => a.attribute_name?.toLowerCase() === 'bedrooms')?.display_value || '0';
+    listing.attributes?.find((a) => a.attribute_name?.toLowerCase() === 'bedrooms')
+      ?.display_value || '0';
 
-  // Map MediaItem to PropertyImage format for PropertyGallery component
-  const images: PropertyImage[] = React.useMemo(() => {
-    if (!listing.media || listing.media.length === 0) return [];
-
-    return listing.media
-      .sort((a, b) => a.display_order - b.display_order)
-      .map((media) => ({
-        id: media.media_id,
-        url: media.media_url,
-        alt: listing.name,
-        type: media.media_type === 'IMAGE'
-          ? 'photo'
-          : media.media_type === 'VIDEO'
-          ? 'video'
-          : '3d-tour',
-        isPrimary: media.is_primary,
-      }));
-  }, [listing.media, listing.name]);
+  const property: Property = mapListingToProperty(listing);
 
   return (
     <div className='min-h-full bg-white'>
       {/* Property Gallery - matches listing-detail-screen */}
       <div className='px-12 pt-8'>
-        <PropertyGallery images={images} />
+        <PropertyGallery images={property.images} />
       </div>
 
       {/* Content */}
@@ -44,10 +29,10 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
         <div className='mb-6 flex items-start justify-between'>
           <div className='flex flex-col gap-2'>
             <h1 className='text-[32px] font-bold leading-[1.25] tracking-[-0.32px] text-main-black'>
-              {listing.name}
+              {property.title}
             </h1>
             <p className='text-base font-medium leading-[1.6] text-main-black/50'>
-              {listing.property?.street_address || 'Address not available'}
+              {property.address || 'Address not available'}
             </p>
           </div>
 
@@ -63,22 +48,14 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
         {/* Features Stats - Aligned with Figma design */}
         <div className='mb-8 rounded-lg border border-purple-92 p-6'>
           <div className='grid grid-cols-6 gap-6'>
-            <FeatureStat
-              label='Properties'
-              value='46'
-              icon='🏠'
-            />
+            <FeatureStat label='Properties' value='46' icon='🏠' />
             <FeatureStat label='Rooms' value={bedrooms} icon='🛏️' />
             <FeatureStat
               label='Living Space'
               value={`${listing.property?.usable_size_m2 || 0} m²`}
               icon='📐'
             />
-            <FeatureStat
-              label='Year Built'
-              value='N/A'
-              icon='📅'
-            />
+            <FeatureStat label='Year Built' value='N/A' icon='📅' />
             <FeatureStat label='Tenants' value='12' icon='👥' />
             <FeatureStat label='Request' value='12' icon='📄' />
           </div>
@@ -109,7 +86,9 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
 
           {/* Table Content - Placeholder for now */}
           <div className='rounded-lg border border-purple-92 p-6'>
-            <p className='text-center text-main-black/50'>Application list will be displayed here</p>
+            <p className='text-center text-main-black/50'>
+              Application list will be displayed here
+            </p>
           </div>
         </div>
       </div>
@@ -123,7 +102,9 @@ function FeatureStat({ label, value, icon }: { label: string; value: string; ico
       <p className='text-base font-medium leading-[1.5] text-grey-500'>{label}</p>
       <div className='flex items-center gap-2'>
         <span className='text-2xl opacity-50'>{icon}</span>
-        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>{value}</p>
+        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
+          {value}
+        </p>
       </div>
     </div>
   );
