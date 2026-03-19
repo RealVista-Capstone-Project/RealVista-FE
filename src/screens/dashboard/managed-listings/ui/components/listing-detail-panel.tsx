@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Calendar } from 'lucide-react';
 import { PropertyGallery } from '@/features/property-gallery';
+import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
@@ -10,11 +11,10 @@ interface ListingDetailPanelProps {
 }
 
 export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
-  const bedrooms =
-    listing.attributes?.find((a) => a.attribute_name?.toLowerCase() === 'bedrooms')
-      ?.display_value || '0';
-
   const property: Property = mapListingToProperty(listing);
+
+  // Get dynamic attributes from listing
+  const attributes = listing.attributes ?? [];
 
   return (
     <div className='min-h-full bg-white'>
@@ -45,20 +45,43 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
           </button>
         </div>
 
-        {/* Features Stats - Aligned with Figma design */}
+        {/* Features Stats - Dynamic attributes from server */}
         <div className='mb-8 rounded-lg border border-purple-92 p-6'>
-          <div className='grid grid-cols-6 gap-6'>
-            <FeatureStat label='Properties' value='46' icon='🏠' />
-            <FeatureStat label='Rooms' value={bedrooms} icon='🛏️' />
-            <FeatureStat
-              label='Living Space'
-              value={`${listing.property?.usable_size_m2 || 0} m²`}
-              icon='📐'
-            />
-            <FeatureStat label='Year Built' value='N/A' icon='📅' />
-            <FeatureStat label='Tenants' value='12' icon='👥' />
-            <FeatureStat label='Request' value='12' icon='📄' />
-          </div>
+          {attributes.length > 0 ? (
+            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6'>
+              {attributes.map((attribute) => (
+                <div key={attribute.attribute_id} className='flex flex-col gap-4'>
+                  <p className='text-base font-medium leading-[1.5] text-grey-500'>
+                    {attribute.attribute_name}
+                  </p>
+                  <div className='flex items-center gap-2'>
+                    <AttributeIcon
+                      iconName={attribute.icon}
+                      className='size-6 text-main-black/50'
+                      strokeWidth={2}
+                    />
+                    <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
+                      {attribute.display_value}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            // Fallback when no attributes are available
+            <div className='grid grid-cols-6 gap-6'>
+              <FeatureStat label='Properties' value='N/A' icon='🏠' />
+              <FeatureStat label='Rooms' value='N/A' icon='🛏️' />
+              <FeatureStat
+                label='Living Space'
+                value={`${listing.property?.usable_size_m2 || 0} m²`}
+                icon='📐'
+              />
+              <FeatureStat label='Year Built' value='N/A' icon='📅' />
+              <FeatureStat label='Tenants' value='12' icon='👥' />
+              <FeatureStat label='Request' value='12' icon='📄' />
+            </div>
+          )}
         </div>
 
         {/* Total Applicants Section */}
