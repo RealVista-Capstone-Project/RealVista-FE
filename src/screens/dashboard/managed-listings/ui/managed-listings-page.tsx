@@ -7,6 +7,10 @@ import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
 import type { Listing } from '@/entities/listing';
+import type { ListingType } from '../types/managed-listing';
+import { cn } from '@/shared/lib/utils';
+
+type TabType = ListingType | 'ALL';
 
 /**
  * Managed Listings Page
@@ -14,6 +18,7 @@ import type { Listing } from '@/entities/listing';
  * Displays a list of properties managed by the current user.
  * Features:
  * - Property list with status badges
+ * - Tabs to filter by listing type (All, Rent, Sale)
  * - Search functionality
  * - Detailed property view
  * - Tenant information
@@ -22,6 +27,7 @@ import type { Listing } from '@/entities/listing';
 export function ManagedListingsPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
+  const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
 
   const { data: listings, isLoading, error } = useQuery(listingQueries.managed());
 
@@ -34,20 +40,35 @@ export function ManagedListingsPage() {
   // Extract listing detail from response
   const listingDetail = listingResponse?.payload.data as Listing | undefined;
 
-  // Filter listings based on search query
+  // Filter listings based on tab and search query
   const filteredListings = React.useMemo(() => {
     if (!listings) return [];
-    if (!searchQuery.trim()) return listings;
+
+    // Filter by tab
+    let tabFiltered = listings;
+    if (activeTab !== 'ALL') {
+      tabFiltered = listings.filter((listing) => listing.listing_type === activeTab);
+    }
+
+    // Filter by search query
+    if (!searchQuery.trim()) return tabFiltered;
 
     const query = searchQuery.toLowerCase();
-    return listings.filter((listing) => {
+    return tabFiltered.filter((listing) => {
       const address = listing.full_address?.toLowerCase() || '';
-      return (
-        listing.name.toLowerCase().includes(query) ||
-        address.includes(query)
-      );
+      return listing.name.toLowerCase().includes(query) || address.includes(query);
     });
-  }, [listings, searchQuery]);
+  }, [listings, activeTab, searchQuery]);
+
+  // Count listings by type
+  const listingCounts = React.useMemo(() => {
+    if (!listings) return { all: 0, rent: 0, sale: 0 };
+    return {
+      all: listings.length,
+      rent: listings.filter((l) => l.listing_type === 'RENT').length,
+      sale: listings.filter((l) => l.listing_type === 'SALE').length,
+    };
+  }, [listings]);
 
   // Select first listing by default
   React.useEffect(() => {
@@ -106,6 +127,72 @@ export function ManagedListingsPage() {
                 aria-label='Filter'
               >
                 <Filter className='h-5 w-5' strokeWidth={2} />
+              </button>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className='border-b border-purple-92/50 px-6 pt-4'>
+            <div className='flex gap-1'>
+              <button
+                type='button'
+                onClick={() => setActiveTab('ALL')}
+                className={cn(
+                  'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  activeTab === 'ALL'
+                    ? 'bg-main-primary text-white'
+                    : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                )}
+              >
+                All
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 text-xs font-bold',
+                    activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
+                  )}
+                >
+                  {listingCounts.all}
+                </span>
+              </button>
+              <button
+                type='button'
+                onClick={() => setActiveTab('RENT' as ListingType)}
+                className={cn(
+                  'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  activeTab === 'RENT'
+                    ? 'bg-main-primary text-white'
+                    : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                )}
+              >
+                For Rent
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 text-xs font-bold',
+                    activeTab === 'RENT' ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
+                  )}
+                >
+                  {listingCounts.rent}
+                </span>
+              </button>
+              <button
+                type='button'
+                onClick={() => setActiveTab('SALE' as ListingType)}
+                className={cn(
+                  'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  activeTab === 'SALE'
+                    ? 'bg-main-primary text-white'
+                    : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                )}
+              >
+                For Sale
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 text-xs font-bold',
+                    activeTab === 'SALE' ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
+                  )}
+                >
+                  {listingCounts.sale}
+                </span>
               </button>
             </div>
           </div>
