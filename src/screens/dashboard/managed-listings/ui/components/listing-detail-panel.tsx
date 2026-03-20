@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Calendar } from 'lucide-react';
 import { PropertyGallery } from '@/features/property-gallery';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
+import { RentalFeatures } from '@/features/rental-features';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
@@ -100,6 +101,13 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
         </div>
 
         <div className='mb-8 h-px w-full bg-purple-92' />
+
+        {/* Rental Features Section */}
+        {property.amenities && property.amenities.length > 0 && (
+          <div className='mb-8'>
+            <RentalFeatures property={property} />
+          </div>
+        )}
 
         {/* Applications Table */}
         <div className='flex flex-col gap-6'>
