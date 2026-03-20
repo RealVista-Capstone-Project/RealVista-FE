@@ -29,6 +29,9 @@ interface ManageAgentContextValue {
   totalElements: number;
   ITEMS_PER_PAGE: number;
   handleAgentClick: (agent: AgentEngagement) => void;
+  // Mock state helpers — replace with real mutation callbacks when BE is ready
+  updateAgentStatus: (engagementId: string, newStatus: string) => void;
+  markAgentReviewed: (engagementId: string) => void;
 }
 
 const ManageAgentContext = createContext<ManageAgentContextValue | null>(null);
@@ -38,6 +41,10 @@ export function ManageAgentProvider({ children }: { children: ReactNode }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAgent, setSelectedAgent] = useState<AgentEngagement | null>(null);
+
+  // Mock local overrides — keyed by engagement_id
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+  const [reviewedEngagements, setReviewedEngagements] = useState<Set<string>>(new Set());
 
   const queryParams = useMemo(
     () => ({
@@ -52,7 +59,17 @@ export function ManageAgentProvider({ children }: { children: ReactNode }) {
   const { data, isLoading, isError } = useHiredAgentsQuery(queryParams);
 
   const pageData = data?.payload?.data;
-  const agents = useMemo(() => pageData?.content ?? [], [pageData?.content]);
+
+  // Apply local overrides on top of server data
+  const agents = useMemo(() => {
+    const raw = pageData?.content ?? [];
+    return raw.map((agent) => ({
+      ...agent,
+      status: statusOverrides[agent.engagement_id] ?? agent.status,
+      has_review: reviewedEngagements.has(agent.engagement_id) ? true : (agent.has_review ?? false),
+    }));
+  }, [pageData?.content, statusOverrides, reviewedEngagements]);
+
   const totalPages = pageData?.total_pages ?? 0;
   const totalElements = pageData?.total_elements ?? 0;
 
@@ -64,6 +81,31 @@ export function ManageAgentProvider({ children }: { children: ReactNode }) {
     },
     []
   );
+
+  /**
+   * Mock: update status locally.
+   * Also syncs the selectedAgent so the detail panel re-renders.
+   * TODO: remove local override after real API mutation + query invalidation.
+   */
+  const updateAgentStatus = useCallback((engagementId: string, newStatus: string) => {
+    setStatusOverrides((prev) => ({ ...prev, [engagementId]: newStatus }));
+    setSelectedAgent((prev) => {
+      if (!prev || prev.engagement_id !== engagementId) return prev;
+      return { ...prev, status: newStatus };
+    });
+  }, []);
+
+  /**
+   * Mock: mark engagement as reviewed locally.
+   * TODO: remove after real API mutation + query invalidation.
+   */
+  const markAgentReviewed = useCallback((engagementId: string) => {
+    setReviewedEngagements((prev) => new Set(prev).add(engagementId));
+    setSelectedAgent((prev) => {
+      if (!prev || prev.engagement_id !== engagementId) return prev;
+      return { ...prev, has_review: true };
+    });
+  }, []);
 
   const value = useMemo<ManageAgentContextValue>(
     () => ({
@@ -88,6 +130,8 @@ export function ManageAgentProvider({ children }: { children: ReactNode }) {
       totalElements,
       ITEMS_PER_PAGE,
       handleAgentClick,
+      updateAgentStatus,
+      markAgentReviewed,
     }),
     [
       agents,
@@ -100,6 +144,8 @@ export function ManageAgentProvider({ children }: { children: ReactNode }) {
       totalPages,
       totalElements,
       handleAgentClick,
+      updateAgentStatus,
+      markAgentReviewed,
     ]
   );
 

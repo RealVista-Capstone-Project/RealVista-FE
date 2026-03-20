@@ -14,7 +14,10 @@
       "hiredDate": "Hired Date",
       "specialties": "Specialties",
       "about": "About",
-      "assignedProperty": "Assigned Property"
+      "assignedProperty": "Assigned Property",
+      "addReview": "Add Review",
+      "agent": "Agent",
+      "property": "Property"
     },
     "listItem": {
       "noEmail": "No email"
@@ -29,7 +32,42 @@
       "expired": "Expired"
     },
     "common": {
-      "na": "N/A"
+      "na": "N/A",
+      "cancel": "Cancel",
+      "back": "Back",
+      "thisProperty": "this property"
+    },
+    "actions": {
+      "completeContract": "Complete Contract",
+      "cancelContract": "Cancel Contract",
+      "cancelRequest": "Cancel Request",
+      "alreadyReviewed": "Review submitted"
+    },
+    "completeDialog": {
+      "title": "Complete Contract",
+      "description": "Confirm completion of the contract with {agentName} for {property}?",
+      "confirm": "Yes, complete"
+    },
+    "cancelDialog": {
+      "title": "Cancel Contract",
+      "description": "You are about to cancel the contract with {agentName}. Please provide a reason.",
+      "reasonLabel": "Reason for cancellation",
+      "reasonPlaceholder": "Describe why you are cancelling this contract...",
+      "confirm": "Confirm Cancellation"
+    },
+    "reviewModal": {
+      "title": "Rate your agent",
+      "description": "How was your experience working with {agentName}?",
+      "commentLabel": "Your review",
+      "commentPlaceholder": "Share your experience working with this agent...",
+      "optional": "optional",
+      "skip": "Skip",
+      "submit": "Submit Review"
+    },
+    "toast": {
+      "completeSuccess": "Contract completed successfully",
+      "cancelSuccess": "Contract cancelled",
+      "reviewSuccess": "Thank you! Your review has been submitted"
     }
   }
 }

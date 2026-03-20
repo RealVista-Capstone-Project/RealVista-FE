@@ -18,6 +18,18 @@ export interface AgentEngagement {
   engagement_type: string;
   status: string;
   hired_at: string;
+  has_review?: boolean;
+}
+
+export interface CreateReviewPayload {
+  engagement_id: string;
+  rating: number;
+  comment?: string;
+}
+
+export interface CancelEngagementPayload {
+  engagement_id: string;
+  reason: string;
 }
 
 export interface AgentEngagementPageResponse {

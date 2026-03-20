@@ -1,35 +1,73 @@
 {
   "AgentEngagement": {
     "detailPanel": {
-      "title": "Chi ti\u1EBFt \u0111\u1EA1i l\u00FD",
-      "contactInfo": "Th\u00F4ng tin li\u00EAn h\u1EC7",
+      "title": "Chi tiết đại lý",
+      "contactInfo": "Thông tin liên hệ",
       "email": "Email",
-      "phone": "\u0110i\u1EC7n tho\u1EA1i",
-      "serviceAreas": "Khu v\u1EF1c ph\u1EE5c v\u1EE5",
-      "professionalInfo": "Th\u00F4ng tin chuy\u00EAn m\u00F4n",
-      "experience": "Kinh nghi\u1EC7m",
-      "yearsUnit": "{count} n\u0103m",
-      "propertiesSold": "B\u0110S \u0111\u00E3 b\u00E1n",
-      "engagementType": "Lo\u1EA1i h\u1EE3p \u0111\u1ED3ng",
-      "hiredDate": "Ng\u00E0y thu\u00EA",
-      "specialties": "Chuy\u00EAn m\u00F4n",
-      "about": "Gi\u1EDBi thi\u1EC7u",
-      "assignedProperty": "B\u0110S \u0111\u01B0\u1EE3c giao"
+      "phone": "Điện thoại",
+      "serviceAreas": "Khu vực phục vụ",
+      "professionalInfo": "Thông tin chuyên môn",
+      "experience": "Kinh nghiệm",
+      "yearsUnit": "{count} năm",
+      "propertiesSold": "BĐS đã bán",
+      "engagementType": "Loại hợp đồng",
+      "hiredDate": "Ngày thuê",
+      "specialties": "Chuyên môn",
+      "about": "Giới thiệu",
+      "assignedProperty": "BĐS được giao",
+      "addReview": "Thêm đánh giá",
+      "agent": "Đại lý",
+      "property": "Bất động sản"
     },
     "listItem": {
-      "noEmail": "Ch\u01B0a c\u00F3 email"
+      "noEmail": "Chưa có email"
     },
     "status": {
-      "active": "\u0110ang ho\u1EA1t \u0111\u1ED9ng",
-      "pending": "Ch\u1EDD duy\u1EC7t",
-      "completed": "Ho\u00E0n th\u00E0nh",
-      "cancelled": "\u0110\u00E3 h\u1EE7y",
-      "accepted": "\u0110\u00E3 ch\u1EA5p nh\u1EADn",
-      "rejected": "T\u1EEB ch\u1ED1i",
-      "expired": "H\u1EBFt h\u1EA1n"
+      "active": "Đang hoạt động",
+      "pending": "Chờ duyệt",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "accepted": "Đã chấp nhận",
+      "rejected": "Từ chối",
+      "expired": "Hết hạn"
     },
     "common": {
-      "na": "N/A"
+      "na": "N/A",
+      "cancel": "Hủy bỏ",
+      "back": "Quay lại",
+      "thisProperty": "bất động sản này"
+    },
+    "actions": {
+      "completeContract": "Hoàn thành hợp đồng",
+      "cancelContract": "Hủy hợp đồng",
+      "cancelRequest": "Hủy yêu cầu",
+      "alreadyReviewed": "Đã gửi đánh giá"
+    },
+    "completeDialog": {
+      "title": "Hoàn thành hợp đồng",
+      "description": "Xác nhận hoàn thành hợp đồng với {agentName} cho {property}?",
+      "confirm": "Xác nhận hoàn thành"
+    },
+    "cancelDialog": {
+      "title": "Hủy hợp đồng",
+      "description": "Bạn đang hủy hợp đồng với {agentName}. Vui lòng cung cấp lý do hủy.",
+      "reasonLabel": "Lý do hủy hợp đồng",
+      "reasonPlaceholder": "Mô tả lý do bạn hủy hợp đồng này...",
+      "confirm": "Xác nhận hủy hợp đồng"
+    },
+    "reviewModal": {
+      "title": "Đánh giá đại lý",
+      "description": "Trải nghiệm của bạn khi làm việc với {agentName} như thế nào?",
+      "commentLabel": "Nhận xét của bạn",
+      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn khi làm việc với đại lý này...",
+      "optional": "tùy chọn",
+      "skip": "Bỏ qua",
+      "submit": "Gửi đánh giá"
+    },
+    "toast": {
+      "completeSuccess": "Hợp đồng đã hoàn thành thành công",
+      "cancelSuccess": "Hợp đồng đã được hủy",
+      "reviewSuccess": "Cảm ơn! Đánh giá của bạn đã được gửi"
     }
   }
 }
