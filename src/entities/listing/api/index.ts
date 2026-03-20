@@ -1,5 +1,6 @@
 import http from '@/shared/lib/http';
 import type { Listing, ApiResponse, PriceHistory, SimilarListingsResponse } from '../model/types';
+import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/managed-listing';
 
 /**
  * Listing API - All listing-related HTTP methods
@@ -25,6 +26,13 @@ export const listingApi = {
    */
   getSimilar: (listingId: string, limit: number = 5) =>
     http.get<ApiResponse<SimilarListingsResponse>>(`/listings/${listingId}/similar?limit=${limit}`),
+
+  /**
+   * Get managed listings (listings created by the authenticated user)
+   * Returns a simplified list view with flat address structure
+   * Requires authentication
+   */
+  getManagedListings: () => http.get<ApiResponse<ManagedListing[]>>('/listings/managed-listings'),
 } as const;
 
 // Re-export query keys and queries

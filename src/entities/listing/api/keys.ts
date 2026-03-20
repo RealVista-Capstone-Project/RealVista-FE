@@ -19,4 +19,7 @@ export const listingKeys = {
 
   // Similar listings queries
   similar: (id: string, limit: number) => [...listingKeys.all, 'similar', id, limit] as const,
+
+  // Managed listings (user's own listings)
+  managed: () => [...listingKeys.all, 'managed'] as const,
 } as const;

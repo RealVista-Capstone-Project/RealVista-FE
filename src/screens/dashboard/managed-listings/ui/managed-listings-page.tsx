@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Search, Filter } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useManagedListings } from '../model/use-managed-listings';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
@@ -24,7 +23,7 @@ export function ManagedListingsPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
 
-  const { data: listings, isLoading, error } = useManagedListings();
+  const { data: listings, isLoading, error } = useQuery(listingQueries.managed());
 
   // Use centralized listing query
   const { data: listingResponse, isLoading: isDetailLoading } = useQuery({
@@ -41,11 +40,13 @@ export function ManagedListingsPage() {
     if (!searchQuery.trim()) return listings;
 
     const query = searchQuery.toLowerCase();
-    return listings.filter(
-      (listing) =>
+    return listings.filter((listing) => {
+      const address = listing.full_address?.toLowerCase() || '';
+      return (
         listing.name.toLowerCase().includes(query) ||
-        listing.property?.location?.address?.toLowerCase().includes(query)
-    );
+        address.includes(query)
+      );
+    });
   }, [listings, searchQuery]);
 
   // Select first listing by default
