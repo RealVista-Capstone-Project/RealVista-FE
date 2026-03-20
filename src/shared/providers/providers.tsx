@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
 import { Toaster } from '@/shared/ui/sonner';
+import { PostHogProvider } from '../lib/analytics/posthog-provider';
 
 /**
  * App Providers Component
@@ -41,12 +42,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
-      <AuthTokenProvider>
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster />
-        </QueryClientProvider>
-      </AuthTokenProvider>
+      <PostHogProvider>
+        <AuthTokenProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+            <Toaster />
+          </QueryClientProvider>
+        </AuthTokenProvider>
+      </PostHogProvider>
     </SessionProvider>
   );
 }
