@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Eye, Users, Calendar, TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useListingAnalytics } from '../api/use-listing-analytics';
 
 interface ListingMetricsCardProps {
@@ -14,6 +15,7 @@ interface ListingMetricsCardProps {
  */
 export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
   const { data, isLoading, isError } = useListingAnalytics(listingId);
+  const t = useTranslations('ListingMetricsCard');
 
   if (isError) {
     return null; // Gracefully hide if analytics fail to load
@@ -23,7 +25,7 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
     return (
       <div className='rounded-lg border border-purple-92 p-6'>
         <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
-          Listing Performance
+          {t('title')}
         </h2>
         <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
           {[...Array(4)].map((_, i) => (
@@ -43,28 +45,28 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
   return (
     <div className='rounded-lg border border-purple-92 p-6'>
       <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
-        Listing Performance
+        {t('title')}
       </h2>
 
       <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
         <MetricItem
           icon={<Eye className='h-6 w-6' strokeWidth={2} />}
-          label='Total Views'
+          label={t('metrics.totalViews')}
           value={analytics.total_views.toLocaleString()}
         />
         <MetricItem
           icon={<Users className='h-6 w-6' strokeWidth={2} />}
-          label='Unique Viewers'
+          label={t('metrics.uniqueViewers')}
           value={analytics.unique_viewers.toLocaleString()}
         />
         <MetricItem
           icon={<Calendar className='h-6 w-6' strokeWidth={2} />}
-          label='Tour Bookings'
+          label={t('metrics.tourBookings')}
           value={analytics.tour_bookings.toLocaleString()}
         />
         <MetricItem
           icon={<TrendingUp className='h-6 w-6' strokeWidth={2} />}
-          label='Conversion Rate'
+          label={t('metrics.conversionRate')}
           value={`${analytics.conversion_rate}%`}
         />
       </div>

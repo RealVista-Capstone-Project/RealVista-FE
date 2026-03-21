@@ -1,4 +1,14 @@
 {
+  "DashboardLayout": {
+    "pageTitle": {
+      "default": "RealVista",
+      "dashboard": "Dashboard",
+      "insight": "Insight",
+      "managedListings": "Managed Listings",
+      "tenants": "Tenants",
+      "messages": "Messages"
+    }
+  },
   "Common": {
     "title": "Hello world common!",
     "about": "Go to the about page"

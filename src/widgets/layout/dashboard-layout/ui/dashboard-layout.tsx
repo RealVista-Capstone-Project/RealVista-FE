@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
+import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 
@@ -65,6 +66,29 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
+  const t = useTranslations('DashboardLayout');
+
+  /**
+   * Compute the top nav page title based on the current pathname
+   */
+  const pageTitle = React.useMemo(() => {
+    if (pathname === ROUTES.dashboard.managedListings || pathname.startsWith(ROUTES.dashboard.managedListings)) {
+      return t('pageTitle.managedListings');
+    }
+    if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight)) {
+      return t('pageTitle.insight');
+    }
+    if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants)) {
+      return t('pageTitle.tenants');
+    }
+    if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
+      return t('pageTitle.messages');
+    }
+    if (pathname === ROUTES.dashboard.root) {
+      return t('pageTitle.dashboard');
+    }
+    return t('pageTitle.default');
+  }, [pathname, t]);
 
   /**
    * Determine if a menu item is active based on the current pathname
@@ -222,7 +246,7 @@ export function DashboardLayout({
           <div className='flex items-center gap-4'>
             {/* Logo Text */}
             <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
-              RealVista
+              {pageTitle}
             </span>
           </div>
 
