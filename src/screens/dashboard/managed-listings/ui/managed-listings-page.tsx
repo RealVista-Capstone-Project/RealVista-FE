@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Search, Filter } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
@@ -28,6 +29,7 @@ export function ManagedListingsPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
+  const t = useTranslations('ManagedListings');
 
   const { data: listings, isLoading, error } = useQuery(listingQueries.managed());
 
@@ -100,7 +102,7 @@ export function ManagedListingsPage() {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='text-center'>
-          <p className='text-lg font-semibold text-main-black'>Failed to load listings</p>
+          <p className='text-lg font-semibold text-main-black'>{t('error.title')}</p>
           <p className='mt-2 text-sm text-main-secondary/60'>{error.message}</p>
         </div>
       </div>
@@ -116,7 +118,7 @@ export function ManagedListingsPage() {
           <div className='border-b border-purple-92/50 p-6'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-                <h2 className='text-xl font-bold text-main-black'>Properties</h2>
+                <h2 className='text-xl font-bold text-main-black'>{t('title')}</h2>
                 <div className='flex items-center justify-center rounded-lg bg-main-primary px-2 py-1'>
                   <span className='text-sm font-bold text-white'>{filteredListings.length}</span>
                 </div>
@@ -124,7 +126,7 @@ export function ManagedListingsPage() {
               <button
                 type='button'
                 className='flex size-6 items-center justify-center text-main-black transition-colors hover:text-main-primary'
-                aria-label='Filter'
+                aria-label={t('filter')}
               >
                 <Filter className='h-5 w-5' strokeWidth={2} />
               </button>
@@ -144,7 +146,7 @@ export function ManagedListingsPage() {
                     : 'bg-transparent text-main-black/70 hover:bg-purple-98'
                 )}
               >
-                All
+                {t('tabs.all')}
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-bold',
@@ -164,7 +166,7 @@ export function ManagedListingsPage() {
                     : 'bg-transparent text-main-black/70 hover:bg-purple-98'
                 )}
               >
-                For Rent
+                {t('tabs.forRent')}
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-bold',
@@ -184,7 +186,7 @@ export function ManagedListingsPage() {
                     : 'bg-transparent text-main-black/70 hover:bg-purple-98'
                 )}
               >
-                For Sale
+                {t('tabs.forSale')}
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-bold',
@@ -207,7 +209,7 @@ export function ManagedListingsPage() {
                 type='text'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder='Search...'
+                placeholder={t('search.placeholder')}
                 className='h-14 w-full rounded-lg border-2 border-purple-92 bg-purple-98 pl-12 pr-4 text-base font-medium text-main-black placeholder:text-main-secondary/50 focus:border-main-primary focus:outline-none focus:ring-0'
               />
             </div>
@@ -217,7 +219,7 @@ export function ManagedListingsPage() {
           <div className='flex-1 overflow-y-auto'>
             {filteredListings.length === 0 ? (
               <div className='flex items-center justify-center p-8'>
-                <p className='text-sm text-main-secondary/60'>No properties found</p>
+                <p className='text-sm text-main-secondary/60'>{t('empty.noProperties')}</p>
               </div>
             ) : (
               <div className='divide-y divide-purple-92/50'>
@@ -244,7 +246,7 @@ export function ManagedListingsPage() {
             {isDetailLoading ? (
               <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-98 border-t-main-primary' />
             ) : (
-              <p className='text-sm text-main-secondary/60'>Select a property to view details</p>
+              <p className='text-sm text-main-secondary/60'>{t('empty.selectProperty')}</p>
             )}
           </div>
         )}

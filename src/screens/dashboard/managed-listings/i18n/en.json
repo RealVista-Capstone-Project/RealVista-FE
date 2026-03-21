@@ -1,0 +1,44 @@
+{
+  "ManagedListings": {
+    "title": "Listings",
+    "filter": "Filter",
+    "tabs": {
+      "all": "All",
+      "forRent": "For Rent",
+      "forSale": "For Sale"
+    },
+    "search": {
+      "placeholder": "Search..."
+    },
+    "loading": "Loading...",
+    "error": {
+      "title": "Failed to load listings",
+      "message": "An error occurred while loading your listings"
+    },
+    "empty": {
+      "noProperties": "No properties found",
+      "selectProperty": "Select a property to view details"
+    }
+  },
+  "ListingCard": {
+    "noImage": "No image",
+    "noAddress": "No address available",
+    "listingType": {
+      "rent": "For Rent",
+      "sale": "For Sale"
+    }
+  },
+  "ListingDetailPanel": {
+    "addressNotAvailable": "Address not available",
+    "showCalendar": "Show Property Calendar",
+    "features": {
+      "properties": "Properties",
+      "rooms": "Rooms",
+      "livingSpace": "Living Space",
+      "yearBuilt": "Year Built",
+      "tenants": "Tenants",
+      "request": "Request",
+      "notAvailable": "N/A"
+    }
+  }
+}

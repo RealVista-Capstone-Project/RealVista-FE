@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import type { ManagedListing } from '../../types/managed-listing';
@@ -12,10 +13,12 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) {
+  const t = useTranslations('ListingCard');
+  const tStatus = useTranslations('ListingStatus');
   const status =
     LISTING_STATUS_CONFIG[listing.status as ListingStatus] ??
     LISTING_STATUS_CONFIG[ListingStatus.DRAFT];
-  const address = listing.full_address || 'No address available';
+  const address = listing.full_address || t('noAddress');
   const area = listing.property?.total_area ? `${listing.property.total_area} sq m` : '';
   const formattedPrice = formatVND(listing.price);
 
@@ -35,7 +38,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
             <Image src={listing.thumbnail} alt={listing.name} fill className='object-cover' />
           ) : (
             <div className='flex h-full w-full items-center justify-center bg-purple-98'>
-              <span className='text-xs text-main-secondary/60'>No image</span>
+              <span className='text-xs text-main-secondary/60'>{t('noImage')}</span>
             </div>
           )}
         </div>
@@ -55,7 +58,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
                   : 'bg-orange-50 text-orange-600'
               )}
             >
-              {listing.listing_type === 'RENT' ? 'For Rent' : 'For Sale'}
+              {listing.listing_type === 'RENT' ? t('listingType.rent') : t('listingType.sale')}
             </span>
           </div>
 
@@ -69,7 +72,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
             <span className='font-semibold text-main-primary'>{formattedPrice}</span>
             <span className='text-main-black/50'>•</span>
             <div className={cn('rounded-full px-2 py-0.5', status.className)}>
-              <span className='text-xs font-bold leading-tight'>{status.label}</span>
+              <span className='text-xs font-bold leading-tight'>{tStatus(status.labelKey)}</span>
             </div>
             {area && (
               <>

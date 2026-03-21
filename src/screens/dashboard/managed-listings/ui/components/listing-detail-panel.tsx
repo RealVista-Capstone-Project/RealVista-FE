@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Calendar } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { PropertyGallery } from '@/features/property-gallery';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
@@ -14,6 +15,7 @@ interface ListingDetailPanelProps {
 }
 
 export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
+  const t = useTranslations('ListingDetailPanel');
   const property: Property = mapListingToProperty(listing);
 
   // Get dynamic attributes from listing
@@ -41,7 +43,7 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
                 {property.title}
               </h1>
               <p className='text-base font-medium leading-[1.6] text-main-black/50'>
-                {property.address || 'Address not available'}
+                {property.address || t('addressNotAvailable')}
               </p>
             </div>
 
@@ -50,7 +52,7 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
               className='flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
             >
               <Calendar className='h-4 w-4' strokeWidth={2} />
-              <span>Show Property Calendar</span>
+              <span>{t('showCalendar')}</span>
             </button>
           </div>
 
@@ -87,33 +89,18 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
           ) : (
             // Fallback when no attributes are available
             <div className='grid grid-cols-6 gap-6'>
-              <FeatureStat label='Properties' value='N/A' icon='🏠' />
-              <FeatureStat label='Rooms' value='N/A' icon='🛏️' />
+              <FeatureStat label={t('features.properties')} value={t('features.notAvailable')} icon='🏠' />
+              <FeatureStat label={t('features.rooms')} value={t('features.notAvailable')} icon='🛏️' />
               <FeatureStat
-                label='Living Space'
+                label={t('features.livingSpace')}
                 value={`${listing.property?.usable_size_m2 || 0} m²`}
                 icon='📐'
               />
-              <FeatureStat label='Year Built' value='N/A' icon='📅' />
-              <FeatureStat label='Tenants' value='12' icon='👥' />
-              <FeatureStat label='Request' value='12' icon='📄' />
+              <FeatureStat label={t('features.yearBuilt')} value={t('features.notAvailable')} icon='📅' />
+              <FeatureStat label={t('features.tenants')} value='12' icon='👥' />
+              <FeatureStat label={t('features.request')} value='12' icon='📄' />
             </div>
           )}
-        </div>
-
-        {/* Total Applicants Section */}
-        <div className='mb-6 flex flex-col gap-3'>
-          <p className='text-sm font-medium leading-[1.4] text-main-black'>Total Applicants</p>
-          <div className='flex items-center gap-2'>
-            <p className='text-[32px] font-bold leading-[1.25] tracking-[-0.32px] text-main-black'>
-              394
-            </p>
-            <div className='flex items-center rounded-xl bg-[rgba(111,207,151,0.1)] px-2.5 py-1.5'>
-              <p className='text-sm font-bold leading-[1.4] text-[#27ae60]'>
-                +7.1% <span className='font-normal'>from last month</span>
-              </p>
-            </div>
-          </div>
         </div>
 
         <div className='mb-8 h-px w-full bg-purple-92' />
@@ -124,20 +111,6 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
             <RentalFeatures property={property} />
           </div>
         )}
-
-        {/* Applications Table */}
-        <div className='flex flex-col gap-6'>
-          <h2 className='text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
-            Applications
-          </h2>
-
-          {/* Table Content - Placeholder for now */}
-          <div className='rounded-lg border border-purple-92 p-6'>
-            <p className='text-center text-main-black/50'>
-              Application list will be displayed here
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

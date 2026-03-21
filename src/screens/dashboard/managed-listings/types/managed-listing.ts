@@ -13,30 +13,30 @@ export enum ListingStatus {
  */
 export const LISTING_STATUS_CONFIG: Record<
   ListingStatus,
-  { label: string; className: string }
+  { labelKey: string; className: string }
 > = {
   [ListingStatus.DRAFT]: {
-    label: 'Draft',
+    labelKey: 'status.draft',
     className: 'bg-gray-100 text-gray-600',
   },
   [ListingStatus.PENDING]: {
-    label: 'Pending Review',
+    labelKey: 'status.pending',
     className: 'bg-yellow-50 text-yellow-600',
   },
   [ListingStatus.PUBLISHED]: {
-    label: 'Published',
+    labelKey: 'status.published',
     className: 'bg-purple-94 text-main-primary',
   },
   [ListingStatus.SOLD]: {
-    label: 'Sold',
+    labelKey: 'status.sold',
     className: 'bg-green-50 text-green-600',
   },
   [ListingStatus.RENTED]: {
-    label: 'Rented',
+    labelKey: 'status.rented',
     className: 'bg-green-50 text-green-600',
   },
   [ListingStatus.ARCHIVED]: {
-    label: 'Archived',
+    labelKey: 'status.archived',
     className: 'bg-gray-100 text-gray-600',
   },
 };
