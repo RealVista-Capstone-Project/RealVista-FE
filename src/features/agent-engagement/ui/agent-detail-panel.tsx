@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import type { AgentEngagement, CreateReviewPayload } from '@/entities/agent-engagement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
@@ -20,6 +21,7 @@ import {
   MessageSquarePlus,
   CheckCircle2,
   XCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { formatDate, getInitials, getStatusColor, toStringArray } from '../lib/utils';
@@ -33,6 +35,7 @@ import {
   useCancelEngagementMutation,
   useSubmitReviewMutation,
 } from '../hooks/use-hired-agents';
+import { ROUTES } from '@/shared/config/routes';
 
 interface AgentDetailPanelProps {
   agent: AgentEngagement;
@@ -394,11 +397,16 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
         </CardContent>
 
         {/* Footer CTA — dynamic based on status */}
-        {renderActionButtons() && (
-          <div className='p-4 border-t border-gray-100 bg-white flex-none'>
-            {renderActionButtons()}
-          </div>
-        )}
+        <div className='p-4 border-t border-gray-100 bg-white flex-none space-y-2'>
+          {renderActionButtons()}
+          <Link
+            href={`/${locale}${ROUTES.manageAgent.detail(agent.engagement_id)}`}
+            className='flex items-center justify-center gap-1.5 w-full text-xs text-indigo-600 hover:text-indigo-800 font-medium py-1.5 rounded-lg hover:bg-indigo-50 transition-colors'
+          >
+            <ExternalLink className='h-3.5 w-3.5' />
+            {t('detailPage.viewFullDetails')}
+          </Link>
+        </div>
       </Card>
 
       {/* Dialogs — rendered outside Card to avoid stacking context issues */}

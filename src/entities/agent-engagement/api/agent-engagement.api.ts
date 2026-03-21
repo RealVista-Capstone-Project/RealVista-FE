@@ -1,6 +1,7 @@
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api-response';
 import type {
+  AgentEngagement,
   AgentEngagementPageResponse,
   GetAgentEngagementsParams,
   CreateReviewPayload,
@@ -29,6 +30,10 @@ function buildUrl(params: GetAgentEngagementsParams): string {
 export const agentEngagementApi = {
   getHiredAgents: (params: GetAgentEngagementsParams = {}) =>
     http.get<ApiResponse<AgentEngagementPageResponse>>(buildUrl(params)),
+
+  /** Fetch a single engagement by ID. */
+  getEngagementById: (id: string) =>
+    http.get<ApiResponse<AgentEngagement>>(`/engagements/${id}`),
 
   finishEngagement: (id: string) =>
     http.put<ApiResponse<void>>(`/engagements/${id}/finish`, null),

@@ -71,6 +71,26 @@
       "cancelError": "Failed to cancel contract. Please try again.",
       "reviewSuccess": "Thank you! Your review has been submitted",
       "reviewError": "Failed to submit review. Please try again."
+    },
+    "detailPage": {
+      "backToList": "Back to Manage Agents",
+      "viewFullDetails": "View Full Details",
+      "summaryTitle": "Engagement Summary",
+      "engagementId": "Engagement ID",
+      "hiredDate": "Hired Date",
+      "engagementType": "Engagement Type",
+      "propertyAddress": "Property Address",
+      "propertyType": "Property Type",
+      "propertyLocation": "Location",
+      "listingsTitle": "Listings by Agent",
+      "listingsSubtitle": "Listings created by this agent for your property",
+      "listingsComingSoon": "Listings feature is coming soon",
+      "listingsComingSoonDesc": "Once available, you will be able to view all listings created by this agent for your property.",
+      "listingStatus": "Status",
+      "listingPrice": "Price",
+      "listingDate": "Created",
+      "noListings": "No listings yet",
+      "noListingsDesc": "This agent has not created any listings for your property yet."
     }
   }
 }

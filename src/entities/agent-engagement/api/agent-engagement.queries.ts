@@ -10,4 +10,11 @@ export const agentEngagementQueries = {
       queryFn: () => agentEngagementApi.getHiredAgents(params),
       staleTime: 2 * 60 * 1000,
     }),
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: agentEngagementKeys.detail(id),
+      queryFn: () => agentEngagementApi.getEngagementById(id),
+      staleTime: 2 * 60 * 1000,
+      enabled: !!id,
+    }),
 } as const;

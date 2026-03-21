@@ -6,6 +6,10 @@ export function useHiredAgentsQuery(params: GetAgentEngagementsParams = {}) {
   return useQuery(agentEngagementQueries.list(params));
 }
 
+export function useEngagementDetailQuery(engagementId: string) {
+  return useQuery(agentEngagementQueries.detail(engagementId));
+}
+
 export function useFinishEngagementMutation(onSuccess?: () => void) {
   const queryClient = useQueryClient();
 

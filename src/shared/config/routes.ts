@@ -22,6 +22,7 @@ export const ROUTES = {
   },
   manageAgent: {
     root: '/manage-agent',
+    detail: (id: string) => `/manage-agent/${id}`,
   },
   settings: '/settings',
 } as const;

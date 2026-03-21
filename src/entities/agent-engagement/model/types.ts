@@ -48,3 +48,17 @@ export interface GetAgentEngagementsParams {
   status?: string;
   search?: string;
 }
+
+/** Stub type for listings created by an agent for a specific property/engagement.
+ *  Will be expanded when the backend endpoint is ready.
+ */
+export interface AgentListing {
+  listing_id: string;
+  title: string;
+  price: number | null;
+  image_url: string | null;
+  status: string;
+  created_at: string;
+  property_type?: string;
+  address?: string;
+}

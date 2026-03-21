@@ -5,4 +5,6 @@ export const agentEngagementKeys = {
   lists: () => [...agentEngagementKeys.all, 'list'] as const,
   list: (params: GetAgentEngagementsParams) =>
     [...agentEngagementKeys.lists(), params] as const,
+  details: () => [...agentEngagementKeys.all, 'detail'] as const,
+  detail: (id: string) => [...agentEngagementKeys.details(), id] as const,
 } as const;

@@ -71,6 +71,26 @@
       "cancelError": "Hủy hợp đồng thất bại. Vui lòng thử lại.",
       "reviewSuccess": "Cảm ơn! Đánh giá của bạn đã được gửi",
       "reviewError": "Gửi đánh giá thất bại. Vui lòng thử lại."
+    },
+    "detailPage": {
+      "backToList": "Quay lại danh sách",
+      "viewFullDetails": "Xem chi tiết đầy đủ",
+      "summaryTitle": "Tóm tắt hợp đồng",
+      "engagementId": "Mã hợp đồng",
+      "hiredDate": "Ngày thuê",
+      "engagementType": "Loại hợp đồng",
+      "propertyAddress": "Địa chỉ BĐS",
+      "propertyType": "Loại BĐS",
+      "propertyLocation": "Khu vực",
+      "listingsTitle": "Danh sách bất động sản",
+      "listingsSubtitle": "Các tin đăng đại lý tạo cho BĐS của bạn",
+      "listingsComingSoon": "Tính năng tin đăng sắp ra mắt",
+      "listingsComingSoonDesc": "Khi có mặt, bạn có thể xem tất cả tin đăng mà đại lý này tạo cho BĐS của bạn.",
+      "listingStatus": "Trạng thái",
+      "listingPrice": "Giá",
+      "listingDate": "Ngày tạo",
+      "noListings": "Chưa có tin đăng",
+      "noListingsDesc": "Đại lý này chưa tạo tin đăng nào cho BĐS của bạn."
     }
   }
 }
