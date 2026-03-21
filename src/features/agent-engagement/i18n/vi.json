@@ -66,8 +66,11 @@
     },
     "toast": {
       "completeSuccess": "Hợp đồng đã hoàn thành thành công",
+      "completeError": "Hoàn thành hợp đồng thất bại. Vui lòng thử lại.",
       "cancelSuccess": "Hợp đồng đã được hủy",
-      "reviewSuccess": "Cảm ơn! Đánh giá của bạn đã được gửi"
+      "cancelError": "Hủy hợp đồng thất bại. Vui lòng thử lại.",
+      "reviewSuccess": "Cảm ơn! Đánh giá của bạn đã được gửi",
+      "reviewError": "Gửi đánh giá thất bại. Vui lòng thử lại."
     }
   }
 }

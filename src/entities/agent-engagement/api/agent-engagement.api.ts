@@ -3,6 +3,7 @@ import type { ApiResponse } from '@/shared/types/api-response';
 import type {
   AgentEngagementPageResponse,
   GetAgentEngagementsParams,
+  CreateReviewPayload,
 } from '../model/types';
 
 function buildUrl(params: GetAgentEngagementsParams): string {
@@ -28,4 +29,16 @@ function buildUrl(params: GetAgentEngagementsParams): string {
 export const agentEngagementApi = {
   getHiredAgents: (params: GetAgentEngagementsParams = {}) =>
     http.get<ApiResponse<AgentEngagementPageResponse>>(buildUrl(params)),
+
+  finishEngagement: (id: string) =>
+    http.put<ApiResponse<void>>(`/engagements/${id}/finish`, null),
+
+  cancelEngagement: (id: string, reason: string) =>
+    http.put<ApiResponse<void>>(`/engagements/${id}/cancel`, { reason }),
+
+  submitReview: (payload: CreateReviewPayload) =>
+    http.post<ApiResponse<void>>(`/engagements/${payload.engagement_id}/reviews`, {
+      rating: payload.rating,
+      comment: payload.comment,
+    }),
 } as const;

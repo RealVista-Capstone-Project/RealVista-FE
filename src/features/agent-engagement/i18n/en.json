@@ -66,8 +66,11 @@
     },
     "toast": {
       "completeSuccess": "Contract completed successfully",
+      "completeError": "Failed to complete contract. Please try again.",
       "cancelSuccess": "Contract cancelled",
-      "reviewSuccess": "Thank you! Your review has been submitted"
+      "cancelError": "Failed to cancel contract. Please try again.",
+      "reviewSuccess": "Thank you! Your review has been submitted",
+      "reviewError": "Failed to submit review. Please try again."
     }
   }
 }

@@ -28,6 +28,11 @@ import { useManageAgentContext } from '../model/manage-agent-context';
 import { CompleteConfirmDialog } from './complete-confirm-dialog';
 import { CancelContractDialog } from './cancel-contract-dialog';
 import { ReviewModal } from './review-modal';
+import {
+  useFinishEngagementMutation,
+  useCancelEngagementMutation,
+  useSubmitReviewMutation,
+} from '../hooks/use-hired-agents';
 
 interface AgentDetailPanelProps {
   agent: AgentEngagement;
@@ -37,7 +42,7 @@ interface AgentDetailPanelProps {
 export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
   const t = useTranslations('AgentEngagement');
   const locale = useLocale();
-  const { updateAgentStatus, markAgentReviewed } = useManageAgentContext();
+  const { setSelectedAgent } = useManageAgentContext();
 
   const statusKey = `status.${agent.status.toLowerCase()}` as const;
   const statusLabel = t.has(statusKey) ? t(statusKey) : agent.status;
@@ -47,10 +52,11 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
-  // Loading state per action
-  const [isCompleting, setIsCompleting] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [isReviewing, setIsReviewing] = useState(false);
+  // ── Mutations ──────────────────────────────────────────────────────────────
+
+  const finishMutation = useFinishEngagementMutation();
+  const cancelMutation = useCancelEngagementMutation();
+  const reviewMutation = useSubmitReviewMutation();
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -59,40 +65,41 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
   }, []);
 
   const handleComplete = useCallback(async () => {
-    setIsCompleting(true);
-    // TODO: replace with real API call: await agentEngagementApi.completeEngagement(agent.engagement_id)
-    await new Promise((r) => setTimeout(r, 800));
-    setIsCompleting(false);
-    setCompleteDialogOpen(false);
-    updateAgentStatus(agent.engagement_id, 'COMPLETED');
-    toast.success(t('toast.completeSuccess'));
-    openReviewAfterDelay();
-  }, [agent.engagement_id, updateAgentStatus, t, openReviewAfterDelay]);
+    try {
+      await finishMutation.mutateAsync(agent.engagement_id);
+      setCompleteDialogOpen(false);
+      setSelectedAgent({ ...agent, status: 'COMPLETED' });
+      toast.success(t('toast.completeSuccess'));
+      openReviewAfterDelay();
+    } catch {
+      toast.error(t('toast.completeError'));
+    }
+  }, [agent, finishMutation, setSelectedAgent, t, openReviewAfterDelay]);
 
   const handleCancel = useCallback(async (reason: string) => {
-    setIsCancelling(true);
-    // TODO: replace with real API call: await agentEngagementApi.cancelEngagement(agent.engagement_id, reason)
-    console.log('[mock] cancel reason:', reason);
-    await new Promise((r) => setTimeout(r, 800));
-    setIsCancelling(false);
-    setCancelDialogOpen(false);
-    updateAgentStatus(agent.engagement_id, 'CANCELLED');
-    toast.success(t('toast.cancelSuccess'));
-    openReviewAfterDelay();
-  }, [agent.engagement_id, updateAgentStatus, t, openReviewAfterDelay]);
+    try {
+      await cancelMutation.mutateAsync({ engagementId: agent.engagement_id, reason });
+      setCancelDialogOpen(false);
+      setSelectedAgent({ ...agent, status: 'CANCELLED' });
+      toast.success(t('toast.cancelSuccess'));
+      openReviewAfterDelay();
+    } catch {
+      toast.error(t('toast.cancelError'));
+    }
+  }, [agent, cancelMutation, setSelectedAgent, t, openReviewAfterDelay]);
 
   const handleReviewSubmit = useCallback(
     async (payload: Omit<CreateReviewPayload, 'engagement_id'>) => {
-      setIsReviewing(true);
-      // TODO: replace with real API call: await agentEngagementApi.submitReview({ ...payload, engagement_id: agent.engagement_id })
-      console.log('[mock] review payload:', { ...payload, engagement_id: agent.engagement_id });
-      await new Promise((r) => setTimeout(r, 800));
-      setIsReviewing(false);
-      setReviewModalOpen(false);
-      markAgentReviewed(agent.engagement_id);
-      toast.success(t('toast.reviewSuccess'));
+      try {
+        await reviewMutation.mutateAsync({ ...payload, engagement_id: agent.engagement_id });
+        setReviewModalOpen(false);
+        setSelectedAgent({ ...agent, has_review: true });
+        toast.success(t('toast.reviewSuccess'));
+      } catch {
+        toast.error(t('toast.reviewError'));
+      }
     },
-    [agent.engagement_id, markAgentReviewed, t]
+    [agent, reviewMutation, setSelectedAgent, t]
   );
 
   const handleReviewSkip = useCallback(() => {
@@ -400,7 +407,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
         onOpenChange={setCompleteDialogOpen}
         agent={agent}
         onConfirm={handleComplete}
-        isLoading={isCompleting}
+        isLoading={finishMutation.isPending}
       />
 
       <CancelContractDialog
@@ -408,7 +415,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
         onOpenChange={setCancelDialogOpen}
         agent={agent}
         onConfirm={handleCancel}
-        isLoading={isCancelling}
+        isLoading={cancelMutation.isPending}
       />
 
       <ReviewModal
@@ -417,7 +424,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
         agent={agent}
         onSubmit={handleReviewSubmit}
         onSkip={handleReviewSkip}
-        isLoading={isReviewing}
+        isLoading={reviewMutation.isPending}
       />
     </>
   );
