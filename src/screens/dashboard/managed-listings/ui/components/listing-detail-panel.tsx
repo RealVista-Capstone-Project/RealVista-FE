@@ -17,10 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useChatWindowStore } from '@/entities/contact';
 import { useAuthSession } from '@/features/auth/model';
 import { isAuthenticated } from '@/features/auth/model';
-import { useSendMessage, conversationQueries } from '@/entities/conversation';
-import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
-import { unwrapApiResponse } from '@/shared/types/api';
-import type { SendMessageResponse } from '@/entities/conversation/model/types';
+import { conversationQueries } from '@/entities/conversation';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 
 interface ListingDetailPanelProps {
@@ -37,9 +34,7 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
   const params = useParams();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
-  const sendMessage = useSendMessage();
   const queryClient = useQueryClient();
-  const chatListingData = mapListingToChatData(listing);
 
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
@@ -49,16 +44,14 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
     }
 
     try {
-      // 1. Try to fetch existing conversation
-      const existingConv = await queryClient.fetchQuery(
-        conversationQueries.detail(listing.agent.user_id)
+      // Use the new create or get conversation API
+      const response = await queryClient.fetchQuery(
+        conversationQueries.detailOrCreate(listing.agent.user_id)
       );
 
-      // Depending on the HTTP client structure, we might need to unwrap or access data directly
-      // If it returned successfully, it exists!
-      const convData = (existingConv && typeof existingConv === 'object' && 'data' in existingConv
-        ? (existingConv as Record<string, unknown>).data
-        : existingConv) as Record<string, unknown>;
+      const convData = (response && typeof response === 'object' && 'data' in response
+        ? (response as Record<string, unknown>).data
+        : response) as Record<string, unknown>;
 
       const payload = convData?.payload as Record<string, unknown> | undefined;
       const payloadData = payload?.data as Record<string, unknown> | undefined;
@@ -77,40 +70,9 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
             avatar: listing.agent.avatar_url,
           });
         }
-        return;
-      }
-    } catch {
-      // 2. If it fails (e.g. 404), fallback to creating it
-      console.log('No existing conversation found, creating a new one...');
-    }
-
-    try {
-      const response = await sendMessage.mutateAsync({
-        recipient_user_id: listing.agent.user_id,
-        message_type: 'TEXT',
-        content: '', // Empty content, just sending the card to start conversation
-        metadata: JSON.stringify(chatListingData),
-      });
-
-      if (response) {
-        const sendResult = unwrapApiResponse<SendMessageResponse>(response);
-        const conversationId = sendResult.conversation_id;
-
-        if (conversationId) {
-          if (isMobile) {
-            const locale = params.locale;
-            router.push(`/${locale}/messages/${conversationId}`);
-          } else {
-            openWindow(conversationId, {
-              id: listing.agent.user_id,
-              name: listing.agent.full_name,
-              avatar: listing.agent.avatar_url,
-            });
-          }
-        }
       }
     } catch (error) {
-      console.error('Failed to start conversation:', error);
+      console.error('Failed to create or get conversation:', error);
     }
   };
 

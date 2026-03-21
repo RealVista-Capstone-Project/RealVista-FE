@@ -21,12 +21,12 @@ export const conversationQueries = {
     }),
 
   /**
-   * Get conversation between current user and another user
+   * Get or create conversation between current user and another user
    */
-  detail: (otherUserId: string) =>
+  detailOrCreate: (otherUserId: string) =>
     queryOptions({
       queryKey: conversationKeys.detail(otherUserId),
-      queryFn: () => conversationApi.getConversation(otherUserId),
+      queryFn: () => conversationApi.createOrGetConversation(otherUserId),
       staleTime: 5 * 60 * 1000,
       enabled: !!otherUserId,
     }),
