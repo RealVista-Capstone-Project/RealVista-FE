@@ -128,6 +128,7 @@ export interface ListingData {
   total_videos: number;
   total_3d_tours: number;
   is_favorite?: boolean;
+  is_created_by_owner?: boolean;
 }
 
 // ============ Cost Breakdown (API format - snake_case) ============

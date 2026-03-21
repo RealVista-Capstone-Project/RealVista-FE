@@ -31,6 +31,15 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Địa chỉ không có sẵn",
     "showCalendar": "Hiển thị lịch bất động sản",
+    "agent": {
+      "title": "Người môi giới",
+      "subtitle": "Bài đăng này được quản lý bởi môi giới",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "company": "Công ty",
+      "verified": "Môi giới đã xác thực",
+      "contact": "Liên hệ môi giới"
+    },
     "features": {
       "properties": "Bất động sản",
       "rooms": "Phòng",

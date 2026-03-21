@@ -31,6 +31,15 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
+    "agent": {
+      "title": "Listing Agent",
+      "subtitle": "This listing is managed by an agent",
+      "phone": "Phone",
+      "email": "Email",
+      "company": "Company",
+      "verified": "Verified Agent",
+      "contact": "Contact Agent"
+    },
     "features": {
       "properties": "Properties",
       "rooms": "Rooms",
