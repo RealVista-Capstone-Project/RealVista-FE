@@ -33,6 +33,38 @@ export const listingApi = {
    * Requires authentication
    */
   getManagedListings: () => http.get<ApiResponse<ManagedListing[]>>('/listings/managed-listings'),
+
+  // ==================== Status Update Operations ====================
+
+  /**
+   * Submit listing for review (DRAFT → PENDING)
+   */
+  submitForReview: (listingId: string) =>
+    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/submit-for-review`, undefined),
+
+  /**
+   * Publish listing (DRAFT/PENDING → PUBLISHED)
+   */
+  publish: (listingId: string) =>
+    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/publish`, undefined),
+
+  /**
+   * Unpublish listing (PUBLISHED → DRAFT)
+   */
+  unpublish: (listingId: string) =>
+    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/unpublish`, undefined),
+
+  /**
+   * Mark SALE listing as sold (PUBLISHED → SOLD)
+   */
+  markAsSold: (listingId: string) =>
+    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/mark-as-sold`, undefined),
+
+  /**
+   * Mark RENT listing as rented (PUBLISHED → RENTED)
+   */
+  markAsRented: (listingId: string) =>
+    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/mark-as-rented`, undefined),
 } as const;
 
 // Re-export query keys and queries

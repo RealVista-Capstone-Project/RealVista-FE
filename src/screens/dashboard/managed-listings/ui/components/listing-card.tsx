@@ -2,7 +2,8 @@ import * as React from 'react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { formatVND } from '@/shared/lib/utils/format-currency';
-import type { ManagedListing, ListingStatus } from '../../types/managed-listing';
+import type { ManagedListing } from '../../types/managed-listing';
+import { LISTING_STATUS_CONFIG, ListingStatus } from '../../types/managed-listing';
 
 interface ListingCardProps {
   listing: ManagedListing;
@@ -10,35 +11,10 @@ interface ListingCardProps {
   onClick: () => void;
 }
 
-const statusConfig: Record<ListingStatus, { label: string; className: string }> = {
-  DRAFT: {
-    label: 'DRAFT',
-    className: 'bg-gray-100 text-gray-600',
-  },
-  PENDING: {
-    label: 'PENDING',
-    className: 'bg-yellow-50 text-yellow-600',
-  },
-  PUBLISHED: {
-    label: 'PUBLISHED',
-    className: 'bg-purple-94 text-main-primary',
-  },
-  SOLD: {
-    label: 'SOLD',
-    className: 'bg-green-50 text-green-600',
-  },
-  RENTED: {
-    label: 'RENTED',
-    className: 'bg-green-50 text-green-600',
-  },
-  ARCHIVED: {
-    label: 'ARCHIVED',
-    className: 'bg-gray-100 text-gray-600',
-  },
-};
-
 export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) {
-  const status = statusConfig[listing.status];
+  const status =
+    LISTING_STATUS_CONFIG[listing.status as ListingStatus] ??
+    LISTING_STATUS_CONFIG[ListingStatus.DRAFT];
   const address = listing.full_address || 'No address available';
   const area = listing.property?.total_area ? `${listing.property.total_area} sq m` : '';
   const formattedPrice = formatVND(listing.price);

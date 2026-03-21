@@ -4,6 +4,7 @@ import { PropertyGallery } from '@/features/property-gallery';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
 import { ListingMetricsCard } from '@/features/listing-analytics';
+import { ListingStatusActions } from '@/features/listing-status';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
@@ -32,24 +33,33 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
           <ListingMetricsCard listingId={listing.listing_id} />
         </div>
 
-        {/* Header with Title and Calendar Button */}
-        <div className='mb-6 flex items-start justify-between'>
-          <div className='flex flex-col gap-2'>
-            <h1 className='text-[32px] font-bold leading-[1.25] tracking-[-0.32px] text-main-black'>
-              {property.title}
-            </h1>
-            <p className='text-base font-medium leading-[1.6] text-main-black/50'>
-              {property.address || 'Address not available'}
-            </p>
+        {/* Header with Title, Status Actions, and Calendar Button */}
+        <div className='mb-6 flex flex-col gap-4'>
+          <div className='flex items-start justify-between'>
+            <div className='flex flex-col gap-2'>
+              <h1 className='text-[32px] font-bold leading-[1.25] tracking-[-0.32px] text-main-black'>
+                {property.title}
+              </h1>
+              <p className='text-base font-medium leading-[1.6] text-main-black/50'>
+                {property.address || 'Address not available'}
+              </p>
+            </div>
+
+            <button
+              type='button'
+              className='flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
+            >
+              <Calendar className='h-4 w-4' strokeWidth={2} />
+              <span>Show Property Calendar</span>
+            </button>
           </div>
 
-          <button
-            type='button'
-            className='flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
-          >
-            <Calendar className='h-4 w-4' strokeWidth={2} />
-            <span>Show Property Calendar</span>
-          </button>
+          {/* Status Update Actions */}
+          <ListingStatusActions
+            listingId={listing.listing_id}
+            status={listing.status}
+            listingType={listing.listing_type}
+          />
         </div>
 
         {/* Features Stats - Dynamic attributes from server */}

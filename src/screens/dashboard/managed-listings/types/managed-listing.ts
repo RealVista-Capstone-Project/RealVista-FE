@@ -7,6 +7,40 @@ export enum ListingStatus {
   ARCHIVED = 'ARCHIVED',
 }
 
+/**
+ * Shared status config - single source of truth for status display across
+ * listing-card, listing-detail-panel, and listing-status-actions.
+ */
+export const LISTING_STATUS_CONFIG: Record<
+  ListingStatus,
+  { label: string; className: string }
+> = {
+  [ListingStatus.DRAFT]: {
+    label: 'Draft',
+    className: 'bg-gray-100 text-gray-600',
+  },
+  [ListingStatus.PENDING]: {
+    label: 'Pending Review',
+    className: 'bg-yellow-50 text-yellow-600',
+  },
+  [ListingStatus.PUBLISHED]: {
+    label: 'Published',
+    className: 'bg-purple-94 text-main-primary',
+  },
+  [ListingStatus.SOLD]: {
+    label: 'Sold',
+    className: 'bg-green-50 text-green-600',
+  },
+  [ListingStatus.RENTED]: {
+    label: 'Rented',
+    className: 'bg-green-50 text-green-600',
+  },
+  [ListingStatus.ARCHIVED]: {
+    label: 'Archived',
+    className: 'bg-gray-100 text-gray-600',
+  },
+};
+
 export enum ListingType {
   RENT = 'RENT',
   SALE = 'SALE',
