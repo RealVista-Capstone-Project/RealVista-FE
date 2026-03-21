@@ -2,6 +2,26 @@
   "ManagedListings": {
     "title": "Bài đăng",
     "filter": "Lọc",
+    "filterPanel": {
+      "status": "Trạng thái",
+      "statusOptions": {
+        "all": "Tất cả trạng thái",
+        "draft": "Nháp",
+        "pending": "Chờ duyệt",
+        "published": "Đã đăng",
+        "sold": "Đã bán",
+        "rented": "Đã cho thuê",
+        "archived": "Đã lưu trữ"
+      },
+      "sortBy": "Sắp xếp",
+      "sortOptions": {
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "priceAsc": "Giá: Thấp đến cao",
+        "priceDesc": "Giá: Cao đến thấp"
+      },
+      "reset": "Đặt lại"
+    },
     "tabs": {
       "all": "Tất cả",
       "forRent": "Cho thuê",

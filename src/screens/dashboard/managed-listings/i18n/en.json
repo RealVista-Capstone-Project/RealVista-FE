@@ -2,6 +2,26 @@
   "ManagedListings": {
     "title": "Listings",
     "filter": "Filter",
+    "filterPanel": {
+      "status": "Status",
+      "statusOptions": {
+        "all": "All Statuses",
+        "draft": "Draft",
+        "pending": "Pending",
+        "published": "Published",
+        "sold": "Sold",
+        "rented": "Rented",
+        "archived": "Archived"
+      },
+      "sortBy": "Sort By",
+      "sortOptions": {
+        "newest": "Newest First",
+        "oldest": "Oldest First",
+        "priceAsc": "Price: Low to High",
+        "priceDesc": "Price: High to Low"
+      },
+      "reset": "Reset"
+    },
     "tabs": {
       "all": "All",
       "forRent": "For Rent",

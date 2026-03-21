@@ -1,17 +1,19 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, X, ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
 import type { Listing } from '@/entities/listing';
-import type { ListingType } from '../types/managed-listing';
+import { ListingStatus, type ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
 
 type TabType = ListingType | 'ALL';
+type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
+type StatusFilter = ListingStatus | 'ALL';
 
 /**
  * Managed Listings Page
@@ -21,14 +23,17 @@ type TabType = ListingType | 'ALL';
  * - Property list with status badges
  * - Tabs to filter by listing type (All, Rent, Sale)
  * - Search functionality
+ * - Status filter & sort via filter panel
  * - Detailed property view
- * - Tenant information
- * - Room availability tracking
  */
 export function ManagedListingsPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
+  const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('ALL');
+  const [sortBy, setSortBy] = React.useState<SortOption>('newest');
+  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
+  const filterRef = React.useRef<HTMLDivElement>(null);
   const t = useTranslations('ManagedListings');
 
   const { data: listings, isLoading, error } = useQuery(listingQueries.managed());
@@ -42,25 +47,59 @@ export function ManagedListingsPage() {
   // Extract listing detail from response
   const listingDetail = listingResponse?.payload.data as Listing | undefined;
 
-  // Filter listings based on tab and search query
+  // Close filter panel on outside click
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    }
+    if (isFilterOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFilterOpen]);
+
+  // Filter + sort listings
   const filteredListings = React.useMemo(() => {
     if (!listings) return [];
 
-    // Filter by tab
-    let tabFiltered = listings;
+    let result = listings;
+
+    // Filter by tab (listing type)
     if (activeTab !== 'ALL') {
-      tabFiltered = listings.filter((listing) => listing.listing_type === activeTab);
+      result = result.filter((l) => l.listing_type === activeTab);
+    }
+
+    // Filter by status
+    if (statusFilter !== 'ALL') {
+      result = result.filter((l) => l.status === statusFilter);
     }
 
     // Filter by search query
-    if (!searchQuery.trim()) return tabFiltered;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((l) => {
+        const address = l.full_address?.toLowerCase() || '';
+        return l.name.toLowerCase().includes(query) || address.includes(query);
+      });
+    }
 
-    const query = searchQuery.toLowerCase();
-    return tabFiltered.filter((listing) => {
-      const address = listing.full_address?.toLowerCase() || '';
-      return listing.name.toLowerCase().includes(query) || address.includes(query);
+    // Sort
+    return [...result].sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'priceAsc':
+          return a.price - b.price;
+        case 'priceDesc':
+          return b.price - a.price;
+        case 'newest':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
     });
-  }, [listings, activeTab, searchQuery]);
+  }, [listings, activeTab, statusFilter, searchQuery, sortBy]);
 
   // Count listings by type
   const listingCounts = React.useMemo(() => {
@@ -71,6 +110,15 @@ export function ManagedListingsPage() {
       sale: listings.filter((l) => l.listing_type === 'SALE').length,
     };
   }, [listings]);
+
+  // Whether any filter is active (beyond defaults)
+  const hasActiveFilters = statusFilter !== 'ALL' || sortBy !== 'newest';
+
+  const resetFilters = () => {
+    setStatusFilter('ALL');
+    setSortBy('newest');
+    setIsFilterOpen(false);
+  };
 
   // Select first listing by default
   React.useEffect(() => {
@@ -109,6 +157,18 @@ export function ManagedListingsPage() {
     );
   }
 
+  const statusOptions: StatusFilter[] = [
+    'ALL',
+    ListingStatus.DRAFT,
+    ListingStatus.PENDING,
+    ListingStatus.PUBLISHED,
+    ListingStatus.SOLD,
+    ListingStatus.RENTED,
+    ListingStatus.ARCHIVED,
+  ];
+
+  const sortOptions: SortOption[] = ['newest', 'oldest', 'priceAsc', 'priceDesc'];
+
   return (
     <div className='flex h-[calc(100vh-96px)] overflow-hidden'>
       {/* Left Sidebar - Properties List */}
@@ -123,13 +183,111 @@ export function ManagedListingsPage() {
                   <span className='text-sm font-bold text-white'>{filteredListings.length}</span>
                 </div>
               </div>
-              <button
-                type='button'
-                className='flex size-6 items-center justify-center text-main-black transition-colors hover:text-main-primary'
-                aria-label={t('filter')}
-              >
-                <Filter className='h-5 w-5' strokeWidth={2} />
-              </button>
+
+              {/* Filter Button + Panel */}
+              <div ref={filterRef} className='relative'>
+                <button
+                  type='button'
+                  onClick={() => setIsFilterOpen((prev) => !prev)}
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors',
+                    hasActiveFilters
+                      ? 'border-main-primary bg-purple-96 text-main-primary'
+                      : 'border-purple-92 bg-white text-main-black hover:bg-purple-98'
+                  )}
+                  aria-label={t('filter')}
+                >
+                  <Filter className='h-4 w-4' strokeWidth={2} />
+                  <span>{t('filter')}</span>
+                  {hasActiveFilters && (
+                    <span className='flex h-4 w-4 items-center justify-center rounded-full bg-main-primary text-[10px] font-bold text-white'>
+                      {(statusFilter !== 'ALL' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)}
+                    </span>
+                  )}
+                  <ChevronDown
+                    className={cn('h-3.5 w-3.5 transition-transform', isFilterOpen && 'rotate-180')}
+                    strokeWidth={2}
+                  />
+                </button>
+
+                {/* Filter Dropdown Panel */}
+                {isFilterOpen && (
+                  <div className='absolute right-0 top-full z-30 mt-2 w-60 rounded-xl border border-purple-92 bg-white shadow-lg'>
+                    <div className='flex items-center justify-between border-b border-purple-92/50 px-4 py-3'>
+                      <span className='text-sm font-semibold text-main-black'>{t('filter')}</span>
+                      <button
+                        type='button'
+                        onClick={resetFilters}
+                        className='text-xs font-medium text-main-primary hover:underline'
+                      >
+                        {t('filterPanel.reset')}
+                      </button>
+                    </div>
+
+                    <div className='p-4 space-y-4'>
+                      {/* Status Filter */}
+                      <div>
+                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-main-secondary/60'>
+                          {t('filterPanel.status')}
+                        </p>
+                        <div className='flex flex-col gap-1'>
+                          {statusOptions.map((s) => {
+                            const labelKey = `filterPanel.statusOptions.${s === 'ALL' ? 'all' : s.toLowerCase()}` as Parameters<typeof t>[0];
+                            return (
+                              <button
+                                key={s}
+                                type='button'
+                                onClick={() => setStatusFilter(s)}
+                                className={cn(
+                                  'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                                  statusFilter === s
+                                    ? 'bg-purple-96 font-medium text-main-primary'
+                                    : 'text-main-black hover:bg-purple-98'
+                                )}
+                              >
+                                {t(labelKey)}
+                                {statusFilter === s && (
+                                  <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Sort By */}
+                      <div>
+                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-main-secondary/60'>
+                          {t('filterPanel.sortBy')}
+                        </p>
+                        <div className='flex flex-col gap-1'>
+                          {sortOptions.map((s) => {
+                            const labelKey = `filterPanel.sortOptions.${s}` as Parameters<typeof t>[0];
+                            return (
+                              <button
+                                key={s}
+                                type='button'
+                                onClick={() => setSortBy(s)}
+                                className={cn(
+                                  'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                                  sortBy === s
+                                    ? 'bg-purple-96 font-medium text-main-primary'
+                                    : 'text-main-black hover:bg-purple-98'
+                                )}
+                              >
+                                {t(labelKey)}
+                                {sortBy === s && (
+                                  <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -254,3 +412,4 @@ export function ManagedListingsPage() {
     </div>
   );
 }
+
