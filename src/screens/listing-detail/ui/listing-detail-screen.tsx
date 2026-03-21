@@ -98,7 +98,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const handleContact = () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
@@ -119,7 +119,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {

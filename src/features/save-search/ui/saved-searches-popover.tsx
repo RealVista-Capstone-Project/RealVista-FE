@@ -25,14 +25,14 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  const { data: queryData, isLoading, refetch } = useQuery({
+  const { data: queryData, isLoading } = useQuery({
     ...savedSearchQueries.list(),
     enabled: !!session?.user,
   });
 
   const allSavedSearches = queryData?.payload?.data || [];
-  const savedSearches = searchType 
-    ? allSavedSearches.filter(s => s.search_type === searchType) 
+  const savedSearches = searchType
+    ? allSavedSearches.filter((s) => s.search_type === searchType)
     : allSavedSearches;
 
   const queryClient = useQueryClient();
@@ -53,8 +53,8 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
     // Location — handle both string and array
     if (criteria.location) {
       const locs = Array.isArray(criteria.location)
-        ? criteria.location.filter(Boolean)
-        : [criteria.location];
+        ? (criteria.location as string[]).filter(Boolean)
+        : [criteria.location as string];
       if (locs.length > 0) {
         parts.push(`tại ${locs.slice(0, 2).join(', ')}${locs.length > 2 ? '...' : ''}`);
       }
@@ -113,10 +113,10 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
   const handleApplySearch = (search: SavedSearchDto) => {
     setOpen(false);
     const params = new URLSearchParams();
-    
+
     // Convert criteria back to URL params
     const criteria = search.criteria;
-    
+
     if (criteria.location) {
       const loc = Array.isArray(criteria.location) ? criteria.location[0] : criteria.location;
       if (loc) params.set('location', loc);
@@ -134,7 +134,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
 
     if (criteria.propertyType) params.set('propertyType', criteria.propertyType.toString());
     if (criteria.propertyCategory) params.set('propertyCategory', criteria.propertyCategory.toString());
-    
+
     if (criteria.hasVideo) params.set('hasVideo', 'true');
     if (criteria.has3D) params.set('has3D', 'true');
     if (criteria.sortBy && criteria.sortBy !== 'PRIORITY') params.set('sortBy', criteria.sortBy);
@@ -170,7 +170,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-80 p-0' align="end">
+      <PopoverContent className='w-80 p-0' align='end'>
         <div className='p-4 border-b border-gray-100 flex items-center justify-between'>
           <h3 className='font-semibold text-main-black'>Tìm kiếm đã lưu</h3>
         </div>
@@ -185,7 +185,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
             </p>
           ) : (
             savedSearches.map((search) => (
-              <div 
+              <div
                 key={search.saved_search_id}
                 onClick={() => handleApplySearch(search)}
                 className='flex items-start justify-between p-3 hover:bg-gray-50 rounded-md cursor-pointer group transition-colors'
@@ -198,8 +198,8 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
                     {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: vi })}
                   </p>
                 </div>
-                <Button 
-                  variant='ghost' 
+                <Button
+                  variant='ghost'
                   size='icon'
                   className='h-8 w-8 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity'
                   onClick={(e) => handleDelete(e, search.saved_search_id)}

@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 
 interface SaveSearchButtonProps {
   searchType: SearchType;
-  criteria: Record<string, any>;
+  criteria: Record<string, unknown>;
 }
 
 export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps) {
@@ -41,7 +41,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
     );
   };
 
-  const isAlreadySaved = savedSearches.some(s => {
+  const isAlreadySaved = savedSearches.some((s) => {
     if (s.search_type !== searchType) return false;
     return stableStringify(s.criteria) === stableStringify(criteria);
   });
@@ -54,7 +54,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
 
     // Always call BE — if duplicate, useSaveSearch.onError intercepts 409 and refreshes cache silently
     saveSearch(
-      { search_type: searchType, criteria },
+      { search_type: searchType, criteria: criteria as any },
       {
         onSuccess: () => {
           toast.success('Đã lưu tìm kiếm thành công');

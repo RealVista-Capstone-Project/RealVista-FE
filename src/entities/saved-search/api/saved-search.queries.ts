@@ -53,7 +53,7 @@ export function useDeleteSavedSearch() {
           ...old,
           payload: {
             ...old.payload,
-            data: old.payload.data.filter((item: any) => 
+            data: old.payload.data.filter((item: any) =>
                (item.saved_search_id || item.savedSearchId) !== id
             )
           }
@@ -65,7 +65,7 @@ export function useDeleteSavedSearch() {
     },
     // If the mutation fails, use the context returned from onMutate to roll back
     onError: (err, id, context: any) => {
-      queryClient.setQueryData(savedSearchKeys.lists(), context.previousData);
+      queryClient.setQueryData(savedSearchKeys.lists(), context?.previousData);
     },
     // Always refetch after error or success:
     onSettled: () => {
