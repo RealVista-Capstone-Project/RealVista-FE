@@ -1,0 +1,105 @@
+'use client';
+
+import * as React from 'react';
+import { Eye, Users, Calendar, TrendingUp } from 'lucide-react';
+import { useListingAnalytics } from '../api/use-listing-analytics';
+
+interface ListingMetricsCardProps {
+  listingId: string;
+}
+
+/**
+ * Displays listing performance metrics
+ * Shows total views, unique viewers, tour bookings, and conversion rate
+ */
+export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
+  const { data, isLoading, isError } = useListingAnalytics(listingId);
+
+  if (isError) {
+    return null; // Gracefully hide if analytics fail to load
+  }
+
+  if (isLoading) {
+    return (
+      <div className='rounded-lg border border-purple-92 p-6'>
+        <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
+          Listing Performance
+        </h2>
+        <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
+          {[...Array(4)].map((_, i) => (
+            <MetricSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const analytics = data;
+
+  if (!analytics) {
+    return null;
+  }
+
+  return (
+    <div className='rounded-lg border border-purple-92 p-6'>
+      <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
+        Listing Performance
+      </h2>
+
+      <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
+        <MetricItem
+          icon={<Eye className='h-6 w-6' strokeWidth={2} />}
+          label='Total Views'
+          value={analytics.total_views.toLocaleString()}
+        />
+        <MetricItem
+          icon={<Users className='h-6 w-6' strokeWidth={2} />}
+          label='Unique Viewers'
+          value={analytics.unique_viewers.toLocaleString()}
+        />
+        <MetricItem
+          icon={<Calendar className='h-6 w-6' strokeWidth={2} />}
+          label='Tour Bookings'
+          value={analytics.tour_bookings.toLocaleString()}
+        />
+        <MetricItem
+          icon={<TrendingUp className='h-6 w-6' strokeWidth={2} />}
+          label='Conversion Rate'
+          value={`${analytics.conversion_rate}%`}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface MetricItemProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}
+
+function MetricItem({ icon, label, value }: MetricItemProps) {
+  return (
+    <div className='flex flex-col gap-4'>
+      <p className='text-base font-medium leading-[1.5] text-grey-500'>{label}</p>
+      <div className='flex items-center gap-2'>
+        <div className='text-main-black/50'>{icon}</div>
+        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MetricSkeleton() {
+  return (
+    <div className='flex flex-col gap-4'>
+      <div className='h-6 w-24 animate-pulse rounded bg-purple-92' />
+      <div className='flex items-center gap-2'>
+        <div className='h-6 w-6 animate-pulse rounded bg-purple-92' />
+        <div className='h-7 w-16 animate-pulse rounded bg-purple-92' />
+      </div>
+    </div>
+  );
+}

@@ -3,6 +3,7 @@ import { Calendar } from 'lucide-react';
 import { PropertyGallery } from '@/features/property-gallery';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
+import { ListingMetricsCard } from '@/features/listing-analytics';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
@@ -26,6 +27,11 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
 
       {/* Content */}
       <div className='px-12 py-8'>
+        {/* Listing Analytics Metrics */}
+        <div className='mb-8'>
+          <ListingMetricsCard listingId={listing.listing_id} />
+        </div>
+
         {/* Header with Title and Calendar Button */}
         <div className='mb-6 flex items-start justify-between'>
           <div className='flex flex-col gap-2'>
