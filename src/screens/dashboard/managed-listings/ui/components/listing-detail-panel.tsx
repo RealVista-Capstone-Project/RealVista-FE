@@ -1,7 +1,10 @@
+'use client';
+
 import * as React from 'react';
 import Image from 'next/image';
 import { Calendar, Mail, Phone, Building2, BadgeCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useRouter, useParams } from 'next/navigation';
 import { PropertyGallery } from '@/features/property-gallery';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
@@ -10,6 +13,15 @@ import { ListingStatusActions } from '@/features/listing-status';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
+import { useQueryClient } from '@tanstack/react-query';
+import { useChatWindowStore } from '@/entities/contact';
+import { useAuthSession } from '@/features/auth/model';
+import { isAuthenticated } from '@/features/auth/model';
+import { useSendMessage, conversationQueries } from '@/entities/conversation';
+import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
+import { unwrapApiResponse } from '@/shared/types/api';
+import type { SendMessageResponse } from '@/entities/conversation/model/types';
+import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 
 interface ListingDetailPanelProps {
   listing: Listing;
@@ -19,6 +31,88 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
   const t = useTranslations('ListingDetailPanel');
   const property: Property = mapListingToProperty(listing);
   console.log(`Listing user: ${listing.user_id}`);
+
+  const { data: session } = useAuthSession();
+  const router = useRouter();
+  const params = useParams();
+  const { openWindow } = useChatWindowStore();
+  const isMobile = useIsMobile();
+  const sendMessage = useSendMessage();
+  const queryClient = useQueryClient();
+  const chatListingData = mapListingToChatData(listing);
+
+  const handleContact = async () => {
+    if (!isAuthenticated(session)) {
+      const locale = params.locale;
+      router.push(`/${locale}/login`);
+      return;
+    }
+
+    try {
+      // 1. Try to fetch existing conversation
+      const existingConv = await queryClient.fetchQuery(
+        conversationQueries.detail(listing.agent.user_id)
+      );
+
+      // Depending on the HTTP client structure, we might need to unwrap or access data directly
+      // If it returned successfully, it exists!
+      const convData = (existingConv && typeof existingConv === 'object' && 'data' in existingConv
+        ? (existingConv as Record<string, unknown>).data
+        : existingConv) as Record<string, unknown>;
+
+      const payload = convData?.payload as Record<string, unknown> | undefined;
+      const payloadData = payload?.data as Record<string, unknown> | undefined;
+
+      const conversationId = (payloadData?.conversation_id ??
+        convData?.conversation_id) as string;
+
+      if (conversationId) {
+        if (isMobile) {
+          const locale = params.locale;
+          router.push(`/${locale}/messages/${conversationId}`);
+        } else {
+          openWindow(conversationId, {
+            id: listing.agent.user_id,
+            name: listing.agent.full_name,
+            avatar: listing.agent.avatar_url,
+          });
+        }
+        return;
+      }
+    } catch {
+      // 2. If it fails (e.g. 404), fallback to creating it
+      console.log('No existing conversation found, creating a new one...');
+    }
+
+    try {
+      const response = await sendMessage.mutateAsync({
+        recipient_user_id: listing.agent.user_id,
+        message_type: 'TEXT',
+        content: '', // Empty content, just sending the card to start conversation
+        metadata: JSON.stringify(chatListingData),
+      });
+
+      if (response) {
+        const sendResult = unwrapApiResponse<SendMessageResponse>(response);
+        const conversationId = sendResult.conversation_id;
+
+        if (conversationId) {
+          if (isMobile) {
+            const locale = params.locale;
+            router.push(`/${locale}/messages/${conversationId}`);
+          } else {
+            openWindow(conversationId, {
+              id: listing.agent.user_id,
+              name: listing.agent.full_name,
+              avatar: listing.agent.avatar_url,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to start conversation:', error);
+    }
+  };
 
   // Get dynamic attributes from listing
   const attributes = listing.attributes ?? [];
@@ -177,6 +271,7 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
                   {/* Contact Button */}
                   <button
                     type='button'
+                    onClick={handleContact}
                     className='w-full rounded-lg bg-main-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-main-primary/90 hover:shadow-md'
                   >
                     {t('agent.contact')}

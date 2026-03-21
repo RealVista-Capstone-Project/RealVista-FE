@@ -19,6 +19,7 @@ import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
+import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 
 export interface SidebarMenuItem {
   id: string;
@@ -72,7 +73,10 @@ export function DashboardLayout({
    * Compute the top nav page title based on the current pathname
    */
   const pageTitle = React.useMemo(() => {
-    if (pathname === ROUTES.dashboard.managedListings || pathname.startsWith(ROUTES.dashboard.managedListings)) {
+    if (
+      pathname === ROUTES.dashboard.managedListings ||
+      pathname.startsWith(ROUTES.dashboard.managedListings)
+    ) {
       return t('pageTitle.managedListings');
     }
     if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight)) {
@@ -123,6 +127,7 @@ export function DashboardLayout({
 
   return (
     <div className={cn('flex min-h-screen w-full', className)}>
+      <ChatWindowRenderer />
       {/* Sidebar */}
       <aside
         className={cn(
