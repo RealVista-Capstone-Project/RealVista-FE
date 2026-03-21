@@ -22,8 +22,8 @@ export function getInitials(name: string | null | undefined): string {
     .toUpperCase();
 }
 
-export function getStatusColor(status: string) {
-  switch (status.toUpperCase()) {
+export function getStatusColor(status: string | null | undefined) {
+  switch ((status ?? '').toUpperCase()) {
     case 'ACTIVE':
       return 'bg-green-100 text-green-700';
     case 'PENDING':

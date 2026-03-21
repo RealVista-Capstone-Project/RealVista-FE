@@ -62,7 +62,7 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
       <div className='col-span-2 flex items-center gap-1'>
         <Star className='h-3.5 w-3.5 text-yellow-400 fill-yellow-400' />
         <span className='text-sm font-medium text-gray-700'>
-          {agent.agent_rating !== null ? agent.agent_rating.toFixed(1) : t('common.na')}
+          {agent.agent_rating != null ? agent.agent_rating.toFixed(1) : t('common.na')}
         </span>
       </div>
 

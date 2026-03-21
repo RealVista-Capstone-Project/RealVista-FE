@@ -41,8 +41,8 @@ interface AgentProfileSidebarProps {
 export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSidebarProps) {
   const t = useTranslations('AgentEngagement');
 
-  const statusKey = `status.${agent.status.toLowerCase()}` as const;
-  const statusLabel = t.has(statusKey) ? t(statusKey) : agent.status;
+  const statusKey = `status.${(agent.status ?? '').toLowerCase()}` as const;
+  const statusLabel = agent.status && t.has(statusKey) ? t(statusKey) : (agent.status ?? '');
 
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -99,7 +99,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
     [agent, reviewMutation, onAgentUpdate, t]
   );
 
-  const status = agent.status.toUpperCase();
+  const status = (agent.status ?? '').toUpperCase();
   const hasReview = agent.has_review ?? false;
 
   const renderActionButtons = () => {
@@ -188,7 +188,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
             </p>
           )}
 
-          {agent.agent_rating !== null && (
+          {agent.agent_rating != null && (
             <div className='flex items-center gap-1 mt-2'>
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star

@@ -24,9 +24,9 @@ export function ManageAgentDetailPage({ initialAgent }: ManageAgentDetailPagePro
   const [agent, setAgent] = useState<AgentEngagement>(initialAgent);
 
   return (
-    <div className='container mx-auto p-4 md:p-6 bg-[#F7F7FD] min-h-screen font-sans'>
+    <div className='container mx-auto p-4 md:px-6 md:py-0 bg-[#F7F7FD] min-h-screen font-sans'>
       {/* Back navigation */}
-      <div className='mb-6'>
+      <div className='mb-3'>
         <Button
           variant='ghost'
           size='sm'

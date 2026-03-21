@@ -212,7 +212,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
             <h3 className='text-lg font-bold text-gray-900'>{agent.agent_full_name}</h3>
 
             {/* Rating */}
-            {agent.agent_rating !== null && (
+            {agent.agent_rating != null && (
               <div className='flex items-center gap-1 mt-1'>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star

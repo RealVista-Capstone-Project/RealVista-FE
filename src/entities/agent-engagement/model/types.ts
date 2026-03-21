@@ -19,6 +19,8 @@ export interface AgentEngagement {
   status: string;
   hired_at: string;
   has_review?: boolean;
+  content?: string | null;
+  cancellation_reason?: string | null;
 }
 
 export interface CreateReviewPayload {

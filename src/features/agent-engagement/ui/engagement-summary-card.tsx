@@ -12,12 +12,23 @@ interface EngagementSummaryCardProps {
   agent: AgentEngagement;
 }
 
+interface ParsedContent {
+  message?: string;
+  offeredCommission?: string;
+}
+
 export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
   const t = useTranslations('AgentEngagement');
   const locale = useLocale();
 
-  const statusKey = `status.${agent.status.toLowerCase()}` as const;
-  const statusLabel = t.has(statusKey) ? t(statusKey) : agent.status;
+  const statusKey = `status.${(agent.status ?? '').toLowerCase()}` as const;
+  const statusLabel = agent.status && t.has(statusKey) ? t(statusKey) : (agent.status ?? '');
+
+  const parsedContent: ParsedContent | null = (() => {
+    if (!agent.content) return null;
+    try { return JSON.parse(agent.content) as ParsedContent; }
+    catch { return null; }
+  })();
 
   return (
     <Card className='border-none shadow-sm rounded-xl overflow-hidden'>
@@ -49,6 +60,9 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
         <CardTitle className='text-base font-bold text-gray-900'>
           {t('detailPage.summaryTitle')}
         </CardTitle>
+        {parsedContent?.message && (
+          <p className='text-sm text-gray-500 mt-1 leading-relaxed'>{parsedContent.message}</p>
+        )}
       </CardHeader>
 
       <CardContent className='px-6 pb-6'>

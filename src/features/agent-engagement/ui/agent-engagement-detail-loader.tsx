@@ -16,6 +16,7 @@ interface AgentEngagementDetailLoaderProps {
 export function AgentEngagementDetailLoader({ engagementId }: AgentEngagementDetailLoaderProps) {
   const t = useTranslations('ManageAgent');
   const { data, isLoading, isError } = useEngagementDetailQuery(engagementId);
+  console.log('data', data )
 
   if (isLoading) {
     return (
