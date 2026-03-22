@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
+import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
@@ -48,7 +49,7 @@ export function ManagedListingsPage() {
   } = useQuery(
     listingQueries.managed({
       page,
-      size: 10,
+      size: 5,
       search: searchQuery,
       listingType: activeTab,
       status: statusFilter,
@@ -376,26 +377,12 @@ export function ManagedListingsPage() {
                 ))}
                 {/* Pagination Controls */}
                 {listingPage && listingPage.total_pages > 1 && (
-                  <div className='flex items-center justify-center gap-4 py-4 bg-white border-t border-purple-92/50'>
-                    <button
-                      type='button'
-                      disabled={page === 0}
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
-                      className='rounded-lg border border-purple-92 px-3 py-1.5 text-sm font-medium disabled:opacity-50 hover:bg-purple-98'
-                    >
-                      {t('pagination.previous')}
-                    </button>
-                    <span className='text-sm text-main-secondary'>
-                      {t('pagination.page', { current: page + 1, total: listingPage.total_pages })}
-                    </span>
-                    <button
-                      type='button'
-                      disabled={page >= listingPage.total_pages - 1}
-                      onClick={() => setPage((p) => p + 1)}
-                      className='rounded-lg border border-purple-92 px-3 py-1.5 text-sm font-medium disabled:opacity-50 hover:bg-purple-98'
-                    >
-                      {t('pagination.next')}
-                    </button>
+                  <div className='py-6 bg-white border-t border-purple-92/50'>
+                    <RealVistaPagination
+                      currentPage={page + 1}
+                      totalPages={listingPage.total_pages}
+                      onPageChange={(p) => setPage(p - 1)}
+                    />
                   </div>
                 )}
               </div>
