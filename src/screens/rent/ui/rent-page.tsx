@@ -251,6 +251,7 @@ function RentPageContent() {
                   onChange={(e) => setLocation(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={100}
                 />
               </div>
 
@@ -267,6 +268,7 @@ function RentPageContent() {
                   onChange={(e) => setMinPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
@@ -283,6 +285,7 @@ function RentPageContent() {
                   onChange={(e) => setMaxPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
