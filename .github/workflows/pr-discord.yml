@@ -19,12 +19,12 @@ jobs:
           PR_TITLE="${{ github.event.pull_request.title }}"
           AUTHOR="${{ github.event.pull_request.user.login }}"
 
-          # lấy reviewer
+          # Lấy danh sách Reviewers
           REVIEWERS=$(jq -r '.pull_request.requested_reviewers[].login' <<< '${{ toJson(github.event) }}')
 
-          # Nếu không có reviewer và sự kiện là review_requested thì thoát (để tránh spam khi trigger review_requested mà k có ai)
+          # Nếu sự kiện là review_requested mà danh sách reviewers trống thì thoát
           if [ -z "$REVIEWERS" ] && [ "${{ github.event.action }}" == "review_requested" ]; then
-            echo "No reviewers requested. Skipping notification."
+            echo "No reviewers found. Skipping notification."
             exit 0
           fi
 
@@ -44,12 +44,11 @@ jobs:
             fi
           done
 
-          # Nếu sau khi lọc mà TAGS trống (ví dụ chỉ tag chính mình), và là review_requested thì cũng skip
+          # Nếu sau khi lọc mà TAGS trống, và là review_requested thì cũng skip
           if [ -z "$(echo $TAGS | xargs)" ] && [ "${{ github.event.action }}" == "review_requested" ]; then
             echo "No other human reviewers to tag. Skipping."
             exit 0
           fi
-
 
           # Clean up TAGS (remove leading space)
           TAGS=$(echo $TAGS | xargs)
@@ -58,5 +57,5 @@ jobs:
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
           -H "Content-Type: application/json" \
           -d "{
-            \"content\": \"🚀 **New PR Notification**\n**Title:** $PR_TITLE\n**Link:** $PR_URL\n👤 **Author:** $AUTHOR\n👀 **Reviewers:** $TAGS\"
+            \"content\": \"🚀 **New PR Notification**\n**TITLE:** $PR_TITLE\n**LINK:** $PR_URL\n👤 **Author:** $AUTHOR\n👀 **Reviewers:** $TAGS\"
           }"
