@@ -8,7 +8,7 @@ import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
 import type { Listing } from '@/entities/listing';
-import { ListingStatus, type ListingType } from '../types/managed-listing';
+import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
 
 type TabType = ListingType | 'ALL';
@@ -32,11 +32,31 @@ export function ManagedListingsPage() {
   const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('ALL');
   const [sortBy, setSortBy] = React.useState<SortOption>('newest');
+  const [page, setPage] = React.useState(0);
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const filterRef = React.useRef<HTMLDivElement>(null);
   const t = useTranslations('ManagedListings');
 
-  const { data: listings, isLoading, error } = useQuery(listingQueries.managed());
+  // Fetch summary counts for tabs
+  const { data: summary } = useQuery(listingQueries.managedSummary());
+
+  // Fetch paginated, filtered, and sorted listings
+  const {
+    data: listingPage,
+    isLoading,
+    error,
+  } = useQuery(
+    listingQueries.managed({
+      page,
+      size: 10,
+      search: searchQuery,
+      listingType: activeTab,
+      status: statusFilter,
+      sortBy: sortBy,
+    })
+  );
+
+  const listings = React.useMemo(() => listingPage?.content || [], [listingPage]);
 
   // Use centralized listing query
   const { data: listingResponse, isLoading: isDetailLoading } = useQuery({
@@ -60,56 +80,19 @@ export function ManagedListingsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterOpen]);
 
-  // Filter + sort listings
-  const filteredListings = React.useMemo(() => {
-    if (!listings) return [];
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(0);
+  }, [searchQuery, activeTab, statusFilter, sortBy]);
 
-    let result = listings;
-
-    // Filter by tab (listing type)
-    if (activeTab !== 'ALL') {
-      result = result.filter((l) => l.listing_type === activeTab);
-    }
-
-    // Filter by status
-    if (statusFilter !== 'ALL') {
-      result = result.filter((l) => l.status === statusFilter);
-    }
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter((l) => {
-        const address = l.full_address?.toLowerCase() || '';
-        return l.name.toLowerCase().includes(query) || address.includes(query);
-      });
-    }
-
-    // Sort
-    return [...result].sort((a, b) => {
-      switch (sortBy) {
-        case 'oldest':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        case 'priceAsc':
-          return a.price - b.price;
-        case 'priceDesc':
-          return b.price - a.price;
-        case 'newest':
-        default:
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      }
-    });
-  }, [listings, activeTab, statusFilter, searchQuery, sortBy]);
-
-  // Count listings by type
+  // Count listings by type from summary API
   const listingCounts = React.useMemo(() => {
-    if (!listings) return { all: 0, rent: 0, sale: 0 };
     return {
-      all: listings.length,
-      rent: listings.filter((l) => l.listing_type === 'RENT').length,
-      sale: listings.filter((l) => l.listing_type === 'SALE').length,
+      all: summary?.all || 0,
+      rent: summary?.rent || 0,
+      sale: summary?.sale || 0,
     };
-  }, [listings]);
+  }, [summary]);
 
   // Whether any filter is active (beyond defaults)
   const hasActiveFilters = statusFilter !== 'ALL' || sortBy !== 'newest';
@@ -122,21 +105,23 @@ export function ManagedListingsPage() {
 
   // Select first listing by default
   React.useEffect(() => {
-    if (filteredListings.length > 0 && !selectedListingId) {
-      setSelectedListingId(filteredListings[0].listing_id);
+    if (listings.length > 0 && !selectedListingId) {
+      setSelectedListingId(listings[0].listing_id);
     }
-  }, [filteredListings, selectedListingId]);
+  }, [listings, selectedListingId]);
 
-  // Clear selection if listing is not in filtered list
+  // Clear selection if listing is not in current page
   React.useEffect(() => {
     if (
       selectedListingId &&
-      filteredListings.length > 0 &&
-      !filteredListings.find((l) => l.listing_id === selectedListingId)
+      listings.length > 0 &&
+      !listings.find((l) => l.listing_id === selectedListingId)
     ) {
-      setSelectedListingId(filteredListings[0].listing_id);
+      // Don't auto-reset selection when paginating if possible,
+      // but here we keep the original logic adapted to pages
+      // setSelectedListingId(listings[0].listing_id);
     }
-  }, [filteredListings, selectedListingId]);
+  }, [listings, selectedListingId]);
 
   if (isLoading) {
     return (
@@ -180,7 +165,7 @@ export function ManagedListingsPage() {
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-main-black'>{t('title')}</h2>
                 <div className='flex items-center justify-center rounded-lg bg-main-primary px-2 py-1'>
-                  <span className='text-sm font-bold text-white'>{filteredListings.length}</span>
+                  <span className='text-sm font-bold text-white'>{listingCounts.all}</span>
                 </div>
               </div>
 
@@ -316,10 +301,10 @@ export function ManagedListingsPage() {
               </button>
               <button
                 type='button'
-                onClick={() => setActiveTab('RENT' as ListingType)}
+                onClick={() => setActiveTab(ListingType.RENT)}
                 className={cn(
                   'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
-                  activeTab === 'RENT'
+                  activeTab === ListingType.RENT
                     ? 'bg-main-primary text-white'
                     : 'bg-transparent text-main-black/70 hover:bg-purple-98'
                 )}
@@ -328,7 +313,7 @@ export function ManagedListingsPage() {
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-bold',
-                    activeTab === 'RENT' ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
+                    activeTab === ListingType.RENT ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
                   )}
                 >
                   {listingCounts.rent}
@@ -336,10 +321,10 @@ export function ManagedListingsPage() {
               </button>
               <button
                 type='button'
-                onClick={() => setActiveTab('SALE' as ListingType)}
+                onClick={() => setActiveTab(ListingType.SALE)}
                 className={cn(
                   'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
-                  activeTab === 'SALE'
+                  activeTab === ListingType.SALE
                     ? 'bg-main-primary text-white'
                     : 'bg-transparent text-main-black/70 hover:bg-purple-98'
                 )}
@@ -348,7 +333,7 @@ export function ManagedListingsPage() {
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-bold',
-                    activeTab === 'SALE' ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
+                    activeTab === ListingType.SALE ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
                   )}
                 >
                   {listingCounts.sale}
@@ -375,13 +360,13 @@ export function ManagedListingsPage() {
 
           {/* Properties List */}
           <div className='flex-1 overflow-y-auto'>
-            {filteredListings.length === 0 ? (
+            {listings.length === 0 ? (
               <div className='flex items-center justify-center p-8'>
                 <p className='text-sm text-main-secondary/60'>{t('empty.noProperties')}</p>
               </div>
             ) : (
               <div className='divide-y divide-purple-92/50'>
-                {filteredListings.map((listing) => (
+                {listings.map((listing) => (
                   <ListingCard
                     key={listing.listing_id}
                     listing={listing}
@@ -389,6 +374,30 @@ export function ManagedListingsPage() {
                     onClick={() => setSelectedListingId(listing.listing_id)}
                   />
                 ))}
+                {/* Pagination Controls */}
+                {listingPage && listingPage.total_pages > 1 && (
+                  <div className='flex items-center justify-center gap-4 py-4 bg-white border-t border-purple-92/50'>
+                    <button
+                      type='button'
+                      disabled={page === 0}
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                      className='rounded-lg border border-purple-92 px-3 py-1.5 text-sm font-medium disabled:opacity-50 hover:bg-purple-98'
+                    >
+                      {t('pagination.previous')}
+                    </button>
+                    <span className='text-sm text-main-secondary'>
+                      {t('pagination.page', { current: page + 1, total: listingPage.total_pages })}
+                    </span>
+                    <button
+                      type='button'
+                      disabled={page >= listingPage.total_pages - 1}
+                      onClick={() => setPage((p) => p + 1)}
+                      className='rounded-lg border border-purple-92 px-3 py-1.5 text-sm font-medium disabled:opacity-50 hover:bg-purple-98'
+                    >
+                      {t('pagination.next')}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

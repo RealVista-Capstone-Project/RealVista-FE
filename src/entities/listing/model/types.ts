@@ -193,6 +193,24 @@ export interface SimilarListingsResponse {
   limit: number;
 }
 
+// ============ Generic Paginated Response ============
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  total_elements: number;
+  total_pages: number;
+  first: boolean;
+  last: boolean;
+}
+
+// ============ Managed Listing Summary ============
+export interface ManagedListingSummary {
+  all: number;
+  rent: number;
+  sale: number;
+}
+
 // ============ Main Listing Type (what we export) ============
 export type Listing = ListingData;
 export type PriceHistory = PriceHistoryData;

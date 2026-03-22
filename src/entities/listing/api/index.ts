@@ -1,5 +1,5 @@
 import http from '@/shared/lib/http';
-import type { Listing, ApiResponse, PriceHistory, SimilarListingsResponse } from '../model/types';
+import type { Listing, ApiResponse, PriceHistory, SimilarListingsResponse, PageResponse, ManagedListingSummary } from '../model/types';
 import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/managed-listing';
 
 /**
@@ -29,10 +29,37 @@ export const listingApi = {
 
   /**
    * Get managed listings (listings created by the authenticated user)
-   * Returns a simplified list view with flat address structure
+   * Returns a paginated list of listings
    * Requires authentication
    */
-  getManagedListings: () => http.get<ApiResponse<ManagedListing[]>>('/listings/managed-listings'),
+  getManagedListings: (params?: {
+    page?: number;
+    size?: number;
+    search?: string;
+    listingType?: string;
+    status?: string;
+    sortBy?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.page !== undefined) query.append('page', params.page.toString());
+    if (params?.size !== undefined) query.append('size', params.size.toString());
+    if (params?.search) query.append('search', params.search);
+    if (params?.listingType) query.append('listingType', params.listingType);
+    if (params?.status) query.append('status', params.status);
+    if (params?.sortBy) query.append('sortBy', params.sortBy);
+
+    const queryString = query.toString();
+    return http.get<ApiResponse<PageResponse<ManagedListing>>>(
+      `/listings/managed-listings${queryString ? `?${queryString}` : ''}`
+    );
+  },
+
+  /**
+   * Get managed listings summary (counts by type)
+   * Requires authentication
+   */
+  getManagedListingSummary: () =>
+    http.get<ApiResponse<ManagedListingSummary>>('/listings/managed-listings/summary'),
 
   // ==================== Status Update Operations ====================
 

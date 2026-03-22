@@ -45,13 +45,33 @@ export const listingQueries = {
    * Get managed listings (listings created by the authenticated user)
    * Requires authentication
    */
-  managed: () =>
+  managed: (params?: {
+    page?: number;
+    size?: number;
+    search?: string;
+    listingType?: string;
+    status?: string;
+    sortBy?: string;
+  }) =>
     queryOptions({
-      queryKey: listingKeys.managed(),
+      queryKey: listingKeys.managed(params),
       queryFn: async () => {
-        const response = await listingApi.getManagedListings();
+        const response = await listingApi.getManagedListings(params);
         return response.payload.data;
       },
       staleTime: 2 * 60 * 1000, // 2 minutes
     }),
-} as const;
+
+  /**
+   * Get summary counts for managed listings
+   */
+  managedSummary: () =>
+    queryOptions({
+      queryKey: listingKeys.managedSummary(),
+      queryFn: async () => {
+        const response = await listingApi.getManagedListingSummary();
+        return response.payload.data;
+      },
+      staleTime: 5 * 60 * 1000,
+    }),
+};
