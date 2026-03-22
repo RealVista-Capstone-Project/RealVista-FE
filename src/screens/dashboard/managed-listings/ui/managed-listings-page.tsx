@@ -11,7 +11,7 @@ import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-
 import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
-import { useDebounce } from '@/shared/lib/hooks';
+import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
@@ -39,6 +39,7 @@ export function ManagedListingsPage() {
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const filterRef = React.useRef<HTMLDivElement>(null);
   const t = useTranslations('ManagedListings');
+  const isMobile = useIsMobile();
 
   // Fetch summary counts for tabs
   const { data: summary } = useQuery(listingQueries.managedSummary());
@@ -105,12 +106,12 @@ export function ManagedListingsPage() {
     setIsFilterOpen(false);
   };
 
-  // Select first listing by default
+  // Select first listing by default (only on desktop)
   React.useEffect(() => {
-    if (listings.length > 0 && !selectedListingId) {
+    if (!isMobile && listings.length > 0 && !selectedListingId) {
       setSelectedListingId(listings[0].listing_id);
     }
-  }, [listings, selectedListingId]);
+  }, [listings, selectedListingId, isMobile]);
 
   // Clear selection if listing is not in current page
   React.useEffect(() => {
@@ -157,13 +158,18 @@ export function ManagedListingsPage() {
   const sortOptions: SortOption[] = ['newest', 'oldest', 'priceAsc', 'priceDesc'];
 
   return (
-    <div className='flex h-[calc(100vh-96px)] overflow-hidden'>
+    <div className='flex h-[calc(100vh-96px)] overflow-hidden flex-col sm:flex-row'>
       {/* Left Sidebar - Properties List */}
-      <aside className='w-[460px] border-r border-purple-92/50 bg-white'>
+      <aside
+        className={cn(
+          'flex-col border-r border-purple-92/50 bg-white transition-all duration-300',
+          isMobile ? (selectedListingId ? 'hidden' : 'flex w-full') : 'flex w-[460px]'
+        )}
+      >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-purple-92/50 p-6'>
-            <div className='flex items-center justify-between'>
+          <div className='border-b border-purple-92/50 p-4 sm:p-6'>
+            <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-main-black'>{t('title')}</h2>
                 <div className='flex items-center justify-center rounded-lg bg-main-primary px-2 py-1'>
@@ -172,12 +178,12 @@ export function ManagedListingsPage() {
               </div>
 
               {/* Filter Button + Panel */}
-              <div ref={filterRef} className='relative'>
+              <div ref={filterRef} className='relative w-full sm:w-auto'>
                 <button
                   type='button'
                   onClick={() => setIsFilterOpen((prev) => !prev)}
                   className={cn(
-                    'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors',
+                    'flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors',
                     hasActiveFilters
                       ? 'border-main-primary bg-purple-96 text-main-primary'
                       : 'border-purple-92 bg-white text-main-black hover:bg-purple-98'
@@ -279,8 +285,8 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Tabs */}
-          <div className='border-b border-purple-92/50 px-6 pt-4'>
-            <div className='flex gap-1'>
+          <div className='border-b border-purple-92/50 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
+            <div className='flex gap-1 min-w-max'>
               <button
                 type='button'
                 onClick={() => setActiveTab('ALL')}
@@ -345,7 +351,7 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Search Bar */}
-          <div className='border-b border-purple-92/50 p-6'>
+          <div className='border-b border-purple-92/50 p-4 sm:p-6'>
             <div className='relative'>
               <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
                 <Search className='h-5 w-5 text-main-secondary/50' strokeWidth={2} />
@@ -393,9 +399,17 @@ export function ManagedListingsPage() {
       </aside>
 
       {/* Right Content - Property Detail */}
-      <main className='flex-1 overflow-y-auto bg-purple-98'>
+      <main
+        className={cn(
+          'flex-1 overflow-y-auto bg-purple-98',
+          isMobile ? (selectedListingId ? 'block' : 'hidden') : 'block'
+        )}
+      >
         {listingDetail && !isDetailLoading ? (
-          <ListingDetailPanel listing={listingDetail} />
+          <ListingDetailPanel
+            listing={listingDetail}
+            onBack={isMobile ? () => setSelectedListingId(null) : undefined}
+          />
         ) : (
           <div className='flex h-full items-center justify-center'>
             {isDetailLoading ? (

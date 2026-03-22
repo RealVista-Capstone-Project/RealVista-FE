@@ -27,11 +27,11 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       type='button'
       onClick={onClick}
       className={cn(
-        'w-full border-b border-purple-92/50 p-6 text-left transition-colors hover:bg-purple-98',
+        'w-full border-b border-purple-92/50 p-4 sm:p-6 text-left transition-colors hover:bg-purple-98',
         isSelected && 'bg-purple-96'
       )}
     >
-      <div className='flex items-center gap-4'>
+      <div className='flex items-center gap-3 sm:gap-4'>
         {/* Property Image */}
         <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg'>
           {listing.thumbnail ? (
@@ -47,7 +47,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
         <div className='flex min-w-0 flex-1 flex-col gap-2'>
           {/* Name & Listing Type */}
           <div className='flex items-center gap-2'>
-            <h3 className='line-clamp-1 text-lg font-medium leading-snug tracking-[-0.09px] text-main-black'>
+            <h3 className='line-clamp-1 text-base sm:text-lg font-medium leading-snug tracking-[-0.09px] text-main-black'>
               {listing.name}
             </h3>
             <span

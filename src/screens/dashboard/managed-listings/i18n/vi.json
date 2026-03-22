@@ -51,6 +51,7 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Địa chỉ không có sẵn",
     "showCalendar": "Hiển thị lịch bất động sản",
+    "backToList": "Quay lại danh sách",
     "agent": {
       "title": "Người môi giới",
       "subtitle": "Bài đăng này được quản lý bởi môi giới",

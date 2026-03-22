@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { Calendar, Mail, Phone, Building2, BadgeCheck } from 'lucide-react';
+import { Calendar, Mail, Phone, Building2, BadgeCheck, ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 import { PropertyGallery } from '@/features/property-gallery';
@@ -22,9 +22,10 @@ import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 
 interface ListingDetailPanelProps {
   listing: Listing;
+  onBack?: () => void;
 }
 
-export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
+export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps) {
   const t = useTranslations('ListingDetailPanel');
   const property: Property = mapListingToProperty(listing);
   console.log(`Listing user: ${listing.user_id}`);
@@ -83,14 +84,27 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
   const showAgentInfo = listing.is_created_by_owner === false && listing.agent;
 
   return (
-    <div className='min-h-full bg-white'>
+    <div className='min-h-full bg-white pb-20 sm:pb-8'>
+      {/* Mobile Back Button */}
+      {onBack && (
+        <div className='sticky top-0 z-20 flex items-center border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
+          <button
+            onClick={onBack}
+            className='flex items-center gap-2 text-sm font-semibold text-main-black'
+          >
+            <ArrowLeft className='h-5 w-5' strokeWidth={2.5} />
+            <span>{t('backToList')}</span>
+          </button>
+        </div>
+      )}
+
       {/* Property Gallery - matches listing-detail-screen */}
-      <div className='px-12 pt-8'>
+      <div className='px-4 sm:px-12 pt-4 sm:pt-8'>
         <PropertyGallery images={property.images} />
       </div>
 
       {/* Content */}
-      <div className='px-12 py-8'>
+      <div className='px-4 sm:px-12 py-6 sm:py-8'>
         {/* Listing Analytics Metrics */}
         <div className='mb-8'>
           <ListingMetricsCard listingId={listing.listing_id} />
@@ -98,19 +112,19 @@ export function ListingDetailPanel({ listing }: ListingDetailPanelProps) {
 
         {/* Header with Title, Status Actions, and Calendar Button */}
         <div className='mb-6 flex flex-col gap-4'>
-          <div className='flex items-start justify-between'>
+          <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
             <div className='flex flex-col gap-2'>
-              <h1 className='text-[32px] font-bold leading-[1.25] tracking-[-0.32px] text-main-black'>
+              <h1 className='text-2xl sm:text-[32px] font-bold leading-tight sm:leading-[1.25] tracking-tight sm:tracking-[-0.32px] text-main-black'>
                 {property.title}
               </h1>
-              <p className='text-base font-medium leading-[1.6] text-main-black/50'>
+              <p className='text-sm sm:text-base font-medium leading-relaxed sm:leading-[1.6] text-main-black/50'>
                 {property.address || t('addressNotAvailable')}
               </p>
             </div>
 
             <button
               type='button'
-              className='flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
+              className='flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
             >
               <Calendar className='h-4 w-4' strokeWidth={2} />
               <span>{t('showCalendar')}</span>

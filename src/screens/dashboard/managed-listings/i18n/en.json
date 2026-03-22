@@ -51,6 +51,7 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
+    "backToList": "Back to list",
     "agent": {
       "title": "Listing Agent",
       "subtitle": "This listing is managed by an agent",
