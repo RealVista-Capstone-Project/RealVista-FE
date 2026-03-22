@@ -19,6 +19,7 @@ import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/
 import { useHideFooter } from '@/widgets/layout';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { SaveSearchButton, SavedSearchesPopover } from '@/features/save-search';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -219,7 +220,9 @@ function BuyPageContent() {
             </h1>
 
             {/* Search Option Toggle */}
-            <div className='w-full sm:w-auto'>
+            <div className='flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0'>
+              <SavedSearchesPopover searchType='BUY' />
+              <SaveSearchButton searchType='BUY' criteria={searchCriteria} />
               <Button
                 type='button'
                 onClick={() => setIsMapView(!isMapView)}
@@ -251,6 +254,7 @@ function BuyPageContent() {
                   onChange={(e) => setLocation(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={100}
                 />
               </div>
 
@@ -267,6 +271,7 @@ function BuyPageContent() {
                   onChange={(e) => setMinPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
@@ -283,6 +288,7 @@ function BuyPageContent() {
                   onChange={(e) => setMaxPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 

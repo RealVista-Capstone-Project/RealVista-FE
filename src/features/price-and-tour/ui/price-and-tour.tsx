@@ -1,14 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
+import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
 import { formatVND } from '@/shared/lib/utils';
 
 export interface PriceAndTourProps {
   price: number;
   listingType: 'RENT' | 'SALE';
   onContact?: () => void;
-  onRequestTour?: () => void;
+  onRequestTour?: (date: string) => void;
 }
 
 /**
@@ -18,13 +20,14 @@ export interface PriceAndTourProps {
  */
 export function PriceAndTour({ price, listingType, onContact, onRequestTour }: PriceAndTourProps) {
   const t = useTranslations('PriceAndTour');
+  const [tourDate, setTourDate] = useState('');
 
   const priceLabel = listingType === 'RENT' ? t('rentPrice') : t('buyPrice');
   const priceSuffix = listingType === 'RENT' ? t('perMonth') : '';
 
   const handleRequestTour = () => {
-    if (onRequestTour) {
-      onRequestTour();
+    if (tourDate && onRequestTour) {
+      onRequestTour(tourDate);
     }
   };
 
@@ -61,11 +64,22 @@ export function PriceAndTour({ price, listingType, onContact, onRequestTour }: P
           </p>
 
           <div className='flex flex-col gap-6'>
+            {/* Date Selector */}
+            <DatePickerInput
+              id='tour-date-input'
+              value={tourDate}
+              onChange={(value) => setTourDate(value)}
+              placeholder={t('selectTourDate')}
+              minDate={new Date()}
+              variant='tour'
+            />
+
             {/* Request Tour Button */}
             <RealVistaButton
               variant='primary'
               size='medium'
               className='w-full bg-main-secondary'
+              disabled={!tourDate}
               onClick={handleRequestTour}
             >
               {t('requestTour')}
