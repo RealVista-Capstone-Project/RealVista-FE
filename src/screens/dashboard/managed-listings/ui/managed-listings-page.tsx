@@ -11,6 +11,7 @@ import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-
 import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
+import { useDebounce } from '@/shared/lib/hooks';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
@@ -29,6 +30,7 @@ type StatusFilter = ListingStatus | 'ALL';
  */
 export function ManagedListingsPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('ALL');
@@ -49,8 +51,8 @@ export function ManagedListingsPage() {
   } = useQuery(
     listingQueries.managed({
       page,
-      size: 5,
-      search: searchQuery,
+      size: 10,
+      search: debouncedSearchQuery,
       listingType: activeTab,
       status: statusFilter,
       sortBy: sortBy,
@@ -81,10 +83,9 @@ export function ManagedListingsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterOpen]);
 
-  // Reset page when filters change
   React.useEffect(() => {
     setPage(0);
-  }, [searchQuery, activeTab, statusFilter, sortBy]);
+  }, [debouncedSearchQuery, activeTab, statusFilter, sortBy]);
 
   // Count listings by type from summary API
   const listingCounts = React.useMemo(() => {
