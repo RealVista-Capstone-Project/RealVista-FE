@@ -93,10 +93,16 @@ const request = async <Response>(
     body,
     method,
   });
-  const payload: Response = await res.json();
+
+  let payload: any = {};
+  const contentType = res.headers.get('content-type');
+  if (res.status !== 204 && contentType && contentType.includes('application/json')) {
+    payload = await res.json();
+  }
+
   const data = {
     status: res.status,
-    payload,
+    payload: payload as Response,
   };
   // Interceptor for error
   if (!res.ok) {

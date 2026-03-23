@@ -3,15 +3,23 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, Search, DollarSign, SlidersHorizontal } from 'lucide-react';
-import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+import {
+  RealVistaListingCard,
+  type ListingAttribute,
+} from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
+import { useQueryClient } from '@tanstack/react-query';
+import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
 import { useHideFooter } from '@/widgets/layout';
+import { useAuthSession } from '@/features/auth/model';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { SaveSearchButton, SavedSearchesPopover } from '@/features/save-search';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -26,7 +34,33 @@ function BuyPageContent() {
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: session } = useAuthSession();
+  const queryClient = useQueryClient();
   const itemsPerPage = 9;
+
+  const handleToggleFavorite = async (id: string) => {
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    // Optimistic update
+    setListings((prev) =>
+      prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
+    );
+
+    try {
+      await bookmarkApi.toggleBookmark(id);
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+    } catch (error) {
+      // Revert on error
+      setListings((prev) =>
+        prev.map((l) => (l.listing_id === id ? { ...l, is_favorite: !l.is_favorite } : l))
+      );
+      console.error('Failed to toggle bookmark:', error);
+    }
+  };
 
   // Initialize state from URL params
   const [location, setLocation] = useState(searchParams?.get('location') || '');
@@ -168,7 +202,7 @@ function BuyPageContent() {
 
   if (isMapView) {
     return (
-      <div className='h-screen w-full bg-white'>
+      <div className='fixed inset-0 top-[72px] w-full bg-white z-10'>
         <PropertyMapBasedSearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
       </div>
     );
@@ -186,7 +220,9 @@ function BuyPageContent() {
             </h1>
 
             {/* Search Option Toggle */}
-            <div className='w-full sm:w-auto'>
+            <div className='flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0'>
+              <SavedSearchesPopover searchType='BUY' />
+              <SaveSearchButton searchType='BUY' criteria={searchCriteria} />
               <Button
                 type='button'
                 onClick={() => setIsMapView(!isMapView)}
@@ -218,6 +254,7 @@ function BuyPageContent() {
                   onChange={(e) => setLocation(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={100}
                 />
               </div>
 
@@ -234,6 +271,7 @@ function BuyPageContent() {
                   onChange={(e) => setMinPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
@@ -250,6 +288,7 @@ function BuyPageContent() {
                   onChange={(e) => setMaxPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
@@ -308,13 +347,11 @@ function BuyPageContent() {
                       listing.thumbnail ||
                       'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
                     }
-                    address={listing.location || 'Unknown'}
-                    beds={listing.bedrooms || 0}
-                    bathrooms={listing.bathrooms || 0}
-                    area={listing.area || 0}
-                    isFavorite={false}
-                    onToggleFavorite={(id: string) => {}}
-                    onClick={(id: string) => {}}
+                    address={listing.full_address || 'Unknown'}
+                    attributes={listing.attributes as ListingAttribute[]}
+                    isFavorite={listing.is_favorite ?? false}
+                    onToggleFavorite={handleToggleFavorite}
+                    onClick={() => router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`)}
                   />
                 ))}
               </div>
@@ -342,6 +379,7 @@ function BuyPageContent() {
           )}
         </div>
       </section>
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }

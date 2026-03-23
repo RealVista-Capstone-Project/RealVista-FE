@@ -23,16 +23,27 @@ export default async function ListingPage({ params }: ListingPageProps) {
     // Extract listing_id from slug using the utility function
     const listingId = extractListingId(slug);
 
+    console.log('[ListingPage] Slug:', slug);
+    console.log('[ListingPage] Extracted ID:', listingId);
+
     // Fetch listing from API
     // The API returns { success, message, data, timestamp }
     const { payload: response } = await listingApi.getById(listingId);
 
+    console.log('[ListingPage] API Response:', { success: response.success, hasData: !!response.data });
+
     // Extract the actual listing data from the response
     const listing = response.data;
 
+    if (!listing) {
+      console.error('[ListingPage] No listing data in response');
+      notFound();
+    }
+
     return <ListingDetailScreen listing={listing} />;
-  } catch {
+  } catch (error) {
     // If listing not found, return 404
+    console.error('[ListingPage] Error fetching listing:', error);
     notFound();
   }
 }

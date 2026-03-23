@@ -66,12 +66,18 @@
     "sell": "Bán nhà",
     "favorited": "Yêu thích",
     "appointments": "Lịch hẹn",
-    "myEngagements": "Engagement của tôi"
+    "myEngagements": "Engagement của tôi",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký"
   },
   "PropertyCard": {
     "beds": "Phòng ngủ",
     "bathrooms": "Phòng tắm",
-    "perMonth": "/tháng"
+    "perMonth": "/tháng",
+    "confirmUnfavoriteTitle": "Bỏ yêu thích?",
+    "confirmUnfavoriteMessage": "Bạn có chắc muốn bỏ yêu thích bất động sản này không?",
+    "unfavorite": "Bỏ yêu thích",
+    "cancel": "Hủy"
   },
   "Rent": {
     "searchTitle": "Tìm kiếm bất động sản cho thuê",

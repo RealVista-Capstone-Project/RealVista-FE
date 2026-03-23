@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { CalendarIcon } from 'lucide-react';
+import { format, Locale, startOfDay } from 'date-fns';
 import {
   InputGroup,
   InputGroupAddon,
@@ -12,18 +13,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
 import { Field, FieldLabel } from '@/shared/ui/field';
 import { cn } from '@/shared/lib/utils';
-
-function formatDate(date: Date | undefined) {
-  if (!date) {
-    return '';
-  }
-
-  return date.toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 function isValidDate(date: Date | undefined) {
   if (!date) {
@@ -43,6 +32,7 @@ export interface DatePickerInputProps {
   minDate?: Date;
   className?: string;
   variant?: DatePickerInputVariant;
+  locale?: Locale;
 }
 
 export function DatePickerInput({
@@ -54,11 +44,22 @@ export function DatePickerInput({
   minDate,
   className,
   variant = 'default',
+  locale,
 }: DatePickerInputProps) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(value ? new Date(value) : undefined);
   const [month, setMonth] = React.useState<Date | undefined>(value ? new Date(value) : undefined);
-  const [inputValue, setInputValue] = React.useState(formatDate(date));
+
+  // Helper to format date based on locale
+  const formatDateValue = React.useCallback(
+    (d: Date | undefined) => {
+      if (!d) return '';
+      return format(d, 'PP', { locale });
+    },
+    [locale]
+  );
+
+  const [inputValue, setInputValue] = React.useState(formatDateValue(date));
 
   React.useEffect(() => {
     if (value) {
@@ -66,14 +67,21 @@ export function DatePickerInput({
       if (isValidDate(newDate)) {
         setDate(newDate);
         setMonth(newDate);
-        setInputValue(formatDate(newDate));
+        setInputValue(formatDateValue(newDate));
       }
     }
-  }, [value]);
+  }, [value, formatDateValue]);
+
+  // Update input value when locale changes
+  React.useEffect(() => {
+    if (date) {
+      setInputValue(formatDateValue(date));
+    }
+  }, [locale, date, formatDateValue]);
 
   const handleDateChange = (newDate: Date | undefined) => {
     if (newDate) {
-      const formattedDate = formatDate(newDate);
+      const formattedDate = formatDateValue(newDate);
       const isoDate = newDate.toISOString().split('T')[0];
       setDate(newDate);
       setMonth(newDate);
@@ -144,8 +152,9 @@ export function DatePickerInput({
               handleDateChange(selectedDate);
               setOpen(false);
             }}
-            disabled={(date) => (minDate ? date < minDate : false)}
+            disabled={(date) => (minDate ? date < startOfDay(minDate) : false)}
             initialFocus
+            locale={locale}
           />
         </PopoverContent>
       </Popover>
@@ -192,8 +201,9 @@ export function DatePickerInput({
               month={month}
               onMonthChange={setMonth}
               onSelect={handleDateChange}
-              disabled={(date) => (minDate ? date < minDate : false)}
+              disabled={(date) => (minDate ? date < startOfDay(minDate) : false)}
               initialFocus
+              locale={locale}
             />
           </PopoverContent>
         </Popover>

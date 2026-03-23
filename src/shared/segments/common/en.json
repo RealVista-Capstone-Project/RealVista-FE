@@ -66,12 +66,18 @@
     "sell": "Sell",
     "favorited": "Favorited",
     "appointments": "Appointments",
-    "myEngagements": "My Engagements"
+    "myEngagements": "My Engagements",
+    "login": "Login",
+    "signup": "Sign up"
   },
   "PropertyCard": {
     "beds": "Beds",
     "bathrooms": "Bathrooms",
-    "perMonth": "/month"
+    "perMonth": "/month",
+    "confirmUnfavoriteTitle": "Remove from favorites?",
+    "confirmUnfavoriteMessage": "Are you sure you want to remove this property from your favorites?",
+    "unfavorite": "Remove",
+    "cancel": "Cancel"
   },
   "Rent": {
     "searchTitle": "Search properties to rent",

@@ -43,6 +43,7 @@ export function HomeHero() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             onKeyDown={handleKeyDown}
+            maxLength={100}
           />
         </div>
         <Button
