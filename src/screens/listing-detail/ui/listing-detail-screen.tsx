@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { Heart } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
@@ -13,65 +15,94 @@ import { useSendMessage } from '@/entities/conversation';
 import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
 import { ContactModal } from '@/widgets/contact-modal';
 import type { ContactFormData } from '@/entities/contact';
+import { useListingFavorite } from '@/features/bookmark';
+import { useAuthSession } from '@/features/auth/model';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
+import { Button } from '@/shared/ui/button';
 import { SimilarListings } from '@/widgets/similar-listings';
+import { BookTourModal } from '@/features/price-and-tour/ui/book-tour-modal';
 import { useRouter, useParams } from 'next/navigation';
 import { useChatWindowStore } from '@/entities/contact';
-import { useAuthSession, isAuthenticated } from '@/features/auth/model';
+import { isAuthenticated } from '@/features/auth/model';
 import { unwrapApiResponse } from '@/shared/types/api';
 import type { SendMessageResponse } from '@/entities/conversation/model/types';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/shared/ui/dialog/dialog';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
 }
 
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
-  // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
+  const [isBookTourOpen, setIsBookTourOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const { data: session } = useAuthSession();
+  const t = useTranslations('PropertyCard');
   const sendMessage = useSendMessage();
   const chatListingData = mapListingToChatData(listing);
   const router = useRouter();
   const params = useParams();
-  const { data: session } = useAuthSession();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
 
+  const { isFavorite, toggleFavorite } = useListingFavorite(
+    listing.listing_id,
+    listing.is_favorite ?? false,
+  );
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
+
   const handleFavorite = () => {
-    // Toggle favorite
-    console.log('Toggle favorite');
+    if (!session?.user) {
+      setShowLoginModal(true);
+      return;
+    }
+    if (isFavorite) {
+      setShowUnfavoriteConfirm(true);
+    } else {
+      toggleFavorite();
+    }
+  };
+
+  const handleConfirmUnfavorite = () => {
+    setShowUnfavoriteConfirm(false);
+    toggleFavorite();
   };
 
   const handleBrowseNearby = () => {
-    // Browse nearby listings
     console.log('Browse nearby');
   };
 
   const handleViewAllPhotos = () => {
-    // Open photo gallery
     console.log('View all photos');
   };
 
   const handle3DTour = () => {
-    // Open 3D tour
     console.log('Open 3D tour');
   };
 
   const handleVideo = () => {
-    // Play video
     console.log('Play video');
   };
 
   const handleContact = () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
     setIsContactModalOpen(true);
-    // console.log('Contact agent (disabled for debug)');
   };
 
   const handleSendContact = async (data: ContactFormData) => {
@@ -88,7 +119,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {
@@ -101,9 +132,12 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
     }
   };
 
-  const handleRequestTour = (date: string) => {
-    // Request tour with date
-    console.log('Request tour for:', date);
+  const handleRequestTour = () => {
+    if (!session) {
+      setShowLoginModal(true);
+      return;
+    }
+    setIsBookTourOpen(true);
   };
 
   const formattedPrice = formatVND(property.price);
@@ -114,7 +148,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         <PropertyHeader
           property={property}
           onFavorite={handleFavorite}
-          isFavorite={false}
+          isFavorite={isFavorite}
           onBrowseNearby={handleBrowseNearby}
         />
 
@@ -126,7 +160,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             on3DTour={handle3DTour}
             onVideo={handleVideo}
             onFavorite={handleFavorite}
-            isFavorite={false}
+            isFavorite={isFavorite}
           />
         </div>
 
@@ -218,6 +252,37 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
           </RealVistaButton>
         </div>
       </div>
+
+      <BookTourModal
+        listingId={property.id}
+        isOpen={isBookTourOpen}
+        onClose={() => setIsBookTourOpen(false)}
+      />
+      <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <Dialog open={showUnfavoriteConfirm} onOpenChange={setShowUnfavoriteConfirm}>
+        <DialogContent className='max-w-sm p-8'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2'>
+              <Heart className='h-5 w-5 fill-purple-100 text-main-primary' strokeWidth={2} />
+              {t('confirmUnfavoriteTitle')}
+            </DialogTitle>
+            <DialogDescription>{t('confirmUnfavoriteMessage')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='mt-6 gap-2'>
+            <DialogClose asChild>
+              <Button variant='outline' className='flex-1 pt-2'>
+                {t('cancel')}
+              </Button>
+            </DialogClose>
+            <Button
+              onClick={handleConfirmUnfavorite}
+              className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white border-0'
+            >
+              {t('unfavorite')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,0 +1,10 @@
+{
+  "Profile": {
+    "profile": "My Profile",
+    "help": "Help",
+    "logout": "Logout",
+    "loggingOut": "Logging out...",
+    "logoutSuccess": "Logged out successfully",
+    "logoutFailed": "Failed to logout. Please try again"
+  }
+}

@@ -3,6 +3,7 @@ import { Button } from '@/shared/ui/button';
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/shared/config/i18n/navigation';
 import { use } from 'react';
+import { ROUTES } from '@/shared/config/routes';
 
 export default function UnauthorizedPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = use(params);
@@ -16,10 +17,10 @@ export default function UnauthorizedPage({ params }: { params: Promise<{ locale:
         <p className='mt-4 text-lg text-muted-foreground'>{t('description')}</p>
         <div className='mt-8 flex gap-4 justify-center'>
           <Button asChild>
-            <Link href='/dashboard'>{t('backToDashboard')}</Link>
+            <Link href={ROUTES.login}>{t('login')}</Link>
           </Button>
           <Button variant='outline' asChild>
-            <Link href='/'>{t('backToHome')}</Link>
+            <Link href={ROUTES.buy}>{t('backToHome')}</Link>
           </Button>
         </div>
       </div>

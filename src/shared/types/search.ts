@@ -14,6 +14,7 @@ export interface AdvancedSearchRequest {
   hasVideo?: boolean;
   has3D?: boolean;
   sortBy?: 'PRIORITY' | 'DATE_DESC' | 'PRICE_ASC' | 'PRICE_DESC';
+  [key: string]: any;
 }
 
 export interface ListingSearchResponse {
@@ -24,7 +25,11 @@ export interface ListingSearchResponse {
   status: string;
   price: number;
   area: number;
-  location: string;
+  street_address: string | null;
+  ward_name: string | null;
+  district_name: string | null;
+  city_name: string | null;
+  full_address: string;
   bedrooms?: number;
   bathrooms?: number;
   thumbnail?: string;
@@ -32,6 +37,17 @@ export interface ListingSearchResponse {
   is_boosted: boolean;
   boost_package?: string;
   user_type: string;
+  is_favorite?: boolean;
+  attributes?: Array<{
+    attribute_id: string;
+    attribute_code: string;
+    attribute_name: string;
+    icon: string | null;
+    unit: string | null;
+    value_number: number | null;
+    value_text: string | null;
+    value_boolean: boolean | null;
+  }>;
 }
 
 export interface PageResponse<T> {

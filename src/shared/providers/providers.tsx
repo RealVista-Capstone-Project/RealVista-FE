@@ -13,6 +13,7 @@ import { Toaster } from '@/shared/ui/sonner';
  * - SessionProvider: NextAuth authentication state
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
+ * - Toaster: Displays toast notifications across the application
  *
  * @example
  * ```tsx

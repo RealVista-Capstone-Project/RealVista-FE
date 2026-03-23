@@ -85,7 +85,7 @@ export function SearchIntegrationExample() {
               className='border rounded-lg p-4 hover:shadow-lg transition-shadow'
             >
               <h3 className='font-bold text-lg'>{listing.name}</h3>
-              <p className='text-grey-600'>{listing.location}</p>
+              <p className='text-grey-600'>{listing.full_address}</p>
               <p className='text-main-primary font-bold mt-2'>
                 ${listing.price.toLocaleString()}
               </p>

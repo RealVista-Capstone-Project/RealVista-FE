@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import { User, HelpCircle, LogOut } from 'lucide-react';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn } from '@/shared/lib/utils';
 import { ROUTES } from '@/shared/config/routes';
 
@@ -33,14 +36,34 @@ export function ProfileDropdown({
   className,
 }: ProfileDropdownProps) {
   const [open, setOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
   const locale = useLocale();
-  const t = useTranslations('ProfileDropdown');
+  const t = useTranslations('Profile');
 
   const resolvedMenuItems = menuItems ?? [
-    { id: 'profile', label: t('myProfile'), icon: User, href: `/${locale}${ROUTES.settings}` },
-    { id: 'help', label: t('help'), icon: HelpCircle },
-    { id: 'logout', label: t('logout'), icon: LogOut },
+    { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}` },
+    { id: 'help', label: 'help', icon: HelpCircle },
+    { id: 'logout', label: 'logout', icon: LogOut },
   ];
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      // Sign out from NextAuth (returns void when redirect: false)
+      await signOut({ redirect: false });
+
+      toast.success(t('logoutSuccess'));
+      setOpen(false);
+      router.push(`/${locale}/login`);
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error(t('logoutFailed'));
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -99,17 +122,22 @@ export function ProfileDropdown({
                   <button
                     type='button'
                     onClick={() => {
-                      item.onClick?.();
-                      if (item.href) {
-                        window.location.href = item.href;
+                      if (item.id === 'logout') {
+                        handleLogout();
+                      } else {
+                        item.onClick?.();
+                        if (item.href) {
+                          window.location.href = item.href;
+                        }
+                        setOpen(false);
                       }
-                      setOpen(false);
                     }}
-                    className='flex h-16 w-full items-center gap-4 px-6 opacity-70 transition-opacity hover:opacity-100'
+                    disabled={isLoggingOut && item.id === 'logout'}
+                    className='flex h-16 w-full items-center gap-4 px-6 opacity-70 transition-opacity hover:opacity-100 disabled:opacity-50'
                   >
                     <Icon className='h-5 w-5 text-main-black' />
                     <span className='text-base font-medium leading-[1.5] text-main-black'>
-                      {item.label}
+                      {isLoggingOut && item.id === 'logout' ? t('loggingOut') : t(item.label)}
                     </span>
                   </button>
 
