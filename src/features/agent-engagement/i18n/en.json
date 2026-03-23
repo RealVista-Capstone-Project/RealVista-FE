@@ -90,7 +90,10 @@
       "listingPrice": "Price",
       "listingDate": "Created",
       "noListings": "No listings yet",
-      "noListingsDesc": "This agent has not created any listings for your property yet."
+      "noListingsDesc": "This agent has not created any listings for your property yet.",
+      "soldListingsTitle": "Sold by Agent",
+      "soldListingsSubtitle": "Property successfully sold through this agent",
+      "soldBadge": "Sold"
     }
   }
 }

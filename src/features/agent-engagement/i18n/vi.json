@@ -90,7 +90,10 @@
       "listingPrice": "Giá",
       "listingDate": "Ngày tạo",
       "noListings": "Chưa có tin đăng",
-      "noListingsDesc": "Đại lý này chưa tạo tin đăng nào cho BĐS của bạn."
+      "noListingsDesc": "Đại lý này chưa tạo tin đăng nào cho BĐS của bạn.",
+      "soldListingsTitle": "Đã bán bởi đại lý",
+      "soldListingsSubtitle": "Bất động sản đã được bán thành công qua đại lý này",
+      "soldBadge": "Đã bán"
     }
   }
 }

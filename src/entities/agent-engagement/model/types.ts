@@ -1,3 +1,5 @@
+import type { ListingAttribute } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+
 export interface AgentEngagement {
   agent_user_id: string;
   agent_full_name: string;
@@ -21,6 +23,10 @@ export interface AgentEngagement {
   has_review?: boolean;
   content?: string | null;
   cancellation_reason?: string | null;
+  /** The single listing sold by the agent for this engagement's property.
+   *  Per business rule, at most one listing per engagement can reach SOLD status.
+   *  Null / absent means no sold listing yet — the card will be hidden. */
+  sold_listing?: AgentListing | null;
 }
 
 export interface CreateReviewPayload {
@@ -51,16 +57,19 @@ export interface GetAgentEngagementsParams {
   search?: string;
 }
 
-/** Stub type for listings created by an agent for a specific property/engagement.
- *  Will be expanded when the backend endpoint is ready.
- */
+/** Listing created by an agent for a specific property/engagement. */
 export interface AgentListing {
   listing_id: string;
   title: string;
-  price: number | null;
+  /** Sale/rental price in VND. Required by RealVistaListingCard. */
+  price: number;
   image_url: string | null;
+  /** e.g. "ACTIVE", "SOLD", "EXPIRED" */
   status: string;
-  created_at: string;
-  property_type?: string;
+  created_at?: string;
   address?: string;
+  property_type?: string;
+  listing_type?: 'RENT' | 'SALE';
+  /** Dynamic property attributes (beds, bathrooms, area, etc.) — same shape as listing detail. */
+  attributes?: ListingAttribute[];
 }

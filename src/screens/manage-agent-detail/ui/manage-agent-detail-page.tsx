@@ -9,6 +9,7 @@ import type { AgentEngagement } from '@/entities/agent-engagement';
 import { EngagementSummaryCard } from '@/features/agent-engagement/ui/engagement-summary-card';
 import { AgentListingsSection } from '@/features/agent-engagement/ui/agent-listings-section';
 import { AgentProfileSidebar } from '@/features/agent-engagement/ui/agent-profile-sidebar';
+import { SoldListingsCard } from '@/features/agent-engagement/ui/sold-listings-card';
 
 interface ManageAgentDetailPageProps {
   /** Initial agent data passed from the server (from query cache or SSR). */
@@ -42,6 +43,7 @@ export function ManageAgentDetailPage({ initialAgent }: ManageAgentDetailPagePro
       <div className='flex flex-col xl:flex-row gap-6 items-start'>
         {/* Left column — engagement summary + listings */}
         <div className='flex-1 flex flex-col gap-6 min-w-0'>
+          <SoldListingsCard agent={agent} />
           <EngagementSummaryCard agent={agent} />
           <AgentListingsSection agent={agent} />
         </div>

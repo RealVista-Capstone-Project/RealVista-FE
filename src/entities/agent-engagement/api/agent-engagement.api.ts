@@ -6,6 +6,7 @@ import type {
   GetAgentEngagementsParams,
   CreateReviewPayload,
 } from '../model/types';
+import type { ListingAttribute } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 
 /** Raw snake_case shape returned by GET /engagements/{id} */
 interface RawEngagementDetail {
@@ -31,6 +32,17 @@ interface RawEngagementDetail {
   has_review: boolean;
   cancellation_reason: string | null;
   content: string | null;
+  /** Single sold listing embedded in the detail response (max 1 per engagement). */
+  sold_listing?: {
+    listing_id: string;
+    title: string;
+    price: number;
+    image_url: string | null;
+    status: string;
+    listing_type?: 'RENT' | 'SALE';
+    address?: string;
+    attributes?: ListingAttribute[];
+  } | null;
 }
 
 function mapDetailResponse(raw: RawEngagementDetail): AgentEngagement {
@@ -57,6 +69,7 @@ function mapDetailResponse(raw: RawEngagementDetail): AgentEngagement {
     has_review: raw.has_review,
     cancellation_reason: raw.cancellation_reason,
     content: raw.content,
+    sold_listing: raw.sold_listing ?? null,
   };
 }
 
@@ -91,7 +104,7 @@ export const agentEngagementApi = {
       ...res,
       payload: {
         ...res.payload,
-        // data: mapDetailResponse(res.payload.data),
+        data: mapDetailResponse(res.payload.data),
       },
     };
   },
