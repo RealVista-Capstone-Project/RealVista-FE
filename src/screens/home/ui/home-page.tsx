@@ -1,5 +1,4 @@
 import { HomeHero, HomeSection, HomeFooter } from '@/features/home';
-import { RecommendedListings } from '@/widgets/recommended-listings';
 
 export function HomePage() {
   return (
@@ -7,7 +6,6 @@ export function HomePage() {
       <h1>Welcome</h1>
       <main className='flex flex-col gap-[32px] row-start-2 items-center sm:items-start w-full'>
         <HomeHero />
-        <RecommendedListings />
         <HomeSection />
       </main>
       <HomeFooter />

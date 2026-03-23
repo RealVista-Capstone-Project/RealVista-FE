@@ -21,6 +21,7 @@ import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { behaviorTracker } from '@/shared/lib/analytics';
 import { SaveSearchButton, SavedSearchesPopover } from '@/features/save-search';
+import { RecommendedListings } from '@/widgets/recommended-listings';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -325,6 +326,9 @@ function BuyPageContent() {
           />
         </div>
       </section>
+
+      {/* Recommended Listings - only on page 1 */}
+      {currentPage === 1 && <RecommendedListings sourcePage='buy' />}
 
       {/* Results Section */}
       <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>

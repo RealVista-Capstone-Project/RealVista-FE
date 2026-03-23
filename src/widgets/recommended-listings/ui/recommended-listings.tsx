@@ -13,6 +13,10 @@ import type { RecommendedListingDTO } from '@/entities/recommendation';
 import { buildListingDetailUrl } from '@/shared/lib/utils';
 import { behaviorTracker } from '@/shared/lib/analytics';
 
+interface RecommendedListingsProps {
+  sourcePage: 'buy' | 'rent';
+}
+
 /**
  * Recommended Listings Widget
  *
@@ -25,7 +29,7 @@ import { behaviorTracker } from '@/shared/lib/analytics';
  * - Force-refresh button to regenerate
  * - Tracks clicks for further recommendation refinement
  */
-export function RecommendedListings() {
+export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const { status: authStatus } = useSession();
   const router = useRouter();
   const locale = useLocale();
@@ -42,7 +46,6 @@ export function RecommendedListings() {
   });
 
   const recommendations = response?.payload?.data?.recommendations ?? [];
-  const behaviorSummary = response?.payload?.data?.behavior_summary;
 
   const refreshMutation = useMutation({
     mutationFn: () => recommendationApi.refreshRecommendations(6),
@@ -55,7 +58,7 @@ export function RecommendedListings() {
     behaviorTracker.trackClick(listing.listing_id, {
       listing_type: listing.listing_type as 'RENT' | 'SALE',
       price: listing.price,
-      source_page: 'home',
+      source_page: sourcePage,
     });
     router.push(buildListingDetailUrl(locale, listing.slug || listing.listing_id));
   };
@@ -77,9 +80,6 @@ export function RecommendedListings() {
                 {t('recommendedForYou', { defaultMessage: 'Recommended for you' })}
               </h2>
             </div>
-            {behaviorSummary && (
-              <p className='text-main-secondary text-sm mt-1'>{behaviorSummary}</p>
-            )}
           </div>
           <Button
             variant='outline'
@@ -151,14 +151,6 @@ export function RecommendedListings() {
                     listingType={listing.listing_type as 'RENT' | 'SALE'}
                     onClick={() => handleListingClick(listing)}
                   />
-                  {/* Recommendation reason badge */}
-                  {listing.reason && (
-                    <div className='mt-2 px-3 py-1.5 bg-purple-96 rounded-md'>
-                      <p className='text-xs text-main-secondary truncate'>
-                        {listing.reason}
-                      </p>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
