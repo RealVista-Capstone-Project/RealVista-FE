@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import type { AgentEngagement, CreateReviewPayload } from '@/entities/agent-engagement';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { CardContent } from '@/shared/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   XCircle,
   ExternalLink,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { formatDate, getInitials, getStatusColor, toStringArray } from '../lib/utils';
@@ -119,7 +120,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       return (
         <div className='flex flex-col gap-2'>
           <Button
-            className='w-full bg-main-primary hover:bg-main-primary-hover text-white font-semibold rounded-lg h-10 gap-2'
+            className='w-full bg-main-primary hover:bg-main-primary-hover text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
             onClick={() => setCompleteDialogOpen(true)}
           >
             <CheckCircle2 className='h-4 w-4' />
@@ -127,7 +128,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
           </Button>
           <Button
             variant='outline'
-            className='w-full border-destructive/40 text-destructive hover:bg-red-50 hover:border-destructive font-semibold rounded-lg h-10 gap-2'
+            className='w-full border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 hover:text-red-600 font-semibold rounded-xl h-10 gap-2'
             onClick={() => setCancelDialogOpen(true)}
           >
             <XCircle className='h-4 w-4' />
@@ -141,7 +142,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       return (
         <Button
           variant='outline'
-          className='w-full border-destructive/40 text-destructive hover:bg-red-50 hover:border-destructive font-semibold rounded-lg h-10 gap-2'
+          className='w-full border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 hover:text-red-600 font-semibold rounded-xl h-10 gap-2'
           onClick={() => setCancelDialogOpen(true)}
         >
           <XCircle className='h-4 w-4' />
@@ -153,7 +154,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
     if ((status === 'COMPLETED' || status === 'CANCELLED') && !hasReview) {
       return (
         <Button
-          className='w-full bg-main-primary hover:bg-main-primary-hover text-white font-semibold rounded-lg h-10 gap-2'
+          className='w-full bg-main-primary hover:bg-main-primary-hover text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
           onClick={() => setReviewModalOpen(true)}
         >
           <MessageSquarePlus className='h-4 w-4' />
@@ -164,9 +165,9 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
 
     if ((status === 'COMPLETED' || status === 'CANCELLED') && hasReview) {
       return (
-        <div className='flex items-center justify-center gap-2 py-2 text-sm text-gray-500'>
+        <div className='flex items-center justify-center gap-2 py-2 text-sm text-gray-500 bg-green-50 rounded-xl border border-green-100'>
           <CheckCircle2 className='h-4 w-4 text-green-500' />
-          {t('actions.alreadyReviewed')}
+          <span className='font-medium text-green-700'>{t('actions.alreadyReviewed')}</span>
         </div>
       );
     }
@@ -176,240 +177,280 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
 
   return (
     <>
-      <Card
+      <div
         id='agent-detail-panel'
         key={agent.engagement_id}
-        className='w-full lg:w-[400px] flex-shrink-0 border-none shadow-lg bg-white flex flex-col max-h-[calc(100vh-100px)] animate-in slide-in-from-right-4 fade-in duration-300 rounded-xl sticky top-4 overflow-hidden'
+        className='w-full lg:w-[380px] flex-shrink-0 bg-white border border-gray-100 rounded-2xl shadow-lg flex flex-col max-h-[calc(100vh-120px)] animate-in slide-in-from-right-4 fade-in duration-300 sticky top-4 overflow-hidden'
       >
         {/* Header */}
-        <CardHeader className='p-5 border-b border-gray-100 flex flex-row items-center justify-between bg-white flex-none'>
-          <CardTitle className='font-bold text-base text-gray-900'>
+        <div className='flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white flex-none'>
+          <h2 className='font-bold text-sm text-gray-900 tracking-tight'>
             {t('detailPanel.title')}
-          </CardTitle>
+          </h2>
           <Button
             variant='ghost'
             size='icon'
-            className='h-8 w-8 text-gray-400 hover:text-gray-900'
+            className='h-7 w-7 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg'
             onClick={onClose}
           >
-            <X className='h-4 w-4' />
+            <X className='h-3.5 w-3.5' />
           </Button>
-        </CardHeader>
+        </div>
 
-        {/* Content */}
+        {/* Scrollable Content */}
         <CardContent className='p-0 flex-1 overflow-y-auto min-h-0'>
-          {/* Profile Section */}
-          <div className='p-6 flex flex-col items-center border-b border-gray-50 bg-gray-50/30'>
-            <Avatar className='h-24 w-24 mb-4 border-4 border-white shadow-sm ring-1 ring-gray-100'>
-              <AvatarImage
-                src={agent.agent_avatar_url ?? undefined}
-                alt={agent.agent_full_name}
-              />
-              <AvatarFallback className='bg-indigo-100 text-indigo-700 text-lg font-bold'>
-                {getInitials(agent.agent_full_name)}
-              </AvatarFallback>
-            </Avatar>
-            <h3 className='text-lg font-bold text-gray-900'>{agent.agent_full_name}</h3>
-
-            {/* Rating */}
-            {agent.agent_rating != null && (
-              <div className='flex items-center gap-1 mt-1'>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      'h-4 w-4',
-                      i < Math.round(agent.agent_rating ?? 0)
-                        ? 'text-yellow-400 fill-yellow-400'
-                        : 'text-gray-200'
-                    )}
+          {/* Profile Banner */}
+          <div className='relative bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white px-6 pt-6 pb-5 border-b border-gray-100'>
+            <div className='flex flex-col items-center'>
+              <div className='relative mb-3'>
+                <Avatar className='h-20 w-20 ring-4 ring-white shadow-md'>
+                  <AvatarImage
+                    src={agent.agent_avatar_url ?? undefined}
+                    alt={agent.agent_full_name}
                   />
-                ))}
-                <span className='text-sm text-gray-500 ml-1'>
-                  ({agent.agent_rating?.toFixed(1)})
-                </span>
+                  <AvatarFallback className='bg-indigo-100 text-indigo-700 text-xl font-bold'>
+                    {getInitials(agent.agent_full_name)}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Status dot */}
+                <span
+                  className={cn(
+                    'absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white shadow-sm',
+                    status === 'ACTIVE' || status === 'ACCEPTED'
+                      ? 'bg-emerald-400'
+                      : status === 'PENDING'
+                        ? 'bg-amber-400'
+                        : status === 'COMPLETED'
+                          ? 'bg-blue-400'
+                          : 'bg-gray-300'
+                  )}
+                />
               </div>
-            )}
+              <h3 className='text-base font-bold text-gray-900 text-center leading-tight'>
+                {agent.agent_full_name}
+              </h3>
 
-            <Badge
-              variant='secondary'
-              className={cn(
-                'mt-3 text-xs px-3 py-0.5 font-medium pointer-events-none',
-                getStatusColor(agent.status)
+              {/* Star Rating */}
+              {agent.agent_rating != null && (
+                <div className='flex items-center gap-0.5 mt-1.5'>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={cn(
+                        'h-3.5 w-3.5',
+                        i < Math.round(agent.agent_rating ?? 0)
+                          ? 'text-amber-400 fill-amber-400'
+                          : 'text-gray-200 fill-gray-200'
+                      )}
+                    />
+                  ))}
+                  <span className='text-xs text-gray-500 ml-1.5 font-medium'>
+                    {agent.agent_rating?.toFixed(1)}
+                  </span>
+                </div>
               )}
-            >
-              {statusLabel}
-            </Badge>
+
+              <Badge
+                variant='secondary'
+                className={cn(
+                  'mt-2.5 text-xs px-3 py-0.5 font-semibold pointer-events-none rounded-full',
+                  getStatusColor(agent.status)
+                )}
+              >
+                {statusLabel}
+              </Badge>
+            </div>
           </div>
 
-          {/* Contact Info */}
-          <div className='p-6 space-y-6'>
-            <div className='space-y-4'>
-              <h4 className='font-bold text-xs text-gray-900 uppercase tracking-wider'>
+          <div className='p-5 space-y-5'>
+            {/* Contact Info */}
+            <section className='space-y-3'>
+              <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest'>
                 {t('detailPanel.contactInfo')}
               </h4>
               {agent.agent_email && (
-                <div className='flex items-center gap-3 text-sm'>
-                  <div className='flex items-center justify-center h-8 w-8 rounded-lg bg-indigo-50'>
-                    <Mail className='h-4 w-4 text-indigo-600' />
+                <div className='flex items-center gap-3'>
+                  <div className='h-8 w-8 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0'>
+                    <Mail className='h-3.5 w-3.5 text-indigo-500' />
                   </div>
                   <div className='min-w-0'>
-                    <div className='text-xs text-gray-400'>{t('detailPanel.email')}</div>
-                    <div className='font-medium text-gray-900 truncate'>
+                    <div className='text-[10px] text-gray-400 font-medium'>
+                      {t('detailPanel.email')}
+                    </div>
+                    <div className='text-sm font-semibold text-gray-800 truncate'>
                       {agent.agent_email}
                     </div>
                   </div>
                 </div>
               )}
               {agent.agent_phone && (
-                <div className='flex items-center gap-3 text-sm'>
-                  <div className='flex items-center justify-center h-8 w-8 rounded-lg bg-green-50'>
-                    <Phone className='h-4 w-4 text-green-600' />
+                <div className='flex items-center gap-3'>
+                  <div className='h-8 w-8 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0'>
+                    <Phone className='h-3.5 w-3.5 text-green-500' />
                   </div>
-                  <div className='min-w-0'>
-                    <div className='text-xs text-gray-400'>{t('detailPanel.phone')}</div>
-                    <div className='font-medium text-gray-900'>{agent.agent_phone}</div>
+                  <div>
+                    <div className='text-[10px] text-gray-400 font-medium'>
+                      {t('detailPanel.phone')}
+                    </div>
+                    <div className='text-sm font-semibold text-gray-800'>
+                      {agent.agent_phone}
+                    </div>
                   </div>
                 </div>
               )}
               {toStringArray(agent.agent_service_areas).length > 0 && (
-                <div className='flex items-center gap-3 text-sm'>
-                  <div className='flex items-center justify-center h-8 w-8 rounded-lg bg-orange-50'>
-                    <MapPin className='h-4 w-4 text-orange-600' />
+                <div className='flex items-center gap-3'>
+                  <div className='h-8 w-8 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0'>
+                    <MapPin className='h-3.5 w-3.5 text-orange-500' />
                   </div>
                   <div className='min-w-0'>
-                    <div className='text-xs text-gray-400'>{t('detailPanel.serviceAreas')}</div>
-                    <div className='font-medium text-gray-900 truncate'>
+                    <div className='text-[10px] text-gray-400 font-medium'>
+                      {t('detailPanel.serviceAreas')}
+                    </div>
+                    <div className='text-sm font-semibold text-gray-800 truncate'>
                       {toStringArray(agent.agent_service_areas).join(', ')}
                     </div>
                   </div>
                 </div>
               )}
-            </div>
+            </section>
 
-            <Separator />
+            <Separator className='bg-gray-100' />
 
             {/* Professional Info */}
-            <div className='bg-gray-50 rounded-xl p-5 border border-gray-100'>
-              <h4 className='font-bold text-xs text-gray-900 uppercase tracking-wider mb-4'>
+            <section>
+              <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3'>
                 {t('detailPanel.professionalInfo')}
               </h4>
-              <div className='grid grid-cols-2 gap-y-5 gap-x-4'>
-                <div>
-                  <div className='flex items-center gap-1.5 text-xs text-gray-400 mb-1'>
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
+                  <div className='flex items-center gap-1.5 text-[10px] text-gray-400 mb-1'>
                     <Briefcase className='h-3 w-3' />
-                    {t('detailPanel.experience')}
+                    <span className='font-medium uppercase tracking-wide'>
+                      {t('detailPanel.experience')}
+                    </span>
                   </div>
                   <div className='font-bold text-gray-900 text-sm'>
                     {agent.agent_years_of_experience !== null
-                      ? t('detailPanel.yearsUnit', { count: agent.agent_years_of_experience })
+                      ? t('detailPanel.yearsUnit', {
+                          count: agent.agent_years_of_experience,
+                        })
                       : t('common.na')}
                   </div>
                 </div>
-                <div>
-                  <div className='flex items-center gap-1.5 text-xs text-gray-400 mb-1'>
+                <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
+                  <div className='flex items-center gap-1.5 text-[10px] text-gray-400 mb-1'>
                     <Home className='h-3 w-3' />
-                    {t('detailPanel.propertiesSold')}
+                    <span className='font-medium uppercase tracking-wide'>
+                      {t('detailPanel.propertiesSold')}
+                    </span>
                   </div>
                   <div className='font-bold text-gray-900 text-sm'>
                     {agent.agent_properties_sold ?? t('common.na')}
                   </div>
                 </div>
-                <div>
-                  <div className='flex items-center gap-1.5 text-xs text-gray-400 mb-1'>
+                <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
+                  <div className='flex items-center gap-1.5 text-[10px] text-gray-400 mb-1'>
                     <Award className='h-3 w-3' />
-                    {t('detailPanel.engagementType')}
+                    <span className='font-medium uppercase tracking-wide'>
+                      {t('detailPanel.engagementType')}
+                    </span>
                   </div>
                   <div className='font-bold text-gray-900 text-sm'>
                     {agent.engagement_type}
                   </div>
                 </div>
-                <div>
-                  <div className='flex items-center gap-1.5 text-xs text-gray-400 mb-1'>
-                    {t('detailPanel.hiredDate')}
+                <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
+                  <div className='flex items-center gap-1.5 text-[10px] text-gray-400 mb-1'>
+                    <Calendar className='h-3 w-3' />
+                    <span className='font-medium uppercase tracking-wide'>
+                      {t('detailPanel.hiredDate')}
+                    </span>
                   </div>
                   <div className='font-bold text-gray-900 text-sm'>
                     {formatDate(agent.hired_at, 'dd/MM/yyyy', locale)}
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Specialties */}
             {toStringArray(agent.agent_specialties).length > 0 && (
-              <div>
-                <h4 className='font-bold text-xs text-gray-900 uppercase tracking-wider mb-3'>
+              <section>
+                <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5'>
                   {t('detailPanel.specialties')}
                 </h4>
-                <div className='flex flex-wrap gap-2'>
+                <div className='flex flex-wrap gap-1.5'>
                   {toStringArray(agent.agent_specialties).map((specialty) => (
                     <Badge
                       key={specialty}
                       variant='outline'
-                      className='text-xs font-medium bg-indigo-50/50 text-indigo-700 border-indigo-100'
+                      className='text-xs font-semibold bg-indigo-50/60 text-indigo-600 border-indigo-100 rounded-lg px-2.5 py-0.5'
                     >
                       {specialty}
                     </Badge>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Bio */}
             {agent.agent_bio && (
-              <div>
-                <h4 className='font-bold text-xs text-gray-900 uppercase tracking-wider mb-3'>
+              <section>
+                <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5'>
                   {t('detailPanel.about')}
                 </h4>
-                <p className='text-sm text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100'>
+                <p className='text-sm text-gray-600 leading-relaxed bg-gray-50/80 p-4 rounded-xl border border-gray-100'>
                   {agent.agent_bio}
                 </p>
-              </div>
+              </section>
             )}
 
-            {/* Property Info */}
-            <div>
-              <h4 className='font-bold text-xs text-gray-900 uppercase tracking-wider mb-3'>
+            {/* Assigned Property */}
+            <section>
+              <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5'>
                 {t('detailPanel.assignedProperty')}
               </h4>
-              <div className='bg-white border border-gray-100 p-4 rounded-xl shadow-sm space-y-2'>
+              <div className='bg-indigo-50/40 border border-indigo-100/70 p-4 rounded-xl space-y-2'>
                 {agent.property_address && (
                   <div className='flex items-start gap-2'>
-                    <MapPin className='h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0' />
-                    <span className='text-sm text-gray-700'>
+                    <MapPin className='h-3.5 w-3.5 text-indigo-400 mt-0.5 flex-shrink-0' />
+                    <span className='text-sm text-gray-700 font-medium leading-snug'>
                       {agent.property_address}
                     </span>
                   </div>
                 )}
-                <div className='flex items-center gap-4 text-xs text-gray-500'>
+                <div className='flex items-center gap-2 flex-wrap'>
                   {agent.property_type_name && (
-                    <span className='bg-gray-100 px-2 py-1 rounded'>
+                    <span className='text-xs bg-white text-indigo-600 border border-indigo-100 px-2.5 py-1 rounded-lg font-semibold'>
                       {agent.property_type_name}
                     </span>
                   )}
                   {agent.property_location_name && (
-                    <span>{agent.property_location_name}</span>
+                    <span className='text-xs text-gray-400 font-medium'>
+                      {agent.property_location_name}
+                    </span>
                   )}
                 </div>
               </div>
-            </div>
+            </section>
           </div>
         </CardContent>
 
-        {/* Footer CTA — dynamic based on status */}
-        <div className='p-4 border-t border-gray-100 bg-white flex-none space-y-2'>
+        {/* Footer */}
+        <div className='p-4 border-t border-gray-100 bg-white/80 backdrop-blur-sm flex-none space-y-2.5'>
           {renderActionButtons()}
           <Link
             href={`/${locale}${ROUTES.manageAgent.detail(agent.engagement_id)}`}
-            className='flex items-center justify-center gap-1.5 w-full text-xs text-indigo-600 hover:text-indigo-800 font-medium py-1.5 rounded-lg hover:bg-indigo-50 transition-colors'
+            className='flex items-center justify-center gap-1.5 w-full text-xs text-main-primary hover:text-main-primary-hover font-semibold py-2 rounded-xl hover:bg-indigo-50 transition-colors'
           >
-            <ExternalLink className='h-3.5 w-3.5' />
+            <ExternalLink className='h-3 w-3' />
             {t('detailPage.viewFullDetails')}
           </Link>
         </div>
-      </Card>
+      </div>
 
-      {/* Dialogs — rendered outside Card to avoid stacking context issues */}
+      {/* Dialogs */}
       <CompleteConfirmDialog
         open={completeDialogOpen}
         onOpenChange={setCompleteDialogOpen}
