@@ -33,7 +33,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const { status: authStatus } = useSession();
   const router = useRouter();
   const locale = useLocale();
-  const t = useTranslations('Home');
+  const t = useTranslations('RecommendedListings');
   const queryClient = useQueryClient();
 
   const {
@@ -77,7 +77,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
             <div className='flex items-center gap-2 mb-1'>
               <Sparkles className='h-5 w-5 text-main-primary' />
               <h2 className='text-main-black text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
-                {t('recommendedForYou', { defaultMessage: 'Recommended for you' })}
+                {t('recommendedForYou')}
               </h2>
             </div>
           </div>
@@ -92,7 +92,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
               className={`h-4 w-4 ${refreshMutation.isPending ? 'animate-spin' : ''}`}
             />
             <span className='hidden sm:inline'>
-              {t('refresh', { defaultMessage: 'Refresh' })}
+              {t('refresh')}
             </span>
           </Button>
         </div>
@@ -122,11 +122,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
         {isError && (
           <div className='flex items-center justify-center gap-2 text-red-500 py-8'>
             <AlertCircle className='h-5 w-5' />
-            <p>
-              {t('failedToLoadRecommendations', {
-                defaultMessage: 'Failed to load recommendations',
-              })}
-            </p>
+            <p>{t('failedToLoadRecommendations')}</p>
           </div>
         )}
 
@@ -161,16 +157,8 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
         {!isLoading && !isError && recommendations.length === 0 && (
           <div className='text-center py-12 text-main-secondary'>
             <Sparkles className='h-8 w-8 mx-auto mb-3 text-purple-80' />
-            <p className='text-base font-medium mb-1'>
-              {t('noRecommendationsYet', {
-                defaultMessage: 'No recommendations yet',
-              })}
-            </p>
-            <p className='text-sm'>
-              {t('browseMoreListings', {
-                defaultMessage: 'Browse more listings to get personalized recommendations',
-              })}
-            </p>
+            <p className='text-base font-medium mb-1'>{t('noRecommendationsYet')}</p>
+            <p className='text-sm'>{t('browseMoreListings')}</p>
           </div>
         )}
       </div>

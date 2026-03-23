@@ -1,0 +1,9 @@
+{
+  "RecommendedListings": {
+    "recommendedForYou": "Recommended for you",
+    "refresh": "Refresh",
+    "failedToLoadRecommendations": "Failed to load recommendations",
+    "noRecommendationsYet": "No recommendations yet",
+    "browseMoreListings": "Browse more listings to get personalized recommendations"
+  }
+}
