@@ -47,9 +47,9 @@ export interface ListingDetailScreenProps {
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const property: Property = mapListingToProperty(listing);
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyCard');
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const sendMessage = useSendMessage();
   const chatListingData = mapListingToChatData(listing);
   const router = useRouter();
@@ -92,34 +92,30 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleBrowseNearby = () => {
-    // Browse nearby listings
     console.log('Browse nearby');
   };
 
   const handleViewAllPhotos = () => {
-    // Open photo gallery
     console.log('View all photos');
   };
 
   const handle3DTour = () => {
-    // Open 3D tour
     console.log('Open 3D tour');
   };
 
   const handleVideo = () => {
-    // Play video
     console.log('Play video');
   };
 
   const handleContact = () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
     setIsContactModalOpen(true);
-    // console.log('Contact agent (disabled for debug)');
   };
+
   const handleSendContact = async (data: ContactFormData) => {
     const response = await sendMessage.mutateAsync({
       recipient_user_id: listing.agent.user_id,
@@ -134,7 +130,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {
