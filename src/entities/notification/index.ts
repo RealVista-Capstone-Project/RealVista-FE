@@ -5,4 +5,5 @@ export {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
 } from './api/notification.queries';
-export type { Notification, NotificationResponse, NotificationType } from './model/types';
+export type { Notification, NotificationResponse, NotificationWsPayload } from './model/types';
+export { mapToNotification, mapWsPayloadToNotification } from './model/types';

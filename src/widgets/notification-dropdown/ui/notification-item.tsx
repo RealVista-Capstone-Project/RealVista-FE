@@ -2,24 +2,20 @@
 
 import { Home, UserCheck, Calendar, Bell } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import type { Notification, NotificationType } from '@/entities/notification';
+import type { Notification } from '@/entities/notification';
 
 interface NotificationItemProps {
   notification: Notification;
   onClick?: (notification: Notification) => void;
 }
 
-function getNotificationIcon(type: NotificationType) {
-  switch (type) {
-    case 'OPEN_DRAFT':
-      return { Icon: Home, bg: 'bg-main-primary' };
-    case 'TENANT_APPLICATION':
-      return { Icon: UserCheck, bg: 'bg-orange-400' };
-    case 'TOUR_REQUEST':
-      return { Icon: Calendar, bg: 'bg-emerald-500' };
-    default:
-      return { Icon: Bell, bg: 'bg-grey-400' };
+function getNotificationIcon(eventType: string) {
+  if (eventType.includes('TOUR')) return { Icon: Calendar, bg: 'bg-emerald-500' };
+  if (eventType.includes('APPLICATION')) return { Icon: UserCheck, bg: 'bg-orange-400' };
+  if (eventType.includes('DRAFT') || eventType.includes('LISTING')) {
+    return { Icon: Home, bg: 'bg-main-primary' };
   }
+  return { Icon: Bell, bg: 'bg-grey-400' };
 }
 
 function formatNotificationDate(date: Date): string {
@@ -34,7 +30,7 @@ function formatNotificationDate(date: Date): string {
 }
 
 export function NotificationItem({ notification, onClick }: NotificationItemProps) {
-  const { Icon, bg } = getNotificationIcon(notification.type);
+  const { Icon, bg } = getNotificationIcon(notification.eventType);
 
   return (
     <button
@@ -55,40 +51,26 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         >
           {notification.title}
         </p>
-        <p className='mt-1 text-xs text-grey-500'>
+        {notification.message && (
+          <p className='mt-0.5 text-xs text-grey-500 line-clamp-2 leading-snug'>
+            {notification.message}
+          </p>
+        )}
+        <p className='mt-1 text-xs text-grey-400'>
           {formatNotificationDate(notification.createdAt)}
         </p>
       </div>
 
-      {/* Right: avatar or icon */}
-      <div className='relative shrink-0'>
-        {notification.actor?.avatar ? (
-          <div className='relative'>
-            <img
-              src={notification.actor.avatar}
-              alt={notification.actor.name}
-              className='h-10 w-10 rounded-full object-cover'
-            />
-            {/* type badge overlay */}
-            <span
-              className={cn(
-                'absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full',
-                bg
-              )}
-            >
-              <Icon className='h-3 w-3 text-white' strokeWidth={2.5} />
-            </span>
-          </div>
-        ) : (
-          <div
-            className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full',
-              bg
-            )}
-          >
-            <Icon className='h-5 w-5 text-white' strokeWidth={2} />
-          </div>
-        )}
+      {/* Right: event-type icon */}
+      <div className='shrink-0'>
+        <div
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-full',
+            bg
+          )}
+        >
+          <Icon className='h-5 w-5 text-white' strokeWidth={2} />
+        </div>
       </div>
     </button>
   );

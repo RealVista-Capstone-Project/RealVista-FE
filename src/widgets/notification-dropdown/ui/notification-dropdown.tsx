@@ -31,7 +31,6 @@ export function NotificationDropdown({
   const [open, setOpen] = useState(false);
 
   const displayed = notifications.slice(0, 5);
-  const hasMore = notifications.length > 5;
 
   const handleClick = (n: Notification) => {
     onNotificationClick?.(n);

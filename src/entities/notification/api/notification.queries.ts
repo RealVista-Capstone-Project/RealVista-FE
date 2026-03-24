@@ -9,6 +9,18 @@ export const notificationQueries = {
       queryFn: () => notificationApi.list(),
       staleTime: 60 * 1000,
     }),
+
+  /**
+   * Query options that pass the token directly to the fetch call.
+   * Avoids the AuthTokenProvider race condition (sync cache not yet populated).
+   * Call with `enabled: !!token` at the consumer.
+   */
+  listWithToken: (token: string) =>
+    queryOptions({
+      queryKey: [...notificationKeys.list(), 'auth'] as const,
+      queryFn: () => notificationApi.listWithToken(token),
+      staleTime: 60 * 1000,
+    }),
 } as const;
 
 export function useMarkAllNotificationsRead() {
