@@ -13,8 +13,9 @@ import {
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
-import type { UserProperty, RepresentingType } from '../model/types';
+import type { UserProperty, RepresentingType, CreateListingFormData } from '../model/types';
 import { mockUserProperties } from '../model/mock-user-properties';
+import { ListingInformationStep } from './listing-information-step';
 
 export interface CreateListingModalProps {
   open: boolean;
@@ -204,6 +205,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   const [selectedPropertyId, setSelectedPropertyId] = React.useState<string | null>(null);
   const [representing, setRepresenting] = React.useState<RepresentingType>('landlord');
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentStep, setCurrentStep] = React.useState<1 | 2>(1);
 
   const ITEMS_PER_PAGE = 3;
 
@@ -213,6 +215,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
       setSelectedPropertyId(null);
       setRepresenting('landlord');
       setCurrentPage(1);
+      setCurrentStep(1);
     }
   }, [open]);
 
@@ -222,6 +225,26 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+
+  const selectedProperty = properties.find(
+    (p) => p.propertyId === selectedPropertyId
+  );
+
+  const handleNextStep = () => {
+    if (selectedPropertyId) {
+      setCurrentStep(2);
+    }
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep(1);
+  };
+
+  const handleSubmit = (data: CreateListingFormData) => {
+    console.log('=== Create Listing Form Data ===');
+    console.log('Representing:', representing);
+    console.log('Form Data:', JSON.stringify(data, null, 2));
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -239,122 +262,137 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
           {/* Step indicator */}
           <div className='flex justify-center border-b border-purple-92/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
-            <StepIndicator currentStep={1} />
+            <StepIndicator currentStep={currentStep} />
           </div>
         </div>
 
-        {/* Scrollable content - Flex 1 */}
-        <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
-          {/* Property Selection */}
-          <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
-            <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-main-black'>
-              {t('selectProperty')}
-            </h3>
+        {/* Step 1: Property Selection */}
+        {currentStep === 1 && (
+          <>
+            {/* Scrollable content - Flex 1 */}
+            <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
+              {/* Property Selection */}
+              <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
+                <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-main-black'>
+                  {t('selectProperty')}
+                </h3>
 
-            <div className='flex flex-col gap-3'>
-              {paginatedProperties.map((property) => (
-                <PropertyCard
-                  key={property.propertyId}
-                  property={property}
-                  isSelected={selectedPropertyId === property.propertyId}
-                  onSelect={() => setSelectedPropertyId(property.propertyId)}
-                />
-              ))}
-            </div>
+                <div className='flex flex-col gap-3'>
+                  {paginatedProperties.map((property) => (
+                    <PropertyCard
+                      key={property.propertyId}
+                      property={property}
+                      isSelected={selectedPropertyId === property.propertyId}
+                      onSelect={() => setSelectedPropertyId(property.propertyId)}
+                    />
+                  ))}
+                </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className='mt-6 flex justify-center'>
-                <RealVistaPagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                />
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className='mt-6 flex justify-center'>
+                    <RealVistaPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                    />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* I'm representing */}
-          <div className='mt-6 flex flex-col gap-4'>
-            <div className='flex items-center gap-1'>
-              <span className='text-sm font-medium text-main-black'>
-                {t('representing.label')}
-              </span>
-              <span className='text-xs text-main-primary'>*</span>
-            </div>
-            <div className='flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10'>
-              {/* Landlord */}
-              <label className='flex cursor-pointer items-center gap-2'>
-                <div
-                  className={cn(
-                    'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
-                    representing === 'landlord'
-                      ? 'border-main-primary'
-                      : 'border-purple-92'
-                  )}
-                >
-                  {representing === 'landlord' && (
-                    <div className='h-3 w-3 rounded-full bg-main-primary' />
-                  )}
+              {/* I'm representing */}
+              <div className='mt-6 flex flex-col gap-4'>
+                <div className='flex items-center gap-1'>
+                  <span className='text-sm font-medium text-main-black'>
+                    {t('representing.label')}
+                  </span>
+                  <span className='text-xs text-main-primary'>*</span>
                 </div>
-                <input
-                  type='radio'
-                  name='representing'
-                  value='landlord'
-                  checked={representing === 'landlord'}
-                  onChange={() => setRepresenting('landlord')}
-                  className='sr-only'
-                />
-                <span className='text-sm font-medium text-main-black'>
-                  {t('representing.landlord')}
-                </span>
-              </label>
+                <div className='flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10'>
+                  {/* Landlord */}
+                  <label className='flex cursor-pointer items-center gap-2'>
+                    <div
+                      className={cn(
+                        'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
+                        representing === 'landlord'
+                          ? 'border-main-primary'
+                          : 'border-purple-92'
+                      )}
+                    >
+                      {representing === 'landlord' && (
+                        <div className='h-3 w-3 rounded-full bg-main-primary' />
+                      )}
+                    </div>
+                    <input
+                      type='radio'
+                      name='representing'
+                      value='landlord'
+                      checked={representing === 'landlord'}
+                      onChange={() => setRepresenting('landlord')}
+                      className='sr-only'
+                    />
+                    <span className='text-sm font-medium text-main-black'>
+                      {t('representing.landlord')}
+                    </span>
+                  </label>
 
-              {/* Applicant */}
-              <label className='flex cursor-pointer items-center gap-2'>
-                <div
-                  className={cn(
-                    'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
-                    representing === 'applicant'
-                      ? 'border-main-primary'
-                      : 'border-purple-92'
-                  )}
-                >
-                  {representing === 'applicant' && (
-                    <div className='h-3 w-3 rounded-full bg-main-primary' />
-                  )}
+                  {/* Applicant */}
+                  <label className='flex cursor-pointer items-center gap-2'>
+                    <div
+                      className={cn(
+                        'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
+                        representing === 'applicant'
+                          ? 'border-main-primary'
+                          : 'border-purple-92'
+                      )}
+                    >
+                      {representing === 'applicant' && (
+                        <div className='h-3 w-3 rounded-full bg-main-primary' />
+                      )}
+                    </div>
+                    <input
+                      type='radio'
+                      name='representing'
+                      value='applicant'
+                      checked={representing === 'applicant'}
+                      onChange={() => setRepresenting('applicant')}
+                      className='sr-only'
+                    />
+                    <span className='text-sm font-medium text-main-black'>
+                      {t('representing.applicant')}
+                    </span>
+                  </label>
                 </div>
-                <input
-                  type='radio'
-                  name='representing'
-                  value='applicant'
-                  checked={representing === 'applicant'}
-                  onChange={() => setRepresenting('applicant')}
-                  className='sr-only'
-                />
-                <span className='text-sm font-medium text-main-black'>
-                  {t('representing.applicant')}
-                </span>
-              </label>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Footer — Next button - Fixed */}
-        <div className='shrink-0 flex justify-end border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
-          <button
-            type='button'
-            disabled={!selectedPropertyId}
-            className={cn(
-              'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
-              selectedPropertyId
-                ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
-                : 'bg-main-primary/30 cursor-not-allowed'
-            )}
-          >
-            {t('next')}
-          </button>
-        </div>
+            {/* Footer — Next button - Fixed */}
+            <div className='shrink-0 flex justify-end border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+              <button
+                type='button'
+                disabled={!selectedPropertyId}
+                onClick={handleNextStep}
+                className={cn(
+                  'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
+                  selectedPropertyId
+                    ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
+                    : 'bg-main-primary/30 cursor-not-allowed'
+                )}
+              >
+                {t('next')}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: Listing Information */}
+        {currentStep === 2 && selectedProperty && (
+          <ListingInformationStep
+            selectedProperty={selectedProperty}
+            onPrevious={handlePreviousStep}
+            onSubmit={handleSubmit}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

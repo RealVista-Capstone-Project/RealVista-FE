@@ -47,3 +47,38 @@ export interface UserProperty {
 export type RepresentingType = 'landlord' | 'applicant';
 
 export type CreateListingStep = 'request' | 'listing-information';
+
+export type ListingType = 'RENT' | 'SALE';
+
+/**
+ * Form data for creating a listing.
+ * Aligned with CreateListingRequest.java:
+ *   propertyId, listingType, name, price, minPrice, maxPrice, isNegotiable, availableFrom
+ */
+export interface CreateListingFormData {
+  propertyId: string;
+  listingType: ListingType;
+  name: string;
+  price: string;
+  minPrice: string;
+  maxPrice: string;
+  isNegotiable: boolean;
+  availableFrom: string;
+  description: string;
+  selectedAmenities: string[];
+}
+
+export const MOCK_AMENITIES = [
+  'A/C',
+  'Deck',
+  'Pet Friendly',
+  'Free Parking Spots',
+  'Pool',
+  'Yard',
+  'Free Wi-Fi',
+  'Gym',
+  'Hardwood Floor',
+  'Jacuzzi',
+  'Security',
+  'Laundry',
+];
