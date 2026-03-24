@@ -7,6 +7,10 @@
       "managedListings": "Quản lý bài đăng",
       "tenants": "Người thuê",
       "messages": "Tin nhắn"
+    },
+    "actionButton": {
+      "addProperty": "Thêm bất động sản",
+      "createListing": "Tạo bài đăng"
     }
   },
   "Common": {

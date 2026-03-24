@@ -95,6 +95,19 @@ export function DashboardLayout({
   }, [pathname, t]);
 
   /**
+   * Compute the action button label based on the current pathname
+   */
+  const buttonLabel = React.useMemo(() => {
+    if (
+      pathname === ROUTES.dashboard.managedListings ||
+      pathname.startsWith(ROUTES.dashboard.managedListings)
+    ) {
+      return t('actionButton.createListing');
+    }
+    return t('actionButton.addProperty');
+  }, [pathname, t]);
+
+  /**
    * Determine if a menu item is active based on the current pathname
    * Matches exact path or checks if pathname starts with the href for nested routes
    */
@@ -261,10 +274,10 @@ export function DashboardLayout({
             <button
               type='button'
               className='flex items-center gap-2 rounded-lg bg-main-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-main-primary/90'
-              aria-label='Add a property'
+              aria-label={buttonLabel}
             >
               <Plus className='h-4 w-4' strokeWidth={2} />
-              <span>Add a property</span>
+              <span>{buttonLabel}</span>
             </button>
 
             {/* Notification Button */}

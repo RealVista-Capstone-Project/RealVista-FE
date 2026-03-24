@@ -7,6 +7,10 @@
       "managedListings": "Managed Listings",
       "tenants": "Tenants",
       "messages": "Messages"
+    },
+    "actionButton": {
+      "addProperty": "Add a property",
+      "createListing": "Create a listing"
     }
   },
   "Common": {
