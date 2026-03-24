@@ -135,4 +135,31 @@ export const mockUserProperties: UserProperty[] = [
       propertyTypeCode: 'VILLA',
     },
   },
+  // Generate more properties for pagination testing
+  ...Array.from({ length: 10 }).map((_, i) => ({
+    propertyId: `generated-id-${i}`,
+    ownerId: 'user-001',
+    streetAddress: `${100 + i} Lê Duẩn, Phường Bến Nghé`,
+    latitude: 10.7780 + (i * 0.001),
+    longitude: 106.7000 + (i * 0.001),
+    landSizeM2: 150.0 + (i * 10),
+    usableSizeM2: 120.0 + (i * 10),
+    widthM: 6.0,
+    lengthM: 25.0,
+    status: (i % 3 === 0 ? 'AVAILABLE' : i % 3 === 1 ? 'DRAFT' : 'SOLD') as UserProperty['status'],
+    descriptions: `Premium business district property #${i + 1}`,
+    slug: `premium-property-${i}`,
+    thumbnailUrl: `https://images.unsplash.com/photo-${1600000000000 + i}?w=400&auto=format&fit=crop`,
+    location: {
+      locationId: 'loc-001',
+      cityName: 'Hồ Chí Minh',
+      districtName: 'Quận 1',
+      wardName: 'Phường Bến Nghé',
+    },
+    propertyType: {
+      propertyTypeId: 'pt-001',
+      propertyTypeName: 'Townhouse',
+      propertyTypeCode: 'TOWNHOUSE',
+    },
+  })),
 ];

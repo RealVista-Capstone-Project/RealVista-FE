@@ -12,6 +12,7 @@ import {
 } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
+import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import type { UserProperty, RepresentingType } from '../model/types';
 import { mockUserProperties } from '../model/mock-user-properties';
 
@@ -180,7 +181,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             </div>
             <span
               className={cn(
-                'text-base font-medium',
+                'text-sm md:text-base font-medium hidden sm:block',
                 step.number <= currentStep
                   ? 'text-main-black'
                   : 'text-main-secondary/50'
@@ -202,45 +203,56 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   const t = useTranslations('CreateListingModal');
   const [selectedPropertyId, setSelectedPropertyId] = React.useState<string | null>(null);
   const [representing, setRepresenting] = React.useState<RepresentingType>('landlord');
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  const ITEMS_PER_PAGE = 3;
 
   // Reset state when modal closes
   React.useEffect(() => {
     if (!open) {
       setSelectedPropertyId(null);
       setRepresenting('landlord');
+      setCurrentPage(1);
     }
   }, [open]);
 
   const properties = mockUserProperties;
+  const totalPages = Math.ceil(properties.length / ITEMS_PER_PAGE);
+  const paginatedProperties = properties.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] sm:max-w-5xl !max-w-5xl overflow-hidden p-0'>
-        {/* Header */}
-        <DialogHeader className='space-y-4 px-8 pt-8 pb-0 text-center'>
-          <DialogTitle className='text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
-            {t('title')}
-          </DialogTitle>
-          <DialogDescription className='mx-auto max-w-md text-base leading-relaxed text-main-secondary/50'>
-            {t('subtitle')}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className='flex flex-col max-h-[95vh] sm:max-h-[90vh] sm:max-w-5xl !max-w-[95vw] sm:!max-w-5xl overflow-hidden p-0'>
+        {/* Header - Fixed */}
+        <div className='shrink-0'>
+          <DialogHeader className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
+            <DialogTitle className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
+              {t('title')}
+            </DialogTitle>
+            <DialogDescription className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-main-secondary/50'>
+              {t('subtitle')}
+            </DialogDescription>
+          </DialogHeader>
 
-        {/* Step indicator */}
-        <div className='flex justify-center border-b border-purple-92/50 px-8 pb-6'>
-          <StepIndicator currentStep={1} />
+          {/* Step indicator */}
+          <div className='flex justify-center border-b border-purple-92/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
+            <StepIndicator currentStep={1} />
+          </div>
         </div>
 
-        {/* Scrollable content */}
-        <div className='overflow-y-auto px-8 py-6' style={{ maxHeight: 'calc(90vh - 320px)' }}>
+        {/* Scrollable content - Flex 1 */}
+        <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
           {/* Property Selection */}
-          <div className='rounded-xl border-[1.5px] border-purple-92 p-6'>
+          <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
             <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-main-black'>
               {t('selectProperty')}
             </h3>
 
             <div className='flex flex-col gap-3'>
-              {properties.map((property) => (
+              {paginatedProperties.map((property) => (
                 <PropertyCard
                   key={property.propertyId}
                   property={property}
@@ -249,6 +261,17 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                 />
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className='mt-6 flex justify-center'>
+                <RealVistaPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
           </div>
 
           {/* I'm representing */}
@@ -259,7 +282,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
               </span>
               <span className='text-xs text-main-primary'>*</span>
             </div>
-            <div className='flex items-center gap-10'>
+            <div className='flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10'>
               {/* Landlord */}
               <label className='flex cursor-pointer items-center gap-2'>
                 <div
@@ -317,13 +340,13 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
           </div>
         </div>
 
-        {/* Footer — Next button */}
-        <div className='flex justify-end border-t border-purple-92/50 px-8 py-5'>
+        {/* Footer — Next button - Fixed */}
+        <div className='shrink-0 flex justify-end border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
           <button
             type='button'
             disabled={!selectedPropertyId}
             className={cn(
-              'flex min-w-[160px] items-center justify-center rounded-lg px-8 py-4 text-base font-bold text-white transition-all',
+              'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
               selectedPropertyId
                 ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
                 : 'bg-main-primary/30 cursor-not-allowed'
