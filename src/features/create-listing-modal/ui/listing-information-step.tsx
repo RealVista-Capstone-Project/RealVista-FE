@@ -9,7 +9,7 @@ import type {
   ListingType,
   CreateListingFormData,
 } from '../model/types';
-import { MOCK_AMENITIES } from '../model/types';
+import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
 
 interface ListingInformationStepProps {
   selectedProperty: UserProperty;
@@ -56,7 +56,6 @@ export function ListingInformationStep({
   const [isNegotiable, setIsNegotiable] = React.useState(false);
   const [availableFrom, setAvailableFrom] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [selectedAmenities, setSelectedAmenities] = React.useState<string[]>([]);
 
   const fullAddress = [
     selectedProperty.streetAddress,
@@ -67,13 +66,15 @@ export function ListingInformationStep({
     .filter(Boolean)
     .join(', ');
 
-  const toggleAmenity = (amenity: string) => {
-    setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
-    );
-  };
+  const numericFeatures =
+    selectedProperty.extraAttributes?.filter(
+      (attr) => attr.value_number !== null || attr.value_text !== null
+    ) || [];
+
+  const booleanFeatures =
+    selectedProperty.extraAttributes?.filter(
+      (attr) => attr.value_boolean === true
+    ) || [];
 
   const handleSubmit = () => {
     const formData: CreateListingFormData = {
@@ -86,7 +87,6 @@ export function ListingInformationStep({
       isNegotiable,
       availableFrom,
       description,
-      selectedAmenities,
     };
     onSubmit(formData);
   };
@@ -182,27 +182,36 @@ export function ListingInformationStep({
               badge={t('readOnly')}
             />
 
-            {/* Bedrooms / Baths / Area (read-only) */}
+            {/* Property Attributes (dynamic) */}
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
-              <ReadOnlyField
-                label={t('bedrooms')}
-                value={selectedProperty.usableSizeM2 ? '—' : '—'}
-                badge={t('readOnly')}
-              />
-              <ReadOnlyField
-                label={t('baths')}
-                value='—'
-                badge={t('readOnly')}
-              />
-              <ReadOnlyField
-                label={t('squareFeet')}
-                value={
-                  selectedProperty.usableSizeM2
-                    ? `${selectedProperty.usableSizeM2} m²`
-                    : '—'
-                }
-                badge={t('readOnly')}
-              />
+              {numericFeatures.map((attr) => (
+                <ReadOnlyField
+                  key={attr.attribute_id}
+                  label={attr.attribute_name}
+                  value={
+                    attr.value_text !== null
+                      ? attr.value_text
+                      : attr.value_number !== null
+                        ? attr.value_number.toString()
+                        : '—'
+                  }
+                  badge={t('readOnly')}
+                />
+              ))}
+              {selectedProperty.usableSizeM2 && (
+                <ReadOnlyField
+                  label={t('squareFeet')} /* Reusing squareFeet translation as Area */
+                  value={`${selectedProperty.usableSizeM2} m²`}
+                  badge={t('readOnly')}
+                />
+              )}
+              {selectedProperty.landSizeM2 && (
+                <ReadOnlyField
+                  label={t('landSize', { size: '' }).replace(' m²', '').replace(':', '').trim()}
+                  value={`${selectedProperty.landSizeM2} m²`}
+                  badge={t('readOnly')}
+                />
+              )}
             </div>
 
             {/* Price */}
@@ -308,34 +317,33 @@ export function ListingInformationStep({
               </button>
             </div>
 
-            {/* Amenities */}
-            <div className='flex flex-col gap-3'>
-              <span className='text-sm font-medium text-main-black'>
-                {t('selectAmenities')}
-              </span>
-              <div className='rounded-lg border border-purple-92 p-4'>
-                <div className='flex flex-wrap gap-2'>
-                  {MOCK_AMENITIES.map((amenity) => {
-                    const isActive = selectedAmenities.includes(amenity);
-                    return (
-                      <button
-                        key={amenity}
-                        type='button'
-                        onClick={() => toggleAmenity(amenity)}
-                        className={cn(
-                          'rounded-lg border-[1.5px] px-4 py-2 text-sm font-medium transition-all',
-                          isActive
-                            ? 'border-main-primary bg-purple-94 text-main-primary'
-                            : 'border-purple-92 bg-white text-main-black/70 hover:border-main-primary/40'
-                        )}
+            {/* Amenities / Features (dynamic) */}
+            {booleanFeatures.length > 0 && (
+              <div className='flex flex-col gap-3'>
+                <span className='text-sm font-medium text-main-black'>
+                  {t('selectAmenities')}
+                </span>
+                <div className='rounded-lg border border-purple-92 p-4'>
+                  <div className='flex flex-wrap gap-2'>
+                    {booleanFeatures.map((attr) => (
+                      <div
+                        key={attr.attribute_id}
+                        className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/30 px-3 py-1.5 text-sm font-medium text-main-black/80'
                       >
-                        {amenity}
-                      </button>
-                    );
-                  })}
+                        {attr.icon && (
+                          <AttributeIcon
+                            iconName={attr.icon}
+                            className='h-4 w-4 text-main-primary'
+                            strokeWidth={2}
+                          />
+                        )}
+                        {attr.attribute_name}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Description */}
             <div className='flex flex-col gap-2'>

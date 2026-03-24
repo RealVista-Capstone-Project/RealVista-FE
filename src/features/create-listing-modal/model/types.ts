@@ -3,6 +3,8 @@
  * Aligned with Property.java entity from the backend
  */
 
+import { ListingAttribute } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
+
 export type PropertyStatus = 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
 
 export interface UserPropertyLocation {
@@ -42,6 +44,7 @@ export interface UserProperty {
   thumbnailUrl: string | null;
   location: UserPropertyLocation;
   propertyType: UserPropertyType;
+  extraAttributes?: ListingAttribute[];
 }
 
 export type RepresentingType = 'landlord' | 'applicant';
@@ -65,20 +68,6 @@ export interface CreateListingFormData {
   isNegotiable: boolean;
   availableFrom: string;
   description: string;
-  selectedAmenities: string[];
 }
 
-export const MOCK_AMENITIES = [
-  'A/C',
-  'Deck',
-  'Pet Friendly',
-  'Free Parking Spots',
-  'Pool',
-  'Yard',
-  'Free Wi-Fi',
-  'Gym',
-  'Hardwood Floor',
-  'Jacuzzi',
-  'Security',
-  'Laundry',
-];
+
