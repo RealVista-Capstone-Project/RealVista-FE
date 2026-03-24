@@ -108,7 +108,7 @@ export function DashboardLayout({
     }
 
     // For other routes, match if pathname starts with href
-    // This handles nested routes like /dashboard/quan-ly-bai-dang
+    // This handles nested routes like /dashboard/listings
     return pathname.startsWith(href);
   };
 
