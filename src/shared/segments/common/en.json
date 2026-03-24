@@ -13,6 +13,29 @@
       "createListing": "Create a listing"
     }
   },
+  "CreateListingModal": {
+    "title": "Create New Listing",
+    "subtitle": "Select one of your properties and fill in the listing details.",
+    "steps": {
+      "request": "Request",
+      "listingInformation": "Listing Information"
+    },
+    "selectProperty": "Select Property",
+    "landSize": "Land: {size} m²",
+    "usableSize": "Usable: {size} m²",
+    "propertyStatus": {
+      "draft": "Draft",
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold"
+    },
+    "representing": {
+      "label": "I'm representing",
+      "landlord": "The landlord or property",
+      "applicant": "Applicant(s)"
+    },
+    "next": "Next"
+  },
   "Common": {
     "title": "Hello world common!",
     "about": "Go to the about page"

@@ -13,6 +13,29 @@
       "createListing": "Tạo bài đăng"
     }
   },
+  "CreateListingModal": {
+    "title": "Tạo bài đăng mới",
+    "subtitle": "Chọn một bất động sản của bạn và điền thông tin bài đăng.",
+    "steps": {
+      "request": "Yêu cầu",
+      "listingInformation": "Thông tin bài đăng"
+    },
+    "selectProperty": "Chọn bất động sản",
+    "landSize": "Đất: {size} m²",
+    "usableSize": "Sử dụng: {size} m²",
+    "propertyStatus": {
+      "draft": "Nháp",
+      "available": "Sẵn sàng",
+      "reserved": "Đã đặt",
+      "sold": "Đã bán"
+    },
+    "representing": {
+      "label": "Tôi đại diện cho",
+      "landlord": "Chủ nhà hoặc bất động sản",
+      "applicant": "Người nộp đơn"
+    },
+    "next": "Tiếp theo"
+  },
   "Common": {
     "title": "Xin chào common!",
     "about": "Về trang chủ"
