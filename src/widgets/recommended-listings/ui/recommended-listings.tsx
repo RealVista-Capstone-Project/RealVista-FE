@@ -45,7 +45,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
     enabled: authStatus === 'authenticated',
   });
 
-  const recommendations = response?.payload?.data?.recommendations ?? [];
+  const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
 
   const refreshMutation = useMutation({
     mutationFn: () => recommendationApi.refreshRecommendations(6),
@@ -137,15 +137,15 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
                 >
                   <RealVistaListingCard
                     id={listing.listing_id}
-                    image={
-                      listing.thumbnail ||
-                      'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
-                    }
+                    image={listing.thumbnail || ''}
                     title={listing.name}
-                    address={listing.location}
+                    address={listing.full_address}
                     price={listing.price}
-                    listingType={listing.listing_type as 'RENT' | 'SALE'}
+                    area={listing.area}
+                    attributes={listing.attributes}
+                    listingType={listing.listing_type}
                     onClick={() => handleListingClick(listing)}
+                    className='h-full'
                   />
                 </div>
               ))}

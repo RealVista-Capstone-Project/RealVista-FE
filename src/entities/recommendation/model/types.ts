@@ -7,6 +7,7 @@
  */
 
 import type { ApiResponse } from '@/entities/listing';
+import type { ListingSearchResponse } from '@/shared/types/search';
 
 // ============ Behavior Events (Request) ============
 
@@ -24,14 +25,7 @@ export interface UserBehaviorRequest {
 
 // ============ Recommendations (Response) ============
 
-export interface RecommendedListingDTO {
-  listing_id: string;
-  listing_type: string;
-  slug: string;
-  name: string;
-  price: number;
-  thumbnail: string;
-  location: string;
+export interface RecommendedListingDTO extends ListingSearchResponse {
   score: number;
   reason: string;
 }
