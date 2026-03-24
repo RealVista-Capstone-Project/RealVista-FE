@@ -215,7 +215,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] max-w-3xl overflow-hidden p-0'>
+      <DialogContent className='max-h-[90vh] sm:max-w-5xl !max-w-5xl overflow-hidden p-0'>
         {/* Header */}
         <DialogHeader className='space-y-4 px-8 pt-8 pb-0 text-center'>
           <DialogTitle className='text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
