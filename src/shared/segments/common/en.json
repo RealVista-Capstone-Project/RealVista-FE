@@ -59,6 +59,13 @@
       "messageMinLength": "Message must be at least 10 characters"
     }
   },
+  "Notifications": {
+    "notifications": "Notifications",
+    "new": "NEW",
+    "noNotifications": "No notifications yet",
+    "markAsRead": "Mark as read",
+    "viewAll": "View all notifications"
+  },
   "Navigation": {
     "explore": "Explore",
     "rent": "Rent",
