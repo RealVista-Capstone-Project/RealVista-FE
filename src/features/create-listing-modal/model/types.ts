@@ -1,9 +1,7 @@
 /**
  * Types for the Create Listing Modal feature
- * Aligned with Property.java entity from the backend
+ * Aligned with PropertySummaryResponse from the backend
  */
-
-import { ListingAttribute } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 
 export type PropertyStatus = 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
 
@@ -12,39 +10,65 @@ export interface UserPropertyLocation {
   cityName: string;
   districtName: string;
   wardName: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface UserPropertyType {
   propertyTypeId: string;
   propertyTypeName: string;
   propertyTypeCode: string;
+  propertyCategoryName: string;
+  propertyCategoryCode: string;
+}
+
+export interface UserPropertyAttribute {
+  attributeId: string;
+  attributeCode: string;
+  attributeName: string;
+  dataType: string;
+  icon: string | null;
+  unit: string | null;
+  valueNumber: number | null;
+  valueText: string | null;
+  valueBoolean: boolean | null;
+  displayValue: string | null;
+}
+
+export interface UserPropertyMedia {
+  mediaId: string;
+  mediaType: string;
+  mediaUrl: string;
+  thumbnailUrl: string | null;
+  isPrimary: boolean;
+  displayOrder: number;
+}
+
+export interface UserPropertyAmenity {
+  amenityId: string;
+  amenityName: string;
 }
 
 /**
  * Represents a property owned by the user.
- * Aligned with Property.java fields:
- *   propertyId, ownerId, locationId, propertyTypeId,
- *   streetAddress, latitude, longitude,
- *   landSizeM2, usableSizeM2, widthM, lengthM,
- *   status, descriptions, slug, extraAttributes
+ * Aligned with PropertySummaryResponse fields.
  */
 export interface UserProperty {
   propertyId: string;
-  ownerId: string;
   streetAddress: string;
-  latitude: number;
-  longitude: number;
   landSizeM2: number | null;
   usableSizeM2: number | null;
   widthM: number | null;
   lengthM: number | null;
+  areaSqft: number | null;
+  description: string | null;
   status: PropertyStatus;
-  descriptions: string | null;
-  slug: string | null;
   thumbnailUrl: string | null;
   location: UserPropertyLocation;
   propertyType: UserPropertyType;
-  extraAttributes?: ListingAttribute[];
+  attributes: UserPropertyAttribute[];
+  amenities: UserPropertyAmenity[];
+  media: UserPropertyMedia[];
 }
 
 export type RepresentingType = 'landlord' | 'applicant';
@@ -69,5 +93,3 @@ export interface CreateListingFormData {
   availableFrom: string;
   description: string;
 }
-
-

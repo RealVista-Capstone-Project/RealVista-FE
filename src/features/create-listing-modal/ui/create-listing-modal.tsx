@@ -229,32 +229,61 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   const rawProperties = propertiesResponse?.content || [];
   const totalPages = propertiesResponse?.totalPages || 0;
 
-  const properties: UserProperty[] = rawProperties.map((p) => ({
-    propertyId: p.property_id,
-    ownerId: '',
-    streetAddress: p.street_address,
-    latitude: p.latitude,
-    longitude: p.longitude,
-    landSizeM2: p.land_size_m2,
-    usableSizeM2: p.usable_size_m2,
-    widthM: null,
-    lengthM: null,
-    status: p.status,
-    descriptions: null,
-    slug: null,
-    thumbnailUrl: p.thumbnail_url,
-    location: {
-      locationId: '',
-      cityName: p.city_name || '',
-      districtName: p.district_name || '',
-      wardName: p.ward_name || ''
-    },
-    propertyType: {
-      propertyTypeId: p.property_type_id,
-      propertyTypeName: p.property_type_name || '',
-      propertyTypeCode: ''
-    }
-  }));
+  const properties: UserProperty[] = rawProperties.map((p) => {
+    const primaryMedia = p.media?.find((m) => m.is_primary) ?? p.media?.[0];
+
+    return {
+      propertyId: p.property_id,
+      streetAddress: p.street_address,
+      landSizeM2: p.land_size_m2,
+      usableSizeM2: p.usable_size_m2,
+      widthM: p.width_m,
+      lengthM: p.length_m,
+      areaSqft: p.area_sqft,
+      description: p.description,
+      status: p.status,
+      thumbnailUrl: primaryMedia?.thumbnail_url ?? primaryMedia?.media_url ?? null,
+      location: {
+        locationId: p.location_info?.location_id ?? '',
+        cityName: p.location_info?.city_name ?? '',
+        districtName: p.location_info?.district_name ?? '',
+        wardName: p.location_info?.ward_name ?? '',
+        latitude: p.location_info?.latitude ?? null,
+        longitude: p.location_info?.longitude ?? null,
+      },
+      propertyType: {
+        propertyTypeId: p.property_type_info?.property_type_id ?? p.property_type_id,
+        propertyTypeName: p.property_type_info?.property_type_name ?? '',
+        propertyTypeCode: p.property_type_info?.property_type_code ?? '',
+        propertyCategoryName: p.property_type_info?.property_category_name ?? '',
+        propertyCategoryCode: p.property_type_info?.property_category_code ?? '',
+      },
+      attributes: (p.attributes ?? []).map((attr) => ({
+        attributeId: attr.attribute_id,
+        attributeCode: attr.attribute_code,
+        attributeName: attr.attribute_name,
+        dataType: attr.data_type,
+        icon: attr.icon,
+        unit: attr.unit,
+        valueNumber: attr.value_number,
+        valueText: attr.value_text,
+        valueBoolean: attr.value_boolean,
+        displayValue: attr.display_value,
+      })),
+      amenities: (p.amenities ?? []).map((a) => ({
+        amenityId: a.amenity_id,
+        amenityName: a.amenity_name,
+      })),
+      media: (p.media ?? []).map((m) => ({
+        mediaId: m.media_id,
+        mediaType: m.media_type,
+        mediaUrl: m.media_url,
+        thumbnailUrl: m.thumbnail_url,
+        isPrimary: m.is_primary,
+        displayOrder: m.display_order,
+      })),
+    };
+  });
 
   const handleNextStep = () => {
     if (selectedProperty) {

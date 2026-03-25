@@ -10,6 +10,7 @@ import type {
   CreateListingFormData,
 } from '../model/types';
 import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
+import { Check } from 'lucide-react';
 
 interface ListingInformationStepProps {
   selectedProperty: UserProperty;
@@ -55,7 +56,9 @@ export function ListingInformationStep({
   const [maxPrice, setMaxPrice] = React.useState('');
   const [isNegotiable, setIsNegotiable] = React.useState(false);
   const [availableFrom, setAvailableFrom] = React.useState('');
-  const [description, setDescription] = React.useState('');
+  const [description, setDescription] = React.useState(
+    selectedProperty.description ?? ''
+  );
 
   const fullAddress = [
     selectedProperty.streetAddress,
@@ -67,13 +70,13 @@ export function ListingInformationStep({
     .join(', ');
 
   const numericFeatures =
-    selectedProperty.extraAttributes?.filter(
-      (attr) => attr.value_number !== null || attr.value_text !== null
+    selectedProperty.attributes?.filter(
+      (attr) => attr.valueNumber !== null || attr.valueText !== null
     ) || [];
 
   const booleanFeatures =
-    selectedProperty.extraAttributes?.filter(
-      (attr) => attr.value_boolean === true
+    selectedProperty.attributes?.filter(
+      (attr) => attr.valueBoolean === true
     ) || [];
 
   const handleSubmit = () => {
@@ -186,22 +189,16 @@ export function ListingInformationStep({
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
               {numericFeatures.map((attr) => (
                 <ReadOnlyField
-                  key={attr.attribute_id}
-                  label={attr.attribute_name}
-                  value={
-                    attr.value_text !== null
-                      ? attr.value_text
-                      : attr.value_number !== null
-                        ? attr.value_number.toString()
-                        : '—'
-                  }
+                  key={attr.attributeId}
+                  label={attr.attributeName}
+                  value={attr.displayValue ?? (attr.valueText ?? attr.valueNumber?.toString() ?? '—')}
                   badge={t('readOnly')}
                 />
               ))}
               {selectedProperty.usableSizeM2 && (
                 <ReadOnlyField
-                  label={t('squareFeet')} /* Reusing squareFeet translation as Area */
-                  value={`${selectedProperty.usableSizeM2} m²`}
+                  label={t('squareFeet')}
+                  value={`${selectedProperty.usableSizeM2} m²${selectedProperty.areaSqft ? ` (${selectedProperty.areaSqft} sqft)` : ''}`}
                   badge={t('readOnly')}
                 />
               )}
@@ -209,6 +206,13 @@ export function ListingInformationStep({
                 <ReadOnlyField
                   label={t('landSize', { size: '' }).replace(' m²', '').replace(':', '').trim()}
                   value={`${selectedProperty.landSizeM2} m²`}
+                  badge={t('readOnly')}
+                />
+              )}
+              {selectedProperty.widthM && selectedProperty.lengthM && (
+                <ReadOnlyField
+                  label={t('dimensions', { fallback: 'Dimensions' })}
+                  value={`${selectedProperty.widthM}m × ${selectedProperty.lengthM}m`}
                   badge={t('readOnly')}
                 />
               )}
@@ -317,17 +321,39 @@ export function ListingInformationStep({
               </button>
             </div>
 
-            {/* Amenities / Features (dynamic) */}
-            {booleanFeatures.length > 0 && (
+            {/* Amenities (from property amenities) */}
+            {selectedProperty.amenities.length > 0 && (
               <div className='flex flex-col gap-3'>
                 <span className='text-sm font-medium text-main-black'>
                   {t('selectAmenities')}
                 </span>
                 <div className='rounded-lg border border-purple-92 p-4'>
                   <div className='flex flex-wrap gap-2'>
+                    {selectedProperty.amenities.map((amenity) => (
+                      <div
+                        key={amenity.amenityId}
+                        className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/30 px-3 py-1.5 text-sm font-medium text-main-black/80'
+                      >
+                        <Check className='h-3.5 w-3.5 text-main-primary' strokeWidth={2.5} />
+                        {amenity.amenityName}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Boolean features from attributes */}
+            {booleanFeatures.length > 0 && (
+              <div className='flex flex-col gap-3'>
+                <span className='text-sm font-medium text-main-black'>
+                  {t('features', { fallback: 'Features' })}
+                </span>
+                <div className='rounded-lg border border-purple-92 p-4'>
+                  <div className='flex flex-wrap gap-2'>
                     {booleanFeatures.map((attr) => (
                       <div
-                        key={attr.attribute_id}
+                        key={attr.attributeId}
                         className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/30 px-3 py-1.5 text-sm font-medium text-main-black/80'
                       >
                         {attr.icon && (
@@ -337,7 +363,7 @@ export function ListingInformationStep({
                             strokeWidth={2}
                           />
                         )}
-                        {attr.attribute_name}
+                        {attr.attributeName}
                       </div>
                     ))}
                   </div>
