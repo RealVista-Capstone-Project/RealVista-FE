@@ -360,9 +360,14 @@ export function ListingInformationStep({
             {/* Amenities (from property amenities) */}
             {selectedProperty.amenities.length > 0 && (
               <div className='flex flex-col gap-3'>
-                <span className='text-sm font-medium text-main-black'>
-                  {t('selectAmenities')}
-                </span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-main-black'>
+                    {t('selectAmenities')}
+                  </span>
+                  <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
+                    {t('readOnly')}
+                  </span>
+                </div>
                 <div className='rounded-lg border border-purple-92 p-4'>
                   <div className='flex flex-wrap gap-2'>
                     {selectedProperty.amenities.map((amenity) => (
@@ -382,9 +387,14 @@ export function ListingInformationStep({
             {/* Boolean features from attributes */}
             {booleanFeatures.length > 0 && (
               <div className='flex flex-col gap-3'>
-                <span className='text-sm font-medium text-main-black'>
-                  {t('features', { fallback: 'Features' })}
-                </span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium text-main-black'>
+                    {t('features', { fallback: 'Features' })}
+                  </span>
+                  <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
+                    {t('readOnly')}
+                  </span>
+                </div>
                 <div className='rounded-lg border border-purple-92 p-4'>
                   <div className='flex flex-wrap gap-2'>
                     {booleanFeatures.map((attr) => (
