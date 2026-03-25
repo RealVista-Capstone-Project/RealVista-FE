@@ -91,5 +91,5 @@ export interface CreateListingFormData {
   maxPrice: string;
   isNegotiable: boolean;
   availableFrom: string;
-  description: string;
+  content: string;
 }

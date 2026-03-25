@@ -82,6 +82,7 @@ export interface ListingDetail {
   published_at?: string;
   created_at: string;
   updated_at: string;
+  content?: string;
 
   property: PropertyInfo;
   location: LocationInfo;

@@ -83,9 +83,6 @@ export function ListingInformationStep({
   const [maxPrice, setMaxPrice] = React.useState('');
   const [isNegotiable, setIsNegotiable] = React.useState(false);
   const [availableFrom, setAvailableFrom] = React.useState('');
-  const [description, setDescription] = React.useState(
-    selectedProperty.description ?? ''
-  );
 
   const fullAddress = [
     selectedProperty.streetAddress,
@@ -116,7 +113,7 @@ export function ListingInformationStep({
       maxPrice,
       isNegotiable,
       availableFrom,
-      description,
+      content: content,
     };
     onSubmit(formData);
   };
@@ -410,19 +407,19 @@ export function ListingInformationStep({
               </div>
             )}
 
-            {/* Description */}
+            {/* Property Description (read-only) */}
             <div className='flex flex-col gap-2'>
-              <label className='text-sm font-medium text-main-black'>
-                {t('description')}
-                <span className='text-main-primary'>*</span>
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder={t('descriptionPlaceholder')}
-                rows={5}
-                className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 transition-colors focus:border-main-primary focus:outline-none resize-none'
-              />
+              <div className='flex items-center justify-between'>
+                <span className='text-sm font-medium text-main-black'>
+                  {t('description')}
+                </span>
+                <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
+                  {t('readOnly')}
+                </span>
+              </div>
+              <div className='min-h-[100px] whitespace-pre-wrap rounded-lg border border-purple-92 bg-purple-98/50 px-4 py-3 text-sm text-main-secondary/60'>
+                {selectedProperty.description || '—'}
+              </div>
             </div>
 
             {/* Date Available */}

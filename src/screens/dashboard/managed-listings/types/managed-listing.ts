@@ -62,6 +62,7 @@ export interface ManagedListing {
   published_at?: string;
   created_at: string;
   updated_at: string;
+  content?: string;
   // Address fields
   street_address?: string;
   ward_name?: string;
