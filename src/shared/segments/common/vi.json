@@ -41,6 +41,8 @@
     "listingInformation": "Thông tin bài đăng",
     "listingName": "Tên bài đăng",
     "listingNamePlaceholder": "Nhập tiêu đề cho bài đăng",
+    "listingContent": "Nội dung",
+    "listingContentPlaceholder": "Thêm chi tiết, điểm nổi bật hoặc ghi chú về bài đăng...",
     "listingTypeLabel": "Loại bài đăng",
     "listingTypeRent": "Cho thuê",
     "listingTypeSale": "Bán",

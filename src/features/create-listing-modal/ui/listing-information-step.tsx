@@ -77,6 +77,7 @@ export function ListingInformationStep({
 
   const [listingType, setListingType] = React.useState<ListingType>('RENT');
   const [name, setName] = React.useState('');
+  const [content, setContent] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [minPrice, setMinPrice] = React.useState('');
   const [maxPrice, setMaxPrice] = React.useState('');
@@ -167,7 +168,19 @@ export function ListingInformationStep({
               />
             </div>
 
-            {/* Listing Type */}
+            {/* Listing Content */}
+            <div className='flex flex-col gap-2'>
+              <label className='text-sm font-medium text-main-black'>
+                {t('listingContent')}
+              </label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={t('listingContentPlaceholder')}
+                rows={4}
+                className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 transition-colors focus:border-main-primary focus:outline-none resize-none'
+              />
+            </div>
             <div className='flex flex-col gap-2'>
               <span className='text-sm font-medium text-main-black'>
                 {t('listingTypeLabel')}

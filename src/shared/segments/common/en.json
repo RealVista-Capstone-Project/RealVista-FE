@@ -41,6 +41,8 @@
     "listingInformation": "Listing Information",
     "listingName": "Listing Name",
     "listingNamePlaceholder": "Enter a title for your listing",
+    "listingContent": "Content",
+    "listingContentPlaceholder": "Add more details, highlights, or notes about this listing...",
     "listingTypeLabel": "Listing Type",
     "listingTypeRent": "Rent",
     "listingTypeSale": "Sale",
