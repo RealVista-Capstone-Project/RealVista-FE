@@ -88,3 +88,44 @@ export interface PropertySearchResponse {
   };
   timestamp: string;
 }
+
+export interface MyPropertiesSearchCriteria {
+  keyword?: string;
+  page: number;
+  size: number;
+}
+
+export interface PropertySummaryResponse {
+  property_id: string;
+  property_type_id: string;
+  property_type_name: string | null;
+  street_address: string;
+  city_name: string | null;
+  district_name: string | null;
+  ward_name: string | null;
+  latitude: number;
+  longitude: number;
+  status: 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  thumbnail_url: string | null;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements?: number;
+  totalPages?: number;
+  last?: boolean;
+  first?: boolean;
+  hasNext?: boolean;
+  hasPrevious?: boolean;
+}
+
+export interface MyPropertiesResponse {
+  success: boolean;
+  message: string;
+  data: PageResponse<PropertySummaryResponse>;
+  timestamp: string;
+}

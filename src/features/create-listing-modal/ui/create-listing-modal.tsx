@@ -13,8 +13,9 @@ import {
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
+import { useQuery } from '@tanstack/react-query';
+import { propertyQueries } from '@/entities/property';
 import type { UserProperty, RepresentingType, CreateListingFormData } from '../model/types';
-import { mockUserProperties } from '../model/mock-user-properties';
 import { ListingInformationStep } from './listing-information-step';
 
 export interface CreateListingModalProps {
@@ -200,38 +201,63 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   );
 }
 
+const ITEMS_PER_PAGE = 4;
+
 export function CreateListingModal({ open, onOpenChange }: CreateListingModalProps) {
   const t = useTranslations('CreateListingModal');
-  const [selectedPropertyId, setSelectedPropertyId] = React.useState<string | null>(null);
-  const [representing, setRepresenting] = React.useState<RepresentingType>('landlord');
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [currentStep, setCurrentStep] = React.useState<1 | 2>(1);
+  const [currentStep, setCurrentStep] = React.useState(1);
 
-  const ITEMS_PER_PAGE = 3;
+  const { data, isLoading } = useQuery(
+    propertyQueries.myProperties({ page: currentPage - 1, size: ITEMS_PER_PAGE })
+  );
+
+  const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
+  const [representing, setRepresenting] = React.useState<RepresentingType>('landlord');
 
   // Reset state when modal closes
   React.useEffect(() => {
     if (!open) {
-      setSelectedPropertyId(null);
+      setSelectedProperty(null);
       setRepresenting('landlord');
       setCurrentPage(1);
       setCurrentStep(1);
     }
   }, [open]);
 
-  const properties = mockUserProperties;
-  const totalPages = Math.ceil(properties.length / ITEMS_PER_PAGE);
-  const paginatedProperties = properties.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const propertiesResponse = data?.payload?.data;
+  const rawProperties = propertiesResponse?.content || [];
+  const totalPages = propertiesResponse?.totalPages || 0;
 
-  const selectedProperty = properties.find(
-    (p) => p.propertyId === selectedPropertyId
-  );
+  const properties: UserProperty[] = rawProperties.map((p) => ({
+    propertyId: p.property_id,
+    ownerId: '',
+    streetAddress: p.street_address,
+    latitude: p.latitude,
+    longitude: p.longitude,
+    landSizeM2: p.land_size_m2,
+    usableSizeM2: p.usable_size_m2,
+    widthM: null,
+    lengthM: null,
+    status: p.status,
+    descriptions: null,
+    slug: null,
+    thumbnailUrl: p.thumbnail_url,
+    location: {
+      locationId: '',
+      cityName: p.city_name || '',
+      districtName: p.district_name || '',
+      wardName: p.ward_name || ''
+    },
+    propertyType: {
+      propertyTypeId: p.property_type_id,
+      propertyTypeName: p.property_type_name || '',
+      propertyTypeCode: ''
+    }
+  }));
 
   const handleNextStep = () => {
-    if (selectedPropertyId) {
+    if (selectedProperty) {
       setCurrentStep(2);
     }
   };
@@ -278,14 +304,24 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                 </h3>
 
                 <div className='flex flex-col gap-3'>
-                  {paginatedProperties.map((property) => (
-                    <PropertyCard
-                      key={property.propertyId}
-                      property={property}
-                      isSelected={selectedPropertyId === property.propertyId}
-                      onSelect={() => setSelectedPropertyId(property.propertyId)}
-                    />
-                  ))}
+                  {isLoading ? (
+                    <div className='flex justify-center py-8'>
+                      <div className='h-8 w-8 animate-spin rounded-full border-4 border-main-primary border-t-transparent' />
+                    </div>
+                  ) : properties.length === 0 ? (
+                    <div className='flex justify-center py-8'>
+                      <span className='text-main-secondary/50'>{t('noProperties', { fallback: 'No properties found' })}</span>
+                    </div>
+                  ) : (
+                    properties.map((property) => (
+                      <PropertyCard
+                        key={property.propertyId}
+                        property={property}
+                        isSelected={selectedProperty?.propertyId === property.propertyId}
+                        onSelect={() => setSelectedProperty(property)}
+                      />
+                    ))
+                  )}
                 </div>
 
                 {/* Pagination */}
@@ -370,11 +406,11 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
             <div className='shrink-0 flex justify-end border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
               <button
                 type='button'
-                disabled={!selectedPropertyId}
+                disabled={!selectedProperty}
                 onClick={handleNextStep}
                 className={cn(
                   'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
-                  selectedPropertyId
+                  selectedProperty
                     ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
                     : 'bg-main-primary/30 cursor-not-allowed'
                 )}
