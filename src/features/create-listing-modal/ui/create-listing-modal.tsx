@@ -3,13 +3,7 @@
 import * as React from 'react';
 import Image from 'next/image';
 import { ChevronRight, MapPin, Maximize2, Home, Check } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/shared/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
@@ -26,10 +20,7 @@ export interface CreateListingModalProps {
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] }) {
   const t = useTranslations('CreateListingModal');
 
-  const statusConfig: Record<
-    UserProperty['status'],
-    { label: string; className: string }
-  > = {
+  const statusConfig: Record<UserProperty['status'], { label: string; className: string }> = {
     DRAFT: {
       label: t('propertyStatus.draft'),
       className: 'bg-grey-100 text-grey-600',
@@ -184,17 +175,13 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep
-                  ? 'text-main-black'
-                  : 'text-main-secondary/50'
+                step.number <= currentStep ? 'text-main-black' : 'text-main-secondary/50'
               )}
             >
               {step.label}
             </span>
           </div>
-          {index < steps.length - 1 && (
-            <ChevronRight className='h-5 w-5 text-main-secondary/50' />
-          )}
+          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-main-secondary/50' />}
         </React.Fragment>
       ))}
     </div>
@@ -339,7 +326,9 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                     </div>
                   ) : properties.length === 0 ? (
                     <div className='flex justify-center py-8'>
-                      <span className='text-main-secondary/50'>{t('noProperties', { fallback: 'No properties found' })}</span>
+                      <span className='text-main-secondary/50'>
+                        {t('noProperties', { fallback: 'No properties found' })}
+                      </span>
                     </div>
                   ) : (
                     properties.map((property) => (
@@ -379,9 +368,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                     <div
                       className={cn(
                         'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
-                        representing === 'landlord'
-                          ? 'border-main-primary'
-                          : 'border-purple-92'
+                        representing === 'landlord' ? 'border-main-primary' : 'border-purple-92'
                       )}
                     >
                       {representing === 'landlord' && (
@@ -406,9 +393,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                     <div
                       className={cn(
                         'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
-                        representing === 'applicant'
-                          ? 'border-main-primary'
-                          : 'border-purple-92'
+                        representing === 'applicant' ? 'border-main-primary' : 'border-purple-92'
                       )}
                     >
                       {representing === 'applicant' && (

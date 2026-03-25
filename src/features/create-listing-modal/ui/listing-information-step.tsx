@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Home, MapPin, Upload, Calendar } from 'lucide-react';
+import Image from 'next/image';
+import { Home, MapPin, Upload, Calendar, X, Play, ImageIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import type {
@@ -10,7 +11,7 @@ import type {
   CreateListingFormData,
 } from '../model/types';
 import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
-import { Check } from 'lucide-react';
+import { Check, CheckCircle2 } from 'lucide-react';
 
 interface ListingInformationStepProps {
   selectedProperty: UserProperty;
@@ -48,6 +49,31 @@ export function ListingInformationStep({
   onSubmit,
 }: ListingInformationStepProps) {
   const t = useTranslations('CreateListingModal');
+
+  const [selectedMediaIds, setSelectedMediaIds] = React.useState<Set<string>>(
+    () => new Set(selectedProperty.media.map((m) => m.mediaId))
+  );
+  const [newFiles, setNewFiles] = React.useState<File[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const toggleMedia = (mediaId: string) => {
+    setSelectedMediaIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(mediaId)) next.delete(mediaId);
+      else next.add(mediaId);
+      return next;
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    setNewFiles((prev) => [...prev, ...files]);
+    e.target.value = '';
+  };
+
+  const removeNewFile = (index: number) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const [listingType, setListingType] = React.useState<ListingType>('RENT');
   const [name, setName] = React.useState('');
@@ -404,20 +430,150 @@ export function ListingInformationStep({
               </div>
             </div>
 
-            {/* Media Upload Zone */}
-            <div className='flex flex-col gap-2'>
-              <span className='text-sm font-medium text-main-black'>
-                {t('mediaUpload')}
-              </span>
-              <p className='text-xs text-main-secondary/50'>
-                {t('mediaUploadHint')}
-              </p>
-              <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-purple-98/30 px-6 py-10 text-center transition-colors hover:border-main-primary/40 cursor-pointer'>
-                <Upload className='mb-3 h-8 w-8 text-main-primary/50' />
-                <p className='text-sm font-medium text-main-secondary/60'>
-                  {t('dragAndDrop')}
-                </p>
+            {/* Media Section */}
+            <div className='flex flex-col gap-3'>
+              <div className='flex items-center justify-between'>
+                <span className='text-sm font-medium text-main-black'>
+                  {t('mediaUpload')}
+                </span>
+                {selectedProperty.media.length > 0 && (
+                  <span className='text-xs text-main-secondary/50'>
+                    {selectedMediaIds.size} / {selectedProperty.media.length} {t('selected', { fallback: 'selected' })}
+                  </span>
+                )}
               </div>
+              <p className='text-xs text-main-secondary/50'>{t('mediaUploadHint')}</p>
+
+              {/* Existing property media grid */}
+              {selectedProperty.media.length > 0 && (
+                <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+                  {selectedProperty.media
+                    .sort((a, b) => a.displayOrder - b.displayOrder)
+                    .map((media) => {
+                      const isSelected = selectedMediaIds.has(media.mediaId);
+                      const isVideo = media.mediaType === 'VIDEO';
+                      return (
+                        <button
+                          key={media.mediaId}
+                          type='button'
+                          onClick={() => toggleMedia(media.mediaId)}
+                          className={cn(
+                            'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
+                            isSelected
+                              ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
+                              : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-main-primary/40'
+                          )}
+                        >
+                          {/* Thumbnail */}
+                          {media.thumbnailUrl ?? media.mediaUrl ? (
+                            <Image
+                              src={media.thumbnailUrl ?? media.mediaUrl}
+                              alt=''
+                              fill
+                              className='object-cover'
+                              sizes='(max-width: 640px) 50vw, 33vw'
+                            />
+                          ) : (
+                            <div className='flex h-full w-full items-center justify-center bg-purple-96'>
+                              <ImageIcon className='h-8 w-8 text-main-secondary/30' />
+                            </div>
+                          )}
+
+                          {/* Video indicator */}
+                          {isVideo && (
+                            <div className='absolute inset-0 flex items-center justify-center'>
+                              <div className='flex h-8 w-8 items-center justify-center rounded-full bg-black/50'>
+                                <Play className='h-4 w-4 text-white' fill='white' />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Selected overlay */}
+                          <div
+                            className={cn(
+                              'absolute inset-0 bg-main-primary/10 transition-opacity',
+                              isSelected ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+
+                          {/* Checkmark */}
+                          <div
+                            className={cn(
+                              'absolute right-1.5 top-1.5 transition-all',
+                              isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                            )}
+                          >
+                            <CheckCircle2 className='h-5 w-5 text-main-primary drop-shadow' fill='white' />
+                          </div>
+
+                          {/* Primary badge */}
+                          {media.isPrimary && (
+                            <div className='absolute left-1.5 bottom-1.5 rounded-full bg-main-primary px-2 py-0.5 text-[10px] font-semibold text-white'>
+                              {t('primary', { fallback: 'Primary' })}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                </div>
+              )}
+
+              {/* New uploads preview */}
+              {newFiles.length > 0 && (
+                <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+                  {newFiles.map((file, index) => (
+                    <div
+                      key={`new-${index}`}
+                      className='group relative aspect-video w-full overflow-hidden rounded-lg border-2 border-main-primary/40 bg-purple-96'
+                    >
+                      {file.type.startsWith('image/') ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={file.name}
+                          className='h-full w-full object-cover'
+                        />
+                      ) : (
+                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2'>
+                          <Play className='h-6 w-6 text-main-primary/60' />
+                          <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
+                            {file.name}
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        type='button'
+                        onClick={() => removeNewFile(index)}
+                        className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100'
+                      >
+                        <X className='h-3 w-3' />
+                      </button>
+                      <div className='absolute left-1.5 bottom-1.5 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white'>
+                        {t('newUpload', { fallback: 'New' })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Upload drop zone */}
+              <input
+                ref={fileInputRef}
+                type='file'
+                accept='image/*,video/*'
+                multiple
+                className='hidden'
+                onChange={handleFileChange}
+              />
+              <button
+                type='button'
+                onClick={() => fileInputRef.current?.click()}
+                className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-purple-98/30 px-6 py-8 text-center transition-colors hover:border-main-primary/40 hover:bg-purple-98/60 cursor-pointer w-full'
+              >
+                <Upload className='mb-2 h-7 w-7 text-main-primary/50' />
+                <p className='text-sm font-medium text-main-secondary/60'>{t('dragAndDrop')}</p>
+                <p className='mt-0.5 text-xs text-main-secondary/40'>{t('uploadHint', { fallback: 'JPG, PNG, MP4 supported' })}</p>
+              </button>
             </div>
           </div>
         </div>

@@ -64,6 +64,10 @@
     "mediaUpload": "Phương tiện",
     "mediaUploadHint": "Tải ảnh hoặc video cho bài đăng",
     "dragAndDrop": "Kéo & thả tệp vào đây, hoặc nhấn để chọn",
+    "uploadHint": "Hỗ trợ JPG, PNG, MP4",
+    "selected": "đã chọn",
+    "primary": "Chính",
+    "newUpload": "Mới",
     "readOnly": "Từ bất động sản"
   },
   "Common": {

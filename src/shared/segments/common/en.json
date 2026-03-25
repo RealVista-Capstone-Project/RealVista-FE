@@ -64,6 +64,10 @@
     "mediaUpload": "Media",
     "mediaUploadHint": "Upload photos or videos for your listing",
     "dragAndDrop": "Drag & drop files here, or click to browse",
+    "uploadHint": "JPG, PNG, MP4 supported",
+    "selected": "selected",
+    "primary": "Primary",
+    "newUpload": "New",
     "readOnly": "From property"
   },
   "Common": {
