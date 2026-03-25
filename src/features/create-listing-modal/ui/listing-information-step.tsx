@@ -256,9 +256,9 @@ export function ListingInformationStep({
 
             {/* Price */}
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              <div className='flex flex-col gap-2'>
+              <div className={cn('flex flex-col gap-2', listingType === 'SALE' && 'sm:col-span-2')}>
                 <label className='text-sm font-medium text-main-black'>
-                  {t('price')}
+                  {listingType === 'RENT' ? t('priceRent') : t('priceSale')}
                   <span className='text-main-primary'>*</span>
                 </label>
                 <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
@@ -275,22 +275,24 @@ export function ListingInformationStep({
                   />
                 </div>
               </div>
-              <div className='flex flex-col gap-2'>
-                <label className='text-sm font-medium text-main-black'>
-                  {t('securityDeposit')}
-                </label>
-                <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
-                  <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
-                    ₫
-                  </span>
-                  <input
-                    type='text'
-                    inputMode='numeric'
-                    placeholder={t('pricePlaceholder')}
-                    className='flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none'
-                  />
+              {listingType === 'RENT' && (
+                <div className='flex flex-col gap-2'>
+                  <label className='text-sm font-medium text-main-black'>
+                    {t('securityDeposit')}
+                  </label>
+                  <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
+                    <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
+                      ₫
+                    </span>
+                    <input
+                      type='text'
+                      inputMode='numeric'
+                      placeholder={t('pricePlaceholder')}
+                      className='flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none'
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Min / Max Price */}
@@ -433,22 +435,24 @@ export function ListingInformationStep({
             </div>
 
             {/* Date Available */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              <div className='flex flex-col gap-2'>
-                <label className='text-sm font-medium text-main-black'>
-                  {t('dateAvailable')}
-                </label>
-                <div className='relative'>
-                  <input
-                    type='date'
-                    value={availableFrom}
-                    onChange={(e) => setAvailableFrom(e.target.value)}
-                    className='w-full rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black transition-colors focus:border-main-primary focus:outline-none'
-                  />
-                  <Calendar className='absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-main-secondary/40 pointer-events-none' />
+            {listingType === 'RENT' && (
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-2'>
+                  <label className='text-sm font-medium text-main-black'>
+                    {t('dateAvailable')}
+                  </label>
+                  <div className='relative'>
+                    <input
+                      type='date'
+                      value={availableFrom}
+                      onChange={(e) => setAvailableFrom(e.target.value)}
+                      className='w-full rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black transition-colors focus:border-main-primary focus:outline-none'
+                    />
+                    <Calendar className='absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-main-secondary/40 pointer-events-none' />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Media Section */}
             <div className='flex flex-col gap-3'>

@@ -51,6 +51,8 @@
     "baths": "Baths",
     "squareFeet": "Area (m²)",
     "price": "Price",
+    "priceRent": "Rent Price / Month",
+    "priceSale": "Sale Price",
     "pricePlaceholder": "Enter price",
     "minPrice": "Min Price",
     "maxPrice": "Max Price",

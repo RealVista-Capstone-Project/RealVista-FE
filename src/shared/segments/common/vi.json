@@ -51,6 +51,8 @@
     "baths": "Phòng tắm",
     "squareFeet": "Diện tích (m²)",
     "price": "Giá",
+    "priceRent": "Giá thuê / tháng",
+    "priceSale": "Giá bán",
     "pricePlaceholder": "Nhập giá",
     "minPrice": "Giá thấp nhất",
     "maxPrice": "Giá cao nhất",
