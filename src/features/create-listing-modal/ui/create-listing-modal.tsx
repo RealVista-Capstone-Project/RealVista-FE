@@ -8,8 +8,10 @@ import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { propertyQueries } from '@/entities/property';
-import type { UserProperty, CreateListingFormData } from '../model/types';
+import type { UserProperty, CreateListingFormData, CreateListingPayload } from '../model/types';
+import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
 
 export interface CreateListingModalProps {
@@ -280,9 +282,29 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
     setCurrentStep(1);
   };
 
-  const handleSubmit = (data: CreateListingFormData) => {
-    console.log('=== Create Listing Form Data ===');
-    console.log('Form Data:', JSON.stringify(data, null, 2));
+  const createListingMutation = useCreateListing();
+
+  const handleSubmit = async (data: CreateListingFormData) => {
+    // Backend uses snake_case JSON naming (Jackson PropertyNamingStrategies.SNAKE_CASE)
+    const payload: CreateListingPayload = {
+      property_id: data.propertyId,
+      listing_type: data.listingType,
+      name: data.name.trim(),
+      price: Number(data.price),
+      min_price: data.minPrice.trim() ? Number(data.minPrice) : null,
+      max_price: data.maxPrice.trim() ? Number(data.maxPrice) : null,
+      is_negotiable: data.isNegotiable,
+      available_from: data.availableFrom || null,
+      content: data.content.trim() || null,
+    };
+
+    try {
+      await createListingMutation.mutateAsync(payload);
+      toast.success(t('createSuccess'));
+      onOpenChange(false);
+    } catch {
+      toast.error(t('createError'));
+    }
   };
 
   return (
@@ -378,6 +400,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
             selectedProperty={selectedProperty}
             onPrevious={handlePreviousStep}
             onSubmit={handleSubmit}
+            isSubmitting={createListingMutation.isPending}
           />
         )}
       </DialogContent>

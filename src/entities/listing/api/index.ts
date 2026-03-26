@@ -92,6 +92,13 @@ export const listingApi = {
    */
   markAsRented: (listingId: string) =>
     http.patch<ApiResponse<unknown>>(`/listings/${listingId}/mark-as-rented`, undefined),
+
+  /**
+   * Create a new listing (DRAFT status)
+   * Requires authentication
+   */
+  createListing: (data: Record<string, unknown>) =>
+    http.post<ApiResponse<unknown>>('/listings', data),
 } as const;
 
 // Re-export query keys and queries

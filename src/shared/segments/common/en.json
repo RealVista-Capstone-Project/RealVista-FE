@@ -74,7 +74,21 @@
     "makePrimary": "Make Primary",
     "newUpload": "New",
     "readOnly": "From property",
-    "noProperties": "No properties found"
+    "noProperties": "No properties found",
+    "submitting": "Submitting...",
+    "createSuccess": "Listing created successfully!",
+    "createError": "Failed to create listing. Please try again.",
+    "validation": {
+      "nameRequired": "Listing name is required",
+      "nameTooLong": "Name must not exceed 500 characters",
+      "priceRequired": "Price is required",
+      "priceInvalid": "Price must be a number greater than 0",
+      "minPriceRequired": "Min price is required",
+      "minPriceInvalid": "Min price must be a valid number greater than 0",
+      "maxPriceRequired": "Max price is required",
+      "maxPriceInvalid": "Max price must be a valid number greater than 0",
+      "dateInvalid": "Please enter a valid date"
+    }
   },
   "Common": {
     "title": "Hello world common!",

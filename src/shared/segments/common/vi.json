@@ -74,7 +74,21 @@
     "makePrimary": "Đặt làm hình chính",
     "newUpload": "Mới",
     "readOnly": "Từ bất động sản",
-    "noProperties": "Không tìm thấy bất động sản"
+    "noProperties": "Không tìm thấy bất động sản",
+    "submitting": "Đang gửi...",
+    "createSuccess": "Tạo bài đăng thành công!",
+    "createError": "Tạo bài đăng thất bại. Vui lòng thử lại.",
+    "validation": {
+      "nameRequired": "Tên bài đăng là bắt buộc",
+      "nameTooLong": "Tên không được vượt quá 500 ký tự",
+      "priceRequired": "Giá là bắt buộc",
+      "priceInvalid": "Giá phải là một số lớn hơn 0",
+      "minPriceRequired": "Giá thấp nhất là bắt buộc",
+      "minPriceInvalid": "Giá thấp nhất phải là một số hợp lệ lớn hơn 0",
+      "maxPriceRequired": "Giá cao nhất là bắt buộc",
+      "maxPriceInvalid": "Giá cao nhất phải là một số hợp lệ lớn hơn 0",
+      "dateInvalid": "Vui lòng nhập ngày hợp lệ"
+    }
   },
   "Common": {
     "title": "Xin chào common!",

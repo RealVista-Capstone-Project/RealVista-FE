@@ -17,6 +17,7 @@ interface ListingInformationStepProps {
   selectedProperty: UserProperty;
   onPrevious: () => void;
   onSubmit: (data: CreateListingFormData) => void;
+  isSubmitting?: boolean;
 }
 
 function ReadOnlyField({
@@ -47,6 +48,7 @@ export function ListingInformationStep({
   selectedProperty,
   onPrevious,
   onSubmit,
+  isSubmitting = false,
 }: ListingInformationStepProps) {
   const t = useTranslations('CreateListingModal');
 
@@ -112,7 +114,43 @@ export function ListingInformationStep({
       (attr) => attr.valueBoolean === true
     ) || [];
 
+  // ---- Validation ----
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false);
+
+  const validate = React.useCallback(() => {
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = t('validation.nameRequired');
+    else if (name.length > 500) errs.name = t('validation.nameTooLong');
+
+    if (!price.trim()) errs.price = t('validation.priceRequired');
+    else if (isNaN(Number(price)) || Number(price) <= 0) errs.price = t('validation.priceInvalid');
+
+    if (!minPrice.trim()) errs.minPrice = t('validation.minPriceRequired');
+    else if (isNaN(Number(minPrice)) || Number(minPrice) <= 0) errs.minPrice = t('validation.minPriceInvalid');
+
+    if (!maxPrice.trim()) errs.maxPrice = t('validation.maxPriceRequired');
+    else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0) errs.maxPrice = t('validation.maxPriceInvalid');
+
+    if (listingType === 'RENT' && availableFrom) {
+      const d = new Date(availableFrom);
+      if (isNaN(d.getTime())) errs.availableFrom = t('validation.dateInvalid');
+    }
+
+    return errs;
+  }, [name, price, minPrice, maxPrice, availableFrom, listingType, t]);
+
+  // Re-validate on field change after first submit attempt
+  React.useEffect(() => {
+    if (hasAttemptedSubmit) setErrors(validate());
+  }, [hasAttemptedSubmit, validate]);
+
   const handleSubmit = () => {
+    setHasAttemptedSubmit(true);
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
     const formData: CreateListingFormData = {
       propertyId: selectedProperty.propertyId,
       listingType,
@@ -128,7 +166,7 @@ export function ListingInformationStep({
     onSubmit(formData);
   };
 
-  const isValid = name.trim() !== '' && price.trim() !== '';
+  const isValid = name.trim() !== '' && price.trim() !== '' && Object.keys(errors).length === 0;
 
   return (
     <>
@@ -171,8 +209,12 @@ export function ListingInformationStep({
                 onChange={(e) => setName(e.target.value)}
                 maxLength={500}
                 placeholder={t('listingNamePlaceholder')}
-                className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 transition-colors focus:border-main-primary focus:outline-none'
+                className={cn(
+                  'rounded-lg border bg-white px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 transition-colors focus:outline-none',
+                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-purple-92 focus:border-main-primary'
+                )}
               />
+              {errors.name && <span className='text-xs text-red-500'>{errors.name}</span>}
             </div>
 
             {/* Listing Content */}
@@ -281,9 +323,13 @@ export function ListingInformationStep({
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder={t('pricePlaceholder')}
-                    className='flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none'
+                    className={cn(
+                      'flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none',
+                      errors.price && 'text-red-500'
+                    )}
                   />
                 </div>
+                {errors.price && <span className='text-xs text-red-500'>{errors.price}</span>}
               </div>
               {listingType === 'RENT' && (
                 <div className='flex flex-col gap-2'>
@@ -324,6 +370,7 @@ export function ListingInformationStep({
                     className='flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none'
                   />
                 </div>
+                {errors.minPrice && <span className='text-xs text-red-500'>{errors.minPrice}</span>}
               </div>
               <div className='flex flex-col gap-2'>
                 <label className='text-sm font-medium text-main-black'>
@@ -342,6 +389,7 @@ export function ListingInformationStep({
                     className='flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none'
                   />
                 </div>
+                {errors.maxPrice && <span className='text-xs text-red-500'>{errors.maxPrice}</span>}
               </div>
             </div>
 
@@ -639,22 +687,23 @@ export function ListingInformationStep({
         <button
           type='button'
           onClick={onPrevious}
-          className='flex min-w-[140px] items-center justify-center rounded-lg bg-purple-98 px-6 py-3 md:py-4 text-base font-bold text-main-primary transition-colors hover:bg-purple-96'
+          disabled={isSubmitting}
+          className='flex min-w-[140px] items-center justify-center rounded-lg bg-purple-98 px-6 py-3 md:py-4 text-base font-bold text-main-primary transition-colors hover:bg-purple-96 disabled:opacity-50'
         >
           {t('previous')}
         </button>
         <button
           type='button'
           onClick={handleSubmit}
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           className={cn(
             'flex min-w-[140px] items-center justify-center rounded-lg px-6 py-3 md:py-4 text-base font-bold text-white transition-all',
-            isValid
+            isValid && !isSubmitting
               ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
               : 'bg-main-primary/30 cursor-not-allowed'
           )}
         >
-          {t('submit')}
+          {isSubmitting ? t('submitting') : t('submit')}
         </button>
       </div>
     </>

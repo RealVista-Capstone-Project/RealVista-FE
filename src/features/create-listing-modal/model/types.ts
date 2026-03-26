@@ -71,16 +71,12 @@ export interface UserProperty {
   media: UserPropertyMedia[];
 }
 
-export type RepresentingType = 'landlord' | 'applicant';
-
 export type CreateListingStep = 'request' | 'listing-information';
 
 export type ListingType = 'RENT' | 'SALE';
 
 /**
- * Form data for creating a listing.
- * Aligned with CreateListingRequest.java:
- *   propertyId, listingType, name, price, minPrice, maxPrice, isNegotiable, availableFrom
+ * Form data for creating a listing (camelCase, used in the form UI).
  */
 export interface CreateListingFormData {
   propertyId: string;
@@ -93,4 +89,20 @@ export interface CreateListingFormData {
   availableFrom: string;
   content: string;
   primaryMediaId?: string;
+}
+
+/**
+ * API payload for creating a listing.
+ * Uses snake_case to match backend Jackson PropertyNamingStrategies.SNAKE_CASE.
+ */
+export interface CreateListingPayload {
+  property_id: string;
+  listing_type: 'RENT' | 'SALE';
+  name: string;
+  price: number;
+  min_price?: number | null;
+  max_price?: number | null;
+  is_negotiable: boolean;
+  available_from?: string | null;
+  content?: string | null;
 }
