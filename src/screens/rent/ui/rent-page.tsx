@@ -241,7 +241,7 @@ function RentPageContent() {
           </div>
 
           {/* Simple Search Bar */}
-          <div className='bg-white rounded-lg border border-purple-92 p-6 mb-6'>
+          <div className='bg-white rounded-lg border border-purple-92 p-6'>
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               {/* Location */}
               <div>
@@ -331,7 +331,7 @@ function RentPageContent() {
       <RecommendedListings sourcePage='rent' />
 
       {/* Results Section */}
-      <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>
+      <section className='px-6 pb-12 pt-2 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Results Header */}
           <div className='mb-6 flex items-center justify-between'>
