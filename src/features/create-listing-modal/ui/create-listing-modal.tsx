@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { useQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property';
-import type { UserProperty, RepresentingType, CreateListingFormData } from '../model/types';
+import type { UserProperty, CreateListingFormData } from '../model/types';
 import { ListingInformationStep } from './listing-information-step';
 
 export interface CreateListingModalProps {
@@ -200,13 +200,11 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   );
 
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
-  const [representing, setRepresenting] = React.useState<RepresentingType>('landlord');
 
   // Reset state when modal closes
   React.useEffect(() => {
     if (!open) {
       setSelectedProperty(null);
-      setRepresenting('landlord');
       setCurrentPage(1);
       setCurrentStep(1);
     }
@@ -284,7 +282,6 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
   const handleSubmit = (data: CreateListingFormData) => {
     console.log('=== Create Listing Form Data ===');
-    console.log('Representing:', representing);
     console.log('Form Data:', JSON.stringify(data, null, 2));
   };
 
@@ -354,66 +351,6 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                 )}
               </div>
 
-              {/* I'm representing */}
-              <div className='mt-6 flex flex-col gap-4'>
-                <div className='flex items-center gap-1'>
-                  <span className='text-sm font-medium text-main-black'>
-                    {t('representing.label')}
-                  </span>
-                  <span className='text-xs text-main-primary'>*</span>
-                </div>
-                <div className='flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10'>
-                  {/* Landlord */}
-                  <label className='flex cursor-pointer items-center gap-2'>
-                    <div
-                      className={cn(
-                        'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
-                        representing === 'landlord' ? 'border-main-primary' : 'border-purple-92'
-                      )}
-                    >
-                      {representing === 'landlord' && (
-                        <div className='h-3 w-3 rounded-full bg-main-primary' />
-                      )}
-                    </div>
-                    <input
-                      type='radio'
-                      name='representing'
-                      value='landlord'
-                      checked={representing === 'landlord'}
-                      onChange={() => setRepresenting('landlord')}
-                      className='sr-only'
-                    />
-                    <span className='text-sm font-medium text-main-black'>
-                      {t('representing.landlord')}
-                    </span>
-                  </label>
-
-                  {/* Applicant */}
-                  <label className='flex cursor-pointer items-center gap-2'>
-                    <div
-                      className={cn(
-                        'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
-                        representing === 'applicant' ? 'border-main-primary' : 'border-purple-92'
-                      )}
-                    >
-                      {representing === 'applicant' && (
-                        <div className='h-3 w-3 rounded-full bg-main-primary' />
-                      )}
-                    </div>
-                    <input
-                      type='radio'
-                      name='representing'
-                      value='applicant'
-                      checked={representing === 'applicant'}
-                      onChange={() => setRepresenting('applicant')}
-                      className='sr-only'
-                    />
-                    <span className='text-sm font-medium text-main-black'>
-                      {t('representing.applicant')}
-                    </span>
-                  </label>
-                </div>
-              </div>
             </div>
 
             {/* Footer — Next button - Fixed */}

@@ -487,12 +487,19 @@ export function ListingInformationStep({
                       const isSelected = selectedMediaIds.has(media.mediaId);
                       const isVideo = media.mediaType === 'VIDEO';
                       return (
-                        <button
+                        <div
                           key={media.mediaId}
-                          type='button'
+                          role='button'
+                          tabIndex={0}
                           onClick={() => toggleMedia(media.mediaId)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleMedia(media.mediaId);
+                            }
+                          }}
                           className={cn(
-                            'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
+                            'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
                             isSelected
                               ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
                               : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-main-primary/40'
@@ -560,7 +567,7 @@ export function ListingInformationStep({
                               ? t('primary', { fallback: 'Primary' })
                               : t('makePrimary', { fallback: 'Make Primary' })}
                           </button>
-                        </button>
+                        </div>
                       );
                     })}
                 </div>
