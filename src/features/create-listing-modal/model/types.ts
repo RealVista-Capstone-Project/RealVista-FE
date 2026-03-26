@@ -92,4 +92,5 @@ export interface CreateListingFormData {
   isNegotiable: boolean;
   availableFrom: string;
   content: string;
+  primaryMediaId?: string;
 }

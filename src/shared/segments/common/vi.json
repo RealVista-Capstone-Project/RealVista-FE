@@ -71,8 +71,10 @@
     "uploadHint": "Hỗ trợ JPG, PNG, MP4",
     "selected": "đã chọn",
     "primary": "Chính",
+    "makePrimary": "Đặt làm hình chính",
     "newUpload": "Mới",
-    "readOnly": "Từ bất động sản"
+    "readOnly": "Từ bất động sản",
+    "noProperties": "Không tìm thấy bất động sản"
   },
   "Common": {
     "title": "Xin chào common!",

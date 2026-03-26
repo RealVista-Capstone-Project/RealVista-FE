@@ -71,8 +71,10 @@
     "uploadHint": "JPG, PNG, MP4 supported",
     "selected": "selected",
     "primary": "Primary",
+    "makePrimary": "Make Primary",
     "newUpload": "New",
-    "readOnly": "From property"
+    "readOnly": "From property",
+    "noProperties": "No properties found"
   },
   "Common": {
     "title": "Hello world common!",

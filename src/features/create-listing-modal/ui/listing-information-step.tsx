@@ -53,14 +53,23 @@ export function ListingInformationStep({
   const [selectedMediaIds, setSelectedMediaIds] = React.useState<Set<string>>(
     () => new Set(selectedProperty.media.map((m) => m.mediaId))
   );
+  const [primaryMediaId, setPrimaryMediaId] = React.useState<string | null>(
+    () => selectedProperty.media.find((m) => m.isPrimary)?.mediaId ?? null
+  );
   const [newFiles, setNewFiles] = React.useState<File[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const toggleMedia = (mediaId: string) => {
     setSelectedMediaIds((prev) => {
       const next = new Set(prev);
-      if (next.has(mediaId)) next.delete(mediaId);
-      else next.add(mediaId);
+      if (next.has(mediaId)) {
+        next.delete(mediaId);
+        if (primaryMediaId === mediaId) {
+          setPrimaryMediaId(null);
+        }
+      } else {
+        next.add(mediaId);
+      }
       return next;
     });
   };
@@ -114,6 +123,7 @@ export function ListingInformationStep({
       isNegotiable,
       availableFrom,
       content: content,
+      primaryMediaId: primaryMediaId ?? undefined,
     };
     onSubmit(formData);
   };
@@ -530,12 +540,26 @@ export function ListingInformationStep({
                             <CheckCircle2 className='h-5 w-5 text-main-primary drop-shadow' fill='white' />
                           </div>
 
-                          {/* Primary badge */}
-                          {media.isPrimary && (
-                            <div className='absolute left-1.5 bottom-1.5 rounded-full bg-main-primary px-2 py-0.5 text-[10px] font-semibold text-white'>
-                              {t('primary', { fallback: 'Primary' })}
-                            </div>
-                          )}
+                          {/* Primary badge/button */}
+                          <button
+                            type='button'
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPrimaryMediaId(media.mediaId);
+                              // Ensure it's selected when made primary
+                              setSelectedMediaIds((prev) => new Set(prev).add(media.mediaId));
+                            }}
+                            className={cn(
+                              'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
+                              primaryMediaId === media.mediaId
+                                ? 'bg-main-primary text-white'
+                                : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
+                            )}
+                          >
+                            {primaryMediaId === media.mediaId
+                              ? t('primary', { fallback: 'Primary' })
+                              : t('makePrimary', { fallback: 'Make Primary' })}
+                          </button>
                         </button>
                       );
                     })}
