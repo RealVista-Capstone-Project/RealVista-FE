@@ -88,6 +88,7 @@ export interface CreateListingFormData {
   isNegotiable: boolean;
   availableFrom: string;
   content: string;
+  selectedMediaIds: string[];
   primaryMediaId?: string;
 }
 
@@ -105,4 +106,6 @@ export interface CreateListingPayload {
   is_negotiable: boolean;
   available_from?: string | null;
   content?: string | null;
+  media_ids?: string[];
+  primary_media_id?: string | null;
 }

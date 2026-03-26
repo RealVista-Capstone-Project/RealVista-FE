@@ -296,6 +296,8 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
       is_negotiable: data.isNegotiable,
       available_from: data.availableFrom || null,
       content: data.content.trim() || null,
+      media_ids: data.selectedMediaIds.length > 0 ? data.selectedMediaIds : undefined,
+      primary_media_id: data.primaryMediaId ?? null,
     };
 
     try {

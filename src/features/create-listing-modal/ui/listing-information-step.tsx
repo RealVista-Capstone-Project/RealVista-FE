@@ -161,6 +161,7 @@ export function ListingInformationStep({
       isNegotiable,
       availableFrom,
       content: content,
+      selectedMediaIds: Array.from(selectedMediaIds),
       primaryMediaId: primaryMediaId ?? undefined,
     };
     onSubmit(formData);
