@@ -100,6 +100,10 @@
     "filters": "Bộ lọc",
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
+    "resultsHeader": "Kết quả tìm kiếm",
+    "showingResults": "Hiển thị {count} bất động sản",
+    "noResults": "Không tìm thấy bất động sản",
+    "noResultsHint": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc mở rộng bộ lọc",
     "perMonth": "/ tháng"
   },
   "Buy": {
@@ -124,6 +128,10 @@
     "filters": "Bộ lọc",
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
+    "resultsHeader": "Kết quả tìm kiếm",
+    "showingResults": "Hiển thị {count} bất động sản",
+    "noResults": "Không tìm thấy bất động sản",
+    "noResultsHint": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc mở rộng bộ lọc",
     "totalPrice": "Tổng giá"
   },
   "PropertyDetail": {
