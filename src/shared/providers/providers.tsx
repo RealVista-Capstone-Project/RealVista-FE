@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
+import { PostHogProvider } from '@/shared/lib/analytics';
 import { Toaster } from '@/shared/ui/sonner';
 
 /**
@@ -13,6 +14,7 @@ import { Toaster } from '@/shared/ui/sonner';
  * - SessionProvider: NextAuth authentication state
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
+ * - PostHogProvider: PostHog analytics initialization and user identification
  * - Toaster: Displays toast notifications across the application
  *
  * @example
@@ -41,12 +43,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
-      <AuthTokenProvider>
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster />
-        </QueryClientProvider>
-      </AuthTokenProvider>
+      <PostHogProvider>
+        <AuthTokenProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+            <Toaster />
+          </QueryClientProvider>
+        </AuthTokenProvider>
+      </PostHogProvider>
     </SessionProvider>
   );
 }
