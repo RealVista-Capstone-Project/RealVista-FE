@@ -7,6 +7,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { X, Save, Upload, Play, ImageIcon, CheckCircle2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/shared/lib/utils';
+import { propertyApi } from '@/entities/property/api/property.api';
+import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
 import { useUpdateListing } from '../api/use-update-listing';
 import type { EditListingPayload } from '../model/types';
 import type { Listing, ListingType } from '@/entities/listing';
@@ -121,26 +123,81 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    const payload: EditListingPayload = {
-      name: name.trim() !== listing.name ? name.trim() : undefined,
-      content: content.trim() !== (listing.content || '') ? content.trim() || null : undefined,
-      listing_type: listingType !== listing.listing_type ? listingType : undefined,
-      price: Number(price) !== listing.price ? Number(price) : undefined,
-      min_price: minPrice.trim() ? Number(minPrice) : null,
-      max_price: maxPrice.trim() ? Number(maxPrice) : null,
-      is_negotiable: isNegotiable,
-      available_from: availableFrom || null,
-      media_ids: Array.from(selectedMediaIds),
-      primary_media_id: primaryMediaId ?? null,
-    };
-
-    // Remove empty payload fields that haven't changed to send a minimal PATCH/PUT
-    // Actually our API expects full PUT right now, so we send what we have, but omit undefined.
-    const cleanPayload = Object.fromEntries(
-      Object.entries(payload).filter(([_, v]) => v !== undefined)
-    );
+    let finalMediaIds = Array.from(selectedMediaIds);
+    let finalPrimaryMediaId = primaryMediaId;
 
     try {
+      if (newFiles.length > 0) {
+        // 1. Upload new files to S3
+        const uploadRes = await mediaApi.uploadBulk(newFiles);
+        if (
+          uploadRes.status !== 200 ||
+          uploadRes.payload.failedCount > 0 ||
+          !uploadRes.payload.results
+        ) {
+          toast.error(t('mediaUploadError', { fallback: 'Failed to upload some media files.' }));
+          return;
+        }
+
+        const uploadedResults = uploadRes.payload.results;
+
+        // 2. Add them to the property via updateProperty
+        const newMediaRequests = uploadedResults.map((res: MediaUploadResponse) => ({
+          url: res.url,
+          type: res.mediaType,
+          isThumbnail: false,
+        }));
+
+        const existingMediaRequests = (listing.property.media || []).map((m) => ({
+          url: m.media_url,
+          type: m.media_type,
+          isThumbnail: m.is_primary,
+          thumbnailUrl: m.thumbnail_url,
+        }));
+
+        const updatePropPayload = {
+          media: [...existingMediaRequests, ...newMediaRequests],
+        };
+
+        const propUpdateRes = await propertyApi.updateProperty(
+          listing.property.property_id,
+          updatePropPayload
+        );
+
+        // 3. Find newly created PropertyMedia IDs
+        const updatedMedia = propUpdateRes.payload.media || [];
+        const newUrls = new Set(newMediaRequests.map((m) => m.url));
+        const newlyAddedMediaIds = updatedMedia
+          .filter((m: { media_url: string }) => newUrls.has(m.media_url))
+          .map((m: { media_id: string }) => m.media_id);
+
+        // Add the new media IDs to the selected list
+        finalMediaIds = [...finalMediaIds, ...newlyAddedMediaIds];
+
+        // If we didn't have a primary media yet, make the first new one primary
+        if (!finalPrimaryMediaId && newlyAddedMediaIds.length > 0) {
+          finalPrimaryMediaId = newlyAddedMediaIds[0];
+        }
+      }
+
+      // 4. Update the listing
+      const payload: EditListingPayload = {
+        name: name.trim() !== listing.name ? name.trim() : undefined,
+        content: content.trim() !== (listing.content || '') ? content.trim() || null : undefined,
+        listing_type: listingType !== listing.listing_type ? listingType : undefined,
+        price: Number(price) !== listing.price ? Number(price) : undefined,
+        min_price: minPrice.trim() ? Number(minPrice) : null,
+        max_price: maxPrice.trim() ? Number(maxPrice) : null,
+        is_negotiable: isNegotiable,
+        available_from: availableFrom || null,
+        media_ids: finalMediaIds,
+        primary_media_id: finalPrimaryMediaId ?? null,
+      };
+
+      const cleanPayload = Object.fromEntries(
+        Object.entries(payload).filter(([_, v]) => v !== undefined)
+      );
+
       await updateMutation.mutateAsync({
         listingId: listing.listing_id,
         data: cleanPayload,

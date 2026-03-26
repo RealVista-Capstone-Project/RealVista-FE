@@ -26,4 +26,11 @@ export const propertyApi = {
         : undefined,
     });
   },
+  updateProperty: (propertyId: string, data: any) => {
+    return http.put<any>(`properties/${propertyId}`, data, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
+        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
+        : undefined,
+    });
+  },
 };
