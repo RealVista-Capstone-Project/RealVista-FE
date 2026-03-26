@@ -19,6 +19,8 @@ import { useAuthSession } from '@/features/auth/model';
 import { isAuthenticated } from '@/features/auth/model';
 import { conversationQueries } from '@/entities/conversation';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { EditListingModal } from '@/features/edit-listing-modal';
+import { Pencil } from 'lucide-react';
 
 interface ListingDetailPanelProps {
   listing: Listing;
@@ -37,6 +39,8 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
 
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
       const locale = params.locale;
@@ -50,15 +54,16 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         conversationQueries.detailOrCreate(listing.agent.user_id)
       );
 
-      const convData = (response && typeof response === 'object' && 'data' in response
-        ? (response as Record<string, unknown>).data
-        : response) as Record<string, unknown>;
+      const convData = (
+        response && typeof response === 'object' && 'data' in response
+          ? (response as Record<string, unknown>).data
+          : response
+      ) as Record<string, unknown>;
 
       const payload = convData?.payload as Record<string, unknown> | undefined;
       const payloadData = payload?.data as Record<string, unknown> | undefined;
 
-      const conversationId = (payloadData?.conversation_id ??
-        convData?.conversation_id) as string;
+      const conversationId = (payloadData?.conversation_id ?? convData?.conversation_id) as string;
 
       if (conversationId) {
         if (isMobile) {
@@ -122,13 +127,23 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               </p>
             </div>
 
-            <button
-              type='button'
-              className='flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
-            >
-              <Calendar className='h-4 w-4' strokeWidth={2} />
-              <span>{t('showCalendar')}</span>
-            </button>
+            <div className='flex w-full sm:w-auto flex-col sm:flex-row gap-3'>
+              <button
+                type='button'
+                onClick={() => setIsEditModalOpen(true)}
+                className='flex items-center justify-center gap-2 rounded-lg bg-main-primary px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-main-primary/90 hover:shadow-md'
+              >
+                <Pencil className='h-4 w-4' strokeWidth={2} />
+                <span>{t('editListing', { fallback: 'Edit Listing' })}</span>
+              </button>
+              <button
+                type='button'
+                className='flex items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
+              >
+                <Calendar className='h-4 w-4' strokeWidth={2} />
+                <span>{t('showCalendar')}</span>
+              </button>
+            </div>
           </div>
 
           {/* Status Update Actions */}
@@ -318,6 +333,11 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           </div>
         )}
       </div>
+      <EditListingModal
+        listing={listing}
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+      />
     </div>
   );
 }

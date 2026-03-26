@@ -69,6 +69,7 @@
       "tenants": "Tenants",
       "request": "Request",
       "notAvailable": "N/A"
-    }
+    },
+    "editListing": "Edit Listing"
   }
 }

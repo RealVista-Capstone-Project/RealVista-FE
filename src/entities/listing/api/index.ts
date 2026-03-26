@@ -99,6 +99,13 @@ export const listingApi = {
    */
   createListing: (data: Record<string, unknown>) =>
     http.post<ApiResponse<unknown>>('/listings', data),
+
+  /**
+   * Update an existing listing (name, price, content, media)
+   * Requires authentication and ownership
+   */
+  updateListing: (listingId: string, data: Record<string, unknown>) =>
+    http.put<ApiResponse<unknown>>(`/listings/${listingId}`, data),
 } as const;
 
 // Re-export query keys and queries
