@@ -324,8 +324,8 @@ function RentPageContent() {
         </div>
       </section>
 
-      {/* Recommended Listings - only on page 1 */}
-      {currentPage === 1 && <RecommendedListings sourcePage='rent' />}
+      {/* Recommended Listings */}
+      <RecommendedListings sourcePage='rent' />
 
       {/* Results Section */}
       <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>
