@@ -78,6 +78,7 @@
     "submitting": "Submitting...",
     "createSuccess": "Listing created successfully!",
     "createError": "Failed to create listing. Please try again.",
+    "mediaUploadError": "Failed to upload media files. Please try again.",
     "editTitle": "Edit Listing",
     "editSubtitle": "Update your listing details below.",
     "saveChanges": "Save Changes",

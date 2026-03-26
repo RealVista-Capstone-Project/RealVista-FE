@@ -78,6 +78,7 @@
     "submitting": "Đang gửi...",
     "createSuccess": "Tạo bài đăng thành công!",
     "createError": "Tạo bài đăng thất bại. Vui lòng thử lại.",
+    "mediaUploadError": "Tải lên tệp phương tiện thất bại. Vui lòng thử lại.",
     "editTitle": "Chỉnh sửa bài đăng",
     "editSubtitle": "Cập nhật thông tin bài đăng của bạn bên dưới.",
     "saveChanges": "Lưu thay đổi",

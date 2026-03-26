@@ -1,13 +1,13 @@
 import http from '@/shared/lib/http';
 
 export interface MediaUploadResponse {
-  url: string;
-  mediaType: string;
+  media_url: string;
+  media_type: string;
 }
 
 export interface BulkMediaUploadResponse {
-  results: MediaUploadResponse[];
-  failedCount: number;
+  uploaded_files: MediaUploadResponse[];
+  failed_count: number;
 }
 
 export const mediaApi = {
@@ -21,9 +21,6 @@ export const mediaApi = {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
         ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
         : undefined,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
     });
   },
 };

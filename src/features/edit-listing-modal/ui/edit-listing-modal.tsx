@@ -131,20 +131,21 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
         // 1. Upload new files to S3
         const uploadRes = await mediaApi.uploadBulk(newFiles);
         if (
-          uploadRes.status !== 200 ||
-          uploadRes.payload.failedCount > 0 ||
-          !uploadRes.payload.results
+          uploadRes.status < 200 ||
+          uploadRes.status >= 300 ||
+          uploadRes.payload.failed_count > 0 ||
+          !uploadRes.payload.uploaded_files
         ) {
           toast.error(t('mediaUploadError', { fallback: 'Failed to upload some media files.' }));
           return;
         }
 
-        const uploadedResults = uploadRes.payload.results;
+        const uploadedResults = uploadRes.payload.uploaded_files;
 
         // 2. Add them to the property via updateProperty
         const newMediaRequests = uploadedResults.map((res: MediaUploadResponse) => ({
-          url: res.url,
-          type: res.mediaType,
+          url: res.media_url,
+          type: res.media_type,
           isThumbnail: false,
         }));
 
@@ -168,8 +169,8 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
         const updatedMedia = propUpdateRes.payload.media || [];
         const newUrls = new Set(newMediaRequests.map((m) => m.url));
         const newlyAddedMediaIds = updatedMedia
-          .filter((m: { media_url: string }) => newUrls.has(m.media_url))
-          .map((m: { media_id: string }) => m.media_id);
+          .filter((m: any) => newUrls.has(m.media_url))
+          .map((m: any) => m.media_id);
 
         // Add the new media IDs to the selected list
         finalMediaIds = [...finalMediaIds, ...newlyAddedMediaIds];
@@ -184,7 +185,6 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       const payload: EditListingPayload = {
         name: name.trim() !== listing.name ? name.trim() : undefined,
         content: content.trim() !== (listing.content || '') ? content.trim() || null : undefined,
-        listing_type: listingType !== listing.listing_type ? listingType : undefined,
         price: Number(price) !== listing.price ? Number(price) : undefined,
         min_price: minPrice.trim() ? Number(minPrice) : null,
         max_price: maxPrice.trim() ? Number(maxPrice) : null,

@@ -13,19 +13,19 @@ export function useUpdateListing() {
       data: Record<string, unknown>;
     }) => {
       const response = await listingApi.updateListing(listingId, data);
-      return response.data;
+      return response.payload.data;
     },
     onSuccess: (_, variables) => {
       // Invalidate specific listing details
       queryClient.invalidateQueries({
-        queryKey: listingKeys.detail(variables.listingId).queryKey,
+        queryKey: listingKeys.detail(variables.listingId),
       });
       // Invalidate managed listings list and summary
       queryClient.invalidateQueries({
-        queryKey: listingKeys.managed().queryKey,
+        queryKey: listingKeys.managed(),
       });
       queryClient.invalidateQueries({
-        queryKey: listingKeys.managedSummary().queryKey,
+        queryKey: listingKeys.managedSummary(),
       });
     },
   });
