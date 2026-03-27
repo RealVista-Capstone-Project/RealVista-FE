@@ -163,6 +163,7 @@ export function ListingInformationStep({
       content: content,
       selectedMediaIds: Array.from(selectedMediaIds),
       primaryMediaId: primaryMediaId ?? undefined,
+      newFiles: newFiles,
     };
     onSubmit(formData);
   };
@@ -625,38 +626,65 @@ export function ListingInformationStep({
               {/* New uploads preview */}
               {newFiles.length > 0 && (
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
-                  {newFiles.map((file, index) => (
-                    <div
-                      key={`new-${index}`}
-                      className='group relative aspect-video w-full overflow-hidden rounded-lg border-2 border-main-primary/40 bg-purple-96'
-                    >
-                      {file.type.startsWith('image/') ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={file.name}
-                          className='h-full w-full object-cover'
-                        />
-                      ) : (
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2'>
-                          <Play className='h-6 w-6 text-main-primary/60' />
-                          <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
-                            {file.name}
-                          </span>
-                        </div>
-                      )}
-                      <button
-                        type='button'
-                        onClick={() => removeNewFile(index)}
-                        className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100'
+                  {newFiles.map((file, index) => {
+                    const isPrimary = primaryMediaId === `new:${index}`;
+                    return (
+                      <div
+                        key={`new-${index}`}
+                        className={cn(
+                          'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
+                          isPrimary
+                            ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
+                            : 'border-purple-92 opacity-70 hover:opacity-100'
+                        )}
                       >
-                        <X className='h-3 w-3' />
-                      </button>
-                      <div className='absolute left-1.5 bottom-1.5 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white'>
-                        {t('newUpload', { fallback: 'New' })}
+                        {file.type.startsWith('image/') ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={file.name}
+                            className='h-full w-full object-cover'
+                          />
+                        ) : (
+                          <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96'>
+                            <Play className='h-6 w-6 text-main-primary/60' />
+                            <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
+                              {file.name}
+                            </span>
+                          </div>
+                        )}
+                        <button
+                          type='button'
+                          onClick={() => removeNewFile(index)}
+                          className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-10'
+                        >
+                          <X className='h-3 w-3' />
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => setPrimaryMediaId(`new:${index}`)}
+                          className={cn(
+                            'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
+                            isPrimary
+                              ? 'bg-main-primary text-white'
+                              : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
+                          )}
+                        >
+                          {isPrimary
+                            ? t('primary', { fallback: 'Primary' })
+                            : `${t('newUpload', { fallback: 'New' })} - ${t('makePrimary', { fallback: 'Make Primary' })}`}
+                        </button>
+
+                        {/* Selected overlay */}
+                        <div
+                          className={cn(
+                            'absolute inset-0 bg-main-primary/10 transition-opacity',
+                            isPrimary ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

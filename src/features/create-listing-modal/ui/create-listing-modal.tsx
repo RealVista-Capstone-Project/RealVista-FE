@@ -10,6 +10,7 @@ import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { propertyQueries } from '@/entities/property';
+import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
 import type { UserProperty, CreateListingFormData, CreateListingPayload } from '../model/types';
 import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
@@ -301,6 +302,35 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
     };
 
     try {
+      if (data.newFiles && data.newFiles.length > 0) {
+        const uploadRes = await mediaApi.uploadBulk(data.newFiles);
+        console.log(`status is: ${JSON.stringify(uploadRes.status)}`);
+        console.log(`uploaded_files is: ${JSON.stringify(uploadRes.payload.data.uploaded_files)}`);
+        console.log('status < 200 is: ' + (uploadRes.status < 200));
+        if (
+          uploadRes.status < 200 ||
+          uploadRes.status >= 300 ||
+          uploadRes.payload.data.failed_count > 0 ||
+          !uploadRes.payload.data.uploaded_files
+        ) {
+          console.log(`uploadRes sau khi upload anh la: ${JSON.stringify(uploadRes)}`);
+          toast.error(t('mediaUploadError', { fallback: 'Failed to upload some media files.' }));
+          return;
+        }
+
+        const uploadedResults = uploadRes.payload.data.uploaded_files;
+
+        payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
+          url: res.media_url,
+          type: res.media_type,
+          isPrimary: data.primaryMediaId === `new:${index}`,
+        }));
+
+        if (data.primaryMediaId?.startsWith('new:')) {
+          payload.primary_media_id = null;
+        }
+      }
+
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
       onOpenChange(false);
@@ -374,7 +404,6 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
                   </div>
                 )}
               </div>
-
             </div>
 
             {/* Footer — Next button - Fixed */}

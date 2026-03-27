@@ -6,8 +6,16 @@ export interface MediaUploadResponse {
 }
 
 export interface BulkMediaUploadResponse {
-  uploaded_files: MediaUploadResponse[];
-  failed_count: number;
+  success: boolean;
+  message: string;
+  data: {
+    uploaded_files: MediaUploadResponse[];
+    total_count: number;
+    success_count: number;
+    failed_count: number;
+    failed_files: any[];
+  };
+  timestamp: string;
 }
 
 export const mediaApi = {

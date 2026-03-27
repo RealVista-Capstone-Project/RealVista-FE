@@ -90,6 +90,7 @@ export interface CreateListingFormData {
   content: string;
   selectedMediaIds: string[];
   primaryMediaId?: string;
+  newFiles?: File[];
 }
 
 /**
@@ -108,4 +109,10 @@ export interface CreateListingPayload {
   content?: string | null;
   media_ids?: string[];
   primary_media_id?: string | null;
+  new_medias?: Array<{
+    url: string;
+    type: string;
+    isPrimary: boolean;
+    thumbnailUrl?: string;
+  }>;
 }

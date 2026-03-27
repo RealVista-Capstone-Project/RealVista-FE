@@ -7,7 +7,6 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { X, Save, Upload, Play, ImageIcon, CheckCircle2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/shared/lib/utils';
-import { propertyApi } from '@/entities/property/api/property.api';
 import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
 import { useUpdateListing } from '../api/use-update-listing';
 import type { EditListingPayload } from '../model/types';
@@ -104,12 +103,10 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     else if (isNaN(Number(price)) || Number(price) <= 0)
       newErrors.price = t('validation.priceInvalid');
 
-    if (!minPrice.trim()) newErrors.minPrice = t('validation.minPriceRequired');
-    else if (isNaN(Number(minPrice)) || Number(minPrice) <= 0)
+    if (minPrice.trim() && (isNaN(Number(minPrice)) || Number(minPrice) <= 0))
       newErrors.minPrice = t('validation.minPriceInvalid');
 
-    if (!maxPrice.trim()) newErrors.maxPrice = t('validation.maxPriceRequired');
-    else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0)
+    if (maxPrice.trim() && (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0))
       newErrors.maxPrice = t('validation.maxPriceInvalid');
 
     if (availableFrom && isNaN(Date.parse(availableFrom))) {
@@ -123,8 +120,17 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    let finalMediaIds = Array.from(selectedMediaIds);
-    let finalPrimaryMediaId = primaryMediaId;
+    const payload: EditListingPayload = {
+      name: name.trim() !== listing.name ? name.trim() : undefined,
+      content: content.trim() !== (listing.content || '') ? content.trim() || null : undefined,
+      price: Number(price) !== listing.price ? Number(price) : undefined,
+      min_price: minPrice.trim() ? Number(minPrice) : null,
+      max_price: maxPrice.trim() ? Number(maxPrice) : null,
+      is_negotiable: isNegotiable,
+      available_from: availableFrom || null,
+      media_ids: Array.from(selectedMediaIds),
+      primary_media_id: primaryMediaId && !primaryMediaId.startsWith('new:') ? primaryMediaId : null,
+    };
 
     try {
       if (newFiles.length > 0) {
@@ -142,57 +148,18 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
 
         const uploadedResults = uploadRes.payload.uploaded_files;
 
-        // 2. Add them to the property via updateProperty
-        const newMediaRequests = uploadedResults.map((res: MediaUploadResponse) => ({
+        // 2. Map new media for the payload
+        payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
           url: res.media_url,
           type: res.media_type,
-          isThumbnail: false,
+          isPrimary: primaryMediaId === `new:${index}`,
         }));
 
-        const existingMediaRequests = (listing.property.media || []).map((m) => ({
-          url: m.media_url,
-          type: m.media_type,
-          isThumbnail: m.is_primary,
-          thumbnailUrl: m.thumbnail_url,
-        }));
-
-        const updatePropPayload = {
-          media: [...existingMediaRequests, ...newMediaRequests],
-        };
-
-        const propUpdateRes = await propertyApi.updateProperty(
-          listing.property.property_id,
-          updatePropPayload
-        );
-
-        // 3. Find newly created PropertyMedia IDs
-        const updatedMedia = propUpdateRes.payload.media || [];
-        const newUrls = new Set(newMediaRequests.map((m) => m.url));
-        const newlyAddedMediaIds = updatedMedia
-          .filter((m: any) => newUrls.has(m.media_url))
-          .map((m: any) => m.media_id);
-
-        // Add the new media IDs to the selected list
-        finalMediaIds = [...finalMediaIds, ...newlyAddedMediaIds];
-
-        // If we didn't have a primary media yet, make the first new one primary
-        if (!finalPrimaryMediaId && newlyAddedMediaIds.length > 0) {
-          finalPrimaryMediaId = newlyAddedMediaIds[0];
+        // If a new media was primary, we already set it in new_medias, so primary_media_id should be null
+        if (primaryMediaId?.startsWith('new:')) {
+          payload.primary_media_id = null;
         }
       }
-
-      // 4. Update the listing
-      const payload: EditListingPayload = {
-        name: name.trim() !== listing.name ? name.trim() : undefined,
-        content: content.trim() !== (listing.content || '') ? content.trim() || null : undefined,
-        price: Number(price) !== listing.price ? Number(price) : undefined,
-        min_price: minPrice.trim() ? Number(minPrice) : null,
-        max_price: maxPrice.trim() ? Number(maxPrice) : null,
-        is_negotiable: isNegotiable,
-        available_from: availableFrom || null,
-        media_ids: finalMediaIds,
-        primary_media_id: finalPrimaryMediaId ?? null,
-      };
 
       const cleanPayload = Object.fromEntries(
         Object.entries(payload).filter(([_, v]) => v !== undefined)
@@ -200,7 +167,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
 
       await updateMutation.mutateAsync({
         listingId: listing.listing_id,
-        data: cleanPayload,
+        data: cleanPayload as any,
       });
       toast.success(t('editSuccess'));
       onOpenChange(false);
@@ -542,38 +509,66 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                 {/* New uploads preview */}
                 {newFiles.length > 0 && (
                   <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
-                    {newFiles.map((file, index) => (
-                      <div
-                        key={`new-${index}`}
-                        className='group relative aspect-video w-full overflow-hidden rounded-lg border-2 border-main-primary/40 bg-purple-96'
-                      >
-                        {file.type.startsWith('image/') ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={file.name}
-                            className='h-full w-full object-cover'
-                          />
-                        ) : (
-                          <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2'>
-                            <Play className='h-6 w-6 text-main-primary/60' />
-                            <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
-                              {file.name}
-                            </span>
-                          </div>
-                        )}
-                        <button
-                          type='button'
-                          onClick={() => removeNewFile(index)}
-                          className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100'
+                    {newFiles.map((file, index) => {
+                      const isPrimary = primaryMediaId === `new:${index}`;
+                      return (
+                        <div
+                          key={`new-${index}`}
+                          className={cn(
+                            'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
+                            isPrimary
+                              ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
+                              : 'border-purple-92 opacity-70 hover:opacity-100'
+                          )}
                         >
-                          <X className='h-3 w-3' />
-                        </button>
-                        <div className='absolute left-1.5 bottom-1.5 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white'>
-                          {t('newUpload', { fallback: 'New' })}
+                          {file.type.startsWith('image/') ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={file.name}
+                              className='h-full w-full object-cover'
+                            />
+                          ) : (
+                            <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96'>
+                              <Play className='h-6 w-6 text-main-primary/60' />
+                              <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
+                                {file.name}
+                              </span>
+                            </div>
+                          )}
+                          <button
+                            type='button'
+                            onClick={() => removeNewFile(index)}
+                            className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-10'
+                          >
+                            <X className='h-3 w-3' />
+                          </button>
+
+                          <button
+                            type='button'
+                            onClick={() => setPrimaryMediaId(`new:${index}`)}
+                            className={cn(
+                              'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
+                              isPrimary
+                                ? 'bg-main-primary text-white'
+                                : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
+                            )}
+                          >
+                            {isPrimary
+                              ? t('primary', { fallback: 'Primary' })
+                              : `${t('newUpload', { fallback: 'New' })} - ${t('makePrimary', { fallback: 'Make Primary' })}`}
+                          </button>
+
+                          {/* Selected overlay */}
+                          <div
+                            className={cn(
+                              'absolute inset-0 bg-main-primary/10 transition-opacity',
+                              isPrimary ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
