@@ -1,4 +1,4 @@
-import { HomeHero, HomeSection, HomeFooter } from '@/features/home';
+import { HomeHero, HomeSection } from '@/features/home';
 
 export function HomePage() {
   return (
@@ -8,7 +8,6 @@ export function HomePage() {
         <HomeHero />
         <HomeSection />
       </main>
-      <HomeFooter />
     </div>
   );
 }
