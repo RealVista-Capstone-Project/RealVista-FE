@@ -14,6 +14,7 @@ import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.a
 import type { UserProperty, CreateListingFormData, CreateListingPayload } from '../model/types';
 import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
+import { getMediaType } from '@/features/tenant-application/lib/utils';
 
 export interface CreateListingModalProps {
   open: boolean;
@@ -304,16 +305,12 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
     try {
       if (data.newFiles && data.newFiles.length > 0) {
         const uploadRes = await mediaApi.uploadBulk(data.newFiles);
-        console.log(`status is: ${JSON.stringify(uploadRes.status)}`);
-        console.log(`uploaded_files is: ${JSON.stringify(uploadRes.payload.data.uploaded_files)}`);
-        console.log('status < 200 is: ' + (uploadRes.status < 200));
         if (
           uploadRes.status < 200 ||
           uploadRes.status >= 300 ||
           uploadRes.payload.data.failed_count > 0 ||
           !uploadRes.payload.data.uploaded_files
         ) {
-          console.log(`uploadRes sau khi upload anh la: ${JSON.stringify(uploadRes)}`);
           toast.error(t('mediaUploadError', { fallback: 'Failed to upload some media files.' }));
           return;
         }
@@ -322,7 +319,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
         payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
           url: res.media_url,
-          type: res.media_type,
+          type: getMediaType(res.media_type),
           isPrimary: data.primaryMediaId === `new:${index}`,
         }));
 
