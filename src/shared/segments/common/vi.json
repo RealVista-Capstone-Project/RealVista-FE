@@ -97,6 +97,15 @@
       "maxPriceRequired": "Giá cao nhất là bắt buộc",
       "maxPriceInvalid": "Giá cao nhất phải là một số hợp lệ lớn hơn 0",
       "dateInvalid": "Vui lòng nhập ngày hợp lệ"
+    },
+    "aiAnalysis": {
+      "analyzing": "AI đang phân tích chất lượng hình ảnh...",
+      "lowQuality": "Phát hiện chất lượng thấp (Điểm: {score}). {feedback}",
+      "passed": "Chất lượng hình ảnh đã được xác minh (Điểm: {score}).",
+      "error": "Không thể phân tích hình ảnh. Vui lòng thử hình ảnh khác.",
+      "notAllowed": "Hình ảnh này không được phép tiếp tục.",
+      "feedbackLabel": "Phản hồi từ AI",
+      "scoreLabel": "Điểm số"
     }
   },
   "Common": {

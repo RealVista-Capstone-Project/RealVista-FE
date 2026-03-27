@@ -269,6 +269,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         mediaUrl: m.media_url,
         thumbnailUrl: m.thumbnail_url,
         isPrimary: m.is_primary,
+        isPropertyStandard: m.is_property_standard,
         displayOrder: m.display_order,
       })),
     };

@@ -5,13 +5,10 @@ import Image from 'next/image';
 import { Home, MapPin, Upload, Calendar, X, Play, ImageIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import type {
-  UserProperty,
-  ListingType,
-  CreateListingFormData,
-} from '../model/types';
+import type { UserProperty, ListingType, CreateListingFormData } from '../model/types';
 import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
-import { Check, CheckCircle2 } from 'lucide-react';
+import { Check, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { aiAnalysisApi, type AIAnalysisResult } from '@/entities/ai/api/ai-analysis.api';
 
 interface ListingInformationStepProps {
   selectedProperty: UserProperty;
@@ -20,15 +17,7 @@ interface ListingInformationStepProps {
   isSubmitting?: boolean;
 }
 
-function ReadOnlyField({
-  label,
-  value,
-  badge,
-}: {
-  label: string;
-  value: string;
-  badge?: string;
-}) {
+function ReadOnlyField({ label, value, badge }: { label: string; value: string; badge?: string }) {
   return (
     <div className='flex flex-col gap-2'>
       <span className='text-sm font-medium text-main-black'>{label}</span>
@@ -59,7 +48,61 @@ export function ListingInformationStep({
     () => selectedProperty.media.find((m) => m.isPrimary)?.mediaId ?? null
   );
   const [newFiles, setNewFiles] = React.useState<File[]>([]);
+  const [analysisStatus, setAnalysisStatus] = React.useState<
+    {
+      result: AIAnalysisResult | null;
+      isLoading: boolean;
+      error: string | null;
+    }[]
+  >([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const QUALITY_THRESHOLD = 50;
+
+  const analyzeFile = React.useCallback(async (file: File, index: number) => {
+    setAnalysisStatus((prev) => {
+      const next = [...prev];
+      next[index] = { result: null, isLoading: true, error: null };
+      return next;
+    });
+
+    try {
+      const res = await aiAnalysisApi.analyzeImage(file);
+      setAnalysisStatus((prev) => {
+        const next = [...prev];
+        if (next[index]) {
+          next[index] = { result: res.payload, isLoading: false, error: null };
+        }
+        return next;
+      });
+    } catch {
+      setAnalysisStatus((prev) => {
+        const next = [...prev];
+        if (next[index]) {
+          next[index] = { result: null, isLoading: false, error: 'Analysis failed' };
+        }
+        return next;
+      });
+    }
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    const startIndex = newFiles.length;
+
+    setNewFiles((prev) => [...prev, ...files]);
+    setAnalysisStatus((prev) => [
+      ...prev,
+      ...files.map(() => ({ result: null, isLoading: false, error: null })),
+    ]);
+
+    // Trigger analysis for each new file
+    files.forEach((file, i) => {
+      analyzeFile(file, startIndex + i);
+    });
+
+    e.target.value = '';
+  };
 
   const toggleMedia = (mediaId: string) => {
     setSelectedMediaIds((prev) => {
@@ -76,14 +119,9 @@ export function ListingInformationStep({
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    setNewFiles((prev) => [...prev, ...files]);
-    e.target.value = '';
-  };
-
   const removeNewFile = (index: number) => {
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
+    setAnalysisStatus((prev) => prev.filter((_, i) => i !== index));
   };
 
   const [listingType, setListingType] = React.useState<ListingType>('RENT');
@@ -110,9 +148,7 @@ export function ListingInformationStep({
     ) || [];
 
   const booleanFeatures =
-    selectedProperty.attributes?.filter(
-      (attr) => attr.valueBoolean === true
-    ) || [];
+    selectedProperty.attributes?.filter((attr) => attr.valueBoolean === true) || [];
 
   // ---- Validation ----
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -127,10 +163,12 @@ export function ListingInformationStep({
     else if (isNaN(Number(price)) || Number(price) <= 0) errs.price = t('validation.priceInvalid');
 
     if (!minPrice.trim()) errs.minPrice = t('validation.minPriceRequired');
-    else if (isNaN(Number(minPrice)) || Number(minPrice) <= 0) errs.minPrice = t('validation.minPriceInvalid');
+    else if (isNaN(Number(minPrice)) || Number(minPrice) <= 0)
+      errs.minPrice = t('validation.minPriceInvalid');
 
     if (!maxPrice.trim()) errs.maxPrice = t('validation.maxPriceRequired');
-    else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0) errs.maxPrice = t('validation.maxPriceInvalid');
+    else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0)
+      errs.maxPrice = t('validation.maxPriceInvalid');
 
     if (listingType === 'RENT' && availableFrom) {
       const d = new Date(availableFrom);
@@ -168,7 +206,17 @@ export function ListingInformationStep({
     onSubmit(formData);
   };
 
-  const isValid = name.trim() !== '' && price.trim() !== '' && Object.keys(errors).length === 0;
+  const allImagesAnalyzed = analysisStatus.every((s) => !s.isLoading && (s.result || s.error));
+  const allImagesPassed = analysisStatus.every(
+    (s) => s.result && (s.result.finalScore ?? 100) >= QUALITY_THRESHOLD
+  );
+
+  const isValid =
+    name.trim() !== '' &&
+    price.trim() !== '' &&
+    Object.keys(errors).length === 0 &&
+    allImagesAnalyzed &&
+    allImagesPassed;
 
   return (
     <>
@@ -213,7 +261,9 @@ export function ListingInformationStep({
                 placeholder={t('listingNamePlaceholder')}
                 className={cn(
                   'rounded-lg border bg-white px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 transition-colors focus:outline-none',
-                  errors.name ? 'border-red-400 focus:border-red-500' : 'border-purple-92 focus:border-main-primary'
+                  errors.name
+                    ? 'border-red-400 focus:border-red-500'
+                    : 'border-purple-92 focus:border-main-primary'
                 )}
               />
               {errors.name && <span className='text-xs text-red-500'>{errors.name}</span>}
@@ -221,9 +271,7 @@ export function ListingInformationStep({
 
             {/* Listing Content */}
             <div className='flex flex-col gap-2'>
-              <label className='text-sm font-medium text-main-black'>
-                {t('listingContent')}
-              </label>
+              <label className='text-sm font-medium text-main-black'>{t('listingContent')}</label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -243,9 +291,7 @@ export function ListingInformationStep({
                     <div
                       className={cn(
                         'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors',
-                        listingType === type
-                          ? 'border-main-primary'
-                          : 'border-purple-92'
+                        listingType === type ? 'border-main-primary' : 'border-purple-92'
                       )}
                     >
                       {listingType === type && (
@@ -281,7 +327,7 @@ export function ListingInformationStep({
                 <ReadOnlyField
                   key={attr.attributeId}
                   label={attr.attributeName}
-                  value={attr.displayValue ?? (attr.valueText ?? attr.valueNumber?.toString() ?? '—')}
+                  value={attr.displayValue ?? attr.valueText ?? attr.valueNumber?.toString() ?? '—'}
                   badge={t('readOnly')}
                 />
               ))}
@@ -356,9 +402,7 @@ export function ListingInformationStep({
             {/* Min / Max Price */}
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               <div className='flex flex-col gap-2'>
-                <label className='text-sm font-medium text-main-black'>
-                  {t('minPrice')}
-                </label>
+                <label className='text-sm font-medium text-main-black'>{t('minPrice')}</label>
                 <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
                   <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
                     ₫
@@ -375,9 +419,7 @@ export function ListingInformationStep({
                 {errors.minPrice && <span className='text-xs text-red-500'>{errors.minPrice}</span>}
               </div>
               <div className='flex flex-col gap-2'>
-                <label className='text-sm font-medium text-main-black'>
-                  {t('maxPrice')}
-                </label>
+                <label className='text-sm font-medium text-main-black'>{t('maxPrice')}</label>
                 <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
                   <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
                     ₫
@@ -397,9 +439,7 @@ export function ListingInformationStep({
 
             {/* Negotiable */}
             <div className='flex items-center justify-between'>
-              <span className='text-sm font-medium text-main-black'>
-                {t('negotiable')}
-              </span>
+              <span className='text-sm font-medium text-main-black'>{t('negotiable')}</span>
               <button
                 type='button'
                 role='switch'
@@ -482,9 +522,7 @@ export function ListingInformationStep({
             {/* Property Description (read-only) */}
             <div className='flex flex-col gap-2'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-main-black'>
-                  {t('description')}
-                </span>
+                <span className='text-sm font-medium text-main-black'>{t('description')}</span>
                 <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
                   {t('readOnly')}
                 </span>
@@ -517,12 +555,11 @@ export function ListingInformationStep({
             {/* Media Section */}
             <div className='flex flex-col gap-3'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-main-black'>
-                  {t('mediaUpload')}
-                </span>
+                <span className='text-sm font-medium text-main-black'>{t('mediaUpload')}</span>
                 {selectedProperty.media.length > 0 && (
                   <span className='text-xs text-main-secondary/50'>
-                    {selectedMediaIds.size} / {selectedProperty.media.length} {t('selected', { fallback: 'selected' })}
+                    {selectedMediaIds.size} / {selectedProperty.media.length}{' '}
+                    {t('selected', { fallback: 'selected' })}
                   </span>
                 )}
               </div>
@@ -556,7 +593,7 @@ export function ListingInformationStep({
                           )}
                         >
                           {/* Thumbnail */}
-                          {media.thumbnailUrl ?? media.mediaUrl ? (
+                          {(media.thumbnailUrl ?? media.mediaUrl) ? (
                             <Image
                               src={media.thumbnailUrl ?? media.mediaUrl}
                               alt=''
@@ -594,7 +631,10 @@ export function ListingInformationStep({
                               isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
                             )}
                           >
-                            <CheckCircle2 className='h-5 w-5 text-main-primary drop-shadow' fill='white' />
+                            <CheckCircle2
+                              className='h-5 w-5 text-main-primary drop-shadow'
+                              fill='white'
+                            />
                           </div>
 
                           {/* Primary badge/button */}
@@ -628,6 +668,11 @@ export function ListingInformationStep({
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
                   {newFiles.map((file, index) => {
                     const isPrimary = primaryMediaId === `new:${index}`;
+                    const status = analysisStatus[index];
+                    const score = status?.result?.finalScore;
+                    const isRejected = score !== undefined && score < QUALITY_THRESHOLD;
+                    const feedback = status?.result?.analysis?.feedback;
+
                     return (
                       <div
                         key={`new-${index}`}
@@ -635,7 +680,9 @@ export function ListingInformationStep({
                           'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
                           isPrimary
                             ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
-                            : 'border-purple-92 opacity-70 hover:opacity-100'
+                            : isRejected
+                              ? 'border-red-400'
+                              : 'border-purple-92 opacity-70 hover:opacity-100'
                         )}
                       >
                         {file.type.startsWith('image/') ? (
@@ -643,7 +690,10 @@ export function ListingInformationStep({
                           <img
                             src={URL.createObjectURL(file)}
                             alt={file.name}
-                            className='h-full w-full object-cover'
+                            className={cn(
+                              'h-full w-full object-cover',
+                              isRejected && 'grayscale-[0.5] blur-[1px]'
+                            )}
                           />
                         ) : (
                           <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96'>
@@ -653,27 +703,73 @@ export function ListingInformationStep({
                             </span>
                           </div>
                         )}
+
+                        {/* AI Status Overlay */}
+                        <div className='absolute inset-x-0 top-0 z-20 flex flex-col gap-1 p-1'>
+                          {status?.isLoading ? (
+                            <div className='flex items-center gap-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white'>
+                              <Loader2 className='h-3 w-3 animate-spin' />
+                              {t('aiAnalysis.analyzing')}
+                            </div>
+                          ) : status?.error ? (
+                            <div className='flex items-center gap-1 rounded bg-red-500/80 px-1.5 py-0.5 text-[10px] text-white'>
+                              <AlertCircle className='h-3 w-3' />
+                              {t('aiAnalysis.error')}
+                            </div>
+                          ) : isRejected ? (
+                            <div className='flex flex-col gap-0.5 rounded bg-red-500/90 p-1.5 text-[10px] text-white'>
+                              <div className='flex items-center gap-1 font-bold italic underline'>
+                                <AlertCircle className='h-3 w-3' />
+                                {t('aiAnalysis.notAllowed')}
+                              </div>
+                              {feedback && (
+                                <div className='line-clamp-2 italic opacity-90'>{feedback}</div>
+                              )}
+                            </div>
+                          ) : score !== undefined ? (
+                            <div className='flex items-center gap-1 rounded bg-emerald-500/80 px-1.5 py-0.5 text-[10px] text-white'>
+                              <CheckCircle2 className='h-3 w-3' />
+                              {t('aiAnalysis.passed', { score })}
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {/* Feedback Tooltip on Hover */}
+                        {!status?.isLoading && feedback && !isRejected && (
+                          <div className='absolute inset-x-0 bottom-8 z-20 px-1.5 opacity-0 transition-opacity group-hover:opacity-100'>
+                            <div className='rounded bg-black/80 p-1.5 text-[10px] leading-tight text-white shadow-lg'>
+                              <p className='font-bold text-main-primary/40'>
+                                {t('aiAnalysis.feedbackLabel')}
+                              </p>
+                              <p className='mt-0.5 line-clamp-3 italic'>{feedback}</p>
+                            </div>
+                          </div>
+                        )}
+
                         <button
                           type='button'
                           onClick={() => removeNewFile(index)}
-                          className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-10'
+                          className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-30'
                         >
                           <X className='h-3 w-3' />
                         </button>
-                        <button
-                          type='button'
-                          onClick={() => setPrimaryMediaId(`new:${index}`)}
-                          className={cn(
-                            'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
-                            isPrimary
-                              ? 'bg-main-primary text-white'
-                              : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
-                          )}
-                        >
-                          {isPrimary
-                            ? t('primary', { fallback: 'Primary' })
-                            : `${t('newUpload', { fallback: 'New' })} - ${t('makePrimary', { fallback: 'Make Primary' })}`}
-                        </button>
+
+                        {!isRejected && (
+                          <button
+                            type='button'
+                            onClick={() => setPrimaryMediaId(`new:${index}`)}
+                            className={cn(
+                              'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
+                              isPrimary
+                                ? 'bg-main-primary text-white'
+                                : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
+                            )}
+                          >
+                            {isPrimary
+                              ? t('primary', { fallback: 'Primary' })
+                              : `${t('newUpload', { fallback: 'New' })} - ${t('makePrimary', { fallback: 'Make Primary' })}`}
+                          </button>
+                        )}
 
                         {/* Selected overlay */}
                         <div
@@ -700,11 +796,35 @@ export function ListingInformationStep({
               <button
                 type='button'
                 onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const files = Array.from(e.dataTransfer.files).filter(
+                    (f) => f.type.startsWith('image/') || f.type.startsWith('video/')
+                  );
+                  if (files.length > 0) {
+                    const startIndex = newFiles.length;
+                    setNewFiles((prev) => [...prev, ...files]);
+                    setAnalysisStatus((prev) => [
+                      ...prev,
+                      ...files.map(() => ({ result: null, isLoading: false, error: null })),
+                    ]);
+                    files.forEach((file, i) => {
+                      analyzeFile(file, startIndex + i);
+                    });
+                  }
+                }}
                 className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-purple-98/30 px-6 py-8 text-center transition-colors hover:border-main-primary/40 hover:bg-purple-98/60 cursor-pointer w-full'
               >
                 <Upload className='mb-2 h-7 w-7 text-main-primary/50' />
                 <p className='text-sm font-medium text-main-secondary/60'>{t('dragAndDrop')}</p>
-                <p className='mt-0.5 text-xs text-main-secondary/40'>{t('uploadHint', { fallback: 'JPG, PNG, MP4 supported' })}</p>
+                <p className='mt-0.5 text-xs text-main-secondary/40'>
+                  {t('uploadHint', { fallback: 'JPG, PNG, MP4 supported' })}
+                </p>
               </button>
             </div>
           </div>

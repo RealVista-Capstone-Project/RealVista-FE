@@ -97,6 +97,15 @@
       "maxPriceRequired": "Max price is required",
       "maxPriceInvalid": "Max price must be a valid number greater than 0",
       "dateInvalid": "Please enter a valid date"
+    },
+    "aiAnalysis": {
+      "analyzing": "AI is analyzing image quality...",
+      "lowQuality": "Lower quality detected (Score: {score}). {feedback}",
+      "passed": "Image quality verified (Score: {score}).",
+      "error": "Unable to analyze image. Please try another one.",
+      "notAllowed": "This image is not allowed to proceed.",
+      "feedbackLabel": "AI Feedback",
+      "scoreLabel": "Score"
     }
   },
   "Common": {

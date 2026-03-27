@@ -41,6 +41,7 @@ export interface UserPropertyMedia {
   mediaUrl: string;
   thumbnailUrl: string | null;
   isPrimary: boolean;
+  isPropertyStandard: boolean;
   displayOrder: number;
 }
 
