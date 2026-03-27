@@ -132,6 +132,7 @@ export interface PropertyMediaItem {
   media_url: string;
   thumbnail_url: string | null;
   is_primary: boolean;
+  is_property_standard: boolean;
   display_order: number;
 }
 

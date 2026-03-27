@@ -42,10 +42,13 @@ export function ListingInformationStep({
   const t = useTranslations('CreateListingModal');
 
   const [selectedMediaIds, setSelectedMediaIds] = React.useState<Set<string>>(
-    () => new Set(selectedProperty.media.map((m) => m.mediaId))
+    () => new Set(selectedProperty.media.filter((m) => m.isPropertyStandard).map((m) => m.mediaId))
   );
   const [primaryMediaId, setPrimaryMediaId] = React.useState<string | null>(
-    () => selectedProperty.media.find((m) => m.isPrimary)?.mediaId ?? null
+    () =>
+      selectedProperty.media.find((m) => m.isPrimary && m.isPropertyStandard)?.mediaId ??
+      selectedProperty.media.find((m) => m.isPropertyStandard)?.mediaId ??
+      null
   );
   const [newFiles, setNewFiles] = React.useState<File[]>([]);
   const [analysisStatus, setAnalysisStatus] = React.useState<
@@ -199,7 +202,9 @@ export function ListingInformationStep({
       isNegotiable,
       availableFrom,
       content: content,
-      selectedMediaIds: Array.from(selectedMediaIds),
+      selectedMediaIds: Array.from(selectedMediaIds).filter(
+        (id) => selectedProperty.media.find((m) => m.mediaId === id)?.isPropertyStandard
+      ),
       primaryMediaId: primaryMediaId ?? undefined,
       newFiles: newFiles,
     };
@@ -569,6 +574,7 @@ export function ListingInformationStep({
               {selectedProperty.media.length > 0 && (
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
                   {selectedProperty.media
+                    .filter((media) => media.isPropertyStandard)
                     .sort((a, b) => a.displayOrder - b.displayOrder)
                     .map((media) => {
                       const isSelected = selectedMediaIds.has(media.mediaId);
