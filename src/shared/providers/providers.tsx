@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
+import { PostHogProvider } from '@/shared/lib/analytics';
 import { Toaster } from '@/shared/ui/sonner';
 import { PostHogProvider } from '../lib/analytics/posthog-provider';
 
@@ -14,6 +15,7 @@ import { PostHogProvider } from '../lib/analytics/posthog-provider';
  * - SessionProvider: NextAuth authentication state
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
+ * - PostHogProvider: PostHog analytics initialization and user identification
  * - Toaster: Displays toast notifications across the application
  *
  * @example
