@@ -1,9 +1,9 @@
+import { auth } from '@/shared/lib/auth/config';
+import { redirect } from '@/shared/config/i18n/navigation';
 import { RegisterForm } from '@/features/auth/ui/register-form/register-form';
 import { GoogleLoginButton } from '@/features/auth/ui/google-login-button';
 import { Link } from '@/shared/config/i18n/navigation';
-import { useTranslations } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
-import { use } from 'react';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 /**
  * Register Page
@@ -11,10 +11,17 @@ import { use } from 'react';
  * Provides a registration page with Role switching, email/password form,
  * and Google OAuth options. Matches the styling of LoginPage.
  */
-export default function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = use(params);
+export default async function RegisterPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   setRequestLocale(locale);
-  const t = useTranslations('Auth');
+
+  // Root Cause: Prevent logged-in users from accessing the register page
+  const session = await auth();
+  if (session) {
+    redirect({ href: '/', locale });
+  }
+
+  const t = await getTranslations('Auth');
 
   return (
     <div className='flex min-h-[calc(100vh-80px)] items-center justify-center py-12'>

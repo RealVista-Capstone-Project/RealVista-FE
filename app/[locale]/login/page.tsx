@@ -1,9 +1,9 @@
+import { auth } from '@/shared/lib/auth/config';
+import { redirect } from '@/shared/config/i18n/navigation';
 import { LoginFormNextAuth } from '@/features/auth/ui/login-form-nextauth';
 import { GoogleLoginButton } from '@/features/auth/ui/google-login-button';
 import { Link } from '@/shared/config/i18n/navigation';
-import { useTranslations } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
-import { use } from 'react';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 /**
  * Login Page
@@ -16,10 +16,17 @@ import { use } from 'react';
  * - Visual separator between login methods
  * - Locale-aware routing (supports /vi and /en)
  */
-export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = use(params);
+export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   setRequestLocale(locale);
-  const t = useTranslations('Auth');
+
+  // Root Cause: Prevent logged-in users from accessing the login page
+  const session = await auth();
+  if (session) {
+    redirect({ href: '/', locale });
+  }
+
+  const t = await getTranslations('Auth');
   return (
     <div className='flex min-h-screen items-center justify-center'>
       <div className='w-full max-w-md space-y-8 px-4'>
