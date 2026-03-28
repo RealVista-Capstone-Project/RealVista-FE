@@ -1,4 +1,18 @@
 {
+  "DashboardLayout": {
+    "pageTitle": {
+      "default": "RealVista",
+      "dashboard": "Dashboard",
+      "insight": "Insight",
+      "managedListings": "Managed Listings",
+      "tenants": "Tenants",
+      "messages": "Messages"
+    },
+    "actionButton": {
+      "addProperty": "Add a property",
+      "createListing": "Create a listing"
+    }
+  },
   "Common": {
     "title": "Hello world common!",
     "about": "Go to the about page"
@@ -107,6 +121,10 @@
     "filters": "Filters",
     "sortBy": "Sort by",
     "results": "results",
+    "resultsHeader": "Search Results",
+    "showingResults": "Showing {count} properties",
+    "noResults": "No properties found",
+    "noResultsHint": "Try adjusting your search criteria or expanding your filters",
     "perMonth": "/ month"
   },
   "Buy": {
@@ -131,6 +149,10 @@
     "filters": "Filters",
     "sortBy": "Sort by",
     "results": "results",
+    "resultsHeader": "Search Results",
+    "showingResults": "Showing {count} properties",
+    "noResults": "No properties found",
+    "noResultsHint": "Try adjusting your search criteria or expanding your filters",
     "totalPrice": "Total Price"
   },
   "PropertyDetail": {

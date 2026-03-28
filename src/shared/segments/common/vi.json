@@ -1,4 +1,18 @@
 {
+  "DashboardLayout": {
+    "pageTitle": {
+      "default": "RealVista",
+      "dashboard": "Dashboard",
+      "insight": "Thống kê",
+      "managedListings": "Quản lý bài đăng",
+      "tenants": "Người thuê",
+      "messages": "Tin nhắn"
+    },
+    "actionButton": {
+      "addProperty": "Thêm bất động sản",
+      "createListing": "Tạo bài đăng"
+    }
+  },
   "Common": {
     "title": "Xin chào common!",
     "about": "Về trang chủ"
@@ -107,6 +121,10 @@
     "filters": "Bộ lọc",
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
+    "resultsHeader": "Kết quả tìm kiếm",
+    "showingResults": "Hiển thị {count} bất động sản",
+    "noResults": "Không tìm thấy bất động sản",
+    "noResultsHint": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc mở rộng bộ lọc",
     "perMonth": "/ tháng"
   },
   "Buy": {
@@ -131,6 +149,10 @@
     "filters": "Bộ lọc",
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
+    "resultsHeader": "Kết quả tìm kiếm",
+    "showingResults": "Hiển thị {count} bất động sản",
+    "noResults": "Không tìm thấy bất động sản",
+    "noResultsHint": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc mở rộng bộ lọc",
     "totalPrice": "Tổng giá"
   },
   "PropertyDetail": {

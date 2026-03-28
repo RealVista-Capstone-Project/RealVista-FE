@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { X, Minus, Send, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
@@ -139,11 +140,15 @@ export function FloatingChatWindow({
         <div className='flex items-center gap-2 overflow-hidden'>
           {/* Avatar */}
           {participant.avatar ? (
-            <img
-              src={participant.avatar}
-              alt={participant.name}
-              className='h-7 w-7 rounded-full object-cover'
-            />
+            <div className='relative h-7 w-7 flex-shrink-0 overflow-hidden rounded-full'>
+              <Image
+                src={participant.avatar}
+                alt={participant.name}
+                fill
+                className='object-cover'
+                sizes='28px'
+              />
+            </div>
           ) : (
             <div className='flex h-7 w-7 items-center justify-center rounded-full bg-main-primary text-white'>
               <span className='text-xs font-bold'>{participant.name.charAt(0).toUpperCase()}</span>

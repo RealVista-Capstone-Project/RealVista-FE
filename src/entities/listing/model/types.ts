@@ -128,6 +128,7 @@ export interface ListingData {
   total_videos: number;
   total_3d_tours: number;
   is_favorite?: boolean;
+  is_created_by_owner?: boolean;
 }
 
 // ============ Cost Breakdown (API format - snake_case) ============
@@ -190,6 +191,24 @@ export interface SimilarListingsResponse {
   listings: SimilarListing[];
   total: number;
   limit: number;
+}
+
+// ============ Generic Paginated Response ============
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  total_elements: number;
+  total_pages: number;
+  first: boolean;
+  last: boolean;
+}
+
+// ============ Managed Listing Summary ============
+export interface ManagedListingSummary {
+  all: number;
+  rent: number;
+  sale: number;
 }
 
 // ============ Main Listing Type (what we export) ============
