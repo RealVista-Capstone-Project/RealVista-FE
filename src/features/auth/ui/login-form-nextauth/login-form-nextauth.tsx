@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { getRedirectPathByRole } from '@/shared/lib/auth/rbac';
+import type { UserRole } from '@/shared/lib/auth/rbac';
 
 /**
  * LoginFormNextAuth Component
@@ -65,11 +67,15 @@ export function LoginFormNextAuth() {
         setError(errorMessage);
         toast.error(errorMessage);
       } else if (result?.ok) {
-        // Success! Show toast and redirect
+        // Success! Show toast and redirect based on role
         toast.success(t('loginSuccess'));
 
-        // Redirect to buy page with locale
-        router.push(`/${locale}/buy`);
+        // Fetch the session to get the user's role for redirect
+        const session = await getSession();
+        const role = session?.user?.role as UserRole | undefined;
+        const redirectPath = getRedirectPathByRole(role);
+
+        router.push(`/${locale}${redirectPath}`);
       }
     } catch {
       // Unexpected error
