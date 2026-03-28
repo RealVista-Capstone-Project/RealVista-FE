@@ -212,6 +212,10 @@
     "filters": "Filters",
     "sortBy": "Sort by",
     "results": "results",
+    "resultsHeader": "Search Results",
+    "showingResults": "Showing {count} properties",
+    "noResults": "No properties found",
+    "noResultsHint": "Try adjusting your search criteria or expanding your filters",
     "perMonth": "/ month"
   },
   "Buy": {
@@ -236,6 +240,10 @@
     "filters": "Filters",
     "sortBy": "Sort by",
     "results": "results",
+    "resultsHeader": "Search Results",
+    "showingResults": "Showing {count} properties",
+    "noResults": "No properties found",
+    "noResultsHint": "Try adjusting your search criteria or expanding your filters",
     "totalPrice": "Total Price"
   },
   "PropertyDetail": {

@@ -7,6 +7,7 @@ import { useAuthSession } from '@/features/auth/model';
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api-response';
 import type { Listing } from '@/entities/listing';
+import { behaviorTracker } from '@/shared/lib/analytics';
 
 /**
  * Manages the favorite (bookmark) state for a single listing.
@@ -37,7 +38,11 @@ export function useListingFavorite(listingId: string, initialFavorite: boolean) 
 
   const { mutate: toggleFavorite } = useMutation({
     mutationFn: () => bookmarkApi.toggleBookmark(listingId),
-    onMutate: () => setIsFavorite((prev) => !prev),
+    onMutate: () => {
+      const willBeFavorite = !isFavorite;
+      setIsFavorite(willBeFavorite);
+      behaviorTracker.trackBookmark(listingId, willBeFavorite ? 'add' : 'remove');
+    },
     onError: () => setIsFavorite((prev) => !prev),
   });
 

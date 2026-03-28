@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { getPostHogClient, posthog } from './posthog';
 import { PostHogPageview } from './posthog-pageview';
+import { behaviorTracker } from './tracker';
 
 /**
  * PostHog Analytics Provider
@@ -21,6 +22,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   // Initialize PostHog + behavior event queue on mount
   useEffect(() => {
     getPostHogClient();
+    behaviorTracker.init();
   }, []);
 
   // Identify/reset user when auth state changes
