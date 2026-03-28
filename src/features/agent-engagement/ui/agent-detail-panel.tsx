@@ -441,7 +441,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
         <div className='p-4 border-t border-gray-100 bg-white/80 backdrop-blur-sm flex-none space-y-2.5'>
           {renderActionButtons()}
           <Link
-            href={`/${locale}${ROUTES.manageAgent.detail(agent.engagement_id)}`}
+            href={`/${locale}${ROUTES.dashboard.agentDetail(agent.engagement_id)}`}
             className='flex items-center justify-center gap-1.5 w-full text-xs text-main-primary hover:text-main-primary-hover font-semibold py-2 rounded-xl hover:bg-indigo-50 transition-colors'
           >
             <ExternalLink className='h-3 w-3' />
