@@ -105,6 +105,7 @@ export interface PropertyMediaRequest {
 }
 
 export interface CreatePropertyRequest {
+  owner_id?: string;
   location_id: string;
   property_type_id: string;
   street_address: string;
@@ -173,6 +174,8 @@ export interface PropertySummary {
   status: string;
   land_size_m2?: number;
   thumbnail_url?: string;
+  owner_name?: string;
+  owner_phone?: string;
 }
 
 export interface ApiResponse<T> {

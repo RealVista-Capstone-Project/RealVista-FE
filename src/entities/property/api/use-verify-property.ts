@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { propertyApi } from './property.api';
-import type { CreatePropertyRequest } from './property-api.types';
 import { MY_PROPERTIES_QUERY_KEY } from './use-my-properties';
 
-export const useCreateProperty = () => {
+export function useVerifyPropertyByAgent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreatePropertyRequest) => propertyApi.createProperty(request),
-    onSuccess: () => {
+    mutationFn: (propertyId: string) => propertyApi.verifyByAgent(propertyId),
+    onSuccess: (_, propertyId) => {
+      // Invalidate specific property and the list
       queryClient.invalidateQueries({ queryKey: [MY_PROPERTIES_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['property', propertyId] });
     },
   });
-};
+}

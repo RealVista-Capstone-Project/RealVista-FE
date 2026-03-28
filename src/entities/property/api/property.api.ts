@@ -1,7 +1,5 @@
 import http from '@/shared/lib/http';
 import type {
-  PropertySearchRequest,
-  PropertySearchResponse,
   CreatePropertyRequest,
   UpdatePropertyRequest,
   PropertyDetailResponse,
@@ -10,11 +8,25 @@ import type {
 } from './property-api.types';
 
 export const propertyApi = {
-  search: (request: PropertySearchRequest) => {
-    return http.post<PropertySearchResponse>('map/listings', request, {
-      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
-        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
-        : undefined,
+  search: (params: {
+    address?: string;
+    north_lat?: number;
+    south_lat?: number;
+    east_lng?: number;
+    west_lng?: number;
+  }) => {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, value.toString());
+      }
+    });
+
+    const queryString = searchParams.toString();
+    const url = queryString ? `properties/search?${queryString}` : 'properties/search';
+
+    return http.get<ApiResponse<PropertySummary[]>>(url, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
 
@@ -46,5 +58,24 @@ export const propertyApi = {
     return http.get<ApiResponse<PropertyDetailResponse>>(`properties/${propertyId}`, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
+  },
+
+  verifyByAgent: (propertyId: string) => {
+    return http.post<ApiResponse<void>>(
+      `properties/${propertyId}/verify-agent`,
+      {},
+      {
+        baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+      }
+    );
+  },
+  assignAgent: (propertyId: string) => {
+    return http.post<ApiResponse<PropertyDetailResponse>>(
+      `properties/${propertyId}/assign-agent`,
+      {},
+      {
+        baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+      }
+    );
   },
 };
