@@ -1,0 +1,14 @@
+{
+  "AiAssistant": {
+    "title": "Trợ lý AI",
+    "subtitle": "Trợ lý bất động sản",
+    "welcomeMessage": "Xin chào! Tôi là trợ lý AI bất động sản. Tôi có thể giúp gì cho bạn?",
+    "placeholder": "Hỏi tôi bất cứ điều gì...",
+    "send": "Gửi",
+    "close": "Đóng",
+    "chipFindProperties": "Tìm bất động sản gần tôi",
+    "chipAverageRent": "Giá thuê trung bình Quận 1?",
+    "chipCompareListings": "So sánh tin đăng",
+    "thinking": "Đang suy nghĩ..."
+  }
+}
