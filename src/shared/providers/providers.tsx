@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
-import { PostHogProvider } from '@/shared/lib/analytics';
 import { Toaster } from '@/shared/ui/sonner';
 import { PostHogProvider } from '../lib/analytics/posthog-provider';
 
