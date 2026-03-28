@@ -1,0 +1,75 @@
+{
+  "ManagedListings": {
+    "title": "Bài đăng",
+    "filter": "Lọc",
+    "filterPanel": {
+      "status": "Trạng thái",
+      "statusOptions": {
+        "all": "Tất cả trạng thái",
+        "draft": "Nháp",
+        "pending": "Chờ duyệt",
+        "published": "Đã đăng",
+        "sold": "Đã bán",
+        "rented": "Đã cho thuê",
+        "archived": "Đã lưu trữ"
+      },
+      "sortBy": "Sắp xếp",
+      "sortOptions": {
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "priceAsc": "Giá: Thấp đến cao",
+        "priceDesc": "Giá: Cao đến thấp"
+      },
+      "reset": "Đặt lại"
+    },
+    "tabs": {
+      "all": "Tất cả",
+      "forRent": "Cho thuê",
+      "forSale": "Bán"
+    },
+    "search": {
+      "placeholder": "Tìm kiếm..."
+    },
+    "loading": "Đang tải...",
+    "error": {
+      "title": "Không thể tải danh sách",
+      "message": "Đã xảy ra lỗi khi tải danh sách bài đăng của bạn"
+    },
+    "empty": {
+      "noProperties": "Không tìm thấy bất động sản",
+      "selectProperty": "Chọn một bất động sản để xem chi tiết"
+    }
+  },
+  "ListingCard": {
+    "noImage": "Không có ảnh",
+    "noAddress": "Không có địa chỉ",
+    "listingType": {
+      "rent": "Cho thuê",
+      "sale": "Bán"
+    }
+  },
+  "ListingDetailPanel": {
+    "addressNotAvailable": "Địa chỉ không có sẵn",
+    "showCalendar": "Lịch hẹn",
+    "preview": "Xem trước",
+    "backToList": "Quay lại danh sách",
+    "agent": {
+      "title": "Người môi giới",
+      "subtitle": "Bài đăng này được quản lý bởi môi giới",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "company": "Công ty",
+      "verified": "Môi giới đã xác thực",
+      "contact": "Liên hệ môi giới"
+    },
+    "features": {
+      "properties": "Bất động sản",
+      "rooms": "Phòng",
+      "livingSpace": "Diện tích sử dụng",
+      "yearBuilt": "Năm xây dựng",
+      "tenants": "Người thuê",
+      "request": "Yêu cầu",
+      "notAvailable": "Không có"
+    }
+  }
+}

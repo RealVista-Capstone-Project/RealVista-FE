@@ -1,4 +1,18 @@
 {
+  "DashboardLayout": {
+    "pageTitle": {
+      "default": "RealVista",
+      "dashboard": "Dashboard",
+      "insight": "Thống kê",
+      "managedListings": "Quản lý bài đăng",
+      "tenants": "Người thuê",
+      "messages": "Tin nhắn"
+    },
+    "actionButton": {
+      "addProperty": "Thêm bất động sản",
+      "createListing": "Tạo bài đăng"
+    }
+  },
   "Common": {
     "title": "Xin chào common!",
     "about": "Về trang chủ"
@@ -58,6 +72,13 @@
       "messageRequired": "Vui lòng nhập tin nhắn",
       "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
     }
+  },
+  "Notifications": {
+    "notifications": "Thông báo",
+    "new": "MỚI",
+    "noNotifications": "Chưa có thông báo nào",
+    "markAsRead": "Đánh dấu đã đọc",
+    "viewAll": "Xem tất cả thông báo"
   },
   "Navigation": {
     "explore": "Khám phá",
