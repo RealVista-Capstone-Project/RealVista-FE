@@ -11,6 +11,7 @@ export interface AuthSession {
     name?: string | null;
     role?: 'user' | 'owner' | 'admin' | 'moderator';
     accessToken?: string;
+    backendRoles?: string[];
   };
   expires: string;
 }

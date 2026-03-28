@@ -3,12 +3,14 @@
 import { useEffect } from 'react';
 import { useAuthSession } from '@/features/auth/model';
 import { useRouter } from '@/shared/config/i18n/navigation';
-import type { UserRole } from './rbac';
+import type { UserRole, BackendRole } from './rbac';
 import { hasRole } from './rbac';
 
 interface RoleGuardProps {
   children: React.ReactNode;
   allowedRoles: UserRole[];
+  /** Optional: Allow specific backend roles even if their mapped frontend role is not in allowedRoles */
+  allowedBackendRoles?: BackendRole[];
   fallback?: React.ReactNode;
   redirectPath?: string;
 }
@@ -26,6 +28,15 @@ interface RoleGuardProps {
  *   <DashboardPage />
  * </RoleGuard>
  *
+ * // Allow admin/moderator OR specifically allow OWNER backend role
+ * <RoleGuard
+ *   allowedRoles={['admin', 'moderator']}
+ *   allowedBackendRoles={['OWNER']}
+ *   redirectPath="/"
+ * >
+ *   <ManagedListingsPage />
+ * </RoleGuard>
+ *
  * // Show custom fallback
  * <RoleGuard
  *   allowedRoles={['admin']}
@@ -38,6 +49,7 @@ interface RoleGuardProps {
 export function RoleGuard({
   children,
   allowedRoles,
+  allowedBackendRoles,
   fallback = null,
   redirectPath,
 }: RoleGuardProps) {
@@ -69,6 +81,28 @@ export function RoleGuard({
 
   // No session or no permission
   if (isUnauthenticated || !hasPermission) {
+  // No session - should be protected by auth middleware
+  if (!session?.user) {
+    if (redirectPath) {
+      router.push(redirectPath);
+      return null;
+    }
+    return <>{fallback}</>;
+  }
+
+  const userRole = session.user.role;
+  const backendRoles = session.user.backendRoles || [];
+
+  // Check if user has any of the allowed roles (frontend role hierarchy)
+  const hasPermission = allowedRoles.some((role) => hasRole(userRole, role));
+
+  // Check if user has any of the allowed backend roles (direct backend role check)
+  const hasBackendPermission = allowedBackendRoles?.some((role) =>
+    backendRoles.includes(role)
+  );
+
+  if (!hasPermission && !hasBackendPermission) {
+    // Redirect or show fallback
     if (redirectPath) {
       // Show spinner while redirect is happening via useEffect
       return (

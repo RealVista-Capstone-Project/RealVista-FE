@@ -9,21 +9,23 @@ import {
   Columns,
   LayoutDashboard,
   MessageCircle,
+  Plus,
   TrendingUp,
   Users,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { Link } from '@/shared/config/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
+import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 
 export interface SidebarMenuItem {
   id: string;
   label: string;
   href: string;
   icon: LucideIcon;
-  isActive?: boolean;
 }
 
 export interface DashboardLayoutProps {
@@ -46,10 +48,9 @@ const defaultSidebarItems: SidebarMenuItem[] = [
     label: 'Dashboard',
     href: ROUTES.dashboard.root,
     icon: LayoutDashboard,
-    isActive: true,
   },
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
-  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.listings, icon: Calendar },
+  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
@@ -69,6 +70,64 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const pathname = usePathname();
+  const t = useTranslations('DashboardLayout');
+
+  /**
+   * Compute the top nav page title based on the current pathname
+   */
+  const pageTitle = React.useMemo(() => {
+    if (
+      pathname === ROUTES.dashboard.managedListings ||
+      pathname.startsWith(ROUTES.dashboard.managedListings)
+    ) {
+      return t('pageTitle.managedListings');
+    }
+    if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight)) {
+      return t('pageTitle.insight');
+    }
+    if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants)) {
+      return t('pageTitle.tenants');
+    }
+    if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
+      return t('pageTitle.messages');
+    }
+    if (pathname === ROUTES.dashboard.root) {
+      return t('pageTitle.dashboard');
+    }
+    return t('pageTitle.default');
+  }, [pathname, t]);
+
+  /**
+   * Compute the action button label based on the current pathname
+   */
+  const buttonLabel = React.useMemo(() => {
+    if (
+      pathname === ROUTES.dashboard.managedListings ||
+      pathname.startsWith(ROUTES.dashboard.managedListings)
+    ) {
+      return t('actionButton.createListing');
+    }
+    return t('actionButton.addProperty');
+  }, [pathname, t]);
+
+  /**
+   * Determine if a menu item is active based on the current pathname
+   * Matches exact path or checks if pathname starts with the href for nested routes
+   */
+  const isItemActive = (href: string) => {
+    // Exact match
+    if (pathname === href) return true;
+
+    // For dashboard root, only match exact path
+    if (href === ROUTES.dashboard.root) {
+      return pathname === ROUTES.dashboard.root;
+    }
+
+    // For other routes, match if pathname starts with href
+    // This handles nested routes like /dashboard/listings
+    return pathname.startsWith(href);
+  };
 
   // Keyboard shortcut: Cmd/Ctrl + B to toggle sidebar
   React.useEffect(() => {
@@ -85,6 +144,7 @@ export function DashboardLayout({
 
   return (
     <div className={cn('flex min-h-screen w-full', className)}>
+      <ChatWindowRenderer />
       {/* Sidebar */}
       <aside
         className={cn(
@@ -147,24 +207,27 @@ export function DashboardLayout({
 
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3'>
-          {/* TODO: Implement mapping to determine active state based on current route/screen name */}
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
-                item.isActive
-                  ? 'bg-purple-96 text-main-primary'
-                  : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
-                isCollapsed ? 'justify-center' : 'justify-start'
-              )}
-              title={isCollapsed ? item.label : undefined}
-            >
-              <item.icon className='h-5 w-5 shrink-0' strokeWidth={2} />
-              {!isCollapsed && <span className='text-sm font-medium'>{item.label}</span>}
-            </Link>
-          ))}
+          {sidebarItems.map((item) => {
+            const isActive = isItemActive(item.href);
+
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
+                  isActive
+                    ? 'bg-purple-96 text-main-primary'
+                    : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                  isCollapsed ? 'justify-center' : 'justify-start'
+                )}
+                title={isCollapsed ? item.label : undefined}
+              >
+                <item.icon className='h-5 w-5 shrink-0' strokeWidth={2} />
+                {!isCollapsed && <span className='text-sm font-medium'>{item.label}</span>}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Footer */}
@@ -202,27 +265,25 @@ export function DashboardLayout({
         {/* Top Nav */}
         <header className='flex items-center justify-between bg-white px-10 py-4'>
           {/* Left Section */}
-          <div className='flex flex-col'>
-            {headerTitle ? (
-              <>
-                <h1 className='text-3xl font-bold leading-tight text-main-black'>
-                  {headerTitle}
-                </h1>
-                {headerSubtitle && (
-                  <p className='text-sm text-main-secondary/60 mt-0.5'>
-                    {headerSubtitle}
-                  </p>
-                )}
-              </>
-            ) : (
-              <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
-                Estatery
-              </span>
-            )}
+          <div className='flex items-center gap-4'>
+            {/* Logo Text */}
+            <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
+              {pageTitle}
+            </span>
           </div>
 
           {/* Right Actions */}
           <div className='flex items-center gap-6'>
+            {/* Add Property Button */}
+            <button
+              type='button'
+              className='flex items-center gap-2 rounded-lg bg-main-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-main-primary/90'
+              aria-label={buttonLabel}
+            >
+              <Plus className='h-4 w-4' strokeWidth={2} />
+              <span>{buttonLabel}</span>
+            </button>
+
             {/* Notification Button */}
             <button
               type='button'

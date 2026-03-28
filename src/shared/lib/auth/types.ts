@@ -18,6 +18,7 @@ declare module 'next-auth' {
     accessToken?: string;
     role?: 'user' | 'owner' | 'admin' | 'moderator';
     avatar?: string;
+    backendRoles?: string[];
   }
 
   /**
@@ -30,6 +31,7 @@ declare module 'next-auth' {
       role?: 'user' | 'owner' | 'admin' | 'moderator';
       avatar?: string;
       accessToken?: string;
+      backendRoles?: string[];
     } & DefaultSession['user'];
   }
 }
