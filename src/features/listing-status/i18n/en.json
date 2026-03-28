@@ -1,0 +1,22 @@
+{
+  "ListingStatus": {
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending Review",
+      "published": "Published",
+      "sold": "Sold",
+      "rented": "Rented",
+      "archived": "Archived"
+    },
+    "actions": {
+      "submitForReview": "Submit for Review",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "markAsSold": "Mark as Sold",
+      "markAsRented": "Mark as Rented"
+    },
+    "tooltips": {
+      "notAvailable": "Not available for current status"
+    }
+  }
+}

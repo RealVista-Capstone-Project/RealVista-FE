@@ -18,6 +18,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       // Feature segments
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
       ...(await import(`@/features/auth/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/listing-status/i18n/${locale}.json`)).default,
       ...(await import(`@/features/price-and-tour/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-about/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-gallery/i18n/${locale}.json`)).default,
@@ -26,8 +27,10 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/rental-features/i18n/${locale}.json`)).default,
       // Screen segments
       ...(await import(`@/screens/favorited/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/dashboard/managed-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/listing-analytics/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-search/i18n/${locale}.json`)).default,
       // Widget segments
       ...(await import(`@/widgets/recommended-listings/i18n/${locale}.json`)).default,

@@ -77,12 +77,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // If user ONLY has ADMIN or AGENT → dashboard layout ('admin' or 'moderator')
           const mappedRole = determineUserRole(roles);
 
-          // Return user object with accessToken and role
+          // Return user object with accessToken, role, and backend roles
           return {
             id: user_id.toString(),
             email: userEmail,
             accessToken: access_token,
             role: mappedRole,
+            backendRoles: roles, // Store original backend roles for granular access control
           };
         } catch (error) {
           console.error('[NextAuth] Login error:', error);
@@ -137,6 +138,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         // Store accessToken for use in HTTP client
         token.accessToken = user.accessToken;
+        // Store backend roles for granular access control
+        token.backendRoles = (user as any).backendRoles;
       }
       return token;
     },
@@ -149,6 +152,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as 'user' | 'admin' | 'moderator' | undefined;
         session.user.accessToken = token.accessToken as string | undefined;
+        (session.user as any).backendRoles = token.backendRoles as string[] | undefined;
       }
       return session;
     },

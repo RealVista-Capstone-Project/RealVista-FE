@@ -1,4 +1,18 @@
 {
+  "DashboardLayout": {
+    "pageTitle": {
+      "default": "RealVista",
+      "dashboard": "Dashboard",
+      "insight": "Insight",
+      "managedListings": "Managed Listings",
+      "tenants": "Tenants",
+      "messages": "Messages"
+    },
+    "actionButton": {
+      "addProperty": "Add a property",
+      "createListing": "Create a listing"
+    }
+  },
   "Common": {
     "title": "Hello world common!",
     "about": "Go to the about page"
