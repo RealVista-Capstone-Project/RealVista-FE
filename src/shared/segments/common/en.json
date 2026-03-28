@@ -105,7 +105,10 @@
       "error": "Unable to analyze image. Please try another one.",
       "notAllowed": "This image is not allowed to proceed.",
       "feedbackLabel": "AI Feedback",
-      "scoreLabel": "Score"
+      "scoreLabel": "Score",
+      "contentVerification": "AI Content Verification",
+      "verified": "Verified ✅",
+      "violated": "Policy Violation"
     }
   },
   "Common": {

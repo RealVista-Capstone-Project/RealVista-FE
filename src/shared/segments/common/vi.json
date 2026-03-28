@@ -105,7 +105,10 @@
       "error": "Không thể phân tích hình ảnh. Vui lòng thử hình ảnh khác.",
       "notAllowed": "Hình ảnh này không được phép tiếp tục.",
       "feedbackLabel": "Phản hồi từ AI",
-      "scoreLabel": "Điểm số"
+      "scoreLabel": "Điểm số",
+      "contentVerification": "Xác thực nội dung bằng AI",
+      "verified": "Đã xác thực ✅",
+      "violated": "Vi phạm chính sách"
     }
   },
   "Common": {

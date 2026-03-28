@@ -8,7 +8,11 @@ import { useTranslations } from 'next-intl';
 import type { UserProperty, ListingType, CreateListingFormData } from '../model/types';
 import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
 import { Check, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
-import { aiAnalysisApi, type AIAnalysisResult } from '@/entities/ai/api/ai-analysis.api';
+import {
+  aiAnalysisApi,
+  type AIAnalysisResult,
+  type ListingVerificationResponse,
+} from '@/entities/ai/api/ai-analysis.api';
 
 interface ListingInformationStepProps {
   selectedProperty: UserProperty;
@@ -58,6 +62,11 @@ export function ListingInformationStep({
       error: string | null;
     }[]
   >([]);
+  const [contentStatus, setContentStatus] = React.useState<{
+    isLoading: boolean;
+    result: ListingVerificationResponse | null;
+    error: string | null;
+  }>({ isLoading: false, result: null, error: null });
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const QUALITY_THRESHOLD = 50;
@@ -145,6 +154,35 @@ export function ListingInformationStep({
     .filter(Boolean)
     .join(', ');
 
+  const verifyListingContent = React.useCallback(async () => {
+    if (!name.trim() && !content.trim()) return;
+    setContentStatus({ isLoading: true, result: null, error: null });
+    try {
+      const res = await aiAnalysisApi.verifyListing({
+        title: name || 'Trống',
+        description: content || 'Trống',
+      });
+      setContentStatus({ isLoading: false, result: res.payload, error: null });
+    } catch {
+      setContentStatus({ isLoading: false, result: null, error: 'Analysis failed' });
+    }
+  }, [name, content]);
+
+  React.useEffect(() => {
+    const isNameEmpty = name.trim().length === 0;
+    const isContentEmpty = content.trim().length === 0;
+
+    // Only check if at least name or content is populated
+    if (isNameEmpty && isContentEmpty) {
+      setContentStatus({ isLoading: false, result: null, error: null });
+      return;
+    }
+    const timer = setTimeout(() => {
+      verifyListingContent();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [name, content, verifyListingContent]);
+
   const numericFeatures =
     selectedProperty.attributes?.filter(
       (attr) => attr.valueNumber !== null || attr.valueText !== null
@@ -216,12 +254,15 @@ export function ListingInformationStep({
     (s) => s.result && (s.result.finalScore ?? 100) >= QUALITY_THRESHOLD
   );
 
+  const isContentValid = contentStatus.result?.isValid ?? false;
+
   const isValid =
     name.trim() !== '' &&
     price.trim() !== '' &&
     Object.keys(errors).length === 0 &&
     allImagesAnalyzed &&
-    allImagesPassed;
+    allImagesPassed &&
+    isContentValid; // Must be verified and valid
 
   return (
     <>
@@ -285,6 +326,45 @@ export function ListingInformationStep({
                 className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 transition-colors focus:border-main-primary focus:outline-none resize-none'
               />
             </div>
+
+            {/* Content Verification Status */}
+            {(name.trim() || content.trim()) && (
+              <div className='flex flex-col gap-2 rounded-lg border border-purple-92 bg-purple-98/30 p-4'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-sm font-semibold text-main-black'>
+                    {t('aiAnalysis.contentVerification')}
+                  </span>
+                  {contentStatus.isLoading && (
+                    <Loader2 className='h-4 w-4 animate-spin text-main-primary' />
+                  )}
+                  {!contentStatus.isLoading && contentStatus.result?.isValid && (
+                    <span className='flex items-center gap-1 text-xs font-semibold text-emerald-600'>
+                      <CheckCircle2 className='h-4 w-4' /> {t('aiAnalysis.verified')}
+                    </span>
+                  )}
+                  {!contentStatus.isLoading &&
+                    contentStatus.result &&
+                    !contentStatus.result.isValid && (
+                      <span className='flex items-center gap-1 text-xs font-semibold text-red-600'>
+                        <AlertCircle className='h-4 w-4' /> {t('aiAnalysis.violated')}
+                      </span>
+                    )}
+                </div>
+                {!contentStatus.isLoading && contentStatus.result && (
+                  <p
+                    className={cn(
+                      'text-xs',
+                      contentStatus.result.isValid
+                        ? 'text-main-secondary'
+                        : 'text-red-500 font-medium'
+                    )}
+                  >
+                    {contentStatus.result.feedback}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className='flex flex-col gap-2'>
               <span className='text-sm font-medium text-main-black'>
                 {t('listingTypeLabel')}
@@ -599,9 +679,26 @@ export function ListingInformationStep({
                           )}
                         >
                           {/* Thumbnail */}
-                          {(media.thumbnailUrl ?? media.mediaUrl) ? (
+                          {isVideo ? (
+                            media.thumbnailUrl ? (
+                              <Image
+                                src={media.thumbnailUrl}
+                                alt=''
+                                fill
+                                className='object-cover'
+                                sizes='(max-width: 640px) 50vw, 33vw'
+                              />
+                            ) : (
+                              <video
+                                src={media.mediaUrl}
+                                className='h-full w-full object-cover'
+                                muted
+                                playsInline
+                              />
+                            )
+                          ) : media.mediaUrl ? (
                             <Image
-                              src={media.thumbnailUrl ?? media.mediaUrl}
+                              src={media.mediaUrl}
                               alt=''
                               fill
                               className='object-cover'
