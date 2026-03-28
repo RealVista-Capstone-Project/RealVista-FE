@@ -1,5 +1,12 @@
 import http from '@/shared/lib/http';
-import type { Listing, ApiResponse, PriceHistory, SimilarListingsResponse, PageResponse, ManagedListingSummary } from '../model/types';
+import type {
+  Listing,
+  ApiResponse,
+  PriceHistory,
+  SimilarListingsResponse,
+  PageResponse,
+  ManagedListingSummary,
+} from '../model/types';
 import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/managed-listing';
 
 /**

@@ -1,11 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+
 import { X, Heart } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SharePopover } from '@/features/property-header/ui/share-popover';
+import { VisuallyHidden } from '@/shared/ui';
 
 export type MediaType = 'photos' | '3d-tour' | 'video';
 
@@ -54,13 +58,15 @@ export function MediaViewer({
   onFavorite,
   onRequestTour,
 }: MediaViewerProps) {
+  const t = useTranslations('PropertyGallery');
+
   const [activeTab, setActiveTab] = React.useState<MediaType>(defaultTab);
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
   const tabs: { id: MediaType; label: string }[] = [
-    { id: 'photos', label: 'Photos' },
-    { id: '3d-tour', label: '3D Tour' },
-    { id: 'video', label: 'Video' },
+    { id: 'photos', label: t('photosTab') },
+    { id: '3d-tour', label: t('tour3DTab') },
+    { id: 'video', label: t('videoTab') },
   ];
 
   const handlePrevious = () => {
@@ -89,6 +95,10 @@ export function MediaViewer({
           className='fixed left-0 right-0 top-0 bottom-0 z-50 flex flex-col bg-main-black/50'
           onKeyDown={handleKeyDown}
         >
+          <VisuallyHidden>
+            <DialogPrimitive.Title>{t('viewerTitle')}</DialogPrimitive.Title>
+          </VisuallyHidden>
+
           {/* Top Navigation */}
           <div className='relative h-24 px-6 flex items-center justify-between'>
             {/* Navigation Tabs */}
@@ -125,7 +135,7 @@ export function MediaViewer({
                 onClick={onRequestTour}
                 className='!bg-main-primary !border-main-primary !text-white hover:!bg-main-primary-hover'
               >
-                Request a tour
+                {t('requestTour')}
               </RealVistaButton>
 
               <RealVistaButton
@@ -134,7 +144,7 @@ export function MediaViewer({
                 className={cn('!border-transparent !bg-transparent !text-white')}
               >
                 <Heart className='size-4' />
-                Favorite
+                {t('favorite')}
               </RealVistaButton>
 
               <SharePopover
@@ -149,12 +159,17 @@ export function MediaViewer({
             {activeTab === 'photos' && images.length > 0 && (
               <>
                 {/* Image */}
-                <div className='absolute inset-0 flex items-center justify-center'>
-                  <img
-                    src={images[currentIndex]}
-                    alt={`Property photo ${currentIndex + 1}`}
-                    className='max-w-full max-h-full object-contain'
-                  />
+                <div className='absolute inset-0 flex items-center justify-center p-4 md:p-8'>
+                  <div className='relative w-full h-full'>
+                    <Image
+                      src={images[currentIndex]}
+                      alt={t('photoAlt', { index: currentIndex + 1 })}
+                      fill
+                      className='object-contain'
+                      priority
+                      sizes='100vw'
+                    />
+                  </div>
                 </div>
 
                 {/* Navigation Arrows */}
@@ -208,8 +223,8 @@ export function MediaViewer({
             {activeTab === '3d-tour' && (
               <div className='absolute inset-0 flex items-center justify-center text-white'>
                 <div className='text-center'>
-                  <p className='text-2xl font-bold mb-2'>3D Tour</p>
-                  <p className='text-white/60'>3D tour content will be displayed here</p>
+                  <p className='text-2xl font-bold mb-2'>{t('tour3DPlaceholder')}</p>
+                  <p className='text-white/60'>{t('tour3DPlaceholderDescription')}</p>
                 </div>
               </div>
             )}
@@ -217,8 +232,8 @@ export function MediaViewer({
             {activeTab === 'video' && (
               <div className='absolute inset-0 flex items-center justify-center text-white'>
                 <div className='text-center'>
-                  <p className='text-2xl font-bold mb-2'>Video Tour</p>
-                  <p className='text-white/60'>Video content will be displayed here</p>
+                  <p className='text-2xl font-bold mb-2'>{t('videoPlaceholder')}</p>
+                  <p className='text-white/60'>{t('videoPlaceholderDescription')}</p>
                 </div>
               </div>
             )}
@@ -227,9 +242,7 @@ export function MediaViewer({
           {/* Bottom Footer (Optional) */}
           <div className='border-t border-white/10 bg-white/5 backdrop-blur-sm'>
             <div className='px-6 py-4'>
-              <p className='text-white/60 text-sm text-center'>
-                Press ESC or click X to close • Use arrow keys to navigate
-              </p>
+              <p className='text-white/60 text-sm text-center'>{t('navigationHint')}</p>
             </div>
           </div>
         </MediaViewerContent>

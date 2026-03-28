@@ -51,6 +51,7 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
+    "preview": "Preview",
     "backToList": "Back to list",
     "agent": {
       "title": "Listing Agent",
@@ -69,7 +70,6 @@
       "tenants": "Tenants",
       "request": "Request",
       "notAvailable": "N/A"
-    },
-    "editListing": "Edit Listing"
+    }
   }
 }

@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Eye, Users, Calendar, TrendingUp } from 'lucide-react';
+import { Eye, Users, Calendar, TrendingUp, CircleHelp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui/tooltip';
 import { useListingAnalytics } from '../api/use-listing-analytics';
 
 interface ListingMetricsCardProps {
@@ -68,6 +69,7 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
           icon={<TrendingUp className='h-6 w-6' strokeWidth={2} />}
           label={t('metrics.conversionRate')}
           value={`${analytics.conversion_rate}%`}
+          tooltip={t('metrics.conversionRateTooltip')}
         />
       </div>
     </div>
@@ -78,12 +80,25 @@ interface MetricItemProps {
   icon: React.ReactNode;
   label: string;
   value: string;
+  tooltip?: string;
 }
 
-function MetricItem({ icon, label, value }: MetricItemProps) {
+function MetricItem({ icon, label, value, tooltip }: MetricItemProps) {
   return (
     <div className='flex flex-col gap-4'>
-      <p className='text-base font-medium leading-[1.5] text-grey-500'>{label}</p>
+      <div className='flex items-center gap-1.5'>
+        <p className='text-base font-medium leading-[1.5] text-grey-500'>{label}</p>
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleHelp className='h-4 w-4 cursor-help text-grey-500/60 transition-colors hover:text-grey-500' />
+            </TooltipTrigger>
+            <TooltipContent side='top' align='start'>
+              {tooltip}
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       <div className='flex items-center gap-2'>
         <div className='text-main-black/50'>{icon}</div>
         <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
