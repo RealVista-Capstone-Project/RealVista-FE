@@ -9,6 +9,11 @@
     "chipFindProperties": "Find properties near me",
     "chipAverageRent": "Average rent in District 1?",
     "chipCompareListings": "Compare listings",
-    "thinking": "Thinking..."
+    "thinking": "Thinking...",
+    "newChat": "New chat",
+    "retry": "Retry",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorUnauthorized": "Session expired. Please sign in again.",
+    "errorNetwork": "Connection lost. Check your internet and retry."
   }
 }

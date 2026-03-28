@@ -4,30 +4,34 @@ import * as React from 'react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import { X, Send } from 'lucide-react';
+import { X, Send, RotateCcw, AlertCircle } from 'lucide-react';
 import { AiChatMessageItem, TypingIndicator } from './ai-chat-message-item';
 import type { AiChatMessage } from './ai-chat-message-item';
 
 interface AiChatWindowProps {
   messages: AiChatMessage[];
   isTyping: boolean;
+  error?: string | null;
   onSendMessage: (content: string) => void;
   onClose: () => void;
   onQuickAction: (text: string) => void;
+  onNewChat?: () => void;
   className?: string;
 }
 
 /**
  * AiChatWindow - The main chat panel.
- * 380x520px, header with Sparkles branding, scrollable messages area,
+ * 380x520px, header with AI branding, scrollable messages area,
  * welcome state with quick-action chips, and an input bar.
  */
 export function AiChatWindow({
   messages,
   isTyping,
+  error,
   onSendMessage,
   onClose,
   onQuickAction,
+  onNewChat,
   className,
 }: AiChatWindowProps) {
   const t = useTranslations('AiAssistant');
@@ -40,7 +44,7 @@ export function AiChatWindow({
   // Auto-scroll to bottom when messages change
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [messages, isTyping, error]);
 
   // Focus input on mount
   React.useEffect(() => {
@@ -84,6 +88,17 @@ export function AiChatWindow({
           <h3 className='text-sm font-semibold text-white'>{t('title')}</h3>
           <p className='text-xs text-white/70'>{t('subtitle')}</p>
         </div>
+        {/* New chat button */}
+        {onNewChat && messages.length > 0 && (
+          <button
+            onClick={onNewChat}
+            className='flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
+            aria-label={t('newChat')}
+            title={t('newChat')}
+          >
+            <RotateCcw className='h-4 w-4' />
+          </button>
+        )}
         <button
           onClick={onClose}
           className='flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
@@ -107,6 +122,7 @@ export function AiChatWindow({
               <AiChatMessageItem key={msg.id} message={msg} />
             ))}
             {isTyping && <TypingIndicator />}
+            {error && <ErrorBanner message={error} />}
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -140,6 +156,17 @@ export function AiChatWindow({
           <Send className='h-4 w-4' />
         </button>
       </form>
+    </div>
+  );
+}
+
+/* ---------- Error banner sub-component ---------- */
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div className='flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2'>
+      <AlertCircle className='mt-0.5 h-4 w-4 shrink-0 text-red-500' />
+      <p className='text-xs leading-relaxed text-red-700'>{message}</p>
     </div>
   );
 }

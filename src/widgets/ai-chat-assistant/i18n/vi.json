@@ -9,6 +9,11 @@
     "chipFindProperties": "Tìm bất động sản gần tôi",
     "chipAverageRent": "Giá thuê trung bình Quận 1?",
     "chipCompareListings": "So sánh tin đăng",
-    "thinking": "Đang suy nghĩ..."
+    "thinking": "Đang suy nghĩ...",
+    "newChat": "Cuộc trò chuyện mới",
+    "retry": "Thử lại",
+    "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "errorUnauthorized": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
+    "errorNetwork": "Mất kết nối. Kiểm tra mạng và thử lại."
   }
 }
