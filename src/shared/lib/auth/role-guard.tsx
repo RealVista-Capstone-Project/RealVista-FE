@@ -57,12 +57,21 @@ export function RoleGuard({
   const router = useRouter();
 
   const userRole = session?.user?.role;
-  const hasPermission = userRole
+  const backendRoles = session?.user?.backendRoles || [];
+
+  // Check frontend role hierarchy
+  const hasFrontendPermission = userRole
     ? allowedRoles.some((role) => hasRole(userRole, role))
     : false;
+
+  // Check backend roles directly (allows bypassing frontend role mapping)
+  const hasBackendPermission =
+    allowedBackendRoles?.some((role) => backendRoles.includes(role)) ?? false;
+
+  const isAuthorized = hasFrontendPermission || hasBackendPermission;
   const isLoading = status === 'loading';
   const isUnauthenticated = status !== 'loading' && !session?.user;
-  const shouldRedirect = !isLoading && (isUnauthenticated || !hasPermission) && !!redirectPath;
+  const shouldRedirect = !isLoading && (isUnauthenticated || !isAuthorized) && !!redirectPath;
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -79,30 +88,16 @@ export function RoleGuard({
     );
   }
 
-  // No session or no permission
-  if (isUnauthenticated || !hasPermission) {
-  // No session - should be protected by auth middleware
-  if (!session?.user) {
+  // Unauthenticated
+  if (isUnauthenticated) {
     if (redirectPath) {
-      router.push(redirectPath);
       return null;
     }
     return <>{fallback}</>;
   }
 
-  const userRole = session.user.role;
-  const backendRoles = session.user.backendRoles || [];
-
-  // Check if user has any of the allowed roles (frontend role hierarchy)
-  const hasPermission = allowedRoles.some((role) => hasRole(userRole, role));
-
-  // Check if user has any of the allowed backend roles (direct backend role check)
-  const hasBackendPermission = allowedBackendRoles?.some((role) =>
-    backendRoles.includes(role)
-  );
-
-  if (!hasPermission && !hasBackendPermission) {
-    // Redirect or show fallback
+  // Authenticated but not authorized
+  if (!isAuthorized) {
     if (redirectPath) {
       // Show spinner while redirect is happening via useEffect
       return (
@@ -114,6 +109,6 @@ export function RoleGuard({
     return <>{fallback}</>;
   }
 
-  // User has required role
+  // Authorized - render children
   return <>{children}</>;
 }
