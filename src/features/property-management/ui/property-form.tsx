@@ -8,17 +8,22 @@ import { useRouter } from '@/shared/config/i18n/navigation';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/ui/button';
-import { createPropertyFormSchema, PropertyFormValues } from '../model/property-form.schema';
+import { createPropertyFormSchema, PropertyFormValues, UploadedMediaItem } from '../model/property-form.schema';
 import { PropertyInfoStep } from './property-info-step';
 import { PropertyMediaStep } from './property-media-step';
+import { PropertySearchStep } from './property-search-step';
 import { useCreateProperty } from '@/entities/property/api/use-create-property';
 import { useUpdateProperty } from '@/entities/property/api/use-update-property';
+import { propertyApi } from '@/entities/property/api/property.api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthSession } from '@/features/auth/model/use-auth-session';
 import type {
   CreatePropertyRequest,
   PropertyMediaRequest,
   PropertyAttributeRequest,
 } from '@/entities/property/api/property-api.types';
 import { PropertyAttribute, ATTRIBUTE_TYPES } from '@/shared/config/property-types';
+import { AgentVerificationModal } from './components/agent-verification-modal';
 
 interface PropertyFormProps {
   initialData?: Partial<PropertyFormValues>;
@@ -29,18 +34,32 @@ interface PropertyFormProps {
 export function PropertyForm({ initialData, propertyId, isEditMode = false }: PropertyFormProps) {
   const t = useTranslations('PropertyManagement');
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: session } = useAuthSession();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null);
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
+  const assignAgent = useMutation({
+    mutationFn: (id: string) => propertyApi.assignAgent(id),
+  });
 
-  const isPending = createProperty.isPending || updateProperty.isPending;
+  const isPending = createProperty.isPending || updateProperty.isPending || assignAgent.isPending;
 
   const schema = useMemo(() => createPropertyFormSchema(t), [t]);
 
   const methods = useForm<PropertyFormValues>({
     resolver: zodResolver(schema),
     defaultValues: initialData || {
+      role: {
+        role: 'OWNER',
+        ownerEmail: '',
+        ownerId: '',
+        ownerName: '',
+        ownerMaskedPhone: '',
+      },
       info: {
         city: '',
         district: '',
@@ -59,22 +78,40 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         videoUrl: '',
         tour3dUrl: '',
       },
+      isExistingProperty: false,
+      selectedPropertyId: null,
     },
     mode: 'onTouched',
   });
 
   const { handleSubmit, trigger } = methods;
 
-  const STEPS = [
-    { id: 0, component: <PropertyInfoStep /> },
-    { id: 1, component: <PropertyMediaStep /> },
-  ];
+  const ALL_STEPS = useMemo(
+    () => [
+      { id: 'role', component: <PropertySearchStep />, label: t('tabRole') },
+      { id: 'info', component: <PropertyInfoStep />, label: t('tabInfo') },
+      { id: 'media', component: <PropertyMediaStep />, label: t('tabMedia') },
+    ],
+    [t]
+  );
+
+  const isExistingProp = methods.watch('isExistingProperty');
+
+  const STEPS = useMemo(() => {
+    if (isEditMode) {
+      return ALL_STEPS.filter((step) => step.id !== 'role');
+    }
+    if (isExistingProp) {
+      return ALL_STEPS.filter((step) => step.id === 'role');
+    }
+    return ALL_STEPS;
+  }, [isEditMode, ALL_STEPS, isExistingProp]);
 
   const transformToRequest = (data: PropertyFormValues): CreatePropertyRequest => {
     const mediaItems: PropertyMediaRequest[] = [];
 
     if (data.media.images && data.media.images.length > 0) {
-      data.media.images.forEach((item) => {
+      data.media.images.forEach((item: UploadedMediaItem) => {
         mediaItems.push({
           url: item.url,
           type: item.type,
@@ -97,11 +134,11 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     }
 
     return {
-      location_id: data.info.ward,
-      property_type_id: data.info.propertyType,
-      street_address: data.info.streetAddress,
-      latitude: data.info.location.lat,
-      longitude: data.info.location.lng,
+      location_id: data.info.ward!,
+      property_type_id: data.info.propertyType!,
+      street_address: data.info.streetAddress!,
+      latitude: data.info.location!.lat,
+      longitude: data.info.location!.lng,
       land_size_m2: data.info.landSize || undefined,
       usable_size_m2: data.info.usableSize || undefined,
       length_m: data.info.length || undefined,
@@ -116,12 +153,13 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         } as PropertyAttributeRequest;
       }),
       media: mediaItems.length > 0 ? mediaItems : undefined,
+      owner_id: data.role.role === 'AGENT' ? data.role.ownerId : undefined,
     };
   };
 
   const handleNext = async () => {
-    const fieldsToValidate = currentStep === 0 ? 'info' : 'media';
-    const isStepValid = await trigger(fieldsToValidate as 'info' | 'media');
+    const stepId = STEPS[currentStep].id as 'role' | 'info' | 'media';
+    const isStepValid = await trigger(stepId);
 
     if (isStepValid) {
       setCurrentStep((prev) => prev + 1);
@@ -137,9 +175,10 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   };
 
   const onSubmit = (data: PropertyFormValues) => {
-    const request = transformToRequest(data);
+    console.log('Form Submit Data:', data);
 
     if (isEditMode && propertyId) {
+      const request = transformToRequest(data);
       updateProperty.mutate(
         { propertyId, request },
         {
@@ -152,11 +191,46 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
           },
         }
       );
-    } else {
-      createProperty.mutate(request, {
+    } else if (data.isExistingProperty && data.selectedPropertyId) {
+      assignAgent.mutate(data.selectedPropertyId, {
         onSuccess: () => {
           toast.success(t('createSuccess'));
-          router.push('/dashboard/property');
+          queryClient.invalidateQueries({ queryKey: ['my-properties'] });
+          const currentUserId = session?.user?.id;
+          const ownerId = data.role.ownerId;
+          const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
+
+          if (data.role.role === 'AGENT' && !isSelfOwned) {
+            setCreatedPropertyId(data.selectedPropertyId!);
+            setIsVerificationModalOpen(true);
+          } else {
+            router.push('/dashboard/property');
+          }
+        },
+        onError: () => {
+          toast.error(t('submitError'));
+        },
+      });
+    } else {
+      const request = transformToRequest(data);
+      createProperty.mutate(request, {
+        onSuccess: (response: { payload: { data: { property_id: string } } }) => {
+          toast.success(t('createSuccess'));
+          queryClient.invalidateQueries({ queryKey: ['my-properties'] });
+
+          const propId = response?.payload?.data?.property_id;
+          const role = data.role.role;
+          const ownerId = data.role.ownerId;
+          const currentUserId = session?.user?.id;
+
+          const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
+
+          if (role === 'AGENT' && propId && !isSelfOwned) {
+            setCreatedPropertyId(propId);
+            setIsVerificationModalOpen(true);
+          } else {
+            router.push('/dashboard/property');
+          }
         },
         onError: () => {
           toast.error(t('submitError'));
@@ -169,38 +243,43 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     <div className='max-w-4xl mx-auto py-8'>
       {/* Stepper Header */}
       <div className='flex items-center justify-center mb-8'>
-        <div className='flex items-center'>
-          <div
-            className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors ${currentStep >= 0 ? 'border-primary bg-primary text-white' : 'border-slate-300 text-slate-500'}`}
-          >
-            1
+        {STEPS.map((step, index) => (
+          <div key={step.id} className='flex items-center'>
+            <div className='flex items-center'>
+              <div
+                className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors ${
+                  currentStep >= index
+                    ? 'border-primary bg-primary text-white'
+                    : 'border-slate-300 text-slate-500'
+                }`}
+              >
+                {index + 1}
+              </div>
+              <div
+                className={`text-sm font-medium ml-3 transition-colors ${
+                  currentStep >= index ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400'
+                }`}
+              >
+                {step.label}
+              </div>
+            </div>
+            {index < STEPS.length - 1 && (
+              <div
+                className={`w-12 sm:w-16 h-1 mx-2 sm:mx-4 rounded-full transition-colors ${
+                  currentStep > index ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'
+                }`}
+              />
+            )}
           </div>
-          <div className='text-sm font-medium ml-3 text-slate-700 dark:text-slate-300'>
-            {t('tabInfo')}
-          </div>
-        </div>
-
-        <div
-          className={`w-24 h-1 mx-4 rounded-full transition-colors ${currentStep >= 1 ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}
-        />
-
-        <div className='flex items-center'>
-          <div
-            className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors ${currentStep >= 1 ? 'border-primary bg-primary text-white' : 'border-slate-300 text-slate-500'}`}
-          >
-            2
-          </div>
-          <div
-            className={`text-sm font-medium ml-3 transition-colors ${currentStep >= 1 ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400'}`}
-          >
-            {t('tabMedia')}
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className='bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-sm'>
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <form
+            onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation Errors:', errors))}
+            className='space-y-6'
+          >
             {STEPS[currentStep].component}
 
             <div className='pt-8 border-t flex justify-between items-center mt-10'>
@@ -237,6 +316,19 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
           </form>
         </FormProvider>
       </div>
+
+      {createdPropertyId && (
+        <AgentVerificationModal
+          isOpen={isVerificationModalOpen}
+          onClose={() => {
+            setIsVerificationModalOpen(false);
+            router.push('/dashboard/property');
+          }}
+          propertyId={createdPropertyId}
+          ownerName={methods.getValues('role.ownerName') ?? ''}
+          ownerPhone={methods.getValues('role.ownerPhone') ?? ''}
+        />
+      )}
     </div>
   );
 }
