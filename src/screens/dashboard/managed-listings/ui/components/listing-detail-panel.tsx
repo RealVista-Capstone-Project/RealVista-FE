@@ -127,10 +127,10 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               </p>
             </div>
 
-            <div className='flex flex-col items-center gap-2 sm:items-end'>
+            <div className='flex flex-col items-center gap-2 sm:shrink-0 sm:items-end'>
               <Link
                 href={`/listing/${listing.slug}`}
-                className='hidden sm:flex items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+                className='hidden whitespace-nowrap sm:flex items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
               >
                 <Eye className='h-4 w-4' strokeWidth={2} />
                 <span>{t('preview')}</span>
@@ -138,7 +138,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
               <button
                 type='button'
-                className='flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+                className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
               >
                 <Calendar className='h-4 w-4' strokeWidth={2} />
                 <span>{t('showCalendar')}</span>
