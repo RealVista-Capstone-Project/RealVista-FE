@@ -11,11 +11,12 @@ import {
   MessageCircle,
   TrendingUp,
   Users,
+  Building2,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { Link } from '@/shared/config/i18n/navigation';
+import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 
 export interface SidebarMenuItem {
@@ -44,12 +45,12 @@ const defaultSidebarItems: SidebarMenuItem[] = [
     label: 'Dashboard',
     href: ROUTES.dashboard.root,
     icon: LayoutDashboard,
-    isActive: true,
   },
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
   { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.listings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
+  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
 ];
 
 const defaultUser = {
@@ -65,6 +66,7 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const pathname = usePathname();
 
   // Keyboard shortcut: Cmd/Ctrl + B to toggle sidebar
   React.useEffect(() => {
@@ -143,24 +145,29 @@ export function DashboardLayout({
 
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3'>
-          {/* TODO: Implement mapping to determine active state based on current route/screen name */}
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
-                item.isActive
-                  ? 'bg-purple-96 text-main-primary'
-                  : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
-                isCollapsed ? 'justify-center' : 'justify-start'
-              )}
-              title={isCollapsed ? item.label : undefined}
-            >
-              <item.icon className='h-5 w-5 shrink-0' strokeWidth={2} />
-              {!isCollapsed && <span className='text-sm font-medium'>{item.label}</span>}
-            </Link>
-          ))}
+          {sidebarItems.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== ROUTES.dashboard.root && pathname.startsWith(item.href));
+
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
+                  isActive
+                    ? 'bg-purple-96 text-main-primary'
+                    : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                  isCollapsed ? 'justify-center' : 'justify-start'
+                )}
+                title={isCollapsed ? item.label : undefined}
+              >
+                <item.icon className='h-5 w-5 shrink-0' strokeWidth={2} />
+                {!isCollapsed && <span className='text-sm font-medium'>{item.label}</span>}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Footer */}

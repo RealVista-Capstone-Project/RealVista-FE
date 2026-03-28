@@ -19,6 +19,7 @@ export const ROUTES = {
     listings: '/dashboard/listings',
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
+    property: '/dashboard/property',
   },
   settings: '/settings',
 } as const;

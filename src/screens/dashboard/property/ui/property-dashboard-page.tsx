@@ -1,7 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Settings, Plus, Search, Edit, Eye, Home } from 'lucide-react';
+import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import Image from 'next/image';
 
 import { Button } from '@/shared/ui/button';
@@ -9,10 +10,20 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 import { useMyProperties } from '@/entities/property/api/use-my-properties';
+import { AgentVerificationModal } from '@/features/property-management/ui/components/agent-verification-modal';
+import type { PropertySummary } from '@/entities/property/api/property-api.types';
 
 export default function PropertyDashboardPage() {
   const t = useTranslations('PropertyManagement');
   const { data: properties, isLoading, isError } = useMyProperties();
+
+  const [selectedProperty, setSelectedProperty] = useState<PropertySummary | null>(null);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+
+  const handleVerifyClick = (property: PropertySummary) => {
+    setSelectedProperty(property);
+    setIsVerifyModalOpen(true);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -24,6 +35,10 @@ export default function PropertyDashboardPage() {
         return 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400';
       case 'RESERVED':
         return 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400';
+      case 'PENDING':
+        return 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400';
+      case 'VERIFIED':
+        return 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400';
       default:
         return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
     }
@@ -182,6 +197,17 @@ export default function PropertyDashboardPage() {
                           <Eye className='w-4 h-4' />
                           <span className='sr-only'>{t('viewAction', { default: 'View' })}</span>
                         </Button>
+                        {property.status === 'PENDING' && (
+                          <Button
+                            variant='default'
+                            size='sm'
+                            className='rounded-full h-8 px-3 text-xs gap-1 bg-primary'
+                            onClick={() => handleVerifyClick(property)}
+                          >
+                            <ShieldCheck className='w-3 h-3' />
+                            {t('verifyAction', { default: 'Verify' })}
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -190,6 +216,19 @@ export default function PropertyDashboardPage() {
             </table>
           </div>
         </div>
+      )}
+
+      {selectedProperty && (
+        <AgentVerificationModal
+          isOpen={isVerifyModalOpen}
+          onClose={() => {
+            setIsVerifyModalOpen(false);
+            setSelectedProperty(null);
+          }}
+          propertyId={selectedProperty.property_id}
+          ownerName={selectedProperty.owner_name || ''}
+          ownerPhone={selectedProperty.owner_phone || ''}
+        />
       )}
     </div>
   );
