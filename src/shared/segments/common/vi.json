@@ -73,6 +73,13 @@
       "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
     }
   },
+  "Notifications": {
+    "notifications": "Thông báo",
+    "new": "MỚI",
+    "noNotifications": "Chưa có thông báo nào",
+    "markAsRead": "Đánh dấu đã đọc",
+    "viewAll": "Xem tất cả thông báo"
+  },
   "Navigation": {
     "explore": "Khám phá",
     "rent": "Thuê nhà",
