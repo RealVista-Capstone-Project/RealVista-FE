@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { Calendar, Mail, Phone, Building2, BadgeCheck, ArrowLeft } from 'lucide-react';
+import { Calendar, Mail, Phone, Building2, BadgeCheck, ArrowLeft, Eye } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/shared/config/i18n/navigation';
 import { useRouter, useParams } from 'next/navigation';
 import { PropertyGallery } from '@/features/property-gallery';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
@@ -50,15 +51,16 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         conversationQueries.detailOrCreate(listing.agent.user_id)
       );
 
-      const convData = (response && typeof response === 'object' && 'data' in response
-        ? (response as Record<string, unknown>).data
-        : response) as Record<string, unknown>;
+      const convData = (
+        response && typeof response === 'object' && 'data' in response
+          ? (response as Record<string, unknown>).data
+          : response
+      ) as Record<string, unknown>;
 
       const payload = convData?.payload as Record<string, unknown> | undefined;
       const payloadData = payload?.data as Record<string, unknown> | undefined;
 
-      const conversationId = (payloadData?.conversation_id ??
-        convData?.conversation_id) as string;
+      const conversationId = (payloadData?.conversation_id ?? convData?.conversation_id) as string;
 
       if (conversationId) {
         if (isMobile) {
@@ -87,7 +89,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
       {/* Mobile Back Button */}
       {onBack && (
-        <div className='sticky top-0 z-20 flex items-center border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
+        <div className='sticky top-0 z-20 flex items-center justify-between border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
           <button
             onClick={onBack}
             className='flex items-center gap-2 text-sm font-semibold text-main-black'
@@ -95,6 +97,14 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             <ArrowLeft className='h-5 w-5' strokeWidth={2.5} />
             <span>{t('backToList')}</span>
           </button>
+
+          <Link
+            href={`/listing/${listing.slug}`}
+            className='flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-1.5 text-xs font-bold text-main-black transition-colors hover:bg-purple-98'
+          >
+            <Eye className='h-3.5 w-3.5' strokeWidth={2.5} />
+            <span>{t('preview')}</span>
+          </Link>
         </div>
       )}
 
@@ -105,11 +115,6 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
       {/* Content */}
       <div className='px-4 sm:px-12 py-6 sm:py-8'>
-        {/* Listing Analytics Metrics */}
-        <div className='mb-8'>
-          <ListingMetricsCard listingId={listing.listing_id} />
-        </div>
-
         {/* Header with Title, Status Actions, and Calendar Button */}
         <div className='mb-6 flex flex-col gap-4'>
           <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
@@ -122,13 +127,23 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               </p>
             </div>
 
-            <button
-              type='button'
-              className='flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
-            >
-              <Calendar className='h-4 w-4' strokeWidth={2} />
-              <span>{t('showCalendar')}</span>
-            </button>
+            <div className='flex flex-col items-center gap-2 sm:items-end'>
+              <Link
+                href={`/listing/${listing.slug}`}
+                className='hidden sm:flex items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+              >
+                <Eye className='h-4 w-4' strokeWidth={2} />
+                <span>{t('preview')}</span>
+              </Link>
+
+              <button
+                type='button'
+                className='flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+              >
+                <Calendar className='h-4 w-4' strokeWidth={2} />
+                <span>{t('showCalendar')}</span>
+              </button>
+            </div>
           </div>
 
           {/* Status Update Actions */}
@@ -137,6 +152,10 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             status={listing.status}
             listingType={listing.listing_type}
           />
+        </div>
+        {/* Listing Analytics Metrics */}
+        <div className='mb-8'>
+          <ListingMetricsCard listingId={listing.listing_id} />
         </div>
 
         {/* Agent Information Card - Show when listing is created by agent (not property owner) */}
@@ -261,7 +280,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         {/* Features Stats - Dynamic attributes from server */}
         <div className='mb-8 rounded-lg border border-purple-92 p-6'>
           {attributes.length > 0 ? (
-            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6'>
+            <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
               {attributes.map((attribute) => (
                 <div key={attribute.attribute_id} className='flex flex-col gap-4'>
                   <p className='text-base font-medium leading-[1.5] text-grey-500'>
@@ -282,7 +301,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             </div>
           ) : (
             // Fallback when no attributes are available
-            <div className='grid grid-cols-6 gap-6'>
+            <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
               <FeatureStat
                 label={t('features.properties')}
                 value={t('features.notAvailable')}
