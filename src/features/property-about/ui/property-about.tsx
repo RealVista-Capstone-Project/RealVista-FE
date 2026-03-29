@@ -1,6 +1,6 @@
 'use client';
 
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, Phone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
@@ -191,7 +191,18 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
                 </p>
               </div>
             </div>
-            <div className='flex gap-2'>
+            <div className='flex flex-wrap gap-2'>
+              {property.agent.phone && (
+                <RealVistaButton
+                  variant='secondary'
+                  size='small'
+                  className='border-main-primary text-main-primary hover:bg-main-primary/5'
+                  onClick={() => window.open(`tel:${property.agent.phone.replace(/\s+/g, '')}`, '_self')}
+                >
+                  <Phone className='size-4' />
+                  {t('call')}
+                </RealVistaButton>
+              )}
               <RealVistaButton variant='secondary' size='small'>
                 {t('askAQuestion')}
               </RealVistaButton>
