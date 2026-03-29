@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { cn } from '@/shared/lib/utils';
 
 export interface AiChatMessage {
@@ -17,8 +19,8 @@ interface AiChatMessageItemProps {
 
 /**
  * AiChatMessageItem - renders a single AI or user message bubble.
- * User messages: right-aligned purple bubble.
- * AI messages: left-aligned with small Sparkles avatar.
+ * User messages: right-aligned purple bubble (plain text).
+ * AI messages: left-aligned with avatar, rendered as markdown.
  */
 export function AiChatMessageItem({ message, className }: AiChatMessageItemProps) {
   const isUser = message.role === 'user';
@@ -57,7 +59,25 @@ export function AiChatMessageItem({ message, className }: AiChatMessageItemProps
               : 'rounded-bl-md bg-grey-100 text-main-black'
           )}
         >
-          {message.content}
+          {isUser ? (
+            message.content
+          ) : (
+            <div className='prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:my-2 prose-blockquote:my-1 prose-hr:my-2 prose-table:my-2 prose-a:text-main-primary prose-a:underline prose-code:rounded prose-code:bg-grey-200 prose-code:px-1 prose-code:py-0.5 prose-code:text-xs prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-lg prose-pre:bg-grey-200'>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  // Open links in a new tab
+                  a: ({ children, ...props }) => (
+                    <a {...props} target='_blank' rel='noopener noreferrer'>
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
 
         {/* Timestamp */}

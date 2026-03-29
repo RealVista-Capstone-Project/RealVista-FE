@@ -4,13 +4,15 @@ import * as React from 'react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import { X, Send, RotateCcw, AlertCircle } from 'lucide-react';
+import { X, Send, RotateCcw, AlertCircle, Loader2 } from 'lucide-react';
 import { AiChatMessageItem, TypingIndicator } from './ai-chat-message-item';
 import type { AiChatMessage } from './ai-chat-message-item';
 
 interface AiChatWindowProps {
   messages: AiChatMessage[];
   isTyping: boolean;
+  isLoadingHistory?: boolean;
+  isClearing?: boolean;
   error?: string | null;
   onSendMessage: (content: string) => void;
   onClose: () => void;
@@ -27,6 +29,8 @@ interface AiChatWindowProps {
 export function AiChatWindow({
   messages,
   isTyping,
+  isLoadingHistory,
+  isClearing,
   error,
   onSendMessage,
   onClose,
@@ -92,11 +96,19 @@ export function AiChatWindow({
         {onNewChat && messages.length > 0 && (
           <button
             onClick={onNewChat}
-            className='flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
+            disabled={isClearing}
+            className={cn(
+              'flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white',
+              isClearing && 'pointer-events-none opacity-50'
+            )}
             aria-label={t('newChat')}
             title={t('newChat')}
           >
-            <RotateCcw className='h-4 w-4' />
+            {isClearing ? (
+              <Loader2 className='h-4 w-4 animate-spin' />
+            ) : (
+              <RotateCcw className='h-4 w-4' />
+            )}
           </button>
         )}
         <button
@@ -110,7 +122,9 @@ export function AiChatWindow({
 
       {/* Messages area */}
       <div className='flex-1 overflow-y-auto px-4 py-3'>
-        {showWelcome ? (
+        {isLoadingHistory ? (
+          <LoadingState message={t('loadingHistory')} />
+        ) : showWelcome ? (
           <WelcomeState
             welcomeMessage={t('welcomeMessage')}
             quickActions={quickActions}
@@ -156,6 +170,17 @@ export function AiChatWindow({
           <Send className='h-4 w-4' />
         </button>
       </form>
+    </div>
+  );
+}
+
+/* ---------- Loading state sub-component ---------- */
+
+function LoadingState({ message }: { message: string }) {
+  return (
+    <div className='flex h-full flex-col items-center justify-center gap-3'>
+      <Loader2 className='h-6 w-6 animate-spin text-main-primary' />
+      <p className='text-sm text-grey-500'>{message}</p>
     </div>
   );
 }

@@ -14,6 +14,7 @@
     "retry": "Thử lại",
     "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "errorUnauthorized": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
-    "errorNetwork": "Mất kết nối. Kiểm tra mạng và thử lại."
+    "errorNetwork": "Mất kết nối. Kiểm tra mạng và thử lại.",
+    "loadingHistory": "Đang tải tin nhắn..."
   }
 }

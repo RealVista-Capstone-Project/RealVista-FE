@@ -4,17 +4,25 @@ import { getAuthTokenSync } from '@/shared/lib/auth/get-auth-token';
 /**
  * Shape of each parsed SSE data chunk from the AI backend.
  *
- * The backend streams `data: {...}` lines. Each parsed object may contain:
- * - `content`   — a text token to append to the assistant's message
- * - `thread_id` — conversation thread ID for continuity
- * - `done`      — signals the stream is complete
- * - `error`     — an error message from the AI service
+ * The backend streams `data: {...}` lines with typed events:
+ *
+ * Start event:  `{"type":"start","conversationId":"uuid","threadId":"uuid"}`
+ * Token event:  `{"token":"Hello"}`  (no `type` field)
+ * Done event:   `{"type":"done","fullResponse":"Hello world..."}`
+ * Error event:  `{"type":"error","message":"Something went wrong"}`
  */
 export interface SseDataChunk {
+  type?: 'start' | 'done' | 'error';
+  /** Start event — conversation ID */
+  conversationId?: string;
+  /** Start event — thread ID */
+  threadId?: string;
+  /** Token event — text token to append */
   content?: string;
-  thread_id?: string;
-  done?: boolean;
-  error?: string;
+  /** Done event — full accumulated response */
+  fullResponse?: string;
+  /** Error event — error message */
+  message?: string;
 }
 
 export interface SseFetchOptions {
@@ -117,8 +125,8 @@ export async function sseFetch({ url, body, signal, onData, onDone, onError }: S
           const chunk: SseDataChunk = JSON.parse(jsonStr);
 
           // Backend error event
-          if (chunk.error) {
-            onError(chunk.error);
+          if (chunk.type === 'error') {
+            onError(chunk.message ?? 'Unknown error from AI service.');
             reader.cancel();
             return;
           }
@@ -126,7 +134,7 @@ export async function sseFetch({ url, body, signal, onData, onDone, onError }: S
           onData(chunk);
 
           // Backend signals completion
-          if (chunk.done) {
+          if (chunk.type === 'done') {
             onDone();
             reader.cancel();
             return;

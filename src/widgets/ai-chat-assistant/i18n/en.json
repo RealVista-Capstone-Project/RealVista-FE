@@ -14,6 +14,7 @@
     "retry": "Retry",
     "errorGeneric": "Something went wrong. Please try again.",
     "errorUnauthorized": "Session expired. Please sign in again.",
-    "errorNetwork": "Connection lost. Check your internet and retry."
+    "errorNetwork": "Connection lost. Check your internet and retry.",
+    "loadingHistory": "Loading messages..."
   }
 }
