@@ -96,7 +96,8 @@
       "minPriceInvalid": "Min price must be a valid number greater than 0",
       "maxPriceRequired": "Max price is required",
       "maxPriceInvalid": "Max price must be a valid number greater than 0",
-      "dateInvalid": "Please enter a valid date"
+      "dateInvalid": "Please enter a valid date",
+      "mediaRequired": "At least one media item is required to create a listing"
     },
     "aiAnalysis": {
       "analyzing": "AI is analyzing image quality...",

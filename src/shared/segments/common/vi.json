@@ -96,7 +96,8 @@
       "minPriceInvalid": "Giá thấp nhất phải là một số hợp lệ lớn hơn 0",
       "maxPriceRequired": "Giá cao nhất là bắt buộc",
       "maxPriceInvalid": "Giá cao nhất phải là một số hợp lệ lớn hơn 0",
-      "dateInvalid": "Vui lòng nhập ngày hợp lệ"
+      "dateInvalid": "Vui lòng nhập ngày hợp lệ",
+      "mediaRequired": "Cần ít nhất một ảnh hoặc video để tạo bài đăng"
     },
     "aiAnalysis": {
       "analyzing": "AI đang phân tích chất lượng hình ảnh...",
