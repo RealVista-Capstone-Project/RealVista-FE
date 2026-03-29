@@ -55,7 +55,9 @@ export function ListingInformationStep({
       null
   );
   const [newFiles, setNewFiles] = React.useState<File[]>([]);
-  const [selectedNewFileIndices, setSelectedNewFileIndices] = React.useState<Set<number>>(new Set());
+  const [selectedNewFileIndices, setSelectedNewFileIndices] = React.useState<Set<number>>(
+    new Set()
+  );
   const [analysisStatus, setAnalysisStatus] = React.useState<
     {
       result: AIAnalysisResult | null;
@@ -79,7 +81,11 @@ export function ListingInformationStep({
       setAnalysisStatus((prev) => {
         const next = [...prev];
         next[index] = {
-          result: { finalScore: 100 } as any, // Dummy score so it passes validation
+          result: {
+            isValid: true,
+            feedback: 'Video file - verification skipped',
+            finalScore: 100,
+          } as unknown as AIAnalysisResult,
           isLoading: false,
           error: null,
         };

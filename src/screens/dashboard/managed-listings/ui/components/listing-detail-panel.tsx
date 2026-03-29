@@ -1,27 +1,25 @@
 'use client';
 
-import * as React from 'react';
-import Image from 'next/image';
-import { Calendar, Mail, Phone, Building2, BadgeCheck, ArrowLeft, Eye } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useRouter, useParams } from 'next/navigation';
-import { PropertyGallery } from '@/features/property-gallery';
-import { AttributeIcon } from '@/shared/ui/attribute-icon';
-import { RentalFeatures } from '@/features/rental-features';
-import { ListingMetricsCard } from '@/features/listing-analytics';
-import { ListingStatusActions } from '@/features/listing-status';
-import type { Property } from '@/entities/property';
+import { useChatWindowStore } from '@/entities/contact';
+import { conversationQueries } from '@/entities/conversation';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
-import { useQueryClient } from '@tanstack/react-query';
-import { useChatWindowStore } from '@/entities/contact';
-import { useAuthSession } from '@/features/auth/model';
-import { isAuthenticated } from '@/features/auth/model';
-import { conversationQueries } from '@/entities/conversation';
-import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import type { Property } from '@/entities/property';
+import { isAuthenticated, useAuthSession } from '@/features/auth/model';
 import { EditListingModal } from '@/features/edit-listing-modal';
-import { Pencil } from 'lucide-react';
+import { ListingMetricsCard } from '@/features/listing-analytics';
+import { ListingStatusActions } from '@/features/listing-status';
+import { PropertyGallery } from '@/features/property-gallery';
+import { RentalFeatures } from '@/features/rental-features';
 import { Link } from '@/shared/config/i18n/navigation';
+import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { AttributeIcon } from '@/shared/ui/attribute-icon';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, BadgeCheck, Building2, Calendar, Eye, Mail, Phone } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import * as React from 'react';
 
 interface ListingDetailPanelProps {
   listing: Listing;

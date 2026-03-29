@@ -80,4 +80,7 @@ export interface ManagedListing {
   // Preview image
   thumbnail?: string;
   primary_media_thumbnail_url?: string;
+  total_photos?: number;
+  total_videos?: number;
+  total_3d_tours?: number;
 }
