@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAuthSession } from '@/features/auth/model';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import type { UserRole, BackendRole } from './rbac';
@@ -55,8 +56,31 @@ export function RoleGuard({
   const { data: session, status } = useAuthSession();
   const router = useRouter();
 
+  const userRole = session?.user?.role;
+  const backendRoles = session?.user?.backendRoles || [];
+
+  // Check frontend role hierarchy
+  const hasFrontendPermission = userRole
+    ? allowedRoles.some((role) => hasRole(userRole, role))
+    : false;
+
+  // Check backend roles directly (allows bypassing frontend role mapping)
+  const hasBackendPermission =
+    allowedBackendRoles?.some((role) => backendRoles.includes(role)) ?? false;
+
+  const isAuthorized = hasFrontendPermission || hasBackendPermission;
+  const isLoading = status === 'loading';
+  const isUnauthenticated = status !== 'loading' && !session?.user;
+  const shouldRedirect = !isLoading && (isUnauthenticated || !isAuthorized) && !!redirectPath;
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push(redirectPath!);
+    }
+  }, [shouldRedirect, redirectPath, router]);
+
   // Loading state
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
@@ -64,35 +88,27 @@ export function RoleGuard({
     );
   }
 
-  // No session - should be protected by auth middleware
-  if (!session?.user) {
+  // Unauthenticated
+  if (isUnauthenticated) {
     if (redirectPath) {
-      router.push(redirectPath);
       return null;
     }
     return <>{fallback}</>;
   }
 
-  const userRole = session.user.role;
-  const backendRoles = session.user.backendRoles || [];
-
-  // Check if user has any of the allowed roles (frontend role hierarchy)
-  const hasPermission = allowedRoles.some((role) => hasRole(userRole, role));
-
-  // Check if user has any of the allowed backend roles (direct backend role check)
-  const hasBackendPermission = allowedBackendRoles?.some((role) =>
-    backendRoles.includes(role)
-  );
-
-  if (!hasPermission && !hasBackendPermission) {
-    // Redirect or show fallback
+  // Authenticated but not authorized
+  if (!isAuthorized) {
     if (redirectPath) {
-      router.push(redirectPath);
-      return null;
+      // Show spinner while redirect is happening via useEffect
+      return (
+        <div className='flex min-h-screen items-center justify-center'>
+          <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
+        </div>
+      );
     }
     return <>{fallback}</>;
   }
 
-  // User has required role
+  // Authorized - render children
   return <>{children}</>;
 }

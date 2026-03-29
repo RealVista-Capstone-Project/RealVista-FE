@@ -5,13 +5,14 @@
  * to frontend role hierarchy for access control.
  *
  * Role hierarchy:
- * - ADMIN -> admin (level 3)
- * - AGENT, VERIFIER -> moderator (level 2)
- * - BUYER, OWNER, TENANT -> user (level 1)
+ * - ADMIN -> admin (level 4)
+ * - AGENT, VERIFIER -> moderator (level 3)
+ * - OWNER -> owner (level 2)
+ * - BUYER, TENANT -> user (level 1)
  */
 
 export type BackendRole = 'ADMIN' | 'AGENT' | 'VERIFIER' | 'BUYER' | 'OWNER' | 'TENANT';
-export type UserRole = 'user' | 'moderator' | 'admin';
+export type UserRole = 'user' | 'owner' | 'moderator' | 'admin';
 
 /**
  * Map backend roles from authentication response to frontend roles
@@ -21,7 +22,7 @@ export const BACKEND_ROLE_MAP: Record<BackendRole, UserRole> = {
   AGENT: 'moderator',
   VERIFIER: 'moderator',
   BUYER: 'user',
-  OWNER: 'user',
+  OWNER: 'owner',
   TENANT: 'user',
 };
 
@@ -31,8 +32,9 @@ export const BACKEND_ROLE_MAP: Record<BackendRole, UserRole> = {
  */
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   user: 1,
-  moderator: 2,
-  admin: 3,
+  owner: 2,
+  moderator: 3,
+  admin: 4,
 };
 
 /**
@@ -45,6 +47,7 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
  * ```ts
  * mapBackendRole('ADMIN') // 'admin'
  * mapBackendRole('BUYER') // 'user'
+ * mapBackendRole('OWNER') // 'owner'
  * mapBackendRole('AGENT') // 'moderator'
  * mapBackendRole(undefined) // undefined
  * ```
@@ -65,10 +68,11 @@ export function mapBackendRole(backendRole: string | undefined): UserRole | unde
  * Determine primary user role from multiple backend roles
  *
  * Priority logic:
- * 1. If user has ANY of [BUYER, TENANT, OWNER] → 'user' (public layout)
- * 2. Else if user has ADMIN → 'admin' (dashboard layout)
- * 3. Else if user has [AGENT, VERIFIER] → 'moderator' (dashboard layout)
- * 4. Else → 'user' (fallback)
+ * 1. If user has OWNER → 'owner' (manage-agent layout)
+ * 2. If user has ANY of [BUYER, TENANT] → 'user' (public layout)
+ * 3. Else if user has ADMIN → 'admin' (dashboard layout)
+ * 4. Else if user has [AGENT, VERIFIER] → 'moderator' (dashboard layout)
+ * 5. Else → 'user' (fallback)
  *
  * @param backendRoles - Array of roles from authentication response
  * @returns Primary frontend role for routing
@@ -76,7 +80,7 @@ export function mapBackendRole(backendRole: string | undefined): UserRole | unde
  * @example
  * ```ts
  * determineUserRole(['BUYER', 'TENANT']) // 'user'
- * determineUserRole(['BUYER', 'TENANT', 'OWNER']) // 'user'
+ * determineUserRole(['OWNER']) // 'owner'
  * determineUserRole(['ADMIN']) // 'admin'
  * determineUserRole(['AGENT']) // 'moderator'
  * determineUserRole([]) // 'user'
@@ -87,8 +91,13 @@ export function determineUserRole(backendRoles: string[] | undefined): UserRole 
     return 'user'; // Default fallback
   }
 
+  // Owner role - gets dedicated manage-agent layout
+  if (backendRoles.includes('OWNER')) {
+    return 'owner';
+  }
+
   // Public roles - if user has ANY of these, they use public layout
-  const publicRoles: BackendRole[] = ['BUYER', 'TENANT', 'OWNER'];
+  const publicRoles: BackendRole[] = ['BUYER', 'TENANT'];
   const hasPublicRole = backendRoles.some((role) => publicRoles.includes(role as BackendRole));
 
   if (hasPublicRole) {
@@ -148,4 +157,31 @@ export function canAccessRoute(
 ): boolean {
   if (!requiredRole) return true; // No role requirement
   return hasRole(userRole, requiredRole);
+}
+
+/**
+ * Get the default redirect path after login based on user role
+ *
+ * @param role - The user's frontend role
+ * @returns The path to redirect to after login
+ *
+ * @example
+ * ```ts
+ * getRedirectPathByRole('user') // '/buy'
+ * getRedirectPathByRole('owner') // '/manage-agent'
+ * getRedirectPathByRole('admin') // '/dashboard'
+ * getRedirectPathByRole('moderator') // '/dashboard'
+ * ```
+ */
+export function getRedirectPathByRole(role: UserRole | undefined): string {
+  switch (role) {
+    case 'owner':
+      return '/manage-agent';
+    case 'admin':
+    case 'moderator':
+      return '/dashboard';
+    case 'user':
+    default:
+      return '/buy';
+  }
 }

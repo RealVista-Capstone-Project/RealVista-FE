@@ -38,6 +38,8 @@ export interface DashboardLayoutProps {
     initials: string;
     avatar?: string;
   };
+  headerTitle?: string;
+  headerSubtitle?: string;
   className?: string;
 }
 
@@ -51,6 +53,13 @@ const defaultSidebarItems: SidebarMenuItem[] = [
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
   { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
+      {
+      id: 'manage-agent',
+      label: 'Manage Agent',
+      href: ROUTES.dashboard.manageAgent,
+      icon: Users,
+    },
+
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
@@ -64,6 +73,8 @@ export function DashboardLayout({
   sidebarItems = defaultSidebarItems,
   logoHref = ROUTES.homePage,
   user = defaultUser,
+  headerTitle,
+  headerSubtitle,
   className,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -261,7 +272,7 @@ export function DashboardLayout({
         )}
       >
         {/* Top Nav */}
-        <header className='flex items-center justify-between bg-white px-8 py-4'>
+        <header className='flex items-center justify-between bg-white px-10 py-4'>
           {/* Left Section */}
           <div className='flex items-center gap-4'>
             {/* Logo Text */}

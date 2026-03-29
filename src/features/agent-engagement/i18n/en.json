@@ -1,0 +1,99 @@
+{
+  "AgentEngagement": {
+    "detailPanel": {
+      "title": "Agent Details",
+      "contactInfo": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "serviceAreas": "Service Areas",
+      "professionalInfo": "Professional Info",
+      "experience": "Experience",
+      "yearsUnit": "{count} years",
+      "propertiesSold": "Properties Sold",
+      "engagementType": "Engagement Type",
+      "hiredDate": "Hired Date",
+      "specialties": "Specialties",
+      "about": "About",
+      "assignedProperty": "Assigned Property",
+      "addReview": "Add Review",
+      "agent": "Agent",
+      "property": "Property"
+    },
+    "listItem": {
+      "noEmail": "No email"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "common": {
+      "na": "N/A",
+      "cancel": "Cancel",
+      "back": "Back",
+      "thisProperty": "this property"
+    },
+    "actions": {
+      "completeContract": "Complete Contract",
+      "cancelContract": "Cancel Contract",
+      "cancelRequest": "Cancel Request",
+      "alreadyReviewed": "Review submitted"
+    },
+    "completeDialog": {
+      "title": "Complete Contract",
+      "description": "Confirm completion of the contract with {agentName} for {property}?",
+      "confirm": "Yes, complete"
+    },
+    "cancelDialog": {
+      "title": "Cancel Contract",
+      "description": "You are about to cancel the contract with {agentName}. Please provide a reason.",
+      "reasonLabel": "Reason for cancellation",
+      "reasonPlaceholder": "Describe why you are cancelling this contract...",
+      "confirm": "Confirm Cancellation"
+    },
+    "reviewModal": {
+      "title": "Rate your agent",
+      "description": "How was your experience working with {agentName}?",
+      "commentLabel": "Your review",
+      "commentPlaceholder": "Share your experience working with this agent...",
+      "optional": "optional",
+      "skip": "Skip",
+      "submit": "Submit Review"
+    },
+    "toast": {
+      "completeSuccess": "Contract completed successfully",
+      "completeError": "Failed to complete contract. Please try again.",
+      "cancelSuccess": "Contract cancelled",
+      "cancelError": "Failed to cancel contract. Please try again.",
+      "reviewSuccess": "Thank you! Your review has been submitted",
+      "reviewError": "Failed to submit review. Please try again."
+    },
+    "detailPage": {
+      "backToList": "Back to Manage Agents",
+      "viewFullDetails": "View Full Details",
+      "summaryTitle": "Engagement Summary",
+      "engagementId": "Engagement ID",
+      "hiredDate": "Hired Date",
+      "engagementType": "Engagement Type",
+      "propertyAddress": "Property Address",
+      "propertyType": "Property Type",
+      "propertyLocation": "Location",
+      "listingsTitle": "Listings by Agent",
+      "listingsSubtitle": "Listings created by this agent for your property",
+      "listingsComingSoon": "Listings feature is coming soon",
+      "listingsComingSoonDesc": "Once available, you will be able to view all listings created by this agent for your property.",
+      "listingStatus": "Status",
+      "listingPrice": "Price",
+      "listingDate": "Created",
+      "noListings": "No listings yet",
+      "noListingsDesc": "This agent has not created any listings for your property yet.",
+      "soldListingsTitle": "Sold by Agent",
+      "soldListingsSubtitle": "Property successfully sold through this agent",
+      "soldBadge": "Sold"
+    }
+  }
+}
