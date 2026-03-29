@@ -1,6 +1,7 @@
 {
   "ManagedListings": {
-    "title": "Bài đăng",
+    "title": "Danh sách",
+    "createButton": "Tạo mới",
     "filter": "Lọc",
     "filterPanel": {
       "status": "Trạng thái",

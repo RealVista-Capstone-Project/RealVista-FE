@@ -9,7 +9,6 @@ import {
   Columns,
   LayoutDashboard,
   MessageCircle,
-  Plus,
   TrendingUp,
   Users,
   type LucideIcon,
@@ -20,7 +19,6 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
-import { CreateListingModal } from '@/features/create-listing-modal';
 
 export interface SidebarMenuItem {
   id: string;
@@ -78,7 +76,6 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const [isCreateListingModalOpen, setIsCreateListingModalOpen] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
 
@@ -107,18 +104,6 @@ export function DashboardLayout({
     return t('pageTitle.default');
   }, [pathname, t]);
 
-  /**
-   * Compute the action button label based on the current pathname
-   */
-  const buttonLabel = React.useMemo(() => {
-    if (
-      pathname === ROUTES.dashboard.managedListings ||
-      pathname.startsWith(ROUTES.dashboard.managedListings)
-    ) {
-      return t('actionButton.createListing');
-    }
-    return t('actionButton.addProperty');
-  }, [pathname, t]);
 
   /**
    * Determine if a menu item is active based on the current pathname
@@ -283,17 +268,6 @@ export function DashboardLayout({
 
           {/* Right Actions */}
           <div className='flex items-center gap-6'>
-            {/* Add Property Button */}
-            <button
-              type='button'
-              onClick={() => setIsCreateListingModalOpen(true)}
-              className='flex items-center gap-2 rounded-lg bg-main-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-main-primary/90'
-              aria-label={buttonLabel}
-            >
-              <Plus className='h-4 w-4' strokeWidth={2} />
-              <span>{buttonLabel}</span>
-            </button>
-
             {/* Notification Button */}
             <button
               type='button'
@@ -328,12 +302,6 @@ export function DashboardLayout({
         {/* Page Content */}
         <main className='flex-1 bg-purple-98 p-4 md:p-6'>{children}</main>
       </div>
-
-      {/* Create Listing Modal */}
-      <CreateListingModal
-        open={isCreateListingModalOpen}
-        onOpenChange={setIsCreateListingModalOpen}
-      />
     </div>
   );
 }
