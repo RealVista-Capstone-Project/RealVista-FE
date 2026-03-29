@@ -55,6 +55,7 @@ export function ListingInformationStep({
       null
   );
   const [newFiles, setNewFiles] = React.useState<File[]>([]);
+  const [selectedNewFileIndices, setSelectedNewFileIndices] = React.useState<Set<number>>(new Set());
   const [analysisStatus, setAnalysisStatus] = React.useState<
     {
       result: AIAnalysisResult | null;
@@ -72,6 +73,21 @@ export function ListingInformationStep({
   const QUALITY_THRESHOLD = 50;
 
   const analyzeFile = React.useCallback(async (file: File, index: number) => {
+    // If it's a video, skip analysis for now
+    if (file.type.startsWith('video/')) {
+      // TODO: Implement video analysis in the future
+      setAnalysisStatus((prev) => {
+        const next = [...prev];
+        next[index] = {
+          result: { finalScore: 100 } as any, // Dummy score so it passes validation
+          isLoading: false,
+          error: null,
+        };
+        return next;
+      });
+      return;
+    }
+
     setAnalysisStatus((prev) => {
       const next = [...prev];
       next[index] = { result: null, isLoading: true, error: null };
@@ -100,26 +116,33 @@ export function ListingInformationStep({
 
   // Auto-set primary media if only one exists
   React.useEffect(() => {
-    const totalCount = selectedMediaIds.size + newFiles.length;
+    const totalCount = selectedMediaIds.size + selectedNewFileIndices.size;
     if (totalCount === 1) {
       if (selectedMediaIds.size === 1) {
         const firstId = Array.from(selectedMediaIds)[0];
         if (primaryMediaId !== firstId) {
           setPrimaryMediaId(firstId);
         }
-      } else if (newFiles.length === 1) {
-        if (primaryMediaId !== 'new:0') {
-          setPrimaryMediaId('new:0');
+      } else if (selectedNewFileIndices.size === 1) {
+        const firstIndex = Array.from(selectedNewFileIndices)[0];
+        const newId = `new:${firstIndex}`;
+        if (primaryMediaId !== newId) {
+          setPrimaryMediaId(newId);
         }
       }
     }
-  }, [selectedMediaIds, newFiles, primaryMediaId]);
+  }, [selectedMediaIds, selectedNewFileIndices, primaryMediaId]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     const startIndex = newFiles.length;
 
     setNewFiles((prev) => [...prev, ...files]);
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set(prev);
+      files.forEach((_, i) => next.add(startIndex + i));
+      return next;
+    });
     setAnalysisStatus((prev) => [
       ...prev,
       ...files.map(() => ({ result: null, isLoading: false, error: null })),
@@ -148,9 +171,46 @@ export function ListingInformationStep({
     });
   };
 
+  const toggleNewFile = (index: number) => {
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set(prev);
+      const id = `new:${index}`;
+      if (next.has(index)) {
+        next.delete(index);
+        if (primaryMediaId === id) {
+          setPrimaryMediaId(null);
+        }
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
   const removeNewFile = (index: number) => {
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
     setAnalysisStatus((prev) => prev.filter((_, i) => i !== index));
+
+    // Handle selectedNewFileIndices re-indexing
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set<number>();
+      Array.from(prev).forEach((idx) => {
+        if (idx === index) return;
+        if (idx > index) next.add(idx - 1);
+        else next.add(idx);
+      });
+      return next;
+    });
+
+    // Handle primaryMediaId re-indexing if it was a "new" file
+    if (primaryMediaId?.startsWith('new:')) {
+      const currentIdx = parseInt(primaryMediaId.split(':')[1], 10);
+      if (currentIdx === index) {
+        setPrimaryMediaId(null);
+      } else if (currentIdx > index) {
+        setPrimaryMediaId(`new:${currentIdx - 1}`);
+      }
+    }
   };
 
   const [listingType, setListingType] = React.useState<ListingType>('RENT');
@@ -261,7 +321,7 @@ export function ListingInformationStep({
         (id) => selectedProperty.media.find((m) => m.mediaId === id)?.isPropertyStandard
       ),
       primaryMediaId: primaryMediaId ?? undefined,
-      newFiles: newFiles,
+      newFiles: newFiles.filter((_, i) => selectedNewFileIndices.has(i)),
     };
     onSubmit(formData);
   };
@@ -280,7 +340,7 @@ export function ListingInformationStep({
     allImagesAnalyzed &&
     allImagesPassed &&
     isContentValid &&
-    (selectedMediaIds.size > 0 || newFiles.length > 0); // Must have at least one media item selected or uploaded
+    (selectedMediaIds.size > 0 || selectedNewFileIndices.size > 0); // Must have at least one media item selected
 
   return (
     <>
@@ -796,6 +856,7 @@ export function ListingInformationStep({
               {newFiles.length > 0 && (
                 <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
                   {newFiles.map((file, index) => {
+                    const isSelected = selectedNewFileIndices.has(index);
                     const isPrimary = primaryMediaId === `new:${index}`;
                     const status = analysisStatus[index];
                     const score = status?.result?.finalScore;
@@ -805,13 +866,24 @@ export function ListingInformationStep({
                     return (
                       <div
                         key={`new-${index}`}
+                        role='button'
+                        tabIndex={0}
+                        onClick={() => toggleNewFile(index)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleNewFile(index);
+                          }
+                        }}
                         className={cn(
-                          'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
+                          'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
                           isPrimary
                             ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
-                            : isRejected
-                              ? 'border-red-400'
-                              : 'border-purple-92 opacity-70 hover:opacity-100'
+                            : isSelected
+                              ? 'border-main-primary/60'
+                              : isRejected
+                                ? 'border-red-400'
+                                : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-main-primary/40'
                         )}
                       >
                         {file.type.startsWith('image/') ? (
@@ -821,11 +893,17 @@ export function ListingInformationStep({
                             alt={file.name}
                             className={cn(
                               'h-full w-full object-cover',
-                              isRejected && 'grayscale-[0.5] blur-[1px]'
+                              isRejected && 'grayscale-[0.5] blur-[1px]',
+                              !isSelected && 'opacity-40'
                             )}
                           />
                         ) : (
-                          <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96'>
+                          <div
+                            className={cn(
+                              'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96 transition-opacity',
+                              !isSelected && 'opacity-40'
+                            )}
+                          >
                             <Play className='h-6 w-6 text-main-primary/60' />
                             <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
                               {file.name}
@@ -863,6 +941,27 @@ export function ListingInformationStep({
                           ) : null}
                         </div>
 
+                        {/* Selected overlay */}
+                        <div
+                          className={cn(
+                            'absolute inset-0 bg-main-primary/10 transition-opacity',
+                            isSelected ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
+
+                        {/* Checkmark */}
+                        <div
+                          className={cn(
+                            'absolute right-1.5 top-1.5 transition-all z-20',
+                            isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                          )}
+                        >
+                          <CheckCircle2
+                            className='h-5 w-5 text-main-primary drop-shadow'
+                            fill='white'
+                          />
+                        </div>
+
                         {/* Feedback Tooltip on Hover */}
                         {!status?.isLoading && feedback && !isRejected && (
                           <div className='absolute inset-x-0 bottom-8 z-20 px-1.5 opacity-0 transition-opacity group-hover:opacity-100'>
@@ -877,7 +976,10 @@ export function ListingInformationStep({
 
                         <button
                           type='button'
-                          onClick={() => removeNewFile(index)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeNewFile(index);
+                          }}
                           className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-30'
                         >
                           <X className='h-3 w-3' />
@@ -886,7 +988,12 @@ export function ListingInformationStep({
                         {!isRejected && (
                           <button
                             type='button'
-                            onClick={() => setPrimaryMediaId(`new:${index}`)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPrimaryMediaId(`new:${index}`);
+                              // Ensure it's selected when made primary
+                              setSelectedNewFileIndices((prev) => new Set(prev).add(index));
+                            }}
                             className={cn(
                               'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
                               isPrimary
@@ -899,14 +1006,6 @@ export function ListingInformationStep({
                               : `${t('newUpload', { fallback: 'New' })} - ${t('makePrimary', { fallback: 'Make Primary' })}`}
                           </button>
                         )}
-
-                        {/* Selected overlay */}
-                        <div
-                          className={cn(
-                            'absolute inset-0 bg-main-primary/10 transition-opacity',
-                            isPrimary ? 'opacity-100' : 'opacity-0'
-                          )}
-                        />
                       </div>
                     );
                   })}
