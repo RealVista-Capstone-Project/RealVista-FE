@@ -98,6 +98,23 @@ export function ListingInformationStep({
     }
   }, []);
 
+  // Auto-set primary media if only one exists
+  React.useEffect(() => {
+    const totalCount = selectedMediaIds.size + newFiles.length;
+    if (totalCount === 1) {
+      if (selectedMediaIds.size === 1) {
+        const firstId = Array.from(selectedMediaIds)[0];
+        if (primaryMediaId !== firstId) {
+          setPrimaryMediaId(firstId);
+        }
+      } else if (newFiles.length === 1) {
+        if (primaryMediaId !== 'new:0') {
+          setPrimaryMediaId('new:0');
+        }
+      }
+    }
+  }, [selectedMediaIds, newFiles, primaryMediaId]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     const startIndex = newFiles.length;

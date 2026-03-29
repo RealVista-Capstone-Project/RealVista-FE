@@ -79,4 +79,5 @@ export interface ManagedListing {
   };
   // Preview image
   thumbnail?: string;
+  primary_media_thumbnail_url?: string;
 }

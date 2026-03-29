@@ -9,12 +9,15 @@ import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { propertyQueries } from '@/entities/property';
-import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
-import type { UserProperty, CreateListingFormData, CreateListingPayload } from '../model/types';
+import { mediaApi } from '@/entities/media/api/media.api';
+import type {
+  UserProperty,
+  CreateListingFormData,
+  CreateListingPayload,
+} from '../model/types';
 import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
-import { getMediaType } from '@/features/tenant-application/lib/utils';
+import { propertyQueries } from '@/entities/property';
 
 export interface CreateListingModalProps {
   open: boolean;
@@ -218,9 +221,9 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   const rawProperties = propertiesResponse?.content || [];
   const totalPages = propertiesResponse?.totalPages || 0;
 
-  const properties: UserProperty[] = rawProperties.map((p) => {
-    const standardMedia = (p.media ?? []).filter((m) => m.is_property_standard);
-    const primaryMedia = standardMedia.find((m) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
+  const properties: UserProperty[] = rawProperties.map((p: any) => {
+    const standardMedia = (p.media ?? []).filter((m: any) => m.is_property_standard);
+    const primaryMedia = standardMedia.find((m: any) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
 
     return {
       propertyId: p.property_id,
@@ -248,7 +251,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         propertyCategoryName: p.property_type_info?.property_category_name ?? '',
         propertyCategoryCode: p.property_type_info?.property_category_code ?? '',
       },
-      attributes: (p.attributes ?? []).map((attr) => ({
+      attributes: (p.attributes ?? []).map((attr: any) => ({
         attributeId: attr.attribute_id,
         attributeCode: attr.attribute_code,
         attributeName: attr.attribute_name,
@@ -260,11 +263,11 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         valueBoolean: attr.value_boolean,
         displayValue: attr.display_value,
       })),
-      amenities: (p.amenities ?? []).map((a) => ({
+      amenities: (p.amenities ?? []).map((a: any) => ({
         amenityId: a.amenity_id,
         amenityName: a.amenity_name,
       })),
-      media: (p.media ?? []).map((m) => ({
+      media: (p.media ?? []).map((m: any) => ({
         mediaId: m.media_id,
         mediaType: m.media_type,
         mediaUrl: m.media_url,
@@ -300,13 +303,14 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
       is_negotiable: data.isNegotiable,
       available_from: data.availableFrom || null,
       content: data.content.trim() || null,
-      media_ids: data.selectedMediaIds.length > 0 ? data.selectedMediaIds : undefined,
-      primary_media_id: data.primaryMediaId ?? null,
+      media_ids: data.selectedMediaIds.length > 0 ? [...data.selectedMediaIds] : [],
+      primary_media_id:
+        data.primaryMediaId && !data.primaryMediaId.startsWith('new:') ? data.primaryMediaId : null,
     };
 
     try {
       if (data.newFiles && data.newFiles.length > 0) {
-        const uploadRes = await mediaApi.uploadBulk(data.newFiles);
+        const uploadRes = await mediaApi.uploadBulk(data.newFiles, data.propertyId);
         if (
           uploadRes.status < 200 ||
           uploadRes.status >= 300 ||
@@ -318,16 +322,23 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         }
 
         const uploadedResults = uploadRes.payload.data.uploaded_files;
+        const newMediaIds = uploadedResults.map((res) => res.media_id);
 
-        payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
-          url: res.media_url,
-          type: getMediaType(res.media_type),
-          isPrimary: data.primaryMediaId === `new:${index}`,
-        }));
+        // Add newly uploaded media IDs to the list
+        payload.media_ids = [...(payload.media_ids || []), ...newMediaIds];
 
+        // If a new file was set as primary, resolve its real UUID
         if (data.primaryMediaId?.startsWith('new:')) {
-          payload.primary_media_id = null;
+          const index = parseInt(data.primaryMediaId.split(':')[1], 10);
+          if (uploadedResults[index]) {
+            payload.primary_media_id = uploadedResults[index].media_id;
+          }
         }
+      }
+
+      // If no media selected/uploaded, media_ids might be empty
+      if (payload.media_ids && payload.media_ids.length === 0) {
+        payload.media_ids = undefined;
       }
 
       await createListingMutation.mutateAsync(payload);

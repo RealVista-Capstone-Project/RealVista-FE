@@ -34,8 +34,13 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       <div className='flex items-center gap-3 sm:gap-4'>
         {/* Property Image */}
         <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg'>
-          {listing.thumbnail ? (
-            <Image src={listing.thumbnail} alt={listing.name} fill className='object-cover' />
+          {listing.primary_media_thumbnail_url || listing.thumbnail ? (
+            <Image
+              src={listing.primary_media_thumbnail_url || listing.thumbnail || ''}
+              alt={listing.name}
+              fill
+              className='object-cover'
+            />
           ) : (
             <div className='flex h-full w-full items-center justify-center bg-purple-98'>
               <span className='text-xs text-main-secondary/60'>{t('noImage')}</span>
