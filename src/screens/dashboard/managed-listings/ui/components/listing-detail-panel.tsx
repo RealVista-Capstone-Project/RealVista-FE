@@ -16,11 +16,22 @@ import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
-import { ArrowLeft, BadgeCheck, Building2, Calendar, Eye, Mail, Phone, ChevronDown, Pencil } from 'lucide-react';
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Building2,
+  Calendar,
+  Eye,
+  Mail,
+  Phone,
+  ChevronDown,
+  Pencil,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import * as React from 'react';
+import { format, isPast, isToday, parseISO } from 'date-fns';
 
 interface ListingDetailPanelProps {
   listing: Listing;
@@ -88,6 +99,15 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
   // Check if listing is created by someone other than the property owner
   const showAgentInfo = listing.is_created_by_owner === false && listing.agent;
+
+  // Calculate availability status
+  const availabilityDate = listing.available_from ? parseISO(listing.available_from) : null;
+  const isAvailableNow = !availabilityDate || isPast(availabilityDate) || isToday(availabilityDate);
+  const displayAvailableFrom = isAvailableNow
+    ? t('features.availableImmediately')
+    : availabilityDate
+      ? format(availabilityDate, 'PP')
+      : t('features.availableImmediately');
 
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
@@ -318,6 +338,13 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         <div className='mb-8 rounded-lg border border-purple-92 p-6'>
           {attributes.length > 0 ? (
             <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
+              {listing.listing_type === 'RENT' && (
+                <FeatureStat
+                  label={t('features.availableFrom')}
+                  value={displayAvailableFrom}
+                  icon='📅'
+                />
+              )}
               {attributes.map((attribute) => (
                 <div key={attribute.attribute_id} className='flex flex-col gap-4'>
                   <p className='text-base font-medium leading-[1.5] text-grey-500'>
@@ -339,6 +366,13 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           ) : (
             // Fallback when no attributes are available
             <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
+              {listing.listing_type === 'RENT' && (
+                <FeatureStat
+                  label={t('features.availableFrom')}
+                  value={displayAvailableFrom}
+                  icon='📅'
+                />
+              )}
               <FeatureStat
                 label={t('features.properties')}
                 value={t('features.notAvailable')}

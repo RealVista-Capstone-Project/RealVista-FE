@@ -392,12 +392,14 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   labels={priceLabels}
                 />
 
-                <ListingDateField
-                  value={availableFrom}
-                  onChange={setAvailableFrom}
-                  label={t('dateAvailable')}
-                  error={errors.availableFrom}
-                />
+                {listingType === 'RENT' && (
+                  <ListingDateField
+                    value={availableFrom}
+                    onChange={setAvailableFrom}
+                    label={t('dateAvailable')}
+                    error={errors.availableFrom}
+                  />
+                )}
               </div>
 
               {/* Media Selection */}

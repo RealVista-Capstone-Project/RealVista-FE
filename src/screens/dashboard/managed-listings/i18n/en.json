@@ -72,6 +72,8 @@
       "yearBuilt": "Year Built",
       "tenants": "Tenants",
       "request": "Request",
+      "availableFrom": "Date Available",
+      "availableImmediately": "Immediately",
       "notAvailable": "N/A"
     }
   }

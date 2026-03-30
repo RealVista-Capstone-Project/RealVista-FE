@@ -72,6 +72,8 @@
       "yearBuilt": "Năm xây dựng",
       "tenants": "Người thuê",
       "request": "Yêu cầu",
+      "availableFrom": "Ngày trống",
+      "availableImmediately": "Ngay lập tức",
       "notAvailable": "Không có"
     }
   }
