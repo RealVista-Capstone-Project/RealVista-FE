@@ -2,15 +2,28 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import * as Dialog from '@radix-ui/react-dialog';
-import { X, Save, Upload, Play, ImageIcon, CheckCircle2 } from 'lucide-react';
+import { X, Save } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/shared/lib/utils';
 import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
 import { useUpdateListing } from '../api/use-update-listing';
 import type { EditListingPayload } from '../model/types';
 import type { Listing, ListingType } from '@/entities/listing';
+import { useContentVerification } from '@/shared/lib/hooks/use-content-verification';
+import { useMediaAnalysis } from '@/shared/lib/hooks/use-media-analysis';
+import {
+  ListingTypeSelector,
+  ListingNameInput,
+  ListingContentTextarea,
+  ContentVerificationStatusPanel,
+  ListingPriceFields,
+  ListingDateField,
+  ExistingMediaGrid,
+  NewFilesGrid,
+  MediaUploadZone,
+  type ExistingMediaItem,
+} from '@/shared/ui/listing-form';
 
 interface EditListingModalProps {
   listing: Listing;
@@ -22,7 +35,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const t = useTranslations('CreateListingModal'); // Reuse translations
   const updateMutation = useUpdateListing();
 
-  // Form State
+  // ── Form State ──
   const [name, setName] = React.useState(listing.name);
   const [content, setContent] = React.useState(listing.content || '');
   const [listingType, setListingType] = React.useState<ListingType>(listing.listing_type);
@@ -32,15 +45,29 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const [isNegotiable, setIsNegotiable] = React.useState(listing.is_negotiable);
   const [availableFrom, setAvailableFrom] = React.useState(listing.available_from || '');
 
-  // Media State
+  // ── Media State ──
   const initialMediaIds = new Set(listing.media?.map((m) => m.media_id) || []);
   const initialPrimary = listing.media?.find((m) => m.is_primary)?.media_id || null;
   const [selectedMediaIds, setSelectedMediaIds] = React.useState<Set<string>>(initialMediaIds);
   const [primaryMediaId, setPrimaryMediaId] = React.useState<string | null>(initialPrimary);
   const [newFiles, setNewFiles] = React.useState<File[]>([]);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [selectedNewFileIndices, setSelectedNewFileIndices] = React.useState<Set<number>>(
+    new Set()
+  );
 
-  // Reset form when opened with a new listing
+  // ── AI Hooks ──
+  const { contentStatus, isContentValid } = useContentVerification(name, content);
+  const {
+    analysisStatus,
+    analyzeFile,
+    appendEntries,
+    removeEntry,
+    allImagesAnalyzed,
+    allImagesPassed,
+    QUALITY_THRESHOLD,
+  } = useMediaAnalysis();
+
+  // ── Reset form when opened with a new listing ──
   React.useEffect(() => {
     if (isOpen) {
       setName(listing.name);
@@ -54,18 +81,18 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       setSelectedMediaIds(new Set(listing.media?.map((m) => m.media_id) || []));
       setPrimaryMediaId(listing.media?.find((m) => m.is_primary)?.media_id || null);
       setNewFiles([]);
+      setSelectedNewFileIndices(new Set());
       setErrors({});
     }
   }, [isOpen, listing]);
 
+  // ── Media Handlers ──
   const toggleMedia = (mediaId: string) => {
     setSelectedMediaIds((prev) => {
       const next = new Set(prev);
       if (next.has(mediaId)) {
         next.delete(mediaId);
-        if (primaryMediaId === mediaId) {
-          setPrimaryMediaId(null);
-        }
+        if (primaryMediaId === mediaId) setPrimaryMediaId(null);
       } else {
         if (next.size + newFiles.length >= 10) {
           toast.error(t('validation.maxMedia', { fallback: 'Maximum 10 media files allowed' }));
@@ -77,21 +104,76 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
+  const handleFilesSelected = (files: File[]) => {
     if (selectedMediaIds.size + newFiles.length + files.length > 10) {
       toast.error(t('validation.maxMedia', { fallback: 'Maximum 10 media files allowed' }));
       return;
     }
+    const startIndex = newFiles.length;
     setNewFiles((prev) => [...prev, ...files]);
-    e.target.value = '';
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set(prev);
+      files.forEach((_, i) => next.add(startIndex + i));
+      return next;
+    });
+    appendEntries(files.length);
+    files.forEach((file, i) => {
+      analyzeFile(file, startIndex + i);
+    });
+  };
+
+  const toggleNewFile = (index: number) => {
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set(prev);
+      const id = `new:${index}`;
+      if (next.has(index)) {
+        next.delete(index);
+        if (primaryMediaId === id) setPrimaryMediaId(null);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
   };
 
   const removeNewFile = (index: number) => {
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
+    removeEntry(index);
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set<number>();
+      Array.from(prev).forEach((idx) => {
+        if (idx === index) return;
+        if (idx > index) next.add(idx - 1);
+        else next.add(idx);
+      });
+      return next;
+    });
+    if (primaryMediaId?.startsWith('new:')) {
+      const currentIdx = parseInt(primaryMediaId.split(':')[1], 10);
+      if (currentIdx === index) setPrimaryMediaId(null);
+      else if (currentIdx > index) setPrimaryMediaId(`new:${currentIdx - 1}`);
+    }
   };
 
-  // Validation
+  const handleSetExistingPrimary = (mediaId: string) => {
+    setPrimaryMediaId(mediaId);
+    setSelectedMediaIds((prev) => new Set(prev).add(mediaId));
+  };
+
+  const handleSetNewPrimary = (id: string, index: number) => {
+    setPrimaryMediaId(id);
+    setSelectedNewFileIndices((prev) => new Set(prev).add(index));
+  };
+
+  // ── Derived Data ──
+  const existingMediaItems: ExistingMediaItem[] = (listing.media || []).map((m) => ({
+    id: m.media_id,
+    url: m.media_url,
+    thumbnailUrl: m.thumbnail_url,
+    type: m.media_type,
+  }));
+
+  // ── Validation ──
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   const validateForm = () => {
@@ -117,8 +199,23 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     return Object.keys(newErrors).length === 0;
   };
 
+  // ── AI Validity Check ──
+  const hasNewUploads = newFiles.length > 0;
+  const aiChecksPassed =
+    isContentValid &&
+    (!hasNewUploads || (allImagesAnalyzed && allImagesPassed));
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
+
+    if (!aiChecksPassed) {
+      toast.error(
+        t('aiAnalysis.notAllowed', {
+          fallback: 'Content or media did not pass AI verification.',
+        })
+      );
+      return;
+    }
 
     const payload: EditListingPayload = {
       name: name.trim() !== listing.name ? name.trim() : undefined,
@@ -129,44 +226,45 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       is_negotiable: isNegotiable,
       available_from: availableFrom || null,
       media_ids: Array.from(selectedMediaIds),
-      primary_media_id: primaryMediaId && !primaryMediaId.startsWith('new:') ? primaryMediaId : null,
+      primary_media_id:
+        primaryMediaId && !primaryMediaId.startsWith('new:') ? primaryMediaId : null,
     };
 
     try {
       if (newFiles.length > 0) {
-        // 1. Upload new files to S3
-        const uploadRes = await mediaApi.uploadBulk(newFiles);
-        if (
-          uploadRes.status < 200 ||
-          uploadRes.status >= 300 ||
-          uploadRes.payload.failed_count > 0 ||
-          !uploadRes.payload.uploaded_files
-        ) {
-          toast.error(t('mediaUploadError', { fallback: 'Failed to upload some media files.' }));
-          return;
-        }
+        const filesToUpload = newFiles.filter((_, i) => selectedNewFileIndices.has(i));
+        if (filesToUpload.length > 0) {
+          const uploadRes = await mediaApi.uploadBulk(filesToUpload);
+          if (
+            uploadRes.status < 200 ||
+            uploadRes.status >= 300 ||
+            uploadRes.payload.data.failed_count > 0 ||
+            !uploadRes.payload.data.uploaded_files
+          ) {
+            toast.error(t('mediaUploadError', { fallback: 'Failed to upload some media files.' }));
+            return;
+          }
 
-        const uploadedResults = uploadRes.payload.uploaded_files;
+          const uploadedResults = uploadRes.payload.data.uploaded_files;
+          payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
+            url: res.media_url,
+            type: res.media_type,
+            isPrimary: primaryMediaId === `new:${index}`,
+          }));
 
-        // 2. Map new media for the payload
-        payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
-          url: res.media_url,
-          type: res.media_type,
-          isPrimary: primaryMediaId === `new:${index}`,
-        }));
-
-        // If a new media was primary, we already set it in new_medias, so primary_media_id should be null
-        if (primaryMediaId?.startsWith('new:')) {
-          payload.primary_media_id = null;
+          if (primaryMediaId?.startsWith('new:')) {
+            payload.primary_media_id = null;
+          }
         }
       }
 
       const cleanPayload = Object.fromEntries(
-        Object.entries(payload).filter(([_, v]) => v !== undefined)
+        Object.entries(payload).filter(([, v]) => v !== undefined)
       );
 
       await updateMutation.mutateAsync({
         listingId: listing.listing_id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: cleanPayload as any,
       });
       toast.success(t('editSuccess'));
@@ -174,6 +272,28 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     } catch {
       toast.error(t('editError'));
     }
+  };
+
+  // ── Translation labels for shared components ──
+  const priceLabels = {
+    priceRent: t('priceRent'),
+    priceSale: t('priceSale'),
+    pricePlaceholder: t('pricePlaceholder'),
+    securityDeposit: t('securityDeposit'),
+    minPrice: t('minPrice'),
+    maxPrice: t('maxPrice'),
+    negotiable: t('negotiable'),
+  };
+
+  const mediaLabels = {
+    primary: t('primary', { fallback: 'Primary' }),
+    makePrimary: t('makePrimary', { fallback: 'Make Primary' }),
+    newUpload: t('newUpload', { fallback: 'New' }),
+    analyzing: t('aiAnalysis.analyzing'),
+    error: t('aiAnalysis.error'),
+    notAllowed: t('aiAnalysis.notAllowed'),
+    passed: t('aiAnalysis.passed', { score: '{score}' }),
+    feedbackLabel: t('aiAnalysis.feedbackLabel'),
   };
 
   return (
@@ -211,67 +331,39 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                     {t('listingTypeLabel')}
                     <span className='text-main-primary'>*</span>
                   </span>
-                  <div className='flex gap-4'>
-                    {(['RENT', 'SALE'] as ListingType[]).map((type) => (
-                      <label key={type} className='flex cursor-pointer items-center gap-2'>
-                        <div
-                          className={cn(
-                            'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors',
-                            listingType === type ? 'border-main-primary' : 'border-purple-92'
-                          )}
-                        >
-                          {listingType === type && (
-                            <div className='h-2.5 w-2.5 rounded-full bg-main-primary' />
-                          )}
-                        </div>
-                        <input
-                          type='radio'
-                          name='listingType'
-                          value={type}
-                          checked={listingType === type}
-                          onChange={() => setListingType(type)}
-                          className='sr-only'
-                        />
-                        <span className='text-sm font-medium text-main-black'>
-                          {type === 'RENT' ? t('listingTypeRent') : t('listingTypeSale')}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className='flex flex-col gap-2'>
-                  <label className='text-sm font-medium text-main-black'>
-                    {t('listingName')} <span className='text-main-primary'>*</span>
-                  </label>
-                  <input
-                    type='text'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    maxLength={500}
-                    placeholder={t('listingNamePlaceholder')}
-                    className={cn(
-                      'rounded-lg border bg-white px-4 py-3 text-sm text-main-black transition-colors focus:outline-none',
-                      errors.name
-                        ? 'border-red-400 focus:border-red-500'
-                        : 'border-purple-92 focus:border-main-primary'
-                    )}
-                  />
-                  {errors.name && <span className='text-xs text-red-500'>{errors.name}</span>}
-                </div>
-
-                <div className='flex flex-col gap-2'>
-                  <label className='text-sm font-medium text-main-black'>
-                    {t('listingContent')}
-                  </label>
-                  <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder={t('listingContentPlaceholder')}
-                    rows={5}
-                    className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black transition-colors focus:border-main-primary focus:outline-none resize-none'
+                  <ListingTypeSelector
+                    value={listingType}
+                    onChange={setListingType}
+                    labels={{ rent: t('listingTypeRent'), sale: t('listingTypeSale') }}
                   />
                 </div>
+
+                <ListingNameInput
+                  value={name}
+                  onChange={setName}
+                  label={t('listingName')}
+                  placeholder={t('listingNamePlaceholder')}
+                  error={errors.name}
+                />
+
+                <ListingContentTextarea
+                  value={content}
+                  onChange={setContent}
+                  label={t('listingContent')}
+                  placeholder={t('listingContentPlaceholder')}
+                  rows={5}
+                />
+
+                {/* AI Content Verification */}
+                <ContentVerificationStatusPanel
+                  hasContent={!!(name.trim() || content.trim())}
+                  status={contentStatus}
+                  labels={{
+                    title: t('aiAnalysis.contentVerification'),
+                    verified: t('aiAnalysis.verified'),
+                    violated: t('aiAnalysis.violated'),
+                  }}
+                />
               </div>
 
               {/* Pricing */}
@@ -280,110 +372,26 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   {t('price')}
                 </h3>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                  <div
-                    className={cn('flex flex-col gap-2', listingType === 'SALE' && 'sm:col-span-2')}
-                  >
-                    <label className='text-sm font-medium text-main-black'>
-                      {listingType === 'RENT' ? t('priceRent') : t('priceSale')}{' '}
-                      <span className='text-main-primary'>*</span>
-                    </label>
-                    <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
-                      <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
-                        ₫
-                      </span>
-                      <input
-                        type='text'
-                        inputMode='numeric'
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        placeholder={t('pricePlaceholder')}
-                        className={cn(
-                          'flex-1 px-4 py-3 text-sm text-main-black focus:outline-none',
-                          errors.price && 'text-red-500'
-                        )}
-                      />
-                    </div>
-                    {errors.price && <span className='text-xs text-red-500'>{errors.price}</span>}
-                  </div>
-                </div>
+                <ListingPriceFields
+                  listingType={listingType}
+                  price={price}
+                  onPriceChange={setPrice}
+                  minPrice={minPrice}
+                  onMinPriceChange={setMinPrice}
+                  maxPrice={maxPrice}
+                  onMaxPriceChange={setMaxPrice}
+                  isNegotiable={isNegotiable}
+                  onNegotiableChange={setIsNegotiable}
+                  errors={errors}
+                  labels={priceLabels}
+                />
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-medium text-main-black'>{t('minPrice')}</label>
-                    <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
-                      <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
-                        ₫
-                      </span>
-                      <input
-                        type='text'
-                        inputMode='numeric'
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
-                        placeholder={t('pricePlaceholder')}
-                        className='flex-1 px-4 py-3 text-sm text-main-black focus:outline-none'
-                      />
-                    </div>
-                    {errors.minPrice && (
-                      <span className='text-xs text-red-500'>{errors.minPrice}</span>
-                    )}
-                  </div>
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-sm font-medium text-main-black'>{t('maxPrice')}</label>
-                    <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
-                      <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
-                        ₫
-                      </span>
-                      <input
-                        type='text'
-                        inputMode='numeric'
-                        value={maxPrice}
-                        onChange={(e) => setMaxPrice(e.target.value)}
-                        placeholder={t('pricePlaceholder')}
-                        className='flex-1 px-4 py-3 text-sm text-main-black focus:outline-none'
-                      />
-                    </div>
-                    {errors.maxPrice && (
-                      <span className='text-xs text-red-500'>{errors.maxPrice}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-main-black'>{t('negotiable')}</span>
-                  <button
-                    type='button'
-                    role='switch'
-                    aria-checked={isNegotiable}
-                    onClick={() => setIsNegotiable(!isNegotiable)}
-                    className={cn(
-                      'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-                      isNegotiable ? 'bg-main-primary' : 'bg-purple-92'
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg transition-transform',
-                        isNegotiable ? 'translate-x-5' : 'translate-x-0'
-                      )}
-                    />
-                  </button>
-                </div>
-
-                <div className='flex flex-col gap-2'>
-                  <label className='text-sm font-medium text-main-black'>
-                    {t('dateAvailable')}
-                  </label>
-                  <input
-                    type='date'
-                    value={availableFrom}
-                    onChange={(e) => setAvailableFrom(e.target.value)}
-                    className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black transition-colors focus:border-main-primary focus:outline-none'
-                  />
-                  {errors.availableFrom && (
-                    <span className='text-xs text-red-500'>{errors.availableFrom}</span>
-                  )}
-                </div>
+                <ListingDateField
+                  value={availableFrom}
+                  onChange={setAvailableFrom}
+                  label={t('dateAvailable')}
+                  error={errors.availableFrom}
+                />
               </div>
 
               {/* Media Selection */}
@@ -392,7 +400,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   <span className='text-sm font-medium text-main-black'>{t('mediaUpload')}</span>
                   {(listing.media || []).length > 0 && (
                     <span className='text-xs text-main-secondary/50'>
-                      {selectedMediaIds.size + newFiles.length} / 10{' '}
+                      {selectedMediaIds.size + selectedNewFileIndices.size} / 10{' '}
                       {t('selected', { fallback: 'selected' })}
                     </span>
                   )}
@@ -403,101 +411,18 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   })}
                 </p>
 
-                {listing.media && listing.media.length > 0 ? (
-                  <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4'>
-                    {listing.media.map((media) => {
-                      const isSelected = selectedMediaIds.has(media.media_id);
-                      const isPrimary = primaryMediaId === media.media_id;
-                      const isVideo = media.media_type === 'VIDEO';
-
-                      return (
-                        <div
-                          key={media.media_id}
-                          role='button'
-                          tabIndex={0}
-                          onClick={() => toggleMedia(media.media_id)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              toggleMedia(media.media_id);
-                            }
-                          }}
-                          className={cn(
-                            'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
-                            isSelected
-                              ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
-                              : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-main-primary/40'
-                          )}
-                        >
-                          {/* Thumbnail */}
-                          {(media.thumbnail_url ?? media.media_url) ? (
-                            <Image
-                              src={media.thumbnail_url ?? media.media_url}
-                              alt=''
-                              fill
-                              className='object-cover'
-                              sizes='(max-width: 640px) 50vw, 33vw'
-                            />
-                          ) : (
-                            <div className='flex h-full w-full items-center justify-center bg-purple-96'>
-                              <ImageIcon className='h-8 w-8 text-main-secondary/30' />
-                            </div>
-                          )}
-
-                          {/* Video indicator */}
-                          {isVideo && (
-                            <div className='absolute inset-0 flex items-center justify-center'>
-                              <div className='flex h-8 w-8 items-center justify-center rounded-full bg-black/50'>
-                                <Play className='h-4 w-4 text-white' fill='white' />
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Selected overlay */}
-                          <div
-                            className={cn(
-                              'absolute inset-0 bg-main-primary/10 transition-opacity',
-                              isSelected ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-
-                          {/* Checkmark */}
-                          <div
-                            className={cn(
-                              'absolute right-1.5 top-1.5 transition-all',
-                              isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                            )}
-                          >
-                            <CheckCircle2
-                              className='h-5 w-5 text-main-primary drop-shadow'
-                              fill='white'
-                            />
-                          </div>
-
-                          {/* Primary badge/button */}
-                          <button
-                            type='button'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPrimaryMediaId(media.media_id);
-                              // Ensure it's selected when made primary
-                              setSelectedMediaIds((prev) => new Set(prev).add(media.media_id));
-                            }}
-                            className={cn(
-                              'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
-                              primaryMediaId === media.media_id
-                                ? 'bg-main-primary text-white'
-                                : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
-                            )}
-                          >
-                            {primaryMediaId === media.media_id
-                              ? t('primary', { fallback: 'Primary' })
-                              : t('makePrimary', { fallback: 'Make Primary' })}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
+                {existingMediaItems.length > 0 ? (
+                  <ExistingMediaGrid
+                    items={existingMediaItems}
+                    selectedIds={selectedMediaIds}
+                    primaryId={primaryMediaId}
+                    onToggle={toggleMedia}
+                    onSetPrimary={handleSetExistingPrimary}
+                    labels={{
+                      primary: mediaLabels.primary,
+                      makePrimary: mediaLabels.makePrimary,
+                    }}
+                  />
                 ) : (
                   <div className='rounded-xl border border-dashed border-purple-92 bg-purple-98/50 p-8 text-center'>
                     <p className='text-sm font-medium text-main-secondary/80'>
@@ -506,92 +431,25 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   </div>
                 )}
 
-                {/* New uploads preview */}
-                {newFiles.length > 0 && (
-                  <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
-                    {newFiles.map((file, index) => {
-                      const isPrimary = primaryMediaId === `new:${index}`;
-                      return (
-                        <div
-                          key={`new-${index}`}
-                          className={cn(
-                            'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all',
-                            isPrimary
-                              ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
-                              : 'border-purple-92 opacity-70 hover:opacity-100'
-                          )}
-                        >
-                          {file.type.startsWith('image/') ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={file.name}
-                              className='h-full w-full object-cover'
-                            />
-                          ) : (
-                            <div className='flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96'>
-                              <Play className='h-6 w-6 text-main-primary/60' />
-                              <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
-                                {file.name}
-                              </span>
-                            </div>
-                          )}
-                          <button
-                            type='button'
-                            onClick={() => removeNewFile(index)}
-                            className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-10'
-                          >
-                            <X className='h-3 w-3' />
-                          </button>
-
-                          <button
-                            type='button'
-                            onClick={() => setPrimaryMediaId(`new:${index}`)}
-                            className={cn(
-                              'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
-                              isPrimary
-                                ? 'bg-main-primary text-white'
-                                : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
-                            )}
-                          >
-                            {isPrimary
-                              ? t('primary', { fallback: 'Primary' })
-                              : `${t('newUpload', { fallback: 'New' })} - ${t('makePrimary', { fallback: 'Make Primary' })}`}
-                          </button>
-
-                          {/* Selected overlay */}
-                          <div
-                            className={cn(
-                              'absolute inset-0 bg-main-primary/10 transition-opacity',
-                              isPrimary ? 'opacity-100' : 'opacity-0'
-                            )}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Upload drop zone */}
-                <input
-                  ref={fileInputRef}
-                  type='file'
-                  accept='image/*,video/*'
-                  multiple
-                  className='hidden'
-                  onChange={handleFileChange}
+                <NewFilesGrid
+                  files={newFiles}
+                  selectedIndices={selectedNewFileIndices}
+                  primaryId={primaryMediaId}
+                  analysisStatus={analysisStatus}
+                  qualityThreshold={QUALITY_THRESHOLD}
+                  onToggle={toggleNewFile}
+                  onRemove={removeNewFile}
+                  onSetPrimary={handleSetNewPrimary}
+                  labels={mediaLabels}
                 />
-                <button
-                  type='button'
-                  onClick={() => fileInputRef.current?.click()}
-                  className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-purple-98/30 px-6 py-8 text-center transition-colors hover:border-main-primary/40 hover:bg-purple-98/60 cursor-pointer w-full mt-2'
-                >
-                  <Upload className='mb-2 h-7 w-7 text-main-primary/50' />
-                  <p className='text-sm font-medium text-main-secondary/60'>{t('dragAndDrop')}</p>
-                  <p className='mt-0.5 text-xs text-main-secondary/40'>
-                    {t('uploadHint', { fallback: 'JPG, PNG, MP4 supported' })}
-                  </p>
-                </button>
+
+                <MediaUploadZone
+                  onFilesSelected={handleFilesSelected}
+                  labels={{
+                    dragAndDrop: t('dragAndDrop'),
+                    uploadHint: t('uploadHint', { fallback: 'JPG, PNG, MP4 supported' }),
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -608,8 +466,13 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
             <button
               type='button'
               onClick={handleSubmit}
-              disabled={updateMutation.isPending}
-              className='flex items-center gap-2 rounded-xl bg-main-primary px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-main-primary/90 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70'
+              disabled={updateMutation.isPending || !aiChecksPassed}
+              className={cn(
+                'flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all',
+                !updateMutation.isPending && aiChecksPassed
+                  ? 'bg-main-primary hover:bg-main-primary/90 hover:shadow-md'
+                  : 'bg-main-primary/30 cursor-not-allowed'
+              )}
             >
               {updateMutation.isPending ? (
                 <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white' />

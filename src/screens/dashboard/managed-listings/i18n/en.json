@@ -53,6 +53,8 @@
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
     "preview": "Preview",
+    "actions": "Actions",
+    "editListing": "Edit Listing",
     "backToList": "Back to list",
     "agent": {
       "title": "Listing Agent",

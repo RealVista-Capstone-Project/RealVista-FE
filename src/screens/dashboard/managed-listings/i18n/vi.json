@@ -50,10 +50,12 @@
     }
   },
   "ListingDetailPanel": {
-    "addressNotAvailable": "Địa chỉ không có sẵn",
-    "showCalendar": "Lịch hẹn",
+    "addressNotAvailable": "Không có địa chỉ",
+    "showCalendar": "Hiển thị lịch thuộc tính",
     "preview": "Xem trước",
-    "backToList": "Quay lại danh sách",
+    "actions": "Hành động",
+    "editListing": "Chỉnh sửa bài đăng",
+    "backToList": "Trở lại danh sách",
     "agent": {
       "title": "Người môi giới",
       "subtitle": "Bài đăng này được quản lý bởi môi giới",
@@ -71,7 +73,6 @@
       "tenants": "Người thuê",
       "request": "Yêu cầu",
       "notAvailable": "Không có"
-    },
-    "editListing": "Chỉnh sửa bài đăng"
+    }
   }
 }

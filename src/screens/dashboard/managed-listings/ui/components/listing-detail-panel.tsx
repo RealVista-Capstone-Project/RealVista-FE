@@ -15,7 +15,8 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BadgeCheck, Building2, Calendar, Eye, Mail, Phone } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { ArrowLeft, BadgeCheck, Building2, Calendar, Eye, Mail, Phone, ChevronDown, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
@@ -39,6 +40,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
   const queryClient = useQueryClient();
 
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [isActionsOpen, setIsActionsOpen] = React.useState(false);
 
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
@@ -129,22 +131,54 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               </p>
             </div>
 
-            <div className='flex flex-col items-center gap-2 sm:shrink-0 sm:items-end'>
-              <Link
-                href={`/listing/${listing.slug}`}
-                className='hidden whitespace-nowrap sm:flex items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
-              >
-                <Eye className='h-4 w-4' strokeWidth={2} />
-                <span>{t('preview')}</span>
-              </Link>
+            <div className='flex flex-col items-center gap-2 sm:shrink-0 sm:items-end relative'>
+              <div className='relative w-full sm:w-auto'>
+                <button
+                  type='button'
+                  onClick={() => setIsActionsOpen(!isActionsOpen)}
+                  className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+                  aria-label={t('actions')}
+                  aria-expanded={isActionsOpen}
+                >
+                  <span>{t('actions')}</span>
+                  <ChevronDown
+                    className={cn('h-4 w-4 transition-transform', isActionsOpen && 'rotate-180')}
+                    strokeWidth={2}
+                  />
+                </button>
 
-              <button
-                type='button'
-                className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
-              >
-                <Calendar className='h-4 w-4' strokeWidth={2} />
-                <span>{t('showCalendar')}</span>
-              </button>
+                {isActionsOpen && (
+                  <div className='absolute right-0 top-full z-30 mt-2 w-48 rounded-xl border border-purple-92 bg-white shadow-lg p-2 flex flex-col gap-1'>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setIsActionsOpen(false);
+                        setIsEditModalOpen(true);
+                      }}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                    >
+                      <Pencil className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('editListing')}</span>
+                    </button>
+                    <Link
+                      href={`/listing/${listing.slug}`}
+                      onClick={() => setIsActionsOpen(false)}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                    >
+                      <Eye className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('preview')}</span>
+                    </Link>
+                    <button
+                      type='button'
+                      onClick={() => setIsActionsOpen(false)}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                    >
+                      <Calendar className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('showCalendar')}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
