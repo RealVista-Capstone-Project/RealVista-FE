@@ -23,8 +23,9 @@ export interface ContentVerificationStatus {
 export function useContentVerification(
   name: string,
   content: string,
-  debounceMs = 1500
+  options?: { enabled?: boolean; debounceMs?: number }
 ) {
+  const { enabled = true, debounceMs = 1500 } = options || {};
   const [contentStatus, setContentStatus] = React.useState<ContentVerificationStatus>({
     isLoading: false,
     result: null,
@@ -46,6 +47,8 @@ export function useContentVerification(
   }, [name, content]);
 
   React.useEffect(() => {
+    if (!enabled) return;
+
     const isNameEmpty = name.trim().length === 0;
     const isContentEmpty = content.trim().length === 0;
 
@@ -57,7 +60,7 @@ export function useContentVerification(
       verifyListingContent();
     }, debounceMs);
     return () => clearTimeout(timer);
-  }, [name, content, verifyListingContent, debounceMs]);
+  }, [name, content, verifyListingContent, debounceMs, enabled]);
 
   const isContentValid = contentStatus.result?.isValid ?? false;
 

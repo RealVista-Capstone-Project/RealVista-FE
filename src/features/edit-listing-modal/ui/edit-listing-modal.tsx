@@ -56,7 +56,13 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   );
 
   // ── AI Hooks ──
-  const { contentStatus, isContentValid } = useContentVerification(name, content);
+  const isNameChanged = name.trim() !== listing.name;
+  const isContentChanged = content.trim() !== (listing.content || '');
+  const needsContentVerify = isNameChanged || isContentChanged;
+
+  const { contentStatus, isContentValid } = useContentVerification(name, content, {
+    enabled: needsContentVerify,
+  });
   const {
     analysisStatus,
     analyzeFile,
@@ -202,7 +208,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   // ── AI Validity Check ──
   const hasNewUploads = newFiles.length > 0;
   const aiChecksPassed =
-    isContentValid &&
+    (!needsContentVerify || isContentValid) &&
     (!hasNewUploads || (allImagesAnalyzed && allImagesPassed));
 
   const handleSubmit = async () => {
