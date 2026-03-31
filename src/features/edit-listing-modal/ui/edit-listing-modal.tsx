@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
 import * as Dialog from '@radix-ui/react-dialog';
-import { X, Save } from 'lucide-react';
+import { X, Save, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/shared/lib/utils';
 import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
@@ -207,6 +207,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
 
   // ── AI Validity Check ──
   const hasNewUploads = newFiles.length > 0;
+  const hasMediaSelected = selectedMediaIds.size > 0 || selectedNewFileIndices.size > 0;
   const aiChecksPassed =
     (!needsContentVerify || isContentValid) &&
     (!hasNewUploads || (allImagesAnalyzed && allImagesPassed));
@@ -419,6 +420,17 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   })}
                 </p>
 
+                {!hasMediaSelected && (
+                  <div className='mt-1 flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-[11px] font-medium text-red-600'>
+                    <AlertCircle className='h-4 w-4' />
+                    <span>
+                      {t('validation.mediaRequired', {
+                        fallback: 'At least one media item is required',
+                      })}
+                    </span>
+                  </div>
+                )}
+
                 {existingMediaItems.length > 0 ? (
                   <ExistingMediaGrid
                     items={existingMediaItems}
@@ -474,10 +486,10 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
             <button
               type='button'
               onClick={handleSubmit}
-              disabled={updateMutation.isPending || !aiChecksPassed}
+              disabled={updateMutation.isPending || !aiChecksPassed || !hasMediaSelected}
               className={cn(
                 'flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all',
-                !updateMutation.isPending && aiChecksPassed
+                !updateMutation.isPending && aiChecksPassed && hasMediaSelected
                   ? 'bg-main-primary hover:bg-main-primary/90 hover:shadow-md'
                   : 'bg-main-primary/30 cursor-not-allowed'
               )}

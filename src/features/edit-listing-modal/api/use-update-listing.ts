@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { listingApi, listingKeys } from '@/entities/listing/api';
+import { listingApi, listingKeys, revalidateListing } from '@/entities/listing/api';
 
 export function useUpdateListing() {
   const queryClient = useQueryClient();
@@ -16,7 +16,10 @@ export function useUpdateListing() {
       return response.payload.data;
     },
     onSuccess: (_, variables) => {
-      // Invalidate specific listing details
+      // Revalidate Next.js Server Cache for the listing detail
+      revalidateListing(variables.listingId);
+
+      // Invalidate specific listing details for React Query
       queryClient.invalidateQueries({
         queryKey: listingKeys.detail(variables.listingId),
       });
