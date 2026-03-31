@@ -21,6 +21,7 @@ export const listingKeys = {
   similar: (id: string, limit: number) => [...listingKeys.all, 'similar', id, limit] as const,
 
   // Managed listings (user's own listings)
-  managed: (params?: Record<string, unknown>) => [...listingKeys.all, 'managed', params] as const,
+  managed: (params?: Record<string, unknown>) =>
+    params ? ([...listingKeys.all, 'managed', params] as const) : ([...listingKeys.all, 'managed'] as const),
   managedSummary: () => [...listingKeys.all, 'managed-summary'] as const,
 } as const;

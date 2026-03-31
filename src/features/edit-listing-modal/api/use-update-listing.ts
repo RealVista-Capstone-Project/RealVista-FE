@@ -15,21 +15,23 @@ export function useUpdateListing() {
       const response = await listingApi.updateListing(listingId, data);
       return response.payload.data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       // Revalidate Next.js Server Cache for the listing detail
-      revalidateListing(variables.listingId);
+      await revalidateListing(variables.listingId);
 
-      // Invalidate specific listing details for React Query
-      queryClient.invalidateQueries({
-        queryKey: listingKeys.detail(variables.listingId),
-      });
-      // Invalidate managed listings list and summary
-      queryClient.invalidateQueries({
-        queryKey: listingKeys.managed(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: listingKeys.managedSummary(),
-      });
+      // Await React Query invalidations so the modal only closes
+      // after the fresh data has been fully fetched and cached.
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: listingKeys.detail(variables.listingId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: listingKeys.managed(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: listingKeys.managedSummary(),
+        }),
+      ]);
     },
   });
 }
