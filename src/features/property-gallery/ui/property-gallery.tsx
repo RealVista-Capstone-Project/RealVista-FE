@@ -74,37 +74,14 @@ export function PropertyGallery({
       {/* Hero Image */}
       <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-purple-98'>
         {mainImage.type === 'video' ? (
-          <>
-            {mainImage.thumbnailUrl ? (
-              <Image
-                src={mainImage.thumbnailUrl}
-                alt={mainImage.alt}
-                fill
-                className='object-cover'
-                priority
-              />
-            ) : (
-              <div className='flex h-full w-full items-center justify-center'>
-                <span className='text-sm text-main-secondary/60'>{t('video')}</span>
-              </div>
-            )}
-            <div className='absolute inset-0 flex items-center justify-center bg-black/20'>
-              <div
-                onClick={handleOpenVideo}
-                className='flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-white/90 text-main-primary shadow-xl transition-transform hover:scale-110 active:scale-95'
-              >
-                <svg
-                  width='32'
-                  height='32'
-                  viewBox='0 0 24 24'
-                  fill='currentColor'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path d='M8 5V19L19 12L8 5Z' />
-                </svg>
-              </div>
-            </div>
-          </>
+          <video
+            src={mainImage.url}
+            poster={mainImage.thumbnailUrl || undefined}
+            controls
+            playsInline
+            preload='metadata'
+            className='h-full w-full object-cover rounded-xl'
+          />
         ) : (
           <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
         )}
