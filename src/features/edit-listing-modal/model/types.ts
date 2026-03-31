@@ -24,9 +24,4 @@ export interface EditListingPayload {
   media_ids?: string[];
   primary_media_id?: string | null;
   listing_type?: ListingType;
-  new_medias?: {
-    url: string;
-    type: string;
-    thumbnailUrl?: string;
-  }[];
 }

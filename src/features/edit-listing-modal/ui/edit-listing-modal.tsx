@@ -6,7 +6,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/shared/lib/utils';
-import { mediaApi, type MediaUploadResponse } from '@/entities/media/api/media.api';
+import { mediaApi } from '@/entities/media/api/media.api';
 import { useUpdateListing } from '../api/use-update-listing';
 import type { EditListingPayload } from '../model/types';
 import type { Listing, ListingType } from '@/entities/listing';
@@ -241,7 +241,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       if (newFiles.length > 0) {
         const filesToUpload = newFiles.filter((_, i) => selectedNewFileIndices.has(i));
         if (filesToUpload.length > 0) {
-          const uploadRes = await mediaApi.uploadBulk(filesToUpload);
+          const uploadRes = await mediaApi.uploadBulk(filesToUpload, listing.property_id);
           if (
             uploadRes.status < 200 ||
             uploadRes.status >= 300 ||
@@ -253,14 +253,17 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
           }
 
           const uploadedResults = uploadRes.payload.data.uploaded_files;
-          payload.new_medias = uploadedResults.map((res: MediaUploadResponse, index: number) => ({
-            url: res.media_url,
-            type: res.media_type,
-            isPrimary: primaryMediaId === `new:${index}`,
-          }));
+          const newMediaIds = uploadedResults.map((res) => res.media_id);
 
+          // Add newly uploaded media IDs to the list
+          payload.media_ids = [...(payload.media_ids || []), ...newMediaIds];
+
+          // If a new file was set as primary, resolve its real UUID
           if (primaryMediaId?.startsWith('new:')) {
-            payload.primary_media_id = null;
+            const index = parseInt(primaryMediaId.split(':')[1], 10);
+            if (uploadedResults[index]) {
+              payload.primary_media_id = uploadedResults[index].media_id;
+            }
           }
         }
       }
