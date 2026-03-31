@@ -51,10 +51,10 @@
   },
   "ListingDetailPanel": {
     "addressNotAvailable": "Không có địa chỉ",
-    "showCalendar": "Hiển thị lịch thuộc tính",
+    "showCalendar": "Lịch hẹn",
     "preview": "Xem trước",
     "actions": "Hành động",
-    "editListing": "Chỉnh sửa bài đăng",
+    "editListing": "Chỉnh sửa",
     "backToList": "Trở lại danh sách",
     "agent": {
       "title": "Người môi giới",
@@ -65,6 +65,12 @@
       "verified": "Môi giới đã xác thực",
       "contact": "Liên hệ môi giới"
     },
+    "deleteListing": "Xóa bài đăng",
+    "deleteConfirmTitle": "Xóa bài đăng",
+    "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.",
+    "deleteConfirmCancel": "Hủy",
+    "deleteConfirmApprove": "Xóa",
+    "deleting": "Đang xóa...",
     "features": {
       "properties": "Bất động sản",
       "rooms": "Phòng",

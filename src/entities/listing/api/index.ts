@@ -112,6 +112,12 @@ export const listingApi = {
    */
   updateListing: (listingId: string, data: Record<string, unknown>) =>
     http.put<ApiResponse<unknown>>(`/listings/${listingId}`, data),
+
+  /**
+   * Delete a listing (soft delete)
+   * Requires authentication and ownership
+   */
+  deleteListing: (listingId: string) => http.delete<ApiResponse<void>>(`/listings/${listingId}`),
 } as const;
 
 // Re-export query keys, queries, and actions

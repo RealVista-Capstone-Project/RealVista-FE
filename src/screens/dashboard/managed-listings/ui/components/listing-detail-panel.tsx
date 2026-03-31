@@ -11,9 +11,18 @@ import { ListingMetricsCard } from '@/features/listing-analytics';
 import { ListingStatusActions } from '@/features/listing-status';
 import { PropertyGallery } from '@/features/property-gallery';
 import { RentalFeatures } from '@/features/rental-features';
+import { useDeleteListing } from '@/features/edit-listing-modal/api/use-delete-listing';
 import { Link } from '@/shared/config/i18n/navigation';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import {
@@ -26,6 +35,7 @@ import {
   Phone,
   ChevronDown,
   Pencil,
+  Trash2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -52,6 +62,19 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [isActionsOpen, setIsActionsOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+
+  const deleteMutation = useDeleteListing();
+
+  const handleDelete = async () => {
+    try {
+      await deleteMutation.mutateAsync(listing.listing_id);
+      setIsDeleteDialogOpen(false);
+      if (onBack) onBack();
+    } catch (error) {
+      console.error('Failed to delete listing:', error);
+    }
+  };
 
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
@@ -195,6 +218,18 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     >
                       <Calendar className='h-4 w-4' strokeWidth={2} />
                       <span>{t('showCalendar')}</span>
+                    </button>
+                    <div className='my-1 h-px bg-purple-92/50' />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setIsActionsOpen(false);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium'
+                    >
+                      <Trash2 className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('deleteListing', { fallback: 'Delete Listing' })}</span>
                     </button>
                   </div>
                 )}
@@ -413,6 +448,41 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         isOpen={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className='sm:max-w-[425px]'>
+          <DialogHeader>
+            <DialogTitle>{t('deleteConfirmTitle', { fallback: 'Delete Listing' })}</DialogTitle>
+            <DialogDescription>
+              {t('deleteConfirmDescription', {
+                fallback:
+                  'Are you sure you want to delete this listing? This action cannot be undone.',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2'>
+            <button
+              type='button'
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className='flex h-11 items-center justify-center rounded-lg border border-purple-92 bg-white px-6 text-sm font-bold text-main-black transition-colors hover:bg-purple-98'
+              disabled={deleteMutation.isPending}
+            >
+              {t('deleteConfirmCancel', { fallback: 'Cancel' })}
+            </button>
+            <button
+              type='button'
+              onClick={handleDelete}
+              className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_rgba(220,38,38,0.2)] disabled:opacity-50 disabled:cursor-not-allowed'
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending
+                ? t('deleting', { fallback: 'Deleting...' })
+                : t('deleteConfirmApprove', { fallback: 'Delete' })}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
