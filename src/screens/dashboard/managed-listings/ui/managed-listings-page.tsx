@@ -428,6 +428,7 @@ export function ManagedListingsPage() {
       >
         {listingDetail && !isDetailLoading ? (
           <ListingDetailPanel
+            key={listingDetail.listing_id}
             listing={listingDetail}
             onBack={isMobile ? () => setSelectedListingId(null) : undefined}
           />

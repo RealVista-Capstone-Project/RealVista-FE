@@ -134,7 +134,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
       {/* Property Gallery - matches listing-detail-screen */}
       <div className='px-4 sm:px-12 pt-4 sm:pt-8'>
-        <PropertyGallery images={property.images} />
+        <PropertyGallery key={listing.listing_id} images={property.images} />
       </div>
 
       {/* Content */}
