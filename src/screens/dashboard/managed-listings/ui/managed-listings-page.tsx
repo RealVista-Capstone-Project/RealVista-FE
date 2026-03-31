@@ -430,7 +430,7 @@ export function ManagedListingsPage() {
           <ListingDetailPanel
             key={listingDetail.listing_id}
             listing={listingDetail}
-            onBack={isMobile ? () => setSelectedListingId(null) : undefined}
+            onBack={() => setSelectedListingId(null)}
           />
         ) : (
           <div className='flex h-full items-center justify-center'>
