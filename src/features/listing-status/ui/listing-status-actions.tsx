@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Send, Globe, EyeOff, CheckCircle, Home } from 'lucide-react';
+import { Globe, EyeOff, CheckCircle, Home } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   useUpdateListingStatus,
@@ -27,9 +27,9 @@ type ActionConfig = {
 
 /**
  * Returns all status actions with enabled/disabled state based on current status.
- * - DRAFT: Submit for Review, Publish = enabled; Unpublish, Mark as Sold/Rented = disabled
+ * - DRAFT: Publish = enabled; Unpublish, Mark as Sold/Rented = disabled
  * - PENDING: Publish = enabled; others = disabled
- * - PUBLISHED: Unpublish, Mark as Sold/Rented = enabled; Submit, Publish = disabled
+ * - PUBLISHED: Unpublish, Mark as Sold/Rented = enabled; Publish = disabled
  * - SOLD/RENTED: All disabled (final state)
  */
 function getAllActions(
@@ -42,12 +42,6 @@ function getAllActions(
   const isPublished = status === 'PUBLISHED';
 
   return [
-    {
-      action: 'submit-for-review' as const,
-      label: t('actions.submitForReview'),
-      icon: <Send className='h-4 w-4' strokeWidth={2} />,
-      enabled: isDraft,
-    },
     {
       action: 'publish' as const,
       label: t('actions.publish'),

@@ -6,14 +6,12 @@ import { listingApi } from '@/entities/listing/api';
 import { listingKeys } from '@/entities/listing/api/keys';
 
 export type ListingStatusAction =
-  | 'submit-for-review'
   | 'publish'
   | 'unpublish'
   | 'mark-as-sold'
   | 'mark-as-rented';
 
 const actionToApiMethod = {
-  'submit-for-review': listingApi.submitForReview,
   publish: listingApi.publish,
   unpublish: listingApi.unpublish,
   'mark-as-sold': listingApi.markAsSold,
@@ -21,10 +19,6 @@ const actionToApiMethod = {
 };
 
 const actionToMessage: Record<ListingStatusAction, { success: string; error: string }> = {
-  'submit-for-review': {
-    success: 'Listing submitted for review',
-    error: 'Failed to submit for review',
-  },
   publish: {
     success: 'Listing published successfully',
     error: 'Failed to publish listing',

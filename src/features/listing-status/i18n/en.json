@@ -9,7 +9,6 @@
       "archived": "Archived"
     },
     "actions": {
-      "submitForReview": "Submit for Review",
       "publish": "Publish",
       "unpublish": "Unpublish",
       "markAsSold": "Mark as Sold",

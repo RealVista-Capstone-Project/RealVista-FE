@@ -70,12 +70,6 @@ export const listingApi = {
   // ==================== Status Update Operations ====================
 
   /**
-   * Submit listing for review (DRAFT → PENDING)
-   */
-  submitForReview: (listingId: string) =>
-    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/submit-for-review`, undefined),
-
-  /**
    * Publish listing (DRAFT/PENDING → PUBLISHED)
    */
   publish: (listingId: string) =>
