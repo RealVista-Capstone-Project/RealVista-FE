@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { signIn } from '@/shared/lib/auth/config';
+import { determineUserRole, getRedirectPathByRole } from '@/shared/lib/auth/rbac';
 
 /**
  * OAuth Callback Route Handler
@@ -7,17 +8,17 @@ import { signIn } from '@/shared/lib/auth/config';
  * Receives OAuth callback from backend with user credentials.
  * Backend redirects here after Google OAuth flow completes.
  *
- * URL Format: /[locale]/auth/callback?user_id=xxx&access_token=yyy&email=zzz
+ * URL Format: /[locale]/auth/callback?user_id=xxx&access_token=yyy&email=zzz&roles=OWNER,BUYER
  *
  * Process:
  * 1. Extract locale from URL pathname
  * 2. Extract OAuth parameters from query string
  * 3. Validate required parameters (user_id, access_token, email)
  * 4. Create NextAuth session using OAuth provider
- * 5. Redirect to dashboard or show error
+ * 5. Redirect based on user role
  *
  * @param request - Next.js request object
- * @returns Redirect to dashboard or login page with error
+ * @returns Redirect to appropriate page based on role, or login page with error
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
   const userId = searchParams.get('user_id');
   const accessToken = searchParams.get('access_token');
   const email = searchParams.get('email');
+  const roles = searchParams.get('roles'); // Comma-separated roles from backend
   const error = searchParams.get('error');
 
   // Handle errors from BE
@@ -54,11 +56,12 @@ export async function GET(request: NextRequest) {
   try {
     console.log('[OAuth Callback] Creating session for:', email);
 
-    // Create NextAuth session using OAuth provider
+    // Create NextAuth session using OAuth provider (pass roles if available)
     const result = await signIn('oauth', {
       userId: userId,
       email: email,
       accessToken: accessToken,
+      roles: roles || '',
       redirect: false,
     });
 
@@ -69,8 +72,12 @@ export async function GET(request: NextRequest) {
 
     console.log('[OAuth Callback] Session created successfully for:', email);
 
-    // Success! Redirect to buy page with locale
-    return NextResponse.redirect(new URL(`/${locale}/buy`, request.url));
+    // Determine redirect path based on role
+    const backendRoles = roles ? roles.split(',').map((r) => r.trim()) : undefined;
+    const userRole = determineUserRole(backendRoles);
+    const redirectPath = getRedirectPathByRole(userRole);
+
+    return NextResponse.redirect(new URL(`/${locale}${redirectPath}`, request.url));
   } catch (error) {
     console.error('[OAuth Callback] Unexpected error:', error);
     return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url));

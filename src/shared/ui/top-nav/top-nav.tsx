@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
-import { Bell, ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
+import { ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -14,6 +14,7 @@ import { cn } from '@/shared/lib/utils';
 import RealVistaLogo from '@/shared/assets/logo/logo';
 import { ProfileDropdown, Separator } from '@/shared/ui';
 import { ChatDropdownContainer } from '@/widgets/chat-dropdown';
+import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
 export type NavItem = {
   id: string;
@@ -147,19 +148,11 @@ export function TopNav({
 
       {/* Right Actions */}
       <div className='flex items-center gap-6'>
-        {/* Notification Button - only shown when logged in, hidden on mobile for public variant */}
+        {/* Notification Dropdown - only shown when logged in, hidden on mobile for public variant */}
         {isUserLoggedIn && (
-          <button
-            type='button'
-            className={cn(
-              'flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92',
-              variant === 'public' && 'hidden lg:flex'
-            )}
-            aria-label='Notifications'
-            title='Notifications'
-          >
-            <Bell className='h-6 w-6' strokeWidth={2} />
-          </button>
+          <div className={cn(variant === 'public' && 'hidden lg:block')}>
+            <NotificationDropdownContainer />
+          </div>
         )}
 
         {/* Bookmark Button - only for public variant, shown when user is logged in, hidden on mobile */}

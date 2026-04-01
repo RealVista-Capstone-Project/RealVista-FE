@@ -20,6 +20,12 @@ export const ROUTES = {
     managedListings: '/dashboard/listings',
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
+    manageAgent: '/dashboard/manage-agent',
+    agentDetail: (id: string) => `/dashboard/manage-agent/${id}`
+  },
+  manageAgent: {
+    root: '/manage-agent',
+    detail: (id: string) => `/manage-agent/${id}`,
   },
   settings: '/settings',
 } as const;

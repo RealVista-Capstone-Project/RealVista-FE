@@ -9,7 +9,7 @@ export interface AuthSession {
     id: string;
     email: string;
     name?: string | null;
-    role?: 'user' | 'admin' | 'moderator';
+    role?: 'user' | 'owner' | 'admin' | 'moderator';
     accessToken?: string;
     backendRoles?: string[];
   };
@@ -77,7 +77,7 @@ export function isAuthenticated(session: AuthSession | null): session is AuthSes
  */
 export function hasRole(
   session: AuthSession | null,
-  role: 'user' | 'admin' | 'moderator'
+  role: 'user' | 'owner' | 'admin' | 'moderator'
 ): boolean {
   return session?.user?.role === role;
 }
