@@ -88,23 +88,30 @@ export async function executeStatusUpdate(
     await mutateAsync({ listingId, action });
     toast.success(messages.success);
   } catch (error: any) {
-    console.error('Listing status update error:', error);
-
-    // Extract error code from various possible structures
+    // 1. Extract error details safely
     const payload = error?.payload || error?.response?.data || error;
     const errorCode = payload?.error_code || payload?.errorCode;
-    const errorMessage = payload?.message || error?.message;
+    const backendMessage = payload?.message;
 
+    // 2. Handle specific business logic errors (localized)
     if (errorCode === 'DUPLICATE_LISTING_PUBLISH') {
       toast.error(t('errors.duplicatePublish'));
       return;
     }
+
     if (errorCode === 'PROPERTY_NOT_AVAILABLE') {
       toast.error(t('errors.propertyNotAvailable'));
       return;
     }
 
-    // fallback to backend message if available, otherwise use default generic error
-    toast.error(errorMessage || messages.error);
+    // 3. Log UNEXPECTED errors for debugging
+    console.error('Unhandled Listing Status Update Error:', error);
+
+    // 4. Final decision on what message to show
+    // We prioritize: Backend custom message > Generic action error message
+    const displayMessage =
+      backendMessage && backendMessage !== 'Http Error' ? backendMessage : messages.error;
+
+    toast.error(displayMessage);
   }
 }
