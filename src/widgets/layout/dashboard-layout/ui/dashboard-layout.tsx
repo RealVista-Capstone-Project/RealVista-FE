@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Image from 'next/image';
 import {
-  Bell,
   Calendar,
   ChevronDown,
   Columns,
@@ -19,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
+import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
 export interface SidebarMenuItem {
   id: string;
@@ -268,14 +268,8 @@ export function DashboardLayout({
 
           {/* Right Actions */}
           <div className='flex items-center gap-6'>
-            {/* Notification Button */}
-            <button
-              type='button'
-              className='flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
-              aria-label='Notifications'
-            >
-              <Bell className='h-6 w-6' strokeWidth={2} />
-            </button>
+            {/* Notification Dropdown */}
+            <NotificationDropdownContainer />
 
             {/* Divider */}
             <div className='flex h-10 items-center'>
