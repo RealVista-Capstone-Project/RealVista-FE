@@ -16,6 +16,10 @@
     },
     "tooltips": {
       "notAvailable": "Not available for current status"
+    },
+    "errors": {
+      "duplicatePublish": "The creator of this listing already has a published listing of this type for this property.",
+      "propertyNotAvailable": "The associated property is not in an active state and cannot be listed."
     }
   }
 }

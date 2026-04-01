@@ -117,7 +117,7 @@ export function ListingStatusActions({
               type='button'
               disabled={isDisabled}
               onClick={() =>
-                enabled && !isPending && executeStatusUpdate(mutateAsync, listingId, action)
+                enabled && !isPending && executeStatusUpdate(mutateAsync, listingId, action, t)
               }
               title={!enabled ? t('tooltips.notAvailable') : undefined}
               className={cn(

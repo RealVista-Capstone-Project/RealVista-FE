@@ -5,11 +5,7 @@ import { toast } from 'sonner';
 import { listingApi } from '@/entities/listing/api';
 import { listingKeys } from '@/entities/listing/api/keys';
 
-export type ListingStatusAction =
-  | 'publish'
-  | 'unpublish'
-  | 'mark-as-sold'
-  | 'mark-as-rented';
+export type ListingStatusAction = 'publish' | 'unpublish' | 'mark-as-sold' | 'mark-as-rented';
 
 const actionToApiMethod = {
   publish: listingApi.publish,
@@ -84,13 +80,31 @@ export function useUpdateListingStatus() {
 export async function executeStatusUpdate(
   mutateAsync: (variables: { listingId: string; action: ListingStatusAction }) => Promise<unknown>,
   listingId: string,
-  action: ListingStatusAction
+  action: ListingStatusAction,
+  t: (key: string) => string
 ) {
   const messages = actionToMessage[action];
   try {
     await mutateAsync({ listingId, action });
     toast.success(messages.success);
-  } catch {
-    toast.error(messages.error);
+  } catch (error: any) {
+    console.error('Listing status update error:', error);
+
+    // Extract error code from various possible structures
+    const payload = error?.payload || error?.response?.data || error;
+    const errorCode = payload?.error_code || payload?.errorCode;
+    const errorMessage = payload?.message || error?.message;
+
+    if (errorCode === 'DUPLICATE_LISTING_PUBLISH') {
+      toast.error(t('errors.duplicatePublish'));
+      return;
+    }
+    if (errorCode === 'PROPERTY_NOT_AVAILABLE') {
+      toast.error(t('errors.propertyNotAvailable'));
+      return;
+    }
+
+    // fallback to backend message if available, otherwise use default generic error
+    toast.error(errorMessage || messages.error);
   }
 }
