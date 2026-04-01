@@ -3,6 +3,20 @@
     "viewAllPhotos": "View all photos",
     "tour3D": "3D Tour",
     "video": "Video",
-    "noImage": "No image"
+    "noImage": "No image",
+    "viewerTitle": "Property Media Viewer",
+    "photoAlt": "Property photo {index}",
+    "photosTab": "Photos",
+    "tour3DTab": "3D Tour",
+    "videoTab": "Video",
+    "requestTour": "Request a tour",
+    "favorite": "Favorite",
+    "navigationHint": "Press ESC or click X to close • Use arrow keys to navigate",
+    "tour3DPlaceholder": "3D Tour",
+    "tour3DPlaceholderDescription": "3D tour content will be displayed here",
+    "videoPlaceholder": "Video Tour",
+    "videoPlaceholderDescription": "Video content will be displayed here"
+
+
   }
 }

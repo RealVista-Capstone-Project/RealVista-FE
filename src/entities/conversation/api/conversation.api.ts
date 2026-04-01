@@ -18,10 +18,10 @@ export const conversationApi = {
   listConversations: () => http.get<ConversationListItemResponse[]>('/conversations'),
 
   /**
-   * Get conversation between current user and another user
+   * Create or get conversation between current user and another user
    */
-  getConversation: (otherUserId: string) =>
-    http.get<ConversationResponse>(`/conversations/users/${otherUserId}`),
+  createOrGetConversation: (otherUserId: string) =>
+    http.post<ApiResponse<ConversationResponse>>(`/conversations/users/${otherUserId}`, {}),
 
   /**
    * Get messages from a conversation with cursor-based pagination
