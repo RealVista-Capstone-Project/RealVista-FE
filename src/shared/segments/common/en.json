@@ -1,10 +1,19 @@
 {
   "DashboardLayout": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "insight": "Insight",
+      "listings": "My Listings",
+      "myEngagements": "My Engagements",
+      "tenants": "Tenants",
+      "messages": "Messages"
+    },
     "pageTitle": {
       "default": "RealVista",
       "dashboard": "Dashboard",
       "insight": "Insight",
       "managedListings": "Managed Listings",
+      "myEngagements": "My Engagements",
       "tenants": "Tenants",
       "messages": "Messages"
     },

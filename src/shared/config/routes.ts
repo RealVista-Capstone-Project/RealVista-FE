@@ -13,11 +13,11 @@ export const ROUTES = {
   sell: '/sell',
   favorited: '/favorited',
   appointments: '/appointments',
-  myEngagements: '/my-engagements',
   dashboard: {
     root: '/dashboard',
     insight: '/dashboard/insight',
     managedListings: '/dashboard/listings',
+    myEngagements: '/dashboard/my-engagements',
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
     manageAgent: '/dashboard/manage-agent',

@@ -1,10 +1,19 @@
 {
   "DashboardLayout": {
+    "menu": {
+      "dashboard": "Bảng điều khiển",
+      "insight": "Thống kê",
+      "listings": "Bài đăng của tôi",
+      "myEngagements": "Engagement của tôi",
+      "tenants": "Người thuê",
+      "messages": "Tin nhắn"
+    },
     "pageTitle": {
       "default": "RealVista",
       "dashboard": "Dashboard",
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
+      "myEngagements": "Engagement của tôi",
       "tenants": "Người thuê",
       "messages": "Tin nhắn"
     },

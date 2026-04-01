@@ -43,7 +43,6 @@ const defaultNavItems: NavItem[] = [
   { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
   { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
   { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
-  { id: 'myEngagements', translationKey: 'myEngagements', href: ROUTES.myEngagements },
 ];
 
 const defaultUser = {
@@ -130,7 +129,7 @@ export function TopNav({
                 return (
                   <Link
                     key={item.id}
-                    href={item.href}
+                    href={`/${locale}${item.href}`}
                     className={cn(
                       'text-base leading-[1.5] transition-colors hover:text-main-primary',
                       isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
