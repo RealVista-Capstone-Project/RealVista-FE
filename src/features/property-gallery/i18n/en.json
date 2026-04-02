@@ -15,8 +15,8 @@
     "tour3DPlaceholder": "3D Tour",
     "tour3DPlaceholderDescription": "3D tour content will be displayed here",
     "videoPlaceholder": "Video Tour",
-    "videoPlaceholderDescription": "Video content will be displayed here"
-
-
+    "videoPlaceholderDescription": "Video content will be displayed here",
+    "noMediaTitle": "Media not available",
+    "noMediaDescription": "This content is not currently available."
   }
 }
