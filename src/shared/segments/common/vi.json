@@ -25,9 +25,13 @@
     "usableSize": "Sử dụng: {size} m²",
     "propertyStatus": {
       "draft": "Nháp",
+      "pending": "Đang chờ",
+      "verified": "Đã xác thực",
+      "rejected": "Bị từ chối",
       "available": "Sẵn sàng",
       "reserved": "Đã đặt",
-      "sold": "Đã bán"
+      "sold": "Đã bán",
+      "rented": "Đã cho thuê"
     },
     "representing": {
       "label": "Tôi đại diện cho",

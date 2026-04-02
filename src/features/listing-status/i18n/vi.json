@@ -20,6 +20,21 @@
     "errors": {
       "duplicatePublish": "Người tạo tin đăng này đã có một tin đăng cùng loại (Bán/Cho thuê) đang hiển thị cho mã bất động sản này.",
       "propertyNotAvailable": "Bất động sản liên quan chưa ở trạng thái sẵn sàng để đăng tin."
+    },
+    "confirm": {
+      "markAsSold": {
+        "title": "Đánh dấu đã bán",
+        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã bán? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các đại lý khác."
+      },
+      "markAsRented": {
+        "title": "Đánh dấu đã cho thuê",
+        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã cho thuê? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các đại lý khác."
+      },
+      "cancel": "Hủy",
+      "proceed": "Xác nhận"
+    },
+    "common": {
+      "processing": "Đang xử lý..."
     }
   }
 }

@@ -10,11 +10,7 @@ import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { mediaApi } from '@/entities/media/api/media.api';
-import type {
-  UserProperty,
-  CreateListingFormData,
-  CreateListingPayload,
-} from '../model/types';
+import type { UserProperty, CreateListingFormData, CreateListingPayload } from '../model/types';
 import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
 import { propertyQueries } from '@/entities/property';
@@ -24,13 +20,25 @@ export interface CreateListingModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function PropertyStatusBadge({ status }: { status: UserProperty['status'] }) {
+function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
   const t = useTranslations('CreateListingModal');
 
-  const statusConfig: Record<UserProperty['status'], { label: string; className: string }> = {
+  const statusConfig: Record<string, { label: string; className: string }> = {
     DRAFT: {
       label: t('propertyStatus.draft'),
       className: 'bg-grey-100 text-grey-600',
+    },
+    PENDING: {
+      label: t('propertyStatus.pending'),
+      className: 'bg-blue-50 text-blue-700',
+    },
+    VERIFIED: {
+      label: t('propertyStatus.verified'),
+      className: 'bg-indigo-50 text-indigo-700',
+    },
+    REJECTED: {
+      label: t('propertyStatus.rejected'),
+      className: 'bg-red-50 text-red-700',
     },
     AVAILABLE: {
       label: t('propertyStatus.available'),
@@ -44,9 +52,16 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] }) {
       label: t('propertyStatus.sold'),
       className: 'bg-red-50 text-red-700',
     },
+    RENTED: {
+      label: t('propertyStatus.rented'),
+      className: 'bg-teal-50 text-teal-700',
+    },
   };
 
-  const config = statusConfig[status];
+  const config = statusConfig[status] || {
+    label: status,
+    className: 'bg-grey-100 text-grey-600',
+  };
 
   return (
     <span
@@ -223,7 +238,8 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
   const properties: UserProperty[] = rawProperties.map((p: any) => {
     const standardMedia = (p.media ?? []).filter((m: any) => m.is_property_standard);
-    const primaryMedia = standardMedia.find((m: any) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
+    const primaryMedia =
+      standardMedia.find((m: any) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
 
     return {
       propertyId: p.property_id,

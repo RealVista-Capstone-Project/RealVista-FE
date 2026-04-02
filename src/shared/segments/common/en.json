@@ -25,9 +25,13 @@
     "usableSize": "Usable: {size} m²",
     "propertyStatus": {
       "draft": "Draft",
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected",
       "available": "Available",
       "reserved": "Reserved",
-      "sold": "Sold"
+      "sold": "Sold",
+      "rented": "Rented"
     },
     "representing": {
       "label": "I'm representing",
