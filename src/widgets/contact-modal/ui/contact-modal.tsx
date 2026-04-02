@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { cn } from '@/shared/lib/utils';
@@ -89,11 +90,15 @@ export function ContactModal({
 
         {/* Listing Preview */}
         <div className='flex gap-3 rounded-lg border border-border bg-muted/30 p-3'>
-          <img
-            src={listing.image}
-            alt={listing.title}
-            className='h-16 w-20 rounded-md object-cover'
-          />
+          <div className='relative h-16 w-20 flex-shrink-0'>
+            <Image
+              src={listing.image}
+              alt={listing.title}
+              fill
+              className='rounded-md object-cover'
+              sizes='80px'
+            />
+          </div>
           <div className='flex flex-col justify-center gap-1'>
             <p className='line-clamp-1 text-sm font-medium text-main-black'>{listing.title}</p>
             <p className='text-base font-bold text-main-primary'>{formatVND(listing.price)}</p>

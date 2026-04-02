@@ -10,6 +10,7 @@ import {
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
 import { Button } from '@/shared/ui/button/button';
+import { Skeleton } from '@/shared/ui/skeleton/skeleton';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,6 +20,9 @@ import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/
 import { useHideFooter } from '@/widgets/layout';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { behaviorTracker } from '@/shared/lib/analytics';
+import { SaveSearchButton, SavedSearchesPopover } from '@/features/save-search';
+import { RecommendedListings } from '@/widgets/recommended-listings';
 
 function RentPageContent() {
   const t = useTranslations('Rent');
@@ -32,7 +36,7 @@ function RentPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [totalResults, setTotalResults] = useState(0);  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();
@@ -127,10 +131,12 @@ function RentPageContent() {
       const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
       setListings(response?.content || []);
       setTotalPages(response?.total_pages || 1);
+      setTotalResults(response?.total_elements || 0);
     } catch (error) {
       console.error('Search failed:', error);
       setListings([]);
       setTotalPages(1);
+      setTotalResults(0);
     } finally {
       setIsLoading(false);
     }
@@ -216,7 +222,9 @@ function RentPageContent() {
             </h1>
 
             {/* Search Option Toggle */}
-            <div className='w-full sm:w-auto'>
+            <div className='flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0'>
+              <SavedSearchesPopover searchType='RENT' />
+              <SaveSearchButton searchType='RENT' criteria={searchCriteria} />
               <Button
                 type='button'
                 onClick={() => setIsMapView(!isMapView)}
@@ -233,7 +241,7 @@ function RentPageContent() {
           </div>
 
           {/* Simple Search Bar */}
-          <div className='bg-white rounded-lg border border-purple-92 p-6 mb-6'>
+          <div className='bg-white rounded-lg border border-purple-92 p-6'>
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               {/* Location */}
               <div>
@@ -248,6 +256,7 @@ function RentPageContent() {
                   onChange={(e) => setLocation(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={100}
                 />
               </div>
 
@@ -264,6 +273,7 @@ function RentPageContent() {
                   onChange={(e) => setMinPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
@@ -280,6 +290,7 @@ function RentPageContent() {
                   onChange={(e) => setMaxPrice(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  maxLength={15}
                 />
               </div>
 
@@ -316,41 +327,76 @@ function RentPageContent() {
         </div>
       </section>
 
+      {/* Recommended Listings */}
+      <RecommendedListings sourcePage='rent' />
+
       {/* Results Section */}
-      <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>
+      <section className='px-6 pb-12 pt-2 sm:px-6 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
+          {/* Results Header */}
+          <div className='mb-6 flex items-center justify-between'>
+            <h2 className='text-xl font-bold text-main-black sm:text-2xl'>
+              {t('resultsHeader')}
+            </h2>
+          </div>
+
           {isLoading ? (
-            <div className='flex items-center justify-center py-12'>
-              <div className='text-lg text-main-secondary'>Loading...</div>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+              {Array.from({ length: itemsPerPage }).map((_, i) => (
+                <div key={i} className='rounded-lg border-[1.5px] border-purple-96 bg-white p-4'>
+                  <Skeleton className='aspect-[16/10] w-full rounded-lg mb-4' />
+                  <Skeleton className='h-6 w-3/4 mb-2' />
+                  <Skeleton className='h-5 w-1/2 mb-3' />
+                  <Skeleton className='h-px w-full mb-3' />
+                  <div className='flex gap-4 justify-center'>
+                    <Skeleton className='h-4 w-12' />
+                    <Skeleton className='h-4 w-12' />
+                    <Skeleton className='h-4 w-12' />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <>
               {/* Property Grid */}
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {listings.map((listing, index) => (
-                  <RealVistaListingCard
-                    key={listing.listing_id || index}
-                    id={listing.listing_id}
-                    title={listing.name}
-                    price={listing.price || 0}
-                    image={
-                      listing.thumbnail ||
-                      'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
-                    }
-                    address={listing.full_address || 'Unknown'}
-                    attributes={listing.attributes as ListingAttribute[]}
-                    isFavorite={listing.is_favorite ?? false}
-                    onToggleFavorite={handleToggleFavorite}
-                    onClick={() => router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`)}
-                  />
-                ))}
-              </div>
+              {listings.length > 0 && (
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+                  {listings.map((listing, index) => (
+                    <RealVistaListingCard
+                      key={listing.listing_id || index}
+                      id={listing.listing_id}
+                      title={listing.name}
+                      price={listing.price || 0}
+                      image={
+                        listing.thumbnail ||
+                        'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
+                      }
+                      address={listing.full_address || 'Unknown'}
+                      attributes={listing.attributes as ListingAttribute[]}
+                      isFavorite={listing.is_favorite ?? false}
+                      onToggleFavorite={handleToggleFavorite}
+                      onClick={() => {
+                        behaviorTracker.trackClick(listing.listing_id, {
+                          listing_type: 'RENT',
+                          price: listing.price,
+                          source_page: 'rent',
+                        });
+                        router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
 
               {/* No Results */}
               {listings.length === 0 && (
-                <div className='py-12 text-center'>
-                  <p className='text-lg text-main-secondary'>
-                    No properties found. Try adjusting your search criteria.
+                <div className='py-16 text-center'>
+                  <Search className='mx-auto h-12 w-12 text-purple-80 mb-4' />
+                  <p className='text-lg font-medium text-main-black mb-2'>
+                    {t('noResults')}
+                  </p>
+                  <p className='text-sm text-main-secondary'>
+                    {t('noResultsHint')}
                   </p>
                 </div>
               )}

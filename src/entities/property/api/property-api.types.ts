@@ -89,6 +89,97 @@ export interface PropertySearchResponse {
   timestamp: string;
 }
 
+export interface MyPropertiesSearchCriteria {
+  keyword?: string;
+  page: number;
+  size: number;
+}
+
+export interface PropertyTypeInfo {
+  property_type_id: string;
+  property_type_name: string | null;
+  property_type_code: string | null;
+  property_category_id: string | null;
+  property_category_name: string | null;
+  property_category_code: string | null;
+}
+
+export interface LocationInfo {
+  location_id: string;
+  city_name: string | null;
+  district_name: string | null;
+  ward_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PropertyAttributeItem {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: string;
+  icon: string | null;
+  unit: string | null;
+  value_number: number | null;
+  value_text: string | null;
+  value_boolean: boolean | null;
+  display_value: string | null;
+}
+
+export interface PropertyMediaItem {
+  media_id: string;
+  media_type: string;
+  media_url: string;
+  thumbnail_url: string | null;
+  is_primary: boolean;
+  is_property_standard: boolean;
+  display_order: number;
+}
+
+export interface PropertyAmenityItem {
+  amenity_id: string;
+  amenity_name: string;
+  amenity_type: string | null;
+  description: string | null;
+}
+
+export interface PropertySummaryResponse {
+  property_id: string;
+  property_type_id: string;
+  street_address: string;
+  status: 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  width_m: number | null;
+  length_m: number | null;
+  area_sqft: number | null;
+  description: string | null;
+  property_type_info: PropertyTypeInfo | null;
+  location_info: LocationInfo | null;
+  attributes: PropertyAttributeItem[] | null;
+  media: PropertyMediaItem[] | null;
+  amenities: PropertyAmenityItem[] | null;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements?: number;
+  totalPages?: number;
+  last?: boolean;
+  first?: boolean;
+  hasNext?: boolean;
+  hasPrevious?: boolean;
+}
+
+export interface MyPropertiesResponse {
+  success: boolean;
+  message: string;
+  data: PageResponse<PropertySummaryResponse>;
+  timestamp: string;
+}
+
 export interface PropertyAttributeRequest {
   attribute_id?: string;
   attribute_code?: string;

@@ -1,6 +1,7 @@
 'use client';
 
 import { BedSingle, Bath, MapPin } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import type { ChatListingData } from '@/entities/contact';
 
@@ -37,7 +38,15 @@ export function ChatListingCard({ listing, onClick, className }: ChatListingCard
       )}
     >
       {/* Thumbnail */}
-      <img src={image} alt={title} className='h-16 w-20 flex-shrink-0 rounded-md object-cover' />
+      <div className='relative h-16 w-20 flex-shrink-0'>
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className='rounded-md object-cover'
+          sizes='80px'
+        />
+      </div>
 
       {/* Content */}
       <div className='flex min-w-0 flex-1 flex-col justify-between gap-1'>

@@ -1,10 +1,12 @@
 import http from '@/shared/lib/http';
 import type {
-  CreatePropertyRequest,
-  UpdatePropertyRequest,
-  PropertyDetailResponse,
   ApiResponse,
+  CreatePropertyRequest,
+  MyPropertiesResponse,
+  MyPropertiesSearchCriteria,
+  PropertyDetailResponse,
   PropertySummary,
+  UpdatePropertyRequest,
 } from './property-api.types';
 
 export const propertyApi = {
@@ -48,15 +50,21 @@ export const propertyApi = {
     });
   },
 
-  getMyProperties: () => {
-    return http.get<ApiResponse<PropertySummary[]>>(`properties/me`, {
-      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
-    });
-  },
-
   getPropertyDetails: (propertyId: string) => {
     return http.get<ApiResponse<PropertyDetailResponse>>(`properties/${propertyId}`, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+  getMyProperties: (criteria: MyPropertiesSearchCriteria) => {
+    const queryParams = new URLSearchParams();
+    if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
+    queryParams.append('page', criteria.page.toString());
+    queryParams.append('size', criteria.size.toString());
+
+    return http.get<MyPropertiesResponse>(`properties/me?${queryParams.toString()}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
+        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
+        : undefined,
     });
   },
 

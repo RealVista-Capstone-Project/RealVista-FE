@@ -12,6 +12,7 @@ const oauthSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
   email: z.string().email('Invalid email format'),
   accessToken: z.string().min(1, 'Access token is required'),
+  roles: z.string().optional(), // Comma-separated roles from backend
 });
 
 /**
@@ -77,12 +78,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // If user ONLY has ADMIN or AGENT → dashboard layout ('admin' or 'moderator')
           const mappedRole = determineUserRole(roles);
 
-          // Return user object with accessToken and role
+          // Return user object with accessToken, role, and backend roles
           return {
             id: user_id.toString(),
             email: userEmail,
             accessToken: access_token,
             role: mappedRole,
+            backendRoles: roles, // Store original backend roles for granular access control
           };
         } catch (error) {
           console.error('[NextAuth] Login error:', error);
@@ -97,6 +99,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         userId: { label: 'User ID', type: 'text' },
         email: { label: 'Email', type: 'email' },
         accessToken: { label: 'Access Token', type: 'password' },
+        roles: { label: 'Roles', type: 'text' },
       },
       async authorize(credentials) {
         try {
@@ -105,12 +108,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           console.log('[NextAuth] OAuth login successful');
 
+          // Parse roles from comma-separated string, or default to 'user'
+          const backendRoles = validatedCredentials.roles
+            ? validatedCredentials.roles.split(',').map((r) => r.trim())
+            : undefined;
+          const mappedRole = determineUserRole(backendRoles);
+
           // Return user object with proper type (no 'as any' needed)
           return {
             id: validatedCredentials.userId,
             email: validatedCredentials.email,
             accessToken: validatedCredentials.accessToken,
-            role: 'user' as const,
+            role: mappedRole,
           };
         } catch (error) {
           console.error('[NextAuth] OAuth validation error:', error);
@@ -137,6 +146,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         // Store accessToken for use in HTTP client
         token.accessToken = user.accessToken;
+        // Store backend roles for granular access control
+        token.backendRoles = (user as any).backendRoles;
       }
       return token;
     },
@@ -147,8 +158,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user && token) {
         // Type assertions needed because token properties are unknown
         session.user.id = token.id as string;
-        session.user.role = token.role as 'user' | 'admin' | 'moderator' | undefined;
+        session.user.role = token.role as 'user' | 'owner' | 'admin' | 'moderator' | undefined;
         session.user.accessToken = token.accessToken as string | undefined;
+        (session.user as any).backendRoles = token.backendRoles as string[] | undefined;
       }
       return session;
     },

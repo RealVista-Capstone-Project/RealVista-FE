@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Image from 'next/image';
 import {
-  Bell,
   Calendar,
   ChevronDown,
   Columns,
@@ -16,15 +15,17 @@ import {
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
+import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
+import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
+import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
 export interface SidebarMenuItem {
   id: string;
   label: string;
   href: string;
   icon: LucideIcon;
-  isActive?: boolean;
 }
 
 export interface DashboardLayoutProps {
@@ -36,6 +37,8 @@ export interface DashboardLayoutProps {
     initials: string;
     avatar?: string;
   };
+  headerTitle?: string;
+  headerSubtitle?: string;
   className?: string;
 }
 
@@ -47,8 +50,15 @@ const defaultSidebarItems: SidebarMenuItem[] = [
     icon: LayoutDashboard,
   },
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
-  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.listings, icon: Calendar },
+  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
+  {
+    id: 'manage-agent',
+    label: 'Manage Agent',
+    href: ROUTES.dashboard.manageAgent,
+    icon: Users,
+  },
+
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
   { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
 ];
@@ -63,10 +73,56 @@ export function DashboardLayout({
   sidebarItems = defaultSidebarItems,
   logoHref = ROUTES.homePage,
   user = defaultUser,
+  headerTitle,
+  headerSubtitle,
   className,
 }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
+  const t = useTranslations('DashboardLayout');
+
+  /**
+   * Compute the top nav page title based on the current pathname
+   */
+  const pageTitle = React.useMemo(() => {
+    if (
+      pathname === ROUTES.dashboard.managedListings ||
+      pathname.startsWith(ROUTES.dashboard.managedListings)
+    ) {
+      return t('pageTitle.managedListings');
+    }
+    if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight)) {
+      return t('pageTitle.insight');
+    }
+    if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants)) {
+      return t('pageTitle.tenants');
+    }
+    if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
+      return t('pageTitle.messages');
+    }
+    if (pathname === ROUTES.dashboard.root) {
+      return t('pageTitle.dashboard');
+    }
+    return t('pageTitle.default');
+  }, [pathname, t]);
+
+  /**
+   * Determine if a menu item is active based on the current pathname
+   * Matches exact path or checks if pathname starts with the href for nested routes
+   */
+  const isItemActive = (href: string) => {
+    // Exact match
+    if (pathname === href) return true;
+
+    // For dashboard root, only match exact path
+    if (href === ROUTES.dashboard.root) {
+      return pathname === ROUTES.dashboard.root;
+    }
+
+    // For other routes, match if pathname starts with href
+    // This handles nested routes like /dashboard/listings
+    return pathname.startsWith(href);
+  };
 
   // Keyboard shortcut: Cmd/Ctrl + B to toggle sidebar
   React.useEffect(() => {
@@ -83,6 +139,7 @@ export function DashboardLayout({
 
   return (
     <div className={cn('flex min-h-screen w-full', className)}>
+      <ChatWindowRenderer />
       {/* Sidebar */}
       <aside
         className={cn(
@@ -146,9 +203,7 @@ export function DashboardLayout({
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3'>
           {sidebarItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== ROUTES.dashboard.root && pathname.startsWith(item.href));
+            const isActive = isItemActive(item.href);
 
             return (
               <Link
@@ -203,25 +258,19 @@ export function DashboardLayout({
         )}
       >
         {/* Top Nav */}
-        <header className='flex items-center justify-between bg-white px-8 py-4'>
+        <header className='flex items-center justify-between bg-white px-10 py-4'>
           {/* Left Section */}
           <div className='flex items-center gap-4'>
             {/* Logo Text */}
             <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
-              RealVista
+              {pageTitle}
             </span>
           </div>
 
           {/* Right Actions */}
           <div className='flex items-center gap-6'>
-            {/* Notification Button */}
-            <button
-              type='button'
-              className='flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
-              aria-label='Notifications'
-            >
-              <Bell className='h-6 w-6' strokeWidth={2} />
-            </button>
+            {/* Notification Dropdown */}
+            <NotificationDropdownContainer />
 
             {/* Divider */}
             <div className='flex h-10 items-center'>

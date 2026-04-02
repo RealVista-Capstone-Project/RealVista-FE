@@ -105,6 +105,7 @@ export function InlineAdvancedFilters({
             onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
             className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+            maxLength={10}
           />
         </div>
       );
@@ -122,6 +123,7 @@ export function InlineAdvancedFilters({
           value={currentValue || ''}
           onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
           className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+          maxLength={100}
         />
       </div>
     );
