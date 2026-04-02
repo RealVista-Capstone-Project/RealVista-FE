@@ -212,6 +212,9 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     (!needsContentVerify || isContentValid) &&
     (!hasNewUploads || (allImagesAnalyzed && allImagesPassed));
 
+  const isTypeUpdateDisabled =
+    listing.status === 'PUBLISHED' || listing.status === 'SOLD' || listing.status === 'RENTED';
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
@@ -235,6 +238,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       media_ids: Array.from(selectedMediaIds),
       primary_media_id:
         primaryMediaId && !primaryMediaId.startsWith('new:') ? primaryMediaId : null,
+      listing_type: listingType,
     };
 
     try {
@@ -345,6 +349,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                     value={listingType}
                     onChange={setListingType}
                     labels={{ rent: t('listingTypeRent'), sale: t('listingTypeSale') }}
+                    disabled={isTypeUpdateDisabled}
                   />
                 </div>
 
