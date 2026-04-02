@@ -233,7 +233,7 @@ export function ListingInformationStep({
     if (hasAttemptedSubmit) setErrors(validate());
   }, [hasAttemptedSubmit, validate]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (shouldPublish: boolean = false) => {
     setHasAttemptedSubmit(true);
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -254,6 +254,7 @@ export function ListingInformationStep({
       ),
       primaryMediaId: primaryMediaId ?? undefined,
       newFiles: newFiles.filter((_, i) => selectedNewFileIndices.has(i)),
+      shouldPublish,
     };
     onSubmit(formData);
   };
@@ -556,22 +557,37 @@ export function ListingInformationStep({
         </div>
       </div>
 
-      {/* Footer — Previous / Submit */}
-      <div className='shrink-0 flex items-center justify-end gap-4 border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+      {/* Footer — Previous / Save as Draft / Submit */}
+      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
         <button
           type='button'
           onClick={onPrevious}
           disabled={isSubmitting}
-          className='flex min-w-[140px] items-center justify-center rounded-lg bg-purple-98 px-6 py-3 md:py-4 text-base font-bold text-main-primary transition-colors hover:bg-purple-96 disabled:opacity-50'
+          className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-purple-98 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-main-primary transition-colors hover:bg-purple-96 disabled:opacity-50'
         >
           {t('previous')}
         </button>
+
         <button
           type='button'
-          onClick={handleSubmit}
+          onClick={() => handleSubmit(false)}
           disabled={!isValid || isSubmitting}
           className={cn(
-            'flex min-w-[140px] items-center justify-center rounded-lg px-6 py-3 md:py-4 text-base font-bold text-white transition-all',
+            'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg border-2 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold transition-all',
+            isValid && !isSubmitting
+              ? 'border-main-primary text-main-primary hover:bg-main-primary/5'
+              : 'border-main-primary/20 text-main-primary/20 cursor-not-allowed'
+          )}
+        >
+          {t('saveAsDraft', { fallback: 'Save as Draft' })}
+        </button>
+
+        <button
+          type='button'
+          onClick={() => handleSubmit(true)}
+          disabled={!isValid || isSubmitting}
+          className={cn(
+            'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all',
             isValid && !isSubmitting
               ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
               : 'bg-main-primary/30 cursor-not-allowed'

@@ -306,6 +306,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
       media_ids: data.selectedMediaIds.length > 0 ? [...data.selectedMediaIds] : [],
       primary_media_id:
         data.primaryMediaId && !data.primaryMediaId.startsWith('new:') ? data.primaryMediaId : null,
+      should_publish: data.shouldPublish,
     };
 
     try {
