@@ -98,35 +98,38 @@ export function PropertyMediaStep() {
   const isUploading = uploadingFiles.length > 0;
 
   return (
-    <div className='space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+    <div className='flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+      {/* Section Header */}
       <div>
-        <h2 className='text-2xl font-semibold mb-2 flex items-center gap-2'>{t('step2Title')}</h2>
-        <p className='text-muted-foreground'>{t('step2Desc')}</p>
+        <h2 className='text-lg font-bold text-foreground tracking-tight flex items-center gap-2'>
+          {t('step2Title')}
+        </h2>
+        <p className='text-sm text-muted-foreground mt-1'>{t('step2Desc')}</p>
       </div>
 
-      <div className='space-y-6'>
+      <div className='flex flex-col gap-6'>
         <FormField
           control={control}
           name='media.images'
           render={() => (
             <FormItem>
-              <FormLabel className='flex items-center gap-2 text-md'>
-                <ImageIcon className='w-4 h-4 text-emerald-500' />
+              <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
+                <ImageIcon className='size-4 text-[#7065F0]' />
                 {t('propertyMedia')}
               </FormLabel>
               <FormControl>
                 <div>
                   {/* Upload Area */}
                   <div
-                    className='border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-10 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer'
+                    className='border-[1.5px] border-dashed border-[#E0DEF7] rounded-lg p-10 flex flex-col items-center justify-center bg-[#F7F7FD] hover:bg-[#F0EFFB] transition-colors cursor-pointer'
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {isUploading ? (
-                      <Loader2 className='w-10 h-10 text-primary animate-spin mb-4' />
+                      <Loader2 className='size-10 text-[#7065F0] animate-spin mb-4' />
                     ) : (
-                      <Camera className='w-10 h-10 text-slate-400 mb-4' />
+                      <Camera className='size-10 text-[#7065F0] opacity-50 mb-4' />
                     )}
-                    <p className='text-sm font-medium'>
+                    <p className='text-sm font-medium text-foreground'>
                       {isUploading ? t('uploading') : t('dragDropDesc')}
                     </p>
                     <p className='text-xs text-muted-foreground mt-1'>{t('supportFormats')}</p>
@@ -147,11 +150,11 @@ export function PropertyMediaStep() {
                       {uploadedMedia.map((item, index) => (
                         <div
                           key={`${item.url}-${index}`}
-                          className='relative group rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 aspect-square'
+                          className='relative group rounded-lg overflow-hidden border border-[#E0DEF7] aspect-square'
                         >
                           {item.type === 'VIDEO' ? (
-                            <div className='w-full h-full bg-slate-800 flex items-center justify-center'>
-                              <Play className='w-10 h-10 text-white/80' />
+                            <div className='size-full bg-[#100A55] flex items-center justify-center'>
+                              <Play className='size-10 text-white/80' />
                               <span className='absolute bottom-2 left-2 text-xs text-white/70 bg-black/50 px-2 py-0.5 rounded'>
                                 Video
                               </span>
@@ -160,17 +163,17 @@ export function PropertyMediaStep() {
                             <img
                               src={item.url}
                               alt={`Property media ${index + 1}`}
-                              className='w-full h-full object-cover'
+                              className='size-full object-cover'
                             />
                           )}
                           <Button
                             type='button'
                             variant='destructive'
                             size='icon'
-                            className='absolute top-1 right-1 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                            className='absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity'
                             onClick={() => handleRemoveMedia(index)}
                           >
-                            <X className='w-3 h-3' />
+                            <X className='size-3' />
                           </Button>
                         </div>
                       ))}
@@ -179,22 +182,22 @@ export function PropertyMediaStep() {
                       {uploadingFiles.map((file) => (
                         <div
                           key={file.id}
-                          className='relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 aspect-square bg-slate-100 dark:bg-slate-800'
+                          className='relative rounded-lg overflow-hidden border border-[#E0DEF7] aspect-square bg-[#F0EFFB]'
                         >
                           {file.previewUrl ? (
                             <img
                               src={file.previewUrl}
                               alt={file.name}
-                              className='w-full h-full object-cover opacity-50'
+                              className='size-full object-cover opacity-50'
                             />
                           ) : (
-                            <div className='w-full h-full flex items-center justify-center opacity-50'>
-                              <Video className='w-8 h-8 text-slate-400' />
+                            <div className='size-full flex items-center justify-center opacity-50'>
+                              <Video className='size-8 text-[#7065F0]' />
                             </div>
                           )}
                           {/* Loading overlay */}
                           <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/30'>
-                            <Loader2 className='w-6 h-6 text-white animate-spin' />
+                            <Loader2 className='size-6 text-white animate-spin' />
                             <span className='text-xs text-white mt-1 px-2 text-center truncate max-w-full'>
                               {file.name}
                             </span>
@@ -210,18 +213,24 @@ export function PropertyMediaStep() {
           )}
         />
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t'>
+        {/* URL Inputs */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#E0DEF7]'>
           <FormField
             control={control}
             name='media.videoUrl'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='flex items-center gap-2'>
-                  <Video className='w-4 h-4 text-blue-500' />
+                <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
+                  <Video className='size-4 text-[#7065F0]' />
                   {t('videoUrl')}
                 </FormLabel>
                 <FormControl>
-                  <Input type='url' placeholder={t('videoPlaceholder')} {...field} />
+                  <Input
+                    type='url'
+                    placeholder={t('videoPlaceholder')}
+                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -233,12 +242,17 @@ export function PropertyMediaStep() {
             name='media.tour3dUrl'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='flex items-center gap-2'>
-                  <Box className='w-4 h-4 text-amber-500' />
+                <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
+                  <Box className='size-4 text-[#7065F0]' />
                   {t('tour3dUrl')}
                 </FormLabel>
                 <FormControl>
-                  <Input type='url' placeholder={t('tourPlaceholder')} {...field} />
+                  <Input
+                    type='url'
+                    placeholder={t('tourPlaceholder')}
+                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

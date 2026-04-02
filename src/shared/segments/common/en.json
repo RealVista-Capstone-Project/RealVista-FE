@@ -141,6 +141,9 @@
   "PropertyManagement": {
     "pageTitle": "Property Management",
     "pageDesc": "Manage your property listings, viewed stats, and active status.",
+    "createTitle": "Add New Property",
+    "editTitle": "Edit Property",
+    "formSubtitle": "Make sure you have filled in all the necessary fields and have uploaded all the required files.",
     "createNew": "Create Property",
     "searchPlaceholder": "Search by title, location or ID...",
     "colImage": "Image",
@@ -222,6 +225,7 @@
     "sendOtp": "Send OTP",
     "otpSentSuccess": "OTP sent to owner successfully!",
     "otpSentError": "Failed to send OTP. Please try again.",
+    "tooManyAttempts": "Too many requests. For security, please wait a few minutes before trying again.",
     "verificationSuccess": "Property verified successfully!",
     "otpVerifyError": "Invalid OTP code. Please try again.",
     "otpExpiryInfo": "OTP code is valid for 5 minutes.",

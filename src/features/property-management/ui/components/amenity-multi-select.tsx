@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import { Search, X, ChevronsUpDown, Loader2 } from 'lucide-react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
-import { Badge } from '@/shared/ui/badge';
 import { Checkbox } from '@/shared/ui/checkbox/checkbox';
 import { cn } from '@/shared/lib/utils';
 import type { PropertyApiAmenity } from '@/entities/property/api/use-amenities';
@@ -51,7 +50,27 @@ export function AmenityMultiSelect({
   };
 
   return (
-    <div className='space-y-3'>
+    <div className='flex flex-col gap-3'>
+      {/* Selected amenities as Figma-style chips */}
+      {selectedAmenities.length > 0 && (
+        <div className='rounded-lg border border-[#E0DEF7] bg-white p-4'>
+          <div className='flex flex-wrap gap-3'>
+            {selectedAmenities.map((amenity) => (
+              <button
+                key={amenity.amenity_id}
+                type='button'
+                onClick={() => removeAmenity(amenity.amenity_id)}
+                className='flex items-center gap-1.5 rounded-lg border-[1.5px] border-[#7065F0] bg-[#E8E6F9] px-4 py-2 text-base font-medium text-[#7065F0] transition-colors hover:bg-[#E0DEF7] cursor-pointer'
+              >
+                <span className='truncate max-w-[150px]'>{amenity.amenity_name}</span>
+                <X className='size-3.5 shrink-0' />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Amenity picker trigger */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
@@ -60,9 +79,9 @@ export function AmenityMultiSelect({
             aria-expanded={open}
             aria-controls='amenity-listbox'
             className={cn(
-              'flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2.5 text-sm ring-offset-background',
-              'hover:bg-accent hover:text-accent-foreground',
-              'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+              'flex w-full items-center justify-between rounded-lg border border-[#E0DEF7] bg-white px-4 py-3 text-sm',
+              'hover:bg-[#F7F7FD]',
+              'focus:outline-none focus:border-[#7065F0] focus:ring-2 focus:ring-[#7065F0]/20',
               'disabled:cursor-not-allowed disabled:opacity-50',
               'cursor-pointer transition-colors'
             )}
@@ -70,7 +89,7 @@ export function AmenityMultiSelect({
           >
             {isLoading ? (
               <span className='flex items-center gap-2 text-muted-foreground'>
-                <Loader2 className='h-4 w-4 animate-spin' />
+                <Loader2 className='size-4 animate-spin' />
                 {t('loadingAmenities', { default: 'Loading amenities...' })}
               </span>
             ) : selectedIds.length > 0 ? (
@@ -85,18 +104,18 @@ export function AmenityMultiSelect({
                 {t('selectAmenities', { default: 'Select amenities' })}
               </span>
             )}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            <ChevronsUpDown className='ml-2 size-4 shrink-0 opacity-50' />
           </button>
         </PopoverTrigger>
 
         <PopoverContent
-          className='w-[var(--radix-popover-trigger-width)] p-0'
+          className='w-[var(--radix-popover-trigger-width)] p-0 rounded-lg border-[#E0DEF7] shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
           align='start'
           sideOffset={4}
         >
           {/* Search input */}
-          <div className='flex items-center border-b px-3 py-2'>
-            <Search className='mr-2 h-4 w-4 shrink-0 opacity-50' />
+          <div className='flex items-center border-b border-[#E0DEF7] px-3 py-2'>
+            <Search className='mr-2 size-4 shrink-0 opacity-50' />
             <input
               type='text'
               placeholder={t('searchAmenities', { default: 'Search amenities...' })}
@@ -110,7 +129,7 @@ export function AmenityMultiSelect({
                 onClick={() => setSearch('')}
                 className='ml-1 rounded-sm opacity-50 hover:opacity-100'
               >
-                <X className='h-3.5 w-3.5' />
+                <X className='size-3.5' />
               </button>
             )}
           </div>
@@ -129,14 +148,14 @@ export function AmenityMultiSelect({
                     key={amenity.amenity_id}
                     onClick={() => toggleAmenity(amenity.amenity_id)}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm cursor-pointer transition-colors',
-                      'hover:bg-accent hover:text-accent-foreground',
-                      isSelected && 'bg-accent/50'
+                      'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm cursor-pointer transition-colors',
+                      'hover:bg-[#F0EFFB]',
+                      isSelected && 'bg-[#F0EFFB] text-[#7065F0] font-semibold'
                     )}
                   >
                     <Checkbox
                       checked={isSelected}
-                      className='pointer-events-none'
+                      className='pointer-events-none border-[#E0DEF7] data-[state=checked]:bg-[#7065F0] data-[state=checked]:border-[#7065F0]'
                       aria-hidden='true'
                     />
                     <span className='truncate'>{amenity.amenity_name}</span>
@@ -147,28 +166,6 @@ export function AmenityMultiSelect({
           </div>
         </PopoverContent>
       </Popover>
-
-      {/* Selected badges */}
-      {selectedAmenities.length > 0 && (
-        <div className='flex flex-wrap gap-1.5'>
-          {selectedAmenities.map((amenity) => (
-            <Badge
-              key={amenity.amenity_id}
-              variant='secondary'
-              className='gap-1 pr-1 cursor-pointer'
-            >
-              <span className='max-w-[150px] truncate'>{amenity.amenity_name}</span>
-              <button
-                type='button'
-                onClick={() => removeAmenity(amenity.amenity_id)}
-                className='ml-0.5 rounded-full p-0.5 hover:bg-foreground/20 transition-colors'
-              >
-                <X className='h-3 w-3' />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

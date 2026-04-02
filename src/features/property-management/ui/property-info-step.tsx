@@ -69,9 +69,9 @@ export function PropertyInfoStep() {
         control={control}
         name={`info.dynamicAttributes.${attrCode}`}
         render={({ field }) => (
-          <FormItem className='flex flex-col space-y-2'>
+          <FormItem className='flex flex-col gap-2'>
             <div className='flex items-center justify-between'>
-              <FormLabel className='text-sm font-medium'>{label}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>{label}</FormLabel>
               {type === 'boolean' && (
                 <FormControl>
                   <Switch checked={field.value === true} onCheckedChange={field.onChange} />
@@ -84,6 +84,7 @@ export function PropertyInfoStep() {
                   type='number'
                   min='0'
                   placeholder={label}
+                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
                   {...field}
                   value={field.value || ''}
                   onChange={(e) =>
@@ -94,7 +95,13 @@ export function PropertyInfoStep() {
             )}
             {type === 'text' && (
               <FormControl>
-                <Input type='text' placeholder={label} {...field} value={field.value || ''} />
+                <Input
+                  type='text'
+                  placeholder={label}
+                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                  {...field}
+                  value={field.value || ''}
+                />
               </FormControl>
             )}
             <FormMessage />
@@ -105,23 +112,27 @@ export function PropertyInfoStep() {
   };
 
   return (
-    <div className='space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+    <div className='flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+      {/* Section Header */}
       <div>
-        <h2 className='text-2xl font-semibold mb-2'>
+        <h2 className='text-lg font-bold text-foreground tracking-tight'>
           {t('step1Title', { default: 'Property Information' })}
         </h2>
-        <p className='text-muted-foreground'>
+        <p className='text-sm text-muted-foreground mt-1'>
           {t('step1Desc', { default: 'Tell us about the property location and details' })}
         </p>
       </div>
 
+      {/* Location Selectors */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
         <FormField
           control={control}
           name='info.city'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('city', { default: 'City / Province' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('city', { default: 'City / Province' })}
+              </FormLabel>
               <Select
                 onValueChange={(val) => {
                   field.onChange(val);
@@ -132,9 +143,9 @@ export function PropertyInfoStep() {
                 disabled={isCitiesLoading}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
                     {isCitiesLoading ? (
-                      <Loader2 className='w-4 h-4 animate-spin' />
+                      <Loader2 className='size-4 animate-spin' />
                     ) : (
                       <SelectValue placeholder={t('selectCity', { default: 'Select city' })} />
                     )}
@@ -158,7 +169,9 @@ export function PropertyInfoStep() {
           name='info.district'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('district', { default: 'District' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('district', { default: 'District' })}
+              </FormLabel>
               <Select
                 onValueChange={(val) => {
                   field.onChange(val);
@@ -168,9 +181,9 @@ export function PropertyInfoStep() {
                 disabled={!selectedCity || isDistrictsLoading}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
                     {isDistrictsLoading ? (
-                      <Loader2 className='w-4 h-4 animate-spin' />
+                      <Loader2 className='size-4 animate-spin' />
                     ) : (
                       <SelectValue
                         placeholder={t('selectDistrict', { default: 'Select district' })}
@@ -196,16 +209,18 @@ export function PropertyInfoStep() {
           name='info.ward'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('ward', { default: 'Ward' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('ward', { default: 'Ward' })}
+              </FormLabel>
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
                 disabled={!selectedDistrict || isWardsLoading}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
                     {isWardsLoading ? (
-                      <Loader2 className='w-4 h-4 animate-spin' />
+                      <Loader2 className='size-4 animate-spin' />
                     ) : (
                       <SelectValue placeholder={t('selectWard', { default: 'Select ward' })} />
                     )}
@@ -225,14 +240,17 @@ export function PropertyInfoStep() {
         />
       </div>
 
+      {/* Street Address + Map */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <div className='space-y-4'>
+        <div className='flex flex-col gap-3'>
           <FormField
             control={control}
             name='info.streetAddress'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t('address', { default: 'Street Address' })}</FormLabel>
+                <FormLabel className='text-sm font-medium text-foreground'>
+                  {t('address', { default: 'Street Address' })}
+                </FormLabel>
                 <FormControl>
                   <MapAutocomplete
                     value={field.value || ''}
@@ -243,6 +261,7 @@ export function PropertyInfoStep() {
                       }
                     }}
                     placeholder={t('addressPlaceholder', { default: '123 Main St' })}
+                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
                   />
                 </FormControl>
                 <FormMessage />
@@ -256,7 +275,7 @@ export function PropertyInfoStep() {
           </p>
         </div>
 
-        <div className='h-48 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800 relative shadow-sm border border-slate-200 dark:border-slate-700'>
+        <div className='h-48 overflow-hidden rounded-lg bg-[#F0EFFB] relative border border-[#E0DEF7]'>
           {location && location.lat && location.lng ? (
             <Map
               defaultZoom={15}
@@ -274,15 +293,23 @@ export function PropertyInfoStep() {
         </div>
       </div>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
+      {/* Size Fields */}
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-6'>
         <FormField
           control={control}
           name='info.landSize'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('landSize', { default: 'Land Size (m²)' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('landSize', { default: 'Land Size (m²)' })}
+              </FormLabel>
               <FormControl>
-                <Input type='number' min='0' {...field} />
+                <Input
+                  type='number'
+                  min='0'
+                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -293,9 +320,16 @@ export function PropertyInfoStep() {
           name='info.usableSize'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('usableSize', { default: 'Usable Size (m²)' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('usableSize', { default: 'Usable Size (m²)' })}
+              </FormLabel>
               <FormControl>
-                <Input type='number' min='0' {...field} />
+                <Input
+                  type='number'
+                  min='0'
+                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -306,9 +340,16 @@ export function PropertyInfoStep() {
           name='info.width'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('width', { default: 'Width (m)' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('width', { default: 'Width (m)' })}
+              </FormLabel>
               <FormControl>
-                <Input type='number' min='0' {...field} />
+                <Input
+                  type='number'
+                  min='0'
+                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -319,9 +360,16 @@ export function PropertyInfoStep() {
           name='info.length'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('length', { default: 'Length (m)' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('length', { default: 'Length (m)' })}
+              </FormLabel>
               <FormControl>
-                <Input type='number' min='0' {...field} />
+                <Input
+                  type='number'
+                  min='0'
+                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -329,22 +377,25 @@ export function PropertyInfoStep() {
         />
       </div>
 
-      <div className='pt-4 border-t'>
+      {/* Property Type & Dynamic Attributes */}
+      <div className='pt-4 border-t border-[#E0DEF7]'>
         <FormField
           control={control}
           name='info.propertyType'
           render={({ field }) => (
             <FormItem className='mb-6'>
-              <FormLabel>{t('propertyType', { default: 'Property Type' })}</FormLabel>
+              <FormLabel className='text-sm font-medium text-foreground'>
+                {t('propertyType', { default: 'Property Type' })}*
+              </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className='w-full md:w-[350px]'>
+                  <SelectTrigger className='w-full h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
                     <SelectValue
                       placeholder={t('selectType', { default: 'Select property type' })}
                     />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className='rounded-lg border-[#E0DEF7] shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'>
                   {PROPERTY_TYPES.map((cat) => (
                     <SelectGroup key={cat.code}>
                       <SelectLabel>{cat.label}</SelectLabel>
@@ -363,18 +414,21 @@ export function PropertyInfoStep() {
         />
 
         {activeAttributes.length > 0 && (
-          <div className='space-y-4 animate-in fade-in slide-in-from-top-2 duration-300'>
-            <h3 className='text-lg font-medium'>
+          <div className='flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300'>
+            <h3 className='text-base font-bold text-foreground'>
               {t('additionalDetails', { default: 'Additional Details' })}
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6 rounded-lg bg-[#F7F7FD] border border-[#E0DEF7]'>
               {activeAttributes.map((attr) => renderDynamicField(attr))}
             </div>
           </div>
         )}
 
+        {/* Amenities */}
         <div className='pt-8 mt-4'>
-          <h3 className='text-lg font-medium mb-4'>{t('amenities', { default: 'Amenities' })}</h3>
+          <h3 className='text-base font-bold text-foreground mb-4'>
+            {t('amenities', { default: 'Amenities' })}
+          </h3>
           <FormField
             control={control}
             name='info.amenityIds'

@@ -141,6 +141,9 @@
   "PropertyManagement": {
     "pageTitle": "Quản lý Bất động sản",
     "pageDesc": "Quản lý danh sách bất động sản, thống kê lượt xem và trạng thái hoạt động.",
+    "createTitle": "Thêm Bất động sản mới",
+    "editTitle": "Chỉnh sửa Bất động sản",
+    "formSubtitle": "Hãy đảm bảo bạn đã điền đầy đủ các thông tin cần thiết và tải lên các tệp tin yêu cầu.",
     "createNew": "Tạo Bất động sản",
     "searchPlaceholder": "Tìm kiếm theo tiêu đề, vị trí hoặc ID...",
     "colImage": "Hình ảnh",
@@ -222,6 +225,7 @@
     "sendOtp": "Gửi mã OTP",
     "otpSentSuccess": "Đã gửi mã OTP tới chủ sở hữu thành công!",
     "otpSentError": "Gửi mã OTP thất bại. Vui lòng thử lại.",
+    "tooManyAttempts": "Bạn đã gửi quá nhiều yêu cầu xác thực. Vui lòng thử lại sau ít phút hoặc liên hệ hỗ trợ.",
     "verificationSuccess": "Xác thực bất động sản thành công!",
     "otpVerifyError": "Nhập sai mã OTP. Vui lòng thử lại.",
     "otpExpiredError": "Mã OTP đã hết hạn. Vui lòng gửi lại mã mới.",

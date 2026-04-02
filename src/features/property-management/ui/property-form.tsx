@@ -6,8 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { toast } from 'sonner';
+import { Check, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
+import { Separator } from '@/shared/ui/separator';
 import { createPropertyFormSchema, PropertyFormValues, UploadedMediaItem } from '../model/property-form.schema';
 import { PropertyInfoStep } from './property-info-step';
 import { PropertyMediaStep } from './property-media-step';
@@ -24,6 +26,7 @@ import type {
 } from '@/entities/property/api/property-api.types';
 import { PropertyAttribute, ATTRIBUTE_TYPES } from '@/shared/config/property-types';
 import { AgentVerificationModal } from './components/agent-verification-modal';
+import { cn } from '@/shared/lib/utils';
 
 interface PropertyFormProps {
   initialData?: Partial<PropertyFormValues>;
@@ -240,51 +243,72 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   };
 
   return (
-    <div className='max-w-4xl mx-auto py-8'>
-      {/* Stepper Header */}
-      <div className='flex items-center justify-center mb-8'>
+    <div className='mx-auto max-w-[736px] font-[family-name:var(--font-plus-jakarta-sans),sans-serif]'>
+      {/* Page Title */}
+      <div className='flex flex-col items-center gap-4 text-center mb-8'>
+        <h1 className='text-[32px] font-bold leading-[1.25] tracking-tight text-foreground'>
+          {isEditMode
+            ? t('editTitle', { default: 'Edit Property' })
+            : t('createTitle', { default: 'Add New Property' })}
+        </h1>
+        <p className='text-base leading-[1.6] text-muted-foreground max-w-[544px]'>
+          {t('formSubtitle', {
+            default:
+              'Make sure you have filled in all the necessary fields and have uploaded all the required files.',
+          })}
+        </p>
+      </div>
+
+      {/* Step Indicator */}
+      <div className='flex items-center justify-center gap-4 mb-8'>
         {STEPS.map((step, index) => (
-          <div key={step.id} className='flex items-center'>
-            <div className='flex items-center'>
+          <div key={step.id} className='flex items-center gap-4'>
+            <div className='flex items-center gap-2'>
+              {/* Step circle */}
               <div
-                className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold border-2 transition-colors ${
-                  currentStep >= index
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-slate-300 text-slate-500'
-                }`}
+                className={cn(
+                  'flex size-7 items-center justify-center rounded-full text-xs font-bold transition-all',
+                  currentStep > index
+                    ? 'bg-[#7065F0] text-white'
+                    : currentStep === index
+                      ? 'bg-[#7065F0] text-white'
+                      : 'bg-[#E8E6F9] text-[#100A55]'
+                )}
               >
-                {index + 1}
+                {currentStep > index ? <Check className='size-4' /> : index + 1}
               </div>
-              <div
-                className={`text-sm font-medium ml-3 transition-colors ${
-                  currentStep >= index ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400'
-                }`}
-              >
-                {step.label}
-              </div>
+              {/* Step label */}
+              <span className='text-base font-medium text-[#100A55]'>{step.label}</span>
             </div>
+
+            {/* Step separator arrow */}
             {index < STEPS.length - 1 && (
-              <div
-                className={`w-12 sm:w-16 h-1 mx-2 sm:mx-4 rounded-full transition-colors ${
-                  currentStep > index ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'
-                }`}
-              />
+              <ChevronRight className='size-5 text-[#100A55] opacity-50' />
             )}
           </div>
         ))}
       </div>
 
-      <div className='bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-sm'>
+      <Separator className='mb-8 bg-[#E0DEF7]' />
+
+      {/* Form Card */}
+      <div className='rounded-lg border-[1.5px] border-[#E0DEF7] bg-white p-6 sm:p-8 shadow-sm'>
         <FormProvider {...methods}>
           <form
             onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation Errors:', errors))}
-            className='space-y-6'
+            className='flex flex-col gap-6'
           >
             {STEPS[currentStep].component}
 
-            <div className='pt-8 border-t flex justify-between items-center mt-10'>
+            {/* Navigation Buttons */}
+            <div className='flex items-center justify-end gap-4 pt-6 mt-4 border-t border-[#E0DEF7]'>
               {currentStep > 0 ? (
-                <Button type='button' variant='outline' onClick={handleBack} disabled={isPending}>
+                <Button
+                  type='button'
+                  onClick={handleBack}
+                  disabled={isPending}
+                  className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
+                >
                   {t('back')}
                 </Button>
               ) : (
@@ -293,21 +317,35 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                   variant='ghost'
                   onClick={() => router.push('/dashboard/property')}
                   disabled={isPending}
+                  className='h-12 rounded-lg text-muted-foreground hover:text-foreground'
                 >
                   {t('cancel')}
                 </Button>
               )}
 
               {currentStep < STEPS.length - 1 ? (
-                <Button type='button' onClick={handleNext} disabled={isPending}>
+                <Button
+                  type='button'
+                  onClick={handleNext}
+                  disabled={isPending}
+                  className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
+                >
                   {t('continue')}
                 </Button>
               ) : (
                 <div className='flex gap-4'>
-                  <Button type='submit' variant='outline' disabled={isPending}>
+                  <Button
+                    type='submit'
+                    disabled={isPending}
+                    className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
+                  >
                     {t('skipSubmit')}
                   </Button>
-                  <Button type='submit' disabled={isPending}>
+                  <Button
+                    type='submit'
+                    disabled={isPending}
+                    className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
+                  >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}
                   </Button>
                 </div>
