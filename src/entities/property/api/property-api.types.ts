@@ -162,7 +162,7 @@ export interface PropertyDetailResponse {
     media_id: string;
     media_url: string;
     thumbnail_url: string | null;
-    media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
+    media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
     is_primary: boolean;
   }>;
 }
@@ -176,6 +176,25 @@ export interface PropertySummary {
   thumbnail_url?: string;
   owner_name?: string;
   owner_phone?: string;
+}
+
+export interface Property3dOperation {
+  operation_id: string;
+  property_id?: string;
+  status?: string;
+  error_message?: string;
+  created_at?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+}
+
+export interface CreateProperty3dOperationRequest {
+  model: string;
+  displayName?: string;
+  images: Array<{
+    mediaAssetId: string;
+    azimuth: number;
+  }>;
 }
 
 export interface ApiResponse<T> {

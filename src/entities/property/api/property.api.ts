@@ -5,6 +5,8 @@ import type {
   PropertyDetailResponse,
   ApiResponse,
   PropertySummary,
+  Property3dOperation,
+  CreateProperty3dOperationRequest,
 } from './property-api.types';
 
 export const propertyApi = {
@@ -76,6 +78,20 @@ export const propertyApi = {
       {
         baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
       }
+    );
+  },
+
+  get3dOperations: (propertyId: string) => {
+    return http.get<Property3dOperation[] | ApiResponse<Property3dOperation[]>>(`properties/${propertyId}/3d-operations`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  initiate3dOperation: (propertyId: string, request: CreateProperty3dOperationRequest) => {
+    return http.post<Property3dOperation | ApiResponse<Property3dOperation>>(
+      `properties/${propertyId}/3d-operations`,
+      request,
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
     );
   },
 };
