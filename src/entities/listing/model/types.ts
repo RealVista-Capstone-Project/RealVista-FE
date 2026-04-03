@@ -23,6 +23,7 @@ export interface PropertyNested {
   usable_size_m2: number;
   width_m: number;
   length_m: number;
+  media?: MediaItem[];
 }
 
 // ============ Location ============
@@ -99,11 +100,14 @@ export interface Amenity {
   description?: string;
 }
 
+export type ListingType = 'RENT' | 'SALE';
+
 // ============ Listing Data (main response object) ============
 export interface ListingData {
   status: string;
   slug: string;
   name: string;
+  content?: string;
   price: number;
   property: PropertyNested;
   location: Location;
@@ -115,7 +119,7 @@ export interface ListingData {
   listing_id: string;
   property_id: string;
   user_id: string;
-  listing_type: 'RENT' | 'SALE';
+  listing_type: ListingType;
   min_price?: number;
   max_price?: number;
   cost_breakdown?: CostBreakdownAPI;

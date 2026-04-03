@@ -1,25 +1,47 @@
 'use client';
 
-import * as React from 'react';
-import Image from 'next/image';
-import { Calendar, Mail, Phone, Building2, BadgeCheck, ArrowLeft, Eye } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/shared/config/i18n/navigation';
-import { useRouter, useParams } from 'next/navigation';
-import { PropertyGallery } from '@/features/property-gallery';
-import { AttributeIcon } from '@/shared/ui/attribute-icon';
-import { RentalFeatures } from '@/features/rental-features';
-import { ListingMetricsCard } from '@/features/listing-analytics';
-import { ListingStatusActions } from '@/features/listing-status';
-import type { Property } from '@/entities/property';
+import { useChatWindowStore } from '@/entities/contact';
+import { conversationQueries } from '@/entities/conversation';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
-import { useQueryClient } from '@tanstack/react-query';
-import { useChatWindowStore } from '@/entities/contact';
-import { useAuthSession } from '@/features/auth/model';
-import { isAuthenticated } from '@/features/auth/model';
-import { conversationQueries } from '@/entities/conversation';
+import type { Property } from '@/entities/property';
+import { isAuthenticated, useAuthSession } from '@/features/auth/model';
+import { EditListingModal } from '@/features/edit-listing-modal';
+import { ListingMetricsCard } from '@/features/listing-analytics';
+import { ListingStatusActions } from '@/features/listing-status';
+import { PropertyGallery } from '@/features/property-gallery';
+import { RentalFeatures } from '@/features/rental-features';
+import { useDeleteListing } from '@/features/edit-listing-modal/api/use-delete-listing';
+import { Link } from '@/shared/config/i18n/navigation';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { AttributeIcon } from '@/shared/ui/attribute-icon';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/dialog';
+import { useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/shared/lib/utils';
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Building2,
+  Calendar,
+  Eye,
+  Mail,
+  Phone,
+  ChevronDown,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import * as React from 'react';
+import { format, isPast, isToday, parseISO } from 'date-fns';
 
 interface ListingDetailPanelProps {
   listing: Listing;
@@ -37,6 +59,22 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
+
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [isActionsOpen, setIsActionsOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+
+  const deleteMutation = useDeleteListing();
+
+  const handleDelete = async () => {
+    try {
+      await deleteMutation.mutateAsync(listing.listing_id);
+      setIsDeleteDialogOpen(false);
+      if (onBack) onBack();
+    } catch (error) {
+      console.error('Failed to delete listing:', error);
+    }
+  };
 
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
@@ -85,11 +123,20 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
   // Check if listing is created by someone other than the property owner
   const showAgentInfo = listing.is_created_by_owner === false && listing.agent;
 
+  // Calculate availability status
+  const availabilityDate = listing.available_from ? parseISO(listing.available_from) : null;
+  const isAvailableNow = !availabilityDate || isPast(availabilityDate) || isToday(availabilityDate);
+  const displayAvailableFrom = isAvailableNow
+    ? t('features.availableImmediately')
+    : availabilityDate
+      ? format(availabilityDate, 'PP')
+      : t('features.availableImmediately');
+
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
       {/* Mobile Back Button */}
       {onBack && (
-        <div className='sticky top-0 z-20 flex items-center justify-between border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
+        <div className='sticky top-0 z-20 flex items-center border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
           <button
             onClick={onBack}
             className='flex items-center gap-2 text-sm font-semibold text-main-black'
@@ -110,7 +157,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
       {/* Property Gallery - matches listing-detail-screen */}
       <div className='px-4 sm:px-12 pt-4 sm:pt-8'>
-        <PropertyGallery images={property.images} />
+        <PropertyGallery key={listing.listing_id} images={property.images} />
       </div>
 
       {/* Content */}
@@ -127,22 +174,66 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               </p>
             </div>
 
-            <div className='flex flex-col items-center gap-2 sm:shrink-0 sm:items-end'>
-              <Link
-                href={`/listing/${listing.slug}`}
-                className='hidden whitespace-nowrap sm:flex items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
-              >
-                <Eye className='h-4 w-4' strokeWidth={2} />
-                <span>{t('preview')}</span>
-              </Link>
+            <div className='flex flex-col items-center gap-2 sm:shrink-0 sm:items-end relative'>
+              <div className='relative w-full sm:w-auto'>
+                <button
+                  type='button'
+                  onClick={() => setIsActionsOpen(!isActionsOpen)}
+                  className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+                  aria-label={t('actions')}
+                  aria-expanded={isActionsOpen}
+                >
+                  <span>{t('actions')}</span>
+                  <ChevronDown
+                    className={cn('h-4 w-4 transition-transform', isActionsOpen && 'rotate-180')}
+                    strokeWidth={2}
+                  />
+                </button>
 
-              <button
-                type='button'
-                className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
-              >
-                <Calendar className='h-4 w-4' strokeWidth={2} />
-                <span>{t('showCalendar')}</span>
-              </button>
+                {isActionsOpen && (
+                  <div className='absolute right-0 top-full z-30 mt-2 w-48 rounded-xl border border-purple-92 bg-white shadow-lg p-2 flex flex-col gap-1'>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setIsActionsOpen(false);
+                        setIsEditModalOpen(true);
+                      }}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                    >
+                      <Pencil className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('editListing')}</span>
+                    </button>
+                    <Link
+                      href={`/listing/${listing.slug}`}
+                      onClick={() => setIsActionsOpen(false)}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                    >
+                      <Eye className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('preview')}</span>
+                    </Link>
+                    <button
+                      type='button'
+                      onClick={() => setIsActionsOpen(false)}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                    >
+                      <Calendar className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('showCalendar')}</span>
+                    </button>
+                    <div className='my-1 h-px bg-purple-92/50' />
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setIsActionsOpen(false);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium'
+                    >
+                      <Trash2 className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('deleteListing', { fallback: 'Delete Listing' })}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -153,6 +244,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             listingType={listing.listing_type}
           />
         </div>
+
         {/* Listing Analytics Metrics */}
         <div className='mb-8'>
           <ListingMetricsCard listingId={listing.listing_id} />
@@ -281,6 +373,13 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         <div className='mb-8 rounded-lg border border-purple-92 p-6'>
           {attributes.length > 0 ? (
             <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
+              {listing.listing_type === 'RENT' && (
+                <FeatureStat
+                  label={t('features.availableFrom')}
+                  value={displayAvailableFrom}
+                  icon='📅'
+                />
+              )}
               {attributes.map((attribute) => (
                 <div key={attribute.attribute_id} className='flex flex-col gap-4'>
                   <p className='text-base font-medium leading-[1.5] text-grey-500'>
@@ -302,6 +401,13 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           ) : (
             // Fallback when no attributes are available
             <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
+              {listing.listing_type === 'RENT' && (
+                <FeatureStat
+                  label={t('features.availableFrom')}
+                  value={displayAvailableFrom}
+                  icon='📅'
+                />
+              )}
               <FeatureStat
                 label={t('features.properties')}
                 value={t('features.notAvailable')}
@@ -337,6 +443,46 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           </div>
         )}
       </div>
+      <EditListingModal
+        listing={listing}
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className='sm:max-w-[425px]'>
+          <DialogHeader>
+            <DialogTitle>{t('deleteConfirmTitle', { fallback: 'Delete Listing' })}</DialogTitle>
+            <DialogDescription>
+              {t('deleteConfirmDescription', {
+                fallback:
+                  'Are you sure you want to delete this listing? This action cannot be undone.',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2'>
+            <button
+              type='button'
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className='flex h-11 items-center justify-center rounded-lg border border-purple-92 bg-white px-6 text-sm font-bold text-main-black transition-colors hover:bg-purple-98'
+              disabled={deleteMutation.isPending}
+            >
+              {t('deleteConfirmCancel', { fallback: 'Cancel' })}
+            </button>
+            <button
+              type='button'
+              onClick={handleDelete}
+              className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_rgba(220,38,38,0.2)] disabled:opacity-50 disabled:cursor-not-allowed'
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending
+                ? t('deleting', { fallback: 'Deleting...' })
+                : t('deleteConfirmApprove', { fallback: 'Delete' })}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

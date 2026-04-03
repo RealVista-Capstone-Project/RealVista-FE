@@ -3,13 +3,11 @@
 import * as React from 'react';
 import Image from 'next/image';
 import {
-  Bell,
   Calendar,
   ChevronDown,
   Columns,
   LayoutDashboard,
   MessageCircle,
-  Plus,
   TrendingUp,
   Users,
   type LucideIcon,
@@ -20,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
+import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
 export interface SidebarMenuItem {
   id: string;
@@ -105,18 +104,6 @@ export function DashboardLayout({
     return t('pageTitle.default');
   }, [pathname, t]);
 
-  /**
-   * Compute the action button label based on the current pathname
-   */
-  const buttonLabel = React.useMemo(() => {
-    if (
-      pathname === ROUTES.dashboard.managedListings ||
-      pathname.startsWith(ROUTES.dashboard.managedListings)
-    ) {
-      return t('actionButton.createListing');
-    }
-    return t('actionButton.addProperty');
-  }, [pathname, t]);
 
   /**
    * Determine if a menu item is active based on the current pathname
@@ -281,24 +268,8 @@ export function DashboardLayout({
 
           {/* Right Actions */}
           <div className='flex items-center gap-6'>
-            {/* Add Property Button */}
-            <button
-              type='button'
-              className='flex items-center gap-2 rounded-lg bg-main-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-main-primary/90'
-              aria-label={buttonLabel}
-            >
-              <Plus className='h-4 w-4' strokeWidth={2} />
-              <span>{buttonLabel}</span>
-            </button>
-
-            {/* Notification Button */}
-            <button
-              type='button'
-              className='flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92'
-              aria-label='Notifications'
-            >
-              <Bell className='h-6 w-6' strokeWidth={2} />
-            </button>
+            {/* Notification Dropdown */}
+            <NotificationDropdownContainer />
 
             {/* Divider */}
             <div className='flex h-10 items-center'>

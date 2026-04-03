@@ -36,7 +36,8 @@ function RentPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [totalResults, setTotalResults] = useState(0);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();

@@ -5,15 +5,9 @@ import { toast } from 'sonner';
 import { listingApi } from '@/entities/listing/api';
 import { listingKeys } from '@/entities/listing/api/keys';
 
-export type ListingStatusAction =
-  | 'submit-for-review'
-  | 'publish'
-  | 'unpublish'
-  | 'mark-as-sold'
-  | 'mark-as-rented';
+export type ListingStatusAction = 'publish' | 'unpublish' | 'mark-as-sold' | 'mark-as-rented';
 
 const actionToApiMethod = {
-  'submit-for-review': listingApi.submitForReview,
   publish: listingApi.publish,
   unpublish: listingApi.unpublish,
   'mark-as-sold': listingApi.markAsSold,
@@ -21,10 +15,6 @@ const actionToApiMethod = {
 };
 
 const actionToMessage: Record<ListingStatusAction, { success: string; error: string }> = {
-  'submit-for-review': {
-    success: 'Listing submitted for review',
-    error: 'Failed to submit for review',
-  },
   publish: {
     success: 'Listing published successfully',
     error: 'Failed to publish listing',
@@ -90,13 +80,38 @@ export function useUpdateListingStatus() {
 export async function executeStatusUpdate(
   mutateAsync: (variables: { listingId: string; action: ListingStatusAction }) => Promise<unknown>,
   listingId: string,
-  action: ListingStatusAction
+  action: ListingStatusAction,
+  t: (key: string) => string
 ) {
   const messages = actionToMessage[action];
   try {
     await mutateAsync({ listingId, action });
     toast.success(messages.success);
-  } catch {
-    toast.error(messages.error);
+  } catch (error: any) {
+    // 1. Extract error details safely
+    const payload = error?.payload || error?.response?.data || error;
+    const errorCode = payload?.error_code || payload?.errorCode;
+    const backendMessage = payload?.message;
+
+    // 2. Handle specific business logic errors (localized)
+    if (errorCode === 'DUPLICATE_LISTING_PUBLISH') {
+      toast.error(t('errors.duplicatePublish'));
+      return;
+    }
+
+    if (errorCode === 'PROPERTY_NOT_AVAILABLE') {
+      toast.error(t('errors.propertyNotAvailable'));
+      return;
+    }
+
+    // 3. Log UNEXPECTED errors for debugging
+    console.error('Unhandled Listing Status Update Error:', error);
+
+    // 4. Final decision on what message to show
+    // We prioritize: Backend custom message > Generic action error message
+    const displayMessage =
+      backendMessage && backendMessage !== 'Http Error' ? backendMessage : messages.error;
+
+    toast.error(displayMessage);
   }
 }
