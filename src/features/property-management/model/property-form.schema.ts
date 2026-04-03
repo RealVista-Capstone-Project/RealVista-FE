@@ -56,6 +56,7 @@ export function createPropertyMediaSchema(t: (key: string) => string) {
     images: z.array(uploadedMediaItemSchema).optional().default([]),
     videoUrl: z.string().url(t('validation.invalidUrl')).optional().or(z.literal('')),
     tour3dUrl: z.string().url(t('validation.invalidUrl')).optional().or(z.literal('')),
+    newFiles: z.array(z.any()).optional().default([]),
   });
 }
 

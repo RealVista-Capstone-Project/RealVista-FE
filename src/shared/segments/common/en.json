@@ -368,6 +368,16 @@
     "verifiedTitle": "Verified Successfully!",
     "resendOtp": "Resend OTP",
     "resendOtpCountdown": "Resend OTP in {seconds}s",
+    "primary": "Primary",
+    "makePrimary": "Make Primary",
+    "newUpload": "New",
+    "aiAnalysis": {
+      "analyzing": "Analyzing...",
+      "error": "Error",
+      "notAllowed": "Not Allowed",
+      "passed": "Score: {score}%",
+      "feedbackLabel": "AI Feedback"
+    },
     "fillRequired": "Please fill out all required fields",
     "updateSuccess": "Property updated successfully!",
     "createSuccess": "Property created successfully!",

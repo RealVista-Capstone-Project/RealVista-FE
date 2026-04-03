@@ -369,6 +369,16 @@
     "verifiedTitle": "Xác thực thành công!",
     "resendOtp": "Gửi lại mã OTP",
     "resendOtpCountdown": "Gửi lại mã OTP sau {seconds} giây",
+    "primary": "Chính",
+    "makePrimary": "Đặt làm hình chính",
+    "newUpload": "Mới",
+    "aiAnalysis": {
+      "analyzing": "AI đang phân tích...",
+      "error": "Lỗi phân tích",
+      "notAllowed": "Không được phép",
+      "passed": "Điểm: {score}%",
+      "feedbackLabel": "Phản hồi từ AI"
+    },
     "fillRequired": "Vui lòng điền đủ các trường bắt buộc",
     "updateSuccess": "Cập nhật bất động sản thành công!",
     "createSuccess": "Tạo bất động sản thành công!",

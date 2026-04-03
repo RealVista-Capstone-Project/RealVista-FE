@@ -23,6 +23,7 @@ import { useUpdateProperty } from '@/entities/property/api/use-update-property';
 import { propertyApi } from '@/entities/property/api/property.api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthSession } from '@/features/auth/model/use-auth-session';
+import { useUploadMedia } from '@/entities/media/api/use-upload-media';
 import type {
   CreatePropertyRequest,
   PropertyMediaRequest,
@@ -50,11 +51,17 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
+  const uploadMedia = useUploadMedia();
   const assignAgent = useMutation({
     mutationFn: (id: string) => propertyApi.assignAgent(id),
   });
 
-  const isPending = createProperty.isPending || updateProperty.isPending || assignAgent.isPending;
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const isPending =
+    createProperty.isPending ||
+    updateProperty.isPending ||
+    assignAgent.isPending ||
+    isUploadingMedia;
 
   const schema = useMemo(() => createPropertyFormSchema(t), [t]);
 
@@ -182,69 +189,101 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const onSubmit = (data: PropertyFormValues) => {
+  const onSubmit = async (data: PropertyFormValues) => {
     console.log('Form Submit Data:', data);
 
-    if (isEditMode && propertyId) {
-      console.log(`property create request is: ${JSON.stringify(data)}`);
-      const request = transformToRequest(data);
-      updateProperty.mutate(
-        { propertyId, request },
-        {
+    try {
+      // 1. Upload any new files first
+      let uploadedUrls: UploadedMediaItem[] = [];
+      const newFiles: File[] = data.media.newFiles || [];
+
+      if (newFiles.length > 0) {
+        setIsUploadingMedia(true);
+        const uploadPromises = newFiles.map((file) =>
+          uploadMedia.mutateAsync({ file, folder: 'properties' }).then((result) => ({
+            url: result.payload.data.media_url,
+            type: file.type.startsWith('video/') ? ('VIDEO' as const) : ('IMAGE' as const),
+          }))
+        );
+
+        uploadedUrls = await Promise.all(uploadPromises);
+        setIsUploadingMedia(false);
+      }
+
+      // Combine existing images with newly uploaded ones
+      const finalData = {
+        ...data,
+        media: {
+          ...data.media,
+          images: [...(data.media.images || []), ...uploadedUrls],
+        },
+      };
+
+      if (isEditMode && propertyId) {
+        console.log(`property create request is: ${JSON.stringify(finalData)}`);
+        const request = transformToRequest(finalData);
+        updateProperty.mutate(
+          { propertyId, request },
+          {
+            onSuccess: () => {
+              toast.success(t('updateSuccess'));
+              router.push('/dashboard/property');
+            },
+            onError: () => {
+              toast.error(t('submitError'));
+            },
+          }
+        );
+      } else if (finalData.isExistingProperty && finalData.selectedPropertyId) {
+        assignAgent.mutate(finalData.selectedPropertyId, {
           onSuccess: () => {
-            toast.success(t('updateSuccess'));
-            router.push('/dashboard/property');
+            toast.success(t('createSuccess'));
+            queryClient.invalidateQueries({ queryKey: ['my-properties'] });
+            const currentUserId = session?.user?.id;
+            const ownerId = finalData.role.ownerId;
+            const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
+
+            if (finalData.role.role === 'AGENT' && !isSelfOwned) {
+              setCreatedPropertyId(finalData.selectedPropertyId!);
+              setIsVerificationModalOpen(true);
+            } else {
+              router.push('/dashboard/property');
+            }
           },
           onError: () => {
             toast.error(t('submitError'));
           },
-        }
-      );
-    } else if (data.isExistingProperty && data.selectedPropertyId) {
-      assignAgent.mutate(data.selectedPropertyId, {
-        onSuccess: () => {
-          toast.success(t('createSuccess'));
-          queryClient.invalidateQueries({ queryKey: ['my-properties'] });
-          const currentUserId = session?.user?.id;
-          const ownerId = data.role.ownerId;
-          const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
+        });
+      } else {
+        const request = transformToRequest(finalData);
+        createProperty.mutate(request, {
+          onSuccess: (response: { payload: { data: { property_id: string } } }) => {
+            toast.success(t('createSuccess'));
+            queryClient.invalidateQueries({ queryKey: ['my-properties'] });
 
-          if (data.role.role === 'AGENT' && !isSelfOwned) {
-            setCreatedPropertyId(data.selectedPropertyId!);
-            setIsVerificationModalOpen(true);
-          } else {
-            router.push('/dashboard/property');
-          }
-        },
-        onError: () => {
-          toast.error(t('submitError'));
-        },
-      });
-    } else {
-      const request = transformToRequest(data);
-      createProperty.mutate(request, {
-        onSuccess: (response: { payload: { data: { property_id: string } } }) => {
-          toast.success(t('createSuccess'));
-          queryClient.invalidateQueries({ queryKey: ['my-properties'] });
+            const propId = response?.payload?.data?.property_id;
+            const role = finalData.role.role;
+            const ownerId = finalData.role.ownerId;
+            const currentUserId = session?.user?.id;
 
-          const propId = response?.payload?.data?.property_id;
-          const role = data.role.role;
-          const ownerId = data.role.ownerId;
-          const currentUserId = session?.user?.id;
+            const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
 
-          const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
-
-          if (role === 'AGENT' && propId && !isSelfOwned) {
-            setCreatedPropertyId(propId);
-            setIsVerificationModalOpen(true);
-          } else {
-            router.push('/dashboard/property');
-          }
-        },
-        onError: () => {
-          toast.error(t('submitError'));
-        },
-      });
+            if (role === 'AGENT' && propId && !isSelfOwned) {
+              setCreatedPropertyId(propId);
+              setIsVerificationModalOpen(true);
+            } else {
+              router.push('/dashboard/property');
+            }
+          },
+          onError: () => {
+            toast.error(t('submitError'));
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error during media upload or submission:', error);
+      toast.error(t('uploadError') || 'Error uploading media');
+      setIsUploadingMedia(false);
     }
   };
 
