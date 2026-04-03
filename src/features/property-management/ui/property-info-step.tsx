@@ -195,8 +195,13 @@ export function PropertyInfoStep() {
                 <Input
                   type='number'
                   min='0'
+                  step='any'
+                  placeholder='0'
                   className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
                   {...field}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -215,8 +220,13 @@ export function PropertyInfoStep() {
                 <Input
                   type='number'
                   min='0'
+                  step='any'
+                  placeholder='0'
                   className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
                   {...field}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -235,8 +245,13 @@ export function PropertyInfoStep() {
                 <Input
                   type='number'
                   min='0'
+                  step='any'
+                  placeholder='0'
                   className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
                   {...field}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -255,8 +270,13 @@ export function PropertyInfoStep() {
                 <Input
                   type='number'
                   min='0'
+                  step='any'
+                  placeholder='0'
                   className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
                   {...field}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                  }
                 />
               </FormControl>
               <FormMessage />
