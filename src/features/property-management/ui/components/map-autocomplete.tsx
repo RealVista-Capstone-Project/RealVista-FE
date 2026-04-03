@@ -6,7 +6,7 @@ import { Input } from '@/shared/ui/input';
 
 interface MapAutocompleteProps {
   value: string;
-  onChange: (address: string, lat: number, lng: number) => void;
+  onChange: (address: string, lat: number, lng: number, components?: google.maps.GeocoderAddressComponent[]) => void;
   placeholder?: string;
   className?: string;
 }
@@ -41,7 +41,8 @@ export function MapAutocomplete({
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
         const address = place.formatted_address || place.name || '';
-        onChange(address, lat, lng);
+        const components = place.address_components;
+        onChange(address, lat, lng, components);
       }
     });
 

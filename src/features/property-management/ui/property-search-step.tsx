@@ -13,14 +13,6 @@ import type { PropertySummary } from '@/entities/property/api/property-api.types
 import { useUserSearch } from '@/entities/user/api/use-user-search';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select';
-import { useCities, useChildrenLocations } from '@/entities/location/api/use-locations';
 import { cn } from '@/shared/lib/utils';
 
 export function PropertySearchStep() {
@@ -33,29 +25,39 @@ export function PropertySearchStep() {
   const [isSearching, setIsSearching] = useState(false);
   const [selection, setSelection] = useState<'NEW' | string | null>(null);
 
-  // Location selectors for pre-filling
-  const selectedCity = useWatch({ control, name: 'info.city' });
-  const selectedDistrict = useWatch({ control, name: 'info.district' });
-
-  const { data: cities = [] } = useCities();
-  const { data: districts = [] } = useChildrenLocations(selectedCity);
-  const { data: wards = [] } = useChildrenLocations(selectedDistrict);
-
   const selectedRole = useWatch({ control, name: 'role.role' });
   const ownerEmail = useWatch({ control, name: 'role.ownerEmail' });
   const ownerId = useWatch({ control, name: 'role.ownerId' });
   const ownerName = useWatch({ control, name: 'role.ownerName' });
   const ownerMaskedPhone = useWatch({ control, name: 'role.ownerMaskedPhone' });
   const [searchUserEmail, setSearchUserEmail] = useState('');
-  const { data: userSearchResult, isFetching: isUserFetching, error: userError } = useUserSearch(searchUserEmail);
+  const {
+    data: userSearchResult,
+    isFetching: isUserFetching,
+    error: userError,
+  } = useUserSearch(searchUserEmail);
 
-  const handleAddressChange = (newAddress: string, lat: number, lng: number) => {
+  const handleAddressChange = (
+    newAddress: string,
+    lat: number,
+    lng: number,
+    components?: google.maps.GeocoderAddressComponent[]
+  ) => {
     setAddress(newAddress);
     if (lat !== 0 && lng !== 0) {
       setCoords({ lat, lng });
       performSearch(lat, lng);
       setValue('info.location', { lat, lng });
-      setValue('info.streetAddress', newAddress);
+
+      if (components) {
+        const streetNumber =
+          components.find((c) => c.types.includes('street_number'))?.long_name || '';
+        const route = components.find((c) => c.types.includes('route'))?.long_name || '';
+        const displayAddress = streetNumber ? `${streetNumber} ${route}`.trim() : route;
+        setValue('info.streetAddress', displayAddress || newAddress);
+      } else {
+        setValue('info.streetAddress', newAddress);
+      }
     } else {
       setCoords(null);
     }
@@ -104,8 +106,6 @@ export function PropertySearchStep() {
     if (id === 'NEW') {
       setValue('isExistingProperty', false);
       setValue('selectedPropertyId', null);
-      setValue('info.streetAddress', address);
-      setValue('info.location', coords);
     } else {
       setValue('isExistingProperty', true);
       setValue('selectedPropertyId', id);
@@ -120,11 +120,17 @@ export function PropertySearchStep() {
 
   useEffect(() => {
     if (userSearchResult) {
-      setValue('role.ownerId', userSearchResult.user_id, { shouldValidate: true, shouldDirty: true });
+      setValue('role.ownerId', userSearchResult.user_id, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       setValue('role.ownerName', userSearchResult.full_name, { shouldDirty: true });
       setValue('role.ownerMaskedPhone', userSearchResult.masked_phone, { shouldDirty: true });
       setValue('role.ownerPhone', userSearchResult.phone, { shouldDirty: true });
-      setValue('role.ownerEmail', userSearchResult.email, { shouldValidate: true, shouldDirty: true });
+      setValue('role.ownerEmail', userSearchResult.email, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       clearErrors('role.ownerEmail');
     }
   }, [userSearchResult, setValue, clearErrors]);
@@ -146,105 +152,6 @@ export function PropertySearchStep() {
       </div>
 
       <div className='flex flex-col gap-6'>
-        {/* Location Selectors */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <FormField
-            control={control}
-            name='info.city'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-sm font-medium text-foreground'>
-                  {t('city')}
-                </FormLabel>
-                <Select
-                  onValueChange={(val) => {
-                    field.onChange(val);
-                    setValue('info.district', '');
-                    setValue('info.ward', '');
-                  }}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                      <SelectValue placeholder={t('selectCity')} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {cities.map((c) => (
-                      <SelectItem key={c.location_id} value={c.location_id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={control}
-            name='info.district'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-sm font-medium text-foreground'>
-                  {t('district')}
-                </FormLabel>
-                <Select
-                  onValueChange={(val) => {
-                    field.onChange(val);
-                    setValue('info.ward', '');
-                  }}
-                  value={field.value}
-                  disabled={!selectedCity}
-                >
-                  <FormControl>
-                    <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                      <SelectValue placeholder={t('selectDistrict')} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {districts.map((d) => (
-                      <SelectItem key={d.location_id} value={d.location_id}>
-                        {d.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={control}
-            name='info.ward'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-sm font-medium text-foreground'>
-                  {t('ward')}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={!selectedDistrict}
-                >
-                  <FormControl>
-                    <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                      <SelectValue placeholder={t('selectWard')} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {wards.map((w) => (
-                      <SelectItem key={w.location_id} value={w.location_id}>
-                        {w.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-        </div>
-
         {/* Address Search */}
         <div className='relative'>
           <MapAutocomplete
@@ -253,7 +160,10 @@ export function PropertySearchStep() {
             className='pl-10 h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
             placeholder={t('searchAddress')}
           />
-          <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground' size={20} />
+          <MapPin
+            className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
+            size={20}
+          />
         </div>
 
         {/* Search Loading */}
@@ -295,7 +205,9 @@ export function PropertySearchStep() {
                       </div>
                       <div>
                         <h4 className='font-semibold text-foreground'>{p.street_address}</h4>
-                        <p className='text-sm text-muted-foreground'>{p.owner_name ? `Owner: ${p.owner_name}` : ''}</p>
+                        <p className='text-sm text-muted-foreground'>
+                          {p.owner_name ? `Owner: ${p.owner_name}` : ''}
+                        </p>
                       </div>
                     </div>
                     {selection === p.property_id && (
@@ -319,7 +231,9 @@ export function PropertySearchStep() {
                     <Plus size={32} />
                   </div>
                   <div>
-                    <h4 className='font-semibold text-foreground'>{t('createNewPropertyOption')}</h4>
+                    <h4 className='font-semibold text-foreground'>
+                      {t('createNewPropertyOption')}
+                    </h4>
                     <p className='text-sm text-muted-foreground'>{t('step0Desc')}</p>
                   </div>
                   {selection === 'NEW' && (

@@ -3,8 +3,7 @@
 import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Map, Marker } from '@vis.gl/react-google-maps';
-import { Loader2 } from 'lucide-react';
+import { Map as GoogleMap, Marker } from '@vis.gl/react-google-maps';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -24,7 +23,6 @@ import {
   ATTRIBUTE_TYPES,
   PropertyAttribute,
 } from '@/shared/config/property-types';
-import { useCities, useChildrenLocations } from '@/entities/location/api/use-locations';
 import { useAmenities } from '@/entities/property/api/use-amenities';
 import { MapAutocomplete } from './components/map-autocomplete';
 import { AmenityMultiSelect } from './components/amenity-multi-select';
@@ -32,20 +30,8 @@ import { AmenityMultiSelect } from './components/amenity-multi-select';
 export function PropertyInfoStep() {
   const t = useTranslations('PropertyManagement');
   const { control, setValue } = useFormContext();
-
-  const selectedCity = useWatch({ control, name: 'info.city' });
-  const selectedDistrict = useWatch({ control, name: 'info.district' });
   const selectedPropertyType = useWatch({ control, name: 'info.propertyType' });
   const location = useWatch({ control, name: 'info.location' });
-
-  // Fetch real location data from backend
-  const { data: cities = [], isLoading: isCitiesLoading } = useCities();
-  const { data: districts = [], isLoading: isDistrictsLoading } = useChildrenLocations(
-    selectedCity || undefined
-  );
-  const { data: wards = [], isLoading: isWardsLoading } = useChildrenLocations(
-    selectedDistrict || undefined
-  );
 
   const { data: amenities = [], isLoading: isAmenitiesLoading } = useAmenities();
 
@@ -123,123 +109,6 @@ export function PropertyInfoStep() {
         </p>
       </div>
 
-      {/* Location Selectors */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        <FormField
-          control={control}
-          name='info.city'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-sm font-medium text-foreground'>
-                {t('city', { default: 'City / Province' })}
-              </FormLabel>
-              <Select
-                onValueChange={(val) => {
-                  field.onChange(val);
-                  setValue('info.district', '');
-                  setValue('info.ward', '');
-                }}
-                value={field.value}
-                disabled={isCitiesLoading}
-              >
-                <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                    {isCitiesLoading ? (
-                      <Loader2 className='size-4 animate-spin' />
-                    ) : (
-                      <SelectValue placeholder={t('selectCity', { default: 'Select city' })} />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {cities.map((c) => (
-                    <SelectItem key={c.location_id} value={c.location_id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name='info.district'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-sm font-medium text-foreground'>
-                {t('district', { default: 'District' })}
-              </FormLabel>
-              <Select
-                onValueChange={(val) => {
-                  field.onChange(val);
-                  setValue('info.ward', '');
-                }}
-                value={field.value}
-                disabled={!selectedCity || isDistrictsLoading}
-              >
-                <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                    {isDistrictsLoading ? (
-                      <Loader2 className='size-4 animate-spin' />
-                    ) : (
-                      <SelectValue
-                        placeholder={t('selectDistrict', { default: 'Select district' })}
-                      />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {districts.map((d) => (
-                    <SelectItem key={d.location_id} value={d.location_id}>
-                      {d.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name='info.ward'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-sm font-medium text-foreground'>
-                {t('ward', { default: 'Ward' })}
-              </FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={!selectedDistrict || isWardsLoading}
-              >
-                <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                    {isWardsLoading ? (
-                      <Loader2 className='size-4 animate-spin' />
-                    ) : (
-                      <SelectValue placeholder={t('selectWard', { default: 'Select ward' })} />
-                    )}
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {wards.map((w) => (
-                    <SelectItem key={w.location_id} value={w.location_id}>
-                      {w.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
       {/* Street Address + Map */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <div className='flex flex-col gap-3'>
@@ -254,10 +123,25 @@ export function PropertyInfoStep() {
                 <FormControl>
                   <MapAutocomplete
                     value={field.value || ''}
-                    onChange={(addr, lat, lng) => {
-                      field.onChange(addr);
+                    onChange={(addr, lat, lng, components) => {
                       if (lat !== 0 && lng !== 0) {
                         setValue('info.location', { lat, lng });
+
+                        if (components) {
+                          const streetNumber =
+                            components.find((c) => c.types.includes('street_number'))?.long_name ||
+                            '';
+                          const route =
+                            components.find((c) => c.types.includes('route'))?.long_name || '';
+                          const displayAddress = streetNumber
+                            ? `${streetNumber} ${route}`.trim()
+                            : route;
+                          field.onChange(displayAddress || addr);
+                        } else {
+                          field.onChange(addr);
+                        }
+                      } else {
+                        field.onChange(addr);
                       }
                     }}
                     placeholder={t('addressPlaceholder', { default: '123 Main St' })}
@@ -277,14 +161,14 @@ export function PropertyInfoStep() {
 
         <div className='h-48 overflow-hidden rounded-lg bg-[#F0EFFB] relative border border-[#E0DEF7]'>
           {location && location.lat && location.lng ? (
-            <Map
+            <GoogleMap
               defaultZoom={15}
               center={{ lat: location.lat, lng: location.lng }}
               disableDefaultUI={true}
               gestureHandling='greedy'
             >
               <Marker position={{ lat: location.lat, lng: location.lng }} />
-            </Map>
+            </GoogleMap>
           ) : (
             <div className='absolute inset-0 flex items-center justify-center text-sm text-muted-foreground'>
               {t('noLocation', { default: 'Pin will appear here after searching for address' })}

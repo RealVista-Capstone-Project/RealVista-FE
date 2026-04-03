@@ -7,9 +7,9 @@ const uploadedMediaItemSchema = z.object({
 
 export function createPropertyInfoSchema(t: (key: string) => string) {
   return z.object({
-    city: z.string().min(1, t('validation.cityRequired')),
-    district: z.string().min(1, t('validation.districtRequired')),
-    ward: z.string().min(1, t('validation.wardRequired')),
+    city: z.string().optional(),
+    district: z.string().optional(),
+    ward: z.string().optional(),
     streetAddress: z.string().min(1, t('validation.streetRequired')),
     location: z.object({
       lat: z.number(),

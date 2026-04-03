@@ -10,7 +10,11 @@ import { Check, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
-import { createPropertyFormSchema, PropertyFormValues, UploadedMediaItem } from '../model/property-form.schema';
+import {
+  createPropertyFormSchema,
+  PropertyFormValues,
+  UploadedMediaItem,
+} from '../model/property-form.schema';
 import { PropertyInfoStep } from './property-info-step';
 import { PropertyMediaStep } from './property-media-step';
 import { PropertySearchStep } from './property-search-step';
@@ -137,7 +141,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     }
 
     return {
-      location_id: data.info.ward!,
+      location_id: data.info.ward || undefined,
       property_type_id: data.info.propertyType!,
       street_address: data.info.streetAddress!,
       latitude: data.info.location!.lat,
