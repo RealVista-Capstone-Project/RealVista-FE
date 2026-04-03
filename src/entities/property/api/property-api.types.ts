@@ -176,12 +176,12 @@ export interface PageResponse<T> {
   content: T[];
   page: number;
   size: number;
-  totalElements?: number;
-  totalPages?: number;
+  total_elements?: number;
+  total_pages?: number;
   last?: boolean;
   first?: boolean;
-  hasNext?: boolean;
-  hasPrevious?: boolean;
+  has_next?: boolean;
+  has_previous?: boolean;
 }
 
 export interface MyPropertiesResponse {

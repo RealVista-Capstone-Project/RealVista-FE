@@ -31,6 +31,7 @@ import type {
 import { PropertyAttribute, ATTRIBUTE_TYPES } from '@/shared/config/property-types';
 import { AgentVerificationModal } from './components/agent-verification-modal';
 import { cn } from '@/shared/lib/utils';
+import { extractStreetAddress } from '@/shared/lib/location.lib';
 
 interface PropertyFormProps {
   initialData?: Partial<PropertyFormValues>;
@@ -143,7 +144,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     return {
       location_id: data.info.ward || undefined,
       property_type_id: data.info.propertyType!,
-      street_address: data.info.streetAddress!,
+      street_address: extractStreetAddress(data.info.streetAddress || ''),
       latitude: data.info.location!.lat,
       longitude: data.info.location!.lng,
       land_size_m2: data.info.landSize || undefined,
@@ -185,6 +186,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     console.log('Form Submit Data:', data);
 
     if (isEditMode && propertyId) {
+      console.log(`property create request is: ${JSON.stringify(data)}`);
       const request = transformToRequest(data);
       updateProperty.mutate(
         { propertyId, request },

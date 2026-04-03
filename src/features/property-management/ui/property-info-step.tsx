@@ -24,8 +24,10 @@ import {
   PropertyAttribute,
 } from '@/shared/config/property-types';
 import { useAmenities } from '@/entities/property/api/use-amenities';
+import { locationApi } from '@/entities/location/api/location.api';
 import { MapAutocomplete } from './components/map-autocomplete';
 import { AmenityMultiSelect } from './components/amenity-multi-select';
+import { extractStreetAddress } from '@/shared/lib/location.lib';
 
 export function PropertyInfoStep() {
   const t = useTranslations('PropertyManagement');
@@ -123,23 +125,25 @@ export function PropertyInfoStep() {
                 <FormControl>
                   <MapAutocomplete
                     value={field.value || ''}
-                    onChange={(addr, lat, lng, components) => {
+                    onChange={async (addr, lat, lng, components) => {
                       if (lat !== 0 && lng !== 0) {
                         setValue('info.location', { lat, lng });
 
-                        if (components) {
-                          const streetNumber =
-                            components.find((c) => c.types.includes('street_number'))?.long_name ||
-                            '';
-                          const route =
-                            components.find((c) => c.types.includes('route'))?.long_name || '';
-                          const displayAddress = streetNumber
-                            ? `${streetNumber} ${route}`.trim()
-                            : route;
-                          field.onChange(displayAddress || addr);
-                        } else {
-                          field.onChange(addr);
+                        // Part 2: Resolve Location ID from Coordinates
+                        try {
+                          const locationRes = await locationApi.searchByCoordinates(lat, lng);
+                          if (locationRes.payload.success && locationRes.payload.data) {
+                            setValue('info.locationId', locationRes.payload.data.location_id, {
+                              shouldValidate: true,
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Failed to resolve location from coordinates:', error);
                         }
+
+                        // Extract short street address using robust utility
+                        const displayAddress = extractStreetAddress(addr, components);
+                        field.onChange(displayAddress);
                       } else {
                         field.onChange(addr);
                       }

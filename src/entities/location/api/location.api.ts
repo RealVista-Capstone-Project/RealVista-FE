@@ -13,4 +13,9 @@ export const locationApi = {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
+  searchByCoordinates: (lat: number, lng: number) => {
+    return http.get<ApiResponse<LocationResponse>>(`locations/search?lat=${lat}&lng=${lng}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
 };

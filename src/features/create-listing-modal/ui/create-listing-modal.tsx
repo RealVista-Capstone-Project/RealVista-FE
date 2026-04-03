@@ -238,7 +238,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
   const propertiesResponse = data?.payload?.data;
   const rawProperties = propertiesResponse?.content || [];
-  const totalPages = propertiesResponse?.totalPages || 0;
+  const totalPages = propertiesResponse?.total_pages || 0;
 
   const properties: UserProperty[] = rawProperties.map((p: any) => {
     const standardMedia = (p.media ?? []).filter((m: any) => m.is_property_standard);

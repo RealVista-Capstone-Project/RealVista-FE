@@ -25,7 +25,7 @@ export function MapAutocomplete({
     if (!placesLib || !inputRef.current) return;
 
     const options = {
-      fields: ['geometry', 'name', 'formatted_address'],
+      fields: ['geometry', 'name', 'formatted_address', 'address_components'],
       componentRestrictions: { country: 'vn' }, // Restrict to Vietnam
     };
 

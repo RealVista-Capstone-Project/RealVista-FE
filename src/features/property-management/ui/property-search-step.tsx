@@ -9,11 +9,13 @@ import { MapAutocomplete } from './components/map-autocomplete';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { propertyApi } from '@/entities/property/api/property.api';
+import { locationApi } from '@/entities/location/api/location.api';
 import type { PropertySummary } from '@/entities/property/api/property-api.types';
 import { useUserSearch } from '@/entities/user/api/use-user-search';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { cn } from '@/shared/lib/utils';
+import { extractStreetAddress } from '@/shared/lib/location.lib';
 
 export function PropertySearchStep() {
   const t = useTranslations('PropertyManagement');
@@ -37,7 +39,7 @@ export function PropertySearchStep() {
     error: userError,
   } = useUserSearch(searchUserEmail);
 
-  const handleAddressChange = (
+  const handleAddressChange = async (
     newAddress: string,
     lat: number,
     lng: number,
@@ -49,15 +51,19 @@ export function PropertySearchStep() {
       performSearch(lat, lng);
       setValue('info.location', { lat, lng });
 
-      if (components) {
-        const streetNumber =
-          components.find((c) => c.types.includes('street_number'))?.long_name || '';
-        const route = components.find((c) => c.types.includes('route'))?.long_name || '';
-        const displayAddress = streetNumber ? `${streetNumber} ${route}`.trim() : route;
-        setValue('info.streetAddress', displayAddress || newAddress);
-      } else {
-        setValue('info.streetAddress', newAddress);
+      // Part 2: Resolve Location ID from Coordinates
+      try {
+        const locationRes = await locationApi.searchByCoordinates(lat, lng);
+        if (locationRes.payload.success && locationRes.payload.data) {
+          setValue('info.locationId', locationRes.payload.data.location_id, { shouldValidate: true });
+        }
+      } catch (error) {
+        console.error('Failed to resolve location from coordinates:', error);
       }
+
+      // Extract short street address using robust utility
+      const displayAddress = extractStreetAddress(newAddress, components);
+      setValue('info.streetAddress', displayAddress);
     } else {
       setCoords(null);
     }
