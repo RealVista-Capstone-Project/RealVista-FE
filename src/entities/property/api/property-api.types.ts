@@ -144,6 +144,24 @@ export interface PropertyAmenityItem {
   description: string | null;
 }
 
+export interface PropertyAttributeRangeResponse {
+  range_id: string;
+  label: string;
+  min_value: number | null;
+  max_value: number | null;
+  display_order: number;
+}
+
+export interface PropertyAttributeDefinition {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: string;
+  icon: string | null;
+  unit: string | null;
+  ranges: PropertyAttributeRangeResponse[] | null;
+}
+
 export interface PropertySummaryResponse {
   property_id: string;
   property_type_id: string;

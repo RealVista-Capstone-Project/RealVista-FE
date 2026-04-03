@@ -4,6 +4,7 @@ import type {
   CreatePropertyRequest,
   MyPropertiesResponse,
   MyPropertiesSearchCriteria,
+  PropertyAttributeDefinition,
   PropertyDetailResponse,
   PropertySummary,
   UpdatePropertyRequest,
@@ -86,5 +87,10 @@ export const propertyApi = {
         baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
       }
     );
+  },
+  getAttributes: () => {
+    return http.get<ApiResponse<PropertyAttributeDefinition[]>>('properties/attributes', {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
   },
 };

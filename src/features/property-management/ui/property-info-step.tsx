@@ -24,6 +24,7 @@ import {
   PropertyAttribute,
 } from '@/shared/config/property-types';
 import { useAmenities } from '@/entities/property/api/use-amenities';
+import { usePropertyAttributes } from '@/entities/property/api/use-property-attributes';
 import { locationApi } from '@/entities/location/api/location.api';
 import { MapAutocomplete } from './components/map-autocomplete';
 import { AmenityMultiSelect } from './components/amenity-multi-select';
@@ -36,6 +37,7 @@ export function PropertyInfoStep() {
   const location = useWatch({ control, name: 'info.location' });
 
   const { data: amenities = [], isLoading: isAmenitiesLoading } = useAmenities();
+  const { data: attributeDefinitions = [] } = usePropertyAttributes();
 
   // Determine dynamic attributes
   const activeAttributes = useMemo(() => {
@@ -50,6 +52,10 @@ export function PropertyInfoStep() {
   const renderDynamicField = (attrCode: PropertyAttribute) => {
     const label = ATTRIBUTE_LABELS[attrCode];
     const type = ATTRIBUTE_TYPES[attrCode];
+
+    // Find if backend has predefined ranges for this attribute
+    const definition = attributeDefinitions.find((d) => d.attribute_code === attrCode);
+    const hasRanges = definition?.ranges && definition.ranges.length > 0;
 
     return (
       <FormField
@@ -66,7 +72,7 @@ export function PropertyInfoStep() {
                 </FormControl>
               )}
             </div>
-            {type === 'number' && (
+            {type === 'number' && !hasRanges && (
               <FormControl>
                 <Input
                   type='number'
@@ -81,7 +87,7 @@ export function PropertyInfoStep() {
                 />
               </FormControl>
             )}
-            {type === 'text' && (
+            {type === 'text' && !hasRanges && (
               <FormControl>
                 <Input
                   type='text'
@@ -91,6 +97,34 @@ export function PropertyInfoStep() {
                   value={field.value || ''}
                 />
               </FormControl>
+            )}
+            {hasRanges && (
+              <Select
+                onValueChange={(val) => {
+                  if (type === 'number') {
+                    field.onChange(Number(val));
+                  } else {
+                    field.onChange(val);
+                  }
+                }}
+                value={field.value?.toString() || ''}
+              >
+                <FormControl>
+                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
+                    <SelectValue placeholder={t('selectOption', { default: 'Select {label}', label })} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className='rounded-lg border-[#E0DEF7]'>
+                  {definition.ranges?.map((range) => (
+                    <SelectItem
+                      key={range.range_id}
+                      value={(type === 'number' ? range.min_value : range.label)?.toString() || ''}
+                    >
+                      {range.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
             <FormMessage />
           </FormItem>
