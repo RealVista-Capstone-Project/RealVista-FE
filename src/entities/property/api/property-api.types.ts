@@ -222,6 +222,7 @@ export interface CreatePropertyRequest {
   amenity_ids?: string[];
   attributes?: PropertyAttributeRequest[];
   media?: PropertyMediaRequest[];
+  status?: string;
 }
 
 export type UpdatePropertyRequest = Partial<CreatePropertyRequest>;

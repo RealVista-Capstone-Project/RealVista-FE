@@ -48,6 +48,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   const [currentStep, setCurrentStep] = useState(0);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<'DRAFT' | 'AVAILABLE'>('AVAILABLE');
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
@@ -122,7 +123,10 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     return ALL_STEPS;
   }, [isEditMode, ALL_STEPS, isExistingProp]);
 
-  const transformToRequest = (data: PropertyFormValues): CreatePropertyRequest => {
+  const transformToRequest = (
+    data: PropertyFormValues,
+    status: string
+  ): CreatePropertyRequest => {
     const mediaItems: PropertyMediaRequest[] = [];
 
     if (data.media.images && data.media.images.length > 0) {
@@ -158,6 +162,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       usable_size_m2: data.info.usableSize || undefined,
       length_m: data.info.length || undefined,
       amenity_ids: data.info.amenityIds || [],
+      status,
       attributes: Object.entries(data.info.dynamicAttributes || {}).map(([code, value]) => {
         const type = ATTRIBUTE_TYPES[code as PropertyAttribute];
         return {
@@ -221,7 +226,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
       if (isEditMode && propertyId) {
         console.log(`property create request is: ${JSON.stringify(finalData)}`);
-        const request = transformToRequest(finalData);
+        const request = transformToRequest(finalData, submissionStatus);
         updateProperty.mutate(
           { propertyId, request },
           {
@@ -255,7 +260,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
           },
         });
       } else {
-        const request = transformToRequest(finalData);
+        const request = transformToRequest(finalData, submissionStatus);
         createProperty.mutate(request, {
           onSuccess: (response: { payload: { data: { property_id: string } } }) => {
             toast.success(t('createSuccess'));
@@ -381,14 +386,22 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 <div className='flex gap-4'>
                   <Button
                     type='submit'
-                    disabled={isPending || !!(methods.formState.errors.media as { newFiles?: object })?.newFiles}
+                    disabled={
+                      isPending ||
+                      !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
+                    }
+                    onClick={() => setSubmissionStatus('DRAFT')}
                     className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
                   >
-                    {t('skipSubmit')}
+                    {t('saveDraft')}
                   </Button>
                   <Button
                     type='submit'
-                    disabled={isPending || !!(methods.formState.errors.media as { newFiles?: object })?.newFiles}
+                    disabled={
+                      isPending ||
+                      !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
+                    }
+                    onClick={() => setSubmissionStatus('AVAILABLE')}
                     className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}

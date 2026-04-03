@@ -24,13 +24,8 @@ export function PropertyMediaStep() {
   const [selectedNewFileIndices, setSelectedNewFileIndices] = useState<Set<number>>(new Set());
   const [primaryMediaId, setPrimaryMediaId] = useState<string | null>(null);
 
-  const {
-    analysisStatus,
-    analyzeFile,
-    appendEntries,
-    removeEntry,
-    QUALITY_THRESHOLD,
-  } = useMediaAnalysis();
+  const { analysisStatus, analyzeFile, appendEntries, removeEntry, QUALITY_THRESHOLD } =
+    useMediaAnalysis();
 
   const handleFilesSelected = (files: File[]) => {
     const startIndex = newFiles.length;
@@ -108,7 +103,9 @@ export function PropertyMediaStep() {
     if (hasRejectedFile) {
       setError('media.newFiles', {
         type: 'manual',
-        message: t('validation.mediaQualityFail', { default: 'Some images do not meet quality standards' }),
+        message: t('validation.mediaQualityFail', {
+          default: 'Some images do not meet quality standards',
+        }),
       });
     } else {
       clearErrors('media.newFiles');
@@ -131,76 +128,76 @@ export function PropertyMediaStep() {
           name='media.images'
           render={() => (
             <FormItem>
-            <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
-              <ImageIcon className='size-4 text-[#7065F0]' />
-              {t('propertyMedia')}
-            </FormLabel>
-            <FormControl>
-              <div className='flex flex-col gap-4'>
-                {/* Existing media */}
-                {uploadedMedia.length > 0 && (
-                  <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
-                    {uploadedMedia.map((item, index) => (
-                      <div
-                        key={`${item.url}-${index}`}
-                        className='relative group rounded-lg overflow-hidden border border-[#E0DEF7] aspect-square'
-                      >
-                        {item.type === 'VIDEO' ? (
-                          <div className='size-full bg-[#100A55] flex items-center justify-center'>
-                            <Play className='size-10 text-white/80' />
-                            <span className='absolute bottom-2 left-2 text-xs text-white/70 bg-black/50 px-2 py-0.5 rounded'>
-                              Video
-                            </span>
-                          </div>
-                        ) : (
-                          <div className='relative size-full'>
-                            <Image
-                              src={item.url}
-                              alt={`Property media ${index + 1}`}
-                              fill
-                              className='object-cover'
-                            />
-                          </div>
-                        )}
-                        <Button
-                          type='button'
-                          variant='destructive'
-                          size='icon'
-                          className='absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity'
-                          onClick={() => handleRemoveMedia(index)}
+              <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
+                <ImageIcon className='size-4 text-[#7065F0]' />
+                {t('propertyMedia')}
+              </FormLabel>
+              <FormControl>
+                <div className='flex flex-col gap-4'>
+                  {/* Existing media */}
+                  {uploadedMedia.length > 0 && (
+                    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+                      {uploadedMedia.map((item, index) => (
+                        <div
+                          key={`${item.url}-${index}`}
+                          className='relative group rounded-lg overflow-hidden border border-[#E0DEF7] aspect-square'
                         >
-                          <X className='size-3' />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                          {item.type === 'VIDEO' ? (
+                            <div className='size-full bg-[#100A55] flex items-center justify-center'>
+                              <Play className='size-10 text-white/80' />
+                              <span className='absolute bottom-2 left-2 text-xs text-white/70 bg-black/50 px-2 py-0.5 rounded'>
+                                Video
+                              </span>
+                            </div>
+                          ) : (
+                            <div className='relative size-full'>
+                              <Image
+                                src={item.url}
+                                alt={`Property media ${index + 1}`}
+                                fill
+                                className='object-cover'
+                              />
+                            </div>
+                          )}
+                          <Button
+                            type='button'
+                            variant='destructive'
+                            size='icon'
+                            className='absolute top-1 right-1 size-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                            onClick={() => handleRemoveMedia(index)}
+                          >
+                            <X className='size-3' />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                {/* New Files Grid with AI analysis */}
-                <NewFilesGrid
-                  files={newFiles}
-                  selectedIndices={selectedNewFileIndices}
-                  primaryId={primaryMediaId}
-                  analysisStatus={analysisStatus}
-                  qualityThreshold={QUALITY_THRESHOLD}
-                  onToggle={handleToggleNewFile}
-                  onRemove={handleRemoveNewFile}
-                  onSetPrimary={handleSetNewPrimary}
-                  labels={mediaLabels}
-                />
+                  {/* New Files Grid with AI analysis */}
+                  <NewFilesGrid
+                    files={newFiles}
+                    selectedIndices={selectedNewFileIndices}
+                    primaryId={primaryMediaId}
+                    analysisStatus={analysisStatus}
+                    qualityThreshold={QUALITY_THRESHOLD}
+                    onToggle={handleToggleNewFile}
+                    onRemove={handleRemoveNewFile}
+                    onSetPrimary={handleSetNewPrimary}
+                    labels={mediaLabels}
+                  />
 
-                {/* Upload Zone */}
-                <MediaUploadZone
-                  onFilesSelected={handleFilesSelected}
-                  labels={{
-                    dragAndDrop: t('dragDropDesc'),
-                    uploadHint: t('supportFormats'),
-                  }}
-                />
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+                  {/* Upload Zone */}
+                  <MediaUploadZone
+                    onFilesSelected={handleFilesSelected}
+                    labels={{
+                      dragAndDrop: t('dragDropDesc'),
+                      uploadHint: t('supportFormats'),
+                    }}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
