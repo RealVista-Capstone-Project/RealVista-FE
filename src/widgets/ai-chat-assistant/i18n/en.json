@@ -1,0 +1,20 @@
+{
+  "AiAssistant": {
+    "title": "AI Assistant",
+    "subtitle": "Real estate assistant",
+    "welcomeMessage": "Hi! I'm your AI real estate assistant. How can I help you today?",
+    "placeholder": "Ask me anything...",
+    "send": "Send",
+    "close": "Close",
+    "chipFindProperties": "Find properties near me",
+    "chipAverageRent": "Average rent in District 1?",
+    "chipCompareListings": "Compare listings",
+    "thinking": "Thinking...",
+    "newChat": "New chat",
+    "retry": "Retry",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorUnauthorized": "Session expired. Please sign in again.",
+    "errorNetwork": "Connection lost. Check your internet and retry.",
+    "loadingHistory": "Loading messages..."
+  }
+}
