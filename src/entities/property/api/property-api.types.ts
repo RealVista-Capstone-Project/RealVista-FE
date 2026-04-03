@@ -91,6 +91,7 @@ export interface PropertySearchResponse {
 
 export interface MyPropertiesSearchCriteria {
   keyword?: string;
+  status?: string;
   page: number;
   size: number;
 }
@@ -147,7 +148,7 @@ export interface PropertySummaryResponse {
   property_id: string;
   property_type_id: string;
   street_address: string;
-  status: 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
+  status: 'DRAFT' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'RENTED';
   land_size_m2: number | null;
   usable_size_m2: number | null;
   width_m: number | null;

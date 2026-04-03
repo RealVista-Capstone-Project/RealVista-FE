@@ -58,6 +58,7 @@ export const propertyApi = {
   getMyProperties: (criteria: MyPropertiesSearchCriteria) => {
     const queryParams = new URLSearchParams();
     if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
+    if (criteria.status) queryParams.append('status', criteria.status);
     queryParams.append('page', criteria.page.toString());
     queryParams.append('size', criteria.size.toString());
 

@@ -218,7 +218,11 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const { data, isLoading } = useQuery(
-    propertyQueries.myProperties({ page: currentPage - 1, size: ITEMS_PER_PAGE })
+    propertyQueries.myProperties({
+      page: currentPage - 1,
+      size: ITEMS_PER_PAGE,
+      status: 'AVAILABLE',
+    })
   );
 
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
