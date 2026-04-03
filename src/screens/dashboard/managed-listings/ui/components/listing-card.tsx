@@ -32,15 +32,47 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       )}
     >
       <div className='flex items-center gap-3 sm:gap-4'>
-        {/* Property Image */}
-        <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg'>
-          {listing.thumbnail ? (
-            <Image src={listing.thumbnail} alt={listing.name} fill className='object-cover' />
-          ) : (
-            <div className='flex h-full w-full items-center justify-center bg-purple-98'>
-              <span className='text-xs text-main-secondary/60'>{t('noImage')}</span>
-            </div>
-          )}
+        <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-purple-98'>
+          {(() => {
+            const thumbUrl = listing.primary_media_thumbnail_url || listing.thumbnail;
+            const isVideoThumb = thumbUrl?.toLowerCase().endsWith('.mp4');
+
+            if (thumbUrl && !isVideoThumb) {
+              return (
+                <Image
+                  src={thumbUrl}
+                  alt={listing.name}
+                  fill
+                  className='object-cover'
+                />
+              );
+            }
+
+            if (listing.total_videos && listing.total_videos > 0) {
+              return (
+                <div className='flex h-full w-full flex-col items-center justify-center'>
+                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-main-primary/10 text-main-primary'>
+                    <svg
+                      width='16'
+                      height='16'
+                      viewBox='0 0 24 24'
+                      fill='currentColor'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path d='M8 5V19L19 12L8 5Z' />
+                    </svg>
+                  </div>
+                  <span className='mt-1 text-[10px] font-medium text-main-primary'>Video</span>
+                </div>
+              );
+            }
+
+            return (
+              <div className='flex h-full w-full items-center justify-center'>
+                <span className='text-xs text-main-secondary/60'>{t('noImage')}</span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Content */}
