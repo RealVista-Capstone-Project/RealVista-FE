@@ -148,7 +148,15 @@ export interface PropertySummaryResponse {
   property_id: string;
   property_type_id: string;
   street_address: string;
-  status: 'DRAFT' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'RENTED';
+  status:
+    | 'DRAFT'
+    | 'PENDING'
+    | 'VERIFIED'
+    | 'REJECTED'
+    | 'AVAILABLE'
+    | 'RESERVED'
+    | 'SOLD'
+    | 'RENTED';
   land_size_m2: number | null;
   usable_size_m2: number | null;
   width_m: number | null;
@@ -160,6 +168,8 @@ export interface PropertySummaryResponse {
   attributes: PropertyAttributeItem[] | null;
   media: PropertyMediaItem[] | null;
   amenities: PropertyAmenityItem[] | null;
+  owner_name?: string;
+  owner_phone?: string;
 }
 
 export interface PageResponse<T> {
