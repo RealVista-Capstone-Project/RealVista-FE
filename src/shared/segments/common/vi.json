@@ -403,7 +403,10 @@
       "invalidUrl": "Đường dẫn không hợp lệ",
       "roleRequired": "Vui lòng chọn vai trò của bạn",
       "invalidEmail": "Email không hợp lệ",
-      "ownerRequired": "Vui lòng tìm và chọn đúng Chủ sở hữu"
+      "ownerRequired": "Vui lòng tìm và chọn đúng Chủ sở hữu",
+      "mediaQualityFail": "Một số hình ảnh không đạt yêu cầu về chất lượng từ AI",
+      "invalidNumber": "Giá trị phải là một số hợp lệ",
+      "numberMin": "Giá trị không được nhỏ hơn 0"
     }
   }
 }

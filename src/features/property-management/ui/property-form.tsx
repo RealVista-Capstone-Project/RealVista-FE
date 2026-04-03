@@ -199,7 +199,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
       if (newFiles.length > 0) {
         setIsUploadingMedia(true);
-        const uploadPromises = newFiles.map((file) =>
+        const uploadPromises = newFiles.map((file: File) =>
           uploadMedia.mutateAsync({ file, folder: 'properties' }).then((result) => ({
             url: result.payload.data.media_url,
             type: file.type.startsWith('video/') ? ('VIDEO' as const) : ('IMAGE' as const),
@@ -381,14 +381,14 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 <div className='flex gap-4'>
                   <Button
                     type='submit'
-                    disabled={isPending}
+                    disabled={isPending || !!(methods.formState.errors.media as { newFiles?: object })?.newFiles}
                     className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
                   >
                     {t('skipSubmit')}
                   </Button>
                   <Button
                     type='submit'
-                    disabled={isPending}
+                    disabled={isPending || !!(methods.formState.errors.media as { newFiles?: object })?.newFiles}
                     className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}

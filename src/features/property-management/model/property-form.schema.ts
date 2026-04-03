@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ATTRIBUTE_TYPES, PropertyAttribute } from '@/shared/config/property-types';
 
 const uploadedMediaItemSchema = z.object({
   url: z.string().url(),
@@ -22,6 +23,43 @@ export function createPropertyInfoSchema(t: (key: string) => string) {
     propertyType: z.string().min(1, t('validation.propertyTypeRequired')),
     dynamicAttributes: z.record(z.string(), z.any()).optional().default({}),
     amenityIds: z.array(z.string()).optional().default([]),
+  })
+  .superRefine((data, ctx) => {
+    if (data.dynamicAttributes) {
+      Object.entries(data.dynamicAttributes).forEach(([code, value]) => {
+        const type = ATTRIBUTE_TYPES[code as PropertyAttribute];
+        if (!type) return;
+
+        const path = ['dynamicAttributes', code];
+
+        if (type === 'number') {
+          if (value === undefined || value === null || value === '') return;
+          const numValue = Number(value);
+          if (isNaN(numValue)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('validation.invalidNumber'),
+              path,
+            });
+          } else if (numValue < 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('validation.numberMin'),
+              path,
+            });
+          }
+        } else if (type === 'boolean') {
+          if (typeof value !== 'boolean' && value !== undefined && value !== null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.invalid_type,
+              expected: 'boolean',
+              received: typeof value,
+              path,
+            });
+          }
+        }
+      });
+    }
   });
 }
 

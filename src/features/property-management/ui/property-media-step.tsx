@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { ImageIcon, Video, Box, X, Play } from 'lucide-react';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
@@ -14,10 +15,11 @@ import type { UploadedMediaItem } from '../model/property-form.schema';
 
 export function PropertyMediaStep() {
   const t = useTranslations('PropertyManagement');
-  const { control, setValue, watch } = useFormContext();
+  const { control, setValue, watch, setError, clearErrors } = useFormContext();
 
   const uploadedMedia: UploadedMediaItem[] = watch('media.images') || [];
-  const newFiles: File[] = watch('media.newFiles') || [];
+  const watchedNewFiles = watch('media.newFiles');
+  const newFiles = useMemo(() => watchedNewFiles || [], [watchedNewFiles]);
 
   const [selectedNewFileIndices, setSelectedNewFileIndices] = useState<Set<number>>(new Set());
   const [primaryMediaId, setPrimaryMediaId] = useState<string | null>(null);
@@ -44,7 +46,10 @@ export function PropertyMediaStep() {
 
     appendEntries(files.length);
     files.forEach((file, i) => {
-      analyzeFile(file, startIndex + i);
+      // Only call AI analysis for image files
+      if (file.type.startsWith('image/')) {
+        analyzeFile(file, startIndex + i);
+      }
     });
   };
 
@@ -71,7 +76,7 @@ export function PropertyMediaStep() {
   };
 
   const handleRemoveNewFile = (index: number) => {
-    const updatedFiles = newFiles.filter((_, i) => i !== index);
+    const updatedFiles = newFiles.filter((_: File, i: number) => i !== index);
     setValue('media.newFiles', updatedFiles);
     removeEntry(index);
   };
@@ -86,6 +91,29 @@ export function PropertyMediaStep() {
     passed: t('aiAnalysis.passed', { score: '{score}', fallback: 'Score: {score}%' }),
     feedbackLabel: t('aiAnalysis.feedbackLabel', { fallback: 'AI Feedback' }),
   };
+
+  // Enforce quality check by setting form error if any image fails
+  useEffect(() => {
+    const hasRejectedFile = analysisStatus.some((entry, index) => {
+      // Only check images that have finished loading
+      const file = newFiles[index];
+      if (!file || !file.type.startsWith('image/')) return false;
+
+      if (!entry.isLoading && entry.result && entry.result.finalScore !== undefined) {
+        return entry.result.finalScore < QUALITY_THRESHOLD;
+      }
+      return false;
+    });
+
+    if (hasRejectedFile) {
+      setError('media.newFiles', {
+        type: 'manual',
+        message: t('validation.mediaQualityFail', { default: 'Some images do not meet quality standards' }),
+      });
+    } else {
+      clearErrors('media.newFiles');
+    }
+  }, [analysisStatus, QUALITY_THRESHOLD, setError, clearErrors, newFiles, t]);
 
   return (
     <div className='flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
@@ -125,11 +153,14 @@ export function PropertyMediaStep() {
                             </span>
                           </div>
                         ) : (
-                          <img
-                            src={item.url}
-                            alt={`Property media ${index + 1}`}
-                            className='size-full object-cover'
-                          />
+                          <div className='relative size-full'>
+                            <Image
+                              src={item.url}
+                              alt={`Property media ${index + 1}`}
+                              fill
+                              className='object-cover'
+                            />
+                          </div>
                         )}
                         <Button
                           type='button'
