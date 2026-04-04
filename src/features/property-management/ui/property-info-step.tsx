@@ -9,12 +9,10 @@ import {
   Bath,
   ArrowUpCircle,
   Layers,
-  ArrowRightLeft,
   Wind,
   Trees,
-  Car,
+  CarFront,
   Wifi,
-  UtensilsCrossed,
   Waves,
   Dumbbell,
   Maximize,
@@ -23,8 +21,41 @@ import {
   Zap,
   Droplets,
   Construction,
-  Warehouse,
-  Tractor,
+  Sprout,
+  Building2,
+  SquareSplitVertical,
+  Compass,
+  ParkingCircle,
+  CircleDot,
+  ArrowUpToLine,
+  Eye,
+  Home,
+  Briefcase,
+  Users,
+  BellRing,
+  ArrowUpDown,
+  MoveHorizontal,
+  MoveVertical,
+  Store,
+  Presentation,
+  Film,
+  Utensils,
+  Table,
+  ChefHat,
+  Hotel,
+  Star,
+  ArrowUpFromLine,
+  Truck,
+  DoorClosed,
+  TrainFront,
+  DoorOpen,
+  Snowflake,
+  Ruler,
+  Map,
+  Target,
+  MapPin,
+  Route,
+  Container,
 } from 'lucide-react';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
@@ -90,27 +121,80 @@ export function PropertyInfoStep() {
 
   const getAttributeIcon = (attrCode: PropertyAttribute) => {
     const iconMap: Record<string, React.ElementType> = {
+      // Common & Residential
       BEDROOMS: Bed,
       BATHROOMS: Bath,
       FLOOR: ArrowUpCircle,
-      TOTAL_FLOORS: Layers,
-      DIRECTION: ArrowRightLeft,
+      TOTAL_FLOORS: Building2,
+      BALCONY: SquareSplitVertical,
+      DIRECTION: Compass,
       AC: Wind,
       GARDEN: Trees,
-      GARAGE: Car,
-      WIFI: Wifi,
-      KITCHEN: UtensilsCrossed,
+      GARAGE: CarFront,
+      FLOORS: Layers,
+      PARKING: ParkingCircle,
       POOL: Waves,
+      TENNIS: CircleDot,
+      TOP_FLOOR: ArrowUpToLine,
+      LARGE_BALCONY: Maximize,
+      VIEW: Eye,
       GYM: Dumbbell,
-      WIDTH: Maximize,
-      DEPTH: Maximize,
-      VIEW: Monitor,
-      SECURITY: ShieldCheck,
-      POWER: Zap,
+      ROOMS: Home,
+      WIFI: Wifi,
+      KITCHEN: Utensils,
+
+      // Commercial & Office
+      OFFICE_ROOMS: Briefcase,
+      MEETING_ROOMS: Users,
+      RESTROOMS: Bath,
+      INDIVIDUAL_AC: Wind,
+      RECEPTION: BellRing,
+      ELEVATOR: ArrowUpDown,
+
+      // Retail & Building info
+      WIDTH: MoveHorizontal,
+      DEPTH: MoveVertical,
+      UPPER_BEDROOMS: Bed,
+      UPPER_BATHROOMS: Bath,
+      SHOP: Store,
+      DISPLAY_WINDOW: Presentation,
+      HIGH_TRAFFIC: Users,
+      SHOPS: Store,
+      CINEMA: Film,
+      FOOD_COURT: Utensils,
+
+      // Restaurant & Hotel
+      TABLES: Table,
+      RESTAURANT_KITCHEN: ChefHat,
+      ROOMS_HOTEL: Hotel,
+      STARS: Star,
+      RESTAURANT: Utensils,
+
+      // Industrial & Logistics
+      HEIGHT: ArrowUpFromLine,
+      TRUCK_PARKING: Truck,
+      GATES: DoorClosed,
+      RAILWAY: TrainFront,
       WATER: Droplets,
-      DRAINAGE: Construction,
-      WAREHOUSE: Warehouse,
-      CROP_TYPE: Tractor,
+      POWER: Zap,
+      DRAINAGE: Waves,
+      ENTRANCES: DoorOpen,
+      SECURITY: ShieldCheck,
+      COLD_STORAGE: Snowflake,
+      LOADING_DOCKS: Container,
+      CRANE: Construction,
+
+      // Land
+      FRONTAGE: Ruler,
+      LAND_DEPTH: Ruler,
+      PLANNING: Map,
+      PURPOSE: Target,
+      HEIGHT_PLANNING: Construction,
+      ZONE: MapPin,
+      CROP_TYPE: Sprout,
+      WATER_SOURCE: Waves,
+      IRRIGATION: Sprout,
+      ACCESS_ROAD: Route,
     };
 
     const IconComponent = iconMap[attrCode];
@@ -179,7 +263,13 @@ export function PropertyInfoStep() {
                   {...field}
                   value={field.value || ''}
                   onChange={(e) => {
-                    field.onChange(type === 'number' ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value);
+                    field.onChange(
+                      type === 'number'
+                        ? e.target.value
+                          ? Number(e.target.value)
+                          : undefined
+                        : e.target.value
+                    );
                   }}
                 />
               </FormControl>
