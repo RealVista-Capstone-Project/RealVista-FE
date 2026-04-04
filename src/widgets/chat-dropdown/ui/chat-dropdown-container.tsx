@@ -61,10 +61,10 @@ export function ChatDropdownContainer() {
       conversations={conversations}
       unreadCount={totalUnread}
       onConversationClick={(conversation) => {
-        if (isMobile) {
+        if (isMobile && params) {
           const locale = params.locale;
           router.push(`/${locale}/messages/${conversation.id}`);
-        } else {
+        } else if (!isMobile) {
           openWindow(conversation.id, conversation.participant);
         }
       }}
