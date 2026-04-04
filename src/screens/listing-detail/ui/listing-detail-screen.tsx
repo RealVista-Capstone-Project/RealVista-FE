@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
@@ -29,6 +29,7 @@ import type { SendMessageResponse } from '@/entities/conversation/model/types';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { behaviorTracker } from '@/shared/lib/analytics';
 import {
   Dialog,
   DialogContent,
@@ -46,9 +47,9 @@ export interface ListingDetailScreenProps {
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const property: Property = mapListingToProperty(listing);
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyCard');
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const sendMessage = useSendMessage();
   const chatListingData = mapListingToChatData(listing);
   const router = useRouter();
@@ -62,6 +63,16 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
+
+  // Track listing view on mount
+  useEffect(() => {
+    behaviorTracker.trackView(listing.listing_id, {
+      listing_type: listing.listing_type,
+      property_type: listing.property_type.property_type_name,
+      price: listing.price,
+      source_page: 'detail',
+    });
+  }, [listing.listing_id, listing.listing_type, listing.property_type.property_type_name, listing.price]);
 
   const handleFavorite = () => {
     if (!session?.user) {
@@ -98,12 +109,13 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const handleContact = () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
     setIsContactModalOpen(true);
   };
+
   const handleSendContact = async (data: ContactFormData) => {
     const response = await sendMessage.mutateAsync({
       recipient_user_id: listing.agent.user_id,
@@ -118,7 +130,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {

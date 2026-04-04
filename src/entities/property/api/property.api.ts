@@ -1,5 +1,9 @@
 import http from '@/shared/lib/http';
 import type {
+  PropertySearchRequest,
+  PropertySearchResponse,
+  MyPropertiesSearchCriteria,
+  MyPropertiesResponse,
   CreatePropertyRequest,
   UpdatePropertyRequest,
   PropertyDetailResponse,
@@ -50,9 +54,16 @@ export const propertyApi = {
     });
   },
 
-  getMyProperties: () => {
-    return http.get<ApiResponse<PropertySummary[]>>(`properties/me`, {
-      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+  getMyProperties: (criteria: MyPropertiesSearchCriteria) => {
+    const queryParams = new URLSearchParams();
+    if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
+    queryParams.append('page', criteria.page.toString());
+    queryParams.append('size', criteria.size.toString());
+
+    return http.get<MyPropertiesResponse>(`properties/me?${queryParams.toString()}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
+        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
+        : undefined,
     });
   },
 
@@ -82,11 +93,13 @@ export const propertyApi = {
   },
 
   get3dOperations: (propertyId: string) => {
-    return http.get<Property3dOperation[] | ApiResponse<Property3dOperation[]>>(`properties/${propertyId}/3d-operations`, {
-      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
-    });
+    return http.get<Property3dOperation[] | ApiResponse<Property3dOperation[]>>(
+      `properties/${propertyId}/3d-operations`,
+      {
+        baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+      }
+    );
   },
-
   initiate3dOperation: (propertyId: string, request: CreateProperty3dOperationRequest) => {
     return http.post<Property3dOperation | ApiResponse<Property3dOperation>>(
       `properties/${propertyId}/3d-operations`,
@@ -94,4 +107,5 @@ export const propertyApi = {
       { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
     );
   },
+  
 };

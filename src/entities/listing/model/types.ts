@@ -23,6 +23,7 @@ export interface PropertyNested {
   usable_size_m2: number;
   width_m: number;
   length_m: number;
+  media?: MediaItem[];
 }
 
 // ============ Location ============
@@ -100,11 +101,14 @@ export interface Amenity {
   description?: string;
 }
 
+export type ListingType = 'RENT' | 'SALE';
+
 // ============ Listing Data (main response object) ============
 export interface ListingData {
   status: string;
   slug: string;
   name: string;
+  content?: string;
   price: number;
   property: PropertyNested;
   location: Location;
@@ -116,7 +120,7 @@ export interface ListingData {
   listing_id: string;
   property_id: string;
   user_id: string;
-  listing_type: 'RENT' | 'SALE';
+  listing_type: ListingType;
   min_price?: number;
   max_price?: number;
   cost_breakdown?: CostBreakdownAPI;
@@ -129,6 +133,7 @@ export interface ListingData {
   total_videos: number;
   total_3d_tours: number;
   is_favorite?: boolean;
+  is_created_by_owner?: boolean;
 }
 
 // ============ Cost Breakdown (API format - snake_case) ============
@@ -191,6 +196,24 @@ export interface SimilarListingsResponse {
   listings: SimilarListing[];
   total: number;
   limit: number;
+}
+
+// ============ Generic Paginated Response ============
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  total_elements: number;
+  total_pages: number;
+  first: boolean;
+  last: boolean;
+}
+
+// ============ Managed Listing Summary ============
+export interface ManagedListingSummary {
+  all: number;
+  rent: number;
+  sale: number;
 }
 
 // ============ Main Listing Type (what we export) ============

@@ -1,0 +1,86 @@
+{
+  "ManagedListings": {
+    "title": "Listings",
+    "createButton": "Create Listing",
+    "filter": "Filter",
+    "filterPanel": {
+      "status": "Status",
+      "statusOptions": {
+        "all": "All Statuses",
+        "draft": "Draft",
+        "pending": "Pending",
+        "published": "Published",
+        "sold": "Sold",
+        "rented": "Rented",
+        "archived": "Archived"
+      },
+      "sortBy": "Sort By",
+      "sortOptions": {
+        "newest": "Newest First",
+        "oldest": "Oldest First",
+        "priceAsc": "Price: Low to High",
+        "priceDesc": "Price: High to Low"
+      },
+      "reset": "Reset"
+    },
+    "tabs": {
+      "all": "All",
+      "forRent": "For Rent",
+      "forSale": "For Sale"
+    },
+    "search": {
+      "placeholder": "Search..."
+    },
+    "loading": "Loading...",
+    "error": {
+      "title": "Failed to load listings",
+      "message": "An error occurred while loading your listings"
+    },
+    "empty": {
+      "noProperties": "No properties found",
+      "selectProperty": "Select a property to view details"
+    }
+  },
+  "ListingCard": {
+    "noImage": "No image",
+    "noAddress": "No address available",
+    "listingType": {
+      "rent": "For Rent",
+      "sale": "For Sale"
+    }
+  },
+  "ListingDetailPanel": {
+    "addressNotAvailable": "Address not available",
+    "showCalendar": "Show Property Calendar",
+    "preview": "Preview",
+    "actions": "Actions",
+    "editListing": "Edit Listing",
+    "backToList": "Back to list",
+    "agent": {
+      "title": "Listing Agent",
+      "subtitle": "This listing is managed by an agent",
+      "phone": "Phone",
+      "email": "Email",
+      "company": "Company",
+      "verified": "Verified Agent",
+      "contact": "Contact Agent"
+    },
+    "deleteListing": "Delete Listing",
+    "deleteConfirmTitle": "Delete Listing",
+    "deleteConfirmDescription": "Are you sure you want to delete this listing? This action cannot be undone.",
+    "deleteConfirmCancel": "Cancel",
+    "deleteConfirmApprove": "Delete",
+    "deleting": "Deleting...",
+    "features": {
+      "properties": "Properties",
+      "rooms": "Rooms",
+      "livingSpace": "Living Space",
+      "yearBuilt": "Year Built",
+      "tenants": "Tenants",
+      "request": "Request",
+      "availableFrom": "Date Available",
+      "availableImmediately": "Immediately",
+      "notAvailable": "N/A"
+    }
+  }
+}

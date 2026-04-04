@@ -1,0 +1,12 @@
+{
+  "ListingMetricsCard": {
+    "title": "Listing Performance",
+    "metrics": {
+      "totalViews": "Total Views",
+      "uniqueViewers": "Unique Viewers",
+      "tourBookings": "Tour Bookings",
+      "conversionRate": "Conversion Rate",
+      "conversionRateTooltip": "The percentage of viewers who booked a tour"
+    }
+  }
+}
