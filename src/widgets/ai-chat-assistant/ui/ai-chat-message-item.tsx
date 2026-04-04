@@ -67,7 +67,8 @@ export function AiChatMessageItem({ message, className }: AiChatMessageItemProps
                 remarkPlugins={[remarkGfm]}
                 components={{
                   // Open links in a new tab
-                  a: ({ children, ...props }) => (
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  a: ({ children, ...props }: any) => (
                     <a {...props} target='_blank' rel='noopener noreferrer'>
                       {children}
                     </a>
