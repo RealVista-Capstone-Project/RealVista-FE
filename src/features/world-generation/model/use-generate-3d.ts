@@ -130,7 +130,7 @@ export function useGenerate3d(propertyId: string) {
         progressDescription: 'Starting image upload...',
       });
 
-      const uploadedAssets: { mediaAssetId: string; azimuth: number }[] = [];
+      const uploadedAssets: { media_asset_id: string; azimuth: number }[] = [];
 
       // Step 1: Upload images sequentially
       for (let i = 0; i < images.length; i++) {
@@ -146,8 +146,8 @@ export function useGenerate3d(propertyId: string) {
         for (let retry = 0; retry <= MAX_UPLOAD_RETRIES; retry++) {
           if (abortRef.current) return;
           try {
-            const assetId = await uploadImage(images[i].file, i);
-            uploadedAssets.push({ mediaAssetId: assetId, azimuth: images[i].azimuth });
+            const assetId = await uploadImage(images[i].file);
+            uploadedAssets.push({ media_asset_id: assetId, azimuth: images[i].azimuth });
             lastError = null;
             break;
           } catch (error: any) {
@@ -183,8 +183,8 @@ export function useGenerate3d(propertyId: string) {
 
       try {
         const generationRes = await propertyApi.initiate3dOperation(propertyId, {
-          displayName,
-          model,
+          display_name: displayName,
+          model: model,
           images: uploadedAssets,
         });
 

@@ -102,6 +102,7 @@ export interface PropertyMediaRequest {
   thumbnailUrl?: string;
   type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
   isThumbnail?: boolean;
+  metadata?: any;
 }
 
 export interface CreatePropertyRequest {
@@ -164,6 +165,7 @@ export interface PropertyDetailResponse {
     thumbnail_url: string | null;
     media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
     is_primary: boolean;
+    metadata?: any;
   }>;
 }
 
@@ -190,9 +192,9 @@ export interface Property3dOperation {
 
 export interface CreateProperty3dOperationRequest {
   model: string;
-  displayName?: string;
+  display_name?: string;
   images: Array<{
-    mediaAssetId: string;
+    media_asset_id: string;
     azimuth: number;
   }>;
 }

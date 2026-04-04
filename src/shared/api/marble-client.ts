@@ -11,50 +11,44 @@ export class MarbleApiError extends Error {
   }
 }
 
-export type MarbleModel = 'Marble 0.1-pro' | 'Marble 0.1-mini'
+export type MarbleModel = 'Marble 0.1-pro' | 'Marble 0.1-mini' | 'Marble 0.1-plus'
+
+export type WorldStatus = 'SUCCEEDED' | 'PENDING' | 'FAILED' | 'RUNNING'
+
+export type World = {
+  world_id: string
+  display_name: string
+  world_marble_url: string
+  model?: string
+  created_at?: string
+  updated_at?: string
+  assets?: {
+    thumbnail_url: string
+    caption?: string
+    imagery?: { pano_url: string }
+    splats?: { spz_urls: Record<string, string> }
+    mesh?: { collider_mesh_url: string }
+  }
+}
 
 export type OperationResponse = {
-  name: string
   operation_id: string
-  metadata?: {
-    '@type': string
-    world_id?: string
-    progress?: {
-      description: string
-    }
-  }
   done: boolean
+  metadata?: {
+    progress_percentage?: number
+    status?: WorldStatus
+    [key: string]: any
+  }
   error?: {
     code: number
     message: string
   }
-  response?: {
-    '@type': string
-    world_id: string
-    display_name: string
-    created_at: string
-    world_marble_url: string
-    model: string
-    assets: {
-      thumbnail_url: string
-      caption?: string
-      imagery?: { pano_url: string }
-      splats?: { spz_urls: { high_res: string; full_res: string } }
-      mesh?: { collider_mesh_url: string }
-    }
-  }
+  response?: World
 }
 
-export async function uploadImage(file: File, sequence: number = 0): Promise<string> {
+export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append(
-    'capture_metadata',
-    JSON.stringify({
-      capture_type: 'CAPTURE_TYPE_SPATIAL_CAMERA',
-      sequence_number: sequence,
-    })
-  )
 
   try {
     const res = await http.post<{ media_asset_id: string }>('/api/marble/upload', formData, {
@@ -80,22 +74,27 @@ export async function uploadImage(file: File, sequence: number = 0): Promise<str
 }
 
 export async function generateWorld(params: {
-  displayName?: string
+  display_name?: string
   model: MarbleModel
-  images: { mediaAssetId: string; azimuth: number }[]
-  textPrompt?: string
+  images: { media_asset_id: string; azimuth: number }[]
+  text_prompt?: string
 }): Promise<{ operation_id: string; metadata?: any }> {
   try {
+    // Transform to World Labs multi-image prompt structure
     const payload = {
-      display_name: params.displayName || 'Property 3D World',
+      display_name: params.display_name || 'Property 3D World',
       model: params.model,
-      generation_options: {
-        images: params.images.map((img) => ({
-          media_asset_id: img.mediaAssetId,
-          camera_parameters: { azimuth: img.azimuth },
+      world_prompt: {
+        type: 'multi-image',
+        multi_image_prompt: params.images.map((img) => ({
+          azimuth: img.azimuth,
+          content: {
+            source: 'media_asset',
+            media_asset_id: img.media_asset_id,
+          },
         })),
-        ...(params.textPrompt && {
-          prompts: [{ text: params.textPrompt }],
+        ...(params.text_prompt && {
+          text_prompt: params.text_prompt,
         }),
       },
     }

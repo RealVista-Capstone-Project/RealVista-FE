@@ -4,25 +4,29 @@ const MARBLE_API_KEY = process.env.MARBLE_API_KEY;
 
 export async function POST(req: NextRequest) {
   if (!MARBLE_API_KEY) {
-    return NextResponse.json({ error: 'MARBLE_API_KEY is not configured' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'MARBLE_API_KEY is not configured' },
+      { status: 500 }
+    );
   }
 
   try {
     const body = await req.json();
 
-    const response = await fetch('https://api.marblehq.com/api/v1/worlds:generate', {
+    const response = await fetch('https://api.worldlabs.ai/marble/v1/worlds:generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': MARBLE_API_KEY,
+        'WLT-Api-Key': MARBLE_API_KEY,
       },
       body: JSON.stringify(body),
     });
 
     if (!response.ok) {
       const errorData = await response.text();
+      console.error('Marble generate failed:', errorData);
       return NextResponse.json(
-        { error: 'Failed to generate world from Marble', details: errorData },
+        { error: 'Failed to generate world from World Labs', details: errorData },
         { status: response.status }
       );
     }

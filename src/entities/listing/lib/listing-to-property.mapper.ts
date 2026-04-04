@@ -47,6 +47,7 @@ export function mapListingToProperty(listing: Listing): Property {
       alt: `${listing.slug}-${media.media_type}`,
       type,
       isPrimary: media.is_primary,
+      metadata: media.metadata,
     };
   });
 
