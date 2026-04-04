@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { propertyApi } from '@/entities/property/api/property.api';
 import { locationApi } from '@/entities/location/api/location.api';
-import type { PropertySummary } from '@/entities/property/api/property-api.types';
+import type { PropertyListingDto } from '@/entities/property/api/property-api.types';
 import { useUserSearch } from '@/entities/user/api/use-user-search';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -27,7 +27,7 @@ export function PropertySearchStep() {
 
   const [address, setAddress] = useState('');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [searchResults, setSearchResults] = useState<PropertySummary[]>([]);
+  const [searchResults, setSearchResults] = useState<PropertyListingDto[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selection, setSelection] = useState<'NEW' | string | null>(null);
 
@@ -111,7 +111,7 @@ export function PropertySearchStep() {
         if (Object.keys(params).length === 0) return;
 
         const response = await propertyApi.search(params);
-        const results = response.payload.data || [];
+        const results = response.payload.data?.content || [];
         setSearchResults(results);
 
         // Auto-select 'NEW' if no existing properties found at this location
@@ -213,33 +213,33 @@ export function PropertySearchStep() {
                 <div className='grid grid-cols-1 gap-3'>
                   {searchResults.map((p) => (
                     <Card
-                      key={p.property_id}
+                      key={p.listing_id}
                       className={cn(
                         'cursor-pointer transition-all hover:shadow-md border-[1.5px]',
-                        selection === p.property_id
+                        selection === p.listing_id
                           ? 'border-[#7065F0] bg-[#F7F7FD]'
                           : 'border-[#E0DEF7] hover:border-[#7065F0]'
                       )}
-                      onClick={() => handleSelect(p.property_id)}
+                      onClick={() => handleSelect(p.listing_id)}
                     >
                       <CardContent className='p-4 flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
                           <div className='size-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F0EFFB] relative'>
                             <NextImage
                               src={p.thumbnail_url || '/placeholder-property.jpg'}
-                              alt={p.street_address}
+                              alt={p.street_address || p.full_address}
                               fill
                               className='object-cover'
                             />
                           </div>
                           <div>
-                            <h4 className='font-semibold text-foreground'>{p.street_address}</h4>
+                            <h4 className='font-semibold text-foreground'>{p.street_address || p.full_address}</h4>
                             <p className='text-sm text-muted-foreground'>
-                              {p.owner_name ? `Owner: ${p.owner_name}` : ''}
+                              {/* TODO: Add owner info if available in PropertyListingDto */}
                             </p>
                           </div>
                         </div>
-                        {selection === p.property_id && (
+                        {selection === p.listing_id && (
                           <div className='size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
                             <Check size={20} />
                           </div>

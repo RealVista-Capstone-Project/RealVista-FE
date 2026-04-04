@@ -6,7 +6,7 @@ import type {
   MyPropertiesSearchCriteria,
   PropertyAttributeDefinition,
   PropertyDetailResponse,
-  PropertySummary,
+  PropertySearchResponse,
   UpdatePropertyRequest,
 } from './property-api.types';
 
@@ -28,7 +28,7 @@ export const propertyApi = {
     const queryString = searchParams.toString();
     const url = queryString ? `properties/search?${queryString}` : 'properties/search';
 
-    return http.get<ApiResponse<PropertySummary[]>>(url, {
+    return http.get<PropertySearchResponse>(url, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },

@@ -331,7 +331,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
     try {
       if (data.newFiles && data.newFiles.length > 0) {
-        const uploadRes = await mediaApi.uploadBulk(data.newFiles, data.propertyId);
+        const uploadRes = await mediaApi.uploadBulkMedia(data.newFiles, 'listings');
         if (
           uploadRes.status < 200 ||
           uploadRes.status >= 300 ||
@@ -343,7 +343,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         }
 
         const uploadedResults = uploadRes.payload.data.uploaded_files;
-        const newMediaIds = uploadedResults.map((res) => res.media_id);
+        const newMediaIds = uploadedResults.map((res: { media_id: string }) => res.media_id);
 
         // Add newly uploaded media IDs to the list
         payload.media_ids = [...(payload.media_ids || []), ...newMediaIds];
