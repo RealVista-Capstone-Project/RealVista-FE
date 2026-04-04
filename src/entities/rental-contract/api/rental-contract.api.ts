@@ -126,7 +126,7 @@ const MOCK_RENTAL_CONTRACTS: RentalContract[] = [
   },
 ];
 
-let rentalContractsStore = [...MOCK_RENTAL_CONTRACTS];
+const rentalContractsStore = [...MOCK_RENTAL_CONTRACTS];
 
 const wait = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
 
