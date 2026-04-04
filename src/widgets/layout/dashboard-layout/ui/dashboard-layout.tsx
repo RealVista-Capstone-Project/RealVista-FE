@@ -16,9 +16,10 @@ import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
-import { ROUTES } from '@/shared/config/routes';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
+import { useAuthSession } from '@/features/auth/model';
+import { ROUTES } from '@/shared/config/routes';
 
 export interface SidebarMenuItem {
   id: string;
@@ -36,8 +37,6 @@ export interface DashboardLayoutProps {
     initials: string;
     avatar?: string;
   };
-  headerTitle?: string;
-  headerSubtitle?: string;
   className?: string;
 }
 
@@ -61,6 +60,34 @@ const defaultSidebarItems: SidebarMenuItem[] = [
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
+const agentSidebarItems: SidebarMenuItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    href: ROUTES.dashboard.root,
+    icon: LayoutDashboard,
+  },
+  {
+    id: 'insight',
+    label: 'Insight',
+    href: ROUTES.dashboard.insight,
+    icon: TrendingUp,
+  },
+  {
+    id: 'listings',
+    label: 'My Listings',
+    href: ROUTES.dashboard.managedListings,
+    icon: Calendar,
+  },
+  {
+    id: 'proposals',
+    label: 'My Proposals',
+    href: ROUTES.dashboard.manageProposals,
+    icon: Calendar,
+  },
+  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
+];
+
 const defaultUser = {
   name: 'Francis',
   initials: 'FR',
@@ -68,13 +95,19 @@ const defaultUser = {
 
 export function DashboardLayout({
   children,
-  sidebarItems = defaultSidebarItems,
+  sidebarItems,
   logoHref = ROUTES.homePage,
   user = defaultUser,
-  headerTitle,
-  headerSubtitle,
   className,
 }: DashboardLayoutProps) {
+  const { data: session } = useAuthSession();
+  const isAgent = session?.user?.role === 'AGENT';
+
+  const finalSidebarItems = React.useMemo(() => {
+    if (sidebarItems) return sidebarItems;
+    return isAgent ? agentSidebarItems : defaultSidebarItems;
+  }, [sidebarItems, isAgent]);
+
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
@@ -201,7 +234,7 @@ export function DashboardLayout({
 
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3'>
-          {sidebarItems.map((item) => {
+          {finalSidebarItems.map((item) => {
             const isActive = isItemActive(item.href);
 
             return (
@@ -294,7 +327,7 @@ export function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main className='flex-1 bg-purple-98 p-4 md:p-6'>{children}</main>
+        <main className='flex-1 bg-purple-98'>{children}</main>
       </div>
     </div>
   );

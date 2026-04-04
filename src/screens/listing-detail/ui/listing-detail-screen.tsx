@@ -21,6 +21,7 @@ import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Button } from '@/shared/ui/button';
 import { SimilarListings } from '@/widgets/similar-listings';
 import { BookTourModal } from '@/features/price-and-tour/ui/book-tour-modal';
+import { AgentApplyProposalModal } from '@/features/agent-proposal/ui/agent-apply-proposal-modal';
 import { useRouter, useParams } from 'next/navigation';
 import { useChatWindowStore } from '@/entities/contact';
 import { isAuthenticated } from '@/features/auth/model';
@@ -47,6 +48,7 @@ export interface ListingDetailScreenProps {
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const property: Property = mapListingToProperty(listing);
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
+  const [isApplyProposalOpen, setIsApplyProposalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyCard');
@@ -56,6 +58,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const params = useParams();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
+  const isAgent = session?.user?.role === 'AGENT';
 
   const { isFavorite, toggleFavorite } = useListingFavorite(
     listing.listing_id,
@@ -143,6 +146,15 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
     }
   };
 
+  const handleApplyProposal = () => {
+    if (!isAuthenticated(session)) {
+      const locale = params?.locale || 'vi';
+      router.push(`/${locale}/login`);
+      return;
+    }
+    setIsApplyProposalOpen(true);
+  };
+
   const handleRequestTour = () => {
     if (!session) {
       setShowLoginModal(true);
@@ -186,6 +198,8 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 listingType={listing.listing_type}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                onApplyProposal={handleApplyProposal}
+                isAgent={isAgent}
               />
             </div>
 
@@ -208,6 +222,8 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 listingType={listing.listing_type}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                onApplyProposal={handleApplyProposal}
+                isAgent={isAgent}
               />
             </div>
           </div>
@@ -257,12 +273,18 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             variant='primary'
             size='medium'
             className='w-full xs:w-auto max-w-[200px]'
-            onClick={handleContact}
+            onClick={isAgent ? handleApplyProposal : handleContact}
           >
-            Apply Now
+            {isAgent ? 'Apply Proposal' : 'Apply Now'}
           </RealVistaButton>
         </div>
       </div>
+
+      <AgentApplyProposalModal
+        propertyId={property.id}
+        isOpen={isApplyProposalOpen}
+        onClose={() => setIsApplyProposalOpen(false)}
+      />
 
       <BookTourModal
         listingId={property.id}

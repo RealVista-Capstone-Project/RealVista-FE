@@ -20,6 +20,7 @@ export const ROUTES = {
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
     manageAgent: '/dashboard/manage-agent',
+    manageProposals: '/dashboard/manage-proposals',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`
   },
   manageAgent: {

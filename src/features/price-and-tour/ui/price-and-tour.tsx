@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { ClipboardEdit } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
 import { formatVND } from '@/shared/lib/utils';
@@ -11,6 +12,8 @@ export interface PriceAndTourProps {
   listingType: 'RENT' | 'SALE';
   onContact?: () => void;
   onRequestTour?: (date: string) => void;
+  onApplyProposal?: () => void;
+  isAgent?: boolean;
 }
 
 /**
@@ -18,7 +21,7 @@ export interface PriceAndTourProps {
  *
  * Shows monthly rent price, contact button, and a home tour request form with date picker
  */
-export function PriceAndTour({ price, listingType, onContact, onRequestTour }: PriceAndTourProps) {
+export function PriceAndTour({ price, listingType, onContact, onRequestTour, onApplyProposal, isAgent }: PriceAndTourProps) {
   const t = useTranslations('PriceAndTour');
   const [tourDate, setTourDate] = useState('');
 
@@ -50,47 +53,61 @@ export function PriceAndTour({ price, listingType, onContact, onRequestTour }: P
         </div>
 
         {/* Contact Button */}
-        <RealVistaButton variant='primary' size='medium' className='w-full' onClick={onContact}>
-          {t('contactAgent')}
-        </RealVistaButton>
+        {isAgent && onApplyProposal ? (
+          <RealVistaButton
+            variant='primary'
+            size='medium'
+            className='w-full bg-main-secondary flex items-center justify-center gap-2'
+            onClick={onApplyProposal}
+          >
+            <ClipboardEdit className='h-5 w-5 shrink-0' />
+            Apply Proposal
+          </RealVistaButton>
+        ) : (
+          <RealVistaButton variant='primary' size='medium' className='w-full' onClick={onContact}>
+            {t('contactAgent')}
+          </RealVistaButton>
+        )}
 
         {/* Divider */}
         <div className='h-px w-full bg-purple-92' />
 
         {/* Request a Home Tour Section */}
-        <div className='flex flex-col gap-6'>
-          <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
-            {t('requestHomeTour')}
-          </p>
-
+        {!isAgent && (
           <div className='flex flex-col gap-6'>
-            {/* Date Selector */}
-            <DatePickerInput
-              id='tour-date-input'
-              value={tourDate}
-              onChange={(value) => setTourDate(value)}
-              placeholder={t('selectTourDate')}
-              minDate={new Date()}
-              variant='tour'
-            />
-
-            {/* Request Tour Button */}
-            <RealVistaButton
-              variant='primary'
-              size='medium'
-              className='w-full bg-main-secondary'
-              disabled={!tourDate}
-              onClick={handleRequestTour}
-            >
-              {t('requestTour')}
-            </RealVistaButton>
-
-            {/* Disclaimer */}
-            <p className='text-grey-500 text-[12px] font-normal leading-[1.35]'>
-              {t('disclaimer')}
+            <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
+              {t('requestHomeTour')}
             </p>
+
+            <div className='flex flex-col gap-6'>
+              {/* Date Selector */}
+              <DatePickerInput
+                id='tour-date-input'
+                value={tourDate}
+                onChange={(value) => setTourDate(value)}
+                placeholder={t('selectTourDate')}
+                minDate={new Date()}
+                variant='tour'
+              />
+
+              {/* Request Tour Button */}
+              <RealVistaButton
+                variant='primary'
+                size='medium'
+                className='w-full bg-main-secondary'
+                disabled={!tourDate}
+                onClick={handleRequestTour}
+              >
+                {t('requestTour')}
+              </RealVistaButton>
+
+              {/* Disclaimer */}
+              <p className='text-grey-500 text-[12px] font-normal leading-[1.35]'>
+                {t('disclaimer')}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

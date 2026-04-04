@@ -8,7 +8,7 @@ export interface User {
   email: string
   name?: string
   avatar?: string
-  role?: 'user' | 'admin' | 'moderator'
+  role?: 'user' | 'admin' | 'moderator' | 'AGENT'
   emailVerified?: boolean
   createdAt: string
   updatedAt: string
