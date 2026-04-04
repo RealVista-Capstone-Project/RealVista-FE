@@ -330,6 +330,7 @@
     "length": "Chiều dài (m)",
     "propertyType": "Loại Bất động sản",
     "selectType": "Chọn loại hình",
+    "selectOption": "Chọn {label}",
     "additionalDetails": "Thông tin bổ sung",
     "amenities": "Tiện ích",
     "loadingAmenities": "Đang tải tiện ích...",

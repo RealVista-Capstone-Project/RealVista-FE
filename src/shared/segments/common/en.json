@@ -330,6 +330,7 @@
     "length": "Length (m)",
     "propertyType": "Property Type",
     "selectType": "Select property type",
+    "selectOption": "Select {label}",
     "additionalDetails": "Additional Details",
     "amenities": "Amenities",
     "loadingAmenities": "Loading amenities...",

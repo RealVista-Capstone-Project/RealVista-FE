@@ -4,6 +4,28 @@ import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Map as GoogleMap, Marker } from '@vis.gl/react-google-maps';
+import {
+  Bed,
+  Bath,
+  ArrowUpCircle,
+  Layers,
+  ArrowRightLeft,
+  Wind,
+  Trees,
+  Car,
+  Wifi,
+  UtensilsCrossed,
+  Waves,
+  Dumbbell,
+  Maximize,
+  Monitor,
+  ShieldCheck,
+  Zap,
+  Droplets,
+  Construction,
+  Warehouse,
+  Tractor,
+} from 'lucide-react';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -39,21 +61,67 @@ export function PropertyInfoStep() {
   const { data: amenities = [], isLoading: isAmenitiesLoading } = useAmenities();
   const { data: attributeDefinitions = [] } = usePropertyAttributes();
 
-  // Determine dynamic attributes
-  const activeAttributes = useMemo(() => {
-    if (!selectedPropertyType) return [];
+  // Segment dynamic attributes into values and booleans
+  const { valueAttributes, booleanAttributes } = useMemo(() => {
+    if (!selectedPropertyType) return { valueAttributes: [], booleanAttributes: [] };
+
+    let attrs: PropertyAttribute[] = [];
     for (const category of PROPERTY_TYPES) {
       const type = category.types.find((t) => t.code === selectedPropertyType);
-      if (type) return type.attributes;
+      if (type) {
+        attrs = type.attributes;
+        break;
+      }
     }
-    return [];
+
+    const values: PropertyAttribute[] = [];
+    const booleans: PropertyAttribute[] = [];
+
+    attrs.forEach((attr) => {
+      if (ATTRIBUTE_TYPES[attr] === 'boolean') {
+        booleans.push(attr);
+      } else {
+        values.push(attr);
+      }
+    });
+
+    return { valueAttributes: values, booleanAttributes: booleans };
   }, [selectedPropertyType]);
 
-  const renderDynamicField = (attrCode: PropertyAttribute) => {
+  const getAttributeIcon = (attrCode: PropertyAttribute) => {
+    const iconMap: Record<string, React.ElementType> = {
+      BEDROOMS: Bed,
+      BATHROOMS: Bath,
+      FLOOR: ArrowUpCircle,
+      TOTAL_FLOORS: Layers,
+      DIRECTION: ArrowRightLeft,
+      AC: Wind,
+      GARDEN: Trees,
+      GARAGE: Car,
+      WIFI: Wifi,
+      KITCHEN: UtensilsCrossed,
+      POOL: Waves,
+      GYM: Dumbbell,
+      WIDTH: Maximize,
+      DEPTH: Maximize,
+      VIEW: Monitor,
+      SECURITY: ShieldCheck,
+      POWER: Zap,
+      WATER: Droplets,
+      DRAINAGE: Construction,
+      WAREHOUSE: Warehouse,
+      CROP_TYPE: Tractor,
+    };
+
+    const IconComponent = iconMap[attrCode];
+    if (!IconComponent) return null;
+
+    return <IconComponent className='w-4 h-4 text-main-primary/70' />;
+  };
+
+  const renderValueField = (attrCode: PropertyAttribute) => {
     const label = ATTRIBUTE_LABELS[attrCode];
     const type = ATTRIBUTE_TYPES[attrCode];
-
-    // Find if backend has predefined ranges for this attribute
     const definition = attributeDefinitions.find((d) => d.attribute_code === attrCode);
     const hasRanges = definition?.ranges && definition.ranges.length > 0;
 
@@ -63,69 +131,87 @@ export function PropertyInfoStep() {
         control={control}
         name={`info.dynamicAttributes.${attrCode}`}
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2'>
-            <div className='flex items-center justify-between'>
-              <FormLabel className='text-sm font-medium text-foreground'>{label}</FormLabel>
-              {type === 'boolean' && (
-                <FormControl>
-                  <Switch checked={field.value === true} onCheckedChange={field.onChange} />
-                </FormControl>
-              )}
+          <FormItem className='flex flex-col gap-1.5'>
+            <div className='flex items-center gap-2 mb-0.5'>
+              {getAttributeIcon(attrCode)}
+              <FormLabel className='text-[13px] font-semibold text-foreground/80'>
+                {label}
+              </FormLabel>
             </div>
-            {type === 'number' && !hasRanges && (
-              <FormControl>
-                <Input
-                  type='number'
-                  min='0'
-                  placeholder={label}
-                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
-                  {...field}
-                  value={field.value || ''}
-                  onChange={(e) =>
-                    field.onChange(e.target.value ? Number(e.target.value) : undefined)
-                  }
-                />
-              </FormControl>
-            )}
-            {type === 'text' && !hasRanges && (
-              <FormControl>
-                <Input
-                  type='text'
-                  placeholder={label}
-                  className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
-                  {...field}
-                  value={field.value || ''}
-                />
-              </FormControl>
-            )}
-            {hasRanges && (
+            {hasRanges ? (
               <Select
-                onValueChange={(val) => {
-                  if (type === 'number') {
-                    field.onChange(Number(val));
-                  } else {
-                    field.onChange(val);
+                onValueChange={(rangeId) => {
+                  const selectedRange = definition.ranges?.find((r) => r.range_id === rangeId);
+                  if (selectedRange) {
+                    const actualValue =
+                      type === 'number' ? selectedRange.min_value : selectedRange.label;
+                    field.onChange(actualValue);
                   }
                 }}
-                value={field.value?.toString() || ''}
+                value={
+                  definition.ranges?.find(
+                    (r) => (type === 'number' ? r.min_value : r.label) === field.value
+                  )?.range_id || ''
+                }
               >
                 <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
-                    <SelectValue placeholder={t('selectOption', { default: 'Select {label}', label })} />
+                  <SelectTrigger className='h-11 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-main-primary focus:ring-1 focus:ring-main-primary'>
+                    <SelectValue
+                      placeholder={t('selectOption', { default: 'Select {label}', label })}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className='rounded-lg border-[#E0DEF7]'>
                   {definition.ranges?.map((range) => (
-                    <SelectItem
-                      key={range.range_id}
-                      value={(type === 'number' ? range.min_value : range.label)?.toString() || ''}
-                    >
+                    <SelectItem key={range.range_id} value={range.range_id}>
                       {range.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+            ) : (
+              <FormControl>
+                <Input
+                  type={type === 'number' ? 'number' : 'text'}
+                  min={type === 'number' ? '0' : undefined}
+                  placeholder={label}
+                  className='h-11 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+                  {...field}
+                  value={field.value || ''}
+                  onChange={(e) => {
+                    field.onChange(type === 'number' ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value);
+                  }}
+                />
+              </FormControl>
             )}
+            <FormMessage className='text-xs' />
+          </FormItem>
+        )}
+      />
+    );
+  };
+
+  const renderBooleanField = (attrCode: PropertyAttribute) => {
+    const label = ATTRIBUTE_LABELS[attrCode];
+
+    return (
+      <FormField
+        key={attrCode}
+        control={control}
+        name={`info.dynamicAttributes.${attrCode}`}
+        render={({ field }) => (
+          <FormItem className='flex items-center justify-between p-3.5 rounded-xl border border-[#E0DEF7] bg-white hover:bg-main-primary/[0.02] transition-colors'>
+            <div className='flex items-center gap-3'>
+              <div className='p-2 rounded-lg bg-main-primary/5 text-main-primary font-bold'>
+                {getAttributeIcon(attrCode) || <div className='w-4 h-4' />}
+              </div>
+              <FormLabel className='text-sm font-medium text-foreground cursor-pointer mb-0'>
+                {label}
+              </FormLabel>
+            </div>
+            <FormControl>
+              <Switch checked={field.value === true} onCheckedChange={field.onChange} />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
@@ -355,13 +441,42 @@ export function PropertyInfoStep() {
           )}
         />
 
-        {activeAttributes.length > 0 && (
-          <div className='flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300'>
-            <h3 className='text-base font-bold text-foreground'>
-              {t('additionalDetails', { default: 'Additional Details' })}
-            </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6 rounded-lg bg-[#F7F7FD] border border-[#E0DEF7]'>
-              {activeAttributes.map((attr) => renderDynamicField(attr))}
+        {/* Dynamic Attributes Section */}
+        {(valueAttributes.length > 0 || booleanAttributes.length > 0) && (
+          <div className='mt-8 pt-8 border-t border-[#E0DEF7] animate-in fade-in slide-in-from-top-4 duration-500'>
+            <div className='flex items-center gap-3 mb-6'>
+              <div className='w-10 h-10 rounded-xl bg-main-primary/10 flex items-center justify-center text-main-primary'>
+                <Monitor className='w-5 h-5' />
+              </div>
+              <div>
+                <h3 className='text-base font-bold text-foreground'>
+                  {t('additionalDetails', { default: 'Additional Details' })}
+                </h3>
+                <p className='text-xs text-muted-foreground'>
+                  Specify technical details and additional features of the property.
+                </p>
+              </div>
+            </div>
+
+            <div className='flex flex-col gap-8'>
+              {/* Value-based Attributes Grid */}
+              {valueAttributes.length > 0 && (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5'>
+                  {valueAttributes.map((attr) => renderValueField(attr))}
+                </div>
+              )}
+
+              {/* Boolean Features Grid */}
+              {booleanAttributes.length > 0 && (
+                <div className='space-y-4'>
+                  <h4 className='text-sm font-semibold text-foreground/70 uppercase tracking-wider'>
+                    Features & Amenities
+                  </h4>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                    {booleanAttributes.map((attr) => renderBooleanField(attr))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
