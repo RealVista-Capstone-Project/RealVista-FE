@@ -58,7 +58,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const { isFavorite, toggleFavorite } = useListingFavorite(
     listing.listing_id,
-    listing.is_favorite ?? false,
+    listing.is_favorite ?? false
   );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
@@ -82,22 +82,18 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const handleBrowseNearby = () => {
     // Browse nearby listings
-    console.log('Browse nearby');
   };
 
   const handleViewAllPhotos = () => {
     // Open photo gallery
-    console.log('View all photos');
   };
 
   const handle3DTour = () => {
     // Open 3D tour
-    console.log('Open 3D tour');
   };
 
   const handleVideo = () => {
     // Play video
-    console.log('Play video');
   };
 
   const handleContact = () => {
@@ -107,7 +103,6 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
       return;
     }
     setIsContactModalOpen(true);
-    // console.log('Contact agent (disabled for debug)');
   };
   const handleSendContact = async (data: ContactFormData) => {
     const response = await sendMessage.mutateAsync({

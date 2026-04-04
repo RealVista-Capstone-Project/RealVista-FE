@@ -183,7 +183,7 @@ export function PropertyGallery({
       <MediaViewer
         open={mediaViewerOpen}
         onOpenChange={setMediaViewerOpen}
-        images={imageUrls}
+        media={safeImages}
         defaultTab={mediaViewerTab}
         onFavorite={onFavorite}
       />

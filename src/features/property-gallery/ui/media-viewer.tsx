@@ -7,12 +7,15 @@ import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SharePopover } from '@/features/property-header/ui/share-popover';
 
+import { SparkViewer } from '@/widgets/spark-viewer/SparkViewer';
+import type { PropertyImage } from '@/entities/property';
+
 export type MediaType = 'photos' | '3d-tour' | 'video';
 
 export interface MediaViewerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  images?: string[];
+  media?: PropertyImage[];
   defaultTab?: MediaType;
   onFavorite?: () => void;
   onRequestTour?: () => void;
@@ -49,7 +52,7 @@ MediaViewerOverlay.displayName = DialogPrimitive.Overlay.displayName;
 export function MediaViewer({
   open,
   onOpenChange,
-  images = [],
+  media = [],
   defaultTab = 'photos',
   onFavorite,
   onRequestTour,
@@ -57,21 +60,60 @@ export function MediaViewer({
   const [activeTab, setActiveTab] = React.useState<MediaType>(defaultTab);
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
-  const tabs: { id: MediaType; label: string }[] = [
-    { id: 'photos', label: 'Photos' },
-    { id: '3d-tour', label: '3D Tour' },
-    { id: 'video', label: 'Video' },
-  ];
+  // Filter media by type with support for both client-side and API structure
+  const photos = React.useMemo(() => {
+    return media
+      .filter((m: any) => m.type === 'photo' || m.media_type === 'IMAGE')
+      .map((m) => ({
+        ...m,
+        url: m.url || m.media_url,
+        type: 'photo',
+      }));
+  }, [media]);
+
+  const video = React.useMemo(() => {
+    const item = media.find((m: any) => m.type === 'video' || m.media_type === 'VIDEO');
+    return item ? { ...item, url: item.url || item.media_url, type: 'video' } : null;
+  }, [media]);
+
+  const tour3d = React.useMemo(() => {
+    const item = media.find(
+      (m: any) =>
+        m.type === '3d-tour' || m.media_type === 'THREE_D' || m.media_type === 'VIRTUAL_TOUR'
+    );
+    if (item) {
+      return {
+        ...item,
+        url: item.url || item.media_url,
+        metadata: item.metadata,
+        type: '3d-tour',
+      };
+    }
+    return null;
+  }, [media]);
+
+  const tabs: { id: MediaType; label: string; count: number }[] = [
+    { id: 'photos' as MediaType, label: 'Photos', count: photos.length },
+    { id: '3d-tour' as MediaType, label: '3D Tour', count: tour3d ? 1 : 0 },
+    { id: 'video' as MediaType, label: 'Video', count: video ? 1 : 0 },
+  ].filter((tab) => tab.count > 0);
+
+  // If active tab's count becomes 0 (due to media update), switch to first available
+  React.useEffect(() => {
+    if (open && tabs.length > 0 && !tabs.find((t) => t.id === activeTab)) {
+      setActiveTab(tabs[0].id);
+    }
+  }, [open, tabs, activeTab]);
 
   const handlePrevious = () => {
-    if (activeTab === 'photos' && images.length > 0) {
-      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+    if (activeTab === 'photos' && photos.length > 0) {
+      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
     }
   };
 
   const handleNext = () => {
-    if (activeTab === 'photos' && images.length > 0) {
-      setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+    if (activeTab === 'photos' && photos.length > 0) {
+      setCurrentIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
     }
   };
 
@@ -146,23 +188,23 @@ export function MediaViewer({
 
           {/* Main Content Area */}
           <div className='flex-1 relative overflow-hidden'>
-            {activeTab === 'photos' && images.length > 0 && (
+            {activeTab === 'photos' && photos.length > 0 && (
               <>
                 {/* Image */}
                 <div className='absolute inset-0 flex items-center justify-center'>
                   <img
-                    src={images[currentIndex]}
+                    src={photos[currentIndex].url}
                     alt={`Property photo ${currentIndex + 1}`}
                     className='max-w-full max-h-full object-contain'
                   />
                 </div>
 
                 {/* Navigation Arrows */}
-                {images.length > 1 && (
+                {photos.length > 1 && (
                   <>
                     <button
                       onClick={handlePrevious}
-                      className='absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors'
+                      className='absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors z-10'
                     >
                       <svg
                         width='24'
@@ -178,7 +220,7 @@ export function MediaViewer({
 
                     <button
                       onClick={handleNext}
-                      className='absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors'
+                      className='absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors z-10'
                     >
                       <svg
                         width='24'
@@ -195,31 +237,34 @@ export function MediaViewer({
                 )}
 
                 {/* Counter */}
-                {images.length > 1 && (
+                {photos.length > 1 && (
                   <div className='absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-main-black px-4 py-2 text-white text-sm'>
                     <span>{currentIndex + 1}</span>
                     <span>/</span>
-                    <span>{images.length}</span>
+                    <span>{photos.length}</span>
                   </div>
                 )}
               </>
             )}
 
-            {activeTab === '3d-tour' && (
-              <div className='absolute inset-0 flex items-center justify-center text-white'>
-                <div className='text-center'>
-                  <p className='text-2xl font-bold mb-2'>3D Tour</p>
-                  <p className='text-white/60'>3D tour content will be displayed here</p>
-                </div>
+            {activeTab === '3d-tour' && tour3d && (
+              <div className='absolute inset-0 p-6 flex items-center justify-center'>
+                <SparkViewer
+                  metadata={tour3d.metadata}
+                  spzUrl={tour3d.url}
+                  className='max-w-[1200px] max-h-full'
+                />
               </div>
             )}
 
-            {activeTab === 'video' && (
-              <div className='absolute inset-0 flex items-center justify-center text-white'>
-                <div className='text-center'>
-                  <p className='text-2xl font-bold mb-2'>Video Tour</p>
-                  <p className='text-white/60'>Video content will be displayed here</p>
-                </div>
+            {activeTab === 'video' && video && (
+              <div className='absolute inset-0 p-6 flex items-center justify-center'>
+                <video
+                  src={video.url}
+                  controls
+                  className='max-w-full max-h-full rounded-xl shadow-2xl'
+                  autoPlay
+                />
               </div>
             )}
           </div>

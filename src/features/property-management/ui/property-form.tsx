@@ -178,7 +178,6 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   };
 
   const onSubmit = (data: PropertyFormValues) => {
-    console.log('Form Submit Data:', data);
 
     if (isEditMode && propertyId) {
       const request = transformToRequest(data);
@@ -294,10 +293,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       {/* Form Card */}
       <div className='rounded-lg border-[1.5px] border-[#E0DEF7] bg-white p-6 sm:p-8 shadow-sm'>
         <FormProvider {...methods}>
-          <form
-            onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation Errors:', errors))}
-            className='flex flex-col gap-6'
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
             {STEPS[currentStep].component}
 
             {/* Navigation Buttons */}

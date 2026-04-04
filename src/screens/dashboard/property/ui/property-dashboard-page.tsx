@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck } from 'lucide-react';
+import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck, Box } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -196,6 +196,17 @@ export default function PropertyDashboardPage() {
                         >
                           <Eye className='w-4 h-4' />
                           <span className='sr-only'>{t('viewAction', { default: 'View' })}</span>
+                        </Button>
+                        <Button
+                          variant='ghost'
+                          size='icon'
+                          className='h-8 w-8 text-slate-500 hover:text-blue-600 hover:bg-blue-50'
+                          asChild
+                        >
+                          <Link href={`/dashboard/property/${property.property_id}/3d`}>
+                            <Box className='w-4 h-4' />
+                            <span className='sr-only'>3D Visualization</span>
+                          </Link>
                         </Button>
                         {property.status === 'PENDING' && (
                           <Button

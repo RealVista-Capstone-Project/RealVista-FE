@@ -67,7 +67,7 @@ export function PropertyMap({
 
   return (
     <div className={cn('relative h-full w-full', className)}>
-      <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API loaded')}>
+      <APIProvider apiKey={apiKey}>
         <Map
           style={{ width: '100%', height: '100%', borderRadius: MAP_CONFIG.BORDER_RADIUS }}
           defaultCenter={center}
