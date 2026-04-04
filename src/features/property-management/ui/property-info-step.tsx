@@ -331,6 +331,7 @@ export function PropertyInfoStep() {
               <FormItem>
                 <FormLabel className='text-sm font-medium text-foreground'>
                   {t('address', { default: 'Street Address' })}
+                  <span className='text-destructive ml-1'>*</span>
                 </FormLabel>
                 <FormControl>
                   <MapAutocomplete
@@ -399,7 +400,8 @@ export function PropertyInfoStep() {
           render={({ field }) => (
             <FormItem>
               <FormLabel className='text-sm font-medium text-foreground'>
-                {t('landSize', { default: 'Land Size (m²)' })}
+                {t('landSize', { default: 'Land Size' })} (m²)
+                <span className='text-destructive ml-1'>*</span>
               </FormLabel>
               <FormControl>
                 <Input
@@ -424,7 +426,8 @@ export function PropertyInfoStep() {
           render={({ field }) => (
             <FormItem>
               <FormLabel className='text-sm font-medium text-foreground'>
-                {t('usableSize', { default: 'Usable Size (m²)' })}
+                {t('usableSize', { default: 'Usable Size' })} (m²)
+                <span className='text-destructive ml-1'>*</span>
               </FormLabel>
               <FormControl>
                 <Input
@@ -503,7 +506,8 @@ export function PropertyInfoStep() {
           render={({ field }) => (
             <FormItem className='mb-6'>
               <FormLabel className='text-sm font-medium text-foreground'>
-                {t('propertyType', { default: 'Property Type' })}*
+                {t('propertyType', { default: 'Property Type' })}
+                <span className='text-destructive ml-1'>*</span>
               </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>

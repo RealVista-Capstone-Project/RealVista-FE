@@ -32,7 +32,6 @@ import type {
 import { PropertyAttribute, ATTRIBUTE_TYPES } from '@/shared/config/property-types';
 import { AgentVerificationModal } from './components/agent-verification-modal';
 import { cn } from '@/shared/lib/utils';
-import { extractStreetAddress } from '@/shared/lib/location.lib';
 
 interface PropertyFormProps {
   initialData?: Partial<PropertyFormValues>;
@@ -113,6 +112,11 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
   const isExistingProp = methods.watch('isExistingProperty');
 
+  const watchLocation = methods.watch('info.location');
+  const watchStreetAddress = methods.watch('info.streetAddress');
+  const watchIsExisting = methods.watch('isExistingProperty');
+  const watchSelectedId = methods.watch('selectedPropertyId');
+
   const STEPS = useMemo(() => {
     if (isEditMode) {
       return ALL_STEPS.filter((step) => step.id !== 'role');
@@ -123,10 +127,28 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     return ALL_STEPS;
   }, [isEditMode, ALL_STEPS, isExistingProp]);
 
-  const transformToRequest = (
-    data: PropertyFormValues,
-    status: string
-  ): CreatePropertyRequest => {
+  const isNextDisabled = useMemo(() => {
+    if (isPending) return true;
+    if (STEPS[currentStep].id === 'role') {
+      // Step 0: Ensure a property is selected (Existing or NEW)
+      // AND a valid address exists (lat/lng and street address string)
+      if (watchIsExisting) return !watchSelectedId;
+
+      // For NEW properties, both coordinates and the street address must be provided
+      return !watchLocation?.lat || watchLocation?.lat === 0 || !watchStreetAddress?.trim();
+    }
+    return false;
+  }, [
+    isPending,
+    currentStep,
+    STEPS,
+    watchLocation,
+    watchStreetAddress,
+    watchIsExisting,
+    watchSelectedId,
+  ]);
+
+  const transformToRequest = (data: PropertyFormValues, status: string): CreatePropertyRequest => {
     const mediaItems: PropertyMediaRequest[] = [];
 
     if (data.media.images && data.media.images.length > 0) {
@@ -155,7 +177,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     return {
       location_id: data.info.ward || undefined,
       property_type_id: data.info.propertyType!,
-      street_address: extractStreetAddress(data.info.streetAddress || ''),
+      street_address: data.info.streetAddress || '',
       latitude: data.info.location!.lat,
       longitude: data.info.location!.lng,
       land_size_m2: data.info.landSize || undefined,
@@ -377,8 +399,8 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 <Button
                   type='button'
                   onClick={handleNext}
-                  disabled={isPending}
-                  className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
+                  disabled={isNextDisabled}
+                  className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none disabled:opacity-50'
                 >
                   {t('continue')}
                 </Button>

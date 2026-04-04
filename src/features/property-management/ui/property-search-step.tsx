@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Search, MapPin, Plus, Check, Loader2, User, Users, AlertCircle } from 'lucide-react';
+import NextImage from 'next/image';
 
 import { MapAutocomplete } from './components/map-autocomplete';
 import { Card, CardContent } from '@/shared/ui/card';
@@ -16,10 +17,13 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shar
 import { Input } from '@/shared/ui/input';
 import { cn } from '@/shared/lib/utils';
 import { extractStreetAddress } from '@/shared/lib/location.lib';
+import { useAuthSession } from '@/features/auth/model/use-auth-session';
 
 export function PropertySearchStep() {
   const t = useTranslations('PropertyManagement');
   const { control, setValue, clearErrors } = useFormContext();
+  const { data: session } = useAuthSession();
+  const currentUserRole = session?.user?.role;
 
   const [address, setAddress] = useState('');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -38,6 +42,20 @@ export function PropertySearchStep() {
     isFetching: isUserFetching,
     error: userError,
   } = useUserSearch(searchUserEmail);
+
+  const handleSelect = useCallback(
+    (id: 'NEW' | string) => {
+      setSelection(id);
+      if (id === 'NEW') {
+        setValue('isExistingProperty', false);
+        setValue('selectedPropertyId', null);
+      } else {
+        setValue('isExistingProperty', true);
+        setValue('selectedPropertyId', id);
+      }
+    },
+    [setValue]
+  );
 
   const handleAddressChange = async (
     newAddress: string,
@@ -66,34 +84,49 @@ export function PropertySearchStep() {
       setValue('info.streetAddress', displayAddress);
     } else {
       setCoords(null);
-    }
-  };
-
-  const performSearch = async (lat: number | null, lng: number | null, addr?: string) => {
-    setIsSearching(true);
-    try {
-      const params: Record<string, string | number> = {};
-      if (lat !== null && lng !== null) {
-        const delta = 0.0005;
-        params.north_lat = lat + delta;
-        params.south_lat = lat - delta;
-        params.east_lng = lng + delta;
-        params.west_lng = lng - delta;
-      } else if (addr) {
-        params.address = addr;
-      }
-
-      if (Object.keys(params).length === 0) return;
-
-      const response = await propertyApi.search(params);
-      setSearchResults(response.payload.data || []);
-    } catch (error) {
-      console.error('Failed to search properties:', error);
+      // Clear form state when address is deleted or invalid
+      setValue('info.location', { lat: 0, lng: 0 });
+      setValue('info.streetAddress', '');
+      setValue('info.locationId', undefined);
       setSearchResults([]);
-    } finally {
-      setIsSearching(false);
+      setSelection(null);
     }
   };
+
+  const performSearch = useCallback(
+    async (lat: number | null, lng: number | null, addr?: string) => {
+      setIsSearching(true);
+      try {
+        const params: Record<string, string | number> = {};
+        if (lat !== null && lng !== null) {
+          const delta = 0.0005;
+          params.north_lat = lat + delta;
+          params.south_lat = lat - delta;
+          params.east_lng = lng + delta;
+          params.west_lng = lng - delta;
+        } else if (addr) {
+          params.address = addr;
+        }
+
+        if (Object.keys(params).length === 0) return;
+
+        const response = await propertyApi.search(params);
+        const results = response.payload.data || [];
+        setSearchResults(results);
+
+        // Auto-select 'NEW' if no existing properties found at this location
+        if (results.length === 0 && (lat !== null || addr)) {
+          handleSelect('NEW');
+        }
+      } catch (error) {
+        console.error('Failed to search properties:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [handleSelect]
+  );
 
   useEffect(() => {
     if (!address || coords) return;
@@ -105,18 +138,7 @@ export function PropertySearchStep() {
     }, 600);
 
     return () => clearTimeout(timer);
-  }, [address, coords]);
-
-  const handleSelect = (id: 'NEW' | string) => {
-    setSelection(id);
-    if (id === 'NEW') {
-      setValue('isExistingProperty', false);
-      setValue('selectedPropertyId', null);
-    } else {
-      setValue('isExistingProperty', true);
-      setValue('selectedPropertyId', id);
-    }
-  };
+  }, [address, coords, performSearch]);
 
   const handleUserSearch = () => {
     if (ownerEmail && ownerEmail.includes('@')) {
@@ -182,80 +204,83 @@ export function PropertySearchStep() {
         {/* Search Results */}
         {(address || coords) && !isSearching && (
           <div className='flex flex-col gap-4 animate-in slide-in-from-top-2'>
-            <h3 className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-              {searchResults.length > 0
-                ? t('foundExistingProperties', { count: searchResults.length })
-                : t('noPropertiesFoundAtLocation')}
-            </h3>
+            {searchResults.length > 0 && (
+              <>
+                <h3 className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  {t('foundExistingProperties', { count: searchResults.length })}
+                </h3>
 
-            <div className='grid grid-cols-1 gap-3'>
-              {searchResults.map((p) => (
-                <Card
-                  key={p.property_id}
-                  className={cn(
-                    'cursor-pointer transition-all hover:shadow-md border-[1.5px]',
-                    selection === p.property_id
-                      ? 'border-[#7065F0] bg-[#F7F7FD]'
-                      : 'border-[#E0DEF7] hover:border-[#7065F0]'
-                  )}
-                  onClick={() => handleSelect(p.property_id)}
-                >
-                  <CardContent className='p-4 flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
-                      <div className='size-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F0EFFB]'>
-                        <img
-                          src={p.thumbnail_url || '/placeholder-property.jpg'}
-                          alt={p.street_address}
-                          className='size-full object-cover'
-                        />
+                <div className='grid grid-cols-1 gap-3'>
+                  {searchResults.map((p) => (
+                    <Card
+                      key={p.property_id}
+                      className={cn(
+                        'cursor-pointer transition-all hover:shadow-md border-[1.5px]',
+                        selection === p.property_id
+                          ? 'border-[#7065F0] bg-[#F7F7FD]'
+                          : 'border-[#E0DEF7] hover:border-[#7065F0]'
+                      )}
+                      onClick={() => handleSelect(p.property_id)}
+                    >
+                      <CardContent className='p-4 flex items-center justify-between'>
+                        <div className='flex items-center gap-4'>
+                          <div className='size-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F0EFFB] relative'>
+                            <NextImage
+                              src={p.thumbnail_url || '/placeholder-property.jpg'}
+                              alt={p.street_address}
+                              fill
+                              className='object-cover'
+                            />
+                          </div>
+                          <div>
+                            <h4 className='font-semibold text-foreground'>{p.street_address}</h4>
+                            <p className='text-sm text-muted-foreground'>
+                              {p.owner_name ? `Owner: ${p.owner_name}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                        {selection === p.property_id && (
+                          <div className='size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
+                            <Check size={20} />
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Card
+                    className={cn(
+                      'cursor-pointer border-[1.5px] border-dashed transition-all hover:bg-[#F7F7FD]',
+                      selection === 'NEW' ? 'border-[#7065F0] bg-[#F7F7FD]' : 'border-[#E0DEF7]'
+                    )}
+                    onClick={() => handleSelect('NEW')}
+                  >
+                    <CardContent className='p-4 flex items-center gap-4'>
+                      <div className='size-16 rounded-lg bg-[#F0EFFB] flex items-center justify-center text-[#7065F0]'>
+                        <Plus size={32} />
                       </div>
                       <div>
-                        <h4 className='font-semibold text-foreground'>{p.street_address}</h4>
-                        <p className='text-sm text-muted-foreground'>
-                          {p.owner_name ? `Owner: ${p.owner_name}` : ''}
-                        </p>
+                        <h4 className='font-semibold text-foreground'>
+                          {t('createNewPropertyOption')}
+                        </h4>
+                        <p className='text-sm text-muted-foreground'>{t('step0Desc')}</p>
                       </div>
-                    </div>
-                    {selection === p.property_id && (
-                      <div className='size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
-                        <Check size={20} />
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-
-              <Card
-                className={cn(
-                  'cursor-pointer border-[1.5px] border-dashed transition-all hover:bg-[#F7F7FD]',
-                  selection === 'NEW' ? 'border-[#7065F0] bg-[#F7F7FD]' : 'border-[#E0DEF7]'
-                )}
-                onClick={() => handleSelect('NEW')}
-              >
-                <CardContent className='p-4 flex items-center gap-4'>
-                  <div className='size-16 rounded-lg bg-[#F0EFFB] flex items-center justify-center text-[#7065F0]'>
-                    <Plus size={32} />
-                  </div>
-                  <div>
-                    <h4 className='font-semibold text-foreground'>
-                      {t('createNewPropertyOption')}
-                    </h4>
-                    <p className='text-sm text-muted-foreground'>{t('step0Desc')}</p>
-                  </div>
-                  {selection === 'NEW' && (
-                    <div className='ml-auto size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
-                      <Check size={20} />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                      {selection === 'NEW' && (
+                        <div className='ml-auto size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
+                          <Check size={20} />
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
 
-      {/* Role Selection */}
-      {selection && (
+      {/* Role Selection - only visible if user is not just an owner */}
+      {selection && currentUserRole !== 'owner' && (
         <div className='flex flex-col gap-6 pt-8 border-t border-[#E0DEF7] animate-in fade-in slide-in-from-top-4 duration-500'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             {/* Owner Card */}
