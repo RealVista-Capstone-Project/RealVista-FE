@@ -1,4 +1,5 @@
 import http from '@/shared/lib/http';
+import { ApiResponse } from './media-api.types';
 
 export interface MediaUploadResponse {
   media_id: string; // UUID from backend
@@ -20,17 +21,25 @@ export interface BulkMediaUploadResponse {
 }
 
 export const mediaApi = {
-  uploadBulk: (files: File[], propertyId?: string) => {
+  uploadBulkMedia: (files: File[], folder = 'properties', propertyId?: string) => {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
+    formData.append('folder', folder);
 
     const params = propertyId ? `?propertyId=${propertyId}` : '';
     return http.post<BulkMediaUploadResponse>(`media/upload/bulk${params}`, formData, {
-      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
-        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
-        : undefined,
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+  uploadMedia: (file: File, folder = 'properties') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
+
+    return http.post<ApiResponse<MediaUploadResponse>>('media/upload', formData, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
 };

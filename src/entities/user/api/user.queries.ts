@@ -49,4 +49,14 @@ export const userQueries = {
       queryFn: () => userApi.list(),
       staleTime: 2 * 60 * 1000, // 2 minutes
     }),
+  /**
+   * Search user by email for owner assignment
+   */
+  searchByEmail: (email: string) =>
+    queryOptions({
+      queryKey: userKeys.search(email),
+      queryFn: () => userApi.searchByEmail(email),
+      staleTime: 1 * 60 * 1000, // 1 minute
+      enabled: !!email && email.includes('@'),
+    }),
 } as const
