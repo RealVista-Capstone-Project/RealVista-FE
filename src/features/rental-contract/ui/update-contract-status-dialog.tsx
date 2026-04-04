@@ -82,8 +82,8 @@ export function UpdateContractStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-md rounded-3xl border-0 p-0 shadow-2xl'>
-        <div className='rounded-3xl bg-white p-6'>
+      <DialogContent className='max-w-md rounded-2xl border-0 p-0 shadow-2xl'>
+        <div className='rounded-2xl bg-white p-6'>
           <DialogHeader className='text-left'>
             <DialogTitle className='text-xl font-semibold text-main-black'>
               {config.title}
@@ -103,7 +103,7 @@ export function UpdateContractStatusDialog({
                 value={reason}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setReason(event.target.value)}
                 placeholder={t('statusDialog.reasonPlaceholder')}
-                className='min-h-28 rounded-2xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-main-primary/30'
+                className='min-h-28 rounded-xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-main-primary/30'
               />
               <p className='text-xs text-main-secondary/60'>
                 {t('statusDialog.reasonHint')}

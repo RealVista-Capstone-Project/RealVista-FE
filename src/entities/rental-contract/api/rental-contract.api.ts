@@ -1,8 +1,6 @@
 import {
   RentalContractStatus,
-  type GetRentalContractsParams,
-  type RentalContract,
-  type RentalContractPageResponse,
+  type GetRentalContractsParams, type RentalContract, type RentalContractPageResponse,
   type UpdateRentalContractStatusPayload,
 } from '../model/types';
 

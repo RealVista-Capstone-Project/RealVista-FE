@@ -88,7 +88,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
   return (
     <>
-      <div className='sticky top-4 w-full max-h-[calc(100vh-120px)] flex-shrink-0 overflow-hidden rounded-[28px] border border-[#E9E7F5] bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:w-[390px]'>
+      <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-[#E9E7F5] bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:basis-[40%] lg:max-w-[40%]'>
         <div className='flex items-center justify-between border-b border-[#F0EEF7] px-5 py-4'>
           <div>
             <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-main-secondary/60'>
@@ -107,8 +107,8 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
           </Button>
         </div>
 
-        <CardContent className='space-y-5 overflow-y-auto p-5'>
-          <div className='overflow-hidden rounded-[24px] border border-[#ECE9FB] bg-[#FBFAFF]'>
+        <CardContent className='min-h-0 flex-1 space-y-5 overflow-y-auto p-5'>
+          <div className='overflow-hidden rounded-2xl border border-[#ECE9FB] bg-[#FBFAFF]'>
             <div className='relative aspect-[3/4] overflow-hidden bg-[#F3F0FF]'>
               <img
                 src={contract.contractDocumentUrl}
@@ -134,9 +134,9 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             </div>
 
             <div className='space-y-4 px-4 py-4'>
-              <div className='rounded-2xl bg-white p-4 shadow-[inset_0_0_0_1px_rgba(234,230,249,0.9)]'>
+              <div className='rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_rgba(234,230,249,0.9)]'>
                 <div className='flex items-start gap-3'>
-                  <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F1ECFF] text-main-primary'>
+                  <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-[#F1ECFF] text-main-primary'>
                     <FileText className='h-5 w-5' />
                   </div>
                   <div className='min-w-0 flex-1'>
@@ -152,7 +152,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </div>
 
               <div className='grid grid-cols-2 gap-3'>
-                <div className='rounded-2xl bg-[#F8F7FD] p-3'>
+                <div className='rounded-xl bg-[#F8F7FD] p-3'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
                     {t('detailPanel.leaseStart')}
                   </p>
@@ -160,7 +160,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     {formatContractDate(contract.leaseStartDate, locale)}
                   </p>
                 </div>
-                <div className='rounded-2xl bg-[#F8F7FD] p-3'>
+                <div className='rounded-xl bg-[#F8F7FD] p-3'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
                     {t('detailPanel.leaseEnd')}
                   </p>
@@ -171,7 +171,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </div>
 
               {reasonText && (
-                <div className='rounded-2xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
+                <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
                     {contract.status === RentalContractStatus.REJECTED
                       ? t('detailPanel.rejectionReason')
@@ -183,7 +183,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             </div>
           </div>
 
-          <div className='rounded-[24px] border border-[#ECE9FB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F7F5FF_100%)] p-4'>
+          <div className='rounded-2xl border border-[#ECE9FB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F7F5FF_100%)] p-4'>
             <div className='mb-3 flex items-center justify-between'>
               <div>
                 <p className='text-xs uppercase tracking-[0.18em] text-main-secondary/50'>
@@ -200,7 +200,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                 <Button
                   type='button'
                   disabled={availableActions.length === 0}
-                  className='h-11 w-full rounded-2xl bg-main-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-main-primary-hover'
+                  className='h-11 w-full rounded-xl bg-main-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-main-primary-hover'
                 >
                   {availableActions.length === 0
                     ? t('statusActions.noAvailableAction')
@@ -208,13 +208,13 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   <ChevronDown className='h-4 w-4' />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align='end' className='w-64 rounded-2xl border-[#ECE9FB] p-2 shadow-xl'>
+              <PopoverContent align='end' className='w-64 rounded-xl border-[#ECE9FB] p-2 shadow-xl'>
                 <div className='space-y-1'>
                   {availableActions.map((action) => (
                     <button
                       key={action}
                       type='button'
-                      className='flex w-full items-start rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-[#F5F1FF]'
+                      className='flex w-full items-start rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#F5F1FF]'
                       onClick={() => {
                         setDialogStatus(action);
                         setIsPopoverOpen(false);
