@@ -543,7 +543,9 @@ export function PropertyInfoStep() {
                   {t('additionalDetails', { default: 'Additional Details' })}
                 </h3>
                 <p className='text-xs text-muted-foreground'>
-                  Specify technical details and additional features of the property.
+                  {t('additionalDetailsDesc', {
+                    default: 'Specify technical details and additional features of the property.',
+                  })}
                 </p>
               </div>
             </div>
@@ -560,7 +562,7 @@ export function PropertyInfoStep() {
               {booleanAttributes.length > 0 && (
                 <div className='space-y-4'>
                   <h4 className='text-sm font-semibold text-foreground/70 uppercase tracking-wider'>
-                    Features & Amenities
+                    {t('featuresAmenities', { default: 'Features & Amenities' })}
                   </h4>
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                     {booleanAttributes.map((attr) => renderBooleanField(attr))}

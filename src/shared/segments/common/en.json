@@ -332,6 +332,8 @@
     "selectType": "Select property type",
     "selectOption": "Select {label}",
     "additionalDetails": "Additional Details",
+    "additionalDetailsDesc": "Specify technical details and additional features of the property.",
+    "featuresAmenities": "Features & Amenities",
     "amenities": "Amenities",
     "loadingAmenities": "Loading amenities...",
     "searchAmenities": "Search amenities...",
