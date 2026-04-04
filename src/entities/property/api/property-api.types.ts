@@ -208,6 +208,7 @@ export interface ApiResponse<T> {
 
 export interface MyPropertiesSearchCriteria {
   keyword?: string;
+  status?: string;
   page: number;
   size: number;
 }
@@ -260,11 +261,37 @@ export interface PropertyAmenityItem {
   description: string | null;
 }
 
+export interface PropertyAttributeRangeResponse {
+  range_id: string;
+  label: string;
+  min_value: number | null;
+  max_value: number | null;
+  display_order: number;
+}
+
+export interface PropertyAttributeDefinition {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: string;
+  icon: string | null;
+  unit: string | null;
+  ranges: PropertyAttributeRangeResponse[] | null;
+}
+
 export interface PropertySummaryResponse {
   property_id: string;
   property_type_id: string;
   street_address: string;
-  status: 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
+  status:
+    | 'DRAFT'
+    | 'PENDING'
+    | 'VERIFIED'
+    | 'REJECTED'
+    | 'AVAILABLE'
+    | 'RESERVED'
+    | 'SOLD'
+    | 'RENTED';
   land_size_m2: number | null;
   usable_size_m2: number | null;
   width_m: number | null;
@@ -276,23 +303,122 @@ export interface PropertySummaryResponse {
   attributes: PropertyAttributeItem[] | null;
   media: PropertyMediaItem[] | null;
   amenities: PropertyAmenityItem[] | null;
+  owner_name?: string;
+  owner_phone?: string;
 }
 
 export interface PageResponse<T> {
   content: T[];
   page: number;
   size: number;
-  totalElements?: number;
-  totalPages?: number;
+  total_elements?: number;
+  total_pages?: number;
   last?: boolean;
   first?: boolean;
-  hasNext?: boolean;
-  hasPrevious?: boolean;
+  has_next?: boolean;
+  has_previous?: boolean;
 }
 
 export interface MyPropertiesResponse {
   success: boolean;
   message: string;
   data: PropertySummary[];
+  timestamp: string;
+}
+
+export interface PropertyAttributeRequest {
+  attribute_id?: string;
+  attribute_code?: string;
+  value_number?: number;
+  value_text?: string;
+  value_boolean?: boolean;
+}
+
+export interface PropertyMediaRequest {
+  url: string;
+  thumbnailUrl?: string;
+  type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
+  isThumbnail?: boolean;
+}
+
+export interface CreatePropertyRequest {
+  owner_id?: string;
+  location_id: string;
+  property_type_id: string;
+  street_address: string;
+  latitude: number;
+  longitude: number;
+  land_size_m2?: number;
+  usable_size_m2?: number;
+  width_m?: number;
+  length_m?: number;
+  descriptions?: string;
+  extra_attributes?: Record<string, unknown>;
+  amenity_ids?: string[];
+  attributes?: PropertyAttributeRequest[];
+  media?: PropertyMediaRequest[];
+  status?: string;
+}
+
+export type UpdatePropertyRequest = Partial<CreatePropertyRequest>;
+
+export interface PropertyDetailResponse {
+  property_id: string;
+  owner_id: string;
+  location_id: string;
+  district_id?: string;
+  city_id?: string;
+  property_type_id: string;
+  property_type_code?: string;
+  street_address: string;
+  latitude: number;
+  longitude: number;
+  status: string;
+  slug: string;
+  land_size_m2?: number;
+  usable_size_m2?: number;
+  width_m?: number;
+  length_m?: number;
+  descriptions?: string;
+  extra_attributes?: Record<string, unknown>;
+  amenities?: Array<{
+    amenity_id: string;
+    amenity_name: string;
+  }>;
+  attributes?: Array<{
+    attribute_id: string;
+    attribute_code: string;
+    attribute_name: string;
+    dataType: string;
+    icon: string | null;
+    unit: string | null;
+    value_number: number | null;
+    value_text: string | null;
+    value_boolean: boolean | null;
+  }>;
+  media?: Array<{
+    media_id: string;
+    media_url: string;
+    thumbnail_url: string | null;
+    media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
+    is_primary: boolean;
+  }>;
+}
+
+export interface PropertySummary {
+  property_id: string;
+  property_type_id: string;
+  street_address: string;
+  status: string;
+  land_size_m2?: number;
+  thumbnail_url?: string;
+  owner_name?: string;
+  owner_phone?: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
   timestamp: string;
 }

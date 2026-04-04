@@ -1,17 +1,16 @@
 import http from '@/shared/lib/http';
 import { env } from '@/shared/lib/env';
 import type {
-  PropertySearchRequest,
-  PropertySearchResponse,
-  MyPropertiesSearchCriteria,
-  MyPropertiesResponse,
-  CreatePropertyRequest,
-  UpdatePropertyRequest,
-  PropertyDetailResponse,
   ApiResponse,
-  PropertySummary,
+  CreatePropertyRequest,
+  MyPropertiesResponse,
   Property3dOperation,
   CreateProperty3dOperationRequest,
+  MyPropertiesSearchCriteria,
+  PropertyAttributeDefinition,
+  PropertyDetailResponse,
+  PropertySearchResponse,
+  UpdatePropertyRequest,
 } from './property-api.types';
 
 export const propertyApi = {
@@ -32,7 +31,7 @@ export const propertyApi = {
     const queryString = searchParams.toString();
     const url = queryString ? `properties/search?${queryString}` : 'properties/search';
 
-    return http.get<ApiResponse<PropertySummary[]>>(url, {
+    return http.get<PropertySearchResponse>(url, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
@@ -60,6 +59,7 @@ export const propertyApi = {
     const page = criteria?.page ?? 0;
     const size = criteria?.size ?? 10;
     if (criteria?.keyword) queryParams.append('keyword', criteria.keyword);
+    if (criteria?.status) queryParams.append('status', criteria.status);
     queryParams.append('page', page.toString());
     queryParams.append('size', size.toString());
 
@@ -74,6 +74,11 @@ export const propertyApi = {
     });
   },
 
+  getAttributes: () => {
+    return http.get<ApiResponse<PropertyAttributeDefinition[]>>('properties/attributes', {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
   verifyByAgent: (propertyId: string) => {
     return http.post<ApiResponse<void>>(
       `properties/${propertyId}/verify-agent`,

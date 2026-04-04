@@ -91,7 +91,7 @@ export function PropertyMapBasedSearchPage({
   const totalElements = searchResponse?.payload.data.total_elements || 0;
 
   // Group properties by coordinates to handle duplicates
-  const groupedProperties = properties.reduce(
+  const groupedProperties = properties.reduce<Record<string, PropertyListingDto[]>>(
     (acc, property) => {
       const key = `${property.coordinates.latitude},${property.coordinates.longitude}`;
       if (!acc[key]) {
@@ -100,10 +100,10 @@ export function PropertyMapBasedSearchPage({
       acc[key].push(property);
       return acc;
     },
-    {} as Record<string, PropertyListingDto[]>
+    {}
   );
 
-  const propertyLocations: PropertyLocation[] = Object.values(groupedProperties).map((group) => {
+  const propertyLocations: PropertyLocation[] = Object.values(groupedProperties).map((group: PropertyListingDto[]) => {
     const firstProperty = group[0];
     const propertyIds = group.map((p) => p.listing_id);
 
@@ -165,7 +165,7 @@ export function PropertyMapBasedSearchPage({
       return;
     }
     const currentFavorite =
-      favoriteOverrides[id] ?? properties.find((p) => p.listing_id === id)?.is_favorite ?? false;
+      favoriteOverrides[id] ?? properties.find((p: PropertyListingDto) => p.listing_id === id)?.is_favorite ?? false;
     setFavoriteOverrides((prev) => ({ ...prev, [id]: !currentFavorite }));
     try {
       await bookmarkApi.toggleBookmark(id);

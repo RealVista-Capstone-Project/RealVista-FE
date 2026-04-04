@@ -10,7 +10,11 @@ import { Check, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
-import { createPropertyFormSchema, PropertyFormValues, UploadedMediaItem } from '../model/property-form.schema';
+import {
+  createPropertyFormSchema,
+  PropertyFormValues,
+  UploadedMediaItem,
+} from '../model/property-form.schema';
 import { PropertyInfoStep } from './property-info-step';
 import { PropertyMediaStep } from './property-media-step';
 import { PropertySearchStep } from './property-search-step';
@@ -19,6 +23,7 @@ import { useUpdateProperty } from '@/entities/property/api/use-update-property';
 import { propertyApi } from '@/entities/property/api/property.api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthSession } from '@/features/auth/model/use-auth-session';
+import { useUploadMedia } from '@/entities/media/api/use-upload-media';
 import type {
   CreatePropertyRequest,
   PropertyMediaRequest,
@@ -42,14 +47,21 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   const [currentStep, setCurrentStep] = useState(0);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<'DRAFT' | 'AVAILABLE'>('AVAILABLE');
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
+  const uploadMedia = useUploadMedia();
   const assignAgent = useMutation({
     mutationFn: (id: string) => propertyApi.assignAgent(id),
   });
 
-  const isPending = createProperty.isPending || updateProperty.isPending || assignAgent.isPending;
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const isPending =
+    createProperty.isPending ||
+    updateProperty.isPending ||
+    assignAgent.isPending ||
+    isUploadingMedia;
 
   const schema = useMemo(() => createPropertyFormSchema(t), [t]);
 
@@ -100,6 +112,11 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
   const isExistingProp = methods.watch('isExistingProperty');
 
+  const watchLocation = methods.watch('info.location');
+  const watchStreetAddress = methods.watch('info.streetAddress');
+  const watchIsExisting = methods.watch('isExistingProperty');
+  const watchSelectedId = methods.watch('selectedPropertyId');
+
   const STEPS = useMemo(() => {
     if (isEditMode) {
       return ALL_STEPS.filter((step) => step.id !== 'role');
@@ -110,7 +127,28 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     return ALL_STEPS;
   }, [isEditMode, ALL_STEPS, isExistingProp]);
 
-  const transformToRequest = (data: PropertyFormValues): CreatePropertyRequest => {
+  const isNextDisabled = useMemo(() => {
+    if (isPending) return true;
+    if (STEPS[currentStep].id === 'role') {
+      // Step 0: Ensure a property is selected (Existing or NEW)
+      // AND a valid address exists (lat/lng and street address string)
+      if (watchIsExisting) return !watchSelectedId;
+
+      // For NEW properties, both coordinates and the street address must be provided
+      return !watchLocation?.lat || watchLocation?.lat === 0 || !watchStreetAddress?.trim();
+    }
+    return false;
+  }, [
+    isPending,
+    currentStep,
+    STEPS,
+    watchLocation,
+    watchStreetAddress,
+    watchIsExisting,
+    watchSelectedId,
+  ]);
+
+  const transformToRequest = (data: PropertyFormValues, status: string): CreatePropertyRequest => {
     const mediaItems: PropertyMediaRequest[] = [];
 
     if (data.media.images && data.media.images.length > 0) {
@@ -137,15 +175,16 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     }
 
     return {
-      location_id: data.info.ward!,
+      location_id: data.info.ward || undefined,
       property_type_id: data.info.propertyType!,
-      street_address: data.info.streetAddress!,
+      street_address: data.info.streetAddress || '',
       latitude: data.info.location!.lat,
       longitude: data.info.location!.lng,
       land_size_m2: data.info.landSize || undefined,
       usable_size_m2: data.info.usableSize || undefined,
       length_m: data.info.length || undefined,
       amenity_ids: data.info.amenityIds || [],
+      status,
       attributes: Object.entries(data.info.dynamicAttributes || {}).map(([code, value]) => {
         const type = ATTRIBUTE_TYPES[code as PropertyAttribute];
         return {
@@ -177,67 +216,101 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const onSubmit = (data: PropertyFormValues) => {
+  const onSubmit = async (data: PropertyFormValues) => {
+    console.log('Form Submit Data:', data);
 
-    if (isEditMode && propertyId) {
-      const request = transformToRequest(data);
-      updateProperty.mutate(
-        { propertyId, request },
-        {
+    try {
+      // 1. Upload any new files first
+      let uploadedUrls: UploadedMediaItem[] = [];
+      const newFiles: File[] = data.media.newFiles || [];
+
+      if (newFiles.length > 0) {
+        setIsUploadingMedia(true);
+        const uploadPromises = newFiles.map((file: File) =>
+          uploadMedia.mutateAsync({ file, folder: 'properties' }).then((result) => ({
+            url: result.payload.data.media_url,
+            type: file.type.startsWith('video/') ? ('VIDEO' as const) : ('IMAGE' as const),
+          }))
+        );
+
+        uploadedUrls = await Promise.all(uploadPromises);
+        setIsUploadingMedia(false);
+      }
+
+      // Combine existing images with newly uploaded ones
+      const finalData = {
+        ...data,
+        media: {
+          ...data.media,
+          images: [...(data.media.images || []), ...uploadedUrls],
+        },
+      };
+
+      if (isEditMode && propertyId) {
+        console.log(`property create request is: ${JSON.stringify(finalData)}`);
+        const request = transformToRequest(finalData, submissionStatus);
+        updateProperty.mutate(
+          { propertyId, request },
+          {
+            onSuccess: () => {
+              toast.success(t('updateSuccess'));
+              router.push('/dashboard/property');
+            },
+            onError: () => {
+              toast.error(t('submitError'));
+            },
+          }
+        );
+      } else if (finalData.isExistingProperty && finalData.selectedPropertyId) {
+        assignAgent.mutate(finalData.selectedPropertyId, {
           onSuccess: () => {
-            toast.success(t('updateSuccess'));
-            router.push('/dashboard/property');
+            toast.success(t('createSuccess'));
+            queryClient.invalidateQueries({ queryKey: ['my-properties'] });
+            const currentUserId = session?.user?.id;
+            const ownerId = finalData.role.ownerId;
+            const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
+
+            if (finalData.role.role === 'AGENT' && !isSelfOwned) {
+              setCreatedPropertyId(finalData.selectedPropertyId!);
+              setIsVerificationModalOpen(true);
+            } else {
+              router.push('/dashboard/property');
+            }
           },
           onError: () => {
             toast.error(t('submitError'));
           },
-        }
-      );
-    } else if (data.isExistingProperty && data.selectedPropertyId) {
-      assignAgent.mutate(data.selectedPropertyId, {
-        onSuccess: () => {
-          toast.success(t('createSuccess'));
-          queryClient.invalidateQueries({ queryKey: ['my-properties'] });
-          const currentUserId = session?.user?.id;
-          const ownerId = data.role.ownerId;
-          const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
+        });
+      } else {
+        const request = transformToRequest(finalData, submissionStatus);
+        createProperty.mutate(request, {
+          onSuccess: (response: { payload: { data: { property_id: string } } }) => {
+            toast.success(t('createSuccess'));
+            queryClient.invalidateQueries({ queryKey: ['my-properties'] });
 
-          if (data.role.role === 'AGENT' && !isSelfOwned) {
-            setCreatedPropertyId(data.selectedPropertyId!);
-            setIsVerificationModalOpen(true);
-          } else {
-            router.push('/dashboard/property');
-          }
-        },
-        onError: () => {
-          toast.error(t('submitError'));
-        },
-      });
-    } else {
-      const request = transformToRequest(data);
-      createProperty.mutate(request, {
-        onSuccess: (response: { payload: { data: { property_id: string } } }) => {
-          toast.success(t('createSuccess'));
-          queryClient.invalidateQueries({ queryKey: ['my-properties'] });
+            const propId = response?.payload?.data?.property_id;
+            const role = finalData.role.role;
+            const ownerId = finalData.role.ownerId;
+            const currentUserId = session?.user?.id;
 
-          const propId = response?.payload?.data?.property_id;
-          const role = data.role.role;
-          const ownerId = data.role.ownerId;
-          const currentUserId = session?.user?.id;
+            const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
 
-          const isSelfOwned = !!(ownerId && currentUserId && ownerId === currentUserId);
-
-          if (role === 'AGENT' && propId && !isSelfOwned) {
-            setCreatedPropertyId(propId);
-            setIsVerificationModalOpen(true);
-          } else {
-            router.push('/dashboard/property');
-          }
-        },
-        onError: () => {
-          toast.error(t('submitError'));
-        },
-      });
+            if (role === 'AGENT' && propId && !isSelfOwned) {
+              setCreatedPropertyId(propId);
+              setIsVerificationModalOpen(true);
+            } else {
+              router.push('/dashboard/property');
+            }
+          },
+          onError: () => {
+            toast.error(t('submitError'));
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error during media upload or submission:', error);
+      toast.error(t('uploadError') || 'Error uploading media');
+      setIsUploadingMedia(false);
     }
   };
 
@@ -293,7 +366,10 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       {/* Form Card */}
       <div className='rounded-lg border-[1.5px] border-[#E0DEF7] bg-white p-6 sm:p-8 shadow-sm'>
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
+          <form
+            onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation Errors:', errors))}
+            className='flex flex-col gap-6'
+          >
             {STEPS[currentStep].component}
 
             {/* Navigation Buttons */}
@@ -323,8 +399,8 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 <Button
                   type='button'
                   onClick={handleNext}
-                  disabled={isPending}
-                  className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
+                  disabled={isNextDisabled}
+                  className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none disabled:opacity-50'
                 >
                   {t('continue')}
                 </Button>
@@ -332,14 +408,22 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 <div className='flex gap-4'>
                   <Button
                     type='submit'
-                    disabled={isPending}
+                    disabled={
+                      isPending ||
+                      !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
+                    }
+                    onClick={() => setSubmissionStatus('DRAFT')}
                     className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
                   >
-                    {t('skipSubmit')}
+                    {t('saveDraft')}
                   </Button>
                   <Button
                     type='submit'
-                    disabled={isPending}
+                    disabled={
+                      isPending ||
+                      !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
+                    }
+                    onClick={() => setSubmissionStatus('AVAILABLE')}
                     className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}

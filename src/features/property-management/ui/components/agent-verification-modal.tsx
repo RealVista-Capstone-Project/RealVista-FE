@@ -70,6 +70,7 @@ export function AgentVerificationModal({
   useEffect(() => {
     return () => {
       if (recaptchaVerifier.current) {
+        console.log('[VerificationModal] Cleaning up Recaptcha...');
         recaptchaVerifier.current.clear();
         recaptchaVerifier.current = null;
       }
@@ -97,21 +98,27 @@ export function AgentVerificationModal({
 
     const container = document.getElementById('recaptcha-container');
     if (!container) {
+      console.error('[VerificationModal] Recaptcha container not found in DOM!');
       setError('Internal error: Recaptcha container not found');
       return null;
     }
 
+    console.log('[VerificationModal] Initializing Recaptcha...');
     try {
       const verifier = new RecaptchaVerifier(auth, container, {
         size: 'invisible',
-        callback: () => {},
+        callback: () => {
+          console.log('[VerificationModal] Recaptcha solved successfully');
+        },
         'expired-callback': () => {
+          console.error('[VerificationModal] Recaptcha expired, please try again');
           setStep('IDLE');
         },
       });
       recaptchaVerifier.current = verifier;
       return verifier;
-    } catch {
+    } catch (err) {
+      console.error('[VerificationModal] Failed to initialize Recaptcha:', err);
       setError('Failed to initialize security check');
       return null;
     }
@@ -122,10 +129,13 @@ export function AgentVerificationModal({
       return;
     }
 
+    console.log('[VerificationModal] Attempting to send OTP to:', ownerPhone);
+
     setError(null);
     const verifier = initRecaptcha();
 
     if (!verifier) {
+      console.error('[VerificationModal] Cannot proceed: Recaptcha verifier not ready');
       return;
     }
 
@@ -153,6 +163,8 @@ export function AgentVerificationModal({
       setResendCountdown(RESEND_COOLDOWN_SECONDS);
       toast.success(t('otpSentSuccess', { default: 'OTP sent to owner successfully!' }));
     } catch (err: unknown) {
+      console.error('Firebase Auth Error:', err);
+
       let errorMessage = t('otpSentError', { default: 'Failed to send OTP. Please try again.' });
 
       // Handle "TOO_MANY_ATTEMPTS_TRY_LATER" or "auth/too-many-requests"
@@ -200,6 +212,7 @@ export function AgentVerificationModal({
       }, 2000);
     } catch (err: unknown) {
       const firebaseError = err as { code?: string; message?: string };
+      console.error('OTP Verification Error:', err);
 
       let errorMessage = t('otpVerifyError', { default: 'Invalid OTP code. Please try again.' });
 

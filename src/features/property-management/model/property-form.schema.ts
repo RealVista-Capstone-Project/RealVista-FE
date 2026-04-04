@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ATTRIBUTE_TYPES, PropertyAttribute } from '@/shared/config/property-types';
 
 const uploadedMediaItemSchema = z.object({
   url: z.string().url(),
@@ -6,23 +7,61 @@ const uploadedMediaItemSchema = z.object({
 });
 
 export function createPropertyInfoSchema(t: (key: string) => string) {
-  return z.object({
-    city: z.string().min(1, t('validation.cityRequired')),
-    district: z.string().min(1, t('validation.districtRequired')),
-    ward: z.string().min(1, t('validation.wardRequired')),
-    streetAddress: z.string().min(1, t('validation.streetRequired')),
-    location: z.object({
-      lat: z.number(),
-      lng: z.number(),
-    }),
-    landSize: z.coerce.number().min(1, t('validation.landSizeMin')),
-    usableSize: z.coerce.number().min(1, t('validation.usableSizeMin')),
-    width: z.coerce.number().min(0, t('validation.widthMin')),
-    length: z.coerce.number().min(0, t('validation.lengthMin')),
-    propertyType: z.string().min(1, t('validation.propertyTypeRequired')),
-    dynamicAttributes: z.record(z.string(), z.any()).optional().default({}),
-    amenityIds: z.array(z.string()).optional().default([]),
-  });
+  return z
+    .object({
+      city: z.string().optional(),
+      district: z.string().optional(),
+      ward: z.string().optional(),
+      streetAddress: z.string().min(1, t('validation.streetRequired')),
+      location: z.object({
+        lat: z.number(),
+        lng: z.number(),
+      }),
+      landSize: z.coerce.number().min(1, t('validation.landSizeMin')),
+      usableSize: z.coerce.number().min(1, t('validation.usableSizeMin')),
+      width: z.coerce.number().min(0, t('validation.widthMin')),
+      length: z.coerce.number().min(0, t('validation.lengthMin')),
+      propertyType: z.string().min(1, t('validation.propertyTypeRequired')),
+      dynamicAttributes: z.record(z.string(), z.any()).optional().default({}),
+      amenityIds: z.array(z.string()).optional().default([]),
+    })
+    .superRefine((data, ctx) => {
+      if (data.dynamicAttributes) {
+        Object.entries(data.dynamicAttributes).forEach(([code, value]) => {
+          const type = ATTRIBUTE_TYPES[code as PropertyAttribute];
+          if (!type) return;
+
+          const path = ['dynamicAttributes', code];
+
+          if (type === 'number') {
+            if (value === undefined || value === null || value === '') return;
+            const numValue = Number(value);
+            if (isNaN(numValue)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('validation.invalidNumber'),
+                path,
+              });
+            } else if (numValue < 0) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('validation.numberMin'),
+                path,
+              });
+            }
+          } else if (type === 'boolean') {
+            if (typeof value !== 'boolean' && value !== undefined && value !== null) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.invalid_type,
+                expected: 'boolean',
+                received: typeof value,
+                path,
+              });
+            }
+          }
+        });
+      }
+    });
 }
 
 export function createPropertyRoleSchema(t: (key: string) => string) {
@@ -56,6 +95,7 @@ export function createPropertyMediaSchema(t: (key: string) => string) {
     images: z.array(uploadedMediaItemSchema).optional().default([]),
     videoUrl: z.string().url(t('validation.invalidUrl')).optional().or(z.literal('')),
     tour3dUrl: z.string().url(t('validation.invalidUrl')).optional().or(z.literal('')),
+    newFiles: z.array(z.any()).optional().default([]),
   });
 }
 

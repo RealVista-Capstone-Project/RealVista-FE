@@ -21,7 +21,7 @@ export function NotificationDropdownContainer() {
 
   const router = useRouter();
   const params = useParams();
-  const locale = (params.locale as string | undefined) ?? 'en';
+  const locale = (params?.locale as string | undefined) ?? 'en';
 
   const markAllRead = useMarkAllNotificationsRead();
   const markRead = useMarkNotificationRead();

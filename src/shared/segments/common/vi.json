@@ -330,7 +330,10 @@
     "length": "Chiều dài (m)",
     "propertyType": "Loại Bất động sản",
     "selectType": "Chọn loại hình",
+    "selectOption": "Chọn {label}",
     "additionalDetails": "Thông tin bổ sung",
+    "additionalDetailsDesc": "Chi tiết kỹ thuật và tính năng bổ sung của bất động sản.",
+    "featuresAmenities": "Tính năng & Tiện ích",
     "amenities": "Tiện ích",
     "loadingAmenities": "Đang tải tiện ích...",
     "searchAmenities": "Tìm kiếm tiện ích...",
@@ -369,6 +372,16 @@
     "verifiedTitle": "Xác thực thành công!",
     "resendOtp": "Gửi lại mã OTP",
     "resendOtpCountdown": "Gửi lại mã OTP sau {seconds} giây",
+    "primary": "Chính",
+    "makePrimary": "Đặt làm hình chính",
+    "newUpload": "Mới",
+    "aiAnalysis": {
+      "analyzing": "AI đang phân tích...",
+      "error": "Lỗi phân tích",
+      "notAllowed": "Không được phép",
+      "passed": "Điểm: {score}%",
+      "feedbackLabel": "Phản hồi từ AI"
+    },
     "fillRequired": "Vui lòng điền đủ các trường bắt buộc",
     "updateSuccess": "Cập nhật bất động sản thành công!",
     "createSuccess": "Tạo bất động sản thành công!",
@@ -377,6 +390,7 @@
     "cancel": "Hủy",
     "continue": "Tiếp tục",
     "skipSubmit": "Bỏ qua & Hoàn tất",
+    "saveDraft": "Lưu bản nháp",
     "saving": "Đang lưu...",
     "update": "Cập nhật Bất động sản",
     "create": "Tạo Bất động sản",
@@ -393,7 +407,10 @@
       "invalidUrl": "Đường dẫn không hợp lệ",
       "roleRequired": "Vui lòng chọn vai trò của bạn",
       "invalidEmail": "Email không hợp lệ",
-      "ownerRequired": "Vui lòng tìm và chọn đúng Chủ sở hữu"
+      "ownerRequired": "Vui lòng tìm và chọn đúng Chủ sở hữu",
+      "mediaQualityFail": "Một số hình ảnh không đạt yêu cầu về chất lượng từ AI",
+      "invalidNumber": "Giá trị phải là một số hợp lệ",
+      "numberMin": "Giá trị không được nhỏ hơn 0"
     }
   }
 }

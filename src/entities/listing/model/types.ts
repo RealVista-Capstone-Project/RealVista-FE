@@ -63,7 +63,7 @@ export interface MediaItem {
 // ============ Agent ============
 export interface Agent {
   email: string;
-  phone: string;
+  phone: string | null;
   company: string;
   user_id: string;
   first_name: string;

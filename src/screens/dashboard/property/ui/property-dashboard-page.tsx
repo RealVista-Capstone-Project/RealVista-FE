@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck, Box } from 'lucide-react';
+import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -9,18 +9,37 @@ import { Button } from '@/shared/ui/button';
 import { Link } from '@/shared/config/i18n/navigation';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
-import { useMyProperties } from '@/entities/property/api/use-my-properties';
+import { useQuery } from '@tanstack/react-query';
+import { propertyQueries } from '@/entities/property/api/property.queries';
+import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { AgentVerificationModal } from '@/features/property-management/ui/components/agent-verification-modal';
-import type { PropertySummary } from '@/entities/property/api/property-api.types';
+import type { PropertySummaryResponse, PropertyMediaItem } from '@/entities/property/api/property-api.types';
 
 export default function PropertyDashboardPage() {
   const t = useTranslations('PropertyManagement');
-  const { data: properties, isLoading, isError } = useMyProperties();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const [selectedProperty, setSelectedProperty] = useState<PropertySummary | null>(null);
+  const {
+    data: propertiesResponse,
+    isLoading,
+    isError,
+  } = useQuery(
+    propertyQueries.myProperties({
+      keyword: debouncedSearch,
+      page,
+      size: pageSize,
+    })
+  );
+
+  const properties = propertiesResponse?.payload.data.content || [];
+
+  const [selectedProperty, setSelectedProperty] = useState<PropertySummaryResponse | null>(null);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
 
-  const handleVerifyClick = (property: PropertySummary) => {
+  const handleVerifyClick = (property: PropertySummaryResponse) => {
     setSelectedProperty(property);
     setIsVerifyModalOpen(true);
   };
@@ -71,6 +90,11 @@ export default function PropertyDashboardPage() {
           <Input
             placeholder={t('searchPlaceholder', { default: 'Search by title, location or ID...' })}
             className='pl-10 bg-slate-50 dark:bg-slate-900/50'
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(0); // Reset to first page on new search
+            }}
           />
         </div>
         <div className='flex items-center gap-2'>
@@ -136,9 +160,12 @@ export default function PropertyDashboardPage() {
                   >
                     <td className='px-6 py-4'>
                       <div className='w-24 h-16 rounded-lg overflow-hidden relative bg-slate-100 dark:bg-slate-800'>
-                        {property.thumbnail_url ? (
+                        {property.media && property.media.length > 0 ? (
                           <Image
-                            src={property.thumbnail_url}
+                            src={
+                              property.media.find((m: PropertyMediaItem) => m.is_primary)?.media_url ||
+                              property.media[0].media_url
+                            }
                             alt={property.street_address}
                             fill
                             className='object-cover'
@@ -196,17 +223,6 @@ export default function PropertyDashboardPage() {
                         >
                           <Eye className='w-4 h-4' />
                           <span className='sr-only'>{t('viewAction', { default: 'View' })}</span>
-                        </Button>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          className='h-8 w-8 text-slate-500 hover:text-blue-600 hover:bg-blue-50'
-                          asChild
-                        >
-                          <Link href={`/dashboard/property/${property.property_id}/3d`}>
-                            <Box className='w-4 h-4' />
-                            <span className='sr-only'>3D Visualization</span>
-                          </Link>
                         </Button>
                         {property.status === 'PENDING' && (
                           <Button

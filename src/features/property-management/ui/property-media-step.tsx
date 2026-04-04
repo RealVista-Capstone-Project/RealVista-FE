@@ -1,93 +1,68 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useState, useEffect, useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Camera, Image as ImageIcon, Video, Box, X, Loader2, Play } from 'lucide-react';
-import { toast } from 'sonner';
+import Image from 'next/image';
+import { ImageIcon, Video, Box, X, Play } from 'lucide-react';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
-import { useUploadMedia } from '@/entities/media/api/use-upload-media';
+import { useMediaAnalysis } from '@/shared/lib/hooks/use-media-analysis';
+import { NewFilesGrid, MediaUploadZone } from '@/shared/ui/listing-form';
 import type { UploadedMediaItem } from '../model/property-form.schema';
-
-interface UploadingFile {
-  id: string;
-  name: string;
-  type: 'IMAGE' | 'VIDEO';
-  previewUrl?: string;
-}
-
-function getMediaType(file: File): 'IMAGE' | 'VIDEO' {
-  return file.type.startsWith('video/') ? 'VIDEO' : 'IMAGE';
-}
 
 export function PropertyMediaStep() {
   const t = useTranslations('PropertyManagement');
-  const { control, setValue } = useFormContext();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
+  const { control, setValue, watch, setError, clearErrors } = useFormContext();
 
-  const uploadedMedia: UploadedMediaItem[] = useWatch({ control, name: 'media.images' }) || [];
+  const uploadedMedia: UploadedMediaItem[] = watch('media.images') || [];
+  const watchedNewFiles = watch('media.newFiles');
+  const newFiles = useMemo(() => watchedNewFiles || [], [watchedNewFiles]);
 
-  const uploadMedia = useUploadMedia();
+  const [selectedNewFileIndices, setSelectedNewFileIndices] = useState<Set<number>>(new Set());
+  const [primaryMediaId, setPrimaryMediaId] = useState<string | null>(null);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const { analysisStatus, analyzeFile, appendEntries, removeEntry, QUALITY_THRESHOLD } =
+    useMediaAnalysis();
 
-    const fileArray = Array.from(files);
+  const handleFilesSelected = (files: File[]) => {
+    const startIndex = newFiles.length;
+    const updatedFiles = [...newFiles, ...files];
+    setValue('media.newFiles', updatedFiles);
 
-    // Add all files to uploading state
-    const newUploadingFiles: UploadingFile[] = fileArray.map((file) => ({
-      id: `${Date.now()}-${file.name}`,
-      name: file.name,
-      type: getMediaType(file),
-      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
-    }));
+    // Automatically select newly added files
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set(prev);
+      files.forEach((_, i) => next.add(startIndex + i));
+      return next;
+    });
 
-    setUploadingFiles((prev) => [...prev, ...newUploadingFiles]);
-
-    // Upload files one by one
-    for (let i = 0; i < fileArray.length; i++) {
-      const file = fileArray[i];
-      const uploadingFile = newUploadingFiles[i];
-
-      try {
-        const result = await uploadMedia.mutateAsync({ file, folder: 'properties' });
-        const mediaUrl = result.payload.data.media_url;
-        const mediaType = getMediaType(file);
-
-        // Get current state of media (avoid stale closure)
-        const currentMedia: UploadedMediaItem[] = (
-          document.querySelector('[data-media-state]') as HTMLElement
-        )?.dataset.mediaState
-          ? JSON.parse(
-              (document.querySelector('[data-media-state]') as HTMLElement).dataset.mediaState!
-            )
-          : uploadedMedia;
-
-        setValue('media.images', [...currentMedia, { url: mediaUrl, type: mediaType }]);
-
-        toast.success(t('uploadSuccess'));
-      } catch {
-        toast.error(t('uploadError'));
-      } finally {
-        // Remove from uploading state
-        setUploadingFiles((prev) => prev.filter((f) => f.id !== uploadingFile.id));
-
-        // Revoke object URL to free memory
-        if (uploadingFile.previewUrl) {
-          URL.revokeObjectURL(uploadingFile.previewUrl);
-        }
+    appendEntries(files.length);
+    files.forEach((file, i) => {
+      // Only call AI analysis for image files
+      if (file.type.startsWith('image/')) {
+        analyzeFile(file, startIndex + i);
       }
-    }
+    });
+  };
 
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const handleToggleNewFile = (index: number) => {
+    setSelectedNewFileIndices((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
+  const handleSetNewPrimary = (id: string, index: number) => {
+    setPrimaryMediaId(id);
+    setSelectedNewFileIndices((prev) => new Set(prev).add(index));
   };
 
   const handleRemoveMedia = (index: number) => {
@@ -95,7 +70,47 @@ export function PropertyMediaStep() {
     setValue('media.images', updated);
   };
 
-  const isUploading = uploadingFiles.length > 0;
+  const handleRemoveNewFile = (index: number) => {
+    const updatedFiles = newFiles.filter((_: File, i: number) => i !== index);
+    setValue('media.newFiles', updatedFiles);
+    removeEntry(index);
+  };
+
+  const mediaLabels = {
+    primary: t('primary', { fallback: 'Primary' }),
+    makePrimary: t('makePrimary', { fallback: 'Make Primary' }),
+    newUpload: t('newUpload', { fallback: 'New' }),
+    analyzing: t('aiAnalysis.analyzing', { fallback: 'Analyzing...' }),
+    error: t('aiAnalysis.error', { fallback: 'Analysis failed' }),
+    notAllowed: t('aiAnalysis.notAllowed', { fallback: 'Not allowed' }),
+    passed: t('aiAnalysis.passed', { score: '{score}', fallback: 'Score: {score}%' }),
+    feedbackLabel: t('aiAnalysis.feedbackLabel', { fallback: 'AI Feedback' }),
+  };
+
+  // Enforce quality check by setting form error if any image fails
+  useEffect(() => {
+    const hasRejectedFile = analysisStatus.some((entry, index) => {
+      // Only check images that have finished loading
+      const file = newFiles[index];
+      if (!file || !file.type.startsWith('image/')) return false;
+
+      if (!entry.isLoading && entry.result && entry.result.finalScore !== undefined) {
+        return entry.result.finalScore < QUALITY_THRESHOLD;
+      }
+      return false;
+    });
+
+    if (hasRejectedFile) {
+      setError('media.newFiles', {
+        type: 'manual',
+        message: t('validation.mediaQualityFail', {
+          default: 'Some images do not meet quality standards',
+        }),
+      });
+    } else {
+      clearErrors('media.newFiles');
+    }
+  }, [analysisStatus, QUALITY_THRESHOLD, setError, clearErrors, newFiles, t]);
 
   return (
     <div className='flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
@@ -118,35 +133,10 @@ export function PropertyMediaStep() {
                 {t('propertyMedia')}
               </FormLabel>
               <FormControl>
-                <div>
-                  {/* Upload Area */}
-                  <div
-                    className='border-[1.5px] border-dashed border-[#E0DEF7] rounded-lg p-10 flex flex-col items-center justify-center bg-[#F7F7FD] hover:bg-[#F0EFFB] transition-colors cursor-pointer'
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {isUploading ? (
-                      <Loader2 className='size-10 text-[#7065F0] animate-spin mb-4' />
-                    ) : (
-                      <Camera className='size-10 text-[#7065F0] opacity-50 mb-4' />
-                    )}
-                    <p className='text-sm font-medium text-foreground'>
-                      {isUploading ? t('uploading') : t('dragDropDesc')}
-                    </p>
-                    <p className='text-xs text-muted-foreground mt-1'>{t('supportFormats')}</p>
-                    <input
-                      ref={fileInputRef}
-                      type='file'
-                      multiple
-                      accept='image/*,video/mp4,video/quicktime,video/webm'
-                      className='hidden'
-                      onChange={handleFileSelect}
-                    />
-                  </div>
-
-                  {/* Uploaded + Uploading Thumbnails */}
-                  {(uploadedMedia.length > 0 || uploadingFiles.length > 0) && (
-                    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4'>
-                      {/* Uploaded media */}
+                <div className='flex flex-col gap-4'>
+                  {/* Existing media */}
+                  {uploadedMedia.length > 0 && (
+                    <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
                       {uploadedMedia.map((item, index) => (
                         <div
                           key={`${item.url}-${index}`}
@@ -160,11 +150,14 @@ export function PropertyMediaStep() {
                               </span>
                             </div>
                           ) : (
-                            <img
-                              src={item.url}
-                              alt={`Property media ${index + 1}`}
-                              className='size-full object-cover'
-                            />
+                            <div className='relative size-full'>
+                              <Image
+                                src={item.url}
+                                alt={`Property media ${index + 1}`}
+                                fill
+                                className='object-cover'
+                              />
+                            </div>
                           )}
                           <Button
                             type='button'
@@ -177,35 +170,30 @@ export function PropertyMediaStep() {
                           </Button>
                         </div>
                       ))}
-
-                      {/* Currently uploading files */}
-                      {uploadingFiles.map((file) => (
-                        <div
-                          key={file.id}
-                          className='relative rounded-lg overflow-hidden border border-[#E0DEF7] aspect-square bg-[#F0EFFB]'
-                        >
-                          {file.previewUrl ? (
-                            <img
-                              src={file.previewUrl}
-                              alt={file.name}
-                              className='size-full object-cover opacity-50'
-                            />
-                          ) : (
-                            <div className='size-full flex items-center justify-center opacity-50'>
-                              <Video className='size-8 text-[#7065F0]' />
-                            </div>
-                          )}
-                          {/* Loading overlay */}
-                          <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/30'>
-                            <Loader2 className='size-6 text-white animate-spin' />
-                            <span className='text-xs text-white mt-1 px-2 text-center truncate max-w-full'>
-                              {file.name}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   )}
+
+                  {/* New Files Grid with AI analysis */}
+                  <NewFilesGrid
+                    files={newFiles}
+                    selectedIndices={selectedNewFileIndices}
+                    primaryId={primaryMediaId}
+                    analysisStatus={analysisStatus}
+                    qualityThreshold={QUALITY_THRESHOLD}
+                    onToggle={handleToggleNewFile}
+                    onRemove={handleRemoveNewFile}
+                    onSetPrimary={handleSetNewPrimary}
+                    labels={mediaLabels}
+                  />
+
+                  {/* Upload Zone */}
+                  <MediaUploadZone
+                    onFilesSelected={handleFilesSelected}
+                    labels={{
+                      dragAndDrop: t('dragDropDesc'),
+                      uploadHint: t('supportFormats'),
+                    }}
+                  />
                 </div>
               </FormControl>
               <FormMessage />

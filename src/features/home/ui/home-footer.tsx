@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/shared/config/i18n/navigation';
 import { Home, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -81,9 +81,9 @@ export function HomeFooter() {
             <FooterLinkGroup
               title={t('termsAndPrivacy')}
               links={[
-                { label: t('trustAndSafety'), href: '#' },
-                { label: t('termsOfService'), href: '#' },
-                { label: t('privacyPolicy'), href: '#' },
+                { label: t('trustAndSafety'), href: '/policies/transaction-safety' },
+                { label: t('termsOfService'), href: '/policies/terms-of-service' },
+                { label: t('privacyPolicy'), href: '/policies/privacy-policy' },
               ]}
             />
           </div>
@@ -114,9 +114,18 @@ export function HomeFooter() {
 
       {/* Bottom bar */}
       <div className='border-t border-grey-200 bg-grey-50'>
-        <div className='mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8'>
-          <p className='text-sm text-grey-500'>{t('copyright')}</p>
-          <div className='flex items-center gap-4'>
+        <div className='mx-auto flex flex-col md:flex-row max-w-7xl items-center justify-between px-6 py-4 lg:px-8 gap-4'>
+          <p className='text-sm text-grey-500 whitespace-nowrap'>{t('copyright')}</p>
+          <div className='flex flex-wrap items-center justify-center gap-x-4 gap-y-2'>
+            <Link href='/policies/terms-of-service' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>Điều khoản sử dụng</Link>
+            <Link href='/policies/privacy-policy' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>Chính sách bảo mật</Link>
+            <Link href='/policies/posting-regulations' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>Quy định đăng tin</Link>
+            <Link href='/policies/fees-and-payments' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>Chính sách phí</Link>
+            <Link href='/policies/transaction-safety' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>An toàn giao dịch</Link>
+            <Link href='/policies/e-commerce-regulations' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>Quy chế TMĐT</Link>
+            <Link href='/policies/cookie-policy' className='text-xs text-grey-500 transition-colors hover:text-main-primary'>Chính sách Cookie</Link>
+          </div>
+          <div className='flex items-center gap-4 whitespace-nowrap'>
             <Link
               href='#'
               aria-label='Facebook'
