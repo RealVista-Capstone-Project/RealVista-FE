@@ -434,6 +434,16 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           )}
         </div>
 
+        {/* About this listing */}
+        <div className='mb-8 flex flex-col gap-4'>
+          <h2 className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
+            {t('aboutThisListing', { fallback: 'About this listing' })}
+          </h2>
+          <p className='text-base font-medium leading-[1.6] text-main-black/70 whitespace-pre-wrap font-sans'>
+            {listing.content || property.description}
+          </p>
+        </div>
+
         <div className='mb-8 h-px w-full bg-purple-92' />
 
         {/* Rental Features Section */}
