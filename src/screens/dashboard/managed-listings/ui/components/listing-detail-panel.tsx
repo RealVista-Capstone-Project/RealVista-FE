@@ -78,7 +78,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
@@ -102,7 +102,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {

@@ -2,6 +2,14 @@ import http from '@/shared/lib/http'
 import { ApiResponse } from '@/shared/types/api'
 import type { User, LoginCredentials, LoginResponse, UpdateUserData, UserSearchResponse } from '../model/types'
 
+/** Response shape from POST /auth/register */
+export interface RegisterResponse {
+  user_id: string
+  email: string
+  first_name: string
+  last_name: string
+}
+
 /**
  * User API - All user-related HTTP methods
  * This is the data source layer - pure functions that make HTTP requests
@@ -39,8 +47,11 @@ export const userApi = {
   register: (data: {
     email: string
     password: string
-    name: string
-  }) => http.post<LoginResponse>('/auth/register', data),
+    first_name: string
+    last_name: string
+    phone_number: string
+    role: string
+  }) => http.post<RegisterResponse>('/auth/register', data),
 
   /**
    * Update user profile
