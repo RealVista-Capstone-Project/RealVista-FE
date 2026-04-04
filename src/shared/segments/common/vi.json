@@ -2,12 +2,13 @@
   "DashboardLayout": {
     "pageTitle": {
       "default": "RealVista",
-      "dashboard": "Dashboard",
-      "insight": "Thống kê",
-      "managedListings": "Quản lý bài đăng",
-      "tenants": "Người thuê",
-      "messages": "Tin nhắn"
-    },
+    "dashboard": "Dashboard",
+    "insight": "Thống kê",
+    "managedListings": "Quản lý bài đăng",
+    "tenants": "Người thuê",
+    "rentalContracts": "Hợp đồng thuê",
+    "messages": "Tin nhắn"
+  },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
       "createListing": "Tạo bài đăng"

@@ -1,0 +1,61 @@
+{
+  "RentalContract": {
+    "detailPanel": {
+      "title": "Contract Preview",
+      "previewAlt": "Contract preview for {tenantName}",
+      "previewBadge": "Preview",
+      "contractMeta": "Contract File",
+      "leaseStart": "Lease Start",
+      "leaseEnd": "Lease End",
+      "rejectionReason": "Rejection Reason",
+      "terminationReason": "Termination Reason",
+      "actionCardEyebrow": "Status Control",
+      "actionCardDescription": "Use the primary action below to move this rental contract to the next valid status."
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "terminated": "Terminated"
+    },
+    "table": {
+      "status": "Status",
+      "tenant": "Tenant",
+      "monthlyRent": "Monthly Rent",
+      "createdDate": "Created Date",
+      "perMonth": "per month"
+    },
+    "statusActions": {
+      "updateStatus": "Update Status",
+      "approve": "Approve Contract",
+      "reject": "Reject Contract",
+      "terminate": "Terminate Contract",
+      "noAvailableAction": "No Available Action"
+    },
+    "statusActionHints": {
+      "approve": "Confirm and activate this pending rental contract.",
+      "reject": "Decline this pending contract and keep a note for the record.",
+      "terminate": "End the active contract early and keep a reason on file."
+    },
+    "statusDialog": {
+      "approveTitle": "Approve rental contract",
+      "approveDescription": "This will move the contract for {tenantName} into active status.",
+      "rejectTitle": "Reject rental contract",
+      "rejectDescription": "Add a short reason before rejecting the contract for {tenantName}.",
+      "terminateTitle": "Terminate rental contract",
+      "terminateDescription": "Add a short reason before terminating the active contract for {tenantName}.",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Write a clear note for this status update...",
+      "reasonHint": "Use at least 10 characters so the update history stays useful.",
+      "updating": "Updating..."
+    },
+    "toast": {
+      "updateSuccess": "Rental contract updated successfully",
+      "updateError": "Failed to update rental contract. Please try again."
+    },
+    "common": {
+      "cancel": "Cancel"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+import { RentalContractStatus } from '@/entities/rental-contract';
+import { format } from 'date-fns';
+import { enUS, vi } from 'date-fns/locale';
+
+const dateLocales = {
+  en: enUS,
+  vi,
+};
+
+export function formatContractDate(date: string, locale = 'en', pattern = 'dd MMM yyyy') {
+  return format(new Date(date), pattern, {
+    locale: dateLocales[locale as keyof typeof dateLocales] ?? enUS,
+  });
+}
+
+export function formatContractCurrency(amount: number, locale = 'vi-VN') {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function getContractInitials(name: string) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
+export function getRentalContractStatusColor(status: RentalContractStatus) {
+  switch (status) {
+    case RentalContractStatus.PENDING:
+      return 'bg-amber-50 text-amber-700 border border-amber-200';
+    case RentalContractStatus.ACTIVE:
+      return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+    case RentalContractStatus.REJECTED:
+      return 'bg-rose-50 text-rose-700 border border-rose-200';
+    case RentalContractStatus.EXPIRED:
+      return 'bg-slate-100 text-slate-600 border border-slate-200';
+    case RentalContractStatus.TERMINATED:
+      return 'bg-violet-50 text-violet-700 border border-violet-200';
+    default:
+      return 'bg-slate-100 text-slate-600 border border-slate-200';
+  }
+}

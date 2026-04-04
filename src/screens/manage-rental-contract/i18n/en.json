@@ -1,0 +1,33 @@
+{
+  "ManageRentalContract": {
+    "hero": {
+      "eyebrow": "Owner Contract Desk",
+      "title": "Manage rental contracts with fast status control",
+      "subtitle": "Track owner-side rental contracts, review uploaded contract previews, and push each contract through its next valid decision without leaving the dashboard.",
+      "stats": {
+        "totalContracts": "Contracts in View",
+        "activeSelection": "Current Selection"
+      },
+      "noSelection": "No contract selected"
+    },
+    "filter": {
+      "allStatuses": "All Statuses",
+      "searchPlaceholder": "Search by tenant or property..."
+    },
+    "table": {
+      "status": "Status",
+      "tenant": "Tenant",
+      "monthlyRent": "Monthly Rent",
+      "createdDate": "Created Date"
+    },
+    "empty": {
+      "title": "No rental contracts found.",
+      "subtitle": "Try a different status filter or search term."
+    },
+    "pagination": {
+      "showing": "Showing {from}-{to} of {total}"
+    },
+    "loading": "Loading rental contracts...",
+    "error": "Failed to load rental contracts. Please try again."
+  }
+}

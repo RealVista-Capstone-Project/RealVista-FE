@@ -1,0 +1,61 @@
+{
+  "RentalContract": {
+    "detailPanel": {
+      "title": "Xem trước hợp đồng",
+      "previewAlt": "Bản xem trước hợp đồng của {tenantName}",
+      "previewBadge": "Xem trước",
+      "contractMeta": "Tệp hợp đồng",
+      "leaseStart": "Ngày bắt đầu",
+      "leaseEnd": "Ngày kết thúc",
+      "rejectionReason": "Lý do từ chối",
+      "terminationReason": "Lý do chấm dứt",
+      "actionCardEyebrow": "Cập nhật trạng thái",
+      "actionCardDescription": "Dùng nút chính bên dưới để chuyển hợp đồng thuê sang trạng thái hợp lệ tiếp theo."
+    },
+    "status": {
+      "pending": "Chờ duyệt",
+      "active": "Đang hiệu lực",
+      "rejected": "Đã từ chối",
+      "expired": "Hết hạn",
+      "terminated": "Đã chấm dứt"
+    },
+    "table": {
+      "status": "Trạng thái",
+      "tenant": "Người thuê",
+      "monthlyRent": "Tiền thuê / tháng",
+      "createdDate": "Ngày tạo",
+      "perMonth": "mỗi tháng"
+    },
+    "statusActions": {
+      "updateStatus": "Cập nhật trạng thái",
+      "approve": "Duyệt hợp đồng",
+      "reject": "Từ chối hợp đồng",
+      "terminate": "Chấm dứt hợp đồng",
+      "noAvailableAction": "Không có thao tác"
+    },
+    "statusActionHints": {
+      "approve": "Xác nhận và kích hoạt hợp đồng thuê đang chờ duyệt.",
+      "reject": "Từ chối hợp đồng đang chờ và lưu lại ghi chú.",
+      "terminate": "Kết thúc sớm hợp đồng đang hiệu lực và lưu lý do."
+    },
+    "statusDialog": {
+      "approveTitle": "Duyệt hợp đồng thuê",
+      "approveDescription": "Thao tác này sẽ chuyển hợp đồng của {tenantName} sang trạng thái đang hiệu lực.",
+      "rejectTitle": "Từ chối hợp đồng thuê",
+      "rejectDescription": "Thêm lý do ngắn gọn trước khi từ chối hợp đồng của {tenantName}.",
+      "terminateTitle": "Chấm dứt hợp đồng thuê",
+      "terminateDescription": "Thêm lý do ngắn gọn trước khi chấm dứt hợp đồng đang hiệu lực của {tenantName}.",
+      "reasonLabel": "Lý do",
+      "reasonPlaceholder": "Ghi chú rõ ràng cho lần cập nhật trạng thái này...",
+      "reasonHint": "Nhập ít nhất 10 ký tự để lịch sử cập nhật có ý nghĩa hơn.",
+      "updating": "Đang cập nhật..."
+    },
+    "toast": {
+      "updateSuccess": "Cập nhật hợp đồng thuê thành công",
+      "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại."
+    },
+    "common": {
+      "cancel": "Hủy"
+    }
+  }
+}

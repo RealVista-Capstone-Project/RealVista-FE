@@ -1,0 +1,33 @@
+{
+  "ManageRentalContract": {
+    "hero": {
+      "eyebrow": "Bảng hợp đồng của chủ nhà",
+      "title": "Quản lý hợp đồng thuê với thao tác cập nhật trạng thái nhanh",
+      "subtitle": "Theo dõi hợp đồng thuê phía chủ nhà, xem trước hợp đồng đã tải lên và đưa từng hợp đồng sang bước xử lý tiếp theo ngay trong dashboard.",
+      "stats": {
+        "totalContracts": "Số hợp đồng hiển thị",
+        "activeSelection": "Mục đang chọn"
+      },
+      "noSelection": "Chưa chọn hợp đồng"
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái",
+      "searchPlaceholder": "Tìm theo người thuê hoặc bất động sản..."
+    },
+    "table": {
+      "status": "Trạng thái",
+      "tenant": "Người thuê",
+      "monthlyRent": "Tiền thuê / tháng",
+      "createdDate": "Ngày tạo"
+    },
+    "empty": {
+      "title": "Không tìm thấy hợp đồng thuê nào.",
+      "subtitle": "Hãy thử bộ lọc trạng thái hoặc từ khóa khác."
+    },
+    "pagination": {
+      "showing": "Hiển thị {from}-{to} trên tổng số {total}"
+    },
+    "loading": "Đang tải hợp đồng thuê...",
+    "error": "Tải hợp đồng thuê thất bại. Vui lòng thử lại."
+  }
+}

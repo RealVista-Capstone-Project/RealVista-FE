@@ -6,6 +6,7 @@ import {
   Calendar,
   ChevronDown,
   Columns,
+  FileText,
   LayoutDashboard,
   MessageCircle,
   TrendingUp,
@@ -51,13 +52,18 @@ const defaultSidebarItems: SidebarMenuItem[] = [
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
   { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
-      {
-      id: 'manage-agent',
-      label: 'Manage Agent',
-      href: ROUTES.dashboard.manageAgent,
-      icon: Users,
-    },
-
+  {
+    id: 'rental-contracts',
+    label: 'Rental Contracts',
+    href: ROUTES.dashboard.rentalContracts,
+    icon: FileText,
+  },
+  {
+    id: 'manage-agent',
+    label: 'Manage Agent',
+    href: ROUTES.dashboard.manageAgent,
+    icon: Users,
+  },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
@@ -94,6 +100,12 @@ export function DashboardLayout({
     }
     if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants)) {
       return t('pageTitle.tenants');
+    }
+    if (
+      pathname === ROUTES.dashboard.rentalContracts ||
+      pathname.startsWith(ROUTES.dashboard.rentalContracts)
+    ) {
+      return t('pageTitle.rentalContracts');
     }
     if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
       return t('pageTitle.messages');

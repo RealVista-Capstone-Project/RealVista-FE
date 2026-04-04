@@ -18,6 +18,7 @@ export const ROUTES = {
     insight: '/dashboard/insight',
     managedListings: '/dashboard/listings',
     tenants: '/dashboard/tenants',
+    rentalContracts: '/dashboard/rental-contracts',
     messages: '/dashboard/messages',
     manageAgent: '/dashboard/manage-agent',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`
