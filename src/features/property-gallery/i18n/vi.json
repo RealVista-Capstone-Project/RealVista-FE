@@ -3,6 +3,20 @@
     "viewAllPhotos": "Xem tất cả ảnh",
     "tour3D": "Tour 3D",
     "video": "Video",
-    "noImage": "Không có ảnh"
+    "noImage": "Không có ảnh",
+    "viewerTitle": "Trình xem nội dung bất động sản",
+    "photoAlt": "Ảnh bất động sản {index}",
+    "photosTab": "Ảnh",
+    "tour3DTab": "Tour 3D",
+    "videoTab": "Video",
+    "requestTour": "Yêu cầu tham quan",
+    "favorite": "Yêu thích",
+    "navigationHint": "Nhấn ESC hoặc nhấn X để đóng • Sử dụng phím mũi tên để di chuyển",
+    "tour3DPlaceholder": "Tour 3D",
+    "tour3DPlaceholderDescription": "Nội dung tour 3D sẽ được hiển thị tại đây",
+    "videoPlaceholder": "Video tham quan",
+    "videoPlaceholderDescription": "Nội dung video sẽ được hiển thị tại đây",
+    "noMediaTitle": "Nội dung không khả dụng",
+    "noMediaDescription": "Nội dung này hiện không có sẵn."
   }
 }

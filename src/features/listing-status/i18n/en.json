@@ -1,0 +1,40 @@
+{
+  "ListingStatus": {
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending Review",
+      "published": "Published",
+      "sold": "Sold",
+      "rented": "Rented",
+      "archived": "Archived"
+    },
+    "actions": {
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "markAsSold": "Mark as Sold",
+      "markAsRented": "Mark as Rented"
+    },
+    "tooltips": {
+      "notAvailable": "Not available for current status"
+    },
+    "errors": {
+      "duplicatePublish": "The creator of this listing already has a published listing of this type for this property.",
+      "propertyNotAvailable": "The associated property is not in an active state and cannot be listed."
+    },
+    "confirm": {
+      "markAsSold": {
+        "title": "Mark as Sold",
+        "description": "Are you sure you want to mark this property as sold? This will close all other active listings for this property and notify other agents."
+      },
+      "markAsRented": {
+        "title": "Mark as Rented",
+        "description": "Are you sure you want to mark this property as rented? This will close all other active listings for this property and notify other agents."
+      },
+      "cancel": "Cancel",
+      "proceed": "Confirm"
+    },
+    "common": {
+      "processing": "Processing..."
+    }
+  }
+}

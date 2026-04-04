@@ -1,13 +1,16 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAuthSession } from '@/features/auth/model';
 import { useRouter } from '@/shared/config/i18n/navigation';
-import type { UserRole } from './rbac';
+import type { UserRole, BackendRole } from './rbac';
 import { hasRole } from './rbac';
 
 interface RoleGuardProps {
   children: React.ReactNode;
   allowedRoles: UserRole[];
+  /** Optional: Allow specific backend roles even if their mapped frontend role is not in allowedRoles */
+  allowedBackendRoles?: BackendRole[];
   fallback?: React.ReactNode;
   redirectPath?: string;
 }
@@ -25,6 +28,15 @@ interface RoleGuardProps {
  *   <DashboardPage />
  * </RoleGuard>
  *
+ * // Allow admin/moderator OR specifically allow OWNER backend role
+ * <RoleGuard
+ *   allowedRoles={['admin', 'moderator']}
+ *   allowedBackendRoles={['OWNER']}
+ *   redirectPath="/"
+ * >
+ *   <ManagedListingsPage />
+ * </RoleGuard>
+ *
  * // Show custom fallback
  * <RoleGuard
  *   allowedRoles={['admin']}
@@ -37,14 +49,38 @@ interface RoleGuardProps {
 export function RoleGuard({
   children,
   allowedRoles,
+  allowedBackendRoles,
   fallback = null,
   redirectPath,
 }: RoleGuardProps) {
   const { data: session, status } = useAuthSession();
   const router = useRouter();
 
+  const userRole = session?.user?.role;
+  const backendRoles = session?.user?.backendRoles || [];
+
+  // Check frontend role hierarchy
+  const hasFrontendPermission = userRole
+    ? allowedRoles.some((role) => hasRole(userRole, role))
+    : false;
+
+  // Check backend roles directly (allows bypassing frontend role mapping)
+  const hasBackendPermission =
+    allowedBackendRoles?.some((role) => backendRoles.includes(role)) ?? false;
+
+  const isAuthorized = hasFrontendPermission || hasBackendPermission;
+  const isLoading = status === 'loading';
+  const isUnauthenticated = status !== 'loading' && !session?.user;
+  const shouldRedirect = !isLoading && (isUnauthenticated || !isAuthorized) && !!redirectPath;
+
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push(redirectPath!);
+    }
+  }, [shouldRedirect, redirectPath, router]);
+
   // Loading state
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
@@ -52,29 +88,27 @@ export function RoleGuard({
     );
   }
 
-  // No session - should be protected by auth middleware
-  if (!session?.user) {
+  // Unauthenticated
+  if (isUnauthenticated) {
     if (redirectPath) {
-      router.push(redirectPath);
       return null;
     }
     return <>{fallback}</>;
   }
 
-  const userRole = session.user.role;
-
-  // Check if user has any of the allowed roles
-  const hasPermission = allowedRoles.some((role) => hasRole(userRole, role));
-
-  if (!hasPermission) {
-    // Redirect or show fallback
+  // Authenticated but not authorized
+  if (!isAuthorized) {
     if (redirectPath) {
-      router.push(redirectPath);
-      return null;
+      // Show spinner while redirect is happening via useEffect
+      return (
+        <div className='flex min-h-screen items-center justify-center'>
+          <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
+        </div>
+      );
     }
     return <>{fallback}</>;
   }
 
-  // User has required role
+  // Authorized - render children
   return <>{children}</>;
 }

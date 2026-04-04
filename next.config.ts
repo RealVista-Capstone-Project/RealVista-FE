@@ -55,6 +55,11 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'realvista.sgp1.cdn.digitaloceanspaces.com',
+        pathname: '/**',
+      },
     ],
     dangerouslyAllowSVG: true,
   },

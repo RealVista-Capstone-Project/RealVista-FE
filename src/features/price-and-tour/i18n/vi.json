@@ -7,6 +7,28 @@
     "requestHomeTour": "Đặt lịch xem nhà",
     "selectTourDate": "Chọn ngày xem",
     "requestTour": "Đặt lịch",
+    "loginRequired": "Vui lòng đăng nhập để đặt lịch xem",
     "disclaimer": "Miễn phí, không bắt buộc — có thể hủy bất cứ lúc nào."
+  },
+  "BookTour": {
+    "scheduleTour": "Đặt lịch xem nhà",
+    "availableSlots": "Các khung giờ còn trống",
+    "loadingSlots": "Đang tải...",
+    "noSlotsAvailable": "Không có lịch trống cho ngày này",
+    "startTime": "Giờ bắt đầu",
+    "selectDuration": "Chọn thời lượng",
+    "duration": "Thời lượng",
+    "endTime": "Giờ kết thúc",
+    "booking": "Đang đặt...",
+    "confirmBooking": "Xác nhận đặt lịch",
+    "bookingSuccess": "Đặt lịch xem nhà thành công!",
+    "bookingError": "Đặt lịch thất bại. Vui lòng thử lại.",
+    "reviewBooking": "Xem lại thông tin",
+    "back": "Quay lại",
+    "confirmDetails": "Xác nhận thông tin",
+    "selectedDate": "Ngày đã chọn",
+    "note": "Ghi chú",
+    "hour": "giờ",
+    "minute": "phút"
   }
 }

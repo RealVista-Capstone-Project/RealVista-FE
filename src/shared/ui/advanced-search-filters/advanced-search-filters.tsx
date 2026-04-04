@@ -141,6 +141,7 @@ export function AdvancedSearchFilters({
             value={currentValue || ''}
             onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
+            maxLength={10}
           />
         </div>
       );
@@ -155,6 +156,7 @@ export function AdvancedSearchFilters({
           placeholder='Nhập giá trị'
           value={currentValue || ''}
           onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
+          maxLength={100}
         />
       </div>
     );
@@ -220,6 +222,7 @@ export function AdvancedSearchFilters({
                       ],
                     })
                   }
+                  maxLength={15}
                 />
               </div>
               <div className='space-y-1.5'>
@@ -236,6 +239,7 @@ export function AdvancedSearchFilters({
                       ],
                     })
                   }
+                  maxLength={15}
                 />
               </div>
             </div>
@@ -276,6 +280,7 @@ export function AdvancedSearchFilters({
                     ],
                   })
                 }
+                maxLength={10}
               />
               <Input
                 type='number'
@@ -290,6 +295,7 @@ export function AdvancedSearchFilters({
                     ],
                   })
                 }
+                maxLength={10}
               />
             </div>
           </div>

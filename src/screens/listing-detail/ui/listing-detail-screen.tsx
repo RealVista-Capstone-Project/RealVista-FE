@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
@@ -16,12 +15,12 @@ import { useSendMessage } from '@/entities/conversation';
 import { mapListingToChatData } from '@/entities/conversation/lib/map-listing-to-chat-data';
 import { ContactModal } from '@/widgets/contact-modal';
 import type { ContactFormData } from '@/entities/contact';
-import { bookmarkApi } from '@/entities/bookmark/api/bookmark.api';
-import { getAuthToken } from '@/shared/lib/auth/get-auth-token';
+import { useListingFavorite } from '@/features/bookmark';
 import { useAuthSession } from '@/features/auth/model';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Button } from '@/shared/ui/button';
 import { SimilarListings } from '@/widgets/similar-listings';
+import { BookTourModal } from '@/features/price-and-tour/ui/book-tour-modal';
 import { useRouter, useParams } from 'next/navigation';
 import { useChatWindowStore } from '@/entities/contact';
 import { isAuthenticated } from '@/features/auth/model';
@@ -30,6 +29,7 @@ import type { SendMessageResponse } from '@/entities/conversation/model/types';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
+import { behaviorTracker } from '@/shared/lib/analytics';
 import {
   Dialog,
   DialogContent,
@@ -45,51 +45,34 @@ export interface ListingDetailScreenProps {
 }
 
 export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
-  // Map Listing to Property for compatibility with existing components
   const property: Property = mapListingToProperty(listing);
+  const [isBookTourOpen, setIsBookTourOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const { data: session } = useAuthSession();
+  const t = useTranslations('PropertyCard');
   const sendMessage = useSendMessage();
   const chatListingData = mapListingToChatData(listing);
   const router = useRouter();
   const params = useParams();
-  const { data: session } = useAuthSession();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
 
-  const [isFavorite, setIsFavorite] = useState<boolean>(listing.is_favorite ?? false);
+  const { isFavorite, toggleFavorite } = useListingFavorite(
+    listing.listing_id,
+    listing.is_favorite ?? false,
+  );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
-  const t = useTranslations('PropertyCard');
 
-  // The listing is fetched server-side (no auth token) so is_favorite is always false
-  // from SSR. Re-fetch on client mount using async getAuthToken() to get a fresh token
-  // (getAuthTokenSync() may be null on first mount since AuthTokenProvider hasn't run yet).
+  // Track listing view on mount
   useEffect(() => {
-    (async () => {
-      try {
-        const token = await getAuthToken();
-        if (!token) return; // Not logged in, keep isFavorite = false
-        const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8080/api/v1';
-        const res = await fetch(`${apiUrl}/listings/${listing.listing_id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data?.data?.is_favorite !== undefined) {
-          setIsFavorite(data.data.is_favorite);
-        }
-      } catch {
-        /* ignore – user may be unauthenticated */
-      }
-    })();
-  }, [listing.listing_id]);
-
-  const { mutate: toggleFavorite } = useMutation({
-    mutationFn: () => bookmarkApi.toggleBookmark(listing.listing_id),
-    onSuccess: () => {
-      setIsFavorite((prev) => !prev);
-    },
-  });
+    behaviorTracker.trackView(listing.listing_id, {
+      listing_type: listing.listing_type,
+      property_type: listing.property_type.property_type_name,
+      price: listing.price,
+      source_page: 'detail',
+    });
+  }, [listing.listing_id, listing.listing_type, listing.property_type.property_type_name, listing.price]);
 
   const handleFavorite = () => {
     if (!session?.user) {
@@ -109,33 +92,28 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleBrowseNearby = () => {
-    // Browse nearby listings
     console.log('Browse nearby');
   };
 
   const handleViewAllPhotos = () => {
-    // Open photo gallery
     console.log('View all photos');
   };
 
   const handle3DTour = () => {
-    // Open 3D tour
     console.log('Open 3D tour');
   };
 
   const handleVideo = () => {
-    // Play video
     console.log('Play video');
   };
 
   const handleContact = () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
     setIsContactModalOpen(true);
-    // console.log('Contact agent (disabled for debug)');
   };
 
   const handleSendContact = async (data: ContactFormData) => {
@@ -152,7 +130,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {
@@ -165,13 +143,12 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
     }
   };
 
-  const handleRequestTour = (date: string) => {
-    if (!session?.user) {
+  const handleRequestTour = () => {
+    if (!session) {
       setShowLoginModal(true);
       return;
     }
-    // Request tour with date
-    console.log('Request tour for:', date);
+    setIsBookTourOpen(true);
   };
 
   const formattedPrice = formatVND(property.price);
@@ -286,6 +263,12 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
           </RealVistaButton>
         </div>
       </div>
+
+      <BookTourModal
+        listingId={property.id}
+        isOpen={isBookTourOpen}
+        onClose={() => setIsBookTourOpen(false)}
+      />
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
       <Dialog open={showUnfavoriteConfirm} onOpenChange={setShowUnfavoriteConfirm}>
         <DialogContent className='max-w-sm p-8'>

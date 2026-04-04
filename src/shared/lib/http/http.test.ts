@@ -7,7 +7,7 @@ jest.mock('@/shared/lib/auth/get-auth-token', () => ({
   getAuthToken: jest.fn(),
 }));
 
-import { getAuthTokenSync, getAuthToken } from '@/shared/lib/auth/get-auth-token';
+import { getAuthTokenSync } from '@/shared/lib/auth/get-auth-token';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -18,12 +18,17 @@ describe('HTTP Client', () => {
     (global.fetch as any).mockClear();
   });
 
+  const mockHeaders = {
+    get: jest.fn().mockReturnValue('application/json'),
+  };
+
   describe('GET request', () => {
     it('makes a successful GET request', async () => {
       const mockData = { id: 1, name: 'Test' };
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce(mockData),
       });
 
@@ -48,6 +53,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({}),
       });
 
@@ -71,6 +77,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 201,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce(mockResponse),
       });
 
@@ -95,6 +102,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({ success: true }),
       });
 
@@ -112,6 +120,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce(mockBody),
       });
 
@@ -130,6 +139,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce(mockBody),
       });
 
@@ -150,6 +160,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 204,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({}),
       });
 
@@ -173,6 +184,7 @@ describe('HTTP Client', () => {
       const mockResponse = {
         ok: false,
         status: 422,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValue({
           message: 'Validation failed',
           errors: mockErrors,
@@ -195,6 +207,7 @@ describe('HTTP Client', () => {
       const mockResponse = {
         ok: false,
         status: 500,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValue({ message: 'Internal Server Error' }),
       };
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -213,6 +226,7 @@ describe('HTTP Client', () => {
       const mockResponse = {
         ok: false,
         status: 404,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValue({ message: 'Not Found' }),
       };
       (global.fetch as any).mockResolvedValue(mockResponse);
@@ -226,6 +240,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({}),
       });
 
@@ -238,6 +253,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({}),
       });
 
@@ -252,6 +268,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({}),
       });
 
@@ -264,6 +281,7 @@ describe('HTTP Client', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: mockHeaders,
         json: jest.fn().mockResolvedValueOnce({}),
       });
 

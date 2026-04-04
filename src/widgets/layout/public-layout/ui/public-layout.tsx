@@ -4,6 +4,7 @@ import * as React from 'react';
 import { TopNav, type NavItem } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
+import { AiChatRenderer } from '@/widgets/ai-chat-assistant';
 import { HomeFooter } from '@/features/home';
 
 const FooterContext = React.createContext<(hide: boolean) => void>(() => {});
@@ -37,6 +38,7 @@ export function PublicLayout({ children, navItems, logoHref, user, className }: 
         <TopNav navItems={navItems} logoHref={logoHref} user={user} />
         <main className='flex-1'>{children}</main>
         <ChatWindowRenderer />
+        <AiChatRenderer />
         {!hideFooter && <HomeFooter />}
       </div>
     </FooterContext.Provider>

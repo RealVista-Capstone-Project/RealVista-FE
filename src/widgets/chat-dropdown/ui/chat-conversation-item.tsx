@@ -1,6 +1,7 @@
 'use client';
 
 import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import type { Conversation } from '@/entities/contact';
 
@@ -43,11 +44,15 @@ export function ChatConversationItem({
       {/* Avatar */}
       <div className='relative flex-shrink-0'>
         {participant.avatar ? (
-          <img
-            src={participant.avatar}
-            alt={participant.name}
-            className='h-10 w-10 rounded-full object-cover'
-          />
+          <div className='relative h-10 w-10 overflow-hidden rounded-full'>
+            <Image
+              src={participant.avatar}
+              alt={participant.name}
+              fill
+              className='object-cover'
+              sizes='40px'
+            />
+          </div>
         ) : (
           <div className='flex h-10 w-10 items-center justify-center rounded-full bg-main-primary text-white'>
             <span className='text-sm font-bold'>{participant.name.charAt(0).toUpperCase()}</span>
@@ -89,7 +94,15 @@ export function ChatConversationItem({
         {/* Listing preview (if available) */}
         {listing && (
           <div className='mt-1 flex items-center gap-2 rounded bg-muted/50 px-2 py-1'>
-            <img src={listing.image} alt={listing.title} className='h-6 w-8 rounded object-cover' />
+            <div className='relative h-6 w-8 flex-shrink-0'>
+              <Image
+                src={listing.image}
+                alt={listing.title}
+                fill
+                className='rounded object-cover'
+                sizes='32px'
+              />
+            </div>
             <span className='truncate text-xs text-grey-600'>{listing.title}</span>
           </div>
         )}

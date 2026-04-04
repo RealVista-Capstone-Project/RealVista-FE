@@ -22,3 +22,5 @@ export * from './switch';
 export * from './tooltip';
 export * from './top-nav';
 export * from './badge';
+export * from './visually-hidden';
+

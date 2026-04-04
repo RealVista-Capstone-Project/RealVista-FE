@@ -1,0 +1,9 @@
+{
+  "RecommendedListings": {
+    "recommendedForYou": "Gợi ý dành cho bạn",
+    "refresh": "Làm mới",
+    "failedToLoadRecommendations": "Không thể tải gợi ý",
+    "noRecommendationsYet": "Chưa có gợi ý nào",
+    "browseMoreListings": "Xem thêm bất động sản để nhận gợi ý cá nhân hóa"
+  }
+}

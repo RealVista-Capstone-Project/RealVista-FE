@@ -113,8 +113,10 @@ export class WebSocketService {
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
 
-        // Debug logging
-        debug: this.options.debug ? (str) => this.log(str) : undefined,
+        // Debug logging — must be a function (never undefined), otherwise
+        // Object.assign(this, conf) in STOMP's configure() overwrites the default
+        // noOp and later calls to this.debug() throw "is not a function".
+        debug: this.options.debug ? (str) => this.log(str) : () => {},
 
         // Connection lifecycle callbacks
         onConnect: () => this.onConnected(),
