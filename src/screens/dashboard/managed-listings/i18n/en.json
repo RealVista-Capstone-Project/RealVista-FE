@@ -71,6 +71,7 @@
     "deleteConfirmCancel": "Cancel",
     "deleteConfirmApprove": "Delete",
     "deleting": "Deleting...",
+    "aboutThisListing": "About this listing",
     "features": {
       "properties": "Properties",
       "rooms": "Rooms",

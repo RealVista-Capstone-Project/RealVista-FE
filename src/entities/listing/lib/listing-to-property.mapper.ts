@@ -70,7 +70,7 @@ export function mapListingToProperty(listing: Listing): Property {
     address: fullAddress,
     price: listing.price,
     area: listing.property.usable_size_m2,
-    description: listing.property.description,
+    description: listing.content || listing.property.description,
     attributes: listing.attributes || [],
     costBreakdown,
     images,
