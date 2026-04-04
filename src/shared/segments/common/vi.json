@@ -1,4 +1,122 @@
 {
+  "DashboardLayout": {
+    "pageTitle": {
+      "default": "RealVista",
+      "dashboard": "Dashboard",
+      "insight": "Thống kê",
+      "managedListings": "Quản lý bài đăng",
+      "tenants": "Người thuê",
+      "messages": "Tin nhắn"
+    },
+    "actionButton": {
+      "addProperty": "Thêm bất động sản",
+      "createListing": "Tạo bài đăng"
+    }
+  },
+  "CreateListingModal": {
+    "title": "Tạo bài đăng mới",
+    "subtitle": "Chọn một bất động sản của bạn và điền thông tin bài đăng.",
+    "steps": {
+      "request": "Yêu cầu",
+      "listingInformation": "Thông tin bài đăng"
+    },
+    "selectProperty": "Chọn bất động sản",
+    "landSize": "Đất: {size} m²",
+    "usableSize": "Sử dụng: {size} m²",
+    "propertyStatus": {
+      "draft": "Nháp",
+      "pending": "Đang chờ",
+      "verified": "Đã xác thực",
+      "rejected": "Bị từ chối",
+      "available": "Sẵn sàng",
+      "reserved": "Đã đặt",
+      "sold": "Đã bán",
+      "rented": "Đã cho thuê"
+    },
+    "representing": {
+      "label": "Tôi đại diện cho",
+      "landlord": "Chủ nhà hoặc bất động sản",
+      "applicant": "Người nộp đơn"
+    },
+    "next": "Tiếp theo",
+    "previous": "Quay lại",
+    "submit": "Đăng bài",
+    "saveAsDraft": "Lưu nháp",
+    "propertyAddress": "Địa chỉ bất động sản",
+    "listingInformation": "Thông tin bài đăng",
+    "listingName": "Tên bài đăng",
+    "listingNamePlaceholder": "Nhập tiêu đề cho bài đăng",
+    "listingContent": "Nội dung",
+    "listingContentPlaceholder": "Thêm chi tiết, điểm nổi bật hoặc ghi chú về bài đăng...",
+    "listingTypeLabel": "Loại bài đăng",
+    "listingTypeRent": "Cho thuê",
+    "listingTypeSale": "Bán",
+    "propertyType": "Loại bất động sản",
+    "bedrooms": "Phòng ngủ",
+    "baths": "Phòng tắm",
+    "squareFeet": "Diện tích (m²)",
+    "price": "Giá",
+    "priceRent": "Giá thuê / tháng",
+    "priceSale": "Giá bán",
+    "pricePlaceholder": "Nhập giá",
+    "minPrice": "Giá thấp nhất",
+    "maxPrice": "Giá cao nhất",
+    "negotiable": "Có thể thương lượng",
+    "securityDeposit": "Tiền đặt cọc",
+    "selectAmenities": "Chọn tiện ích",
+    "addAmenity": "Thêm tiện ích",
+    "description": "Mô tả",
+    "features": "Đặc điểm",
+    "descriptionPlaceholder": "Hãy kể về bài đăng của bạn",
+    "dateAvailable": "Ngày sẵn sàng",
+    "dateAvailablePlaceholder": "Chọn ngày",
+    "mediaUpload": "Phương tiện",
+    "mediaUploadHint": "Tải ảnh hoặc video cho bài đăng",
+    "dragAndDrop": "Kéo & thả tệp vào đây, hoặc nhấn để chọn",
+    "uploadHint": "Hỗ trợ JPG, PNG, MP4",
+    "selected": "đã chọn",
+    "primary": "Chính",
+    "makePrimary": "Đặt làm hình chính",
+    "newUpload": "Mới",
+    "readOnly": "Từ bất động sản",
+    "noProperties": "Không tìm thấy bất động sản",
+    "submitting": "Đang gửi...",
+    "createSuccess": "Tạo bài đăng thành công!",
+    "createError": "Tạo bài đăng thất bại. Vui lòng thử lại.",
+    "mediaUploadError": "Tải lên tệp phương tiện thất bại. Vui lòng thử lại.",
+    "editTitle": "Chỉnh sửa bài đăng",
+    "editSubtitle": "Cập nhật thông tin bài đăng của bạn bên dưới.",
+    "saveChanges": "Lưu thay đổi",
+    "editSuccess": "Cập nhật bài đăng thành công!",
+    "editError": "Cập nhật bài đăng thất bại. Vui lòng thử lại.",
+    "select": "Chọn",
+    "remove": "Gỡ bỏ",
+    "cancel": "Hủy",
+    "validation": {
+      "nameRequired": "Tên bài đăng là bắt buộc",
+      "nameTooLong": "Tên không được vượt quá 500 ký tự",
+      "priceRequired": "Giá là bắt buộc",
+      "priceInvalid": "Giá phải là một số lớn hơn 0",
+      "minPriceRequired": "Giá thấp nhất là bắt buộc",
+      "minPriceInvalid": "Giá thấp nhất phải là một số hợp lệ lớn hơn 0",
+      "maxPriceRequired": "Giá cao nhất là bắt buộc",
+      "maxPriceInvalid": "Giá cao nhất phải là một số hợp lệ lớn hơn 0",
+      "dateInvalid": "Vui lòng nhập ngày hợp lệ",
+      "mediaRequired": "Cần ít nhất một ảnh hoặc video để tạo bài đăng"
+    },
+    "aiAnalysis": {
+      "analyzing": "AI đang phân tích chất lượng hình ảnh...",
+      "lowQuality": "Phát hiện chất lượng thấp (Điểm: {score}). {feedback}",
+      "passed": "Chất lượng hình ảnh đã được xác minh (Điểm: {score}).",
+      "error": "Không thể phân tích hình ảnh. Vui lòng thử hình ảnh khác.",
+      "notAllowed": "Hình ảnh này không được phép tiếp tục.",
+      "feedbackLabel": "Phản hồi từ AI",
+      "scoreLabel": "Điểm số",
+      "contentVerification": "Xác thực nội dung bằng AI",
+      "verified": "Đã xác thực ✅",
+      "violated": "Vi phạm chính sách"
+    }
+  },
   "Common": {
     "title": "Xin chào common!",
     "about": "Về trang chủ"
@@ -58,6 +176,13 @@
       "messageRequired": "Vui lòng nhập tin nhắn",
       "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
     }
+  },
+  "Notifications": {
+    "notifications": "Thông báo",
+    "new": "MỚI",
+    "noNotifications": "Chưa có thông báo nào",
+    "markAsRead": "Đánh dấu đã đọc",
+    "viewAll": "Xem tất cả thông báo"
   },
   "Navigation": {
     "explore": "Khám phá",

@@ -1,0 +1,12 @@
+{
+  "ListingMetricsCard": {
+    "title": "Hiệu suất bài đăng",
+    "metrics": {
+      "totalViews": "Tổng lượt xem",
+      "uniqueViewers": "Người xem riêng",
+      "tourBookings": "Lịch tham quan",
+      "conversionRate": "Tỷ lệ chuyển đổi",
+      "conversionRateTooltip": "Tỷ lệ khách truy cập đã đặt lịch xem nhà"
+    }
+  }
+}
