@@ -1,4 +1,5 @@
 import http from '@/shared/lib/http';
+import { env } from '@/shared/lib/env';
 import type {
   PropertySearchRequest,
   PropertySearchResponse,
@@ -54,16 +55,16 @@ export const propertyApi = {
     });
   },
 
-  getMyProperties: (criteria: MyPropertiesSearchCriteria) => {
+  getMyProperties: (criteria?: MyPropertiesSearchCriteria) => {
     const queryParams = new URLSearchParams();
-    if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
-    queryParams.append('page', criteria.page.toString());
-    queryParams.append('size', criteria.size.toString());
+    const page = criteria?.page ?? 0;
+    const size = criteria?.size ?? 10;
+    if (criteria?.keyword) queryParams.append('keyword', criteria.keyword);
+    queryParams.append('page', page.toString());
+    queryParams.append('size', size.toString());
 
     return http.get<MyPropertiesResponse>(`properties/me?${queryParams.toString()}`, {
-      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
-        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
-        : undefined,
+      baseUrl: env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
 
@@ -107,5 +108,4 @@ export const propertyApi = {
       { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
     );
   },
-  
 };

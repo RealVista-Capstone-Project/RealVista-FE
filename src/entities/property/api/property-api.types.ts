@@ -293,6 +293,6 @@ export interface PageResponse<T> {
 export interface MyPropertiesResponse {
   success: boolean;
   message: string;
-  data: PageResponse<PropertySummaryResponse>;
+  data: PropertySummary[];
   timestamp: string;
 }
