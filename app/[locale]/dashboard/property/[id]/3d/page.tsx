@@ -28,7 +28,8 @@ export default function Property3DPage({ params }: Property3DPageProps) {
   // To check if there's actual media created, we can call the property detail endpoint
   const { data: propertyDetail, refetch: refetchDetail } = usePropertyDetail(propertyId);
 
-  const activeMediaUrl = propertyDetail?.media?.find((m) => m.media_type === 'THREE_D')?.media_url;
+  const activeThreeDMedia = propertyDetail?.media?.find((m) => m.media_type === 'THREE_D');
+  const activeMediaUrl = activeThreeDMedia?.media_url;
   const pendingOperation = operations?.find(
     (op: any) => op.status === 'PENDING' || op.status === 'GENERATING'
   );
@@ -93,6 +94,7 @@ export default function Property3DPage({ params }: Property3DPageProps) {
           <div className='w-full h-full p-4 md:p-6 bg-slate-900'>
             <SparkViewer
               spzUrl={activeMediaUrl}
+              metadata={activeThreeDMedia?.metadata}
               className='w-full h-full shadow-2xl rounded-2xl border border-slate-800'
             />
           </div>
