@@ -40,6 +40,19 @@ export interface CancelEngagementPayload {
   reason: string;
 }
 
+/**
+ * Payload to submit an existing agent proposal template as an engagement for a specific property.
+ * This creates an Engagement of type AGENT_PROPOSAL on the server.
+ *
+ * BE endpoint (to be implemented): POST /api/v1/engagements/agent-proposal
+ */
+export interface SubmitAgentProposalPayload {
+  /** The UUID of the AgentProposal template to submit */
+  agent_proposal_id: string;
+  /** The UUID of the Property this proposal targets */
+  property_id: string;
+}
+
 export interface AgentEngagementPageResponse {
   content: AgentEngagement[];
   page: number;

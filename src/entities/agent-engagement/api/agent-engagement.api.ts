@@ -5,6 +5,7 @@ import type {
   AgentEngagementPageResponse,
   GetAgentEngagementsParams,
   CreateReviewPayload,
+  SubmitAgentProposalPayload,
 } from '../model/types';
 import type { ListingAttribute } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 
@@ -120,4 +121,22 @@ export const agentEngagementApi = {
       rating: payload.rating,
       comment: payload.comment,
     }),
+
+  /**
+   * Submit an AgentProposal template as a new Engagement for a specific property.
+   *
+   * Creates an Engagement of type `AGENT_PROPOSAL` linking the agent to the property owner.
+   * The agent is the initiator; the property owner becomes the receiver.
+   *
+   * @param payload { agent_proposal_id, property_id }
+   * @returns the newly created Engagement ID
+   *
+   * NOTE: BE endpoint `POST /api/v1/engagements/agent-proposal` to be implemented by BE team.
+   */
+  submitAgentProposal: (payload: SubmitAgentProposalPayload) =>
+    http.post<ApiResponse<{ engagement_id: string }>>('/engagements/agent-proposal', {
+      agent_proposal_id: payload.agent_proposal_id,
+      property_id: payload.property_id,
+    }),
 } as const;
+

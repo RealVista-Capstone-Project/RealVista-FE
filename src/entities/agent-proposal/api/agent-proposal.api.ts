@@ -1,9 +1,9 @@
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api-response';
-import type { 
-    AgentProposal, 
-    AgentProposalPageResponse, 
-    ApplyAgentProposalPayload 
+import type {
+    AgentProposal,
+    AgentProposalPageResponse,
+    ApplyAgentProposalPayload
 } from '../model/types';
 
 const BASE_URL = '/agent-proposals';
@@ -23,5 +23,10 @@ export const agentProposalApi = {
 
     cancelProposal: async (id: string) => {
         await http.delete<ApiResponse<void>>(`${BASE_URL}/${id}`);
+    },
+
+    updateProposal: async (id: string, payload: ApplyAgentProposalPayload) => {
+        const response = await http.put<ApiResponse<AgentProposal>>(`${BASE_URL}/${id}`, payload);
+        return response.payload.data;
     }
 };

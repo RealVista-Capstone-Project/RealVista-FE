@@ -13,7 +13,6 @@ export interface PriceAndTourProps {
   phone?: string | null;
   onContact?: () => void;
   onRequestTour?: (date: string) => void;
-  onApplyProposal?: () => void;
   isAgent?: boolean;
 }
 
@@ -28,7 +27,6 @@ export function PriceAndTour({
   phone,
   onContact,
   onRequestTour,
-  onApplyProposal,
   isAgent,
 }: PriceAndTourProps) {
   const t = useTranslations('PriceAndTour');
@@ -68,41 +66,29 @@ export function PriceAndTour({
         </div>
 
         {/* Contact Button */}
-        {isAgent && onApplyProposal ? (
+        <div className='flex gap-2 w-full'>
           <RealVistaButton
             variant='primary'
             size='medium'
-            className='w-full bg-main-secondary flex items-center justify-center gap-2'
-            onClick={onApplyProposal}
+            className={phone ? 'flex-1' : 'w-full'}
+            onClick={onContact}
           >
-            <ClipboardEdit className='h-5 w-5 shrink-0' />
-            Apply Proposal
+            {t('contactAgent')}
           </RealVistaButton>
-        ) : (
-          <div className='flex gap-2 w-full'>
-            <RealVistaButton
-              variant='primary'
-              size='medium'
-              className={phone ? 'flex-1' : 'w-full'}
-              onClick={onContact}
-            >
-              {t('contactAgent')}
-            </RealVistaButton>
 
-            {phone && (
-              <RealVistaButton
-                variant='secondary'
-                size='medium'
-                className='flex-1 border-main-primary text-main-primary hover:bg-main-primary/5 px-2'
-                onClick={handleCall}
-                title={`${t('callAgent')}: ${phone}`}
-              >
-                <Phone className='h-5 w-5' strokeWidth={2.5} />
-                <span className='text-[14px] truncate'>{phone}</span>
-              </RealVistaButton>
-            )}
-          </div>
-        )}
+          {phone && (
+            <RealVistaButton
+              variant='secondary'
+              size='medium'
+              className='flex-1 border-main-primary text-main-primary hover:bg-main-primary/5 px-2'
+              onClick={handleCall}
+              title={`${t('callAgent')}: ${phone}`}
+            >
+              <Phone className='h-5 w-5' strokeWidth={2.5} />
+              <span className='text-[14px] truncate'>{phone}</span>
+            </RealVistaButton>
+          )}
+        </div>
 
         {/* Divider */}
         <div className='h-px w-full bg-purple-92' />
@@ -141,12 +127,6 @@ export function PriceAndTour({
                 {t('disclaimer')}
               </p>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
           </div>
         )}
       </div>

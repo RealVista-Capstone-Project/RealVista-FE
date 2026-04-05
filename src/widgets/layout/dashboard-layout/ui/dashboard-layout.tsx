@@ -171,13 +171,14 @@ export function DashboardLayout({
   }, []);
 
   return (
-    <div className={cn('flex min-h-screen w-full', className)}>
+    <div className={cn('flex h-screen w-full overflow-hidden bg-slate-50', className)}>
       <ChatWindowRenderer />
-      {/* Sidebar */}
+
+      {/* Sidebar - Now part of the flex flow on desktop */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-20 flex h-screen flex-col border-r border-purple-92/50 bg-white transition-all duration-300 ease-in-out',
-          isCollapsed ? 'w-20' : 'w-70'
+          'relative z-20 flex h-screen flex-col border-r border-purple-92/50 bg-white transition-all duration-300 ease-in-out shrink-0',
+          isCollapsed ? 'w-20' : 'w-[280px]'
         )}
       >
         {/* Logo */}
@@ -191,7 +192,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={() => setIsCollapsed(false)}
-              className='flex size-8 items-center justify-center rounded-xl bg-main-primary transition-opacity hover:opacity-90'
+              className='flex size-8 items-center justify-center rounded-xl bg-main-primary transition-opacity hover:opacity-90 shadow-sm shadow-indigo-100'
               aria-label='Expand sidebar'
             >
               <Image
@@ -204,8 +205,8 @@ export function DashboardLayout({
             </button>
           ) : (
             <>
-              <Link href={logoHref} className='flex items-center gap-3'>
-                <div className='flex items-center justify-center rounded-xl bg-main-primary p-2'>
+              <Link href={logoHref} className='flex items-center gap-3 group'>
+                <div className='flex items-center justify-center rounded-xl bg-main-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-indigo-100'>
                   <Image
                     src='/logo.png'
                     alt='RealVista Logo'
@@ -218,13 +219,13 @@ export function DashboardLayout({
                   <span className='text-base font-bold leading-tight text-main-black'>
                     Estatery
                   </span>
-                  <span className='text-xs text-main-secondary/60'>Property Manager</span>
+                  <span className='text-[10px] uppercase font-bold tracking-wider text-main-secondary/40'>Property Manager</span>
                 </div>
               </Link>
               <button
                 type='button'
                 onClick={() => setIsCollapsed(true)}
-                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-main-secondary/60 transition-colors hover:bg-purple-98 hover:text-main-secondary'
+                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-main-secondary/40 transition-all hover:bg-slate-50 hover:text-main-secondary hover:border-slate-300 hover:shadow-sm'
                 aria-label='Collapse sidebar'
               >
                 <Columns className='h-4 w-4' strokeWidth={2} />
@@ -234,7 +235,7 @@ export function DashboardLayout({
         </div>
 
         {/* Menu Items */}
-        <nav className='flex flex-1 flex-col gap-1 p-3'>
+        <nav className='flex flex-1 flex-col gap-1 p-3 overflow-y-auto'>
           {finalSidebarItems.map((item) => {
             const isActive = isItemActive(item.href);
 
@@ -243,16 +244,16 @@ export function DashboardLayout({
                 key={item.id}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
+                  'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200',
                   isActive
-                    ? 'bg-purple-96 text-main-primary'
+                    ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
                     : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
                   isCollapsed ? 'justify-center' : 'justify-start'
                 )}
                 title={isCollapsed ? item.label : undefined}
               >
-                <item.icon className='h-5 w-5 shrink-0' strokeWidth={2} />
-                {!isCollapsed && <span className='text-sm font-medium'>{item.label}</span>}
+                <item.icon className={cn('h-5 w-5 shrink-0 transition-transform', isActive && 'scale-110')} strokeWidth={isActive ? 2.5 : 2} />
+                {!isCollapsed && <span className='text-sm'>{item.label}</span>}
               </Link>
             );
           })}
@@ -263,7 +264,7 @@ export function DashboardLayout({
           <Link
             href={ROUTES.settings}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-main-secondary/60 transition-colors hover:bg-purple-98 hover:text-main-secondary',
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-main-secondary/60 transition-all hover:bg-purple-98 hover:text-main-secondary',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
@@ -283,52 +284,49 @@ export function DashboardLayout({
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div
-        className={cn(
-          'flex flex-1 flex-col transition-all duration-300 ease-in-out',
-          isCollapsed ? 'ml-16' : 'ml-64'
-        )}
-      >
+      {/* Main Content Area - Properly fills space without margin hacks */}
+      <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
         {/* Top Nav */}
-        <header className='flex items-center justify-between bg-white px-10 py-4'>
+        <header className='flex shrink-0 items-center justify-between bg-white px-8 py-3.5 border-b border-slate-100 shadow-sm shadow-slate-100/50 z-10'>
           {/* Left Section */}
           <div className='flex items-center gap-4'>
-            {/* Logo Text */}
-            <span className='font-bold text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
+            <span className='font-bold text-xl tracking-tight text-slate-800 translate-y-[-1px]'>
               {pageTitle}
             </span>
           </div>
 
           {/* Right Actions */}
-          <div className='flex items-center gap-6'>
+          <div className='flex items-center gap-5'>
             {/* Notification Dropdown */}
             <NotificationDropdownContainer />
 
             {/* Divider */}
-            <div className='flex h-10 items-center'>
-              <Separator orientation='vertical' className='h-6 bg-purple-92' />
-            </div>
+            <Separator orientation='vertical' className='h-5 bg-slate-200' />
 
             {/* Profile Button */}
             <button
               type='button'
-              className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
+              className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white pl-2 pr-3 py-1.5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md active:scale-95 group'
               aria-label='Profile menu'
             >
-              <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
-                <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
+              <div className='flex size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-xs ring-2 ring-indigo-50 shadow-inner group-hover:scale-105 transition-transform'>
+                {user.initials}
               </div>
-              <span className='text-base font-medium leading-[1.5] text-main-black'>
-                {user.name}
-              </span>
-              <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
+              <div className='flex flex-col items-start translate-y-[-1px]'>
+                <span className='text-xs font-bold leading-none text-slate-800 mb-0.5'>
+                  {user.name}
+                </span>
+                <span className='text-[10px] font-medium text-slate-400'>Professional Agent</span>
+              </div>
+              <ChevronDown className='h-3.5 w-3.5 text-slate-400 ml-1 group-hover:text-slate-600 transition-colors' strokeWidth={2.5} />
             </button>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className='flex-1 bg-purple-98'>{children}</main>
+        {/* Page Content - fills remaining height */}
+        <main className='flex-1 min-h-0 overflow-hidden bg-slate-50/50 p-0'>
+          {children}
+        </main>
       </div>
     </div>
   );
