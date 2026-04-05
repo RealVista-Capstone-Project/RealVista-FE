@@ -19,9 +19,10 @@ export const ROUTES = {
     managedListings: '/dashboard/listings',
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
+    property: '/dashboard/property',
     manageAgent: '/dashboard/manage-agent',
     manageProposals: '/dashboard/manage-proposals',
-    agentDetail: (id: string) => `/dashboard/manage-agent/${id}`
+    agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
   },
   manageAgent: {
     root: '/manage-agent',

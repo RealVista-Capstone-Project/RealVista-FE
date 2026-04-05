@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ClipboardEdit } from 'lucide-react';
+import { ClipboardEdit, Phone } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
 import { formatVND } from '@/shared/lib/utils';
@@ -10,6 +10,7 @@ import { formatVND } from '@/shared/lib/utils';
 export interface PriceAndTourProps {
   price: number;
   listingType: 'RENT' | 'SALE';
+  phone?: string | null;
   onContact?: () => void;
   onRequestTour?: (date: string) => void;
   onApplyProposal?: () => void;
@@ -21,7 +22,15 @@ export interface PriceAndTourProps {
  *
  * Shows monthly rent price, contact button, and a home tour request form with date picker
  */
-export function PriceAndTour({ price, listingType, onContact, onRequestTour, onApplyProposal, isAgent }: PriceAndTourProps) {
+export function PriceAndTour({
+  price,
+  listingType,
+  phone,
+  onContact,
+  onRequestTour,
+  onApplyProposal,
+  isAgent,
+}: PriceAndTourProps) {
   const t = useTranslations('PriceAndTour');
   const [tourDate, setTourDate] = useState('');
 
@@ -31,6 +40,12 @@ export function PriceAndTour({ price, listingType, onContact, onRequestTour, onA
   const handleRequestTour = () => {
     if (tourDate && onRequestTour) {
       onRequestTour(tourDate);
+    }
+  };
+
+  const handleCall = () => {
+    if (phone) {
+      window.open(`tel:${phone.replace(/\s+/g, '')}`, '_self');
     }
   };
 
@@ -64,9 +79,29 @@ export function PriceAndTour({ price, listingType, onContact, onRequestTour, onA
             Apply Proposal
           </RealVistaButton>
         ) : (
-          <RealVistaButton variant='primary' size='medium' className='w-full' onClick={onContact}>
-            {t('contactAgent')}
-          </RealVistaButton>
+          <div className='flex gap-2 w-full'>
+            <RealVistaButton
+              variant='primary'
+              size='medium'
+              className={phone ? 'flex-1' : 'w-full'}
+              onClick={onContact}
+            >
+              {t('contactAgent')}
+            </RealVistaButton>
+
+            {phone && (
+              <RealVistaButton
+                variant='secondary'
+                size='medium'
+                className='flex-1 border-main-primary text-main-primary hover:bg-main-primary/5 px-2'
+                onClick={handleCall}
+                title={`${t('callAgent')}: ${phone}`}
+              >
+                <Phone className='h-5 w-5' strokeWidth={2.5} />
+                <span className='text-[14px] truncate'>{phone}</span>
+              </RealVistaButton>
+            )}
+          </div>
         )}
 
         {/* Divider */}
@@ -106,6 +141,12 @@ export function PriceAndTour({ price, listingType, onContact, onRequestTour, onA
                 {t('disclaimer')}
               </p>
             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
           </div>
         )}
       </div>

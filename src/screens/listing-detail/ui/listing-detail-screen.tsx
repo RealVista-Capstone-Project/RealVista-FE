@@ -196,6 +196,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <PriceAndTour
                 price={property.price}
                 listingType={listing.listing_type}
+                phone={listing.agent.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
                 onApplyProposal={handleApplyProposal}
@@ -220,6 +221,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <PriceAndTour
                 price={property.price}
                 listingType={listing.listing_type}
+                phone={listing.agent.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
                 onApplyProposal={handleApplyProposal}
