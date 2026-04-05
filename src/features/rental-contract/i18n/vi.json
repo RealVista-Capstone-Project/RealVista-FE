@@ -21,10 +21,12 @@
     },
     "status": {
       "draft": "Bản nháp",
-      "pending_signature": "Chờ ký",
+      "pending_renter": "Chờ người thuê",
+      "pending_landlord": "Chờ chủ nhà",
       "active": "Đang hiệu lực",
       "expired": "Hết hạn",
-      "terminated": "Đã chấm dứt"
+      "terminated": "Đã chấm dứt",
+      "rejected": "Đã từ chối"
     },
     "table": {
       "status": "Trạng thái",

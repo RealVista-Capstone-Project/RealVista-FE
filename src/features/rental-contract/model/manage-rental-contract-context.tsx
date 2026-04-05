@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useSession } from 'next-auth/react';
 import {
   RentalContractStatus,
   type RentalContract,
@@ -37,6 +38,7 @@ interface ManageRentalContractContextValue {
 const ManageRentalContractContext = createContext<ManageRentalContractContextValue | null>(null);
 
 export function ManageRentalContractProvider({ children }: { children: ReactNode }) {
+  const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,16 +46,19 @@ export function ManageRentalContractProvider({ children }: { children: ReactNode
 
   const queryParams = useMemo(
     () => ({
+      landlordId: session?.user?.id ?? '',
       page: currentPage - 1,
       size: ITEMS_PER_PAGE,
       status:
         statusFilter !== 'all' ? (statusFilter as RentalContractStatus) : undefined,
       search: searchQuery || undefined,
     }),
-    [currentPage, searchQuery, statusFilter]
+    [currentPage, searchQuery, session?.user?.id, statusFilter]
   );
 
-  const { data, isLoading, isError } = useRentalContractsQuery(queryParams);
+  const { data, isLoading, isError } = useRentalContractsQuery(queryParams, {
+    enabled: Boolean(session?.user?.id),
+  });
 
   const pageData = data?.payload.data;
   const contracts = useMemo(() => pageData?.content ?? [], [pageData?.content]);

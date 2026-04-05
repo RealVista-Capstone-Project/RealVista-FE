@@ -210,7 +210,7 @@ export function CreateRentalContractPage() {
   };
 
   const buildPayload = (
-    status: RentalContractStatus.DRAFT | RentalContractStatus.PENDING_SIGNATURE
+    status: RentalContractStatus.DRAFT | RentalContractStatus.PENDING_RENTER
   ): CreateRentalContractPayload => ({
     listing_id: form.propertyId,
     property: {
@@ -250,7 +250,7 @@ export function CreateRentalContractPage() {
 
   const sendForSigning = async () => {
     try {
-      await createContractMutation.mutateAsync(buildPayload(RentalContractStatus.PENDING_SIGNATURE));
+      await createContractMutation.mutateAsync(buildPayload(RentalContractStatus.PENDING_RENTER));
 
       toast.success(t('toast.sentSuccess'));
       router.push(ROUTES.dashboard.rentalContracts);

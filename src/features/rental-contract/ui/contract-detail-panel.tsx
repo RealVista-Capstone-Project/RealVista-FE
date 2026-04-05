@@ -38,7 +38,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [dialogStatus, setDialogStatus] = useState<
-    | RentalContractStatus.PENDING_SIGNATURE
+    | RentalContractStatus.PENDING_RENTER
     | RentalContractStatus.ACTIVE
     | RentalContractStatus.TERMINATED
     | null
@@ -49,10 +49,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
   const availableActions = useMemo(() => {
     if (contract.status === RentalContractStatus.DRAFT) {
-      return [RentalContractStatus.PENDING_SIGNATURE] as const;
+      return [RentalContractStatus.PENDING_RENTER] as const;
     }
 
-    if (contract.status === RentalContractStatus.PENDING_SIGNATURE) {
+    if (contract.status === RentalContractStatus.PENDING_RENTER) {
       return [RentalContractStatus.ACTIVE] as const;
     }
 
@@ -65,7 +65,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
   const handleStatusUpdate = async (
     nextStatus:
-      | RentalContractStatus.PENDING_SIGNATURE
+      | RentalContractStatus.PENDING_RENTER
       | RentalContractStatus.ACTIVE
       | RentalContractStatus.TERMINATED,
     reason?: string
@@ -88,11 +88,11 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
   const renderActionLabel = (
     status:
-      | RentalContractStatus.PENDING_SIGNATURE
+      | RentalContractStatus.PENDING_RENTER
       | RentalContractStatus.ACTIVE
       | RentalContractStatus.TERMINATED
   ) => {
-    if (status === RentalContractStatus.PENDING_SIGNATURE) return t('statusActions.sendForSigning');
+    if (status === RentalContractStatus.PENDING_RENTER) return t('statusActions.sendForSigning');
     if (status === RentalContractStatus.ACTIVE) return t('statusActions.markActive');
     return t('statusActions.terminate');
   };
@@ -136,11 +136,17 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
         <CardContent className='min-h-0 flex-1 space-y-5 overflow-y-auto p-5'>
           <div className='overflow-hidden rounded-2xl border border-[#ECE9FB] bg-[#FBFAFF]'>
             <div className='relative aspect-[3/4] overflow-hidden bg-[#F3F0FF]'>
-              <img
-                src={contract.contractDocumentUrl}
-                alt={t('detailPanel.previewAlt', { tenantName: contract.tenant.fullName })}
-                className='h-full w-full object-cover'
-              />
+              {contract.contractDocumentUrl ? (
+                <img
+                  src={contract.contractDocumentUrl}
+                  alt={t('detailPanel.previewAlt', { tenantName: contract.tenant.fullName })}
+                  className='h-full w-full object-cover'
+                />
+              ) : (
+                <div className='flex h-full w-full items-center justify-center text-main-secondary/30'>
+                  <FileText className='h-16 w-16' />
+                </div>
+              )}
               <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-[#120F25]/40 via-transparent to-white/10' />
               <div className='absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3'>
                 <Badge
@@ -270,7 +276,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                           {renderActionLabel(action)}
                         </p>
                         <p className='mt-0.5 text-xs leading-5 text-main-secondary/60'>
-                          {action === RentalContractStatus.PENDING_SIGNATURE
+                          {action === RentalContractStatus.PENDING_RENTER
                             ? t('statusActionHints.sendForSigning')
                             : action === RentalContractStatus.ACTIVE
                               ? t('statusActionHints.markActive')

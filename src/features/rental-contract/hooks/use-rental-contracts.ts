@@ -10,8 +10,14 @@ import {
   type UpdateRentalContractStatusPayload,
 } from '@/entities/rental-contract';
 
-export function useRentalContractsQuery(params: GetRentalContractsParams) {
-  return useQuery(rentalContractQueries.list(params));
+export function useRentalContractsQuery(
+  params: GetRentalContractsParams,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    ...rentalContractQueries.list(params),
+    enabled: options?.enabled ?? true,
+  });
 }
 
 export function useUpdateRentalContractStatusMutation() {

@@ -1,9 +1,11 @@
 export enum RentalContractStatus {
   DRAFT = 'DRAFT',
-  PENDING_SIGNATURE = 'PENDING_SIGNATURE',
+  PENDING_RENTER = 'PENDING_RENTER',
+  PENDING_LANDLORD = 'PENDING_LANDLORD',
   ACTIVE = 'ACTIVE',
   EXPIRED = 'EXPIRED',
   TERMINATED = 'TERMINATED',
+  REJECTED = 'REJECTED',
 }
 
 export interface RentalContractTenant {
@@ -49,6 +51,53 @@ export interface RentalContract {
   terminationReason?: string | null;
 }
 
+export interface LeaseResponse {
+  lease_agreement_id: string;
+  property_id: string;
+  renter_id: string;
+  landlord_id: string;
+  agent_id: string | null;
+  lease_start_date: string;
+  lease_end_date: string;
+  lease_duration_months: number;
+  monthly_rent: number;
+  security_deposit: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  renter_full_name: string;
+  renter_email: string;
+  renter_phone: string | null;
+  landlord_full_name: string;
+  landlord_email: string;
+  landlord_phone: string | null;
+  property_title: string;
+  property_address: string;
+  property_type: string;
+  lease_document_url: string | null;
+  signed_by_renter_at: string | null;
+  signed_by_landlord_at: string | null;
+  reject_reason: string | null;
+  verified_by: string | null;
+  docusign_envelope_id: string | null;
+  docusign_status: string | null;
+}
+
+export interface LeasesApiResponse {
+  success: boolean;
+  message: string;
+  data: {
+    content: LeaseResponse[];
+    page: number;
+    size: number;
+    total_elements: number;
+    total_pages: number;
+    first: boolean;
+    last: boolean;
+  };
+  timestamp: string;
+}
+
 export interface CreateRentalContractPayload {
   listing_id: string;
   property: RentalContractProperty;
@@ -57,10 +106,11 @@ export interface CreateRentalContractPayload {
   securityAmount?: number;
   startDate: string;
   endDate: string;
-  status: RentalContractStatus.DRAFT | RentalContractStatus.PENDING_SIGNATURE;
+  status: RentalContractStatus.DRAFT | RentalContractStatus.PENDING_RENTER;
 }
 
 export interface GetRentalContractsParams {
+  landlordId: string;
   page?: number;
   size?: number;
   status?: RentalContractStatus;
@@ -80,7 +130,7 @@ export interface RentalContractPageResponse {
 export interface UpdateRentalContractStatusPayload {
   contractId: string;
   status:
-    | RentalContractStatus.PENDING_SIGNATURE
+    | RentalContractStatus.PENDING_RENTER
     | RentalContractStatus.ACTIVE
     | RentalContractStatus.TERMINATED;
   reason?: string;

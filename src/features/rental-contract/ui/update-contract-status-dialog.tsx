@@ -18,7 +18,7 @@ import { useTranslations } from 'next-intl';
 interface UpdateContractStatusDialogProps {
   contract: RentalContract;
   nextStatus:
-    | RentalContractStatus.PENDING_SIGNATURE
+    | RentalContractStatus.PENDING_RENTER
     | RentalContractStatus.ACTIVE
     | RentalContractStatus.TERMINATED;
   open: boolean;
@@ -47,7 +47,7 @@ export function UpdateContractStatusDialog({
   const requiresReason = nextStatus === RentalContractStatus.TERMINATED;
 
   const config = useMemo(() => {
-    if (nextStatus === RentalContractStatus.PENDING_SIGNATURE) {
+    if (nextStatus === RentalContractStatus.PENDING_RENTER) {
       return {
         title: t('statusDialog.sendTitle'),
         description: t('statusDialog.sendDescription', {

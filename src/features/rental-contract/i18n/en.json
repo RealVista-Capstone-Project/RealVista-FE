@@ -21,10 +21,12 @@
     },
     "status": {
       "draft": "Draft",
-      "pending_signature": "Pending Signature",
+      "pending_renter": "Pending Renter",
+      "pending_landlord": "Pending Landlord",
       "active": "Active",
       "expired": "Expired",
-      "terminated": "Terminated"
+      "terminated": "Terminated",
+      "rejected": "Rejected"
     },
     "table": {
       "status": "Status",
