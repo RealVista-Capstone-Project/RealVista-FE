@@ -519,10 +519,10 @@ export function CreateRentalContractPage() {
       return (
         <div className='grid gap-4 md:grid-cols-2'>
           <Field label={t('form.monthlyRent')}>
-            <Input value={form.monthlyRent} onChange={(event) => updateField('monthlyRent', event.target.value)} className='h-11 rounded-xl border-[#E5DFFC] bg-white/90' />
+            <MoneyInput value={form.monthlyRent} onChange={(raw) => updateField('monthlyRent', raw)} className='h-11 rounded-xl border-[#E5DFFC] bg-white/90' />
           </Field>
           <Field label={t('form.securityDeposit')}>
-            <Input value={form.securityDeposit} onChange={(event) => updateField('securityDeposit', event.target.value)} className='h-11 rounded-xl border-[#E5DFFC] bg-white/90' />
+            <MoneyInput value={form.securityDeposit} onChange={(raw) => updateField('securityDeposit', raw)} className='h-11 rounded-xl border-[#E5DFFC] bg-white/90' />
           </Field>
           <Field label={t('form.leaseStartDate')}>
             <Input type='date' value={form.leaseStartDate} onChange={(event) => updateField('leaseStartDate', event.target.value)} className='h-11 rounded-xl border-[#E5DFFC] bg-white/90' />
@@ -807,4 +807,40 @@ function formatCurrencyValue(value: string) {
   }
 
   return formatVND(amount);
+}
+
+function formatNumberDisplay(value: string): string {
+  const digits = value.replace(/\D/g, '');
+
+  if (!digits) return '';
+
+  return Number(digits).toLocaleString('vi-VN');
+}
+
+function sanitizeNumericInput(raw: string): string {
+  return raw.replace(/\D/g, '');
+}
+
+function MoneyInput({
+  value,
+  onChange,
+  className,
+}: {
+  value: string;
+  onChange: (raw: string) => void;
+  className?: string;
+}) {
+  return (
+    <div className='relative'>
+      <Input
+        inputMode='numeric'
+        value={formatNumberDisplay(value)}
+        onChange={(event) => onChange(sanitizeNumericInput(event.target.value))}
+        className={cn('pr-14', className)}
+      />
+      <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs font-semibold text-main-secondary/60'>
+        VND
+      </span>
+    </div>
+  );
 }
