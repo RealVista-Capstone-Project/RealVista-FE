@@ -38,12 +38,16 @@
     "statusActions": {
       "updateStatus": "Update Status",
       "sendForSigning": "Send For Signing",
+      "sendToLandlord": "Send to Landlord for Signing",
+      "sendToRenter": "Send to Renter for Signing",
       "markActive": "Mark As Active",
       "terminate": "Terminate Contract",
       "noAvailableAction": "No Available Action"
     },
     "statusActionHints": {
       "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",
+      "sendToLandlord": "Initiate the DocuSign signing flow — you (landlord) will sign first.",
+      "sendToRenter": "Landlord has signed. Now send the contract to the renter to complete signing.",
       "markActive": "Use this when DocuSign reports a completed signing ceremony.",
       "terminate": "End the active contract early and keep a reason on file."
     },
@@ -61,7 +65,8 @@
     },
     "toast": {
       "updateSuccess": "Rental contract updated successfully",
-      "updateError": "Failed to update rental contract. Please try again."
+      "updateError": "Failed to update rental contract. Please try again.",
+      "signingUrlReady": "Signing URL is ready — opening DocuSign in a new tab."
     },
     "common": {
       "cancel": "Cancel"

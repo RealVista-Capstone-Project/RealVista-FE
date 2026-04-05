@@ -17,13 +17,10 @@ import { useTranslations } from 'next-intl';
 
 interface UpdateContractStatusDialogProps {
   contract: RentalContract;
-  nextStatus:
-    | RentalContractStatus.PENDING_RENTER
-    | RentalContractStatus.ACTIVE
-    | RentalContractStatus.TERMINATED;
+  nextStatus: RentalContractStatus.TERMINATED;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (nextStatus: UpdateContractStatusDialogProps['nextStatus'], reason?: string) => Promise<void>;
+  onConfirm: (nextStatus: RentalContractStatus.TERMINATED, reason?: string) => Promise<void>;
   isPending?: boolean;
 }
 
@@ -44,37 +41,15 @@ export function UpdateContractStatusDialog({
     }
   }, [open]);
 
-  const requiresReason = nextStatus === RentalContractStatus.TERMINATED;
+  const requiresReason = true; // TERMINATED always requires a reason
 
-  const config = useMemo(() => {
-    if (nextStatus === RentalContractStatus.PENDING_RENTER) {
-      return {
-        title: t('statusDialog.sendTitle'),
-        description: t('statusDialog.sendDescription', {
-          tenantName: contract.tenant.fullName,
-        }),
-        confirmLabel: t('statusActions.sendForSigning'),
-      };
-    }
-
-    if (nextStatus === RentalContractStatus.ACTIVE) {
-      return {
-        title: t('statusDialog.activateTitle'),
-        description: t('statusDialog.activateDescription', {
-          tenantName: contract.tenant.fullName,
-        }),
-        confirmLabel: t('statusActions.markActive'),
-      };
-    }
-
-    return {
-      title: t('statusDialog.terminateTitle'),
-      description: t('statusDialog.terminateDescription', {
-        tenantName: contract.tenant.fullName,
-      }),
-      confirmLabel: t('statusActions.terminate'),
-    };
-  }, [contract.tenant.fullName, nextStatus, t]);
+  const config = useMemo(() => ({
+    title: t('statusDialog.terminateTitle'),
+    description: t('statusDialog.terminateDescription', {
+      tenantName: contract.tenant.fullName,
+    }),
+    confirmLabel: t('statusActions.terminate'),
+  }), [contract.tenant.fullName, t]);
 
   const handleConfirm = async () => {
     await onConfirm(nextStatus, reason.trim() || undefined);

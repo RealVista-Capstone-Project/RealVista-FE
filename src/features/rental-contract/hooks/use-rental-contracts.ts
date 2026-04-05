@@ -36,7 +36,32 @@ export function useCreateRentalContractMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateRentalContractPayload) => rentalContractApi.createRentalContract(payload),
+    mutationFn: (payload: CreateRentalContractPayload) =>
+      rentalContractApi.createRentalContract(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rentalContractKeys.all });
+    },
+  });
+}
+
+export function useSendToLandlordMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ leaseId, returnUrl }: { leaseId: string; returnUrl?: string }) =>
+      rentalContractApi.sendToLandlordForSigning(leaseId, returnUrl),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rentalContractKeys.all });
+    },
+  });
+}
+
+export function useSendToRenterMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ leaseId, returnUrl }: { leaseId: string; returnUrl?: string }) =>
+      rentalContractApi.sendToRenterForSigning(leaseId, returnUrl),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: rentalContractKeys.all });
     },

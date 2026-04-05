@@ -38,12 +38,16 @@
     "statusActions": {
       "updateStatus": "Cập nhật trạng thái",
       "sendForSigning": "Gửi để ký",
+      "sendToLandlord": "Gửi cho chủ nhà ký",
+      "sendToRenter": "Gửi cho người thuê ký",
       "markActive": "Chuyển sang hiệu lực",
       "terminate": "Chấm dứt hợp đồng",
       "noAvailableAction": "Không có thao tác"
     },
     "statusActionHints": {
       "sendForSigning": "Tạo hoặc dùng lại phong bì DocuSign và gửi cho cả hai bên.",
+      "sendToLandlord": "Khởi tạo luồng ký DocuSign — bạn (chủ nhà) sẽ ký trước.",
+      "sendToRenter": "Chủ nhà đã ký. Bây giờ gửi hợp đồng cho người thuê để hoàn tất ký.",
       "markActive": "Dùng khi DocuSign xác nhận cả hai bên đã hoàn tất ký.",
       "terminate": "Kết thúc sớm hợp đồng đang hiệu lực và lưu lý do."
     },
@@ -61,7 +65,8 @@
     },
     "toast": {
       "updateSuccess": "Cập nhật hợp đồng thuê thành công",
-      "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại."
+      "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại.",
+      "signingUrlReady": "Đường dẫn ký đã sẵn sàng — đang mở DocuSign trong tab mới."
     },
     "common": {
       "cancel": "Hủy"

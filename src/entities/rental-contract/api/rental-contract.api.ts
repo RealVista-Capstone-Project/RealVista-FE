@@ -1,8 +1,12 @@
 import http from '@/shared/lib/http';
 import {
   RentalContractStatus,
+  type CreateLeaseRequest,
   type CreateRentalContractPayload,
+  type DocuSignApiResponse,
+  type DocuSignSigningResponse,
   type GetRentalContractsParams,
+  type LeaseApiResponse,
   type LeaseResponse,
   type LeasesApiResponse,
   type RentalContract,
@@ -13,7 +17,7 @@ import {
 // ---------------------------------------------------------------------------
 // Mapper — raw BE lease → FE RentalContract
 // ---------------------------------------------------------------------------
-function mapLeaseToContract(lease: LeaseResponse): RentalContract {
+export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
   return {
     id: lease.lease_agreement_id,
     listing_id: lease.property_id,
@@ -51,31 +55,32 @@ function mapLeaseToContract(lease: LeaseResponse): RentalContract {
 }
 
 // ---------------------------------------------------------------------------
-// Mock helpers — kept for updateRentalContractStatus and createRentalContract
+// Helper — compute lease_duration_months from date strings
 // ---------------------------------------------------------------------------
-const wait = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const nextContractId = () => `rc-${Date.now()}`;
-
-// In-memory store used only by the two mock mutations so detail panel updates
-// are reflected immediately in the UI without a refetch.
-const mutationStore: Map<string, RentalContract> = new Map();
+function calcDurationMonths(startDate: string, endDate: string): number {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const months =
+    (end.getFullYear() - start.getFullYear()) * 12 +
+    (end.getMonth() - start.getMonth());
+  return Math.max(1, months);
+}
 
 // ---------------------------------------------------------------------------
 // API
 // ---------------------------------------------------------------------------
 export const rentalContractApi = {
+  // ── List ─────────────────────────────────────────────────────────────────
   async getRentalContracts(
     params: GetRentalContractsParams
   ): Promise<{ payload: { data: RentalContractPageResponse } }> {
     const { landlordId, page = 0, size = 10 } = params;
 
     const result = await http.get<LeasesApiResponse>(
-      `/leases/landlord/${landlordId}`
+      `/leases/landlord/${landlordId}?page=${page}&size=${size}`
     );
 
     const apiData = result.payload.data;
-
     const mapped = apiData.content.map(mapLeaseToContract);
 
     return {
@@ -93,81 +98,77 @@ export const rentalContractApi = {
     };
   },
 
+  // ── Create draft ─────────────────────────────────────────────────────────
+  async createRentalContract(payload: CreateRentalContractPayload): Promise<RentalContract> {
+    const body: CreateLeaseRequest = {
+      property_id: payload.listing_id,
+      renter_id: payload.tenantUserId,
+      landlord_id: payload.landlordId,
+      agent_id: null,
+      lease_start_date: payload.startDate,
+      lease_end_date: payload.endDate,
+      lease_duration_months: calcDurationMonths(payload.startDate, payload.endDate),
+      monthly_rent: payload.monthlyRent,
+      security_deposit: payload.securityAmount ?? 0,
+      lease_document_url: null,
+    };
+
+    const result = await http.post<LeaseApiResponse>('/leases', body);
+    return mapLeaseToContract(result.payload.data);
+  },
+
+  // ── DocuSign — Step 1: landlord signs first ───────────────────────────────
+  async sendToLandlordForSigning(
+    leaseId: string,
+    returnUrl?: string
+  ): Promise<DocuSignSigningResponse> {
+    const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
+    const result = await http.post<DocuSignApiResponse>(
+      `/leases/${leaseId}/send-landlord${query}`,
+      {}
+    );
+    return result.payload.data;
+  },
+
+  // ── DocuSign — Step 2: renter signs (lease must be PENDING_LANDLORD) ──────
+  async sendToRenterForSigning(
+    leaseId: string,
+    returnUrl?: string
+  ): Promise<DocuSignSigningResponse> {
+    const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
+    const result = await http.post<DocuSignApiResponse>(
+      `/leases/${leaseId}/send-renter${query}`,
+      {}
+    );
+    return result.payload.data;
+  },
+
+  // ── Refresh signing URLs (expire after ~5 min) ───────────────────────────
+  async getLandlordSigningUrl(leaseId: string, returnUrl?: string): Promise<DocuSignSigningResponse> {
+    const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
+    const result = await http.get<DocuSignApiResponse>(
+      `/leases/${leaseId}/landlord-signing-url${query}`
+    );
+    return result.payload.data;
+  },
+
+  async getRenterSigningUrl(leaseId: string, returnUrl?: string): Promise<DocuSignSigningResponse> {
+    const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
+    const result = await http.get<DocuSignApiResponse>(
+      `/leases/${leaseId}/renter-signing-url${query}`
+    );
+    return result.payload.data;
+  },
+
+  // ── Terminate (mock — no real terminate endpoint confirmed) ──────────────
   async updateRentalContractStatus({
     contractId,
     status,
     reason,
-  }: UpdateRentalContractStatusPayload): Promise<RentalContract> {
+  }: UpdateRentalContractStatusPayload): Promise<{ contractId: string; status: RentalContractStatus; reason?: string }> {
+    // TODO: replace with real PATCH/PUT /leases/{id}/terminate when confirmed
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
     await wait(180);
-
-    const stored = mutationStore.get(contractId);
-    if (!stored) {
-      throw new Error('Rental contract not found in local store');
-    }
-
-    const updated: RentalContract = {
-      ...stored,
-      status,
-      updatedAt: new Date().toISOString(),
-      sentForSigningAt:
-        status === RentalContractStatus.PENDING_RENTER
-          ? new Date().toISOString()
-          : stored.sentForSigningAt ?? null,
-      docusignEnvelopeId:
-        status === RentalContractStatus.PENDING_RENTER
-          ? stored.docusignEnvelopeId ?? `env-${contractId}`
-          : stored.docusignEnvelopeId ?? null,
-      ownerSignedAt:
-        status === RentalContractStatus.ACTIVE
-          ? stored.ownerSignedAt ?? new Date().toISOString()
-          : stored.ownerSignedAt ?? null,
-      tenantSignedAt:
-        status === RentalContractStatus.ACTIVE
-          ? stored.tenantSignedAt ?? new Date().toISOString()
-          : stored.tenantSignedAt ?? null,
-      terminationReason:
-        status === RentalContractStatus.TERMINATED
-          ? reason ?? null
-          : stored.terminationReason ?? null,
-    };
-
-    mutationStore.set(contractId, updated);
-
-    return updated;
-  },
-
-  async createRentalContract(payload: CreateRentalContractPayload): Promise<RentalContract> {
-    await wait(180);
-
-    const now = new Date().toISOString();
-    const contract: RentalContract = {
-      id: nextContractId(),
-      listing_id: payload.listing_id,
-      owner_id: 'owner-current-session',
-      agent_id: null,
-      property: payload.property,
-      tenant: payload.tenant,
-      monthlyRent: payload.monthlyRent,
-      securityDeposit: payload.securityAmount ?? null,
-      leaseStartDate: payload.startDate,
-      leaseEndDate: payload.endDate,
-      paymentDueDay: null,
-      specialClauses: null,
-      status: payload.status,
-      contractDocumentUrl:
-        'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80',
-      createdAt: now,
-      updatedAt: now,
-      docusignEnvelopeId:
-        payload.status === RentalContractStatus.PENDING_RENTER ? `env-${Date.now()}` : null,
-      sentForSigningAt: payload.status === RentalContractStatus.PENDING_RENTER ? now : null,
-      ownerSignedAt: null,
-      tenantSignedAt: null,
-      terminationReason: null,
-    };
-
-    mutationStore.set(contract.id, contract);
-
-    return contract;
+    return { contractId, status, reason };
   },
 };

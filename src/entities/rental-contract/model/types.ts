@@ -98,15 +98,52 @@ export interface LeasesApiResponse {
   timestamp: string;
 }
 
+export interface LeaseApiResponse {
+  success: boolean;
+  message: string;
+  data: LeaseResponse;
+  timestamp: string;
+}
+
+/** Raw body sent to POST /api/v1/leases */
+export interface CreateLeaseRequest {
+  property_id: string;
+  renter_id: string;
+  landlord_id: string;
+  agent_id?: string | null;
+  lease_start_date: string;
+  lease_end_date: string;
+  lease_duration_months: number;
+  monthly_rent: number;
+  security_deposit: number;
+  lease_document_url?: string | null;
+}
+
+/** Response from POST /api/v1/leases/{id}/send-landlord and send-renter */
+export interface DocuSignSigningResponse {
+  signing_url: string;
+  envelope_id: string;
+  signer_role: string;
+}
+
+export interface DocuSignApiResponse {
+  success: boolean;
+  message: string;
+  data: DocuSignSigningResponse;
+  timestamp: string;
+}
+
+/** Kept for backward compat with create wizard form logic */
 export interface CreateRentalContractPayload {
   listing_id: string;
   property: RentalContractProperty;
   tenant: RentalContractTenant;
+  tenantUserId: string;
+  landlordId: string;
   monthlyRent: number;
   securityAmount?: number;
   startDate: string;
   endDate: string;
-  status: RentalContractStatus.DRAFT | RentalContractStatus.PENDING_RENTER;
 }
 
 export interface GetRentalContractsParams {

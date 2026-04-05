@@ -7,7 +7,11 @@ import {
   type RentalContract,
 } from '@/entities/rental-contract';
 import { useManageRentalContractContext } from '../model/manage-rental-contract-context';
-import { useUpdateRentalContractStatusMutation } from '../hooks/use-rental-contracts';
+import {
+  useSendToLandlordMutation,
+  useSendToRenterMutation,
+  useUpdateRentalContractStatusMutation,
+} from '../hooks/use-rental-contracts';
 import {
   Badge,
   Button,
@@ -17,7 +21,7 @@ import {
   PopoverTrigger,
 } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { ChevronDown, Eye, FileText, X } from 'lucide-react';
+import { ChevronDown, Eye, ExternalLink, FileText, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   formatContractCurrency,
@@ -25,90 +29,130 @@ import {
   getRentalContractStatusColor,
 } from '../lib/utils';
 import { UpdateContractStatusDialog } from './update-contract-status-dialog';
+import { DocuSignSigningModal } from './docusign-signing-modal';
 
 interface ContractDetailPanelProps {
   contract: RentalContract;
   onClose: () => void;
 }
 
+type SigningAction =
+  | RentalContractStatus.PENDING_LANDLORD
+  | RentalContractStatus.PENDING_RENTER;
+
+type DialogAction = RentalContractStatus.TERMINATED;
+
 export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelProps) {
   const t = useTranslations('RentalContract');
   const locale = useLocale();
   const { setSelectedContract } = useManageRentalContractContext();
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
+  const sendToLandlordMutation = useSendToLandlordMutation();
+  const sendToRenterMutation = useSendToRenterMutation();
+
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [dialogStatus, setDialogStatus] = useState<
-    | RentalContractStatus.PENDING_RENTER
-    | RentalContractStatus.ACTIVE
-    | RentalContractStatus.TERMINATED
-    | null
-  >(null);
+  const [showTerminateDialog, setShowTerminateDialog] = useState(false);
+  const [signingModal, setSigningModal] = useState<{
+    url: string;
+    role: 'landlord' | 'renter';
+  } | null>(null);
+
+  const isPending =
+    sendToLandlordMutation.isPending ||
+    sendToRenterMutation.isPending ||
+    updateStatusMutation.isPending;
 
   const statusKey = `status.${contract.status.toLowerCase()}` as const;
   const statusLabel = t.has(statusKey) ? t(statusKey) : contract.status;
 
-  const availableActions = useMemo(() => {
-    if (contract.status === RentalContractStatus.DRAFT) {
-      return [RentalContractStatus.PENDING_RENTER] as const;
+  // Map each contract status to the action(s) available
+  const availableActions = useMemo((): Array<SigningAction | DialogAction> => {
+    switch (contract.status) {
+      case RentalContractStatus.DRAFT:
+        return [RentalContractStatus.PENDING_LANDLORD];
+      case RentalContractStatus.PENDING_LANDLORD:
+        return [RentalContractStatus.PENDING_RENTER];
+      case RentalContractStatus.ACTIVE:
+        return [RentalContractStatus.TERMINATED];
+      default:
+        return [];
     }
-
-    if (contract.status === RentalContractStatus.PENDING_RENTER) {
-      return [RentalContractStatus.ACTIVE] as const;
-    }
-
-    if (contract.status === RentalContractStatus.ACTIVE) {
-      return [RentalContractStatus.TERMINATED] as const;
-    }
-
-    return [] as const;
   }, [contract.status]);
 
-  const handleStatusUpdate = async (
-    nextStatus:
-      | RentalContractStatus.PENDING_RENTER
-      | RentalContractStatus.ACTIVE
-      | RentalContractStatus.TERMINATED,
+  // Signing actions open the DocuSign URL; terminate opens a dialog
+  const handleAction = async (action: SigningAction | DialogAction) => {
+    if (action === RentalContractStatus.TERMINATED) {
+      setShowTerminateDialog(true);
+      setIsPopoverOpen(false);
+      return;
+    }
+
+    try {
+      let signingData;
+      if (action === RentalContractStatus.PENDING_LANDLORD) {
+        signingData = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id });
+      } else {
+        signingData = await sendToRenterMutation.mutateAsync({ leaseId: contract.id });
+      }
+
+      setIsPopoverOpen(false);
+      // Show modal — user decides when/whether to open DocuSign
+      setSigningModal({
+        url: signingData.signing_url,
+        role: action === RentalContractStatus.PENDING_LANDLORD ? 'landlord' : 'renter',
+      });
+    } catch {
+      toast.error(t('toast.updateError'));
+    }
+  };
+
+  const handleTerminate = async (
+    _nextStatus: RentalContractStatus.TERMINATED,
     reason?: string
   ) => {
     try {
-      const updated = await updateStatusMutation.mutateAsync({
+      await updateStatusMutation.mutateAsync({
         contractId: contract.id,
-        status: nextStatus,
+        status: RentalContractStatus.TERMINATED,
         reason,
       });
-
-      setSelectedContract(updated);
-      setDialogStatus(null);
-      setIsPopoverOpen(false);
+      // Invalidation happens in the mutation; close the panel
+      setSelectedContract(null);
+      setShowTerminateDialog(false);
       toast.success(t('toast.updateSuccess'));
     } catch {
       toast.error(t('toast.updateError'));
     }
   };
 
-  const renderActionLabel = (
-    status:
-      | RentalContractStatus.PENDING_RENTER
-      | RentalContractStatus.ACTIVE
-      | RentalContractStatus.TERMINATED
-  ) => {
-    if (status === RentalContractStatus.PENDING_RENTER) return t('statusActions.sendForSigning');
-    if (status === RentalContractStatus.ACTIVE) return t('statusActions.markActive');
+  const getActionLabel = (action: SigningAction | DialogAction) => {
+    if (action === RentalContractStatus.PENDING_LANDLORD)
+      return t('statusActions.sendToLandlord');
+    if (action === RentalContractStatus.PENDING_RENTER)
+      return t('statusActions.sendToRenter');
     return t('statusActions.terminate');
+  };
+
+  const getActionHint = (action: SigningAction | DialogAction) => {
+    if (action === RentalContractStatus.PENDING_LANDLORD)
+      return t('statusActionHints.sendToLandlord');
+    if (action === RentalContractStatus.PENDING_RENTER)
+      return t('statusActionHints.sendToRenter');
+    return t('statusActionHints.terminate');
   };
 
   const signingProgress = [
     {
-      label: t('detailPanel.signingProgress.sent'),
-      value: contract.sentForSigningAt ? formatContractDate(contract.sentForSigningAt, locale) : t('detailPanel.signingProgress.pending'),
-    },
-    {
       label: t('detailPanel.signingProgress.ownerSigned'),
-      value: contract.ownerSignedAt ? formatContractDate(contract.ownerSignedAt, locale) : t('detailPanel.signingProgress.pending'),
+      value: contract.ownerSignedAt
+        ? formatContractDate(contract.ownerSignedAt, locale)
+        : t('detailPanel.signingProgress.pending'),
     },
     {
       label: t('detailPanel.signingProgress.tenantSigned'),
-      value: contract.tenantSignedAt ? formatContractDate(contract.tenantSignedAt, locale) : t('detailPanel.signingProgress.pending'),
+      value: contract.tenantSignedAt
+        ? formatContractDate(contract.tenantSignedAt, locale)
+        : t('detailPanel.signingProgress.pending'),
     },
   ];
 
@@ -177,7 +221,11 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     </p>
                     <p className='mt-1 text-sm font-semibold text-main-black'>{contract.id}</p>
                     <p className='mt-1 text-sm leading-6 text-main-secondary/70'>
-                      {contract.tenant.fullName} · {formatContractCurrency(contract.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
+                      {contract.tenant.fullName} ·{' '}
+                      {formatContractCurrency(
+                        contract.monthlyRent,
+                        locale === 'vi' ? 'vi-VN' : 'en-US'
+                      )}
                     </p>
                     {contract.docusignEnvelopeId && (
                       <p className='mt-1 text-xs text-main-secondary/60'>
@@ -250,41 +298,45 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               <PopoverTrigger asChild>
                 <Button
                   type='button'
-                  disabled={availableActions.length === 0}
+                  disabled={availableActions.length === 0 || isPending}
                   className='h-11 w-full rounded-xl bg-main-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-main-primary-hover'
                 >
                   {availableActions.length === 0
                     ? t('statusActions.noAvailableAction')
-                    : t('statusActions.updateStatus')}
+                    : isPending
+                      ? t('statusDialog.updating')
+                      : t('statusActions.updateStatus')}
                   <ChevronDown className='h-4 w-4' />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align='end' className='w-64 rounded-xl border-[#ECE9FB] p-2 shadow-xl'>
+              <PopoverContent
+                align='end'
+                className='w-64 rounded-xl border-[#ECE9FB] p-2 shadow-xl'
+              >
                 <div className='space-y-1'>
-                  {availableActions.map((action) => (
-                    <button
-                      key={action}
-                      type='button'
-                      className='flex w-full items-start rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#F5F1FF]'
-                      onClick={() => {
-                        setDialogStatus(action);
-                        setIsPopoverOpen(false);
-                      }}
-                    >
-                      <div>
-                        <p className='text-sm font-semibold text-main-black'>
-                          {renderActionLabel(action)}
-                        </p>
-                        <p className='mt-0.5 text-xs leading-5 text-main-secondary/60'>
-                          {action === RentalContractStatus.PENDING_RENTER
-                            ? t('statusActionHints.sendForSigning')
-                            : action === RentalContractStatus.ACTIVE
-                              ? t('statusActionHints.markActive')
-                              : t('statusActionHints.terminate')}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
+                  {availableActions.map((action) => {
+                    const isSigning =
+                      action === RentalContractStatus.PENDING_LANDLORD ||
+                      action === RentalContractStatus.PENDING_RENTER;
+                    return (
+                      <button
+                        key={action}
+                        type='button'
+                        className='flex w-full items-start rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#F5F1FF]'
+                        onClick={() => handleAction(action)}
+                      >
+                        <div className='flex-1'>
+                          <p className='flex items-center gap-1.5 text-sm font-semibold text-main-black'>
+                            {getActionLabel(action)}
+                            {isSigning && <ExternalLink className='h-3 w-3 text-main-primary' />}
+                          </p>
+                          <p className='mt-0.5 text-xs leading-5 text-main-secondary/60'>
+                            {getActionHint(action)}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </PopoverContent>
             </Popover>
@@ -292,18 +344,25 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
         </CardContent>
       </div>
 
-      {dialogStatus && (
+      {showTerminateDialog && (
         <UpdateContractStatusDialog
           contract={contract}
-          nextStatus={dialogStatus}
-          open={dialogStatus !== null}
+          nextStatus={RentalContractStatus.TERMINATED}
+          open={showTerminateDialog}
           onOpenChange={(open) => {
-            if (!open) {
-              setDialogStatus(null);
-            }
+            if (!open) setShowTerminateDialog(false);
           }}
-          onConfirm={handleStatusUpdate}
+          onConfirm={handleTerminate}
           isPending={updateStatusMutation.isPending}
+        />
+      )}
+
+      {signingModal && (
+        <DocuSignSigningModal
+          open={Boolean(signingModal)}
+          signingUrl={signingModal.url}
+          signerRole={signingModal.role}
+          onClose={() => setSigningModal(null)}
         />
       )}
     </>

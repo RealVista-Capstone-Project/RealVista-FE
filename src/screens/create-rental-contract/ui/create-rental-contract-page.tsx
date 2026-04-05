@@ -20,10 +20,12 @@ import {
   Search,
   SendHorizontal,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { RentalContractStatus, type CreateRentalContractPayload } from '@/entities/rental-contract';
 import { propertyQueries, type PropertySummaryResponse } from '@/entities/property';
 import { userApi } from '@/entities/user';
-import { useCreateRentalContractMutation } from '@/features/rental-contract/hooks/use-rental-contracts';
+import { useCreateRentalContractMutation, useSendToLandlordMutation } from '@/features/rental-contract/hooks/use-rental-contracts';
+import { DocuSignSigningModal } from '@/features/rental-contract/ui/docusign-signing-modal';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import {
@@ -51,6 +53,7 @@ interface FormState {
   tenantName: string;
   tenantEmail: string;
   tenantPhone: string;
+  tenantUserId: string;
   tenantLookupDone: boolean;
   monthlyRent: string;
   securityDeposit: string;
@@ -92,6 +95,7 @@ const INITIAL_FORM_STATE: FormState = {
   tenantName: '',
   tenantEmail: '',
   tenantPhone: '',
+  tenantUserId: '',
   tenantLookupDone: false,
   monthlyRent: '',
   securityDeposit: '',
@@ -116,12 +120,15 @@ function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormSta
 export function CreateRentalContractPage() {
   const t = useTranslations('CreateRentalContract');
   const router = useRouter();
+  const { data: session } = useSession();
   const createContractMutation = useCreateRentalContractMutation();
+  const sendToLandlordMutation = useSendToLandlordMutation();
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [form, setForm] = useState<FormState>(() => ({ ...INITIAL_FORM_STATE }));
   const [listingSearch, setListingSearch] = useState('');
   const [tenantLookupLoading, setTenantLookupLoading] = useState(false);
   const [propertyPage, setPropertyPage] = useState(1);
+  const [signingModal, setSigningModal] = useState<{ url: string; redirectOnClose: boolean } | null>(null);
 
   const { data: propertiesData, isLoading: propertiesLoading } = useQuery(
     propertyQueries.myProperties({ keyword: listingSearch || undefined, page: propertyPage - 1, size: ITEMS_PER_PAGE })
@@ -144,6 +151,7 @@ export function CreateRentalContractPage() {
           ...previous,
           tenantName: userData.full_name,
           tenantPhone: userData.phone || userData.masked_phone || '',
+          tenantUserId: userData.user_id,
           tenantLookupDone: true,
         }));
         toast.success(t('tenantLookup.found'));
@@ -209,9 +217,7 @@ export function CreateRentalContractPage() {
     }));
   };
 
-  const buildPayload = (
-    status: RentalContractStatus.DRAFT | RentalContractStatus.PENDING_RENTER
-  ): CreateRentalContractPayload => ({
+  const buildPayload = (): CreateRentalContractPayload => ({
     listing_id: form.propertyId,
     property: {
       id: form.propertyId,
@@ -223,23 +229,24 @@ export function CreateRentalContractPage() {
       bathrooms: Number(form.bathrooms) || undefined,
     },
     tenant: {
-      id: `tenant-${Date.now()}`,
-      user_id: `user-${Date.now()}`,
+      id: form.tenantUserId,
+      user_id: form.tenantUserId,
       fullName: form.tenantName,
       email: form.tenantEmail,
       phoneNumber: form.tenantPhone || null,
       avatarUrl: null,
     },
+    tenantUserId: form.tenantUserId,
+    landlordId: session?.user?.id ?? '',
     monthlyRent: Number(form.monthlyRent),
     securityAmount: Number(form.securityDeposit) || undefined,
     startDate: form.leaseStartDate,
     endDate: form.leaseEndDate,
-    status,
   });
 
   const saveDraft = async () => {
     try {
-      await createContractMutation.mutateAsync(buildPayload(RentalContractStatus.DRAFT));
+      await createContractMutation.mutateAsync(buildPayload());
 
       toast.success(t('toast.draftSaved'));
       router.push(ROUTES.dashboard.rentalContracts);
@@ -250,10 +257,13 @@ export function CreateRentalContractPage() {
 
   const sendForSigning = async () => {
     try {
-      await createContractMutation.mutateAsync(buildPayload(RentalContractStatus.PENDING_RENTER));
+      const contract = await createContractMutation.mutateAsync(buildPayload());
+      const signing = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id });
 
+      // Show modal so owner can choose when to open DocuSign
+      // Navigate to contracts list only when the modal is closed
+      setSigningModal({ url: signing.signing_url, redirectOnClose: true });
       toast.success(t('toast.sentSuccess'));
-      router.push(ROUTES.dashboard.rentalContracts);
     } catch {
       toast.error(t('toast.sentError'));
     }
@@ -805,6 +815,19 @@ export function CreateRentalContractPage() {
           </div>
         </div>
       </div>
+
+      {signingModal && (
+        <DocuSignSigningModal
+          open={Boolean(signingModal)}
+          signingUrl={signingModal.url}
+          signerRole='landlord'
+          onClose={() => {
+            const shouldRedirect = signingModal.redirectOnClose;
+            setSigningModal(null);
+            if (shouldRedirect) router.push(ROUTES.dashboard.rentalContracts);
+          }}
+        />
+      )}
     </div>
   );
 }
