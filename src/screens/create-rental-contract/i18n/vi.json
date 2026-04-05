@@ -81,12 +81,20 @@
       "leaseWindow": "Thời hạn thuê"
     },
     "review": {
-      "previewEyebrow": "Xem trước tài liệu",
-      "previewTitle": "Gói hợp đồng trước khi gửi",
-      "documentType": "Gói hợp đồng",
-      "documentTitle": "Hợp đồng thuê nhà ở giữa chủ nhà và người thuê",
-      "signingFlowTitle": "Luồng chuyển ký DocuSign",
-      "signingFlowDescription": "Sau khi gửi, phong bì được tạo trên DocuSign và cả hai bên hoàn tất quy trình ký trong luồng số được quản lý."
+      "propertyBanner": "Bất động sản",
+      "partiesTitle": "Các bên",
+      "ownerLabel": "Chủ nhà",
+      "ownerYou": "Bạn (người tạo hợp đồng)",
+      "tenantLabel": "Người thuê",
+      "financialsTitle": "Điều khoản tài chính",
+      "monthlyRentLabel": "Tiền thuê hàng tháng",
+      "depositLabel": "Tiền cọc",
+      "noDeposit": "Không có tiền cọc",
+      "timelineTitle": "Thời hạn thuê",
+      "timelineFrom": "Từ",
+      "timelineTo": "Đến",
+      "timelineDuration": "{months} tháng",
+      "docusignNotice": "Hợp đồng này sẽ được gửi dưới dạng phong bì DocuSign để cả hai bên ký điện tử."
     },
     "actions": {
       "saveDraft": "Lưu nháp",

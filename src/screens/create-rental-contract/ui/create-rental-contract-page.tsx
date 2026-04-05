@@ -176,20 +176,6 @@ export function CreateRentalContractPage() {
     { id: 4, label: t('steps.review') },
   ] as const;
 
-  const summaryItems = useMemo(
-    () => [
-      { label: t('summary.propertyId'), value: form.propertyId },
-      { label: t('summary.property'), value: form.propertyTitle },
-      { label: t('summary.address'), value: form.propertyAddress },
-      { label: t('summary.tenant'), value: form.tenantName },
-      { label: t('summary.email'), value: form.tenantEmail },
-      { label: t('summary.monthlyRent'), value: formatCurrencyValue(form.monthlyRent) },
-      { label: t('summary.deposit'), value: formatCurrencyValue(form.securityDeposit) },
-      { label: t('summary.leaseWindow'), value: `${form.leaseStartDate} → ${form.leaseEndDate}` },
-    ],
-    [form, t]
-  );
-
   const isStepValid = useMemo(() => {
     if (currentStep === 1) {
       return Boolean(
@@ -534,59 +520,133 @@ export function CreateRentalContractPage() {
       );
     }
 
+    const leaseDurationMonths = (() => {
+      if (!form.leaseStartDate || !form.leaseEndDate) return 0;
+      const start = new Date(form.leaseStartDate);
+      const end = new Date(form.leaseEndDate);
+      return Math.max(0, (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()));
+    })();
+
     return (
-      <div className='grid gap-6 lg:grid-cols-[1.2fr_0.8fr]'>
-        <div className='overflow-hidden rounded-3xl border border-[#E7E0FF] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F4FF_100%)]'>
-          <div className='border-b border-[#EFE8FF] px-5 py-4'>
-            <p className='text-xs font-semibold uppercase tracking-[0.22em] text-main-primary/70'>
-              {t('review.previewEyebrow')}
-            </p>
-            <h3 className='mt-2 text-xl font-semibold text-main-black'>{t('review.previewTitle')}</h3>
-          </div>
-          <div className='space-y-5 px-5 py-5'>
-            <div className='rounded-2xl bg-[#120F25] p-5 text-white shadow-[0_24px_60px_rgba(18,15,37,0.18)]'>
-              <div className='flex items-center justify-between gap-4'>
-                <div>
-                  <p className='text-xs uppercase tracking-[0.18em] text-white/60'>{t('review.documentType')}</p>
-                  <p className='mt-2 text-2xl font-semibold tracking-[-0.03em]'>{t('review.documentTitle')}</p>
-                </div>
-                <div className='rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white/80'>
-                  DocuSign
-                </div>
-              </div>
-              <div className='mt-8 grid gap-4 sm:grid-cols-2'>
-                <DocumentFact label={t('summary.property')} value={form.propertyTitle} />
-                <DocumentFact label={t('summary.tenant')} value={form.tenantName} />
-                <DocumentFact label={t('summary.monthlyRent')} value={formatCurrencyValue(form.monthlyRent)} />
-                <DocumentFact label={t('summary.deposit')} value={formatCurrencyValue(form.securityDeposit)} />
-              </div>
+      <div className='space-y-4'>
+        {/* ── Property banner ── */}
+        <div className='flex items-center gap-4 rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
+          {form.thumbnailUrl ? (
+            <Image
+              src={form.thumbnailUrl}
+              alt={form.propertyTitle}
+              width={80}
+              height={80}
+              className='h-20 w-20 shrink-0 rounded-xl object-cover'
+            />
+          ) : (
+            <div className='flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-[#F3EEFF]'>
+              <Building2 className='h-6 w-6 text-main-primary/50' />
             </div>
-            <div className='rounded-2xl border border-dashed border-[#D7CFFF] bg-white/80 p-5'>
-              <p className='text-sm font-semibold text-main-black'>{t('review.signingFlowTitle')}</p>
-              <p className='mt-2 text-sm leading-6 text-main-secondary/70'>{t('review.signingFlowDescription')}</p>
+          )}
+          <div className='min-w-0'>
+            <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+              {t('review.propertyBanner')}
+            </p>
+            <p className='mt-1 text-lg font-semibold tracking-[-0.02em] text-main-black'>{form.propertyTitle}</p>
+            <div className='mt-1.5 flex flex-wrap items-center gap-2'>
+              <span className='flex items-center gap-1 text-xs text-main-secondary/60'>
+                <MapPin className='h-3 w-3' />
+                {form.propertyAddress}
+              </span>
+              <Badge variant='secondary' className='rounded-full bg-[#F3EEFF] px-2.5 py-0.5 text-[11px] font-medium text-main-primary/80'>
+                {form.propertyType}
+              </Badge>
+              {form.bedrooms && (
+                <span className='flex items-center gap-1 text-xs text-main-secondary/60'>
+                  <BedDouble className='h-3 w-3' /> {form.bedrooms}
+                </span>
+              )}
+              {form.bathrooms && (
+                <span className='flex items-center gap-1 text-xs text-main-secondary/60'>
+                  <Bath className='h-3 w-3' /> {form.bathrooms}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        <div className='space-y-4'>
-          <Card className='rounded-3xl border-[#ECE4FF] bg-white/90 shadow-[0_18px_40px_rgba(95,70,175,0.08)]'>
-            <CardContent className='space-y-4 p-5'>
+        {/* ── Parties + Financial terms ── */}
+        <div className='grid gap-4 sm:grid-cols-2'>
+          {/* Parties */}
+          <div className='rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
+            <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+              {t('review.partiesTitle')}
+            </p>
+            <div className='mt-3 space-y-3'>
               <div>
-                <p className='text-xs font-semibold uppercase tracking-[0.22em] text-main-secondary/50'>
-                  {t('summary.eyebrow')}
+                <p className='text-xs text-main-secondary/50'>{t('review.ownerLabel')}</p>
+                <p className='mt-0.5 text-sm font-medium text-main-black'>{t('review.ownerYou')}</p>
+              </div>
+              <div className='h-px bg-[#F0E8FF]' />
+              <div>
+                <p className='text-xs text-main-secondary/50'>{t('review.tenantLabel')}</p>
+                <p className='mt-0.5 text-sm font-medium text-main-black'>{form.tenantName}</p>
+                <p className='text-xs text-main-secondary/50'>{form.tenantEmail}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Financial terms */}
+          <div className='rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
+            <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+              {t('review.financialsTitle')}
+            </p>
+            <div className='mt-3 space-y-3'>
+              <div>
+                <p className='text-xs text-main-secondary/50'>{t('review.monthlyRentLabel')}</p>
+                <p className='mt-0.5 text-lg font-semibold text-main-black'>
+                  {formatCurrencyValue(form.monthlyRent)}
                 </p>
-                <h3 className='mt-2 text-lg font-semibold text-main-black'>{t('summary.title')}</h3>
               </div>
-              <div className='space-y-3'>
-                {summaryItems.map((item) => (
-                  <div key={item.label} className='flex items-start justify-between gap-4 rounded-2xl bg-[#F8F4FF] px-4 py-3'>
-                    <span className='text-sm text-main-secondary/60'>{item.label}</span>
-                    <span className='text-right text-sm font-semibold text-main-black'>{item.value}</span>
-                  </div>
-                ))}
+              <div className='h-px bg-[#F0E8FF]' />
+              <div>
+                <p className='text-xs text-main-secondary/50'>{t('review.depositLabel')}</p>
+                <p className='mt-0.5 text-sm font-medium text-main-black'>
+                  {form.securityDeposit ? formatCurrencyValue(form.securityDeposit) : t('review.noDeposit')}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Lease timeline ── */}
+        <div className='rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+            {t('review.timelineTitle')}
+          </p>
+          <div className='mt-3 flex items-center gap-3'>
+            <div className='rounded-xl bg-[#F3EEFF] px-3 py-2 text-center'>
+              <p className='text-[10px] font-medium uppercase text-main-secondary/50'>{t('review.timelineFrom')}</p>
+              <p className='mt-0.5 text-sm font-semibold text-main-black'>{form.leaseStartDate}</p>
+            </div>
+            <div className='flex flex-1 items-center gap-2'>
+              <div className='h-px flex-1 bg-[#E7E0FF]' />
+              {leaseDurationMonths > 0 && (
+                <span className='shrink-0 rounded-full bg-main-primary/10 px-3 py-1 text-xs font-semibold text-main-primary'>
+                  {t('review.timelineDuration', { months: leaseDurationMonths })}
+                </span>
+              )}
+              <div className='h-px flex-1 bg-[#E7E0FF]' />
+            </div>
+            <div className='rounded-xl bg-[#F3EEFF] px-3 py-2 text-center'>
+              <p className='text-[10px] font-medium uppercase text-main-secondary/50'>{t('review.timelineTo')}</p>
+              <p className='mt-0.5 text-sm font-semibold text-main-black'>{form.leaseEndDate}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── DocuSign notice ── */}
+        <div className='flex items-center gap-3 rounded-2xl border border-dashed border-[#D7CFFF] bg-[#FAF8FF] px-4 py-3'>
+          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-main-primary/10'>
+            <SendHorizontal className='h-4 w-4 text-main-primary' />
+          </div>
+          <p className='text-sm leading-relaxed text-main-secondary/70'>{t('review.docusignNotice')}</p>
         </div>
       </div>
     );
@@ -771,15 +831,6 @@ function HeroStat({ title, value }: { title: string; value: string }) {
     <div className='rounded-3xl border border-[#EDE4FF] bg-white/85 p-4'>
       <p className='text-[11px] uppercase tracking-[0.18em] text-main-secondary/48'>{title}</p>
       <p className='mt-2 text-sm font-semibold leading-6 text-main-black'>{value}</p>
-    </div>
-  );
-}
-
-function DocumentFact({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className='text-[11px] uppercase tracking-[0.16em] text-white/45'>{label}</p>
-      <p className='mt-1 text-sm font-semibold text-white'>{value}</p>
     </div>
   );
 }

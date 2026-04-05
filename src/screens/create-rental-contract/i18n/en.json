@@ -81,12 +81,20 @@
       "leaseWindow": "Lease window"
     },
     "review": {
-      "previewEyebrow": "Document Preview",
-      "previewTitle": "Pre-flight contract packet",
-      "documentType": "Contract packet",
-      "documentTitle": "Owner to Tenant Residential Lease",
-      "signingFlowTitle": "DocuSign routing",
-      "signingFlowDescription": "Once sent, the envelope is created in DocuSign and both parties complete the signing ceremony through the managed digital flow."
+      "propertyBanner": "Property",
+      "partiesTitle": "Parties",
+      "ownerLabel": "Owner",
+      "ownerYou": "You (contract creator)",
+      "tenantLabel": "Tenant",
+      "financialsTitle": "Financial terms",
+      "monthlyRentLabel": "Monthly rent",
+      "depositLabel": "Security deposit",
+      "noDeposit": "No deposit",
+      "timelineTitle": "Lease timeline",
+      "timelineFrom": "From",
+      "timelineTo": "To",
+      "timelineDuration": "{months} months",
+      "docusignNotice": "This contract will be sent as a DocuSign envelope for e-signature by both parties."
     },
     "actions": {
       "saveDraft": "Save draft",
