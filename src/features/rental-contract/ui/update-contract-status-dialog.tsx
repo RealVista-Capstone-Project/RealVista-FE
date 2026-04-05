@@ -17,7 +17,10 @@ import { useTranslations } from 'next-intl';
 
 interface UpdateContractStatusDialogProps {
   contract: RentalContract;
-  nextStatus: RentalContractStatus.ACTIVE | RentalContractStatus.REJECTED | RentalContractStatus.TERMINATED;
+  nextStatus:
+    | RentalContractStatus.PENDING_SIGNATURE
+    | RentalContractStatus.ACTIVE
+    | RentalContractStatus.TERMINATED;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (nextStatus: UpdateContractStatusDialogProps['nextStatus'], reason?: string) => Promise<void>;
@@ -41,27 +44,26 @@ export function UpdateContractStatusDialog({
     }
   }, [open]);
 
-  const requiresReason =
-    nextStatus === RentalContractStatus.REJECTED || nextStatus === RentalContractStatus.TERMINATED;
+  const requiresReason = nextStatus === RentalContractStatus.TERMINATED;
 
   const config = useMemo(() => {
-    if (nextStatus === RentalContractStatus.ACTIVE) {
+    if (nextStatus === RentalContractStatus.PENDING_SIGNATURE) {
       return {
-        title: t('statusDialog.approveTitle'),
-        description: t('statusDialog.approveDescription', {
+        title: t('statusDialog.sendTitle'),
+        description: t('statusDialog.sendDescription', {
           tenantName: contract.tenant.fullName,
         }),
-        confirmLabel: t('statusActions.approve'),
+        confirmLabel: t('statusActions.sendForSigning'),
       };
     }
 
-    if (nextStatus === RentalContractStatus.REJECTED) {
+    if (nextStatus === RentalContractStatus.ACTIVE) {
       return {
-        title: t('statusDialog.rejectTitle'),
-        description: t('statusDialog.rejectDescription', {
+        title: t('statusDialog.activateTitle'),
+        description: t('statusDialog.activateDescription', {
           tenantName: contract.tenant.fullName,
         }),
-        confirmLabel: t('statusActions.reject'),
+        confirmLabel: t('statusActions.markActive'),
       };
     }
 

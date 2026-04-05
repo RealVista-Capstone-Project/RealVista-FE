@@ -2,8 +2,9 @@
   "ManageRentalContract": {
     "hero": {
       "eyebrow": "Owner Contract Desk",
-      "title": "Manage rental contracts with fast status control",
-      "subtitle": "Track owner-side rental contracts, review uploaded contract previews, and push each contract through its next valid decision without leaving the dashboard.",
+      "title": "Manage DocuSign rental contracts with clear signing control",
+      "subtitle": "Track owner-side rental contracts, monitor each DocuSign signing milestone, and move every contract through its managed lifecycle without leaving the dashboard.",
+      "createButton": "Create Contract",
       "stats": {
         "totalContracts": "Contracts in View",
         "activeSelection": "Current Selection"

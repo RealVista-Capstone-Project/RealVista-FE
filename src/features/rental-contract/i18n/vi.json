@@ -4,18 +4,25 @@
       "title": "Xem trước hợp đồng",
       "previewAlt": "Bản xem trước hợp đồng của {tenantName}",
       "previewBadge": "Xem trước",
-      "contractMeta": "Tệp hợp đồng",
+      "contractMeta": "Phong bì DocuSign",
       "leaseStart": "Ngày bắt đầu",
       "leaseEnd": "Ngày kết thúc",
-      "rejectionReason": "Lý do từ chối",
+      "envelopeId": "Mã phong bì: {envelopeId}",
+      "signingProgress": {
+        "title": "Tiến độ ký",
+        "sent": "Đã gửi ký",
+        "ownerSigned": "Chủ nhà đã ký",
+        "tenantSigned": "Người thuê đã ký",
+        "pending": "Đang chờ"
+      },
       "terminationReason": "Lý do chấm dứt",
       "actionCardEyebrow": "Cập nhật trạng thái",
-      "actionCardDescription": "Dùng nút chính bên dưới để chuyển hợp đồng thuê sang trạng thái hợp lệ tiếp theo."
+      "actionCardDescription": "Kích hoạt bước tiếp theo trong vòng đời DocuSign của hợp đồng ngay trong dashboard."
     },
     "status": {
-      "pending": "Chờ duyệt",
+      "draft": "Bản nháp",
+      "pending_signature": "Chờ ký",
       "active": "Đang hiệu lực",
-      "rejected": "Đã từ chối",
       "expired": "Hết hạn",
       "terminated": "Đã chấm dứt"
     },
@@ -28,21 +35,21 @@
     },
     "statusActions": {
       "updateStatus": "Cập nhật trạng thái",
-      "approve": "Duyệt hợp đồng",
-      "reject": "Từ chối hợp đồng",
+      "sendForSigning": "Gửi để ký",
+      "markActive": "Chuyển sang hiệu lực",
       "terminate": "Chấm dứt hợp đồng",
       "noAvailableAction": "Không có thao tác"
     },
     "statusActionHints": {
-      "approve": "Xác nhận và kích hoạt hợp đồng thuê đang chờ duyệt.",
-      "reject": "Từ chối hợp đồng đang chờ và lưu lại ghi chú.",
+      "sendForSigning": "Tạo hoặc dùng lại phong bì DocuSign và gửi cho cả hai bên.",
+      "markActive": "Dùng khi DocuSign xác nhận cả hai bên đã hoàn tất ký.",
       "terminate": "Kết thúc sớm hợp đồng đang hiệu lực và lưu lý do."
     },
     "statusDialog": {
-      "approveTitle": "Duyệt hợp đồng thuê",
-      "approveDescription": "Thao tác này sẽ chuyển hợp đồng của {tenantName} sang trạng thái đang hiệu lực.",
-      "rejectTitle": "Từ chối hợp đồng thuê",
-      "rejectDescription": "Thêm lý do ngắn gọn trước khi từ chối hợp đồng của {tenantName}.",
+      "sendTitle": "Gửi hợp đồng để ký",
+      "sendDescription": "Thao tác này sẽ gửi phong bì DocuSign tới {tenantName} và chuyển hợp đồng sang trạng thái chờ ký.",
+      "activateTitle": "Chuyển hợp đồng sang hiệu lực",
+      "activateDescription": "Dùng thao tác này sau khi DocuSign xác nhận cả hai bên đã ký xong hợp đồng của {tenantName}.",
       "terminateTitle": "Chấm dứt hợp đồng thuê",
       "terminateDescription": "Thêm lý do ngắn gọn trước khi chấm dứt hợp đồng đang hiệu lực của {tenantName}.",
       "reasonLabel": "Lý do",

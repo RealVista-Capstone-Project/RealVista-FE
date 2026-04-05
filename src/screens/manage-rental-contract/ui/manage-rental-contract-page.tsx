@@ -8,6 +8,8 @@ import { ContractListItem } from '@/features/rental-contract/ui/contract-list-it
 import { ContractDetailPanel } from '@/features/rental-contract/ui/contract-detail-panel';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { useRouter } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 import {
   Select,
   SelectContent,
@@ -20,12 +22,14 @@ import {
   ChevronLeft,
   ChevronRight,
   FileSearch,
+  Plus,
   Search,
   SlidersHorizontal,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 function ManageRentalContractContent() {
+  const router = useRouter();
   const {
     contracts,
     currentPage,
@@ -88,20 +92,33 @@ function ManageRentalContractContent() {
               </p>
             </div>
 
-            <div className='grid gap-3 sm:grid-cols-2 xl:min-w-[360px]'>
-              <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
-                <p className='text-[11px] uppercase tracking-[0.16em] text-main-secondary/50'>
-                  {t('hero.stats.totalContracts')}
-                </p>
-                <p className='mt-2 text-2xl font-semibold text-main-black'>{totalElements}</p>
+            <div className='grid gap-3 xl:min-w-[420px]'>
+              <div className='flex justify-end'>
+                <Button
+                  type='button'
+                  className='h-11 rounded-xl bg-main-primary px-4 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-main-primary-hover'
+                  onClick={() => router.push(ROUTES.dashboard.createRentalContract)}
+                >
+                  <Plus className='h-4 w-4' />
+                  {t('hero.createButton')}
+                </Button>
               </div>
-              <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
-                <p className='text-[11px] uppercase tracking-[0.16em] text-main-secondary/50'>
-                  {t('hero.stats.activeSelection')}
-                </p>
-                <p className='mt-2 text-sm font-semibold text-main-black'>
-                  {selectedContract?.tenant.fullName ?? t('hero.noSelection')}
-                </p>
+
+              <div className='grid gap-3 sm:grid-cols-2'>
+                <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
+                  <p className='text-[11px] uppercase tracking-[0.16em] text-main-secondary/50'>
+                    {t('hero.stats.totalContracts')}
+                  </p>
+                  <p className='mt-2 text-2xl font-semibold text-main-black'>{totalElements}</p>
+                </div>
+                <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
+                  <p className='text-[11px] uppercase tracking-[0.16em] text-main-secondary/50'>
+                    {t('hero.stats.activeSelection')}
+                  </p>
+                  <p className='mt-2 text-sm font-semibold text-main-black'>
+                    {selectedContract?.tenant.fullName ?? t('hero.noSelection')}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -123,9 +140,9 @@ function ManageRentalContractContent() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='all'>{t('filter.allStatuses')}</SelectItem>
-                    <SelectItem value='PENDING'>{tStatus('pending')}</SelectItem>
+                    <SelectItem value='DRAFT'>{tStatus('draft')}</SelectItem>
+                    <SelectItem value='PENDING_SIGNATURE'>{tStatus('pending_signature')}</SelectItem>
                     <SelectItem value='ACTIVE'>{tStatus('active')}</SelectItem>
-                    <SelectItem value='REJECTED'>{tStatus('rejected')}</SelectItem>
                     <SelectItem value='EXPIRED'>{tStatus('expired')}</SelectItem>
                     <SelectItem value='TERMINATED'>{tStatus('terminated')}</SelectItem>
                   </SelectContent>

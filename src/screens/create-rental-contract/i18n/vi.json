@@ -1,0 +1,105 @@
+{
+  "CreateRentalContract": {
+    "backToContracts": "Quay lại hợp đồng thuê",
+    "progress": "Bước {current} / {total}",
+    "hero": {
+      "eyebrow": "Xưởng hợp đồng DocuSign",
+      "title": "Tạo hợp đồng thuê được quản lý trọn vẹn trong hệ thống ký số",
+      "subtitle": "Thiết lập bất động sản, người thuê và điều khoản thương mại một lần, sau đó gửi phong bì DocuSign rõ ràng mà không phụ thuộc vào trạng thái ngoài nền tảng.",
+      "stats": {
+        "lifecycle": "Vòng đời",
+        "lifecycleValue": "Bản nháp → Chờ ký → Hiệu lực",
+        "delivery": "Triển khai",
+        "deliveryValue": "Phong bì DocuSign được tạo và theo dõi ngay trong hệ thống"
+      }
+    },
+    "steps": {
+      "eyebrow": "Các bước hợp đồng",
+      "property": "Bất động sản",
+      "tenant": "Người thuê",
+      "terms": "Điều khoản",
+      "review": "Rà soát",
+      "titles": {
+        "1": "Xác nhận bối cảnh bất động sản",
+        "2": "Xác định người thuê ký hợp đồng",
+        "3": "Thiết lập điều khoản thuê",
+        "4": "Rà soát gói DocuSign"
+      },
+      "descriptions": {
+        "1": "Chọn bất động sản của bạn để lấy thông tin chi tiết cho hợp đồng.",
+        "2": "Nhập email người thuê để tra cứu hồ sơ — tên và số điện thoại sẽ được tự động điền.",
+        "3": "Thiết lập tiền thuê, tiền cọc và thời hạn thuê sẽ đi vào hợp đồng.",
+        "4": "Rà soát bản tóm tắt cuối cùng trước khi lưu nháp hoặc gửi phong bì đi ký."
+      }
+    },
+    "form": {
+      "eyebrow": "Biểu mẫu hợp đồng",
+      "propertyTitle": "Tên bất động sản",
+      "propertyAddress": "Địa chỉ bất động sản",
+      "propertyType": "Loại bất động sản",
+      "bedrooms": "Số phòng ngủ",
+      "bathrooms": "Số phòng tắm",
+      "tenantName": "Họ tên người thuê",
+      "tenantEmail": "Email người thuê",
+      "tenantPhone": "Số điện thoại người thuê",
+      "monthlyRent": "Tiền thuê hàng tháng (VND)",
+      "securityDeposit": "Tiền cọc (VND)",
+      "leaseStartDate": "Ngày bắt đầu thuê",
+      "leaseEndDate": "Ngày kết thúc thuê"
+    },
+    "listingPicker": {
+      "eyebrow": "Nguồn bất động sản",
+      "title": "Chọn bất động sản trước khi soạn hợp đồng",
+      "description": "Chọn bất động sản của bạn để hợp đồng bắt đầu với đúng ngữ cảnh và chi tiết.",
+      "searchPlaceholder": "Tìm theo địa chỉ hoặc loại bất động sản",
+      "bedroomsValue": "{count} phòng ngủ",
+      "bathroomsValue": "{count} phòng tắm",
+      "selected": "Đã chọn",
+      "selectAction": "Dùng bất động sản này",
+      "emptyTitle": "Không có bất động sản phù hợp",
+      "emptyDescription": "Hãy thử từ khóa địa chỉ khác hoặc kiểm tra danh sách bất động sản của bạn."
+    },
+    "tenantLookup": {
+      "eyebrow": "Xác định người thuê",
+      "title": "Tra cứu người thuê qua email",
+      "description": "Nhập email người thuê và hệ thống sẽ tự động lấy thông tin hồ sơ. Tên và số điện thoại sẽ được điền từ hệ thống.",
+      "emailPlaceholder": "vd: nguoithue@example.com",
+      "lookupAction": "Tra cứu",
+      "found": "Tìm thấy người thuê — thông tin đã được điền",
+      "notFound": "Không tìm thấy người thuê với email này. Vui lòng kiểm tra và thử lại."
+    },
+    "summary": {
+      "eyebrow": "Tóm tắt trực tiếp",
+      "title": "Nội dung sẽ được gửi",
+      "property": "Bất động sản",
+      "propertyId": "Mã bất động sản",
+      "address": "Địa chỉ",
+      "tenant": "Người thuê",
+      "email": "Email",
+      "monthlyRent": "Tiền thuê hàng tháng",
+      "deposit": "Tiền cọc",
+      "leaseWindow": "Thời hạn thuê"
+    },
+    "review": {
+      "previewEyebrow": "Xem trước tài liệu",
+      "previewTitle": "Gói hợp đồng trước khi gửi",
+      "documentType": "Gói hợp đồng",
+      "documentTitle": "Hợp đồng thuê nhà ở giữa chủ nhà và người thuê",
+      "signingFlowTitle": "Luồng chuyển ký DocuSign",
+      "signingFlowDescription": "Sau khi gửi, phong bì được tạo trên DocuSign và cả hai bên hoàn tất quy trình ký trong luồng số được quản lý."
+    },
+    "actions": {
+      "saveDraft": "Lưu nháp",
+      "back": "Quay lại",
+      "next": "Bước tiếp theo",
+      "sendForSigning": "Gửi để ký",
+      "sending": "Đang gửi..."
+    },
+    "toast": {
+      "draftSaved": "Đã lưu bản nháp hợp đồng",
+      "draftError": "Không thể lưu bản nháp hợp đồng. Vui lòng thử lại.",
+      "sentSuccess": "Đã gửi hợp đồng để ký",
+      "sentError": "Không thể gửi hợp đồng để ký. Vui lòng thử lại."
+    }
+  }
+}

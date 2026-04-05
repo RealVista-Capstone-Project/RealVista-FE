@@ -1,0 +1,105 @@
+{
+  "CreateRentalContract": {
+    "backToContracts": "Back to rental contracts",
+    "progress": "Step {current} of {total}",
+    "hero": {
+      "eyebrow": "DocuSign Contract Studio",
+      "title": "Create a rental contract that stays fully inside your signing system",
+      "subtitle": "Set up the property, tenant, and commercial terms once, then send a clean DocuSign envelope without relying on off-platform state changes.",
+      "stats": {
+        "lifecycle": "Lifecycle",
+        "lifecycleValue": "Draft → Pending Signature → Active",
+        "delivery": "Delivery",
+        "deliveryValue": "DocuSign envelope generated and tracked in-platform"
+      }
+    },
+    "steps": {
+      "eyebrow": "Contract Steps",
+      "property": "Property",
+      "tenant": "Tenant",
+      "terms": "Terms",
+      "review": "Review",
+      "titles": {
+        "1": "Confirm the property context",
+        "2": "Look up the signing tenant",
+        "3": "Define the lease terms",
+        "4": "Review the DocuSign package"
+      },
+      "descriptions": {
+        "1": "Select one of your properties to pull details into the contract.",
+        "2": "Enter the tenant's email to look up their profile — name and phone are filled automatically.",
+        "3": "Set the rent, deposit, and lease timeline that belong in the generated agreement.",
+        "4": "Review the final summary before creating a draft or sending the envelope for signature."
+      }
+    },
+    "form": {
+      "eyebrow": "Contract Form",
+      "propertyTitle": "Property title",
+      "propertyAddress": "Property address",
+      "propertyType": "Property type",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "tenantName": "Tenant full name",
+      "tenantEmail": "Tenant email",
+      "tenantPhone": "Tenant phone number",
+      "monthlyRent": "Monthly rent (VND)",
+      "securityDeposit": "Security deposit (VND)",
+      "leaseStartDate": "Lease start date",
+      "leaseEndDate": "Lease end date"
+    },
+    "listingPicker": {
+      "eyebrow": "Property Source",
+      "title": "Choose a property before drafting the contract",
+      "description": "Select one of your properties so the contract starts with the right property context and details.",
+      "searchPlaceholder": "Search by address or property type",
+      "bedroomsValue": "{count} bedrooms",
+      "bathroomsValue": "{count} bathrooms",
+      "selected": "Selected",
+      "selectAction": "Use this property",
+      "emptyTitle": "No properties match this search",
+      "emptyDescription": "Try a different address keyword or check that you have available properties."
+    },
+    "tenantLookup": {
+      "eyebrow": "Tenant Identification",
+      "title": "Look up the tenant by email",
+      "description": "Enter the tenant's email address and we'll pull their profile automatically. Name and phone number will be filled in from the system.",
+      "emailPlaceholder": "e.g. tenant@example.com",
+      "lookupAction": "Look up",
+      "found": "Tenant found — profile details filled in",
+      "notFound": "No tenant found with this email. Please check and try again."
+    },
+    "summary": {
+      "eyebrow": "Live Summary",
+      "title": "What will be sent",
+      "property": "Property",
+      "propertyId": "Property ID",
+      "address": "Address",
+      "tenant": "Tenant",
+      "email": "Email",
+      "monthlyRent": "Monthly rent",
+      "deposit": "Deposit",
+      "leaseWindow": "Lease window"
+    },
+    "review": {
+      "previewEyebrow": "Document Preview",
+      "previewTitle": "Pre-flight contract packet",
+      "documentType": "Contract packet",
+      "documentTitle": "Owner to Tenant Residential Lease",
+      "signingFlowTitle": "DocuSign routing",
+      "signingFlowDescription": "Once sent, the envelope is created in DocuSign and both parties complete the signing ceremony through the managed digital flow."
+    },
+    "actions": {
+      "saveDraft": "Save draft",
+      "back": "Back",
+      "next": "Next step",
+      "sendForSigning": "Send for signing",
+      "sending": "Sending..."
+    },
+    "toast": {
+      "draftSaved": "Draft contract saved",
+      "draftError": "Unable to save contract draft. Please try again.",
+      "sentSuccess": "Contract sent for signing",
+      "sentError": "Unable to send contract for signing. Please try again."
+    }
+  }
+}

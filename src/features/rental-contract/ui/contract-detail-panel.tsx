@@ -38,15 +38,22 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [dialogStatus, setDialogStatus] = useState<
-    RentalContractStatus.ACTIVE | RentalContractStatus.REJECTED | RentalContractStatus.TERMINATED | null
+    | RentalContractStatus.PENDING_SIGNATURE
+    | RentalContractStatus.ACTIVE
+    | RentalContractStatus.TERMINATED
+    | null
   >(null);
 
   const statusKey = `status.${contract.status.toLowerCase()}` as const;
   const statusLabel = t.has(statusKey) ? t(statusKey) : contract.status;
 
   const availableActions = useMemo(() => {
-    if (contract.status === RentalContractStatus.PENDING) {
-      return [RentalContractStatus.ACTIVE, RentalContractStatus.REJECTED] as const;
+    if (contract.status === RentalContractStatus.DRAFT) {
+      return [RentalContractStatus.PENDING_SIGNATURE] as const;
+    }
+
+    if (contract.status === RentalContractStatus.PENDING_SIGNATURE) {
+      return [RentalContractStatus.ACTIVE] as const;
     }
 
     if (contract.status === RentalContractStatus.ACTIVE) {
@@ -57,7 +64,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   }, [contract.status]);
 
   const handleStatusUpdate = async (
-    nextStatus: RentalContractStatus.ACTIVE | RentalContractStatus.REJECTED | RentalContractStatus.TERMINATED,
+    nextStatus:
+      | RentalContractStatus.PENDING_SIGNATURE
+      | RentalContractStatus.ACTIVE
+      | RentalContractStatus.TERMINATED,
     reason?: string
   ) => {
     try {
@@ -77,14 +87,30 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   };
 
   const renderActionLabel = (
-    status: RentalContractStatus.ACTIVE | RentalContractStatus.REJECTED | RentalContractStatus.TERMINATED
+    status:
+      | RentalContractStatus.PENDING_SIGNATURE
+      | RentalContractStatus.ACTIVE
+      | RentalContractStatus.TERMINATED
   ) => {
-    if (status === RentalContractStatus.ACTIVE) return t('statusActions.approve');
-    if (status === RentalContractStatus.REJECTED) return t('statusActions.reject');
+    if (status === RentalContractStatus.PENDING_SIGNATURE) return t('statusActions.sendForSigning');
+    if (status === RentalContractStatus.ACTIVE) return t('statusActions.markActive');
     return t('statusActions.terminate');
   };
 
-  const reasonText = contract.terminationReason ?? contract.rejectionReason;
+  const signingProgress = [
+    {
+      label: t('detailPanel.signingProgress.sent'),
+      value: contract.sentForSigningAt ? formatContractDate(contract.sentForSigningAt, locale) : t('detailPanel.signingProgress.pending'),
+    },
+    {
+      label: t('detailPanel.signingProgress.ownerSigned'),
+      value: contract.ownerSignedAt ? formatContractDate(contract.ownerSignedAt, locale) : t('detailPanel.signingProgress.pending'),
+    },
+    {
+      label: t('detailPanel.signingProgress.tenantSigned'),
+      value: contract.tenantSignedAt ? formatContractDate(contract.tenantSignedAt, locale) : t('detailPanel.signingProgress.pending'),
+    },
+  ];
 
   return (
     <>
@@ -147,6 +173,11 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     <p className='mt-1 text-sm leading-6 text-main-secondary/70'>
                       {contract.tenant.fullName} · {formatContractCurrency(contract.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
                     </p>
+                    {contract.docusignEnvelopeId && (
+                      <p className='mt-1 text-xs text-main-secondary/60'>
+                        {t('detailPanel.envelopeId', { envelopeId: contract.docusignEnvelopeId })}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -170,14 +201,28 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                 </div>
               </div>
 
-              {reasonText && (
+              <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
+                <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
+                  {t('detailPanel.signingProgress.title')}
+                </p>
+                <div className='mt-3 space-y-3'>
+                  {signingProgress.map((item) => (
+                    <div key={item.label} className='flex items-center justify-between gap-4'>
+                      <span className='text-sm text-main-secondary/70'>{item.label}</span>
+                      <span className='text-sm font-semibold text-main-black'>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {contract.terminationReason && (
                 <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
-                    {contract.status === RentalContractStatus.REJECTED
-                      ? t('detailPanel.rejectionReason')
-                      : t('detailPanel.terminationReason')}
+                    {t('detailPanel.terminationReason')}
                   </p>
-                  <p className='mt-2 text-sm leading-6 text-main-secondary/80'>{reasonText}</p>
+                  <p className='mt-2 text-sm leading-6 text-main-secondary/80'>
+                    {contract.terminationReason}
+                  </p>
                 </div>
               )}
             </div>
@@ -225,10 +270,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                           {renderActionLabel(action)}
                         </p>
                         <p className='mt-0.5 text-xs leading-5 text-main-secondary/60'>
-                          {action === RentalContractStatus.ACTIVE
-                            ? t('statusActionHints.approve')
-                            : action === RentalContractStatus.REJECTED
-                              ? t('statusActionHints.reject')
+                          {action === RentalContractStatus.PENDING_SIGNATURE
+                            ? t('statusActionHints.sendForSigning')
+                            : action === RentalContractStatus.ACTIVE
+                              ? t('statusActionHints.markActive')
                               : t('statusActionHints.terminate')}
                         </p>
                       </div>

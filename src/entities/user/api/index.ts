@@ -1,5 +1,5 @@
 import http from '@/shared/lib/http'
-import type { User, LoginCredentials, LoginResponse, UpdateUserData } from '../model/types'
+import type { User, LoginCredentials, LoginResponse, UpdateUserData, SearchUserResponse } from '../model/types'
 
 /**
  * User API - All user-related HTTP methods
@@ -60,6 +60,16 @@ export const userApi = {
     formData.append('avatar', file)
     return http.post<{ url: string }>('/user/avatar', formData, { baseUrl: '' })
   },
+
+  /**
+   * Search user by email
+   */
+  searchByEmail: (email: string) =>
+    http.get<SearchUserResponse>(`/users/search?email=${encodeURIComponent(email)}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT
+        ? `${process.env.NEXT_PUBLIC_API_ENDPOINT}`
+        : undefined,
+    }),
 } as const
 
 // Re-export query keys and queries

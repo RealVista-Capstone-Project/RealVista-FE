@@ -2,8 +2,9 @@
   "ManageRentalContract": {
     "hero": {
       "eyebrow": "Bảng hợp đồng của chủ nhà",
-      "title": "Quản lý hợp đồng thuê với thao tác cập nhật trạng thái nhanh",
-      "subtitle": "Theo dõi hợp đồng thuê phía chủ nhà, xem trước hợp đồng đã tải lên và đưa từng hợp đồng sang bước xử lý tiếp theo ngay trong dashboard.",
+      "title": "Quản lý hợp đồng thuê DocuSign với luồng ký rõ ràng",
+      "subtitle": "Theo dõi hợp đồng thuê phía chủ nhà, giám sát từng cột mốc ký trên DocuSign và đưa từng hợp đồng qua vòng đời được quản lý ngay trong dashboard.",
+      "createButton": "Tạo hợp đồng",
       "stats": {
         "totalContracts": "Số hợp đồng hiển thị",
         "activeSelection": "Mục đang chọn"

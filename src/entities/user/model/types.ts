@@ -35,3 +35,16 @@ export interface Session {
   user: User
   expiresAt: number
 }
+
+export interface SearchUserResponse {
+  success: boolean
+  message: string
+  data: {
+    user_id: string
+    email: string
+    full_name: string
+    masked_phone: string
+    phone: string
+  }
+  timestamp: string
+}

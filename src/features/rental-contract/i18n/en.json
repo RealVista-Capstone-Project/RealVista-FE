@@ -4,18 +4,25 @@
       "title": "Contract Preview",
       "previewAlt": "Contract preview for {tenantName}",
       "previewBadge": "Preview",
-      "contractMeta": "Contract File",
+      "contractMeta": "DocuSign Envelope",
       "leaseStart": "Lease Start",
       "leaseEnd": "Lease End",
-      "rejectionReason": "Rejection Reason",
+      "envelopeId": "Envelope ID: {envelopeId}",
+      "signingProgress": {
+        "title": "Signing Progress",
+        "sent": "Sent for signing",
+        "ownerSigned": "Owner signed",
+        "tenantSigned": "Tenant signed",
+        "pending": "Pending"
+      },
       "terminationReason": "Termination Reason",
       "actionCardEyebrow": "Status Control",
-      "actionCardDescription": "Use the primary action below to move this rental contract to the next valid status."
+      "actionCardDescription": "Trigger the next DocuSign lifecycle step for this contract without leaving the dashboard."
     },
     "status": {
-      "pending": "Pending",
+      "draft": "Draft",
+      "pending_signature": "Pending Signature",
       "active": "Active",
-      "rejected": "Rejected",
       "expired": "Expired",
       "terminated": "Terminated"
     },
@@ -28,21 +35,21 @@
     },
     "statusActions": {
       "updateStatus": "Update Status",
-      "approve": "Approve Contract",
-      "reject": "Reject Contract",
+      "sendForSigning": "Send For Signing",
+      "markActive": "Mark As Active",
       "terminate": "Terminate Contract",
       "noAvailableAction": "No Available Action"
     },
     "statusActionHints": {
-      "approve": "Confirm and activate this pending rental contract.",
-      "reject": "Decline this pending contract and keep a note for the record.",
+      "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",
+      "markActive": "Use this when DocuSign reports a completed signing ceremony.",
       "terminate": "End the active contract early and keep a reason on file."
     },
     "statusDialog": {
-      "approveTitle": "Approve rental contract",
-      "approveDescription": "This will move the contract for {tenantName} into active status.",
-      "rejectTitle": "Reject rental contract",
-      "rejectDescription": "Add a short reason before rejecting the contract for {tenantName}.",
+      "sendTitle": "Send contract for signing",
+      "sendDescription": "This will send the DocuSign envelope to {tenantName} and move the contract into pending signature.",
+      "activateTitle": "Mark contract as active",
+      "activateDescription": "Use this after DocuSign confirms both parties have signed the contract for {tenantName}.",
       "terminateTitle": "Terminate rental contract",
       "terminateDescription": "Add a short reason before terminating the active contract for {tenantName}.",
       "reasonLabel": "Reason",

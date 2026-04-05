@@ -49,4 +49,16 @@ export const userQueries = {
       queryFn: () => userApi.list(),
       staleTime: 2 * 60 * 1000, // 2 minutes
     }),
+
+  /**
+   * Search user by email
+   */
+  searchByEmail: (email: string) =>
+    queryOptions({
+      queryKey: userKeys.search(email),
+      queryFn: () => userApi.searchByEmail(email),
+      enabled: false, // Only fetch on demand (manual trigger)
+      staleTime: 30 * 1000, // 30 seconds
+      retry: false,
+    }),
 } as const
