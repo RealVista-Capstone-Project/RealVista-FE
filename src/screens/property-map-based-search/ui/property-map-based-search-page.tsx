@@ -106,7 +106,7 @@ export function PropertyMapBasedSearchPage({
             ...mapBounds,
             search_text: searchValue || undefined,
             listing_type: initialListingType,
-            category: propertyType || undefined,
+            property_type: propertyType || undefined,
             min_price: filters.priceRange.min > 0 ? filters.priceRange.min : undefined,
             max_price: filters.priceRange.max < 20000000000 ? filters.priceRange.max : undefined,
             bedrooms: (filters.attributes.BEDROOMS as number) || undefined,
