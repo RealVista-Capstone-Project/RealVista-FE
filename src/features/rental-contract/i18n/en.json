@@ -42,7 +42,8 @@
       "sendToRenter": "Send to Renter for Signing",
       "markActive": "Mark As Active",
       "terminate": "Terminate Contract",
-      "noAvailableAction": "No Available Action"
+      "noAvailableAction": "No Available Action",
+      "signNow": "Sign Now"
     },
     "statusActionHints": {
       "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",
@@ -66,7 +67,9 @@
     "toast": {
       "updateSuccess": "Rental contract updated successfully",
       "updateError": "Failed to update rental contract. Please try again.",
-      "signingUrlReady": "Signing URL is ready — opening DocuSign in a new tab."
+      "signingUrlReady": "Signing URL is ready — opening DocuSign in a new tab.",
+      "signingUnavailable": "Signing is temporarily unavailable. Please try again later.",
+      "signingError": "Failed to load signing link. Please try again."
     },
     "common": {
       "cancel": "Cancel"

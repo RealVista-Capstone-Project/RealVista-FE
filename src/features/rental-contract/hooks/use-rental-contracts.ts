@@ -67,3 +67,10 @@ export function useSendToRenterMutation() {
     },
   });
 }
+
+export function useGetLandlordSigningUrlMutation() {
+  return useMutation({
+    mutationFn: ({ leaseId, returnUrl }: { leaseId: string; returnUrl?: string }) =>
+      rentalContractApi.getLandlordSigningUrl(leaseId, returnUrl),
+  });
+}

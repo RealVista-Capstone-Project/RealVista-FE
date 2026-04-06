@@ -1,0 +1,20 @@
+{
+  "LeaseSigningComplete": {
+    "title": "Ký hợp đồng thành công",
+    "subtitle": "Người thuê sẽ được thông báo để ký tiếp theo.",
+    "infoTitle": "Bước tiếp theo",
+    "infoBody": "Chữ ký của bạn đã được ghi nhận. Hệ thống sẽ tự động gửi hợp đồng cho người thuê để hoàn tất thủ tục ký.",
+    "contractIdLabel": "Mã hợp đồng:",
+    "steps": {
+      "landlordSigned": "Chủ nhà đã ký",
+      "waitingRenter": "Chờ người thuê ký",
+      "contractActive": "Hợp đồng có hiệu lực"
+    },
+    "backButton": "Quay lại danh sách hợp đồng",
+    "error": {
+      "title": "Ký không hoàn tất",
+      "subtitle": "Phiên ký đã kết thúc mà không hoàn tất. Bạn có thể quay lại danh sách hợp đồng và thử lại.",
+      "backButton": "Quay lại danh sách hợp đồng"
+    }
+  }
+}

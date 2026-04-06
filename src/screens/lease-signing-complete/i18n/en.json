@@ -1,0 +1,20 @@
+{
+  "LeaseSigningComplete": {
+    "title": "Lease signed successfully",
+    "subtitle": "The renter will be notified to sign next.",
+    "infoTitle": "What happens next",
+    "infoBody": "Your signature has been recorded. The system will automatically send the contract to the renter to complete the signing process.",
+    "contractIdLabel": "Contract ID:",
+    "steps": {
+      "landlordSigned": "Landlord has signed",
+      "waitingRenter": "Waiting for renter to sign",
+      "contractActive": "Contract becomes active"
+    },
+    "backButton": "Back to My Leases",
+    "error": {
+      "title": "Signing incomplete",
+      "subtitle": "The signing session ended without completing. You can return to your leases and try again.",
+      "backButton": "Back to My Leases"
+    }
+  }
+}

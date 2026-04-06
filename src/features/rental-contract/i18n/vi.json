@@ -42,7 +42,8 @@
       "sendToRenter": "Gửi cho người thuê ký",
       "markActive": "Chuyển sang hiệu lực",
       "terminate": "Chấm dứt hợp đồng",
-      "noAvailableAction": "Không có thao tác"
+      "noAvailableAction": "Không có thao tác",
+      "signNow": "Ký ngay"
     },
     "statusActionHints": {
       "sendForSigning": "Tạo hoặc dùng lại phong bì DocuSign và gửi cho cả hai bên.",
@@ -66,7 +67,9 @@
     "toast": {
       "updateSuccess": "Cập nhật hợp đồng thuê thành công",
       "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại.",
-      "signingUrlReady": "Đường dẫn ký đã sẵn sàng — đang mở DocuSign trong tab mới."
+      "signingUrlReady": "Đường dẫn ký đã sẵn sàng — đang mở DocuSign trong tab mới.",
+      "signingUnavailable": "Tính năng ký tạm thời không khả dụng. Vui lòng thử lại sau.",
+      "signingError": "Không thể tải liên kết ký. Vui lòng thử lại."
     },
     "common": {
       "cancel": "Hủy"

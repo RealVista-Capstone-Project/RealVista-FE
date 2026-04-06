@@ -33,17 +33,17 @@ export function getContractInitials(name: string) {
 export function getRentalContractStatusColor(status: RentalContractStatus) {
   switch (status) {
     case RentalContractStatus.DRAFT:
-      return 'bg-slate-100 text-slate-700 border border-slate-200';
-    case RentalContractStatus.PENDING_RENTER:
-      return 'bg-amber-50 text-amber-700 border border-amber-200';
+      return 'bg-slate-100 text-slate-600 border border-slate-200';
     case RentalContractStatus.PENDING_LANDLORD:
-      return 'bg-orange-50 text-orange-700 border border-orange-200';
+      return 'bg-amber-50 text-amber-700 border border-amber-200';
+    case RentalContractStatus.PENDING_RENTER:
+      return 'bg-blue-50 text-blue-700 border border-blue-200';
     case RentalContractStatus.ACTIVE:
       return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
     case RentalContractStatus.EXPIRED:
       return 'bg-slate-100 text-slate-600 border border-slate-200';
     case RentalContractStatus.TERMINATED:
-      return 'bg-violet-50 text-violet-700 border border-violet-200';
+      return 'bg-slate-100 text-slate-600 border border-slate-300';
     case RentalContractStatus.REJECTED:
       return 'bg-red-50 text-red-700 border border-red-200';
     default:

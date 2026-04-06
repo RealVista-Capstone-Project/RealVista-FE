@@ -8,6 +8,7 @@ import {
 } from '@/entities/rental-contract';
 import { useManageRentalContractContext } from '../model/manage-rental-contract-context';
 import {
+  useGetLandlordSigningUrlMutation,
   useSendToLandlordMutation,
   useSendToRenterMutation,
   useUpdateRentalContractStatusMutation,
@@ -21,7 +22,7 @@ import {
   PopoverTrigger,
 } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { ChevronDown, Eye, ExternalLink, FileText, Loader2, X } from 'lucide-react';
+import { ChevronDown, Eye, ExternalLink, FileText, Loader2, Pen, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   formatContractCurrency,
@@ -49,6 +50,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
   const sendToLandlordMutation = useSendToLandlordMutation();
   const sendToRenterMutation = useSendToRenterMutation();
+  const getLandlordSigningUrlMutation = useGetLandlordSigningUrlMutation();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
@@ -61,6 +63,32 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
     sendToLandlordMutation.isPending ||
     sendToRenterMutation.isPending ||
     updateStatusMutation.isPending;
+
+  // Show "Sign Now" when PENDING_LANDLORD, owner hasn't signed yet, envelope exists
+  const canSignNow =
+    contract.status === RentalContractStatus.PENDING_LANDLORD &&
+    !contract.ownerSignedAt &&
+    Boolean(contract.docusignEnvelopeId);
+
+  const handleSignNow = async () => {
+    try {
+      const returnUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}`
+          : undefined;
+      const data = await getLandlordSigningUrlMutation.mutateAsync({
+        leaseId: contract.id,
+        returnUrl,
+      });
+      if (!data.signing_url) {
+        toast.error(t('toast.signingUnavailable'));
+        return;
+      }
+      window.open(data.signing_url, '_blank', 'noopener,noreferrer');
+    } catch {
+      toast.error(t('toast.signingError'));
+    }
+  };
 
   const statusKey = `status.${contract.status.toLowerCase()}` as const;
   const statusLabel = t.has(statusKey) ? t(statusKey) : contract.status;
@@ -293,6 +321,27 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                 </p>
               </div>
             </div>
+
+            {canSignNow && (
+              <Button
+                type='button'
+                className='mb-3 h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_rgba(5,150,105,0.22)] hover:bg-emerald-700 disabled:opacity-60'
+                onClick={handleSignNow}
+                disabled={getLandlordSigningUrlMutation.isPending}
+              >
+                {getLandlordSigningUrlMutation.isPending ? (
+                  <>
+                    <Loader2 className='h-4 w-4 animate-spin' />
+                    {t('statusDialog.updating')}
+                  </>
+                ) : (
+                  <>
+                    <Pen className='h-4 w-4' />
+                    {t('statusActions.signNow')}
+                  </>
+                )}
+              </Button>
+            )}
 
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
