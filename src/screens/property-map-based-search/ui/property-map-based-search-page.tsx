@@ -32,7 +32,7 @@ import { HCM_CITY_CENTER } from '@/shared/constants';
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
   category: [],
-  priceRange: { min: 1000, max: 1234567 },
+  priceRange: { min: 0, max: 20000000000 },
   bedrooms: 0,
   bathrooms: 0,
   rentalPeriod: 'any',
@@ -69,15 +69,15 @@ export function PropertyMapBasedSearchPage({
       mapBounds
         ? {
             ...mapBounds,
-            search_text: searchValue,
+            search_text: searchValue || undefined,
             listing_type: initialListingType,
             category: filters.category.length > 0 ? filters.category.join(',') : undefined,
-            min_price: filters.priceRange.min,
-            max_price: filters.priceRange.max,
+            min_price: filters.priceRange.min > 0 ? filters.priceRange.min : undefined,
+            max_price: filters.priceRange.max < 20000000000 ? filters.priceRange.max : undefined,
             // TODO: will be refactored with generic Attribute filters
             bedrooms: filters.bedrooms > 0 ? filters.bedrooms : undefined,
             bathrooms: filters.bathrooms > 0 ? filters.bathrooms : undefined,
-            rental_period: filters.rentalPeriod,
+            rental_period: filters.rentalPeriod !== 'any' ? filters.rentalPeriod : undefined,
             page: currentPage,
             size: pageSize,
           }

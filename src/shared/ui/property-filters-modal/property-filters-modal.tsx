@@ -269,14 +269,14 @@ export function PropertyFiltersModal({
           <div className='pb-6 border-b border-grey-100'>
             <PriceRangeSlider
               minValue={0}
-              maxValue={2000000}
+              maxValue={20000000000}
               currentMin={priceMin}
               currentMax={priceMax}
               onMinChange={setPriceMin}
               onMaxChange={setPriceMax}
               histogramData={[6, 8, 8, 12, 21, 35, 38, 56, 48, 32, 23, 48, 23, 17, 12, 6]}
               title={translations.priceRange}
-              step={10000}
+              step={100000000}
             />
           </div>
 
