@@ -21,7 +21,7 @@ import {
   PopoverTrigger,
 } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { ChevronDown, Eye, ExternalLink, FileText, X } from 'lucide-react';
+import { ChevronDown, Eye, ExternalLink, FileText, Loader2, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   formatContractCurrency,
@@ -304,9 +304,18 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   {availableActions.length === 0
                     ? t('statusActions.noAvailableAction')
                     : isPending
-                      ? t('statusDialog.updating')
-                      : t('statusActions.updateStatus')}
-                  <ChevronDown className='h-4 w-4' />
+                      ? (
+                        <>
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                          {t('statusDialog.updating')}
+                        </>
+                      )
+                      : (
+                        <>
+                          {t('statusActions.updateStatus')}
+                          <ChevronDown className='h-4 w-4' />
+                        </>
+                      )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent

@@ -767,7 +767,7 @@ export function CreateRentalContractPage() {
                       variant='outline'
                       className='h-11 rounded-xl border-[#DED1FF] bg-white px-4 hover:bg-[#F8F4FF]'
                       onClick={saveDraft}
-                      disabled={createContractMutation.isPending}
+                      disabled={createContractMutation.isPending || sendToLandlordMutation.isPending}
                     >
                       <Save className='h-4 w-4' />
                       {t('actions.saveDraft')}
@@ -802,10 +802,19 @@ export function CreateRentalContractPage() {
                         type='button'
                         className='h-11 rounded-xl bg-main-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-main-primary-hover'
                         onClick={sendForSigning}
-                        disabled={createContractMutation.isPending}
+                        disabled={createContractMutation.isPending || sendToLandlordMutation.isPending}
                       >
-                        <SendHorizontal className='h-4 w-4' />
-                        {createContractMutation.isPending ? t('actions.sending') : t('actions.sendForSigning')}
+                        {(createContractMutation.isPending || sendToLandlordMutation.isPending) ? (
+                          <>
+                            <Loader2 className='h-4 w-4 animate-spin' />
+                            {t('actions.sending')}
+                          </>
+                        ) : (
+                          <>
+                            <SendHorizontal className='h-4 w-4' />
+                            {t('actions.sendForSigning')}
+                          </>
+                        )}
                       </Button>
                     )}
                   </div>
