@@ -25,4 +25,7 @@ export const userKeys = {
 
   // User sessions
   sessions: () => [...userKeys.current(), 'sessions'] as const,
+
+  // Search user by email
+  search: (email: string) => [...userKeys.all, 'search', email] as const,
 } as const

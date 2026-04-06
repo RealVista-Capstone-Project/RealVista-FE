@@ -78,7 +78,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
-      const locale = params.locale;
+      const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
       return;
     }
@@ -102,7 +102,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
       if (conversationId) {
         if (isMobile) {
-          const locale = params.locale;
+          const locale = params?.locale || 'vi';
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {
@@ -432,6 +432,16 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               <FeatureStat label={t('features.request')} value='12' icon='📄' />
             </div>
           )}
+        </div>
+
+        {/* About this listing */}
+        <div className='mb-8 flex flex-col gap-4'>
+          <h2 className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
+            {t('aboutThisListing', { fallback: 'About this listing' })}
+          </h2>
+          <p className='text-base font-medium leading-[1.6] text-main-black/70 whitespace-pre-wrap font-sans'>
+            {listing.content || property.description}
+          </p>
         </div>
 
         <div className='mb-8 h-px w-full bg-purple-92' />

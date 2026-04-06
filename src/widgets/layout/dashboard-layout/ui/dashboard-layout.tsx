@@ -10,6 +10,7 @@ import {
   MessageCircle,
   TrendingUp,
   Users,
+  Building2,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
@@ -51,14 +52,15 @@ const defaultSidebarItems: SidebarMenuItem[] = [
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
   { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
-      {
-      id: 'manage-agent',
-      label: 'Manage Agent',
-      href: ROUTES.dashboard.manageAgent,
-      icon: Users,
-    },
+  {
+    id: 'manage-agent',
+    label: 'Manage Agent',
+    href: ROUTES.dashboard.manageAgent,
+    icon: Users,
+  },
 
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
+  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
 ];
 
 const defaultUser = {
@@ -103,7 +105,6 @@ export function DashboardLayout({
     }
     return t('pageTitle.default');
   }, [pathname, t]);
-
 
   /**
    * Determine if a menu item is active based on the current pathname

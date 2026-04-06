@@ -1,6 +1,22 @@
 import http from '@/shared/lib/http'
 import type { ApiResponse } from '@/shared/types/api'
-import type { User, UserProfile, LoginCredentials, LoginResponse, UpdateUserData, UpdateMeData } from '../model/types'
+import type {
+  User,
+  UserProfile,
+  LoginCredentials,
+  LoginResponse,
+  UpdateUserData,
+  UpdateMeData,
+  UserSearchResponse,
+} from '../model/types'
+
+/** Response shape from POST /auth/register */
+export interface RegisterResponse {
+  user_id: string
+  email: string
+  first_name: string
+  last_name: string
+}
 
 /**
  * User API - All user-related HTTP methods
@@ -49,8 +65,11 @@ export const userApi = {
   register: (data: {
     email: string
     password: string
-    name: string
-  }) => http.post<LoginResponse>('/auth/register', data),
+    first_name: string
+    last_name: string
+    phone_number: string
+    role: string
+  }) => http.post<RegisterResponse>('/auth/register', data),
 
   /**
    * Update user profile
@@ -78,6 +97,11 @@ export const userApi = {
     formData.append('avatar', file)
     return http.post<{ url: string }>('/user/avatar', formData, { baseUrl: '' })
   },
+  /**
+   * Search user by email (masked phone) for owner assignment
+   */
+  searchByEmail: (email: string) =>
+    http.get<ApiResponse<UserSearchResponse>>(`/users/search?email=${email}`),
 } as const
 
 // Re-export query keys and queries

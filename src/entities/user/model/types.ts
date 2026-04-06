@@ -58,3 +58,11 @@ export interface Session {
   user: User
   expiresAt: number
 }
+
+export interface UserSearchResponse {
+  user_id: string;
+  email: string;
+  full_name: string;
+  masked_phone: string;
+  phone: string;
+}
