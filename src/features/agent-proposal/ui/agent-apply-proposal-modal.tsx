@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
-import { Search, FileText, Check, ChevronRight, AlertCircle, Clock, Percent, Award, Loader2 } from 'lucide-react';
+import { Search, FileText, Check, ChevronRight, Clock, Percent, Award, Loader2, SendHorizonal } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/ui/dialog/dialog';
 import { Button } from '@/shared/ui/button';
 import { agentEngagementApi } from '@/entities/agent-engagement/api/agent-engagement.api';
@@ -199,7 +199,7 @@ export function AgentApplyProposalModal({
           ) : (
             <div className='p-8 space-y-6 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300'>
               <div className='size-16 rounded-3xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-1 border border-indigo-100 shadow-sm'>
-                <Check size={32} strokeWidth={2.5} />
+                <SendHorizonal size={30} strokeWidth={2.5} className='-rotate-12 translate-x-0.5' />
               </div>
               <div>
                 <h3 className='text-xl font-bold text-slate-900'>{t('confirmTitle')}</h3>
@@ -225,12 +225,6 @@ export function AgentApplyProposalModal({
                 </div>
               )}
 
-              <div className='flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100 text-amber-800 text-xs mt-2 text-left max-w-[420px]'>
-                <AlertCircle size={16} className='shrink-0 text-amber-500 mt-0.5' />
-                <p className='leading-relaxed'>
-                  Sau khi gửi, thông tin proposal sẽ được gắn liền với yêu cầu quản lý bất động sản này và không thể thay đổi cho đến khi chủ sở hữu phản hồi.
-                </p>
-              </div>
             </div>
           )}
         </div>

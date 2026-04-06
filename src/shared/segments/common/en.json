@@ -6,7 +6,8 @@
       "insight": "Insight",
       "managedListings": "Managed Listings",
       "tenants": "Tenants",
-      "messages": "Messages"
+      "messages": "Messages",
+      "manageProposals": "Proposal Library"
     },
     "actionButton": {
       "addProperty": "Add a property",
@@ -425,6 +426,7 @@
     "pageTitle": "Proposal Library",
     "pageSubtitle": "{count} professional proposal templates",
     "createNew": "New Proposal",
+    "loadingProposals": "Loading proposals...",
     "searchPlaceholder": "Search proposals...",
     "emptyTitle": "No proposals yet",
     "emptyDesc": "Create your first proposal template to start applying",

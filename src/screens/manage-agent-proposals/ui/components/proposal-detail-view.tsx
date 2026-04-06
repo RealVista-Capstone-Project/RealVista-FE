@@ -23,7 +23,7 @@ function StatusBadge({ status, t }: { status: AgentProposalStatus; t: ReturnType
   const isActive = status === AgentProposalStatus.ACTIVE;
   return (
     <span className={cn(
-      'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+      'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
       isActive
         ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
         : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
@@ -157,34 +157,6 @@ export function ProposalDetailView({
           </div>
         </div>
 
-        {/* Key Highlights */}
-        <div>
-          <h3 className='mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2'>
-             <div className='size-1 bg-violet-400 rounded-full' />
-            {t('sectionHighlights')}
-          </h3>
-          <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
-            <HighlightCard
-              icon={<ShieldCheck size={20} className='text-indigo-600' />}
-              title={t('highlight1Title')}
-              desc={t('highlight1Desc')}
-              color='indigo'
-            />
-            <HighlightCard
-              icon={<Sparkles size={20} className='text-violet-600' />}
-              title={t('highlight2Title')}
-              desc={t('highlight2Desc')}
-              color='violet'
-            />
-            <HighlightCard
-              icon={<RefreshCw size={20} className='text-emerald-600' />}
-              title={t('highlight3Title')}
-              desc={t('highlight3Desc')}
-              color='emerald'
-            />
-          </div>
-        </div>
-
         {/* Activity Timeline */}
         <div>
           <h3 className='mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2'>
@@ -230,24 +202,6 @@ export function ProposalDetailView({
           </Button>
         )}
       </div>
-    </div>
-  );
-}
-
-function HighlightCard({
-  icon, title, desc, color,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  color: 'indigo' | 'violet' | 'emerald';
-}) {
-  const bg = { indigo: 'bg-indigo-50/60', violet: 'bg-violet-50/60', emerald: 'bg-emerald-50/60' };
-  return (
-    <div className={cn('rounded-xl border border-slate-100 p-4', bg[color])}>
-      <div className='mb-2'>{icon}</div>
-      <p className='text-sm font-semibold text-slate-800 mb-1'>{title}</p>
-      <p className='text-xs text-slate-500 leading-relaxed'>{desc}</p>
     </div>
   );
 }

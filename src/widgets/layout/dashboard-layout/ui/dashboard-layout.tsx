@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Users,
   Building2,
+  FileText,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
@@ -85,7 +86,7 @@ const agentSidebarItems: SidebarMenuItem[] = [
     id: 'proposals',
     label: 'My Proposals',
     href: ROUTES.dashboard.manageProposals,
-    icon: Calendar,
+    icon: FileText,
   },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
@@ -103,7 +104,7 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   const { data: session } = useAuthSession();
-  const isAgent = session?.user?.role === 'AGENT';
+  const isAgent = session?.user?.role === 'AGENT' || session?.user?.backendRoles?.includes('AGENT');
 
   const finalSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
@@ -132,6 +133,12 @@ export function DashboardLayout({
     }
     if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
       return t('pageTitle.messages');
+    }
+    if (
+      pathname === ROUTES.dashboard.manageProposals ||
+      pathname.startsWith(ROUTES.dashboard.manageProposals)
+    ) {
+      return t('pageTitle.manageProposals');
     }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');

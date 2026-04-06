@@ -6,7 +6,8 @@
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
       "tenants": "Người thuê",
-      "messages": "Tin nhắn"
+      "messages": "Tin nhắn",
+      "manageProposals": "Hồ sơ đề xuất"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
@@ -426,6 +427,7 @@
     "pageTitle": "Hồ sơ đề xuất",
     "pageSubtitle": "{count} mẫu hồ sơ chuyên nghiệp",
     "createNew": "Tạo mới",
+    "loadingProposals": "Đang tải hồ sơ...",
     "searchPlaceholder": "Tìm kiếm hồ sơ...",
     "emptyTitle": "Chưa có hồ sơ nào",
     "emptyDesc": "Tạo hồ sơ đề xuất đầu tiên để bắt đầu ứng tuyển",
