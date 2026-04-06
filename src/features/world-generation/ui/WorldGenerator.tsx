@@ -10,10 +10,12 @@ export function WorldGenerator({
   propertyId,
   onComplete,
   pendingOperationId,
+  roomName,
 }: {
   propertyId: string;
   onComplete?: () => void;
   pendingOperationId?: string;
+  roomName?: string;
 }) {
   const { phase, progressDescription, error, uploadedCount, generate, cancel, reset, resumeOperation } = useGenerate3d(propertyId)
   const [images, setImages] = useState<AzimuthImage[]>([])
@@ -55,7 +57,7 @@ export function WorldGenerator({
 
   const handleGenerate = () => {
     if (images.length === REQUIRED_IMAGES_COUNT) {
-      generate(images, selectedModel, `Web Gen - Prop ${propertyId}`)
+      generate(images, selectedModel, `Web Gen - Prop ${propertyId}`, roomName)
     }
   }
 

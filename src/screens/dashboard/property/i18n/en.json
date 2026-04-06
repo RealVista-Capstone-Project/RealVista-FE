@@ -1,0 +1,25 @@
+{
+  "PropertyManagement": {
+    "pageTitle": "Property Management",
+    "pageDesc": "Manage your property listings, viewed stats, and active status.",
+    "createNew": "Create Property",
+    "searchPlaceholder": "Search by title, location or ID...",
+    "noProperties": "No Properties Found",
+    "noPropertiesDesc": "You haven't added any properties yet. Click the button below to get started.",
+    "colImage": "Image",
+    "colAddress": "Property Details",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "statusAVAILABLE": "Available",
+    "statusDRAFT": "Draft",
+    "statusSOLD": "Sold",
+    "statusRESERVED": "Reserved",
+    "statusPENDING": "Pending",
+    "statusVERIFIED": "Verified",
+    "editAction": "Edit",
+    "3dAction": "3D Management",
+    "viewAction": "View",
+    "verifyAction": "Verify"
+  }
+}

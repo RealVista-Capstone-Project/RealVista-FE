@@ -119,7 +119,7 @@ export function useGenerate3d(propertyId: string) {
   }, []);
 
   const generate = useCallback(
-    async (images: AzimuthImage[], model: MarbleModel, displayName?: string) => {
+    async (images: AzimuthImage[], model: MarbleModel, displayName?: string, roomName?: string) => {
       abortRef.current = false;
       setState({
         phase: 'uploading',
@@ -185,6 +185,7 @@ export function useGenerate3d(propertyId: string) {
         const generationRes = await propertyApi.initiate3dOperation(propertyId, {
           display_name: displayName,
           model: model,
+          room_name: roomName,
           images: uploadedAssets,
         });
 

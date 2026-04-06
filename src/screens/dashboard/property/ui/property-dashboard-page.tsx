@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck } from 'lucide-react';
+import { Settings, Plus, Search, Edit, Eye, Home, ShieldCheck, Box } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -204,7 +204,7 @@ export default function PropertyDashboardPage() {
                       </Badge>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
-                      <div className='flex items-center justify-end gap-2'>
+                      <div className='flex items-center justify-end gap-1.5'>
                         <Button
                           variant='ghost'
                           size='icon'
@@ -214,6 +214,17 @@ export default function PropertyDashboardPage() {
                           <Link href={`/dashboard/property/${property.property_id}/edit`}>
                             <Edit className='w-4 h-4' />
                             <span className='sr-only'>{t('editAction', { default: 'Edit' })}</span>
+                          </Link>
+                        </Button>
+                        <Button
+                          variant='ghost'
+                          size='icon'
+                          className='h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                          asChild
+                        >
+                          <Link href={`/dashboard/property/${property.property_id}/3d`}>
+                            <Box className='w-4 h-4' />
+                            <span className='sr-only'>{t('3dAction', { default: '3D Management' })}</span>
                           </Link>
                         </Button>
                         <Button

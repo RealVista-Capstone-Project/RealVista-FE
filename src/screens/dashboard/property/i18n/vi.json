@@ -1,0 +1,25 @@
+{
+  "PropertyManagement": {
+    "pageTitle": "Quản lý Bất động sản",
+    "pageDesc": "Quản lý các danh sách bất động sản của bạn, thống kê lượt xem và trạng thái hoạt động.",
+    "createNew": "Thêm Bất động sản",
+    "searchPlaceholder": "Tìm kiếm theo tiêu đề, vị trí hoặc ID...",
+    "noProperties": "Không tìm thấy Bất động sản nào",
+    "noPropertiesDesc": "Bạn chưa thêm bất kỳ bất động sản nào. Bấm vào nút bên dưới để bắt đầu.",
+    "colImage": "Hình ảnh",
+    "colAddress": "Chi tiết Bất động sản",
+    "colType": "Loại hình",
+    "colStatus": "Trạng thái",
+    "colActions": "Hành động",
+    "statusAVAILABLE": "Đang bán",
+    "statusDRAFT": "Bản nháp",
+    "statusSOLD": "Đã bán",
+    "statusRESERVED": "Đã đặt chỗ",
+    "statusPENDING": "Chờ duyệt",
+    "statusVERIFIED": "Đã xác minh",
+    "editAction": "Chỉnh sửa",
+    "3dAction": "Quản lý 3D",
+    "viewAction": "Xem",
+    "verifyAction": "Xác minh"
+  }
+}
