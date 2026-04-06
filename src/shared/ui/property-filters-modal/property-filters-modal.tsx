@@ -6,41 +6,36 @@ import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
 import { PriceRangeSlider } from '@/shared/ui/price-range-slider';
+import {
+  PROPERTY_TYPES,
+  ATTRIBUTE_LABELS,
+  ATTRIBUTE_TYPES
+} from '@/shared/config/property-types';
+import { Switch } from '@/shared/ui/switch/switch';
 
-// TODO: The property category should be fetched from the GET API for property categories
-export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND';
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
 
 export interface PropertyFilters {
-  category: PropertyCategory[];
   priceRange: {
     min: number;
     max: number;
   };
-  bedrooms: number;
-  bathrooms: number;
   rentalPeriod: RentalPeriod;
+  attributes: Record<string, number | boolean | string | undefined>;
 }
 
 export interface PropertyFiltersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   filters: PropertyFilters;
+  propertyType?: string;
   onApply: (filters: PropertyFilters) => void;
   onReset: () => void;
   translations: {
     title: string;
     category: string;
-    categories: {
-      residential: string;
-      commercial: string;
-      industrial: string;
-      land: string;
-    };
     priceRange: string;
     features: string;
-    bedroom: string;
-    bathroom: string;
     rentalPeriod: {
       label: string;
       any: string;
@@ -53,30 +48,7 @@ export interface PropertyFiltersModalProps {
   };
 }
 
-function CategoryButton({
-  selected,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      className={cn(
-        'rounded-lg px-6 py-2.5 text-sm font-medium transition-colors',
-        selected
-          ? 'bg-main-primary text-white'
-          : 'border-[1.5px] border-purple-92 bg-white text-main-black hover:bg-purple-98'
-      )}
-    >
-      {children}
-    </button>
-  );
-}
+
 
 function Stepper({
   value,
@@ -156,6 +128,7 @@ export function PropertyFiltersModal({
   open,
   onOpenChange,
   filters,
+  propertyType,
   onApply,
   onReset,
   translations,
@@ -163,6 +136,10 @@ export function PropertyFiltersModal({
   const [localFilters, setLocalFilters] = useState<PropertyFilters>(filters);
   const [priceMin, setPriceMin] = useState(filters.priceRange.min);
   const [priceMax, setPriceMax] = useState(filters.priceRange.max);
+
+  // Find the selected property type configuration
+  const typeConfig = PROPERTY_TYPES.flatMap((cat) => cat.types).find((t) => t.code === propertyType);
+  const relevantAttributes = typeConfig?.attributes || [];
 
   // Reset local state when modal opens or filters change
   const handleOpenChange = (newOpen: boolean) => {
@@ -202,68 +179,7 @@ export function PropertyFiltersModal({
 
         {/* Scrollable content area */}
         <div className='flex-1 overflow-y-auto px-6 pb-6 space-y-6'>
-          {/* Category Selection */}
-          <div className='space-y-3 pb-6 border-b border-grey-100'>
-            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.category}</h3>
-            <div className='flex flex-wrap gap-3'>
-              <CategoryButton
-                selected={localFilters.category.includes('RESIDENTIAL')}
-                onClick={() => {
-                  const newCategories = localFilters.category.includes('RESIDENTIAL')
-                    ? localFilters.category.filter((c) => c !== 'RESIDENTIAL')
-                    : [...localFilters.category, 'RESIDENTIAL'];
-                  setLocalFilters({
-                    ...localFilters,
-                    category: newCategories as PropertyCategory[],
-                  });
-                }}
-              >
-                {translations.categories.residential}
-              </CategoryButton>
-              <CategoryButton
-                selected={localFilters.category.includes('COMMERCIAL')}
-                onClick={() => {
-                  const newCategories = localFilters.category.includes('COMMERCIAL')
-                    ? localFilters.category.filter((c) => c !== 'COMMERCIAL')
-                    : [...localFilters.category, 'COMMERCIAL'];
-                  setLocalFilters({
-                    ...localFilters,
-                    category: newCategories as PropertyCategory[],
-                  });
-                }}
-              >
-                {translations.categories.commercial}
-              </CategoryButton>
-              <CategoryButton
-                selected={localFilters.category.includes('INDUSTRIAL')}
-                onClick={() => {
-                  const newCategories = localFilters.category.includes('INDUSTRIAL')
-                    ? localFilters.category.filter((c) => c !== 'INDUSTRIAL')
-                    : [...localFilters.category, 'INDUSTRIAL'];
-                  setLocalFilters({
-                    ...localFilters,
-                    category: newCategories as PropertyCategory[],
-                  });
-                }}
-              >
-                {translations.categories.industrial}
-              </CategoryButton>
-              <CategoryButton
-                selected={localFilters.category.includes('LAND')}
-                onClick={() => {
-                  const newCategories = localFilters.category.includes('LAND')
-                    ? localFilters.category.filter((c) => c !== 'LAND')
-                    : [...localFilters.category, 'LAND'];
-                  setLocalFilters({
-                    ...localFilters,
-                    category: newCategories as PropertyCategory[],
-                  });
-                }}
-              >
-                {translations.categories.land}
-              </CategoryButton>
-            </div>
-          </div>
+
 
           {/* Price Range */}
           <div className='pb-6 border-b border-grey-100'>
@@ -280,29 +196,58 @@ export function PropertyFiltersModal({
             />
           </div>
 
-          {/* Features */}
-          {/* TODO: those attributes should be fetched dynamically from the backend based on the property cateogry */}
-          <div className='space-y-4 pb-6 border-b border-grey-100'>
-            <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
-            <div className='flex items-center justify-between'>
-              <span className='text-base font-normal text-main-black'>{translations.bedroom}</span>
-              <Stepper
-                value={localFilters.bedrooms}
-                onChange={(value) => setLocalFilters({ ...localFilters, bedrooms: value })}
-                min={0}
-                max={10}
-              />
+          {/* Features - Dynamic based on propertyType */}
+          {relevantAttributes.length > 0 && (
+            <div className='space-y-4 pb-6 border-b border-grey-100'>
+              <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
+              <div className='grid grid-cols-1 gap-y-4 gap-x-6'>
+                {relevantAttributes.map((attrKey) => {
+                  const label = ATTRIBUTE_LABELS[attrKey];
+                  const type = ATTRIBUTE_TYPES[attrKey];
+                  const currentValue = localFilters.attributes[attrKey];
+
+                  if (type === 'number') {
+                    return (
+                      <div key={attrKey} className='flex items-center justify-between'>
+                        <span className='text-base font-normal text-main-black'>{label}</span>
+                        <Stepper
+                          value={(currentValue as number) || 0}
+                          onChange={(value) =>
+                            setLocalFilters({
+                              ...localFilters,
+                              attributes: { ...localFilters.attributes, [attrKey]: value },
+                            })
+                          }
+                          min={0}
+                          max={20}
+                        />
+                      </div>
+                    );
+                  }
+
+                  if (type === 'boolean') {
+                    return (
+                      <div key={attrKey} className='flex items-center justify-between'>
+                        <span className='text-base font-normal text-main-black'>{label}</span>
+                        <Switch
+                          checked={!!currentValue}
+                          onCheckedChange={(checked) =>
+                            setLocalFilters({
+                              ...localFilters,
+                              attributes: { ...localFilters.attributes, [attrKey]: checked },
+                            })
+                          }
+                        />
+                      </div>
+                    );
+                  }
+
+                  // Handle text/other attributes if needed, e.g., with a simple Select
+                  return null;
+                })}
+              </div>
             </div>
-            <div className='flex items-center justify-between'>
-              <span className='text-base font-normal text-main-black'>{translations.bathroom}</span>
-              <Stepper
-                value={localFilters.bathrooms}
-                onChange={(value) => setLocalFilters({ ...localFilters, bathrooms: value })}
-                min={0}
-                max={10}
-              />
-            </div>
-          </div>
+          )}
 
           {/* Rental Period */}
           <div className='space-y-3'>
