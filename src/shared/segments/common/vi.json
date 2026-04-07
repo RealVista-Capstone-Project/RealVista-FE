@@ -1,10 +1,19 @@
 {
   "DashboardLayout": {
+    "menu": {
+      "dashboard": "Bảng điều khiển",
+      "insight": "Thống kê",
+      "listings": "Bài đăng của tôi",
+      "myEngagements": "Engagement của tôi",
+      "tenants": "Người thuê",
+      "messages": "Tin nhắn"
+    },
     "pageTitle": {
       "default": "RealVista",
       "dashboard": "Dashboard",
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
+      "myEngagements": "Engagement của tôi",
       "tenants": "Người thuê",
       "messages": "Tin nhắn"
     },
@@ -206,15 +215,38 @@
       "loading": "Đang tải...",
       "avatar": "Ảnh đại diện",
       "upload": "Tải lên",
+      "uploading": "Đang tải...",
       "remove": "Xoá",
       "firstName": "Họ",
       "firstNamePlaceholder": "Nhập họ",
       "lastName": "Tên",
       "lastNamePlaceholder": "Nhập tên",
+      "businessName": "Tên doanh nghiệp / hiển thị",
+      "businessNamePlaceholder": "Nhập tên doanh nghiệp hoặc tên hiển thị",
       "phone": "Số điện thoại",
       "phonePlaceholder": "+84 000-000-0000",
+      "changePhone": "Thay đổi",
+      "changePhoneTitle": "Thay đổi số điện thoại",
+      "newPhone": "Số điện thoại",
       "verify": "Xác minh",
+      "change": "Thay đổi",
+      "verifyAction": "Xác minh",
+      "changeAction": "Thay đổi",
+      "verified": "Đã xác minh",
       "email": "Email",
+      "verifyEmailTitle": "Xác minh email",
+      "sendOtp": "Gửi mã OTP",
+      "resendOtp": "Gửi lại",
+      "otpSent": "Mã OTP đã được gửi tới email của bạn",
+      "otpLabel": "Mã OTP",
+      "otpPlaceholder": "Nhập mã 6 chữ số",
+      "otpCountdown": "Gửi lại sau {seconds}s",
+      "verifying": "Đang xác minh...",
+      "verifyOtp": "Xác minh",
+      "phoneOtpSent": "Mã OTP đã được gửi tới số điện thoại của bạn",
+      "tooManyOtpAttempts": "Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.",
+      "invalidPhoneNumber": "Số điện thoại không hợp lệ. Vui lòng dùng định dạng +84xxxxxxxxx.",
+      "recaptchaError": "Xác minh reCAPTCHA thất bại. Vui lòng thử lại.",
       "password": "Mật khẩu",
       "changePassword": "Đổi mật khẩu",
       "currentPassword": "Mật khẩu hiện tại",
@@ -286,7 +318,10 @@
       "passwordChanged": "Đổi mật khẩu thành công",
       "passwordChangeFailed": "Mật khẩu hiện tại không đúng hoặc không hợp lệ",
       "accountDeleted": "Đã xoá tài khoản",
-      "accountDeleteFailed": "Xoá tài khoản thất bại"
+      "accountDeleteFailed": "Xoá tài khoản thất bại",
+      "emailVerified": "Email đã được xác minh thành công!",
+      "phoneVerified": "Số điện thoại đã được xác minh thành công!",
+      "otpInvalid": "Mã OTP không hợp lệ hoặc đã hết hạn"
     }
   },
   "Navigation": {
@@ -295,6 +330,7 @@
     "buy": "Mua nhà",
     "sell": "Bán nhà",
     "favorited": "Yêu thích",
+    "subscribe": "Gói dịch vụ & thanh toán",
     "appointments": "Lịch hẹn",
     "login": "Đăng nhập",
     "signup": "Đăng ký"

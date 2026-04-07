@@ -1,10 +1,19 @@
 {
   "DashboardLayout": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "insight": "Insight",
+      "listings": "My Listings",
+      "myEngagements": "My Engagements",
+      "tenants": "Tenants",
+      "messages": "Messages"
+    },
     "pageTitle": {
       "default": "RealVista",
       "dashboard": "Dashboard",
       "insight": "Insight",
       "managedListings": "Managed Listings",
+      "myEngagements": "My Engagements",
       "tenants": "Tenants",
       "messages": "Messages"
     },
@@ -206,15 +215,38 @@
       "loading": "Loading...",
       "avatar": "Avatar",
       "upload": "Upload",
+      "uploading": "Uploading...",
       "remove": "Remove",
       "firstName": "First Name",
       "firstNamePlaceholder": "First name",
       "lastName": "Last Name",
       "lastNamePlaceholder": "Last name",
+      "businessName": "Business / Display Name",
+      "businessNamePlaceholder": "Enter business or display name",
       "phone": "Phone Number",
       "phonePlaceholder": "+84 000-000-0000",
+      "changePhone": "Change",
+      "changePhoneTitle": "Change phone number",
+      "newPhone": "New phone number",
       "verify": "Verify",
+      "change": "Change",
+      "verifyAction": "Verify",
+      "changeAction": "Change",
+      "verified": "Verified",
       "email": "Email",
+      "verifyEmailTitle": "Verify email",
+      "sendOtp": "Send OTP",
+      "resendOtp": "Resend",
+      "otpSent": "OTP code has been sent to your email",
+      "otpLabel": "OTP Code",
+      "otpPlaceholder": "Enter 6-digit code",
+      "otpCountdown": "Resend in {seconds}s",
+      "verifying": "Verifying...",
+      "verifyOtp": "Verify",
+      "phoneOtpSent": "OTP code has been sent to your phone number",
+      "tooManyOtpAttempts": "Too many requests. Please try again after a few minutes.",
+      "invalidPhoneNumber": "Invalid phone number. Please use format +84xxxxxxxxx.",
+      "recaptchaError": "reCAPTCHA verification failed. Please try again.",
       "password": "Password",
       "changePassword": "Change Password",
       "currentPassword": "Current Password",
@@ -286,7 +318,10 @@
       "passwordChanged": "Password changed successfully",
       "passwordChangeFailed": "Current password is incorrect or invalid",
       "accountDeleted": "Account deleted",
-      "accountDeleteFailed": "Failed to delete account"
+      "accountDeleteFailed": "Failed to delete account",
+      "emailVerified": "Email verified successfully!",
+      "phoneVerified": "Phone number verified successfully!",
+      "otpInvalid": "Invalid or expired OTP code"
     }
   },
   "Navigation": {
@@ -295,6 +330,7 @@
     "buy": "Buy",
     "sell": "Sell",
     "favorited": "Favorited",
+    "subscribe": "Plans & billing",
     "appointments": "Appointments",
     "login": "Login",
     "signup": "Sign up"
