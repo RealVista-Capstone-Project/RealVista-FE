@@ -136,7 +136,7 @@ export function CreateRentalContractPage() {
 
   const propertiesResponse = propertiesData?.payload?.data;
   const properties = propertiesResponse?.content ?? [];
-  const totalPages = propertiesResponse?.totalPages ?? 0;
+  const totalPages = propertiesResponse?.total_pages ?? 0;
 
   const handleTenantLookup = useCallback(async () => {
     const email = form.tenantEmail.trim();
