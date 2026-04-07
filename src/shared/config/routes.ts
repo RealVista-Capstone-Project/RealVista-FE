@@ -17,6 +17,7 @@ export const ROUTES = {
     root: '/dashboard',
     insight: '/dashboard/insight',
     managedListings: '/dashboard/listings',
+    myEngagements: '/dashboard/my-engagements',
     tenants: '/dashboard/tenants',
     messages: '/dashboard/messages',
     property: '/dashboard/property',
@@ -28,6 +29,7 @@ export const ROUTES = {
     detail: (id: string) => `/manage-agent/${id}`,
   },
   settings: '/settings',
+  subscribe: '/subscribe',
 } as const;
 
 export const CALLBACK_URL = 'callbackUrl';
