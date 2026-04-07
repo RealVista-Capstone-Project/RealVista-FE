@@ -169,7 +169,7 @@ function mapFeaturePackage(p: FeaturePackage): Plan {
   }
   features.push({ label: `Loại: ${featureTypeLabelVi(p.feature_type)}` });
 
-  const priceLabel = (p.price / 1000).toFixed(0) + 'K';
+  const priceLabel = (p.price).toLocaleString('vi-VN') + ' đ';
   const durationLabel =
     p.duration_days === -1 ? 'vô thời hạn' : p.duration_days === 30 ? 'tháng' : `${p.duration_days} ngày`;
 
@@ -202,7 +202,7 @@ function mapBoostPackage(p: BoostPackage): Plan {
     { label: 'Tăng lượt xem' },
     { label: 'Đặt lên đầu kết quả tìm kiếm' },
   ];
-  const priceLabel = (p.price / 1000).toFixed(0) + 'K';
+  const priceLabel = (p.price).toLocaleString('vi-VN') + ' đ';
   return {
     id: p.code,
     name: p.name,
@@ -397,8 +397,7 @@ function CurrentPlansSection() {
                       <h3 className='mt-2 text-lg font-bold text-main-black'>{nextPkg.name}</h3>
                       <p className='mt-1 text-sm text-grey-500'>{nextPkg.description}</p>
                       <p className='mt-3 text-2xl font-bold text-main-black'>
-                        <span className='text-sm font-normal text-grey-500'>₫</span>
-                        {(nextPkg.price / 1000).toFixed(0)}K
+                        {(nextPkg.price).toLocaleString('vi-VN')} đ
                         <span className='text-xs font-normal text-grey-500'>
                           /
                           {nextPkg.duration_days === 30 ? 'tháng' : `${nextPkg.duration_days} ngày`}
@@ -613,11 +612,13 @@ function Step2Content({
   selectedPlanId,
   onSelectPlan,
   onNext,
+  onRetry,
 }: {
   type: PackageType;
   selectedPlanId: string | null;
   onSelectPlan: (id: string) => void;
   onNext: () => void;
+  onRetry: () => void;
 }) {
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
@@ -751,7 +752,6 @@ function Step2Content({
             </div>
             <div className='shrink-0 text-right'>
               <p className='text-2xl font-bold text-main-black'>
-                <span className='text-sm font-normal text-grey-500'>₫</span>
                 {selectedPlan.priceLabel}
               </p>
               <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
@@ -784,7 +784,14 @@ function Step2Content({
         </div>
       </div>
 
-      <div className='flex justify-end pt-1'>
+      <div className='flex justify-between pt-1'>
+        <RealVistaButton
+          variant='secondary'
+          size='small'
+          onClick={onRetry}
+        >
+          Quay lại
+        </RealVistaButton>
         <RealVistaButton
           size='small'
           onClick={onNext}
@@ -809,6 +816,7 @@ function Step3Content({
   onSelectPayment,
   onCheckoutCreated,
   onNext,
+  onRetry,
 }: {
   selectedPlan: Plan | null;
   selectedType: PackageType | null;
@@ -816,6 +824,7 @@ function Step3Content({
   onSelectPayment: (m: PaymentMethod) => void;
   onCheckoutCreated: (res: CheckoutResponse) => void;
   onNext: () => void;
+  onRetry: () => void;
 }) {
   const queryClient = useQueryClient();
   const [checkout, setCheckout] = React.useState<CheckoutResponse | null>(null);
@@ -828,10 +837,11 @@ function Step3Content({
       setCheckout(data);
       onCheckoutCreated(data);
       setError(null);
-      // PayOS: sang bước 4 ngay để polling trạng thái tự chạy (không cần bấm "kiểm tra kết quả").
-      if (data.payment_method === 'PAYOS') {
+      // VNPay: sang bước 4 ngay
+      if (data.payment_method === 'VNPAY') {
         onNext();
       }
+      // PayOS: giữ lại ở step 3, hiển thị QR
     },
     onError: (e: unknown) => {
       if (e instanceof HttpError && e.payload?.message) {
@@ -841,6 +851,21 @@ function Step3Content({
       }
       setError('Không thể tạo link thanh toán. Vui lòng thử lại.');
       toast.error('Không thể tạo link thanh toán.');
+    },
+  });
+
+  const syncPayOsMutation = useMutation({
+    mutationFn: () => billingApi.syncPayOsFromGateway(checkout?.transaction_id ?? ''),
+    onSuccess: (res) => {
+      const txnStatus = (res.payload as { data?: TransactionStatusResponse }).data?.status;
+      if (txnStatus === 'COMPLETED') {
+        onNext();
+      } else {
+        toast.info('Chưa nhận được thanh toán. Vui lòng thử lại sau.');
+      }
+    },
+    onError: () => {
+      toast.error('Không thể kiểm tra trạng thái PayOS');
     },
   });
 
@@ -919,7 +944,7 @@ function Step3Content({
               <p className='text-xs text-grey-500'>{selectedPlan.durationLabel}</p>
             </div>
           </div>
-          <span className='text-sm font-bold text-main-primary'>₫{selectedPlan.priceLabel}</span>
+          <span className='text-sm font-bold text-main-primary'>{selectedPlan.priceLabel}</span>
         </div>
       )}
 
@@ -985,9 +1010,24 @@ function Step3Content({
       {/* PayOS: show QR after checkout created (payload may use qr_code or VietQR string; fallback to payment URL) */}
       {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
         <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
-          <p className='text-sm font-medium text-grey-700'>
+          <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
             Quét mã QR để thanh toán qua{' '}
             <span className='text-blue-600'>PayOS</span>
+            {!syncPayOsMutation.isPending && (
+              <button
+                type='button'
+                onClick={() => syncPayOsMutation.mutate()}
+                disabled={syncPayOsMutation.isPending}
+                className='inline-flex items-center text-grey-700 hover:text-grey-500 transition-colors disabled:opacity-50'
+                title='Kiểm tra thanh toán'
+                aria-label='Confirm payment'
+              >
+                <CreditCard className='size-4' />
+              </button>
+            )}
+            {syncPayOsMutation.isPending && (
+              <Loader2 className='size-4 animate-spin text-grey-700' />
+            )}
           </p>
           <div className='rounded-xl border-4 border-white p-1 shadow-md'>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1023,10 +1063,17 @@ function Step3Content({
         </div>
       )}
 
-      <div className='flex justify-end pt-1'>
+      <div className='flex justify-between gap-2 pt-1'>
+        <RealVistaButton
+          variant='secondary'
+          size='small'
+          onClick={onRetry}
+        >
+          Quay lại
+        </RealVistaButton>
         <RealVistaButton
           size='small'
-          disabled={!selectedPayment || isLoading}
+          disabled={!selectedPayment || isLoading || (selectedPayment === 'payos' && !checkout)}
           onClick={handleConfirm}
           withIcon
         >
@@ -1035,12 +1082,12 @@ function Step3Content({
               <Loader2 className='size-3.5 animate-spin' />
               Đang xử lý...
             </>
-          ) : selectedPayment === 'payos' && checkout ? (
-            'Đã chuyển khoản — kiểm tra kết quả'
           ) : selectedPayment === 'vnpay' && !checkout ? (
             'Tạo link & mở VNPay'
+          ) : selectedPayment === 'payos' && !checkout ? (
+            'Tạo mã QR'
           ) : (
-            'Xác nhận thanh toán'
+            'Xác nhận'
           )}
         </RealVistaButton>
       </div>
@@ -1055,46 +1102,13 @@ function Step3Content({
 function Step4Content({
   transactionId,
   plan,
-  payOsCheckout,
-  onRetry,
   onDone,
 }: {
   transactionId: string | null;
   plan: Plan | null;
-  /** Giữ QR / link PayOS ở bước 4 trong lúc chờ webhook */
-  payOsCheckout?: CheckoutResponse | null;
-  onRetry: () => void;
   onDone: () => void;
 }) {
   const queryClient = useQueryClient();
-  const [payOsCheckMessage, setPayOsCheckMessage] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    setPayOsCheckMessage(null);
-  }, [transactionId]);
-
-  const syncPayOsMutation = useMutation({
-    mutationFn: () => billingApi.syncPayOsFromGateway(transactionId ?? ''),
-    onMutate: () => {
-      setPayOsCheckMessage(null);
-    },
-    onSuccess: (res) => {
-      const txnStatus = (res.payload as { data?: TransactionStatusResponse }).data?.status;
-      if (txnStatus === 'PENDING') {
-        setPayOsCheckMessage(
-          'Chưa nhận được thanh toán từ PayOS. Nếu đã chuyển khoản, đợi vài giây rồi bấm lại.'
-        );
-      } else if (txnStatus === 'FAILED') {
-        setPayOsCheckMessage('PayOS / hệ thống báo thanh toán chưa thành công hoặc đã huỷ.');
-      } else {
-        setPayOsCheckMessage(null);
-      }
-      if (transactionId) {
-        void queryClient.invalidateQueries({ queryKey: billingKeys.transactionStatus(transactionId) });
-      }
-      void queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
-    },
-  });
 
   const { data: statusData, isLoading } = useQuery({
     ...billingQueries.transactionStatus(transactionId ?? ''),
@@ -1111,115 +1125,59 @@ function Step4Content({
   const isPending = !statusData || statusData.status === 'PENDING' || isLoading;
   const isSuccess = statusData?.status === 'COMPLETED';
 
+  // Calculate date range
+  const getDateRange = () => {
+    const today = new Date();
+    const startDate = today.toLocaleDateString('vi-VN');
+
+    let endDate = 'Không giới hạn';
+    if (plan && plan.durationDays > 0) {
+      const end = new Date(today);
+      end.setDate(end.getDate() + plan.durationDays);
+      endDate = end.toLocaleDateString('vi-VN');
+    }
+
+    return { startDate, endDate };
+  };
+
+  const { startDate, endDate } = getDateRange();
+
   if (isPending) {
-    const qrPayload = payOsCheckout?.qr_code || payOsCheckout?.checkout_url;
     return (
-      <div className='flex flex-col items-center gap-4 py-6 text-center'>
-        {qrPayload && (
-          <div className='flex w-full max-w-sm flex-col items-center gap-2 rounded-xl border border-border bg-grey-50 px-4 py-4'>
-            <p className='text-xs font-medium text-grey-700'>Quét mã để chuyển khoản (PayOS)</p>
-            <div className='rounded-xl border-4 border-white p-1 shadow-md'>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                  qrPayload
-                )}&color=7065f0&bgcolor=ffffff`}
-                alt='PayOS QR'
-                width={160}
-                height={160}
-                className='rounded-lg'
-              />
-            </div>
-            {payOsCheckout?.checkout_url && (
-              <a
-                href={payOsCheckout.checkout_url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex items-center gap-1 text-xs text-blue-600 underline underline-offset-2'
-              >
-                Mở trang PayOS <ExternalLink className='size-3' />
-              </a>
-            )}
-          </div>
-        )}
-        <Loader2 className='size-12 animate-spin text-main-primary' />
+      <div className='flex flex-col items-center gap-4 py-12 text-center'>
+        <Loader2 className='size-16 animate-spin text-main-primary' />
         <div>
-          <h3 className='text-base font-bold text-main-black'>Đang chờ thanh toán...</h3>
-          <p className='mt-1 text-sm text-grey-500'>
-            Sau khi chuyển khoản, PayOS gửi webhook tới server để kích hoạt gói. Trang tự hỏi trạng thái mỗi 2 giây.
-          </p>
-          <p className='mt-2 text-xs text-amber-700/90 max-w-md'>
-            Chạy BE trên localhost thì PayOS không gọi được webhook (server của họ không vào được máy bạn). Bạn có thể bấm{' '}
-            <span className='font-medium text-main-black'>Hỏi PayOS</span> để BE gọi API PayOS và kích hoạt gói khi đã thanh
-            toán; hoặc dùng ngrok/tunnel và khai báo webhook trên PayOS.
+          <h3 className='text-lg font-bold text-main-black'>Đang xử lý thanh toán...</h3>
+          <p className='mt-2 text-sm text-grey-500'>
+            Trang đang chờ kết quả từ hệ thống.
           </p>
         </div>
-        <div className='flex flex-wrap items-center justify-center gap-2'>
-          <RealVistaButton
-            variant='secondary'
-            size='small'
-            disabled={!transactionId || syncPayOsMutation.isPending}
-            onClick={() => syncPayOsMutation.mutate()}
-          >
-            {syncPayOsMutation.isPending ? (
-              <>
-                <Loader2 className='size-3.5 animate-spin' />
-                Đang hỏi PayOS…
-              </>
-            ) : (
-              'Hỏi PayOS (đã chuyển chưa?)'
-            )}
-          </RealVistaButton>
-          <RealVistaButton
-            variant='secondary'
-            size='small'
-            disabled={!transactionId}
-            onClick={() =>
-              queryClient.invalidateQueries({ queryKey: billingKeys.transactionStatus(transactionId ?? '') })
-            }
-          >
-            Làm mới trạng thái
-          </RealVistaButton>
-          <RealVistaButton variant='secondary' size='small' onClick={onRetry}>
-            Quay lại
-          </RealVistaButton>
-        </div>
-        {payOsCheckMessage && !syncPayOsMutation.isError && (
-          <p className='max-w-sm rounded-lg border border-grey-200 bg-grey-50 px-3 py-2 text-center text-xs text-grey-700'>
-            {payOsCheckMessage}
-          </p>
-        )}
-        {syncPayOsMutation.isError && (
-          <p className='max-w-sm text-center text-xs text-red-600'>
-            Không lấy được trạng thái từ PayOS. Kiểm tra BE (PAYOS_CLIENT_ID, PAYOS_API_KEY), log server và thử lại.
-          </p>
-        )}
       </div>
     );
   }
 
   return (
     <div className='space-y-5'>
-      <div className='flex flex-col items-center gap-4 py-3 text-center'>
+      <div className='flex flex-col items-center gap-4 py-8 text-center'>
         {isSuccess ? (
-          <CheckCircle2 className='size-16 text-green-500' />
+          <CheckCircle2 className='size-16 text-main-primary' />
         ) : (
           <XCircle className='size-16 text-red-400' />
         )}
         <div>
-          <h3 className={cn('text-lg font-bold', isSuccess ? 'text-green-600' : 'text-red-500')}>
+          <h3 className={cn('text-xl font-bold', isSuccess ? 'text-main-black' : 'text-red-500')}>
             {isSuccess ? 'Thanh toán thành công!' : 'Thanh toán thất bại'}
           </h3>
-          <p className='mt-1 text-sm text-grey-500'>
+          <p className='mt-2 text-sm text-grey-500'>
             {isSuccess
-              ? 'Gói dịch vụ của bạn đã được kích hoạt ngay lập tức.'
+              ? 'Gói dịch vụ của bạn đã được kích hoạt.'
               : 'Đã xảy ra lỗi trong quá trình thanh toán. Vui lòng thử lại.'}
           </p>
         </div>
 
         {isSuccess && plan && (
-          <div className='w-full max-w-xs rounded-xl border border-green-200 bg-green-50 p-4 text-left'>
-            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-green-600'>Chi tiết đơn hàng</p>
+          <div className='w-full max-w-xs rounded-xl border border-purple-90 bg-purple-98 p-4 text-left'>
+            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-main-primary'>Chi tiết đơn hàng</p>
             <div className='space-y-1.5 text-sm'>
               <div className='flex justify-between'>
                 <span className='text-grey-600'>Gói</span>
@@ -1227,12 +1185,55 @@ function Step4Content({
               </div>
               <div className='flex justify-between'>
                 <span className='text-grey-600'>Thời hạn</span>
-                <span className='font-semibold text-main-black'>{plan.durationLabel}</span>
+                <span className='font-semibold text-main-black'>{startDate} - {endDate}</span>
               </div>
-              <div className='flex justify-between border-t border-green-200 pt-1.5'>
+              <div className='flex justify-between border-t border-purple-90 pt-1.5'>
                 <span className='text-grey-600'>Tổng tiền</span>
-                <span className='font-bold text-main-primary'>₫{plan.priceLabel}</span>
+                <span className='font-bold text-main-primary'>{plan.priceLabel}</span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {isSuccess && statusData && (
+          <div className='w-full rounded-xl border border-border bg-white p-6'>
+            <div className='mb-6 flex items-center justify-between'>
+              <p className='text-base font-semibold text-main-black'>Hóa đơn</p>
+              <span className='text-sm text-grey-600'>
+                {new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' }).replace('/', ' năm ')}
+              </span>
+            </div>
+
+            <div className='overflow-x-auto'>
+              <table className='w-full'>
+                <thead>
+                  <tr className='border-b border-grey-200'>
+                    <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Ngày</th>
+                    <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Sự miêu tả</th>
+                    <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Trạng thái</th>
+                    <th className='pb-4 text-right text-xs font-semibold text-grey-600'>Số lượng</th>
+                    <th className='pb-4 text-right text-xs font-semibold text-grey-600'>Hóa đơn</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className='border-b border-grey-100'>
+                    <td className='py-4 text-sm text-grey-700'>{new Date().toLocaleDateString('vi-VN')}</td>
+                    <td className='py-4 text-sm text-grey-700'></td>
+                    <td className='py-4'>
+                      <span className='text-sm text-grey-700'>Trả</span>
+                    </td>
+                    <td className='py-4 text-right text-sm font-semibold text-main-black'>{plan.priceLabel}</td>
+                    <td className='py-4'>
+                      <button
+                        type='button'
+                        className='flex items-center gap-1 text-right text-sm font-medium text-main-primary hover:opacity-80 transition-opacity'
+                      >
+                        Xem <ExternalLink className='size-4' />
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -1246,9 +1247,9 @@ function Step4Content({
         ) : (
           <>
             <RealVistaButton variant='secondary' size='small' onClick={onDone}>
-              Huỷ
+              Quay lại
             </RealVistaButton>
-            <RealVistaButton size='small' onClick={onRetry} withIcon>
+            <RealVistaButton size='small' onClick={onDone}>
               Thử lại
             </RealVistaButton>
           </>
@@ -1285,8 +1286,8 @@ function PurchaseWizard() {
   const selectedPlan = rawPlans.find((p) => p.id === selectedPlanId) ?? null;
 
   const typeSummary =
-    selectedType === 'subscription' ? 'Gói tính năng' : selectedType === 'boost' ? 'Boosting' : undefined;
-  const planSummary = selectedPlan ? `${selectedPlan.name} · ₫${selectedPlan.priceLabel}` : undefined;
+    selectedType === 'subscription' ? 'Gói tính năng' : selectedType === 'boost' ? 'Gói đẩy tin' : undefined;
+  const planSummary = selectedPlan ? `${selectedPlan.name} · ${selectedPlan.priceLabel}` : undefined;
   const paymentSummary = selectedPayment === 'vnpay' ? 'VNPay' : selectedPayment === 'payos' ? 'PayOS' : undefined;
 
   // Load state from localStorage on mount
@@ -1354,7 +1355,7 @@ function PurchaseWizard() {
 
   return (
     <div id='mua-goi-dich-vu'>
-      <h2 className='mb-5 text-base font-semibold text-main-black'>Mua gói dịch vụ</h2>
+      <h2 className='mb-5 text-base font-semibold text-main-black'>Chọn gói trải nghiệm</h2>
 
       <HorizontalWizardSteps
         activeStep={step}
@@ -1374,6 +1375,12 @@ function PurchaseWizard() {
             selectedPlanId={selectedPlanId}
             onSelectPlan={setSelectedPlanId}
             onNext={handlePlanNext}
+            onRetry={() => {
+              setStep(1);
+              setSelectedPlanId(null);
+              setSelectedPayment(null);
+              setCheckoutData(null);
+            }}
           />
         )}
         {step === 2 && !selectedType && (
@@ -1387,18 +1394,17 @@ function PurchaseWizard() {
             onSelectPayment={setSelectedPayment}
             onCheckoutCreated={setCheckoutData}
             onNext={handlePaymentNext}
+            onRetry={() => {
+              setStep(2);
+              setSelectedPayment(null);
+              setCheckoutData(null);
+            }}
           />
         )}
         {step === 4 && (
           <Step4Content
             transactionId={checkoutData?.transaction_id ?? null}
             plan={selectedPlan}
-            payOsCheckout={checkoutData?.payment_method === 'PAYOS' ? checkoutData : null}
-            onRetry={() => {
-              setStep(3);
-              setSelectedPayment(null);
-              setCheckoutData(null);
-            }}
             onDone={handleDone}
           />
         )}
