@@ -1272,6 +1272,7 @@ function PurchaseWizard() {
   const [selectedPlanId, setSelectedPlanId] = React.useState<string | null>(null);
   const [selectedPayment, setSelectedPayment] = React.useState<PaymentMethod | null>(null);
   const [checkoutData, setCheckoutData] = React.useState<CheckoutResponse | null>(null);
+  const [showLoginDialog, setShowLoginDialog] = React.useState(false);
 
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
@@ -1288,7 +1289,28 @@ function PurchaseWizard() {
   const planSummary = selectedPlan ? `${selectedPlan.name} · ₫${selectedPlan.priceLabel}` : undefined;
   const paymentSummary = selectedPayment === 'vnpay' ? 'VNPay' : selectedPayment === 'payos' ? 'PayOS' : undefined;
 
-  // Save step to localStorage
+  // Load state from localStorage on mount
+  React.useEffect(() => {
+    const saved = localStorage.getItem('subscription-wizard-state');
+    if (saved) {
+      try {
+        const state = JSON.parse(saved) as {
+          step: WizardStep;
+          selectedType: PackageType | null;
+          selectedPlanId: string | null;
+          selectedPayment: PaymentMethod | null;
+        };
+        setStep(state.step);
+        setSelectedType(state.selectedType);
+        setSelectedPlanId(state.selectedPlanId);
+        setSelectedPayment(state.selectedPayment);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
+  // Save state to localStorage (but not checkoutData to force fresh state after redirect)
   React.useEffect(() => {
     const wizardState = {
       step,
@@ -1304,15 +1326,7 @@ function PurchaseWizard() {
   const handlePlanNext = () => {
     if (!selectedPlanId) return;
     if (!session?.user) {
-      // Save current state and redirect to login
-      const wizardState = {
-        step: 3,
-        selectedType,
-        selectedPlanId,
-        selectedPayment: null,
-      };
-      localStorage.setItem('subscription-wizard-state', JSON.stringify(wizardState));
-      router.push(`/${locale}${ROUTES.login}?redirectTo=${ROUTES.subscribe}`);
+      setShowLoginDialog(true);
       return;
     }
     setStep(3);
@@ -1329,7 +1343,14 @@ function PurchaseWizard() {
     localStorage.removeItem('subscription-wizard-state');
   };
 
-  const toggleStep = (s: WizardStep) => { if (step !== s) setStep(s); };
+  const toggleStep = (s: WizardStep) => {
+    if (step !== s) {
+      // Reset state when going back to earlier steps
+      if (s < 4) setCheckoutData(null);
+      if (s < 3) setSelectedPayment(null);
+      setStep(s);
+    }
+  };
 
   return (
     <div id='mua-goi-dich-vu'>
@@ -1373,11 +1394,54 @@ function PurchaseWizard() {
             transactionId={checkoutData?.transaction_id ?? null}
             plan={selectedPlan}
             payOsCheckout={checkoutData?.payment_method === 'PAYOS' ? checkoutData : null}
-            onRetry={() => setStep(3)}
+            onRetry={() => {
+              setStep(3);
+              setSelectedPayment(null);
+              setCheckoutData(null);
+            }}
             onDone={handleDone}
           />
         )}
       </div>
+
+      {showLoginDialog && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
+          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+            <h3 className='text-lg font-bold text-main-black'>Yêu cầu đăng nhập</h3>
+            <p className='mt-2 text-sm text-grey-500'>
+              Bạn cần đăng nhập để tiếp tục mua gói dịch vụ.
+            </p>
+            <div className='mt-6 flex flex-col gap-3'>
+              <RealVistaButton
+                className='w-full bg-main-primary text-white hover:bg-main-primary-hover'
+                onClick={() => {
+                  setShowLoginDialog(false);
+                  router.push(`/${locale}${ROUTES.login}?redirectTo=${ROUTES.subscribe}`);
+                }}
+              >
+                Đăng nhập
+              </RealVistaButton>
+              <RealVistaButton
+                variant='secondary'
+                className='w-full'
+                onClick={() => {
+                  setShowLoginDialog(false);
+                  router.push(`/${locale}${ROUTES.register}?redirectTo=${ROUTES.subscribe}`);
+                }}
+              >
+                Tạo tài khoản
+              </RealVistaButton>
+              <button
+                type='button'
+                onClick={() => setShowLoginDialog(false)}
+                className='text-sm font-medium text-grey-500 hover:text-main-black transition-colors'
+              >
+                Tiếp tục mua sắm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
