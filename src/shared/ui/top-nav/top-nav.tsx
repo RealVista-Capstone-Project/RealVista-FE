@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
-import { ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
+import { ChevronDown, Heart, Menu, Receipt, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -24,7 +24,7 @@ export type NavItem = {
 
 type ProfileVariant = 'dropdown' | 'inline';
 
-interface TopNavProps {
+export interface TopNavProps {
   variant?: 'public' | 'dashboard';
   navItems?: NavItem[];
   logoHref?: string;
@@ -129,7 +129,7 @@ export function TopNav({
                 return (
                   <Link
                     key={item.id}
-                    href={item.href}
+                    href={`/${locale}${item.href}`}
                     className={cn(
                       'text-base leading-[1.5] transition-colors hover:text-main-primary',
                       isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
@@ -175,6 +175,23 @@ export function TopNav({
               className='h-5 w-5'
               fill={isRouteActive('/favorited') ? 'currentColor' : 'none'}
             />
+          </button>
+        )}
+
+        {showMessageButton && isUserLoggedIn && (
+          <button
+            type='button'
+            onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
+            className={cn(
+              'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
+              isRouteActive('/subscribe')
+                ? 'bg-main-primary text-white'
+                : 'bg-purple-98 text-main-black hover:bg-purple-92'
+            )}
+            aria-label={t('subscribe')}
+            title={t('subscribe')}
+          >
+            <Receipt className='h-5 w-5' strokeWidth={2} />
           </button>
         )}
 

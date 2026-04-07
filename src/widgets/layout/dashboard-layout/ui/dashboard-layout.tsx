@@ -70,7 +70,7 @@ const defaultUser = {
 
 export function DashboardLayout({
   children,
-  sidebarItems = defaultSidebarItems,
+  sidebarItems,
   logoHref = ROUTES.homePage,
   user = defaultUser,
   headerTitle,
@@ -80,6 +80,7 @@ export function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
+  const navItems = sidebarItems ?? defaultSidebarItems;
 
   /**
    * Compute the top nav page title based on the current pathname
@@ -99,6 +100,12 @@ export function DashboardLayout({
     }
     if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
       return t('pageTitle.messages');
+    }
+    if (
+      pathname === ROUTES.dashboard.myEngagements ||
+      pathname.startsWith(ROUTES.dashboard.myEngagements)
+    ) {
+      return t('pageTitle.myEngagements');
     }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
@@ -202,7 +209,7 @@ export function DashboardLayout({
 
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3'>
-          {sidebarItems.map((item) => {
+          {navItems.map((item) => {
             const isActive = isItemActive(item.href);
 
             return (
