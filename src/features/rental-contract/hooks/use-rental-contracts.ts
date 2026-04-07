@@ -7,6 +7,7 @@ import {
   rentalContractQueries,
   type CreateRentalContractPayload,
   type GetRentalContractsParams,
+  type GetRenterContractsParams,
   type UpdateRentalContractStatusPayload,
 } from '@/entities/rental-contract';
 
@@ -16,6 +17,17 @@ export function useRentalContractsQuery(
 ) {
   return useQuery({
     ...rentalContractQueries.list(params),
+    enabled: options?.enabled ?? true,
+  });
+}
+
+export function useRenterContractsQuery(
+  params: GetRenterContractsParams,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: [...rentalContractKeys.all, 'renter', params.renterId, params],
+    queryFn: () => rentalContractApi.getRenterContracts(params),
     enabled: options?.enabled ?? true,
   });
 }
@@ -72,5 +84,23 @@ export function useGetLandlordSigningUrlMutation() {
   return useMutation({
     mutationFn: ({ leaseId, returnUrl }: { leaseId: string; returnUrl?: string }) =>
       rentalContractApi.getLandlordSigningUrl(leaseId, returnUrl),
+  });
+}
+
+export function useGetRenterSigningUrlMutation() {
+  return useMutation({
+    mutationFn: ({ leaseId, returnUrl }: { leaseId: string; returnUrl?: string }) =>
+      rentalContractApi.getRenterSigningUrl(leaseId, returnUrl),
+  });
+}
+
+export function useConfirmLandlordSignedMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (leaseId: string) => rentalContractApi.confirmLandlordSigned(leaseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rentalContractKeys.all });
+    },
   });
 }

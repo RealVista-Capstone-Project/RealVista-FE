@@ -154,6 +154,14 @@ export interface GetRentalContractsParams {
   search?: string;
 }
 
+export interface GetRenterContractsParams {
+  renterId: string;
+  page?: number;
+  size?: number;
+  status?: RentalContractStatus;
+  search?: string;
+}
+
 export interface RentalContractPageResponse {
   content: RentalContract[];
   page: number;

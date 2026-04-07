@@ -20,6 +20,7 @@ export const ROUTES = {
     tenants: '/dashboard/tenants',
     rentalContracts: '/dashboard/rental-contracts',
     createRentalContract: '/dashboard/rental-contracts/create',
+    myContracts: '/dashboard/my-contracts',
     messages: '/dashboard/messages',
     manageAgent: '/dashboard/manage-agent',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`

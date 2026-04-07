@@ -11,6 +11,28 @@
       "contractActive": "Contract becomes active"
     },
     "backButton": "Back to My Leases",
+    "landlord": {
+      "confirming": "Recording your signature…",
+      "confirmError": "Failed to record your signature. Please try again.",
+      "confirmRetry": "Retry",
+      "sendToRenterTitle": "Ready to send to renter",
+      "sendToRenterBody": "Your signature has been confirmed. Send the contract to the renter to complete the signing process.",
+      "sendToRenterButton": "Send to Renter",
+      "sending": "Sending…",
+      "sendError": "Failed to send to renter. Please try again."
+    },
+    "renter": {
+      "title": "You've signed the contract!",
+      "subtitle": "Your signature has been recorded. The contract is now under review.",
+      "infoTitle": "What happens next",
+      "infoBody": "Both parties have signed. Your contract will be reviewed and activated shortly.",
+      "backButton": "Back to My Contracts",
+      "steps": {
+        "landlordSigned": "Landlord has signed",
+        "youSigned": "You have signed",
+        "contractActive": "Contract becomes active"
+      }
+    },
     "error": {
       "title": "Signing incomplete",
       "subtitle": "The signing session ended without completing. You can return to your leases and try again.",

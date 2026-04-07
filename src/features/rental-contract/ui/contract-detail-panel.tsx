@@ -74,7 +74,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}`
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=landlord`
           : undefined;
       const data = await getLandlordSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
