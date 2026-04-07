@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
@@ -219,9 +220,20 @@ export function TopNav({
               className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
               aria-label='Profile menu'
             >
-              <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
-                <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
-              </div>
+              {user.avatar ? (
+                <Image
+                  src={user.avatar}
+                  alt={user.name}
+                  width={32}
+                  height={32}
+                  className='size-8 rounded-full object-cover'
+                  priority
+                />
+              ) : (
+                <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
+                  <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
+                </div>
+              )}
               <span className='text-base font-medium leading-[1.5] text-main-black'>
                 {user.name}
               </span>

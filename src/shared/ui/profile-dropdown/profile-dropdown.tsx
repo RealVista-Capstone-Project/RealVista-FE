@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { User, HelpCircle, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -77,9 +78,20 @@ export function ProfileDropdown({
           aria-label='User menu'
         >
           {/* Avatar */}
-          <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
-            <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
-          </div>
+          {user.avatar ? (
+            <Image
+              src={user.avatar}
+              alt={user.name}
+              width={32}
+              height={32}
+              className='size-8 rounded-full object-cover'
+              priority
+            />
+          ) : (
+            <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
+              <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
+            </div>
+          )}
 
           {/* Name */}
           <span className='text-base font-medium leading-[1.5] text-main-black'>{user.name}</span>
