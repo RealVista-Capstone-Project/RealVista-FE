@@ -30,13 +30,16 @@ export const userQueries = {
     }),
 
   /**
-   * Get current authenticated user
+   * Get current authenticated user — returns raw UserProfile (snake_case)
    */
   current: () =>
     queryOptions({
       queryKey: userKeys.current(),
-      queryFn: () => userApi.getCurrent(),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      queryFn: async () => {
+        const response = await userApi.getMe();
+        return response.payload.data; // UserProfile with snake_case fields
+      },
+      staleTime: 5 * 60 * 1000,
       retry: 1,
     }),
 

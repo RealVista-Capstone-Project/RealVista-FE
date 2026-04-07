@@ -90,6 +90,21 @@ export const userApi = {
 
 
   /**
+   * Send email OTP to the given email address (updates user's email if changed)
+   */
+  sendEmailOtp: (email: string) =>
+    http.post<ApiResponse<{ expirySeconds: number }>>('/me/send-email-otp', { email }),
+
+  /**
+   * Verify email with OTP
+   */
+  verifyEmail: (otp: string) =>
+    http.post<ApiResponse<UserProfile>>('/me/verify-email', { otp }),
+
+  verifyPhone: (phone?: string) =>
+    http.post<ApiResponse<UserProfile>>('/me/verify-phone', { phone }),
+
+  /**
    * Upload avatar
    */
   uploadAvatar: (file: File) => {
