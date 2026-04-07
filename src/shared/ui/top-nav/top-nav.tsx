@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
-import { ChevronDown, Heart, Menu, Receipt, X } from 'lucide-react';
+import { ChevronDown, Heart, Menu, CreditCard, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -179,7 +179,7 @@ export function TopNav({
           </button>
         )}
 
-        {showMessageButton && isUserLoggedIn && (
+        {showMessageButton && (
           <button
             type='button'
             onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
@@ -192,12 +192,12 @@ export function TopNav({
             aria-label={t('subscribe')}
             title={t('subscribe')}
           >
-            <Receipt className='h-5 w-5' strokeWidth={2} />
+            <CreditCard className='h-5 w-5' strokeWidth={2} />
           </button>
         )}
 
-        {/* Chat Dropdown - only for public variant, hidden on mobile */}
-        {showMessageButton && (
+        {/* Chat Dropdown - only for public variant and logged in users, hidden on mobile */}
+        {showMessageButton && isUserLoggedIn && (
           <div className='hidden lg:block'>
             <ChatDropdownContainer />
           </div>
