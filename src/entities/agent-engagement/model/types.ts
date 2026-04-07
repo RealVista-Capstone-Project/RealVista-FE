@@ -51,6 +51,8 @@ export interface SubmitAgentProposalPayload {
   agent_proposal_id: string;
   /** The UUID of the Property this proposal targets */
   property_id: string;
+  /** Optional personal message to send along with the proposal template */
+  message?: string;
 }
 
 export interface AgentEngagementPageResponse {

@@ -519,6 +519,9 @@
     "confirmTitle": "Ready to submit?",
     "confirmDesc": "Your proposal will be sent to the property owner. You can track the status in your engagement dashboard.",
     "toastSuccess": "Proposal sent successfully!",
-    "toastError": "Failed to send proposal. Please try again."
+    "toastError": "Failed to send proposal. Please try again.",
+    "personalMessageLabel": "Personal Message",
+    "messagePlaceholder": "Introduce yourself and explain why you're a great fit for this property...",
+    "messageHint": "This message will be sent along with your selected proposal template."
   }
 }

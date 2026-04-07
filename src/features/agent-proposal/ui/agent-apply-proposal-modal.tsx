@@ -27,6 +27,7 @@ export function AgentApplyProposalModal({
   const [step, setStep] = React.useState<1 | 2>(1);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [message, setMessage] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // Load proposals - using existing query hook for consistency
@@ -39,6 +40,7 @@ export function AgentApplyProposalModal({
       setStep(1);
       setSearchQuery('');
       setSelectedId(null);
+      setMessage('');
     }
   }, [isOpen]);
 
@@ -66,6 +68,7 @@ export function AgentApplyProposalModal({
       await agentEngagementApi.submitAgentProposal({
         property_id: propertyId,
         agent_proposal_id: selectedId,
+        message: message.trim() || undefined,
       });
 
       toast.success(t('toastSuccess'), {
@@ -225,6 +228,22 @@ export function AgentApplyProposalModal({
                 </div>
               )}
 
+              {/* Personal Message Input */}
+              <div className='w-full max-w-[420px] flex flex-col items-start text-left'>
+                <label className='text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5'>
+                  <SendHorizonal size={12} className='text-indigo-500' />
+                  {t('personalMessageLabel')}
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={t('messagePlaceholder')}
+                  className='w-full min-h-[120px] p-4 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 transition-all resize-none placeholder:text-slate-400'
+                />
+                <p className='text-[10px] text-slate-400 mt-2 italic'>
+                  * {t('messageHint')}
+                </p>
+              </div>
             </div>
           )}
         </div>

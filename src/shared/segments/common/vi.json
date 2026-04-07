@@ -523,6 +523,9 @@
     "confirmTitle": "Bạn đã sẵn sàng gửi?",
     "confirmDesc": "Proposal của bạn sẽ được gửi đến chủ sở hữu. Bạn có thể theo dõi trạng thái tại bảng điều khiển.",
     "toastSuccess": "Gửi proposal thành công!",
-    "toastError": "Gửi proposal thất bại. Vui lòng thử lại."
+    "toastError": "Gửi proposal thất bại. Vui lòng thử lại.",
+    "personalMessageLabel": "Lời nhắn cá nhân",
+    "messagePlaceholder": "Giới thiệu bản thân và giải thích lý do tại sao bạn phù hợp với bất động sản này...",
+    "messageHint": "Lời nhắn này sẽ được gửi kèm với mẫu đề xuất mà bạn đã chọn."
   }
 }
