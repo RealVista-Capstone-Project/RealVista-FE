@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Users,
   Building2,
+  Search,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
@@ -57,6 +58,12 @@ const defaultSidebarItems: SidebarMenuItem[] = [
     label: 'Manage Agent',
     href: ROUTES.dashboard.manageAgent,
     icon: Users,
+  },
+  {
+    id: 'owner-properties',
+    label: 'Owner Properties',
+    href: ROUTES.dashboard.ownerProperties,
+    icon: Search,
   },
 
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },

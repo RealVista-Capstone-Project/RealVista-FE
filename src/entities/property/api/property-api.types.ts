@@ -305,3 +305,34 @@ export interface ApiResponse<T> {
   data: T;
   timestamp: string;
 }
+
+export interface OwnerAvailablePropertiesCriteria {
+  keyword?: string;
+  propertyType?: string;
+  page: number;
+  size: number;
+}
+
+export interface OwnerPropertySummary {
+  property_id: string;
+  street_address: string;
+  status: string;
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  description: string | null;
+  property_type_info: PropertyTypeInfo | null;
+  location_info: LocationInfo | null;
+  media: PropertyMediaItem[] | null;
+  attributes: PropertyAttributeItem[] | null;
+  owner_id: string;
+  owner_name: string | null;
+  owner_phone: string | null;
+  owner_email?: string | null;
+}
+
+export interface OwnerAvailablePropertiesResponse {
+  success: boolean;
+  message: string;
+  data: PageResponse<OwnerPropertySummary>;
+  timestamp: string;
+}

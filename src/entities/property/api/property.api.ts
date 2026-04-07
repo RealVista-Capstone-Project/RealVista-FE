@@ -4,6 +4,8 @@ import type {
   CreatePropertyRequest,
   MyPropertiesResponse,
   MyPropertiesSearchCriteria,
+  OwnerAvailablePropertiesCriteria,
+  OwnerAvailablePropertiesResponse,
   PropertyAttributeDefinition,
   PropertyDetailResponse,
   PropertySearchResponse,
@@ -92,5 +94,20 @@ export const propertyApi = {
     return http.get<ApiResponse<PropertyAttributeDefinition[]>>('properties/attributes', {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
+  },
+
+  getOwnerAvailableProperties: (criteria: OwnerAvailablePropertiesCriteria) => {
+    const queryParams = new URLSearchParams();
+    if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
+    if (criteria.propertyType) queryParams.append('propertyType', criteria.propertyType);
+    queryParams.append('page', criteria.page.toString());
+    queryParams.append('size', criteria.size.toString());
+
+    return http.get<OwnerAvailablePropertiesResponse>(
+      `properties/available?${queryParams.toString()}`,
+      {
+        baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+      }
+    );
   },
 };
