@@ -15,7 +15,12 @@
     "filter": {
       "allStatuses": "All Statuses",
       "searchPlaceholder": "Search by property...",
-      "searchAria": "Search contracts by property name"
+      "searchAria": "Search contracts by property name",
+      "tabs": {
+        "all": "All",
+        "active": "Active",
+        "expired": "Expired"
+      }
     },
     "table": {
       "status": "Status",

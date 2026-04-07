@@ -75,10 +75,13 @@ export const rentalContractApi = {
   async getRentalContracts(
     params: GetRentalContractsParams
   ): Promise<{ payload: { data: RentalContractPageResponse } }> {
-    const { landlordId, page = 0, size = 10 } = params;
+    const { landlordId, page = 0, size = 10, status } = params;
+
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) query.set('status', status);
 
     const result = await http.get<LeasesApiResponse>(
-      `/leases/landlord/${landlordId}?page=${page}&size=${size}`
+      `/leases/landlord/${landlordId}?${query.toString()}`
     );
 
     const apiData = result.payload.data;
@@ -148,10 +151,13 @@ export const rentalContractApi = {
   async getRenterContracts(
     params: GetRenterContractsParams
   ): Promise<{ payload: { data: RentalContractPageResponse } }> {
-    const { renterId, page = 0, size = 10 } = params;
+    const { renterId, page = 0, size = 10, status } = params;
+
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) query.set('status', status);
 
     const result = await http.get<LeasesApiResponse>(
-      `/leases/renter/${renterId}?page=${page}&size=${size}`
+      `/leases/renter/${renterId}?${query.toString()}`
     );
 
     const apiData = result.payload.data;

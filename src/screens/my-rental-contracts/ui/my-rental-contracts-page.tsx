@@ -5,20 +5,12 @@ import { TenantContractListItem } from './tenant-contract-list-item';
 import { TenantContractDetailPanel } from './tenant-contract-detail-panel';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select/select';
 import { cn } from '@/shared/lib/utils';
 import {
   ChevronLeft,
   ChevronRight,
   FileSearch,
   Search,
-  SlidersHorizontal,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -42,7 +34,6 @@ function MyRentalContractsContent() {
   } = useMyRentalContractsContext();
 
   const t = useTranslations('MyRentalContracts');
-  const tStatus = useTranslations('RentalContract.status');
 
   if (isLoading) {
     return (
@@ -114,22 +105,6 @@ function MyRentalContractsContent() {
           >
             {/* Filter bar */}
             <div className='mb-5 flex flex-col gap-3 rounded-3xl border border-white/60 bg-white/90 p-4 shadow-[0_12px_36px_rgba(94,74,175,0.08)] sm:flex-row sm:items-center'>
-              <div className='flex w-full flex-shrink-0 items-center gap-2 sm:w-auto'>
-                <SlidersHorizontal className='h-4 w-4 flex-shrink-0 text-main-secondary/50' />
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className='h-10 w-full rounded-xl border-transparent bg-[#F5F3FF] text-sm font-medium focus:ring-main-primary/20 sm:w-48'>
-                    <SelectValue placeholder={t('filter.allStatuses')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='all'>{t('filter.allStatuses')}</SelectItem>
-                    <SelectItem value='PENDING_RENTER'>{tStatus('pending_renter')}</SelectItem>
-                    <SelectItem value='ACTIVE'>{tStatus('active')}</SelectItem>
-                    <SelectItem value='EXPIRED'>{tStatus('expired')}</SelectItem>
-                    <SelectItem value='TERMINATED'>{tStatus('terminated')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className='relative w-full flex-1'>
                 <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-main-secondary/40' />
                 <Input
@@ -144,6 +119,25 @@ function MyRentalContractsContent() {
 
             {/* Table */}
             <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_rgba(96,72,179,0.10)]'>
+              {/* Status tabs */}
+              <div className='flex items-center gap-1 border-b border-[#F0EEF7] px-5 py-3'>
+                {(['all', 'ACTIVE', 'EXPIRED'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setStatusFilter(tab)}
+                    className={cn(
+                      'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+                      statusFilter === tab
+                        ? 'bg-main-primary text-white'
+                        : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                    )}
+                  >
+                    {t(`filter.tabs.${tab === 'all' ? 'all' : tab === 'ACTIVE' ? 'active' : 'expired'}`)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Column headers */}
               <div className='grid grid-cols-12 gap-4 border-b border-[#F0EEF7] bg-[#FAF8FF] px-5 py-4'>
                 <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/45'>
                   {t('table.status')}

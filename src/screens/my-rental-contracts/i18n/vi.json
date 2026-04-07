@@ -15,7 +15,12 @@
     "filter": {
       "allStatuses": "Tất cả trạng thái",
       "searchPlaceholder": "Tìm theo bất động sản...",
-      "searchAria": "Tìm kiếm hợp đồng theo tên bất động sản"
+      "searchAria": "Tìm kiếm hợp đồng theo tên bất động sản",
+      "tabs": {
+        "all": "Tất cả",
+        "active": "Đang hiệu lực",
+        "expired": "Đã hết hạn"
+      }
     },
     "table": {
       "status": "Trạng thái",
