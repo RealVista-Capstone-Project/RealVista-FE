@@ -218,7 +218,11 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const { data, isLoading } = useQuery(
-    propertyQueries.myProperties({ page: currentPage - 1, size: ITEMS_PER_PAGE })
+    propertyQueries.myProperties({
+      page: currentPage - 1,
+      size: ITEMS_PER_PAGE,
+      status: 'AVAILABLE',
+    })
   );
 
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
@@ -234,7 +238,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
   const propertiesResponse = data?.payload?.data;
   const rawProperties = propertiesResponse?.content || [];
-  const totalPages = propertiesResponse?.totalPages || 0;
+  const totalPages = propertiesResponse?.total_pages || 0;
 
   const properties: UserProperty[] = rawProperties.map((p: any) => {
     const standardMedia = (p.media ?? []).filter((m: any) => m.is_property_standard);
@@ -327,7 +331,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
 
     try {
       if (data.newFiles && data.newFiles.length > 0) {
-        const uploadRes = await mediaApi.uploadBulk(data.newFiles, data.propertyId);
+        const uploadRes = await mediaApi.uploadBulkMedia(data.newFiles, 'listings');
         if (
           uploadRes.status < 200 ||
           uploadRes.status >= 300 ||
@@ -339,7 +343,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         }
 
         const uploadedResults = uploadRes.payload.data.uploaded_files;
-        const newMediaIds = uploadedResults.map((res) => res.media_id);
+        const newMediaIds = uploadedResults.map((res: { media_id: string }) => res.media_id);
 
         // Add newly uploaded media IDs to the list
         payload.media_ids = [...(payload.media_ids || []), ...newMediaIds];

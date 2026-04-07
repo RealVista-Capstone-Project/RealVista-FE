@@ -22,8 +22,9 @@ export const ROUTES = {
     createRentalContract: '/dashboard/rental-contracts/create',
     myContracts: '/dashboard/my-contracts',
     messages: '/dashboard/messages',
+    property: '/dashboard/property',
     manageAgent: '/dashboard/manage-agent',
-    agentDetail: (id: string) => `/dashboard/manage-agent/${id}`
+    agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
   },
   leases: {
     signingComplete: '/leases/signing-complete',

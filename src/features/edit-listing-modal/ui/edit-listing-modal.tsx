@@ -245,7 +245,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       if (newFiles.length > 0) {
         const filesToUpload = newFiles.filter((_, i) => selectedNewFileIndices.has(i));
         if (filesToUpload.length > 0) {
-          const uploadRes = await mediaApi.uploadBulk(filesToUpload, listing.property_id);
+          const uploadRes = await mediaApi.uploadBulkMedia(filesToUpload, 'listings');
           if (
             uploadRes.status < 200 ||
             uploadRes.status >= 300 ||
@@ -257,7 +257,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
           }
 
           const uploadedResults = uploadRes.payload.data.uploaded_files;
-          const newMediaIds = uploadedResults.map((res) => res.media_id);
+          const newMediaIds = uploadedResults.map((res: { media_id: string }) => res.media_id);
 
           // Add newly uploaded media IDs to the list
           payload.media_ids = [...(payload.media_ids || []), ...newMediaIds];
