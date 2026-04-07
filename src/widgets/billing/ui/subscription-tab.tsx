@@ -28,6 +28,10 @@ import {
 } from '@/entities/billing';
 import { toast } from 'sonner';
 import { HttpError } from '@/shared/lib/http';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
+import { ROUTES } from '@/shared/config/routes';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1259,6 +1263,10 @@ function Step4Content({
 // ---------------------------------------------------------------------------
 
 function PurchaseWizard() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const locale = useLocale();
+
   const [step, setStep] = React.useState<WizardStep>(1);
   const [selectedType, setSelectedType] = React.useState<PackageType | null>(null);
   const [selectedPlanId, setSelectedPlanId] = React.useState<string | null>(null);
@@ -1280,8 +1288,36 @@ function PurchaseWizard() {
   const planSummary = selectedPlan ? `${selectedPlan.name} · ₫${selectedPlan.priceLabel}` : undefined;
   const paymentSummary = selectedPayment === 'vnpay' ? 'VNPay' : selectedPayment === 'payos' ? 'PayOS' : undefined;
 
+  // Save step to localStorage
+  React.useEffect(() => {
+    const wizardState = {
+      step,
+      selectedType,
+      selectedPlanId,
+      selectedPayment,
+    };
+    localStorage.setItem('subscription-wizard-state', JSON.stringify(wizardState));
+  }, [step, selectedType, selectedPlanId, selectedPayment]);
+
   const handleTypeNext = () => { if (selectedType) { setSelectedPlanId(null); setStep(2); } };
-  const handlePlanNext = () => { if (selectedPlanId) setStep(3); };
+
+  const handlePlanNext = () => {
+    if (!selectedPlanId) return;
+    if (!session?.user) {
+      // Save current state and redirect to login
+      const wizardState = {
+        step: 3,
+        selectedType,
+        selectedPlanId,
+        selectedPayment: null,
+      };
+      localStorage.setItem('subscription-wizard-state', JSON.stringify(wizardState));
+      router.push(`/${locale}${ROUTES.login}?redirectTo=${ROUTES.subscribe}`);
+      return;
+    }
+    setStep(3);
+  };
+
   const handlePaymentNext = () => setStep(4);
 
   const handleDone = () => {
@@ -1290,6 +1326,7 @@ function PurchaseWizard() {
     setSelectedPlanId(null);
     setSelectedPayment(null);
     setCheckoutData(null);
+    localStorage.removeItem('subscription-wizard-state');
   };
 
   const toggleStep = (s: WizardStep) => { if (step !== s) setStep(s); };
