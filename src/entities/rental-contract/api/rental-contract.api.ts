@@ -62,8 +62,7 @@ function calcDurationMonths(startDate: string, endDate: string): number {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const months =
-    (end.getFullYear() - start.getFullYear()) * 12 +
-    (end.getMonth() - start.getMonth());
+    (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
   return Math.max(1, months);
 }
 
@@ -179,7 +178,10 @@ export const rentalContractApi = {
   },
 
   // ── Refresh signing URLs (expire after ~5 min) ───────────────────────────
-  async getLandlordSigningUrl(leaseId: string, returnUrl?: string): Promise<DocuSignSigningResponse> {
+  async getLandlordSigningUrl(
+    leaseId: string,
+    returnUrl?: string
+  ): Promise<DocuSignSigningResponse> {
     const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
     const result = await http.get<DocuSignApiResponse>(
       `/leases/${leaseId}/landlord-signing-url${query}`
@@ -197,10 +199,7 @@ export const rentalContractApi = {
 
   // ── DocuSign — Step 1b: confirm landlord signed (after DocuSign redirect) ─
   async confirmLandlordSigned(leaseId: string): Promise<void> {
-    await http.post<{ success: boolean }>(
-      `/leases/${leaseId}/confirm-landlord-signed`,
-      {}
-    );
+    await http.post<{ success: boolean }>(`/leases/${leaseId}/confirm-landlord-signed`, {});
   },
 
   // ── Terminate ─────────────────────────────────────────────────────────────
@@ -210,10 +209,7 @@ export const rentalContractApi = {
     reason,
   }: UpdateRentalContractStatusPayload): Promise<RentalContract> {
     const body = reason ? { reason } : {};
-    const result = await http.put<LeaseApiResponse>(
-      `/leases/${contractId}/terminate`,
-      body
-    );
+    const result = await http.put<LeaseApiResponse>(`/leases/${contractId}/terminate`, body);
     return mapLeaseToContract(result.payload.data);
   },
 };
