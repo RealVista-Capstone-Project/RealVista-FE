@@ -25,6 +25,7 @@ import {
   type ActiveSubscriptionResponse,
   type FeaturePackage,
   type TransactionStatusResponse,
+  type TransactionResponse,
 } from '@/entities/billing';
 import { toast } from 'sonner';
 import { HttpError } from '@/shared/lib/http';
@@ -274,12 +275,16 @@ function CurrentPlansSection() {
   const queryClient = useQueryClient();
   const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
   const { data: catalogRaw } = useQuery(billingQueries.subscriptionPlans());
+  const [showCancelConfirm, setShowCancelConfirm] = React.useState(false);
+  const [subscriptionIdToCancel, setSubscriptionIdToCancel] = React.useState<string | null>(null);
 
   const cancelMut = useMutation({
     mutationFn: (id: string) => billingApi.cancelSubscription(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
       toast.success('Đã huỷ gói đăng ký.');
+      setShowCancelConfirm(false);
+      setSubscriptionIdToCancel(null);
     },
     onError: (e: unknown) => {
       const msg =
@@ -335,14 +340,16 @@ function CurrentPlansSection() {
                 className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
               >
                 <div className='flex flex-col rounded-xl border border-border bg-grey-50 p-5 shadow-sm'>
-                  <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói hiện tại</p>
-                  <div className='mt-2 flex flex-wrap items-center gap-2'>
-                    <Badge className={cn('shrink-0 text-xs font-medium border', typeBadge)} variant='outline'>
-                      {featureTypeLabelVi(sub.feature_type)}
-                    </Badge>
-                    <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
-                      {tierLabelVi(tier)}
-                    </span>
+                  <div className='flex flex-row items-center justify-between'>
+                    <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói hiện tại</p>
+                    <div className='flex flex-wrap items-center gap-2'>
+                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
+                        {featureTypeLabelVi(sub.feature_type)}
+                      </span>
+                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
+                        {tierLabelVi(tier)}
+                      </span>
+                    </div>
                   </div>
                   <h3 className='mt-2 text-lg font-bold text-main-black'>{sub.package_name}</h3>
                   <div className='mt-1 flex items-center gap-1.5 text-xs text-grey-500'>
@@ -351,41 +358,20 @@ function CurrentPlansSection() {
                       {sub.end_date ? `Hết hạn: ${formatDate(sub.end_date)}` : 'Không giới hạn thời hạn'}
                     </span>
                   </div>
-                  <div className='mt-4'>
-                    <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Mức dùng quota</p>
+                  <div className='mt-2'>
                     <QuotaUsageBar used={used} total={totalForBar} unlimited={sub.unlimited} />
                   </div>
-                  <p className='mt-3 text-xs text-grey-500'>
-                    Mã: <span className='font-mono'>{sub.package_code}</span>
-                    {sub.status ? ` · ${sub.status}` : ''}
-                  </p>
-                  <div className='mt-4 flex flex-wrap gap-2 border-t border-border pt-4'>
+                  <div className='mt-3 flex flex-wrap gap-2 pt-0'>
                     <RealVistaButton
                       variant='secondary'
                       size='small'
                       disabled={cancelMut.isPending}
                       onClick={() => {
-                        if (
-                          typeof window !== 'undefined' &&
-                          !window.confirm(
-                            'Huỷ gói này? Bạn sẽ mất quyền lợi ngay sau khi huỷ (theo chính sách hiện tại).'
-                          )
-                        ) {
-                          return;
-                        }
-                        cancelMut.mutate(sub.subscription_id);
+                        setSubscriptionIdToCancel(sub.subscription_id);
+                        setShowCancelConfirm(true);
                       }}
                     >
                       {cancelMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
-                    </RealVistaButton>
-                    <RealVistaButton
-                      variant='secondary'
-                      size='small'
-                      onClick={() => {
-                        document.getElementById('mua-goi-dich-vu')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    >
-                      Điều chỉnh / mua thêm
                     </RealVistaButton>
                   </div>
                 </div>
@@ -396,20 +382,17 @@ function CurrentPlansSection() {
                     <>
                       <h3 className='mt-2 text-lg font-bold text-main-black'>{nextPkg.name}</h3>
                       <p className='mt-1 text-sm text-grey-500'>{nextPkg.description}</p>
-                      <p className='mt-3 text-2xl font-bold text-main-black'>
+                      <p className='mt-1 text-2xl font-bold text-main-black'>
                         {(nextPkg.price).toLocaleString('vi-VN')} đ
                         <span className='text-xs font-normal text-grey-500'>
                           /
                           {nextPkg.duration_days === 30 ? 'tháng' : `${nextPkg.duration_days} ngày`}
                         </span>
                       </p>
-                      <p className='mt-2 text-xs text-grey-500'>
-                        Cấp tiếp theo: <span className='font-semibold text-main-black'>{tierLabelVi(tier + 1)}</span>
-                      </p>
-                      <div className='mt-auto pt-6'>
+                      <div className='mt-auto'>
                         <RealVistaButton
                           size='small'
-                          className='w-full sm:w-auto bg-main-black text-white hover:bg-main-black/90'
+                          className='w-full sm:w-auto bg-primary text-white hover:bg-primary-dark'
                           onClick={() => {
                             document.getElementById('mua-goi-dich-vu')?.scrollIntoView({ behavior: 'smooth' });
                           }}
@@ -427,6 +410,42 @@ function CurrentPlansSection() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Cancel confirmation dialog */}
+      {showCancelConfirm && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
+          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+            <h3 className='text-lg font-bold text-main-black'>Xác nhận huỷ gói</h3>
+            <p className='mt-3 text-sm text-grey-600'>
+              Huỷ gói này? Bạn sẽ mất quyền lợi ngay sau khi huỷ (theo chính sách hiện tại).
+            </p>
+            <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end'>
+              <button
+                type='button'
+                onClick={() => {
+                  setShowCancelConfirm(false);
+                  setSubscriptionIdToCancel(null);
+                }}
+                className='rounded-lg border border-grey-200 px-4 py-2 text-sm font-medium text-grey-700 hover:bg-grey-50 transition-colors'
+              >
+                Vẫn giữ gói
+              </button>
+              <RealVistaButton
+                size='small'
+                className='bg-primary text-white hover:bg-primary/90'
+                disabled={cancelMut.isPending}
+                onClick={() => {
+                  if (subscriptionIdToCancel) {
+                    cancelMut.mutate(subscriptionIdToCancel);
+                  }
+                }}
+              >
+                {cancelMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
+              </RealVistaButton>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -539,52 +558,72 @@ function Step1Content({
           type='button'
           onClick={() => onSelect('subscription')}
           className={cn(
-            'flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all',
+            'relative flex flex-col items-start gap-4 rounded-xl p-5 text-left transition-all',
             selected === 'subscription'
-              ? 'border-main-primary bg-purple-98'
-              : 'border-border bg-white hover:border-purple-90 hover:bg-purple-98'
+              ? 'bg-purple-98'
+              : 'bg-white'
           )}
         >
-          <div
-            className={cn(
-              'flex size-10 shrink-0 items-center justify-center rounded-lg',
-              selected === 'subscription' ? 'bg-main-primary text-white' : 'bg-purple-96 text-main-primary'
-            )}
-          >
-            <CreditCard className='size-5' />
+          <div className='flex items-start gap-3 w-full'>
+            <div
+              className={cn(
+                'flex size-10 shrink-0 items-center justify-center rounded-lg',
+                selected === 'subscription' ? 'bg-main-primary text-white' : 'bg-purple-96 text-main-primary'
+              )}
+            >
+              <CreditCard className='size-5' />
+            </div>
+            <p className='font-semibold text-sm text-main-black flex-1'>Gói tính năng</p>
+            {selected === 'subscription' && <Check className='size-5 shrink-0 text-main-primary' />}
           </div>
-          <div>
-            <p className='font-semibold text-sm text-main-black'>Gói tính năng</p>
-            <p className='mt-0.5 text-xs text-grey-500'>
-              Tin đăng, tour 3D, AI assistant — mua lẻ theo nhu cầu.
-            </p>
-          </div>
-          {selected === 'subscription' && <Check className='ml-auto size-4 shrink-0 text-main-primary mt-0.5' />}
+          <ul className='w-full space-y-2'>
+            <li className='flex items-start gap-2 text-sm text-grey-700'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+              Đăng tin bất động sản
+            </li>
+            <li className='flex items-start gap-2 text-sm text-grey-700'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+              Lượt AI assistant
+            </li>
+            <li className='flex items-start gap-2 text-sm text-grey-700'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+              Tạo 3D model cho bất động sản
+            </li>
+          </ul>
         </button>
 
         <button
           type='button'
           onClick={() => onSelect('boost')}
           className={cn(
-            'flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all',
+            'relative flex flex-col items-start gap-4 rounded-xl p-5 text-left transition-all',
             selected === 'boost'
-              ? 'border-orange-400 bg-orange-50'
-              : 'border-border bg-white hover:border-orange-200 hover:bg-orange-50'
+              ? 'bg-purple-98'
+              : 'bg-white'
           )}
         >
-          <div
-            className={cn(
-              'flex size-10 shrink-0 items-center justify-center rounded-lg',
-              selected === 'boost' ? 'bg-orange-400 text-white' : 'bg-orange-100 text-orange-500'
-            )}
-          >
-            <Rocket className='size-5' />
+          <div className='flex items-start gap-3 w-full'>
+            <div
+              className={cn(
+                'flex size-10 shrink-0 items-center justify-center rounded-lg',
+                selected === 'boost' ? 'bg-main-primary text-white' : 'bg-purple-96 text-main-primary'
+              )}
+            >
+              <Rocket className='size-5' />
+            </div>
+            <p className='font-semibold text-sm text-main-black flex-1'>Gói đẩy tin</p>
+            {selected === 'boost' && <Check className='size-5 shrink-0 text-main-primary' />}
           </div>
-          <div>
-            <p className='font-semibold text-sm text-main-black'>Boosting</p>
-            <p className='mt-0.5 text-xs text-grey-500'>Đẩy tin nổi bật, huy hiệu HOT, tăng lượt xem.</p>
-          </div>
-          {selected === 'boost' && <Check className='ml-auto size-4 shrink-0 text-orange-500 mt-0.5' />}
+          <ul className='w-full space-y-2'>
+            <li className='flex items-start gap-2 text-sm text-grey-700'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+              Đẩy nổi bật
+            </li>
+            <li className='flex items-start gap-2 text-sm text-grey-700'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+              Huy hiệu HOT
+            </li>
+          </ul>
         </button>
       </div>
 
@@ -601,10 +640,16 @@ function Step1Content({
 // Step 2 — plan selection
 // ---------------------------------------------------------------------------
 
+function isCurrentActivePlan(planCode: string, mySubs: ActiveSubscriptionResponse[] | undefined): boolean {
+  return mySubs?.some((s) => s.package_code === planCode && s.status === 'ACTIVE') ?? false;
+}
+
 function isSubscriptionPlanBlocked(plan: Plan, mySubs: ActiveSubscriptionResponse[] | undefined): boolean {
   if (!plan.featureType) return false;
   const maxT = maxActiveTierForFeature(mySubs, plan.featureType);
-  return plan.tierLevel < maxT;
+  // Block if lower tier OR if exact code is already active
+  const isCurrentlyActive = mySubs?.some((s) => s.package_code === plan.id && s.status === 'ACTIVE') ?? false;
+  return plan.tierLevel < maxT || isCurrentlyActive;
 }
 
 function Step2Content({
@@ -631,19 +676,47 @@ function Step2Content({
 
   const isLoading = type === 'subscription' ? subQuery.isLoading : boostQuery.isLoading;
 
+  // Group subscription plans by feature type
+  const plansByFeatureType = React.useMemo(() => {
+    if (type !== 'subscription') return null;
+    const grouped: Record<string, Plan[]> = {};
+    rawPlans.forEach((plan) => {
+      if (plan.featureType) {
+        if (!grouped[plan.featureType]) grouped[plan.featureType] = [];
+        grouped[plan.featureType].push(plan);
+      }
+    });
+    return grouped;
+  }, [type, rawPlans]);
+
+  // Feature type order and labels
+  const featureTypeOrder = ['LISTING', '3D_TOUR', 'AI_REQUEST'];
+  const featureTypes = type === 'subscription' && plansByFeatureType
+    ? featureTypeOrder.filter((ft) => plansByFeatureType[ft])
+    : [];
+
+  const [selectedFeatureType, setSelectedFeatureType] = React.useState<string>(
+    featureTypes[0] ?? ''
+  );
+
+  // Get plans for active feature type
+  const plansForFeatureType = type === 'subscription' && plansByFeatureType
+    ? plansByFeatureType[selectedFeatureType] ?? []
+    : rawPlans;
+
   const firstSelectableId = React.useMemo(() => {
     if (type !== 'subscription') return rawPlans[0]?.id ?? '';
-    const ok = rawPlans.find((p) => !isSubscriptionPlanBlocked(p, mySubs));
-    return ok?.id ?? rawPlans[0]?.id ?? '';
-  }, [type, rawPlans, mySubs]);
+    const ok = plansForFeatureType.find((p) => !isSubscriptionPlanBlocked(p, mySubs));
+    return ok?.id ?? plansForFeatureType[0]?.id ?? '';
+  }, [type, plansForFeatureType, mySubs]);
 
   const activePlanId = selectedPlanId ?? firstSelectableId;
-  const selectedPlan = rawPlans.find((p) => p.id === activePlanId) ?? rawPlans[0] ?? null;
+  const selectedPlan = plansForFeatureType.find((p) => p.id === activePlanId) ?? plansForFeatureType[0] ?? null;
 
   React.useEffect(() => {
     if (rawPlans.length === 0) return;
     if (type === 'subscription') {
-      const sel = rawPlans.find((p) => p.id === selectedPlanId);
+      const sel = plansForFeatureType.find((p) => p.id === selectedPlanId);
       if (!selectedPlanId || (sel && isSubscriptionPlanBlocked(sel, mySubs))) {
         if (firstSelectableId) onSelectPlan(firstSelectableId);
       }
@@ -653,7 +726,7 @@ function Step2Content({
       onSelectPlan(rawPlans[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, rawPlans.map((p) => p.id).join(','), firstSelectableId, mySubs]);
+  }, [type, rawPlans.map((p) => p.id).join(','), firstSelectableId, mySubs, selectedFeatureType]);
 
   if (isLoading) {
     return (
@@ -673,13 +746,14 @@ function Step2Content({
 
   if (!selectedPlan) return null;
 
-  const selectableCount =
-    type === 'subscription' ? rawPlans.filter((p) => !isSubscriptionPlanBlocked(p, mySubs)).length : rawPlans.length;
+  const selectableCount = type === 'subscription'
+    ? plansForFeatureType.filter((p) => !isSubscriptionPlanBlocked(p, mySubs)).length
+    : plansForFeatureType.length;
 
-  if (type === 'subscription' && selectableCount === 0 && rawPlans.length > 0) {
+  if (type === 'subscription' && selectableCount === 0 && plansForFeatureType.length > 0) {
     return (
       <p className='py-4 text-sm text-grey-600'>
-        Bạn đang dùng gói cao nhất cho từng loại tính năng. Để đổi gói, hãy{' '}
+        Bạn đang dùng gói cao nhất cho {featureTypeLabelVi(selectedFeatureType)}. Để đổi gói, hãy{' '}
         <span className='font-medium text-main-primary'>huỷ gói hiện tại</span> ở phần trên rồi chọn gói thấp hơn (nếu
         phù hợp), hoặc chờ hết hạn.
       </p>
@@ -687,102 +761,224 @@ function Step2Content({
   }
 
   return (
-    <div className='space-y-4'>
-      <p className='text-xs text-grey-500'>
-        Cấp gói: <span className='font-medium text-main-black'>Miễn phí</span> →{' '}
-        <span className='font-medium text-main-black'>Basic</span> →{' '}
-        <span className='font-medium text-main-black'>Premium</span> →{' '}
-        <span className='font-medium text-main-black'>Pro</span> →{' '}
-        <span className='font-medium text-main-black'>Pro+</span>. Gói cấp thấp hơn gói đang dùng sẽ bị khoá.
-      </p>
-      <div className='flex flex-col gap-4 lg:flex-row'>
-        <div className='flex flex-col gap-2.5 lg:w-2/5'>
-          {rawPlans.map((plan) => {
-            const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
-            return (
-            <button
-              key={plan.id}
-              type='button'
-              disabled={blocked}
-              onClick={() => !blocked && onSelectPlan(plan.id)}
-              className={cn(
-                'relative flex w-full items-center justify-between rounded-lg border-2 px-4 py-3 text-left transition-all',
-                blocked && 'cursor-not-allowed opacity-50',
-                activePlanId === plan.id && !blocked
-                  ? 'border-main-primary bg-purple-98'
-                  : !blocked && 'border-border bg-white hover:border-purple-90 hover:bg-purple-98',
-                blocked && 'border-grey-200 bg-grey-100'
-              )}
-            >
-              {plan.isPopular && (
-                <span className='absolute -top-2.5 left-3 rounded-full bg-main-primary px-2 py-0.5 text-[10px] font-bold text-white'>
-                  Phổ biến nhất
-                </span>
-              )}
-              <div className='min-w-0'>
-                <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
-                <p className='text-xs text-grey-500'>{plan.description}</p>
-              </div>
-              <div className='ml-3 shrink-0 text-right'>
-                <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
-                <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
-              </div>
-              {blocked && (
-                <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>Đang dùng gói cao hơn</span>
-              )}
-            </button>
-          );
-          })}
-        </div>
+    <div className='space-y-4 pt-3'>
+      {/* Feature type tabs for subscriptions */}
+      {type === 'subscription' && featureTypes.length > 1 && (
+        <div className='relative'>
+          {/* Bookmark tags layer - positioned absolutely to the left, outside */}
+          <div className='absolute right-full top-0 -rotate-90 origin-right flex flex-row gap-2 z-10 -mr-[-37px]'>
+            {featureTypes.map((featureType) => (
+              <button
+                key={featureType}
+                type='button'
+                onClick={() => {
+                  setSelectedFeatureType(featureType);
+                  // Reset selected plan when changing feature type
+                  const firstSelectable = plansByFeatureType?.[featureType]?.find(
+                    (p) => !isSubscriptionPlanBlocked(p, mySubs)
+                  )?.id ?? plansByFeatureType?.[featureType]?.[0]?.id;
+                  if (firstSelectable) {
+                    onSelectPlan(firstSelectable);
+                  }
+                }}
+                className={cn(
+                  'relative flex shrink-0 items-center justify-center px-2 py-2 text-xs font-semibold transition-all whitespace-nowrap',
+                  'rounded-t-lg border-2 border-b-0',
+                  selectedFeatureType === featureType
+                    ? 'bg-main-primary text-white border-main-primary'
+                    : 'bg-white border-grey-300 text-grey-600 hover:bg-grey-50'
+                )}
+              >
+                {featureTypeLabelVi(featureType)}
+              </button>
+            ))}
+          </div>
 
-        <div className='rounded-xl border border-border bg-grey-50 p-5 lg:flex-1'>
-          <div className='mb-4 flex items-start justify-between gap-2'>
-            <div>
-              <div className='flex flex-wrap items-center gap-2'>
-                <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
-                {selectedPlan.isPopular && (
-                  <span className='rounded-full bg-main-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
-                    Phổ biến nhất
+          {/* Content section - no border container */}
+          <div className='flex flex-col gap-4 lg:flex-row'>
+              <div className='flex flex-col gap-4 lg:w-2/5'>
+                {plansForFeatureType.map((plan) => {
+                  const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
+                  const isCurrentActive = type === 'subscription' && isCurrentActivePlan(plan.id, mySubs);
+                  return (
+                  <button
+                    key={plan.id}
+                    type='button'
+                    disabled={blocked || isCurrentActive}
+                    onClick={() => !blocked && !isCurrentActive && onSelectPlan(plan.id)}
+                    className={cn(
+                      'relative flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-all',
+                      (blocked || isCurrentActive) && 'cursor-not-allowed',
+                      activePlanId === plan.id && !blocked && !isCurrentActive
+                        ? 'border-2 border-main-primary bg-white shadow-md'
+                        : !blocked && !isCurrentActive && 'border border-grey-200 bg-white hover:border-purple-90 hover:bg-purple-98',
+                      (blocked || isCurrentActive) && 'border border-grey-200 bg-grey-50'
+                    )}
+                  >
+                    {(plan.isPopular || isCurrentActive) && (
+                      <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-main-primary')}>
+                        {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
+                      </span>
+                    )}
+                    <div className='min-w-0'>
+                      <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
+                      <p className='text-xs text-grey-500'>{plan.description}</p>
+                    </div>
+                    <div className='ml-3 shrink-0 text-right'>
+                      <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
+                      <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
+                    </div>
+                  </button>
+                );
+                })}
+              </div>
+
+              {/* Plan details - simplified border */}
+              <div className='rounded-xl border border-grey-200 bg-white p-5 lg:flex-1 shadow-sm'>
+                <div className='mb-4 flex items-start justify-between gap-2'>
+                  <div>
+                    <div className='flex flex-wrap items-center gap-2'>
+                      <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
+                      {selectedPlan.isPopular && (
+                        <span className='rounded-full bg-main-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
+                          Phổ biến nhất
+                        </span>
+                      )}
+                    </div>
+                    <p className='text-xs text-grey-500'>
+                      {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
+                    </p>
+                  </div>
+                  <div className='shrink-0 text-right'>
+                    <p className='text-2xl font-bold text-main-black'>
+                      {selectedPlan.priceLabel}
+                    </p>
+                    <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
+                  </div>
+                </div>
+
+                <div className='mb-4'>
+                  <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+                  <ul className='space-y-1.5'>
+                    {selectedPlan.benefits.map((b) => (
+                      <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                        <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                        {b.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className='mb-5'>
+                  <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
+                  <ul className='space-y-1.5'>
+                    {selectedPlan.features.map((f) => (
+                      <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
+                        <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
+                        {f.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+      )}
+
+      {/* For boost packages or single feature type subscriptions - original layout */}
+      {!(type === 'subscription' && featureTypes.length > 1) && (
+        <div className='flex flex-col gap-4 lg:flex-row'>
+          <div className='flex flex-col gap-4 lg:w-2/5'>
+            {plansForFeatureType.map((plan) => {
+              const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
+              const isCurrentActive = type === 'subscription' && isCurrentActivePlan(plan.id, mySubs);
+              return (
+              <button
+                key={plan.id}
+                type='button'
+                disabled={blocked || isCurrentActive}
+                onClick={() => !blocked && !isCurrentActive && onSelectPlan(plan.id)}
+                className={cn(
+                  'relative flex w-full items-center justify-between rounded-lg border-2 px-4 py-3 text-left transition-all',
+                  (blocked || isCurrentActive) && 'cursor-not-allowed',
+                  activePlanId === plan.id && !blocked && !isCurrentActive
+                    ? 'border-main-primary bg-purple-98'
+                    : !blocked && !isCurrentActive && 'border-border bg-white hover:border-purple-90 hover:bg-purple-98',
+                  (blocked || isCurrentActive) && 'border-grey-200 bg-grey-100'
+                )}
+              >
+                {(plan.isPopular || isCurrentActive) && (
+                  <span className='absolute -top-2.5 left-3 rounded-full bg-main-primary px-2 py-0.5 text-[10px] font-bold text-white'>
+                    {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                   </span>
                 )}
+                <div className='min-w-0'>
+                  <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
+                  <p className='text-xs text-grey-500'>{plan.description}</p>
+                </div>
+                <div className='ml-3 shrink-0 text-right'>
+                  <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
+                  <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
+                </div>
+                {blocked && (
+                  <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>
+                    {isCurrentActive ? 'Gói đang dùng' : 'Đang dùng gói cao hơn'}
+                  </span>
+                )}
+              </button>
+            );
+            })}
+          </div>
+
+          <div className='rounded-xl border border-border bg-grey-50 p-5 lg:flex-1'>
+            <div className='mb-4 flex items-start justify-between gap-2'>
+              <div>
+                <div className='flex flex-wrap items-center gap-2'>
+                  <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
+                  {selectedPlan.isPopular && (
+                    <span className='rounded-full bg-main-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
+                      Phổ biến nhất
+                    </span>
+                  )}
+                </div>
+                <p className='text-xs text-grey-500'>
+                  {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
+                </p>
               </div>
-              <p className='text-xs text-grey-500'>
-                {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
-              </p>
+              <div className='shrink-0 text-right'>
+                <p className='text-2xl font-bold text-main-black'>
+                  {selectedPlan.priceLabel}
+                </p>
+                <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
+              </div>
             </div>
-            <div className='shrink-0 text-right'>
-              <p className='text-2xl font-bold text-main-black'>
-                {selectedPlan.priceLabel}
-              </p>
-              <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
+
+            <div className='mb-4'>
+              <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+              <ul className='space-y-1.5'>
+                {selectedPlan.benefits.map((b) => (
+                  <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    {b.label}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
 
-          <div className='mb-4'>
-            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
-            <ul className='space-y-1.5'>
-              {selectedPlan.benefits.map((b) => (
-                <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
-                  <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
-                  {b.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className='mb-5'>
-            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
-            <ul className='space-y-1.5'>
-              {selectedPlan.features.map((f) => (
-                <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
-                  <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
-                  {f.label}
-                </li>
-              ))}
-            </ul>
+            <div className='mb-5'>
+              <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
+              <ul className='space-y-1.5'>
+                {selectedPlan.features.map((f) => (
+                  <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
+                    <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
+                    {f.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className='flex justify-between pt-1'>
         <RealVistaButton
@@ -837,11 +1033,8 @@ function Step3Content({
       setCheckout(data);
       onCheckoutCreated(data);
       setError(null);
-      // VNPay: sang bước 4 ngay
-      if (data.payment_method === 'VNPAY') {
-        onNext();
-      }
-      // PayOS: giữ lại ở step 3, hiển thị QR
+      // PayOS: hiển thị QR (không auto next)
+      // VNPay: hiển thị button (không auto next, user bấm button để next)
     },
     onError: (e: unknown) => {
       if (e instanceof HttpError && e.payload?.message) {
@@ -855,7 +1048,7 @@ function Step3Content({
   });
 
   const syncPayOsMutation = useMutation({
-    mutationFn: () => billingApi.syncPayOsFromGateway(checkout?.transaction_id ?? ''),
+    mutationFn: () => billingApi.syncPayOsFromCheckoutOrder(checkout?.checkoutOrderId ?? ''),
     onSuccess: (res) => {
       const txnStatus = (res.payload as { data?: TransactionStatusResponse }).data?.status;
       if (txnStatus === 'COMPLETED') {
@@ -868,6 +1061,32 @@ function Step3Content({
       toast.error('Không thể kiểm tra trạng thái PayOS');
     },
   });
+
+  // Poll VNPay transaction status when checkout is created with VNPay
+  React.useEffect(() => {
+    if (!checkout || checkout.paymentMethod !== 'VNPAY') return;
+    if (!checkout.checkoutOrderId) return;
+
+    const interval = setInterval(() => {
+      void queryClient.invalidateQueries({
+        queryKey: billingKeys.transactionStatus(checkout.checkoutOrderId),
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [checkout, queryClient]);
+
+  // When VNPay transaction completes, auto proceed to step 4
+  const { data: vnpayStatusData } = useQuery({
+    ...billingQueries.transactionStatus(checkout?.checkoutOrderId ?? ''),
+    enabled: !!checkout && checkout.paymentMethod === 'VNPAY' && !!checkout.checkoutOrderId,
+  });
+
+  React.useEffect(() => {
+    if (vnpayStatusData?.status === 'COMPLETED' && selectedPayment === 'vnpay') {
+      onNext();
+    }
+  }, [vnpayStatusData?.status, selectedPayment, onNext]);
 
   const requestCheckout = React.useCallback(
     (method: 'PAYOS' | 'VNPAY', onDone?: (data: CheckoutResponse) => void) => {
@@ -896,6 +1115,10 @@ function Step3Content({
 
     if (method === 'vnpay') {
       setCheckout(null);
+      // VNPay: tạo link khi chọn (show button section)
+      if (!selectedPlan || !selectedType) return;
+      if (checkoutMutation.isPending) return;
+      requestCheckout('VNPAY');
       return;
     }
 
@@ -908,107 +1131,141 @@ function Step3Content({
     requestCheckout('PAYOS');
   };
 
-  const handleConfirm = () => {
-    if (!selectedPlan || !selectedPayment || checkoutMutation.isPending) return;
+  const isLoading = checkoutMutation.isPending;
 
-    if (!checkout) {
-      if (selectedPayment === 'payos') {
-        requestCheckout('PAYOS');
-        return;
-      }
-      requestCheckout('VNPAY', (data) => {
-        window.open(data.checkout_url, '_blank');
-        onNext();
-      });
-      return;
+  // Calculate date range
+  const getDateRange = () => {
+    const today = new Date();
+    const startDate = today.toLocaleDateString('vi-VN');
+
+    let endDate = 'Không giới hạn';
+    if (selectedPlan && selectedPlan.durationDays > 0) {
+      const end = new Date(today);
+      end.setDate(end.getDate() + selectedPlan.durationDays);
+      endDate = end.toLocaleDateString('vi-VN');
     }
 
-    if (selectedPayment === 'vnpay') {
-      window.open(checkout.checkout_url, '_blank');
-    }
-    onNext();
+    return { startDate, endDate };
   };
 
-  const isLoading = checkoutMutation.isPending;
+  const { startDate, endDate } = getDateRange();
 
   return (
     <div className='space-y-4'>
-      {selectedPlan && (
-        <div className='flex items-center justify-between rounded-lg border border-purple-90 bg-purple-98 px-4 py-3'>
-          <div className='flex items-center gap-3'>
-            <div className='flex size-8 items-center justify-center rounded-lg bg-main-primary text-white'>
-              <Zap className='size-3.5' />
+      <div className='flex flex-col gap-4 lg:flex-row'>
+        {/* Left: Payment method selection */}
+        <div className='flex flex-col gap-2.5 lg:w-2/5'>
+          <p className='text-xs text-grey-500 mb-1'>Chọn phương thức thanh toán</p>
+          <button
+            type='button'
+            onClick={() => handleSelectPayment('vnpay')}
+            className={cn(
+              'flex items-center gap-3 rounded-xl p-4 text-left transition-all',
+              selectedPayment === 'vnpay'
+                ? 'bg-purple-98'
+                : 'bg-white'
+            )}
+          >
+            <div className='flex size-5 items-center justify-center rounded-full border-2 border-grey-300 shrink-0'>
+              {selectedPayment === 'vnpay' && (
+                <div className='size-2.5 rounded-full bg-main-primary' />
+              )}
             </div>
+            <img
+              src='/vnpay.png'
+              alt='VNPay'
+              className='h-10 w-auto shrink-0 object-contain rounded-lg'
+            />
+            <div className='flex-1'>
+              <p className='font-semibold text-sm text-main-black'>VNPay</p>
+              <p className='text-xs text-grey-500'>Ví điện tử & ngân hàng</p>
+            </div>
+          </button>
+
+          <button
+            type='button'
+            onClick={() => handleSelectPayment('payos')}
+            className={cn(
+              'flex items-center gap-3 rounded-xl p-4 text-left transition-all',
+              selectedPayment === 'payos'
+                ? 'bg-purple-98'
+                : 'bg-white'
+            )}
+          >
+            <div className='flex size-5 items-center justify-center rounded-full border-2 border-grey-300 shrink-0'>
+              {selectedPayment === 'payos' && (
+                <div className='size-2.5 rounded-full bg-main-primary' />
+              )}
+            </div>
+            <img
+              src='/payos.png'
+              alt='PayOS'
+              className='h-10 w-auto shrink-0 object-contain rounded-lg'
+            />
+            <div className='flex-1'>
+              <p className='font-semibold text-sm text-main-black'>PayOS</p>
+              <p className='text-xs text-grey-500'>Chuyển khoản ngân hàng</p>
+            </div>
+          </button>
+        </div>
+
+        {/* Right: Order review */}
+        <div className='rounded-xl border border-border bg-grey-50 p-5 lg:flex-1 bg-white'>
+          <div className='mb-4 flex items-start justify-between gap-2'>
             <div>
-              <p className='text-sm font-semibold text-main-black'>{selectedPlan.name}</p>
-              <p className='text-xs text-grey-500'>{selectedPlan.durationLabel}</p>
+              <div className='flex flex-wrap items-center gap-2'>
+                <h3 className='text-lg font-bold text-main-black'>{selectedPlan?.name || 'Gói dịch vụ'}</h3>
+              </div>
+              <p className='text-xs text-grey-500'>
+                {selectedType === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan?.durationLabel}`}
+              </p>
+            </div>
+            <div className='shrink-0 text-right'>
+              <p className='text-2xl font-bold text-main-black'>
+                {selectedPlan?.priceLabel}
+              </p>
+              <p className='text-xs text-grey-500'>/{selectedPlan?.durationLabel}</p>
             </div>
           </div>
-          <span className='text-sm font-bold text-main-primary'>{selectedPlan.priceLabel}</span>
+
+          <div className='mb-4'>
+            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+            <ul className='space-y-1.5'>
+              {selectedPlan?.benefits.map((b) => (
+                <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                  <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                  {b.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className='mb-5'>
+            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Thời hạn</p>
+            <p className='text-sm text-grey-700'>
+              {startDate} - {endDate}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Error message */}
+      {error && (
+        <div className='rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-500'>
+          {error}
         </div>
       )}
 
-      <div className='grid gap-3 sm:grid-cols-2'>
-        <button
-          type='button'
-          onClick={() => handleSelectPayment('vnpay')}
-          className={cn(
-            'flex items-center gap-3 rounded-xl border-2 p-4 transition-all',
-            selectedPayment === 'vnpay'
-              ? 'border-red-400 bg-red-50'
-              : 'border-border bg-white hover:border-red-200 hover:bg-red-50'
-          )}
-        >
-          <div className='flex size-9 items-center justify-center rounded-lg bg-red-500 text-white'>
-            <span className='text-[11px] font-black leading-none'>VN</span>
-          </div>
-          <div className='text-left flex-1'>
-            <p className='font-semibold text-sm text-main-black'>VNPay</p>
-            <p className='text-xs text-grey-500'>Ví điện tử & ngân hàng</p>
-          </div>
-          {selectedPayment === 'vnpay' && <Check className='size-4 shrink-0 text-red-500' />}
-        </button>
-
-        <button
-          type='button'
-          onClick={() => handleSelectPayment('payos')}
-          className={cn(
-            'flex items-center gap-3 rounded-xl border-2 p-4 transition-all',
-            selectedPayment === 'payos'
-              ? 'border-blue-400 bg-blue-50'
-              : 'border-border bg-white hover:border-blue-200 hover:bg-blue-50'
-          )}
-        >
-          <div className='flex size-9 items-center justify-center rounded-lg bg-blue-600 text-white'>
-            <span className='text-[11px] font-black leading-none'>OS</span>
-          </div>
-          <div className='text-left flex-1'>
-            <p className='font-semibold text-sm text-main-black'>PayOS</p>
-            <p className='text-xs text-grey-500'>Chuyển khoản ngân hàng</p>
-          </div>
-          {selectedPayment === 'payos' && <Check className='size-4 shrink-0 text-blue-500' />}
-        </button>
-      </div>
-
-      {error && (
-        <p className='text-sm text-red-500 rounded-lg border border-red-200 bg-red-50 px-3 py-2'>{error}</p>
-      )}
-
+      {/* PayOS loading */}
       {selectedPayment === 'payos' && isLoading && (
-        <p className='flex items-center justify-center gap-2 text-sm text-grey-600 py-2'>
+        <div className='flex items-center justify-center gap-2 py-2 text-sm text-grey-600'>
           <Loader2 className='size-4 animate-spin' />
           Đang tạo mã QR PayOS…
-        </p>
+        </div>
       )}
 
-      {selectedPayment === 'vnpay' && !checkout && !isLoading && (
-        <p className='text-center text-xs text-grey-500 px-2'>
-          Chọn VNPay xong, bấm nút <span className='font-medium text-main-black'>bên dưới</span> để tạo link và mở trang thanh toán.
-        </p>
-      )}
-
-      {/* PayOS: show QR after checkout created (payload may use qr_code or VietQR string; fallback to payment URL) */}
-      {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
+      {/* PayOS: show QR after checkout created (payload may use qrCode or VietQR string; fallback to payment URL) */}
+      {selectedPayment === 'payos' && checkout && (checkout.qrCode || checkout.checkoutUrl) && (
         <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
           <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
             Quét mã QR để thanh toán qua{' '}
@@ -1033,7 +1290,7 @@ function Step3Content({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                checkout.qr_code || checkout.checkout_url
+                checkout.qrCode || checkout.checkoutUrl
               )}&color=7065f0&bgcolor=ffffff`}
               alt='PayOS QR code'
               width={180}
@@ -1043,7 +1300,7 @@ function Step3Content({
           </div>
           <p className='text-xs text-grey-500'>Mã QR chỉ có giá trị trong 15 phút</p>
           <a
-            href={checkout.checkout_url}
+            href={checkout.checkoutUrl}
             target='_blank'
             rel='noopener noreferrer'
             className='flex items-center gap-1 text-xs text-blue-600 underline underline-offset-2'
@@ -1053,42 +1310,32 @@ function Step3Content({
         </div>
       )}
 
-      {/* VNPay: show redirect notice after link created */}
+      {/* VNPay: show payment button after link created */}
       {selectedPayment === 'vnpay' && checkout && (
-        <div className='flex flex-col items-center gap-2 rounded-xl border border-border bg-red-50 py-5'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
           <p className='text-sm font-medium text-grey-700'>
-            Đã tạo link — bấm <span className='font-semibold'>Tiếp theo</span> bên dưới hoặc mở lại VNPay.
+            Đã tạo link thanh toán VNPay
           </p>
-          <p className='text-xs text-grey-500'>Cửa sổ thanh toán đã mở (nếu trình duyệt chặn popup, bấm nút dưới).</p>
+          <RealVistaButton
+            size='small'
+            className='bg-primary text-white hover:bg-primary-dark'
+            onClick={() => {
+              window.open(checkout.checkoutUrl, '_blank');
+            }}
+          >
+            Chuyển sang VNPay thanh toán
+          </RealVistaButton>
+          <p className='text-xs text-grey-500'>Cửa sổ thanh toán sẽ mở trong tab mới. Tự động quay về sau khi thanh toán xong</p>
         </div>
       )}
 
-      <div className='flex justify-between gap-2 pt-1'>
+      <div className='flex justify-start pt-1'>
         <RealVistaButton
           variant='secondary'
           size='small'
           onClick={onRetry}
         >
           Quay lại
-        </RealVistaButton>
-        <RealVistaButton
-          size='small'
-          disabled={!selectedPayment || isLoading || (selectedPayment === 'payos' && !checkout)}
-          onClick={handleConfirm}
-          withIcon
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className='size-3.5 animate-spin' />
-              Đang xử lý...
-            </>
-          ) : selectedPayment === 'vnpay' && !checkout ? (
-            'Tạo link & mở VNPay'
-          ) : selectedPayment === 'payos' && !checkout ? (
-            'Tạo mã QR'
-          ) : (
-            'Xác nhận'
-          )}
         </RealVistaButton>
       </div>
     </div>
@@ -1115,12 +1362,21 @@ function Step4Content({
     enabled: !!transactionId,
   });
 
-  // Refresh subscriptions when payment completes
+  const saveTransactionMutation = useMutation({
+    mutationFn: (id: string) => billingApi.saveTransaction(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing', 'my-transactions'] });
+    },
+  });
+
+  // Refresh subscriptions and transactions when payment completes
   React.useEffect(() => {
-    if (statusData?.status === 'COMPLETED') {
+    if (statusData?.status === 'COMPLETED' && transactionId && !saveTransactionMutation.isPending) {
+      saveTransactionMutation.mutate(transactionId);
       queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['billing', 'my-transactions'] });
     }
-  }, [statusData?.status, queryClient]);
+  }, [statusData?.status, transactionId, queryClient, saveTransactionMutation]);
 
   const isPending = !statusData || statusData.status === 'PENDING' || isLoading;
   const isSuccess = statusData?.status === 'COMPLETED';
@@ -1195,7 +1451,7 @@ function Step4Content({
           </div>
         )}
 
-        {isSuccess && statusData && (
+        {isSuccess && statusData && plan && (
           <div className='w-full rounded-xl border border-border bg-white p-6'>
             <div className='mb-6 flex items-center justify-between'>
               <p className='text-base font-semibold text-main-black'>Hóa đơn</p>
@@ -1218,7 +1474,7 @@ function Step4Content({
                 <tbody>
                   <tr className='border-b border-grey-100'>
                     <td className='py-4 text-sm text-grey-700'>{new Date().toLocaleDateString('vi-VN')}</td>
-                    <td className='py-4 text-sm text-grey-700'></td>
+                    <td className='py-4 text-sm text-grey-700'>{plan.name}</td>
                     <td className='py-4'>
                       <span className='text-sm text-grey-700'>Trả</span>
                     </td>
@@ -1403,7 +1659,7 @@ function PurchaseWizard() {
         )}
         {step === 4 && (
           <Step4Content
-            transactionId={checkoutData?.transaction_id ?? null}
+            transactionId={checkoutData?.checkoutOrderId ?? null}
             plan={selectedPlan}
             onDone={handleDone}
           />
@@ -1453,6 +1709,133 @@ function PurchaseWizard() {
 }
 
 // ---------------------------------------------------------------------------
+// Transactions Section
+// ---------------------------------------------------------------------------
+
+function TransactionsSection() {
+  const { data: transactions, isLoading, error } = useQuery(billingQueries.myTransactions());
+
+  const formatStatus = (status: string): string => {
+    const statusMap: Record<string, string> = {
+      PENDING: 'Chờ xử lý',
+      COMPLETED: 'Thành công',
+      FAILED: 'Thất bại',
+      REFUNDED: 'Hoàn tiền',
+    };
+    return statusMap[status] || status;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'bg-green-50 text-green-700';
+      case 'PENDING':
+        return 'bg-yellow-50 text-yellow-700';
+      case 'FAILED':
+        return 'bg-red-50 text-red-700';
+      case 'REFUNDED':
+        return 'bg-blue-50 text-blue-700';
+      default:
+        return 'bg-grey-50 text-grey-700';
+    }
+  };
+
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('vi-VN');
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatCurrency = (amount: number): string => {
+    return (amount).toLocaleString('vi-VN') + ' ₫';
+  };
+
+  if (isLoading) {
+    return (
+      <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
+        <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <div className='flex justify-center py-8'>
+          <Loader2 className='size-6 animate-spin text-main-primary' />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
+        <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <div className='text-center py-8 text-grey-500'>
+          Không thể tải lịch sử giao dịch
+        </div>
+      </div>
+    );
+  }
+
+  if (!transactions || transactions.length === 0) {
+    return (
+      <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
+        <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <div className='text-center py-8 text-grey-500'>
+          Chưa có giao dịch nào
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className='rounded-xl border border-grey-200 bg-white shadow-sm overflow-hidden'>
+      <div className='border-b border-grey-200 px-5 py-4'>
+        <h2 className='text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+      </div>
+      <div className='overflow-x-auto'>
+        <table className='w-full'>
+          <thead>
+            <tr className='border-b border-grey-200 bg-grey-50'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+                Ngày
+              </th>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+                Mô tả
+              </th>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+                Trạng thái
+              </th>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+                Số tiền
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((transaction) => (
+              <tr key={transaction.transactionId} className='border-b border-grey-100 hover:bg-grey-50 transition-colors'>
+                <td className='px-5 py-3 text-sm text-grey-600'>
+                  {formatDate(transaction.createdAt)}
+                </td>
+                <td className='px-5 py-3 text-sm text-main-black'>
+                  {transaction.description}
+                </td>
+                <td className='px-5 py-3 text-sm'>
+                  <span className={cn('inline-block rounded-full px-2 py-1 text-xs font-medium', getStatusColor(transaction.status))}>
+                    {formatStatus(transaction.status)}
+                  </span>
+                </td>
+                <td className='px-5 py-3 text-sm font-semibold text-main-black'>
+                  {formatCurrency(transaction.amount)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main export
 // ---------------------------------------------------------------------------
 
@@ -1461,6 +1844,7 @@ export function SubscriptionTab() {
     <div className='space-y-6'>
       <CurrentPlansSection />
       <PurchaseWizard />
+      <TransactionsSection />
     </div>
   );
 }
