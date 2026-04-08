@@ -1,0 +1,59 @@
+{
+  "MyRentalContracts": {
+    "loading": "Loading your contracts...",
+    "error": "Failed to load contracts. Please try again.",
+    "hero": {
+      "eyebrow": "Tenant Portal",
+      "title": "My Rental Contracts",
+      "subtitle": "View and manage your rental agreements. Sign pending contracts to activate your lease.",
+      "noSelection": "None selected",
+      "stats": {
+        "totalContracts": "Total Contracts",
+        "activeSelection": "Selected Property"
+      }
+    },
+    "filter": {
+      "allStatuses": "All Statuses",
+      "searchPlaceholder": "Search by property...",
+      "searchAria": "Search contracts by property name",
+      "tabs": {
+        "all": "All",
+        "active": "Active",
+        "expired": "Expired"
+      }
+    },
+    "table": {
+      "status": "Status",
+      "property": "Property",
+      "monthlyRent": "Monthly Rent",
+      "leaseStart": "Lease Start"
+    },
+    "empty": {
+      "title": "No contracts found",
+      "subtitle": "You don't have any rental contracts yet."
+    },
+    "pagination": {
+      "showing": "Showing {from}–{to} of {total}",
+      "prevAria": "Previous page",
+      "nextAria": "Next page"
+    },
+    "detailPanel": {
+      "title": "Contract Details",
+      "contractMeta": "Contract",
+      "previewAlt": "Contract document for {propertyTitle}",
+      "landlordSigned": "Landlord signed",
+      "youSigned": "You signed",
+      "signingProgressTitle": "Signing Progress",
+      "closeAria": "Close detail panel",
+      "actionCardEyebrow": "Action Required",
+      "actionCardDescription": "This contract is awaiting your signature to become active.",
+      "signNow": "Sign Now",
+      "signNowAria": "Open DocuSign to sign this contract",
+      "signing": "Loading..."
+    },
+    "toast": {
+      "signingUnavailable": "Signing URL is not available. Please try again.",
+      "signingError": "Failed to get signing link. Please try again."
+    }
+  }
+}

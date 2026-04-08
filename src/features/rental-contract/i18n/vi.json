@@ -1,0 +1,78 @@
+{
+  "RentalContract": {
+    "detailPanel": {
+      "title": "Xem trước hợp đồng",
+      "previewAlt": "Bản xem trước hợp đồng của {tenantName}",
+      "previewBadge": "Xem trước",
+      "contractMeta": "Phong bì DocuSign",
+      "leaseStart": "Ngày bắt đầu",
+      "leaseEnd": "Ngày kết thúc",
+      "envelopeId": "Mã phong bì: {envelopeId}",
+      "signingProgress": {
+        "title": "Tiến độ ký",
+        "sent": "Đã gửi ký",
+        "ownerSigned": "Chủ nhà đã ký",
+        "tenantSigned": "Người thuê đã ký",
+        "pending": "Đang chờ"
+      },
+      "terminationReason": "Lý do chấm dứt",
+      "actionCardEyebrow": "Cập nhật trạng thái",
+      "actionCardDescription": "Kích hoạt bước tiếp theo trong vòng đời DocuSign của hợp đồng ngay trong dashboard."
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "pending_renter": "Chờ người thuê",
+      "pending_landlord": "Chờ chủ nhà",
+      "active": "Đang hiệu lực",
+      "expired": "Hết hạn",
+      "terminated": "Đã chấm dứt",
+      "rejected": "Đã từ chối"
+    },
+    "table": {
+      "status": "Trạng thái",
+      "tenant": "Người thuê",
+      "monthlyRent": "Tiền thuê / tháng",
+      "createdDate": "Ngày tạo",
+      "perMonth": "mỗi tháng"
+    },
+    "statusActions": {
+      "updateStatus": "Cập nhật trạng thái",
+      "sendForSigning": "Gửi để ký",
+      "sendToLandlord": "Gửi cho chủ nhà ký",
+      "sendToRenter": "Gửi cho người thuê ký",
+      "markActive": "Chuyển sang hiệu lực",
+      "terminate": "Chấm dứt hợp đồng",
+      "noAvailableAction": "Không có thao tác",
+      "signNow": "Ký ngay"
+    },
+    "statusActionHints": {
+      "sendForSigning": "Tạo hoặc dùng lại phong bì DocuSign và gửi cho cả hai bên.",
+      "sendToLandlord": "Khởi tạo luồng ký DocuSign — bạn (chủ nhà) sẽ ký trước.",
+      "sendToRenter": "Chủ nhà đã ký. Bây giờ gửi hợp đồng cho người thuê để hoàn tất ký.",
+      "markActive": "Dùng khi DocuSign xác nhận cả hai bên đã hoàn tất ký.",
+      "terminate": "Kết thúc sớm hợp đồng đang hiệu lực và lưu lý do."
+    },
+    "statusDialog": {
+      "sendTitle": "Gửi hợp đồng để ký",
+      "sendDescription": "Thao tác này sẽ gửi phong bì DocuSign tới {tenantName} và chuyển hợp đồng sang trạng thái chờ ký.",
+      "activateTitle": "Chuyển hợp đồng sang hiệu lực",
+      "activateDescription": "Dùng thao tác này sau khi DocuSign xác nhận cả hai bên đã ký xong hợp đồng của {tenantName}.",
+      "terminateTitle": "Chấm dứt hợp đồng thuê",
+      "terminateDescription": "Thêm lý do ngắn gọn trước khi chấm dứt hợp đồng đang hiệu lực của {tenantName}.",
+      "reasonLabel": "Lý do",
+      "reasonPlaceholder": "Ghi chú rõ ràng cho lần cập nhật trạng thái này...",
+      "reasonHint": "Nhập ít nhất 10 ký tự để lịch sử cập nhật có ý nghĩa hơn.",
+      "updating": "Đang cập nhật..."
+    },
+    "toast": {
+      "updateSuccess": "Cập nhật hợp đồng thuê thành công",
+      "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại.",
+      "signingUrlReady": "Đường dẫn ký đã sẵn sàng — đang mở DocuSign trong tab mới.",
+      "signingUnavailable": "Tính năng ký tạm thời không khả dụng. Vui lòng thử lại sau.",
+      "signingError": "Không thể tải liên kết ký. Vui lòng thử lại."
+    },
+    "common": {
+      "cancel": "Hủy"
+    }
+  }
+}

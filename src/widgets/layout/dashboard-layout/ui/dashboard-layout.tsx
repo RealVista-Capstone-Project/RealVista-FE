@@ -6,12 +6,12 @@ import {
   Calendar,
   ChevronDown,
   Columns,
+  FileText,
   LayoutDashboard,
   MessageCircle,
   TrendingUp,
   Users,
   Building2,
-  FileText,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
@@ -42,23 +42,23 @@ export interface DashboardLayoutProps {
   className?: string;
 }
 
-const defaultSidebarItems: SidebarMenuItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: ROUTES.dashboard.root,
-    icon: LayoutDashboard,
-  },
+const ownerSidebarItems: SidebarMenuItem[] = [
+  { id: 'dashboard', label: 'Dashboard', href: ROUTES.dashboard.root, icon: LayoutDashboard },
   { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
   { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
   {
-    id: 'manage-agent',
-    label: 'Manage Agent',
-    href: ROUTES.dashboard.manageAgent,
-    icon: Users,
+    id: 'rental-contracts',
+    label: 'Rental Contracts',
+    href: ROUTES.dashboard.rentalContracts,
+    icon: FileText,
   },
+  { id: 'manage-agent', label: 'Manage Agent', href: ROUTES.dashboard.manageAgent, icon: Users },
+  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
+];
 
+const tenantSidebarItems: SidebarMenuItem[] = [
+  { id: 'my-contracts', label: 'My Contracts', href: ROUTES.dashboard.myContracts, icon: FileText },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
   { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
 ];
@@ -104,36 +104,43 @@ export function DashboardLayout({
   className,
 }: DashboardLayoutProps) {
   const { data: session } = useAuthSession();
-  const isAgent = session?.user?.role === 'AGENT' || session?.user?.backendRoles?.includes('AGENT');
-
-  const finalSidebarItems = React.useMemo(() => {
-    if (sidebarItems) return sidebarItems;
-    return isAgent ? agentSidebarItems : defaultSidebarItems;
-  }, [sidebarItems, isAgent]);
+  const backendRoles: string[] = session?.user?.backendRoles ?? [];
+  const isAgent = session?.user?.role === 'AGENT' || backendRoles.includes('AGENT');
+  const isTenant = backendRoles.includes('TENANT') && !backendRoles.includes('OWNER');
 
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
 
-  /**
-   * Compute the top nav page title based on the current pathname
-   */
+  const resolvedSidebarItems = React.useMemo(() => {
+    if (sidebarItems) return sidebarItems;
+    if (isAgent) return agentSidebarItems;
+    if (isTenant) return tenantSidebarItems;
+    return ownerSidebarItems;
+  }, [sidebarItems, isAgent, isTenant]);
+
   const pageTitle = React.useMemo(() => {
     if (
       pathname === ROUTES.dashboard.managedListings ||
       pathname.startsWith(ROUTES.dashboard.managedListings)
-    ) {
+    )
       return t('pageTitle.managedListings');
-    }
-    if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight)) {
+    if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight))
       return t('pageTitle.insight');
-    }
-    if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants)) {
+    if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants))
       return t('pageTitle.tenants');
-    }
-    if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages)) {
+    if (
+      pathname === ROUTES.dashboard.rentalContracts ||
+      pathname.startsWith(ROUTES.dashboard.rentalContracts)
+    )
+      return t('pageTitle.rentalContracts');
+    if (
+      pathname === ROUTES.dashboard.myContracts ||
+      pathname.startsWith(ROUTES.dashboard.myContracts)
+    )
+      return t('pageTitle.myContracts');
+    if (pathname === ROUTES.dashboard.messages || pathname.startsWith(ROUTES.dashboard.messages))
       return t('pageTitle.messages');
-    }
     if (
       pathname === ROUTES.dashboard.manageProposals ||
       pathname.startsWith(ROUTES.dashboard.manageProposals)
@@ -146,25 +153,12 @@ export function DashboardLayout({
     return t('pageTitle.default');
   }, [pathname, t]);
 
-  /**
-   * Determine if a menu item is active based on the current pathname
-   * Matches exact path or checks if pathname starts with the href for nested routes
-   */
   const isItemActive = (href: string) => {
-    // Exact match
     if (pathname === href) return true;
-
-    // For dashboard root, only match exact path
-    if (href === ROUTES.dashboard.root) {
-      return pathname === ROUTES.dashboard.root;
-    }
-
-    // For other routes, match if pathname starts with href
-    // This handles nested routes like /dashboard/listings
+    if (href === ROUTES.dashboard.root) return pathname === ROUTES.dashboard.root;
     return pathname.startsWith(href);
   };
 
-  // Keyboard shortcut: Cmd/Ctrl + B to toggle sidebar
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
@@ -172,7 +166,6 @@ export function DashboardLayout({
         setIsCollapsed((prev) => !prev);
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
@@ -243,9 +236,8 @@ export function DashboardLayout({
 
         {/* Menu Items */}
         <nav className='flex flex-1 flex-col gap-1 p-3 overflow-y-auto'>
-          {finalSidebarItems.map((item) => {
+          {resolvedSidebarItems.map((item) => {
             const isActive = isItemActive(item.href);
-
             return (
               <Link
                 key={item.id}
@@ -309,8 +301,6 @@ export function DashboardLayout({
 
             {/* Divider */}
             <Separator orientation='vertical' className='h-5 bg-slate-200' />
-
-            {/* Profile Button */}
             <button
               type='button'
               className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white pl-2 pr-3 py-1.5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md active:scale-95 group'
