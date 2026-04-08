@@ -1,6 +1,9 @@
 'use client';
 
-import { MyRentalContractsProvider, useMyRentalContractsContext } from '../model/my-rental-contracts-context';
+import {
+  MyRentalContractsProvider,
+  useMyRentalContractsContext,
+} from '../model/my-rental-contracts-context';
 import { TenantContractListItem } from './tenant-contract-list-item';
 import { TenantContractDetailPanel } from './tenant-contract-detail-panel';
 import { Button } from '@/shared/ui/button';
@@ -13,13 +16,7 @@ import {
   SelectValue,
 } from '@/shared/ui/select/select';
 import { cn } from '@/shared/lib/utils';
-import {
-  ChevronLeft,
-  ChevronRight,
-  FileSearch,
-  Search,
-  SlidersHorizontal,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileSearch, Search, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 function MyRentalContractsContent() {
@@ -144,6 +141,27 @@ function MyRentalContractsContent() {
 
             {/* Table */}
             <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_rgba(96,72,179,0.10)]'>
+              {/* Status tabs */}
+              <div className='flex items-center gap-1 border-b border-[#F0EEF7] px-5 py-3'>
+                {(['all', 'ACTIVE', 'EXPIRED'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setStatusFilter(tab)}
+                    className={cn(
+                      'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+                      statusFilter === tab
+                        ? 'bg-main-primary text-white'
+                        : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                    )}
+                  >
+                    {t(
+                      `filter.tabs.${tab === 'all' ? 'all' : tab === 'ACTIVE' ? 'active' : 'expired'}`
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Column headers */}
               <div className='grid grid-cols-12 gap-4 border-b border-[#F0EEF7] bg-[#FAF8FF] px-5 py-4'>
                 <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/45'>
                   {t('table.status')}

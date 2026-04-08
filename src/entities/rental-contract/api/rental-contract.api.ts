@@ -49,7 +49,7 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     sentForSigningAt: null,
     ownerSignedAt: lease.signed_by_landlord_at,
     tenantSignedAt: lease.signed_by_renter_at,
-    terminationReason: lease.reject_reason,
+    terminationReason: lease.termination_reason ?? lease.reject_reason,
     paymentDueDay: null,
     specialClauses: null,
   };
@@ -62,8 +62,7 @@ function calcDurationMonths(startDate: string, endDate: string): number {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const months =
-    (end.getFullYear() - start.getFullYear()) * 12 +
-    (end.getMonth() - start.getMonth());
+    (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
   return Math.max(1, months);
 }
 
@@ -75,10 +74,13 @@ export const rentalContractApi = {
   async getRentalContracts(
     params: GetRentalContractsParams
   ): Promise<{ payload: { data: RentalContractPageResponse } }> {
-    const { landlordId, page = 0, size = 10 } = params;
+    const { landlordId, page = 0, size = 10, status } = params;
+
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) query.set('status', status);
 
     const result = await http.get<LeasesApiResponse>(
-      `/leases/landlord/${landlordId}?page=${page}&size=${size}`
+      `/leases/landlord/${landlordId}?${query.toString()}`
     );
 
     const apiData = result.payload.data;
@@ -148,10 +150,13 @@ export const rentalContractApi = {
   async getRenterContracts(
     params: GetRenterContractsParams
   ): Promise<{ payload: { data: RentalContractPageResponse } }> {
-    const { renterId, page = 0, size = 10 } = params;
+    const { renterId, page = 0, size = 10, status } = params;
+
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) query.set('status', status);
 
     const result = await http.get<LeasesApiResponse>(
-      `/leases/renter/${renterId}?page=${page}&size=${size}`
+      `/leases/renter/${renterId}?${query.toString()}`
     );
 
     const apiData = result.payload.data;
@@ -173,7 +178,10 @@ export const rentalContractApi = {
   },
 
   // ── Refresh signing URLs (expire after ~5 min) ───────────────────────────
-  async getLandlordSigningUrl(leaseId: string, returnUrl?: string): Promise<DocuSignSigningResponse> {
+  async getLandlordSigningUrl(
+    leaseId: string,
+    returnUrl?: string
+  ): Promise<DocuSignSigningResponse> {
     const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
     const result = await http.get<DocuSignApiResponse>(
       `/leases/${leaseId}/landlord-signing-url${query}`
@@ -191,21 +199,17 @@ export const rentalContractApi = {
 
   // ── DocuSign — Step 1b: confirm landlord signed (after DocuSign redirect) ─
   async confirmLandlordSigned(leaseId: string): Promise<void> {
-    await http.post<{ success: boolean }>(
-      `/leases/${leaseId}/confirm-landlord-signed`,
-      {}
-    );
+    await http.post<{ success: boolean }>(`/leases/${leaseId}/confirm-landlord-signed`, {});
   },
 
-  // ── Terminate (mock — no real terminate endpoint confirmed) ──────────────
+  // ── Terminate ─────────────────────────────────────────────────────────────
   async updateRentalContractStatus({
     contractId,
-    status,
+    status: _status,
     reason,
-  }: UpdateRentalContractStatusPayload): Promise<{ contractId: string; status: RentalContractStatus; reason?: string }> {
-    // TODO: replace with real PATCH/PUT /leases/{id}/terminate when confirmed
-    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    await wait(180);
-    return { contractId, status, reason };
+  }: UpdateRentalContractStatusPayload): Promise<RentalContract> {
+    const body = reason ? { reason } : {};
+    const result = await http.put<LeaseApiResponse>(`/leases/${contractId}/terminate`, body);
+    return mapLeaseToContract(result.payload.data);
   },
 };
