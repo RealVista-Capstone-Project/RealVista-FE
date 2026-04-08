@@ -78,6 +78,8 @@ export interface LeaseResponse {
   signed_by_renter_at: string | null;
   signed_by_landlord_at: string | null;
   reject_reason: string | null;
+  termination_reason: string | null;
+  terminated_at: string | null;
   verified_by: string | null;
   docusign_envelope_id: string | null;
   docusign_status: string | null;

@@ -49,7 +49,7 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     sentForSigningAt: null,
     ownerSignedAt: lease.signed_by_landlord_at,
     tenantSignedAt: lease.signed_by_renter_at,
-    terminationReason: lease.reject_reason,
+    terminationReason: lease.termination_reason ?? lease.reject_reason,
     paymentDueDay: null,
     specialClauses: null,
   };
@@ -203,15 +203,17 @@ export const rentalContractApi = {
     );
   },
 
-  // ── Terminate (mock — no real terminate endpoint confirmed) ──────────────
+  // ── Terminate ─────────────────────────────────────────────────────────────
   async updateRentalContractStatus({
     contractId,
-    status,
+    status: _status,
     reason,
-  }: UpdateRentalContractStatusPayload): Promise<{ contractId: string; status: RentalContractStatus; reason?: string }> {
-    // TODO: replace with real PATCH/PUT /leases/{id}/terminate when confirmed
-    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    await wait(180);
-    return { contractId, status, reason };
+  }: UpdateRentalContractStatusPayload): Promise<RentalContract> {
+    const body = reason ? { reason } : {};
+    const result = await http.put<LeaseApiResponse>(
+      `/leases/${contractId}/terminate`,
+      body
+    );
+    return mapLeaseToContract(result.payload.data);
   },
 };
