@@ -9,7 +9,8 @@
       "rentalContracts": "Hợp đồng thuê",
       "myContracts": "Hợp đồng của tôi",
       "messages": "Tin nhắn",
-      "manageProposals": "Hồ sơ đề xuất"
+      "manageProposals": "Hồ sơ đề xuất",
+      "property": "Bất động sản"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

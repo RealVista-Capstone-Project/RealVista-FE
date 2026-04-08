@@ -9,7 +9,8 @@
       "rentalContracts": "Rental Contracts",
       "myContracts": "My Contracts",
       "messages": "Messages",
-      "manageProposals": "Proposal Library"
+      "manageProposals": "Proposal Library",
+      "property": "Property"
     },
     "actionButton": {
       "addProperty": "Add a property",

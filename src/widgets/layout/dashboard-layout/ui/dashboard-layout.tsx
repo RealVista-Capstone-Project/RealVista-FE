@@ -53,6 +53,7 @@ const ownerSidebarItems: SidebarMenuItem[] = [
     href: ROUTES.dashboard.rentalContracts,
     icon: FileText,
   },
+  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
   { id: 'manage-agent', label: 'Manage Agent', href: ROUTES.dashboard.manageAgent, icon: Users },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
@@ -82,6 +83,7 @@ const agentSidebarItems: SidebarMenuItem[] = [
     href: ROUTES.dashboard.managedListings,
     icon: Calendar,
   },
+  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
   {
     id: 'proposals',
     label: 'My Proposals',
