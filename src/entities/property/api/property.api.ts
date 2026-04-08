@@ -113,4 +113,22 @@ export const propertyApi = {
       { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
     );
   },
+  updateRoomName: (propertyId: string, operationId: string, roomName: string) => {
+    return http.patch<ApiResponse<Property3dOperation>>(
+      `properties/${propertyId}/3d-operations/${operationId}`,
+      { room_name: roomName },
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+  delete3dOperation: (propertyId: string, operationId: string) => {
+    return http.delete<ApiResponse<void>>(
+      `properties/${propertyId}/3d-operations/${operationId}`,
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+  deleteMedia: (mediaId: string) => {
+    return http.delete<ApiResponse<void>>(`media/${mediaId}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
 };

@@ -38,6 +38,15 @@
     "tryAgainBtn": "Thử Lại",
     "closeBtn": "Đóng",
     "keepOpenWarning": "Vui lòng giữ cửa sổ này mở trong khi đang khởi tạo.",
-    "safeToClose": "Bạn có thể đóng cửa sổ này an toàn. Quá trình tạo sẽ tiếp tục chạy ngầm."
+    "safeToClose": "Bạn có thể đóng cửa sổ này an toàn. Quá trình tạo sẽ tiếp tục chạy ngầm.",
+    "deleteRoom": "Xóa phòng",
+    "deleteConfirmTitle": "Xóa Phòng 3D",
+    "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa phòng 3D này? Hành động này không thể hoàn tác.",
+    "deleteConfirmCancel": "Hủy",
+    "deleteConfirmApprove": "Xóa",
+    "deleting": "Đang xóa...",
+    "renameRoom": "Đổi tên phòng",
+    "saveRename": "Lưu",
+    "cancelRename": "Hủy"
   }
 }
