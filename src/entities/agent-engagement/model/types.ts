@@ -21,7 +21,7 @@ export interface AgentEngagement {
   status: string;
   hired_at: string;
   has_review?: boolean;
-  content?: string | null;
+  content?: any | null;
   cancellation_reason?: string | null;
   /** The single listing sold by the agent for this engagement's property.
    *  Per business rule, at most one listing per engagement can reach SOLD status.

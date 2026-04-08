@@ -137,6 +137,7 @@ export const agentEngagementApi = {
     http.post<ApiResponse<{ engagement_id: string }>>('/engagements/agent-proposal', {
       agent_proposal_id: payload.agent_proposal_id,
       property_id: payload.property_id,
+      message: payload.message,
     }),
 } as const;
 
