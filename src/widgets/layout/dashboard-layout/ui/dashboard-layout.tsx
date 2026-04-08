@@ -62,7 +62,7 @@ const ownerSidebarItems: SidebarMenuItem[] = [
     href: ROUTES.dashboard.ownerProperties,
     icon: Search,
   },
-
+  {
     id: 'rental-contracts',
     label: 'Rental Contracts',
     href: ROUTES.dashboard.rentalContracts,
