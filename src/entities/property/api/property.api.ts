@@ -105,12 +105,13 @@ export const propertyApi = {
   getOwnerAvailableProperties: (criteria: OwnerAvailablePropertiesCriteria) => {
     const queryParams = new URLSearchParams();
     if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
-    if (criteria.propertyType) queryParams.append('propertyType', criteria.propertyType);
+    if (criteria.propertyTypeId) queryParams.append('propertyTypeId', criteria.propertyTypeId);
+    if (criteria.locationId) queryParams.append('locationId', criteria.locationId);
     queryParams.append('page', criteria.page.toString());
     queryParams.append('size', criteria.size.toString());
 
     return http.get<OwnerAvailablePropertiesResponse>(
-      `properties/available?${queryParams.toString()}`,
+      `properties/feed?${queryParams.toString()}`,
       {
         baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
       }

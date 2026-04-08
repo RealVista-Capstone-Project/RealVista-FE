@@ -21,6 +21,7 @@ import {
   User,
   SendHorizonal,
   Building2,
+  CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -230,13 +231,13 @@ export function OwnerPropertySheet({ property, onClose }: OwnerPropertySheetProp
               </div>
 
               {/* Description */}
-              {property.description && (
+              {property.descriptions && (
                 <section>
                   <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5'>
                     {t('detailPanel.description')}
                   </h4>
                   <p className='text-sm text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100'>
-                    {property.description}
+                    {property.descriptions}
                   </p>
                 </section>
               )}
@@ -301,13 +302,20 @@ export function OwnerPropertySheet({ property, onClose }: OwnerPropertySheetProp
 
           {/* Sticky CTA footer */}
           <div className='p-4 border-t border-gray-100 bg-white flex-shrink-0'>
-            <Button
-              className='w-full bg-main-primary hover:bg-main-primary-hover text-white font-semibold rounded-xl h-11 gap-2 shadow-sm shadow-indigo-200/60 text-sm'
-              onClick={() => setProposalModalOpen(true)}
-            >
-              <SendHorizonal className='h-4 w-4' />
-              {t('detailPanel.submitProposal')}
-            </Button>
+            {property.has_active_proposal ? (
+              <div className='w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold text-sm'>
+                <CheckCircle2 className='h-4 w-4' />
+                {t('detailPanel.alreadyProposed')}
+              </div>
+            ) : (
+              <Button
+                className='w-full bg-main-primary hover:bg-main-primary-hover text-white font-semibold rounded-xl h-11 gap-2 shadow-sm shadow-indigo-200/60 text-sm'
+                onClick={() => setProposalModalOpen(true)}
+              >
+                <SendHorizonal className='h-4 w-4' />
+                {t('detailPanel.submitProposal')}
+              </Button>
+            )}
           </div>
         </SheetContent>
       </Sheet>

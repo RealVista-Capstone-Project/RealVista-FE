@@ -10,7 +10,8 @@
     },
     "card": {
       "bedrooms": "phòng ngủ",
-      "viewDetails": "Xem chi tiết"
+      "viewDetails": "Xem chi tiết",
+      "proposed": "Đã gửi đề xuất"
     },
     "empty": {
       "title": "Không tìm thấy bất động sản.",
@@ -37,7 +38,8 @@
       "ownerName": "Chủ nhà",
       "phone": "Điện thoại",
       "email": "Email",
-      "submitProposal": "Gửi đề xuất"
+      "submitProposal": "Gửi đề xuất",
+      "alreadyProposed": "Đã gửi đề xuất"
     },
     "proposalModal": {
       "title": "Gửi đề xuất",

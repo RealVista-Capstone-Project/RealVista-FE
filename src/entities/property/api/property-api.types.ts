@@ -146,8 +146,10 @@ export interface PropertyMediaItem {
 export interface PropertyAmenityItem {
   amenity_id: string;
   amenity_name: string;
-  amenity_type: string | null;
+  amenity_type: 'ONSITE' | 'OFFSITE' | string | null;
   description: string | null;
+  is_onsite?: boolean;
+  is_offsite?: boolean;
 }
 
 export interface PropertyAttributeRangeResponse {
@@ -200,8 +202,12 @@ export interface PageResponse<T> {
   content: T[];
   page: number;
   size: number;
+  // snake_case (internal/legacy APIs)
   total_elements?: number;
   total_pages?: number;
+  // camelCase (new feed API)
+  totalElements?: number;
+  totalPages?: number;
   last?: boolean;
   first?: boolean;
   has_next?: boolean;
@@ -314,26 +320,34 @@ export interface ApiResponse<T> {
 
 export interface OwnerAvailablePropertiesCriteria {
   keyword?: string;
-  propertyType?: string;
+  propertyTypeId?: string;
+  locationId?: string;
   page: number;
   size: number;
 }
 
 export interface OwnerPropertySummary {
   property_id: string;
-  street_address: string;
-  status: string;
-  land_size_m2: number | null;
-  usable_size_m2: number | null;
-  description: string | null;
-  property_type_info: PropertyTypeInfo | null;
-  location_info: LocationInfo | null;
-  media: PropertyMediaItem[] | null;
-  attributes: PropertyAttributeItem[] | null;
   owner_id: string;
   owner_name: string | null;
   owner_phone: string | null;
   owner_email?: string | null;
+  street_address: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  width_m?: number | null;
+  length_m?: number | null;
+  status: string;
+  /** API field name is "descriptions" (plural) */
+  descriptions: string | null;
+  property_type_info: PropertyTypeInfo | null;
+  location_info: LocationInfo | null;
+  media: PropertyMediaItem[] | null;
+  attributes: PropertyAttributeItem[] | null;
+  amenities?: PropertyAmenityItem[] | null;
+  has_active_proposal?: boolean;
 }
 
 export interface OwnerAvailablePropertiesResponse {

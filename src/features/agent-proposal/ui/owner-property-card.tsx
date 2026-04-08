@@ -3,7 +3,7 @@
 import type { OwnerPropertySummary } from '@/entities/property';
 import { Badge } from '@/shared/ui/badge';
 import { cn } from '@/shared/lib/utils';
-import { MapPin, Ruler, Home, User, BedDouble, Building2, ArrowRight } from 'lucide-react';
+import { MapPin, Ruler, Home, User, BedDouble, Building2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 interface OwnerPropertyCardProps {
@@ -111,12 +111,18 @@ export function OwnerPropertyCard({
               {property.property_type_info.property_type_name}
             </span>
           )}
+          {property.has_active_proposal && (
+            <span className='flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-lg border border-emerald-200'>
+              <CheckCircle2 className='h-3 w-3' />
+              {t('card.proposed')}
+            </span>
+          )}
         </div>
 
         {/* Middle: description */}
-        {property.description && (
+        {property.descriptions && (
           <p className='text-xs text-gray-500 leading-relaxed line-clamp-2'>
-            {property.description}
+            {property.descriptions}
           </p>
         )}
 

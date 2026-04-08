@@ -7,7 +7,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 120,
     usable_size_m2: 100,
-    description: 'Căn hộ cao cấp view sông, nội thất đầy đủ, thoáng mát.',
+    descriptions: 'Căn hộ cao cấp view sông, nội thất đầy đủ, thoáng mát.',
     property_type_info: {
       property_type_id: 'pt-1',
       property_type_name: 'Căn hộ',
@@ -43,6 +43,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     owner_name: 'Nguyễn Văn An',
     owner_phone: '0901234567',
     owner_email: 'an.nguyen@email.com',
+    has_active_proposal: true,
   },
   {
     property_id: 'mock-002',
@@ -50,7 +51,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 200,
     usable_size_m2: 180,
-    description: 'Nhà phố mặt tiền đường lớn, kinh doanh thuận tiện.',
+    descriptions: 'Nhà phố mặt tiền đường lớn, kinh doanh thuận tiện.',
     property_type_info: {
       property_type_id: 'pt-2',
       property_type_name: 'Nhà phố',
@@ -86,6 +87,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     owner_name: 'Trần Thị Bích',
     owner_phone: '0912345678',
     owner_email: 'bich.tran@email.com',
+    has_active_proposal: true,
   },
   {
     property_id: 'mock-003',
@@ -93,7 +95,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'PENDING',
     land_size_m2: 500,
     usable_size_m2: 450,
-    description: 'Biệt thự sân vườn rộng, hồ bơi riêng, an ninh 24/7.',
+    descriptions: 'Biệt thự sân vườn rộng, hồ bơi riêng, an ninh 24/7.',
     property_type_info: {
       property_type_id: 'pt-3',
       property_type_name: 'Biệt thự',
@@ -136,7 +138,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 80,
     usable_size_m2: 75,
-    description: null,
+    descriptions: null,
     property_type_info: {
       property_type_id: 'pt-1',
       property_type_name: 'Căn hộ',
@@ -168,7 +170,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 350,
     usable_size_m2: 320,
-    description: 'Văn phòng cho thuê nguyên sàn, vị trí trung tâm, tiện ích đầy đủ.',
+    descriptions: 'Văn phòng cho thuê nguyên sàn, vị trí trung tâm, tiện ích đầy đủ.',
     property_type_info: {
       property_type_id: 'pt-4',
       property_type_name: 'Văn phòng',
@@ -208,7 +210,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 60,
     usable_size_m2: 55,
-    description: 'Studio hiện đại, view thành phố đẹp, thích hợp cho người độc thân.',
+    descriptions: 'Studio hiện đại, view thành phố đẹp, thích hợp cho người độc thân.',
     property_type_info: {
       property_type_id: 'pt-1',
       property_type_name: 'Căn hộ',
@@ -250,7 +252,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 250,
     usable_size_m2: 230,
-    description: 'Kho xưởng sạch sẽ, điện 3 pha, tiếp giáp đường xe tải.',
+    descriptions: 'Kho xưởng sạch sẽ, điện 3 pha, tiếp giáp đường xe tải.',
     property_type_info: {
       property_type_id: 'pt-5',
       property_type_name: 'Kho xưởng',
@@ -290,7 +292,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 150,
     usable_size_m2: 140,
-    description: 'Shophouse tầng trệt mặt tiền đường lớn, lý tưởng cho kinh doanh bán lẻ.',
+    descriptions: 'Shophouse tầng trệt mặt tiền đường lớn, lý tưởng cho kinh doanh bán lẻ.',
     property_type_info: {
       property_type_id: 'pt-6',
       property_type_name: 'Shophouse',
@@ -330,7 +332,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 90,
     usable_size_m2: 85,
-    description: 'Nhà cấp 4 hẻm xe hơi, cần cải tạo, giá thấp hơn thị trường.',
+    descriptions: 'Nhà cấp 4 hẻm xe hơi, cần cải tạo, giá thấp hơn thị trường.',
     property_type_info: {
       property_type_id: 'pt-7',
       property_type_name: 'Nhà riêng',
@@ -372,7 +374,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 130,
     usable_size_m2: 120,
-    description: 'Căn hộ duplex thiết kế độc đáo, 2 tầng thông nhau.',
+    descriptions: 'Căn hộ duplex thiết kế độc đáo, 2 tầng thông nhau.',
     property_type_info: {
       property_type_id: 'pt-1',
       property_type_name: 'Căn hộ',
@@ -415,7 +417,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'VERIFIED',
     land_size_m2: 400,
     usable_size_m2: 380,
-    description: 'Đất nền dự án quy hoạch rõ ràng, hạ tầng hoàn chỉnh.',
+    descriptions: 'Đất nền dự án quy hoạch rõ ràng, hạ tầng hoàn chỉnh.',
     property_type_info: {
       property_type_id: 'pt-8',
       property_type_name: 'Đất nền',
@@ -455,7 +457,7 @@ export const MOCK_OWNER_PROPERTIES: OwnerPropertySummary[] = [
     status: 'AVAILABLE',
     land_size_m2: 170,
     usable_size_m2: 160,
-    description: 'Nhà phố 3 tầng mới xây, nội thất cơ bản, khu dân cư yên tĩnh.',
+    descriptions: 'Nhà phố 3 tầng mới xây, nội thất cơ bản, khu dân cư yên tĩnh.',
     property_type_info: {
       property_type_id: 'pt-2',
       property_type_name: 'Nhà phố',

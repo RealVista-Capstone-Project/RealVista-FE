@@ -14,7 +14,7 @@ import type { OwnerPropertySummary } from '@/entities/property';
 import { MOCK_OWNER_PROPERTIES } from './mock-data';
 
 // ─── Toggle this flag to switch between mock and real API ───────────────────
-const USE_MOCK = true;
+const USE_MOCK = false;
 // ────────────────────────────────────────────────────────────────────────────
 
 const ITEMS_PER_PAGE = 10;
@@ -85,11 +85,15 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
 
   const totalPages = USE_MOCK
     ? (mockData?.total_pages ?? 0)
-    : (queryResult.data?.payload?.data?.total_pages ?? 0);
+    : (queryResult.data?.payload?.data?.totalPages
+        ?? queryResult.data?.payload?.data?.total_pages
+        ?? 0);
 
   const totalElements = USE_MOCK
     ? (mockData?.total_elements ?? 0)
-    : (queryResult.data?.payload?.data?.total_elements ?? 0);
+    : (queryResult.data?.payload?.data?.totalElements
+        ?? queryResult.data?.payload?.data?.total_elements
+        ?? 0);
 
   const isLoading = USE_MOCK ? false : queryResult.isLoading;
   const isError = USE_MOCK ? false : queryResult.isError;

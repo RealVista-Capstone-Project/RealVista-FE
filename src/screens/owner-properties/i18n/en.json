@@ -10,7 +10,8 @@
     },
     "card": {
       "bedrooms": "beds",
-      "viewDetails": "View details"
+      "viewDetails": "View details",
+      "proposed": "Proposed"
     },
     "empty": {
       "title": "No properties found.",
@@ -37,7 +38,8 @@
       "ownerName": "Owner",
       "phone": "Phone",
       "email": "Email",
-      "submitProposal": "Submit Proposal"
+      "submitProposal": "Submit Proposal",
+      "alreadyProposed": "Proposal Already Sent"
     },
     "proposalModal": {
       "title": "Submit Proposal",
