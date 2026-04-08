@@ -1,9 +1,14 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useProperty3dOperations, usePropertyDetail } from '@/entities/property';
+import {
+  useProperty3dOperations,
+  usePropertyDetail,
+  useDelete3dRoom,
+  useUpdateRoomName,
+} from '@/entities/property';
 import type { Property3dOperation } from '@/entities/property/api/property-api.types';
 import {
   ArrowLeft,
@@ -20,6 +25,10 @@ import {
   CookingPot,
   Home,
   DoorOpen,
+  Pencil,
+  Trash2,
+  Check,
+  X,
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
@@ -27,6 +36,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { SparkViewer } from '@/widgets/spark-viewer/SparkViewer';
 import { RoomGenerationDialog } from './room-generation-dialog';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/dialog';
 
 const ROOM_ICONS: Record<string, React.ElementType> = {
   'Living Room': Sofa,
@@ -83,6 +100,10 @@ interface RoomGroup {
   operations: Property3dOperation[];
   latestOperation: Property3dOperation;
   hasSuccessful: boolean;
+  /** UUID of the PropertyMedia record — present only when status is READY */
+  mediaId?: string;
+  /** UUID of the Property3DGeneration record (the `id` field, not `operation_id`) */
+  operationId?: string;
 }
 
 export function ThreeDManagementScreen({
@@ -96,6 +117,10 @@ export function ThreeDManagementScreen({
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+
+  // Delete state
+  const [roomToDelete, setRoomToDelete] = useState<RoomGroup | null>(null);
+  const deleteMutation = useDelete3dRoom(propertyId);
 
   const {
     data: operations,
@@ -111,25 +136,35 @@ export function ThreeDManagementScreen({
     const grouped = new Map<string, Property3dOperation[]>();
 
     for (const op of (operations as Property3dOperation[])) {
-      // Use an internal fallback for logic, translated one only for UI
       const roomName = op.room_name || 'Unnamed Room';
       if (!grouped.has(roomName)) grouped.set(roomName, []);
       grouped.get(roomName)!.push(op);
     }
+
+    const threeDMedia = propertyDetail?.media?.filter((m) => m.media_type === 'THREE_D') || [];
 
     return Array.from(grouped.entries()).map(([roomName, ops]) => {
       const sorted = ops.sort(
         (a, b) =>
           new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
       );
+      const latestOp = sorted[0];
+
+      const matchedMedia = threeDMedia.find((m) => {
+        const rName = m.metadata?.room_name || 'Unnamed Room';
+        return rName === roomName;
+      });
+
       return {
         roomName,
         operations: sorted,
-        latestOperation: sorted[0],
+        latestOperation: latestOp,
         hasSuccessful: sorted.some((op) => op.status === 'SUCCEEDED'),
+        mediaId: matchedMedia ? (matchedMedia as any).media_id : undefined,
+        operationId: (latestOp as any).id as string | undefined,
       };
     });
-  }, [operations]);
+  }, [operations, propertyDetail]);
 
   const threeDMediaItems = useMemo(() => {
     return propertyDetail?.media?.filter((m) => m.media_type === 'THREE_D') || [];
@@ -139,14 +174,13 @@ export function ThreeDManagementScreen({
     if (!selectedRoom || threeDMediaItems.length === 0) return { url: null, metadata: null };
     const matching = threeDMediaItems.find(
       (m) => {
-        // Match using the same fallback logic
         const rName = m.metadata?.room_name || 'Unnamed Room';
         return rName === selectedRoom;
       }
     );
-    return { 
-      url: matching?.media_url || null, 
-      metadata: matching?.metadata || null 
+    return {
+      url: matching?.media_url || null,
+      metadata: matching?.metadata || null
     };
   }, [selectedRoom, threeDMediaItems]);
 
@@ -154,10 +188,9 @@ export function ThreeDManagementScreen({
   useEffect(() => {
     if (Array.isArray(operations) && (operations as Property3dOperation[]).some((op: Property3dOperation) => op.status === 'SUCCEEDED')) {
       const ops = operations as Property3dOperation[];
-      const successfulCount = ops.filter(op => op.status === 'SUCCEEDED').length;
+      const successfulCount = ops.filter((op) => op.status === 'SUCCEEDED').length;
       const mediaCount = threeDMediaItems.length;
-      
-      // If we have more successful operations than media items, refetch detail
+
       if (successfulCount > mediaCount) {
         refetchDetail();
       }
@@ -168,6 +201,16 @@ export function ThreeDManagementScreen({
     refetchOps();
     refetchDetail();
     setIsDialogOpen(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!roomToDelete?.operationId) return;
+    try {
+      await deleteMutation.mutateAsync(roomToDelete.operationId);
+      if (selectedRoom === roomToDelete.roomName) setSelectedRoom(null);
+    } finally {
+      setRoomToDelete(null);
+    }
   };
 
   const totalRooms = roomGroups.length;
@@ -292,11 +335,9 @@ export function ThreeDManagementScreen({
                   transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
                   className='relative group/stage'
                 >
-                  {/* Ambient Glow behind the viewer */}
                   <div className='absolute -inset-2 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 blur-2xl opacity-0 group-hover/stage:opacity-100 transition-opacity duration-700' />
 
                   <div className='relative overflow-hidden rounded-[2rem] border border-border/50 bg-slate-950 shadow-2xl'>
-                    {/* Immersive Header - Overlaid on top */}
                     <div className='absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-5 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none'>
                       <div className='flex items-center gap-4'>
                         <div className='w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10'>
@@ -328,7 +369,6 @@ export function ThreeDManagementScreen({
                       </Button>
                     </div>
 
-                    {/* Viewer Content */}
                     <div className='aspect-video md:aspect-[21/9] bg-slate-900 overflow-hidden'>
                       <SparkViewer
                         spzUrl={activeViewerData.url || ''}
@@ -338,7 +378,6 @@ export function ThreeDManagementScreen({
                     </div>
                   </div>
 
-                  {/* Room Status Indicator Bar below stage */}
                   <div className='mt-3 flex items-center justify-center gap-4'>
                     <div className='h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent' />
                     <div className='flex items-center gap-2 text-[11px] font-medium text-muted-foreground uppercase tracking-widest'>
@@ -361,7 +400,9 @@ export function ThreeDManagementScreen({
                     index={index}
                     isSelected={selectedRoom === room.roomName}
                     onSelect={() => setSelectedRoom(room.roomName)}
+                    onDelete={() => setRoomToDelete(room)}
                     threeDMedia={threeDMediaItems}
+                    propertyId={propertyId}
                     t={t}
                     locale={locale}
                   />
@@ -380,6 +421,32 @@ export function ThreeDManagementScreen({
         onComplete={handleGenerationComplete}
         existingRoomNames={roomGroups.map((r) => r.roomName)}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!roomToDelete} onOpenChange={(open) => { if (!open) setRoomToDelete(null); }}>
+        <DialogContent className='sm:max-w-[425px]'>
+          <DialogHeader>
+            <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
+            <DialogDescription>{t('deleteConfirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2'>
+            <button
+              onClick={() => setRoomToDelete(null)}
+              className='inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium border border-border bg-background hover:bg-accent transition-colors disabled:opacity-50'
+              disabled={deleteMutation.isPending}
+            >
+              {t('deleteConfirmCancel')}
+            </button>
+            <button
+              onClick={handleDeleteConfirm}
+              className='inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50'
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? t('deleting') : t('deleteConfirmApprove')}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -418,7 +485,9 @@ function RoomCard({
   index,
   isSelected,
   onSelect,
+  onDelete,
   threeDMedia,
+  propertyId,
   t,
   locale,
 }: {
@@ -426,12 +495,19 @@ function RoomCard({
   index: number;
   isSelected: boolean;
   onSelect: () => void;
+  onDelete: () => void;
   threeDMedia: Array<{ media_url: string; metadata?: any }>;
+  propertyId: string;
   t: any;
   locale: string;
 }) {
   const statusConfig = getStatusConfig(room.latestOperation.status, t);
   const RoomIcon = getRoomIcon(room.roomName);
+  const updateMutation = useUpdateRoomName(propertyId);
+
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState(room.roomName);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const hasModel = threeDMedia.some(
     (m) => {
@@ -448,6 +524,34 @@ function RoomCard({
       })
     : null;
 
+  const startRename = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRenameValue(room.roomName === 'Unnamed Room' ? '' : room.roomName);
+    setIsRenaming(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const cancelRename = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIsRenaming(false);
+    setRenameValue(room.roomName);
+  };
+
+  const saveRename = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const trimmed = renameValue.trim();
+    if (!trimmed || trimmed === room.roomName || !room.operationId) {
+      cancelRename();
+      return;
+    }
+    try {
+      await updateMutation.mutateAsync({ operationId: room.operationId, roomName: trimmed });
+      setIsRenaming(false);
+    } catch {
+      // keep rename mode open on error so user can retry
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -461,15 +565,15 @@ function RoomCard({
           ${isSelected ? 'ring-2 ring-primary/40 border-primary/30 shadow-md' : ''}
           ${!hasModel && room.latestOperation.status === 'SUCCEEDED' ? 'opacity-80' : ''}
         `}
-        onClick={hasModel ? onSelect : undefined}
+        onClick={!isRenaming && hasModel ? onSelect : undefined}
       >
         {/* Room Header */}
         <CardHeader className='pb-3'>
-          <div className='flex items-start justify-between'>
-            <div className='flex items-center gap-3'>
+          <div className='flex items-start justify-between gap-2'>
+            <div className='flex items-center gap-3 min-w-0 flex-1'>
               <div
                 className={`
-                  w-11 h-11 rounded-xl flex items-center justify-center transition-colors duration-200
+                  shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-colors duration-200
                   ${
                     room.hasSuccessful
                       ? 'bg-primary/10 text-primary group-hover:bg-primary/15'
@@ -479,11 +583,54 @@ function RoomCard({
               >
                 <RoomIcon className='w-5 h-5' />
               </div>
-              <div className='min-w-0'>
-                <CardTitle className='text-base truncate'>
-                  {room.roomName === 'Unnamed Room' ? t('unnamedRoom') : room.roomName}
-                </CardTitle>
-                {createdDate && (
+              <div className='min-w-0 flex-1'>
+                {isRenaming ? (
+                  <div className='flex items-center gap-1' onClick={(e) => e.stopPropagation()}>
+                    <input
+                      ref={inputRef}
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveRename();
+                        if (e.key === 'Escape') cancelRename();
+                      }}
+                      className='flex-1 min-w-0 text-sm font-semibold border border-primary rounded-md px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary bg-background'
+                      disabled={updateMutation.isPending}
+                    />
+                    <button
+                      onClick={saveRename}
+                      disabled={updateMutation.isPending}
+                      className='shrink-0 p-1 rounded-md hover:bg-emerald-50 text-emerald-600 disabled:opacity-50'
+                      aria-label={t('saveRename')}
+                    >
+                      <Check className='w-3.5 h-3.5' />
+                    </button>
+                    <button
+                      onClick={cancelRename}
+                      disabled={updateMutation.isPending}
+                      className='shrink-0 p-1 rounded-md hover:bg-red-50 text-red-500 disabled:opacity-50'
+                      aria-label={t('cancelRename')}
+                    >
+                      <X className='w-3.5 h-3.5' />
+                    </button>
+                  </div>
+                ) : (
+                  <div className='flex items-center gap-1.5'>
+                    <CardTitle className='text-base truncate'>
+                      {room.roomName === 'Unnamed Room' ? t('unnamedRoom') : room.roomName}
+                    </CardTitle>
+                    {room.operationId && (
+                      <button
+                        onClick={startRename}
+                        className='shrink-0 p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground hover:text-foreground transition-all'
+                        aria-label={t('renameRoom')}
+                      >
+                        <Pencil className='w-3 h-3' />
+                      </button>
+                    )}
+                  </div>
+                )}
+                {!isRenaming && createdDate && (
                   <p className='text-xs text-muted-foreground mt-0.5'>
                     {createdDate}
                   </p>
@@ -491,18 +638,28 @@ function RoomCard({
               </div>
             </div>
 
-            <Badge
-              variant='outline'
-              className={`text-[11px] shrink-0 ${statusConfig.className}`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusConfig.dotColor}`} />
-              {statusConfig.label}
-            </Badge>
+            <div className='flex items-center gap-1 shrink-0'>
+              <Badge
+                variant='outline'
+                className={`text-[11px] ${statusConfig.className}`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusConfig.dotColor}`} />
+                {statusConfig.label}
+              </Badge>
+              {room.operationId && !isRenaming && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                  className='p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-all'
+                  aria-label={t('deleteRoom')}
+                >
+                  <Trash2 className='w-3.5 h-3.5' />
+                </button>
+              )}
+            </div>
           </div>
         </CardHeader>
 
         <CardContent className='pt-0'>
-          {/* Status-specific content */}
           {room.latestOperation.status === 'FAILED' && (
             <div className='text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/5 rounded-lg px-3 py-2.5 leading-relaxed'>
               {room.latestOperation.error_message || t('failed')}
