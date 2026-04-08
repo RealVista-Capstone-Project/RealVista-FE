@@ -301,7 +301,7 @@ export function SettingsPage() {
     onError: (err: unknown) => {
       const httpErr = err as { payload?: { message?: string } };
       const msg = httpErr?.payload?.message;
-      toast.error(msg || t('toast.otpSendFailed') || 'Không thể gửi mã OTP, vui lòng thử lại.');
+      toast.error(msg || t('toast.profileUpdateFailed'));
     },
   });
 
