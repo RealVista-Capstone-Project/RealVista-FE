@@ -4,14 +4,14 @@
  */
 
 export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  avatar?: string;
-  role?: 'user' | 'admin' | 'moderator';
-  emailVerified?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  email: string
+  name?: string
+  avatar?: string
+  role?: 'user' | 'admin' | 'moderator' | 'AGENT'
+  emailVerified?: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export interface LoginCredentials {

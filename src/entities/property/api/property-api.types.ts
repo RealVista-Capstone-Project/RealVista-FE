@@ -251,6 +251,16 @@ export interface CreatePropertyRequest {
 
 export type UpdatePropertyRequest = Partial<CreatePropertyRequest>;
 
+export interface ListingSummaryDTO {
+  listing_id: string;
+  name: string;
+  slug: string;
+  price: number;
+  listing_type: 'RENT' | 'SALE';
+  thumbnail_url: string | null;
+  agent_name: string | null;
+}
+
 export interface PropertyDetailResponse {
   property_id: string;
   owner_id: string;
@@ -292,6 +302,7 @@ export interface PropertyDetailResponse {
     media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
     is_primary: boolean;
   }>;
+  active_listings?: ListingSummaryDTO[];
 }
 
 export interface PropertySummary {

@@ -6,7 +6,6 @@ import { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { RentalFeatures } from '@/features/rental-features';
-import { PriceHistoryChart } from '@/features/listing';
 import Image from 'next/image';
 import { PropertyMapSection } from '@/widgets/property-map-section';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
@@ -219,8 +218,6 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       {/* Rental Features */}
       <RentalFeatures property={property} />
 
-      <div className='h-px w-full bg-purple-92' />
-      <PriceHistoryChart listingId={property.id} />
       <div className='h-px w-full bg-purple-92' />
 
       {/* Map Section */}

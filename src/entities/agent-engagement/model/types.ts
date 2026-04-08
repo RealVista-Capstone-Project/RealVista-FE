@@ -21,7 +21,7 @@ export interface AgentEngagement {
   status: string;
   hired_at: string;
   has_review?: boolean;
-  content?: string | null;
+  content?: any | null;
   cancellation_reason?: string | null;
   /** The single listing sold by the agent for this engagement's property.
    *  Per business rule, at most one listing per engagement can reach SOLD status.
@@ -38,6 +38,21 @@ export interface CreateReviewPayload {
 export interface CancelEngagementPayload {
   engagement_id: string;
   reason: string;
+}
+
+/**
+ * Payload to submit an existing agent proposal template as an engagement for a specific property.
+ * This creates an Engagement of type AGENT_PROPOSAL on the server.
+ *
+ * BE endpoint (to be implemented): POST /api/v1/engagements/agent-proposal
+ */
+export interface SubmitAgentProposalPayload {
+  /** The UUID of the AgentProposal template to submit */
+  agent_proposal_id: string;
+  /** The UUID of the Property this proposal targets */
+  property_id: string;
+  /** Optional personal message to send along with the proposal template */
+  message?: string;
 }
 
 export interface AgentEngagementPageResponse {
