@@ -35,6 +35,12 @@ export const propertyApi = {
     });
   },
 
+  searchMap: (request: import('./property-api.types').PropertySearchRequest) => {
+    return http.post<PropertySearchResponse>('map/listings', request, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
   createProperty: (request: CreatePropertyRequest) => {
     return http.post<ApiResponse<PropertyDetailResponse>>('properties', request, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,

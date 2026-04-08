@@ -2,12 +2,14 @@
   "DashboardLayout": {
     "pageTitle": {
       "default": "RealVista",
-      "dashboard": "Dashboard",
-      "insight": "Insight",
-      "managedListings": "Managed Listings",
-      "tenants": "Tenants",
-      "messages": "Messages"
-    },
+    "dashboard": "Dashboard",
+    "insight": "Insight",
+    "managedListings": "Managed Listings",
+    "tenants": "Tenants",
+    "rentalContracts": "Rental Contracts",
+    "myContracts": "My Contracts",
+    "messages": "Messages"
+  },
     "actionButton": {
       "addProperty": "Add a property",
       "createListing": "Create a listing"

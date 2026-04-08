@@ -10,7 +10,7 @@ export const propertyQueries = {
   search: (request: PropertySearchRequest) =>
     queryOptions({
       queryKey: ['properties', 'search', request],
-      queryFn: () => propertyApi.search(request),
+      queryFn: () => propertyApi.searchMap(request),
       enabled: !!(request.north_lat && request.south_lat && request.east_lng && request.west_lng),
     }),
   myProperties: (criteria: MyPropertiesSearchCriteria) =>
