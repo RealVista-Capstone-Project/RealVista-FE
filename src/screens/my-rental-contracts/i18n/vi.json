@@ -1,0 +1,54 @@
+{
+  "MyRentalContracts": {
+    "loading": "Đang tải hợp đồng của bạn...",
+    "error": "Không thể tải hợp đồng. Vui lòng thử lại.",
+    "hero": {
+      "eyebrow": "Cổng Người Thuê",
+      "title": "Hợp đồng của tôi",
+      "subtitle": "Xem và quản lý các hợp đồng thuê của bạn. Ký các hợp đồng đang chờ để kích hoạt hợp đồng thuê.",
+      "noSelection": "Chưa chọn",
+      "stats": {
+        "totalContracts": "Tổng hợp đồng",
+        "activeSelection": "Bất động sản đã chọn"
+      }
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái",
+      "searchPlaceholder": "Tìm theo bất động sản...",
+      "searchAria": "Tìm kiếm hợp đồng theo tên bất động sản"
+    },
+    "table": {
+      "status": "Trạng thái",
+      "property": "Bất động sản",
+      "monthlyRent": "Tiền thuê/tháng",
+      "leaseStart": "Ngày bắt đầu"
+    },
+    "empty": {
+      "title": "Không tìm thấy hợp đồng",
+      "subtitle": "Bạn chưa có hợp đồng thuê nào."
+    },
+    "pagination": {
+      "showing": "Hiển thị {from}–{to} trong {total}",
+      "prevAria": "Trang trước",
+      "nextAria": "Trang sau"
+    },
+    "detailPanel": {
+      "title": "Chi tiết hợp đồng",
+      "contractMeta": "Hợp đồng",
+      "previewAlt": "Tài liệu hợp đồng cho {propertyTitle}",
+      "landlordSigned": "Chủ nhà đã ký",
+      "youSigned": "Bạn đã ký",
+      "signingProgressTitle": "Tiến trình ký",
+      "closeAria": "Đóng bảng chi tiết",
+      "actionCardEyebrow": "Cần hành động",
+      "actionCardDescription": "Hợp đồng này đang chờ chữ ký của bạn để có hiệu lực.",
+      "signNow": "Ký ngay",
+      "signNowAria": "Mở DocuSign để ký hợp đồng này",
+      "signing": "Đang tải..."
+    },
+    "toast": {
+      "signingUnavailable": "Đường dẫn ký không khả dụng. Vui lòng thử lại.",
+      "signingError": "Không thể lấy đường dẫn ký. Vui lòng thử lại."
+    }
+  }
+}

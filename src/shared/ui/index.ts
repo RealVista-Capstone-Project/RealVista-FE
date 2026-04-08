@@ -19,8 +19,8 @@ export * from './skeleton';
 export * from './slider';
 export * from './sonner';
 export * from './switch';
+export * from './textarea';
 export * from './tooltip';
 export * from './top-nav';
 export * from './badge';
 export * from './visually-hidden';
-
