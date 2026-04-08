@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import {
   CreditCard,
   Rocket,
@@ -690,9 +691,11 @@ function Step2Content({
   );
 
   // Get plans for active feature type
-  const plansForFeatureType = type === 'subscription' && plansByFeatureType
-    ? plansByFeatureType[selectedFeatureType] ?? []
-    : rawPlans;
+  const plansForFeatureType = React.useMemo(() => {
+    return type === 'subscription' && plansByFeatureType
+      ? plansByFeatureType[selectedFeatureType] ?? []
+      : rawPlans;
+  }, [type, plansByFeatureType, selectedFeatureType, rawPlans]);
 
   const firstSelectableId = React.useMemo(() => {
     if (type !== 'subscription') return rawPlans[0]?.id ?? '';
@@ -1161,9 +1164,11 @@ function Step3Content({
                 <div className='size-2.5 rounded-full bg-main-primary' />
               )}
             </div>
-            <img
+            <Image
               src='/vnpay.png'
               alt='VNPay'
+              width={40}
+              height={40}
               className='h-10 w-auto shrink-0 object-contain rounded-lg'
             />
             <div className='flex-1'>
@@ -1187,9 +1192,11 @@ function Step3Content({
                 <div className='size-2.5 rounded-full bg-main-primary' />
               )}
             </div>
-            <img
+            <Image
               src='/payos.png'
               alt='PayOS'
+              width={40}
+              height={40}
               className='h-10 w-auto shrink-0 object-contain rounded-lg'
             />
             <div className='flex-1'>
