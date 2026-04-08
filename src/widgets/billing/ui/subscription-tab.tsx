@@ -7,14 +7,12 @@ import {
   Check,
   CheckCircle2,
   XCircle,
-  Zap,
   CalendarDays,
   Loader2,
   ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
-import { Badge } from '@/shared/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   billingApi,
@@ -25,7 +23,6 @@ import {
   type ActiveSubscriptionResponse,
   type FeaturePackage,
   type TransactionStatusResponse,
-  type TransactionResponse,
 } from '@/entities/billing';
 import { toast } from 'sonner';
 import { HttpError } from '@/shared/lib/http';
@@ -40,7 +37,6 @@ import { ROUTES } from '@/shared/config/routes';
 
 type PackageType = 'subscription' | 'boost';
 type PaymentMethod = 'vnpay' | 'payos';
-type PaymentResult = 'success' | 'failed' | 'pending';
 type WizardStep = 1 | 2 | 3 | 4;
 
 interface Plan {
@@ -318,12 +314,6 @@ function CurrentPlansSection() {
       ) : (
         <div className='space-y-6'>
           {active.map((sub) => {
-            const typeBadge =
-              sub.feature_type === '3D_TOUR'
-                ? 'bg-sky-100 text-sky-800 border-sky-200'
-                : sub.feature_type === 'AI_REQUEST'
-                  ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                  : 'bg-purple-96 text-main-primary border-purple-90';
             const tier = sub.tier_level ?? packageTierLevelFromCode(sub.package_code);
             const limit = sub.quota_limit;
             const remaining = sub.remaining_quota;
@@ -708,7 +698,7 @@ function Step2Content({
     if (type !== 'subscription') return rawPlans[0]?.id ?? '';
     const ok = plansForFeatureType.find((p) => !isSubscriptionPlanBlocked(p, mySubs));
     return ok?.id ?? plansForFeatureType[0]?.id ?? '';
-  }, [type, plansForFeatureType, mySubs]);
+  }, [type, rawPlans, plansForFeatureType, mySubs]);
 
   const activePlanId = selectedPlanId ?? firstSelectableId;
   const selectedPlan = plansForFeatureType.find((p) => p.id === activePlanId) ?? plansForFeatureType[0] ?? null;
@@ -1561,7 +1551,7 @@ function PurchaseWizard() {
         setSelectedType(state.selectedType);
         setSelectedPlanId(state.selectedPlanId);
         setSelectedPayment(state.selectedPayment);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
