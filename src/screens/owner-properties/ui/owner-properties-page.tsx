@@ -1,12 +1,12 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import {
   OwnerPropertiesProvider,
   useOwnerPropertiesContext,
 } from '@/features/agent-proposal/model/owner-properties-context';
 import { OwnerPropertyCard } from '@/features/agent-proposal/ui/owner-property-card';
 import { OwnerPropertyDetailPanel } from '@/features/agent-proposal/ui/owner-property-detail-panel';
-import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { Input } from '@/shared/ui/input';
 import { Search, Home } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -18,20 +18,38 @@ function OwnerPropertiesContent() {
     properties,
     isLoading,
     isError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
     searchQuery,
     setSearchQuery,
-    currentPage,
-    setCurrentPage,
     selectedProperty,
     setSelectedProperty,
-    totalPages,
     totalElements,
-    ITEMS_PER_PAGE,
     handlePropertyClick,
   } = useOwnerPropertiesContext();
 
   const t = useTranslations('OwnerProperties');
   const isMobile = useIsMobile();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Trigger next page fetch when sentinel enters viewport
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -64,7 +82,7 @@ function OwnerPropertiesContent() {
             ? selectedProperty
               ? 'hidden'
               : 'flex w-full'
-            : 'flex w-1/2'
+            : 'flex w-[55%]'
         )}
       >
         <div className='flex h-full flex-col'>
@@ -118,14 +136,20 @@ function OwnerPropertiesContent() {
                   />
                 ))}
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className='border-t border-purple-92/50 bg-white py-6'>
-                    <RealVistaPagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={(p) => setCurrentPage(() => p)}
-                    />
+                {/* Infinite scroll sentinel — observed to trigger next page */}
+                <div ref={sentinelRef} className='h-2' />
+
+                {/* Loading next page */}
+                {isFetchingNextPage && (
+                  <div className='flex justify-center py-4'>
+                    <div className='h-6 w-6 animate-spin rounded-full border-4 border-purple-98 border-t-main-primary' />
+                  </div>
+                )}
+
+                {/* End of list indicator */}
+                {!hasNextPage && (
+                  <div className='py-4 text-center text-xs text-main-secondary/40'>
+                    {t('empty.endOfList')}
                   </div>
                 )}
               </div>
@@ -164,3 +188,4 @@ export function OwnerPropertiesPage() {
     </OwnerPropertiesProvider>
   );
 }
+

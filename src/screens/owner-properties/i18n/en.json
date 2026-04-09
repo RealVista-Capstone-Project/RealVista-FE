@@ -16,7 +16,8 @@
     "empty": {
       "title": "No properties found.",
       "subtitle": "Try adjusting your search or check back later.",
-      "selectProperty": "Select a property to view details"
+      "selectProperty": "Select a property to view details",
+      "endOfList": "You've reached the end of the list"
     },
     "pagination": {
       "showing": "Showing {from}-{to} of {total}"

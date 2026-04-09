@@ -8,14 +8,10 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property';
 import type { OwnerPropertySummary } from '@/entities/property';
-import { MOCK_OWNER_PROPERTIES } from './mock-data';
-
-// ─── Toggle this flag to switch between mock and real API ───────────────────
-const USE_MOCK = false;
-// ────────────────────────────────────────────────────────────────────────────
+import { useDebounce } from '@/shared/lib/hooks';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -23,80 +19,47 @@ interface OwnerPropertiesContextValue {
   properties: OwnerPropertySummary[];
   isLoading: boolean;
   isError: boolean;
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   selectedProperty: OwnerPropertySummary | null;
   setSelectedProperty: (property: OwnerPropertySummary | null) => void;
-  totalPages: number;
   totalElements: number;
-  ITEMS_PER_PAGE: number;
   handlePropertyClick: (property: OwnerPropertySummary) => void;
 }
 
 const OwnerPropertiesContext = createContext<OwnerPropertiesContextValue | null>(null);
 
 export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQueryRaw] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 400);
   const [selectedProperty, setSelectedProperty] = useState<OwnerPropertySummary | null>(null);
 
-  const queryParams = useMemo(
-    () => ({
-      page: currentPage - 1, // API is 0-indexed
+  const queryResult = useInfiniteQuery(
+    propertyQueries.ownerAvailableInfinite({
       size: ITEMS_PER_PAGE,
-      keyword: searchQuery || undefined,
-    }),
-    [currentPage, searchQuery]
+      keyword: debouncedSearch || undefined,
+    })
   );
 
-  // ── Real API query (disabled when USE_MOCK = true) ──────────────────────
-  const queryResult = useQuery({
-    ...propertyQueries.ownerAvailable(queryParams),
-    enabled: !USE_MOCK,
-  });
+  // Flatten all pages into a single list
+  const properties = useMemo(
+    () => queryResult.data?.pages.flatMap((page) => page.payload.data.content) ?? [],
+    [queryResult.data]
+  );
 
-  // ── Mock data: filter by keyword + paginate client-side ─────────────────
-  const mockData = useMemo(() => {
-    if (!USE_MOCK) return null;
-    const filtered = searchQuery
-      ? MOCK_OWNER_PROPERTIES.filter(
-          (p) =>
-            p.street_address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.owner_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.property_type_info?.property_type_name
-              ?.toLowerCase()
-              .includes(searchQuery.toLowerCase())
-        )
-      : MOCK_OWNER_PROPERTIES;
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return {
-      content: filtered.slice(start, start + ITEMS_PER_PAGE),
-      total_elements: filtered.length,
-      total_pages: Math.ceil(filtered.length / ITEMS_PER_PAGE),
-    };
-  }, [searchQuery, currentPage]);
+  const totalElements = useMemo(() => {
+    const lastPage = queryResult.data?.pages.at(-1);
+    const data = lastPage?.payload?.data;
+    return data?.totalElements ?? data?.total_elements ?? 0;
+  }, [queryResult.data]);
 
-  const properties = useMemo(() => {
-    if (USE_MOCK) return mockData?.content ?? [];
-    return queryResult.data?.payload?.data?.content ?? [];
-  }, [mockData, queryResult.data]);
-
-  const totalPages = USE_MOCK
-    ? (mockData?.total_pages ?? 0)
-    : (queryResult.data?.payload?.data?.totalPages
-        ?? queryResult.data?.payload?.data?.total_pages
-        ?? 0);
-
-  const totalElements = USE_MOCK
-    ? (mockData?.total_elements ?? 0)
-    : (queryResult.data?.payload?.data?.totalElements
-        ?? queryResult.data?.payload?.data?.total_elements
-        ?? 0);
-
-  const isLoading = USE_MOCK ? false : queryResult.isLoading;
-  const isError = USE_MOCK ? false : queryResult.isError;
+  const setSearchQuery = useCallback((q: string) => {
+    setSearchQueryRaw(q);
+    setSelectedProperty(null);
+  }, []);
 
   const handlePropertyClick = useCallback(
     (property: OwnerPropertySummary) => {
@@ -110,30 +73,28 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
   const value = useMemo<OwnerPropertiesContextValue>(
     () => ({
       properties,
-      isLoading,
-      isError,
+      isLoading: queryResult.isLoading,
+      isError: queryResult.isError,
+      isFetchingNextPage: queryResult.isFetchingNextPage,
+      hasNextPage: queryResult.hasNextPage,
+      fetchNextPage: queryResult.fetchNextPage,
       searchQuery,
-      setSearchQuery: (q: string) => {
-        setSearchQuery(q);
-        setCurrentPage(1);
-      },
-      currentPage,
-      setCurrentPage,
+      setSearchQuery,
       selectedProperty,
       setSelectedProperty,
-      totalPages,
       totalElements,
-      ITEMS_PER_PAGE,
       handlePropertyClick,
     }),
     [
       properties,
-      isLoading,
-      isError,
+      queryResult.isLoading,
+      queryResult.isError,
+      queryResult.isFetchingNextPage,
+      queryResult.hasNextPage,
+      queryResult.fetchNextPage,
       searchQuery,
-      currentPage,
+      setSearchQuery,
       selectedProperty,
-      totalPages,
       totalElements,
       handlePropertyClick,
     ]

@@ -16,7 +16,8 @@
     "empty": {
       "title": "Không tìm thấy bất động sản.",
       "subtitle": "Hãy thử điều chỉnh tìm kiếm hoặc kiểm tra lại sau.",
-      "selectProperty": "Chọn một bất động sản để xem chi tiết"
+      "selectProperty": "Chọn một bất động sản để xem chi tiết",
+      "endOfList": "Bạn đã xem hết danh sách"
     },
     "pagination": {
       "showing": "Hiển thị {from}-{to} trong {total}"
