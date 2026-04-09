@@ -48,6 +48,9 @@ export const billingApi = {
   cancelSubscription: (subscriptionId: string) =>
     http.delete<ApiResponse<null>>(`/billing/subscriptions/${subscriptionId}`),
 
+  cancelBoost: (boostPackageId: string) =>
+    http.delete<ApiResponse<null>>(`/billing/boosts/${boostPackageId}`),
+
   getTransactions: () =>
     http.get<ApiResponse<TransactionResponse[]>>('/billing/transactions/me'),
 

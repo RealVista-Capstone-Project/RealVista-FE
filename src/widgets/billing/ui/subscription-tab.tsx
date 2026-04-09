@@ -272,9 +272,12 @@ function QuotaUsageBar({
 function CurrentPlansSection() {
   const queryClient = useQueryClient();
   const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
+  const { data: boosts, isLoading: boostsLoading } = useQuery(billingQueries.myBoosts());
   const { data: catalogRaw } = useQuery(billingQueries.subscriptionPlans());
   const [showCancelConfirm, setShowCancelConfirm] = React.useState(false);
   const [subscriptionIdToCancel, setSubscriptionIdToCancel] = React.useState<string | null>(null);
+  const [showCancelBoostConfirm, setShowCancelBoostConfirm] = React.useState(false);
+  const [boostIdToCancel, setBoostIdToCancel] = React.useState<string | null>(null);
 
   const cancelMut = useMutation({
     mutationFn: (id: string) => billingApi.cancelSubscription(id),
@@ -293,10 +296,27 @@ function CurrentPlansSection() {
     },
   });
 
-  if (isLoading) {
+  const cancelBoostMut = useMutation({
+    mutationFn: (id: string) => billingApi.cancelBoost(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: billingKeys.myBoosts() });
+      toast.success('Đã huỷ gói đẩy tin.');
+      setShowCancelBoostConfirm(false);
+      setBoostIdToCancel(null);
+    },
+    onError: (e: unknown) => {
+      const msg =
+        e instanceof HttpError && e.payload?.message
+          ? String(e.payload.message)
+          : 'Không huỷ được gói. Thử lại sau.';
+      toast.error(msg);
+    },
+  });
+
+  if (isLoading || boostsLoading) {
     return (
       <div>
-        <h2 className='mb-4 text-base font-semibold text-main-black'>Gói tính năng đang hoạt động</h2>
+        <h2 className='mb-4 text-base font-semibold text-main-black'>Gói đang hoạt động</h2>
         <div className='flex items-center gap-2 text-sm text-grey-500'>
           <Loader2 className='size-4 animate-spin' /> Đang tải...
         </div>
@@ -305,16 +325,19 @@ function CurrentPlansSection() {
   }
 
   const active: ActiveSubscriptionResponse[] = subscriptions ?? [];
+  const activeBoosts: ActiveBoostPackageResponse[] = boosts ?? [];
   const catalog = catalogRaw ?? [];
 
   return (
     <div>
-      <h2 className='mb-4 text-base font-semibold text-main-black'>Gói tính năng đang hoạt động</h2>
+      <h2 className='mb-4 text-base font-semibold text-main-black'>Gói đang hoạt động</h2>
 
-      {active.length === 0 ? (
-        <p className='text-sm text-grey-500'>Bạn chưa có gói tính năng trả phí nào đang hoạt động.</p>
+      {/* Display subscriptions */}
+      {active.length === 0 && activeBoosts.length === 0 ? (
+        <p className='text-sm text-grey-500'>Bạn chưa có gói nào đang hoạt động.</p>
       ) : (
         <div className='space-y-6'>
+          {/* Subscriptions section */}
           {active.map((sub) => {
             const tier = sub.tier_level ?? packageTierLevelFromCode(sub.package_code);
             const limit = sub.quota_limit;
@@ -402,10 +425,91 @@ function CurrentPlansSection() {
               </div>
             );
           })}
+
+          {/* Boost packages section */}
+          {activeBoosts.map((boost) => (
+            <div
+              key={boost.boost_package_id}
+              className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
+            >
+              <div className='flex flex-col rounded-xl border border-border bg-grey-50 p-5 shadow-sm'>
+                <div className='flex flex-row items-center justify-between'>
+                  <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói đẩy tin</p>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
+                      {boost.code}
+                    </span>
+                  </div>
+                </div>
+                <h3 className='mt-2 text-lg font-bold text-main-black'>{boost.name}</h3>
+                <div className='mt-1 flex items-center gap-1.5 text-xs text-grey-500'>
+                  <CalendarDays className='size-3.5 shrink-0' />
+                  <span>
+                    Hết hạn: {formatDate(boost.end_date)}
+                  </span>
+                </div>
+                <div className='mt-2 space-y-2 text-sm'>
+                  <div className='flex justify-between'>
+                    <span className='text-grey-600'>Lượt đẩy nổi bật:</span>
+                    <span className='font-semibold text-main-black'>{boost.remaining_featured_quota}/{boost.featured_quota}</span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span className='text-grey-600'>Huy hiệu HOT:</span>
+                    <span className='font-semibold text-main-black'>{boost.remaining_hot_badge_quota}/{boost.hot_badge_quota}</span>
+                  </div>
+                </div>
+                <div className='mt-3 flex flex-wrap gap-2 pt-0'>
+                  <RealVistaButton
+                    variant='secondary'
+                    size='small'
+                    disabled={cancelBoostMut.isPending}
+                    onClick={() => {
+                      setBoostIdToCancel(boost.boost_package_id);
+                      setShowCancelBoostConfirm(true);
+                    }}
+                  >
+                    {cancelBoostMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
+                  </RealVistaButton>
+                </div>
+              </div>
+
+              <div className='flex flex-col rounded-xl border border-main-black/10 bg-white p-5 shadow-sm ring-1 ring-grey-100'>
+                <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Chi tiết gói</p>
+                <h3 className='mt-2 text-lg font-bold text-main-black'>{boost.name}</h3>
+                <p className='mt-1 text-sm text-grey-500'>{boost.description}</p>
+                <ul className='mt-3 space-y-1.5'>
+                  <li className='flex items-start gap-2 text-sm text-grey-700'>
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    {boost.featured_quota} lượt đẩy nổi bật
+                  </li>
+                  <li className='flex items-start gap-2 text-sm text-grey-700'>
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    {boost.hot_badge_quota} huy hiệu HOT
+                  </li>
+                  <li className='flex items-start gap-2 text-sm text-grey-700'>
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    Hiển thị ưu tiên {boost.duration_days} ngày
+                  </li>
+                </ul>
+                <div className='mt-auto pt-4'>
+                  <p className='text-xs text-grey-500 mb-2'>Muốn mua thêm gói khác?</p>
+                  <RealVistaButton
+                    size='small'
+                    className='w-full sm:w-auto bg-primary text-white hover:bg-primary-dark'
+                    onClick={() => {
+                      document.getElementById('mua-goi-dich-vu')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    Xem thêm gói
+                  </RealVistaButton>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Cancel confirmation dialog */}
+      {/* Cancel subscription confirmation dialog */}
       {showCancelConfirm && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
@@ -435,6 +539,42 @@ function CurrentPlansSection() {
                 }}
               >
                 {cancelMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
+              </RealVistaButton>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel boost confirmation dialog */}
+      {showCancelBoostConfirm && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
+          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+            <h3 className='text-lg font-bold text-main-black'>Xác nhận huỷ gói đẩy tin</h3>
+            <p className='mt-3 text-sm text-grey-600'>
+              Huỷ gói này? Bạn sẽ mất lượt đẩy tin còn lại ngay sau khi huỷ.
+            </p>
+            <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end'>
+              <button
+                type='button'
+                onClick={() => {
+                  setShowCancelBoostConfirm(false);
+                  setBoostIdToCancel(null);
+                }}
+                className='rounded-lg border border-grey-200 px-4 py-2 text-sm font-medium text-grey-700 hover:bg-grey-50 transition-colors'
+              >
+                Vẫn giữ gói
+              </button>
+              <RealVistaButton
+                size='small'
+                className='bg-primary text-white hover:bg-primary/90'
+                disabled={cancelBoostMut.isPending}
+                onClick={() => {
+                  if (boostIdToCancel) {
+                    cancelBoostMut.mutate(boostIdToCancel);
+                  }
+                }}
+              >
+                {cancelBoostMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
               </RealVistaButton>
             </div>
           </div>
@@ -898,7 +1038,12 @@ function Step2Content({
           <div className='flex flex-col gap-4 lg:w-2/5'>
             {plansForFeatureType.map((plan) => {
               const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
-              const isCurrentActive = type === 'subscription' && isCurrentActivePlan(plan.id, mySubs);
+              let isCurrentActive = false;
+              if (type === 'subscription') {
+                isCurrentActive = isCurrentActivePlan(plan.id, mySubs);
+              } else if (type === 'boost') {
+                isCurrentActive = isCurrentActiveBoost(plan.id, myBoosts);
+              }
               return (
               <button
                 key={plan.id}
