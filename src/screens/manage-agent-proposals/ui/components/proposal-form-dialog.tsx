@@ -4,8 +4,12 @@ import * as React from 'react';
 import { Plus, Edit3, Percent, Award, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-  DialogDescription, DialogClose,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
 } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Textarea } from '@/shared/ui/textarea';
@@ -27,11 +31,13 @@ interface FormErrors {
   commission_rate?: string;
   experience_years?: string;
   pitch_content?: string;
+  specialty?: string;
+  price_range?: string;
 }
 
 function validateForm(
   form: ApplyAgentProposalPayload,
-  t: ReturnType<typeof useTranslations<'ManageProposals'>>,
+  t: ReturnType<typeof useTranslations<'ManageProposals'>>
 ): FormErrors {
   const errors: FormErrors = {};
 
@@ -68,7 +74,11 @@ function validateForm(
 
 /* ─── Field Component ─── */
 function Field({
-  label, required, hint, error, children,
+  label,
+  required,
+  hint,
+  error,
+  children,
 }: {
   label: string;
   required?: boolean;
@@ -91,7 +101,8 @@ function Field({
   );
 }
 
-const INPUT_CLASS = 'w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all';
+const INPUT_CLASS =
+  'w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all';
 const INPUT_DEFAULT = `${INPUT_CLASS} border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20`;
 const INPUT_ERROR = `${INPUT_CLASS} border-red-300 focus:border-red-500 focus:ring-red-500/20`;
 
@@ -106,7 +117,12 @@ interface ProposalFormDialogProps {
 }
 
 export function ProposalFormDialog({
-  isOpen, onClose, mode, initialData, onSubmit, isLoading,
+  isOpen,
+  onClose,
+  mode,
+  initialData,
+  onSubmit,
+  isLoading,
 }: ProposalFormDialogProps) {
   const t = useTranslations('ManageProposals');
 
@@ -124,7 +140,9 @@ export function ProposalFormDialog({
 
   const [form, setForm] = React.useState<ApplyAgentProposalPayload>(defaultForm);
   const [errors, setErrors] = React.useState<FormErrors>({});
-  const [touched, setTouched] = React.useState<Partial<Record<keyof ApplyAgentProposalPayload, boolean>>>({});
+  const [touched, setTouched] = React.useState<
+    Partial<Record<keyof ApplyAgentProposalPayload, boolean>>
+  >({});
 
   // Sync form with initialData when dialog opens
   React.useEffect(() => {
@@ -146,7 +164,7 @@ export function ProposalFormDialog({
     }
     setErrors({});
     setTouched({});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, mode, initialData]);
 
   // Real-time validation on touched fields
@@ -224,7 +242,6 @@ export function ProposalFormDialog({
         {/* ── Form Body ── */}
         <form onSubmit={handleSubmit} className='flex flex-col' noValidate>
           <div className='px-6 py-5 space-y-5 max-h-[62vh] overflow-y-auto'>
-
             {/* Title */}
             <Field label={t('fieldTitle')} required error={errors.title}>
               <input
@@ -251,7 +268,10 @@ export function ProposalFormDialog({
                     onBlur={() => setTouched((prev) => ({ ...prev, commission_rate: true }))}
                     className={cn(errors.commission_rate ? INPUT_ERROR : INPUT_DEFAULT, 'pr-8')}
                   />
-                  <Percent className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none' size={14} />
+                  <Percent
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                    size={14}
+                  />
                 </div>
               </Field>
               <Field label={t('fieldExperience')} required error={errors.experience_years}>
@@ -265,18 +285,20 @@ export function ProposalFormDialog({
                     onBlur={() => setTouched((prev) => ({ ...prev, experience_years: true }))}
                     className={cn(errors.experience_years ? INPUT_ERROR : INPUT_DEFAULT, 'pr-8')}
                   />
-                  <Award className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none' size={14} />
+                  <Award
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                    size={14}
+                  />
                 </div>
               </Field>
             </div>
-<br />
+            <br />
             {/* Specialty Field */}
             <Field label={t('fieldSpecialty')} error={errors.specialty}>
-              <Select
-                value={form.specialty}
-                onValueChange={(v) => update('specialty', v)}
-              >
-                <SelectTrigger className={cn(errors.specialty ? INPUT_ERROR : INPUT_DEFAULT, 'h-10')}>
+              <Select value={form.specialty} onValueChange={(v) => update('specialty', v)}>
+                <SelectTrigger
+                  className={cn(errors.specialty ? INPUT_ERROR : INPUT_DEFAULT, 'h-10')}
+                >
                   <SelectValue placeholder={t('fieldSpecialtyPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -320,7 +342,9 @@ export function ProposalFormDialog({
                         type='number'
                         min='0'
                         value={form.price_range?.rent?.min || 0}
-                        onChange={(e) => updatePriceRange('rent', 'min', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          updatePriceRange('rent', 'min', parseInt(e.target.value) || 0)
+                        }
                         className={INPUT_DEFAULT}
                         placeholder='Min'
                       />
@@ -332,7 +356,9 @@ export function ProposalFormDialog({
                         type='number'
                         min='0'
                         value={form.price_range?.rent?.max || 0}
-                        onChange={(e) => updatePriceRange('rent', 'max', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          updatePriceRange('rent', 'max', parseInt(e.target.value) || 0)
+                        }
                         className={INPUT_DEFAULT}
                         placeholder='Max'
                       />
@@ -352,7 +378,9 @@ export function ProposalFormDialog({
                         type='number'
                         min='0'
                         value={form.price_range?.sale?.min || 0}
-                        onChange={(e) => updatePriceRange('sale', 'min', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          updatePriceRange('sale', 'min', parseInt(e.target.value) || 0)
+                        }
                         className={INPUT_DEFAULT}
                         placeholder='Min'
                       />
@@ -364,7 +392,9 @@ export function ProposalFormDialog({
                         type='number'
                         min='0'
                         value={form.price_range?.sale?.max || 0}
-                        onChange={(e) => updatePriceRange('sale', 'max', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          updatePriceRange('sale', 'max', parseInt(e.target.value) || 0)
+                        }
                         className={INPUT_DEFAULT}
                         placeholder='Max'
                       />
@@ -390,7 +420,7 @@ export function ProposalFormDialog({
                   'w-full rounded-lg border px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all min-h-[160px] resize-y leading-relaxed',
                   errors.pitch_content
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
-                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20',
+                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20'
                 )}
               />
               {/* Character progress */}
@@ -407,13 +437,17 @@ export function ProposalFormDialog({
                             ? 'bg-amber-400'
                             : 'bg-emerald-400'
                       )}
-                      style={{ width: `${Math.min((form.pitch_content.length / 2000) * 100, 100)}%` }}
+                      style={{
+                        width: `${Math.min((form.pitch_content.length / 2000) * 100, 100)}%`,
+                      }}
                     />
                   </div>
-                  <span className={cn(
-                    'text-[10px] font-medium',
-                    form.pitch_content.length > 2000 ? 'text-red-500' : 'text-slate-400',
-                  )}>
+                  <span
+                    className={cn(
+                      'text-[10px] font-medium',
+                      form.pitch_content.length > 2000 ? 'text-red-500' : 'text-slate-400'
+                    )}
+                  >
                     {form.pitch_content.length}/2000
                   </span>
                 </div>
@@ -442,7 +476,11 @@ export function ProposalFormDialog({
                   <Clock size={14} className='animate-spin' />
                   {t('btnSaving')}
                 </span>
-              ) : mode === 'create' ? t('btnCreate') : t('btnSave')}
+              ) : mode === 'create' ? (
+                t('btnCreate')
+              ) : (
+                t('btnSave')
+              )}
             </Button>
           </div>
         </form>
