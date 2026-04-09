@@ -667,6 +667,7 @@ function Step2Content({
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
   const { data: mySubs } = useQuery(billingQueries.mySubscriptions());
+  const { data: myBoosts } = useQuery(billingQueries.myBoosts());
 
   const rawPlans =
     type === 'subscription'
@@ -800,9 +801,12 @@ function Step2Content({
               <div className='flex flex-col gap-4 lg:w-2/5'>
                 {plansForFeatureType.map((plan) => {
                   const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
-                  const isCurrentActive =
-                    (type === 'subscription' && isCurrentActivePlan(plan.id, mySubs)) ||
-                    (type === 'boost' && isCurrentActiveBoost(plan.id, myBoostsQuery.data ?? []));
+                  let isCurrentActive = false;
+                  if (type === 'subscription') {
+                    isCurrentActive = isCurrentActivePlan(plan.id, mySubs);
+                  } else if (type === 'boost') {
+                    isCurrentActive = isCurrentActiveBoost(plan.id, myBoosts);
+                  }
                   return (
                   <button
                     key={plan.id}
