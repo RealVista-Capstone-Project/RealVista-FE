@@ -146,6 +146,7 @@ export function SettingsPage() {
     setAvatarPreviewUrl(null);
     setSelectedAvatarFile(null);
     setPendingRemoveAvatar(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditingProfile]);
 
   useEffect(() => {

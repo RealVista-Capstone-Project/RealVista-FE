@@ -1,0 +1,14 @@
+{
+  "Chat": {
+    "joinRoom": "Join Chat Room",
+    "description": "Enter your name and a room ID to start chatting",
+    "yourName": "Your Name",
+    "yourNamePlaceholder": "Enter your name",
+    "roomId": "Room ID",
+    "roomIdPlaceholder": "Enter room ID (e.g., general)",
+    "joinButton": "Join Room",
+    "demoTitle": "WebSocket Chat Demo",
+    "leaveRoom": "Leave Room",
+    "testingNotes": "Testing Notes"
+  }
+}

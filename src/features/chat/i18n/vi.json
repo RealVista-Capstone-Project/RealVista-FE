@@ -1,0 +1,14 @@
+{
+  "Chat": {
+    "joinRoom": "Tham gia phòng chat",
+    "description": "Nhập tên và ID phòng để bắt đầu trò chuyện",
+    "yourName": "Tên của bạn",
+    "yourNamePlaceholder": "Nhập tên của bạn",
+    "roomId": "ID phòng",
+    "roomIdPlaceholder": "Nhập ID phòng (ví dụ: chung)",
+    "joinButton": "Tham gia",
+    "demoTitle": "Demo Chat WebSocket",
+    "leaveRoom": "Rời phòng",
+    "testingNotes": "Ghi chú kiểm thử"
+  }
+}
