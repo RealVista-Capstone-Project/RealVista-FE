@@ -1,0 +1,9 @@
+{
+  "Notifications": {
+    "notifications": "Notifications",
+    "new": "new",
+    "markAsRead": "Mark all as read",
+    "noNotifications": "No notifications yet",
+    "viewAll": "View all notifications"
+  }
+}
