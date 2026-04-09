@@ -33,6 +33,16 @@ export const billingQueries = {
       staleTime: 2 * 60 * 1000,
     }),
 
+  myBoosts: () =>
+    queryOptions({
+      queryKey: billingKeys.myBoosts(),
+      queryFn: async () => {
+        const res = await billingApi.getMyBoosts();
+        return res.payload.data;
+      },
+      staleTime: 2 * 60 * 1000,
+    }),
+
   transactionStatus: (checkoutOrderId: string) =>
     queryOptions({
       queryKey: billingKeys.transactionStatus(checkoutOrderId),

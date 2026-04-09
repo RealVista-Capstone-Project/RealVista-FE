@@ -29,6 +29,21 @@ export interface BoostPackage {
   price: number;
 }
 
+export interface ActiveBoostPackageResponse {
+  boost_package_id: string;
+  code: string;
+  name: string;
+  description: string;
+  featured_quota: number;
+  hot_badge_quota: number;
+  duration_days: number;
+  start_date: string;
+  end_date: string | null;
+  remaining_featured_quota: number | null;
+  remaining_hot_badge_quota: number | null;
+  status: string;
+}
+
 export interface CheckoutRequest {
   plan_code: string;
   plan_type: PlanType;

@@ -1,6 +1,7 @@
 import http from '@/shared/lib/http';
 import type {
   ActiveSubscriptionResponse,
+  ActiveBoostPackageResponse,
   BoostPackage,
   CheckoutRequest,
   CheckoutResponse,
@@ -40,6 +41,9 @@ export const billingApi = {
 
   getMySubscriptions: () =>
     http.get<ApiResponse<ActiveSubscriptionResponse[]>>('/billing/subscriptions/me'),
+
+  getMyBoosts: () =>
+    http.get<ApiResponse<ActiveBoostPackageResponse[]>>('/billing/boosts/me'),
 
   cancelSubscription: (subscriptionId: string) =>
     http.delete<ApiResponse<null>>(`/billing/subscriptions/${subscriptionId}`),

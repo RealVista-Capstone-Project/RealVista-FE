@@ -5,6 +5,7 @@ export type {
   FeaturePackage,
   SubscriptionPlan,
   BoostPackage,
+  ActiveBoostPackageResponse,
   CheckoutRequest,
   CheckoutResponse,
   TransactionStatusResponse,

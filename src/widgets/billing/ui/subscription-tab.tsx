@@ -22,6 +22,7 @@ import {
   type BoostPackage,
   type CheckoutResponse,
   type ActiveSubscriptionResponse,
+  type ActiveBoostPackageResponse,
   type FeaturePackage,
   type TransactionStatusResponse,
 } from '@/entities/billing';
@@ -635,6 +636,13 @@ function isCurrentActivePlan(planCode: string, mySubs: ActiveSubscriptionRespons
   return mySubs?.some((s) => s.package_code === planCode && s.status === 'ACTIVE') ?? false;
 }
 
+function isCurrentActiveBoost(
+  boostCode: string,
+  myBoosts: ActiveBoostPackageResponse[] | undefined
+): boolean {
+  return myBoosts?.some((b) => b.code === boostCode && b.status === 'ACTIVE') ?? false;
+}
+
 function isSubscriptionPlanBlocked(plan: Plan, mySubs: ActiveSubscriptionResponse[] | undefined): boolean {
   if (!plan.featureType) return false;
   const maxT = maxActiveTierForFeature(mySubs, plan.featureType);
@@ -792,7 +800,9 @@ function Step2Content({
               <div className='flex flex-col gap-4 lg:w-2/5'>
                 {plansForFeatureType.map((plan) => {
                   const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
-                  const isCurrentActive = type === 'subscription' && isCurrentActivePlan(plan.id, mySubs);
+                  const isCurrentActive =
+                    (type === 'subscription' && isCurrentActivePlan(plan.id, mySubs)) ||
+                    (type === 'boost' && isCurrentActiveBoost(plan.id, myBoostsQuery.data ?? []));
                   return (
                   <button
                     key={plan.id}
@@ -1091,6 +1101,7 @@ function Step3Content({
             setCheckout(data);
             setError(null);
             queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
+            queryClient.invalidateQueries({ queryKey: ['billing', 'my-boosts'] });
             onCheckoutCreated(data);
             onDone?.(data);
           },
@@ -1524,11 +1535,14 @@ function PurchaseWizard() {
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
   const [pendingPlanId, setPendingPlanId] = React.useState<string | null>(null);
   const [showConflictDialog, setShowConflictDialog] = React.useState(false);
-  const [conflictingPlan, setConflictingPlan] = React.useState<ActiveSubscriptionResponse | null>(null);
+  const [conflictingPlan, setConflictingPlan] = React.useState<
+    ActiveSubscriptionResponse | ActiveBoostPackageResponse | null
+  >(null);
 
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
   const mySubsQuery = useQuery(billingQueries.mySubscriptions());
+  const myBoostsQuery = useQuery(billingQueries.myBoosts());
 
   const rawPlans =
     selectedType === 'subscription'
@@ -1578,16 +1592,24 @@ function PurchaseWizard() {
 
   // Check if user already has active subscription with same feature type
   const checkSameTypeConflict = (planId: string) => {
-    if (selectedType !== 'subscription') return null; // Boost packages have no conflicts
+    if (selectedType === 'subscription') {
+      const newPlan = rawPlans.find((p) => p.id === planId);
+      if (!newPlan || !newPlan.featureType) return null;
 
-    const newPlan = rawPlans.find((p) => p.id === planId);
-    if (!newPlan || !newPlan.featureType) return null;
+      const activeSametype = (mySubsQuery.data ?? []).find(
+        (s) => s.status === 'ACTIVE' && s.feature_type === newPlan.featureType
+      );
 
-    const activeSametype = (mySubsQuery.data ?? []).find(
-      (s) => s.status === 'ACTIVE' && s.feature_type === newPlan.featureType
-    );
+      return activeSametype || null;
+    }
 
-    return activeSametype ?? null;
+    if (selectedType === 'boost') {
+      // For boosts, check if user already has an active boost
+      const activeBoost = (myBoostsQuery.data ?? []).find((b) => b.status === 'ACTIVE');
+      return activeBoost || null;
+    }
+
+    return null;
   };
 
   const handleSelectPlan = (planId: string) => {
@@ -1741,7 +1763,12 @@ function PurchaseWizard() {
           <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
             <h3 className='text-lg font-bold text-main-black'>Nâng cấp gói dịch vụ</h3>
             <p className='mt-3 text-sm text-grey-600'>
-              Bạn đã có gói <span className='font-semibold text-main-black'>{conflictingPlan.package_name}</span> đang hoạt động.
+              Bạn đã có gói{' '}
+              <span className='font-semibold text-main-black'>
+                {('package_name' in conflictingPlan ? conflictingPlan.package_name : null) ||
+                  ('name' in conflictingPlan ? conflictingPlan.name : 'hiện tại')}
+              </span>{' '}
+              đang hoạt động.
             </p>
             <p className='mt-2 text-sm text-grey-600'>
               Hủy gói hiện tại để mua gói mới?
