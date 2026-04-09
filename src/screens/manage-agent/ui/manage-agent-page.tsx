@@ -74,7 +74,7 @@ function ManageAgentContent() {
   }
 
   return (
-    <div className='h-full overflow-y-auto bg-[#F7F7FD] font-sans'>
+    <div className='h-full bg-[#F7F7FD] font-sans'>
       <div className='container mx-auto px-6 py-6'>
         <div className='flex flex-col lg:flex-row gap-6 items-start'>
           {/* Left Panel */}

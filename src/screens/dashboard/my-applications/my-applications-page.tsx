@@ -37,7 +37,7 @@ function MyApplicationsContent() {
     if (isError) return <div className='p-8 text-center text-red-500'>Lỗi không tải được dữ liệu</div>;
 
     return (
-        <div className='container mx-auto py-8 px-4 bg-[#F7F7FD] min-h-screen font-sans'>
+        <div className='container mx-auto py-8 px-4 bg-[#F7F7FD] font-sans'>
              {/* Header */}
              <div className='flex justify-between items-center mb-8'>
                 <div>

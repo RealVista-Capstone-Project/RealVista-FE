@@ -76,7 +76,7 @@ function ManageRentalContractContent() {
   }
 
   return (
-    <div className='h-full overflow-y-auto bg-[radial-gradient(circle_at_top_left,_rgba(122,92,255,0.10),_transparent_28%),linear-gradient(180deg,#F6F4FF_0%,#F9F8FE_32%,#F7F7FD_100%)]'>
+    <div className='h-full bg-[radial-gradient(circle_at_top_left,_rgba(122,92,255,0.10),_transparent_28%),linear-gradient(180deg,#F6F4FF_0%,#F9F8FE_32%,#F7F7FD_100%)]'>
       <div className='mx-auto px-6 py-6'>
         <div className='mb-6 rounded-3xl border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(246,243,255,0.92))] p-6 shadow-[0_20px_60px_rgba(96,72,179,0.08)] backdrop-blur-md'>
           <div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
