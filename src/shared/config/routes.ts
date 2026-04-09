@@ -26,6 +26,7 @@ export const ROUTES = {
     manageAgent: '/dashboard/manage-agent',
     manageProposals: '/dashboard/manage-proposals',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
+    ownerProperties: '/dashboard/owner-properties',
   },
   leases: {
     signingComplete: '/leases/signing-complete',

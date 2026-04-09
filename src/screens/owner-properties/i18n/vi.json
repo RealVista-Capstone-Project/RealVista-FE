@@ -1,0 +1,61 @@
+{
+  "OwnerProperties": {
+    "loading": "Đang tải bất động sản...",
+    "error": "Không thể tải bất động sản. Vui lòng thử lại.",
+    "pageTitle": "Bất động sản khả dụng",
+    "pageSubtitle": "Duyệt các bất động sản từ chủ nhà đang tìm kiếm môi giới.",
+    "filter": {
+      "searchPlaceholder": "Tìm theo địa chỉ, chủ nhà, hoặc loại...",
+      "resultCount": "Tìm thấy {count} bất động sản"
+    },
+    "card": {
+      "bedrooms": "phòng ngủ",
+      "viewDetails": "Xem chi tiết",
+      "proposed": "Đã ứng tuyển"
+    },
+    "empty": {
+      "title": "Không tìm thấy bất động sản.",
+      "subtitle": "Hãy thử điều chỉnh tìm kiếm hoặc kiểm tra lại sau.",
+      "selectProperty": "Chọn một bất động sản để xem chi tiết",
+      "endOfList": "Bạn đã xem hết danh sách"
+    },
+    "pagination": {
+      "showing": "Hiển thị {from}-{to} trong {total}"
+    },
+    "common": {
+      "na": "Không có",
+      "cancel": "Hủy"
+    },
+    "detailPanel": {
+      "title": "Chi tiết bất động sản",
+      "propertyInfo": "Thông tin bất động sản",
+      "type": "Loại",
+      "usableArea": "Diện tích sử dụng",
+      "landArea": "Diện tích đất",
+      "bedrooms": "Phòng ngủ",
+      "bathrooms": "Phòng tắm",
+      "floors": "Số tầng",
+      "description": "Mô tả",
+      "ownerInfo": "Thông tin chủ nhà",
+      "ownerName": "Chủ nhà",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "submitProposal": "Ứng tuyển",
+      "alreadyProposed": "Ứng tuyển",
+      "backToList": "Quay lại danh sách"
+    },
+    "proposalModal": {
+      "title": "Ứng tuyển",
+      "description": "Gửi đề xuất để quản lý bất động sản này cho chủ nhà.",
+      "commissionLabel": "Hoa hồng đề xuất",
+      "commissionPlaceholder": "Ví dụ: 2% hoặc 5,000,000 VND",
+      "messageLabel": "Tin nhắn của bạn",
+      "messagePlaceholder": "Giới thiệu bản thân và giải thích tại sao bạn là môi giới tốt nhất cho bất động sản này...",
+      "submit": "Ứng tuyển"
+    },
+    "toast": {
+      "proposalSuccess": "Đề xuất đã được gửi thành công! Chủ nhà sẽ xem xét yêu cầu của bạn.",
+      "proposalError": "Gửi đề xuất thất bại. Vui lòng thử lại."
+    }
+  }
+}

@@ -315,7 +315,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   };
 
   return (
-    <div className='mx-auto max-w-[736px] font-[family-name:var(--font-plus-jakarta-sans),sans-serif]'>
+    <div className='h-full mx-auto max-w-[736px] font-[family-name:var(--font-plus-jakarta-sans),sans-serif]'>
       {/* Page Title */}
       <div className='flex flex-col items-center gap-4 text-center mb-8'>
         <h1 className='text-[32px] font-bold leading-[1.25] tracking-tight text-foreground'>
