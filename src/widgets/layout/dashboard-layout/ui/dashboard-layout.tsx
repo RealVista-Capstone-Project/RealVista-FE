@@ -113,7 +113,6 @@ export function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
-  const navItems = sidebarItems ?? defaultSidebarItems;
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
