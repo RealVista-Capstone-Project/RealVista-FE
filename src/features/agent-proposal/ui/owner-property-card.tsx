@@ -10,6 +10,7 @@ interface OwnerPropertyCardProps {
   property: OwnerPropertySummary;
   isSelected: boolean;
   onClick: (property: OwnerPropertySummary) => void;
+  variant?: 'sidebar' | 'card';
 }
 
 function getStatusStyle(status: string): string {
@@ -34,6 +35,7 @@ export function OwnerPropertyCard({
   property,
   isSelected,
   onClick,
+  variant = 'sidebar',
 }: OwnerPropertyCardProps) {
   const t = useTranslations('OwnerProperties');
 
@@ -56,12 +58,18 @@ export function OwnerPropertyCard({
       type='button'
       onClick={() => onClick(property)}
       className={cn(
-        'group w-full text-left bg-white rounded-2xl border transition-all duration-200 overflow-hidden',
-        'flex flex-row items-stretch gap-0',
-        'hover:shadow-md hover:-translate-y-0.5',
-        isSelected
-          ? 'border-main-primary shadow-md ring-2 ring-main-primary/20'
-          : 'border-gray-200 shadow-sm hover:border-main-primary/40'
+        'group w-full text-left transition-colors',
+        variant === 'sidebar'
+          ? cn(
+              'flex flex-row items-stretch gap-0 p-4 sm:p-6 hover:bg-purple-98',
+              isSelected ? 'bg-purple-96' : 'bg-white'
+            )
+          : cn(
+              'flex flex-row items-stretch gap-0 rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5',
+              isSelected
+                ? 'border-main-primary shadow-md ring-2 ring-main-primary/20'
+                : 'border-gray-200 shadow-sm hover:border-main-primary/40'
+            )
       )}
     >
       {/* Thumbnail — fixed width + height left column */}

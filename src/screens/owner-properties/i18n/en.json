@@ -15,7 +15,8 @@
     },
     "empty": {
       "title": "No properties found.",
-      "subtitle": "Try adjusting your search or check back later."
+      "subtitle": "Try adjusting your search or check back later.",
+      "selectProperty": "Select a property to view details"
     },
     "pagination": {
       "showing": "Showing {from}-{to} of {total}"
@@ -39,7 +40,8 @@
       "phone": "Phone",
       "email": "Email",
       "submitProposal": "Submit Proposal",
-      "alreadyProposed": "Proposal Already Sent"
+      "alreadyProposed": "Proposal Already Sent",
+      "backToList": "Back to list"
     },
     "proposalModal": {
       "title": "Submit Proposal",

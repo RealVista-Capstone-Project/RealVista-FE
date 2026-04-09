@@ -22,6 +22,7 @@ import {
   SendHorizonal,
   Building2,
   CheckCircle2,
+  ArrowLeft,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -31,6 +32,11 @@ import { useSubmitProposalMutation } from '../hooks/use-submit-proposal';
 interface OwnerPropertySheetProps {
   property: OwnerPropertySummary | null;
   onClose: () => void;
+}
+
+interface OwnerPropertyDetailPanelProps {
+  property: OwnerPropertySummary;
+  onBack?: () => void;
 }
 
 function getStatusStyle(status: string): string {
@@ -321,6 +327,267 @@ export function OwnerPropertySheet({ property, onClose }: OwnerPropertySheetProp
       </Sheet>
 
       {/* Proposal modal (opened from sheet) */}
+      <SubmitProposalModal
+        open={proposalModalOpen}
+        onOpenChange={setProposalModalOpen}
+        property={property}
+        onSubmit={handleProposalSubmit}
+        isLoading={submitProposalMutation.isPending}
+      />
+    </>
+  );
+}
+
+/**
+ * Inline detail panel — renders directly inside the right-side main area
+ * (used by the two-panel layout in OwnerPropertiesPage).
+ */
+export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDetailPanelProps) {
+  const t = useTranslations('OwnerProperties');
+  const [proposalModalOpen, setProposalModalOpen] = useState(false);
+  const submitProposalMutation = useSubmitProposalMutation();
+
+  const handleProposalSubmit = useCallback(
+    async (values: { message: string; offered_commission: string }) => {
+      try {
+        await submitProposalMutation.mutateAsync({
+          property_id: property.property_id,
+          message: values.message,
+          offered_commission: values.offered_commission,
+        });
+        setProposalModalOpen(false);
+        toast.success(t('toast.proposalSuccess'));
+      } catch {
+        toast.error(t('toast.proposalError'));
+      }
+    },
+    [property, submitProposalMutation, t]
+  );
+
+  const thumbnailUrl =
+    property.media?.find((m) => m.is_primary)?.media_url ?? property.media?.[0]?.media_url;
+
+  const location = [
+    property.location_info?.ward_name,
+    property.location_info?.district_name,
+    property.location_info?.city_name,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  const usableArea = formatArea(property.usable_size_m2);
+  const landArea = formatArea(property.land_size_m2);
+  const bedroomsAttr = property.attributes?.find((a) => a.attribute_code === 'BEDROOMS');
+  const bathroomsAttr = property.attributes?.find((a) => a.attribute_code === 'BATHROOMS');
+  const floorsAttr = property.attributes?.find((a) => a.attribute_code === 'FLOORS');
+
+  return (
+    <>
+      <div className='flex h-full flex-col bg-white'>
+        {/* Mobile back button */}
+        {onBack && (
+          <div className='sticky top-0 z-20 flex items-center border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
+            <button
+              onClick={onBack}
+              className='flex items-center gap-2 text-sm font-semibold text-main-black'
+            >
+              <ArrowLeft className='h-5 w-5' strokeWidth={2.5} />
+              <span>{t('detailPanel.backToList')}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Hero image */}
+        <div className='relative h-56 w-full flex-shrink-0 bg-gray-100'>
+          {thumbnailUrl ? (
+            <img
+              src={thumbnailUrl}
+              alt={property.street_address}
+              className='h-full w-full object-cover'
+            />
+          ) : (
+            <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
+              <Home className='h-14 w-14 text-indigo-200' />
+            </div>
+          )}
+          <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent' />
+
+          {/* Overlaid address + status */}
+          <div className='absolute bottom-0 left-0 right-0 px-5 pb-4'>
+            <div className='flex items-end justify-between gap-3'>
+              <div className='min-w-0 flex-1'>
+                <h2 className='text-base font-bold leading-tight text-white line-clamp-2'>
+                  {property.street_address}
+                </h2>
+                {location && (
+                  <div className='mt-1 flex items-center gap-1'>
+                    <MapPin className='h-3 w-3 flex-shrink-0 text-white/70' />
+                    <span className='truncate text-xs text-white/80'>{location}</span>
+                  </div>
+                )}
+              </div>
+              <Badge
+                variant='outline'
+                className={cn(
+                  'flex-shrink-0 rounded-full border bg-white/90 px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-sm',
+                  getStatusStyle(property.status)
+                )}
+              >
+                {property.status}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable body */}
+        <div className='flex-1 overflow-y-auto'>
+          <div className='space-y-6 p-5 sm:p-8'>
+            {/* Property type + category */}
+            {property.property_type_info && (
+              <div className='flex items-center gap-2'>
+                <Building2 className='h-4 w-4 flex-shrink-0 text-indigo-500' />
+                <span className='text-sm font-semibold text-gray-800'>
+                  {property.property_type_info.property_type_name}
+                </span>
+                {property.property_type_info.property_category_name && (
+                  <>
+                    <span className='text-gray-300'>·</span>
+                    <span className='text-sm text-gray-500'>
+                      {property.property_type_info.property_category_name}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Stats tiles */}
+            <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
+              {usableArea && (
+                <InfoTile
+                  label={t('detailPanel.usableArea')}
+                  value={usableArea}
+                  icon={<Ruler className='h-3 w-3' />}
+                />
+              )}
+              {landArea && (
+                <InfoTile
+                  label={t('detailPanel.landArea')}
+                  value={landArea}
+                  icon={<Ruler className='h-3 w-3' />}
+                />
+              )}
+              {bedroomsAttr?.value_number != null && (
+                <InfoTile
+                  label={t('detailPanel.bedrooms')}
+                  value={String(bedroomsAttr.value_number)}
+                  icon={<Home className='h-3 w-3' />}
+                />
+              )}
+              {bathroomsAttr?.value_number != null && (
+                <InfoTile
+                  label={t('detailPanel.bathrooms')}
+                  value={String(bathroomsAttr.value_number)}
+                  icon={<Home className='h-3 w-3' />}
+                />
+              )}
+              {floorsAttr?.value_number != null && (
+                <InfoTile
+                  label={t('detailPanel.floors')}
+                  value={String(floorsAttr.value_number)}
+                  icon={<Building2 className='h-3 w-3' />}
+                />
+              )}
+            </div>
+
+            {/* Description */}
+            {property.descriptions && (
+              <section>
+                <h4 className='mb-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
+                  {t('detailPanel.description')}
+                </h4>
+                <p className='rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm leading-relaxed text-gray-600'>
+                  {property.descriptions}
+                </p>
+              </section>
+            )}
+
+            <Separator className='bg-gray-100' />
+
+            {/* Owner info */}
+            <section>
+              <h4 className='mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
+                {t('detailPanel.ownerInfo')}
+              </h4>
+              <div className='space-y-3'>
+                {property.owner_name && (
+                  <div className='flex items-center gap-3'>
+                    <div className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50'>
+                      <User className='h-4 w-4 text-indigo-500' />
+                    </div>
+                    <div>
+                      <div className='text-[10px] font-medium uppercase tracking-wide text-gray-400'>
+                        {t('detailPanel.ownerName')}
+                      </div>
+                      <div className='text-sm font-semibold text-gray-800'>
+                        {property.owner_name}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {property.owner_phone && (
+                  <div className='flex items-center gap-3'>
+                    <div className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-green-50'>
+                      <Phone className='h-4 w-4 text-green-500' />
+                    </div>
+                    <div>
+                      <div className='text-[10px] font-medium uppercase tracking-wide text-gray-400'>
+                        {t('detailPanel.phone')}
+                      </div>
+                      <div className='text-sm font-semibold text-gray-800'>
+                        {property.owner_phone}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {property.owner_email && (
+                  <div className='flex items-center gap-3'>
+                    <div className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-orange-50'>
+                      <Mail className='h-4 w-4 text-orange-500' />
+                    </div>
+                    <div>
+                      <div className='text-[10px] font-medium uppercase tracking-wide text-gray-400'>
+                        {t('detailPanel.email')}
+                      </div>
+                      <div className='truncate text-sm font-semibold text-gray-800'>
+                        {property.owner_email}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        {/* Sticky CTA footer */}
+        <div className='flex-shrink-0 border-t border-gray-100 bg-white p-4'>
+          {property.has_active_proposal ? (
+            <div className='flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-semibold text-emerald-700'>
+              <CheckCircle2 className='h-4 w-4' />
+              {t('detailPanel.alreadyProposed')}
+            </div>
+          ) : (
+            <Button
+              className='h-11 w-full gap-2 rounded-xl bg-main-primary text-sm font-semibold text-white shadow-sm shadow-indigo-200/60 hover:bg-main-primary/90'
+              onClick={() => setProposalModalOpen(true)}
+            >
+              <SendHorizonal className='h-4 w-4' />
+              {t('detailPanel.submitProposal')}
+            </Button>
+          )}
+        </div>
+      </div>
+
       <SubmitProposalModal
         open={proposalModalOpen}
         onOpenChange={setProposalModalOpen}

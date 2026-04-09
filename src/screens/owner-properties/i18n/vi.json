@@ -15,7 +15,8 @@
     },
     "empty": {
       "title": "Không tìm thấy bất động sản.",
-      "subtitle": "Hãy thử điều chỉnh tìm kiếm hoặc kiểm tra lại sau."
+      "subtitle": "Hãy thử điều chỉnh tìm kiếm hoặc kiểm tra lại sau.",
+      "selectProperty": "Chọn một bất động sản để xem chi tiết"
     },
     "pagination": {
       "showing": "Hiển thị {from}-{to} trong {total}"
@@ -39,7 +40,8 @@
       "phone": "Điện thoại",
       "email": "Email",
       "submitProposal": "Gửi đề xuất",
-      "alreadyProposed": "Đã gửi đề xuất"
+      "alreadyProposed": "Đã gửi đề xuất",
+      "backToList": "Quay lại danh sách"
     },
     "proposalModal": {
       "title": "Gửi đề xuất",
