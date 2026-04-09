@@ -10,7 +10,10 @@ export interface PropertySearchRequest {
   sort_by?: string;
   sort_direction?: 'asc' | 'desc';
   search_text?: string;
+  /** @deprecated Use property_category or property_type */
   category?: string;
+  property_category?: string;
+  property_type?: string;
   bedrooms?: number;
   bathrooms?: number;
   area?: number;
@@ -72,7 +75,10 @@ export interface PropertySearchResponse {
     has_more: boolean;
     filter_metadata: {
       applied_filters: {
+        /** @deprecated */
         category?: string;
+        property_category?: string;
+        property_type?: string;
         price_range?: {
           min: number;
           max: number;
@@ -245,6 +251,16 @@ export interface CreatePropertyRequest {
 
 export type UpdatePropertyRequest = Partial<CreatePropertyRequest>;
 
+export interface ListingSummaryDTO {
+  listing_id: string;
+  name: string;
+  slug: string;
+  price: number;
+  listing_type: 'RENT' | 'SALE';
+  thumbnail_url: string | null;
+  agent_name: string | null;
+}
+
 export interface PropertyDetailResponse {
   property_id: string;
   owner_id: string;
@@ -286,6 +302,7 @@ export interface PropertyDetailResponse {
     media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
     is_primary: boolean;
   }>;
+  active_listings?: ListingSummaryDTO[];
 }
 
 export interface PropertySummary {

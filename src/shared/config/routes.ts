@@ -19,10 +19,17 @@ export const ROUTES = {
     managedListings: '/dashboard/listings',
     myEngagements: '/dashboard/my-engagements',
     tenants: '/dashboard/tenants',
+    rentalContracts: '/dashboard/rental-contracts',
+    createRentalContract: '/dashboard/rental-contracts/create',
+    myContracts: '/dashboard/my-contracts',
     messages: '/dashboard/messages',
     property: '/dashboard/property',
     manageAgent: '/dashboard/manage-agent',
+    manageProposals: '/dashboard/manage-proposals',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
+  },
+  leases: {
+    signingComplete: '/leases/signing-complete',
   },
   manageAgent: {
     root: '/manage-agent',

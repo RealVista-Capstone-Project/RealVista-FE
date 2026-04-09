@@ -56,6 +56,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const params = useParams();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
+  // RBAC maps backend 'AGENT' → frontend 'moderator', so we must check backendRoles
+  const backendRoles: string[] = (session?.user as any)?.backendRoles ?? [];
+  const isAgent = backendRoles.includes('AGENT');
+
 
   const { isFavorite, toggleFavorite } = useListingFavorite(
     listing.listing_id,
@@ -187,6 +191,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 phone={listing.agent.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                isAgent={isAgent}
               />
             </div>
 
@@ -210,6 +215,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 phone={listing.agent.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                isAgent={isAgent}
               />
             </div>
           </div>
@@ -261,7 +267,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             className='w-full xs:w-auto max-w-[200px]'
             onClick={handleContact}
           >
-            Apply Now
+            {'Apply Now'}
           </RealVistaButton>
         </div>
       </div>
