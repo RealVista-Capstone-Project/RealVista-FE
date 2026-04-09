@@ -462,9 +462,10 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       <iframe
         ref={iframeRef}
         srcDoc={htmlContent}
-        className='w-full h-full border-0 outline-none'
+        className='w-full h-full border-0 outline-none ph-no-capture'
         sandbox='allow-scripts allow-same-origin allow-popups'
         title='3D Spark Viewer'
+        data-ph-no-capture='true'
       />
     </div>
   );

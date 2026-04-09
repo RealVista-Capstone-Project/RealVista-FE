@@ -337,7 +337,7 @@ export function ThreeDManagementScreen({
                 >
                   <div className='absolute -inset-2 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 blur-2xl opacity-0 group-hover/stage:opacity-100 transition-opacity duration-700' />
 
-                  <div className='relative overflow-hidden rounded-[2rem] border border-border/50 bg-slate-950 shadow-2xl'>
+                  <div className='relative overflow-hidden rounded-[2rem] border border-border/50 shadow-2xl'>
                     <div className='absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-5 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none'>
                       <div className='flex items-center gap-4'>
                         <div className='w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10'>
@@ -518,10 +518,10 @@ function RoomCard({
 
   const createdDate = room.latestOperation.created_at
     ? new Date(room.latestOperation.created_at).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
     : null;
 
   const startRename = (e: React.MouseEvent) => {
@@ -574,10 +574,9 @@ function RoomCard({
               <div
                 className={`
                   shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-colors duration-200
-                  ${
-                    room.hasSuccessful
-                      ? 'bg-primary/10 text-primary group-hover:bg-primary/15'
-                      : 'bg-muted text-muted-foreground'
+                  ${room.hasSuccessful
+                    ? 'bg-primary/10 text-primary group-hover:bg-primary/15'
+                    : 'bg-muted text-muted-foreground'
                   }
                 `}
               >
@@ -668,16 +667,16 @@ function RoomCard({
 
           {(room.latestOperation.status === 'PENDING' ||
             room.latestOperation.status === 'GENERATING') && (
-            <div className='space-y-2.5'>
-              <div className='w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden'>
-                <div className='bg-primary h-1.5 rounded-full animate-pulse w-2/3' />
+              <div className='space-y-2.5'>
+                <div className='w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden'>
+                  <div className='bg-primary h-1.5 rounded-full animate-pulse w-2/3' />
+                </div>
+                <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
+                  <RefreshCw className='w-3 h-3 animate-spin' />
+                  {t('processing')}...
+                </p>
               </div>
-              <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
-                <RefreshCw className='w-3 h-3 animate-spin' />
-                {t('processing')}...
-              </p>
-            </div>
-          )}
+            )}
 
           {room.hasSuccessful && hasModel && (
             <div className='flex items-center justify-between'>

@@ -43,6 +43,7 @@ export interface UserPropertyMedia {
   isPrimary: boolean;
   isPropertyStandard: boolean;
   displayOrder: number;
+  roomName?: string | null;
 }
 
 export interface UserPropertyAmenity {

@@ -205,7 +205,41 @@ export function MediaViewer({
                   </video>
                 )}
 
-                {activeTab === '3d-tour' && (
+                {activeTab === '3d-tour' && currentMedia && (
+                  <div className='relative w-full h-full'>
+                    {/* Room name badge — top-left overlay */}
+                    {currentMedia.metadata?.room_name && (
+                      <div className='absolute top-4 left-4 z-10 flex items-center gap-2 rounded-full bg-black/60 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold pointer-events-none'>
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          width='14'
+                          height='14'
+                          viewBox='0 0 24 24'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          className='opacity-80'
+                        >
+                          <path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z' />
+                        </svg>
+                        <span>{String(currentMedia.metadata.room_name)}</span>
+                        {currentMediaItems.length > 1 && (
+                          <span className='opacity-50 text-xs ml-1'>
+                            {currentIndex + 1}/{currentMediaItems.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <SparkViewer
+                      metadata={currentMedia.metadata}
+                      className='w-full h-full'
+                    />
+                  </div>
+                )}
+
+                {activeTab === '3d-tour' && !currentMedia && (
                   <div className='text-center text-white'>
                     <p className='text-2xl font-bold mb-2'>{t('tour3DPlaceholder')}</p>
                     <p className='text-white/60'>{t('tour3DPlaceholderDescription')}</p>
