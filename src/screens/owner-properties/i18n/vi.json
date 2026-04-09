@@ -11,7 +11,7 @@
     "card": {
       "bedrooms": "phòng ngủ",
       "viewDetails": "Xem chi tiết",
-      "proposed": "Đã gửi đề xuất"
+      "proposed": "Đã ứng tuyển"
     },
     "empty": {
       "title": "Không tìm thấy bất động sản.",
@@ -40,18 +40,18 @@
       "ownerName": "Chủ nhà",
       "phone": "Điện thoại",
       "email": "Email",
-      "submitProposal": "Gửi đề xuất",
-      "alreadyProposed": "Đã gửi đề xuất",
+      "submitProposal": "Ứng tuyển",
+      "alreadyProposed": "Ứng tuyển",
       "backToList": "Quay lại danh sách"
     },
     "proposalModal": {
-      "title": "Gửi đề xuất",
+      "title": "Ứng tuyển",
       "description": "Gửi đề xuất để quản lý bất động sản này cho chủ nhà.",
       "commissionLabel": "Hoa hồng đề xuất",
       "commissionPlaceholder": "Ví dụ: 2% hoặc 5,000,000 VND",
       "messageLabel": "Tin nhắn của bạn",
       "messagePlaceholder": "Giới thiệu bản thân và giải thích tại sao bạn là môi giới tốt nhất cho bất động sản này...",
-      "submit": "Gửi đề xuất"
+      "submit": "Ứng tuyển"
     },
     "toast": {
       "proposalSuccess": "Đề xuất đã được gửi thành công! Chủ nhà sẽ xem xét yêu cầu của bạn.",
