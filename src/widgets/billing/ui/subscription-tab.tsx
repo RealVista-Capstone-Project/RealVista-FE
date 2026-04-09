@@ -681,7 +681,7 @@ function HorizontalWizardSteps({
 }) {
   return (
     <div className='mb-6 w-full overflow-x-auto pb-1'>
-      <div className='flex min-w-0 items-start'>
+      <div className='flex min-w-0 items-start pl-1'>
         {WIZARD_STEP_DEFS.map((item, index) => {
           const done      = activeStep > item.num;
           const active    = activeStep === item.num;
@@ -703,7 +703,7 @@ function HorizontalWizardSteps({
                 <div
                   aria-hidden
                   className={cn(
-                    'absolute left-8 right-0 top-4 h-px transition-colors',
+                    'absolute left-8 right-0 top-4 h-0.5 translate-y-px transition-colors',
                     done ? 'bg-main-primary' : 'bg-grey-200'
                   )}
                 />
