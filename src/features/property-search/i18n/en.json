@@ -1,0 +1,42 @@
+{
+  "PropertySearch": {
+    "home": "Home",
+    "search": "Search",
+    "searchTitleRent": "Search rental properties",
+    "searchTitleSale": "Search properties for sale",
+    "propertiesAvailableRent": "properties available for rent",
+    "propertiesAvailableSale": "properties available for sale",
+    "searchPlaceholder": "Search...",
+    "searchWithSearchBar": "Search with Search Bar",
+    "moreFilters": "More Filters",
+    "anyPrice": "Any Price",
+    "beds": "Bedrooms",
+    "allTypes": "All Types",
+    "newest": "Newest",
+    "gridView": "Grid View",
+    "listView": "List View",
+    "map": "Map",
+    "satellite": "Satellite",
+    "moreFiltersTitle": "More Filters",
+    "category": "Category",
+    "categories": {
+      "residential": "Residential",
+      "commercial": "Commercial",
+      "industrial": "Industrial",
+      "land": "Land"
+    },
+    "priceRange": "Price Range",
+    "features": "Features",
+    "bedroom": "Bedroom",
+    "bathroom": "Bathroom",
+    "rentalPeriod": {
+      "label": "Rental Period",
+      "any": "Any",
+      "1-12": "1 - 12 months",
+      "13-24": "13 - 24 months",
+      "24+": "24+ months"
+    },
+    "reset": "Reset",
+    "apply": "Apply"
+  }
+}
