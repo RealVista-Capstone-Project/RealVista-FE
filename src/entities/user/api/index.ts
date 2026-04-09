@@ -1,6 +1,5 @@
-<<<<<<< HEAD
-import http from '@/shared/lib/http'
-import type { ApiResponse } from '@/shared/types/api'
+import http from '@/shared/lib/http';
+import type { ApiResponse } from '@/shared/types/api';
 import type {
   User,
   UserProfile,
@@ -9,18 +8,7 @@ import type {
   UpdateUserData,
   UpdateMeData,
   UserSearchResponse,
-} from '../model/types'
-=======
-import http from '@/shared/lib/http';
-import { ApiResponse } from '@/shared/types/api';
-import type {
-  User,
-  LoginCredentials,
-  LoginResponse,
-  UpdateUserData,
-  UserSearchResponse,
 } from '../model/types';
->>>>>>> 952a607f0d29cb7092912b77dd6479d021eadf48
 
 /** Response shape from POST /auth/register */
 export interface RegisterResponse {

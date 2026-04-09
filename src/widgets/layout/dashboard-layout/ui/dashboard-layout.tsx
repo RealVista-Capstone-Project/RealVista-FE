@@ -244,13 +244,8 @@ export function DashboardLayout({
         </div>
 
         {/* Menu Items */}
-<<<<<<< HEAD
-        <nav className='flex flex-1 flex-col gap-1 p-3'>
-          {navItems.map((item) => {
-=======
         <nav className='flex flex-1 flex-col gap-1 p-3 overflow-y-auto'>
           {resolvedSidebarItems.map((item) => {
->>>>>>> 952a607f0d29cb7092912b77dd6479d021eadf48
             const isActive = isItemActive(item.href);
             return (
               <Link
