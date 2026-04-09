@@ -63,8 +63,11 @@ const request = async <Response>(
     // Cold path: cache empty on first render before AuthTokenProvider's useEffect runs —
     // fall back to async getSession() to avoid a 401 on initial page load.
     let token = getAuthTokenSync();
+    console.debug(`[http] ${method} ${url} | sync token:`, token ? 'present' : 'null');
     if (!token) {
+      console.debug(`[http] ${method} ${url} | falling back to async getSession()...`);
       token = await getAuthToken();
+      console.debug(`[http] ${method} ${url} | async token:`, token ? 'present' : 'null');
       if (token) updateAuthTokenCache(token); // warm the cache for subsequent calls
     }
     if (token) {
@@ -77,6 +80,7 @@ const request = async <Response>(
   const baseUrl = options?.baseUrl === undefined ? env.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl;
 
   const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
+  console.debug(`[http] ${method} fullUrl:`, fullUrl);
 
   const res = await fetch(fullUrl, {
     ...options,

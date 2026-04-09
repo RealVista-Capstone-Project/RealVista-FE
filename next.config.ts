@@ -60,6 +60,16 @@ const nextConfig: NextConfig = {
         hostname: 'realvista.sgp1.cdn.digitaloceanspaces.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.firebasestorage.app',
+        pathname: '/**',
+      },
     ],
     dangerouslyAllowSVG: true,
   },

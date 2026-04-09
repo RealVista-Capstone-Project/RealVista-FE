@@ -51,4 +51,6 @@ history/
 # bv (beads viewer) local config and caches
 .bv/
 
-.agents/
+.agent/
+.gitnexus
+.opencode

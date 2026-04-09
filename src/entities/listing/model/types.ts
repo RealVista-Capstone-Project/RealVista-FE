@@ -57,6 +57,7 @@ export interface MediaItem {
   thumbnail_url: string;
   is_primary: boolean;
   display_order: number;
+  metadata?: any;
 }
 
 // ============ Agent ============
