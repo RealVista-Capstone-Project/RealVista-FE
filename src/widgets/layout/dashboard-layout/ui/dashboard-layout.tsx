@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Users,
   Building2,
+  Search,
   type LucideIcon,
 } from 'lucide-react';
 import { Separator } from '@/shared/ui';
@@ -70,6 +71,12 @@ const agentSidebarItems: SidebarMenuItem[] = [
     label: 'Dashboard',
     href: ROUTES.dashboard.root,
     icon: LayoutDashboard,
+  },
+  {
+    id: 'owner-properties',
+    label: 'Owner Properties',
+    href: ROUTES.dashboard.ownerProperties,
+    icon: Search,
   },
   {
     id: 'insight',
@@ -221,7 +228,9 @@ export function DashboardLayout({
                   <span className='text-base font-bold leading-tight text-main-black'>
                     Estatery
                   </span>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-main-secondary/40'>Property Manager</span>
+                  <span className='text-[10px] uppercase font-bold tracking-wider text-main-secondary/40'>
+                    Property Manager
+                  </span>
                 </div>
               </Link>
               <button
@@ -253,7 +262,10 @@ export function DashboardLayout({
                 )}
                 title={isCollapsed ? item.label : undefined}
               >
-                <item.icon className={cn('h-5 w-5 shrink-0 transition-transform', isActive && 'scale-110')} strokeWidth={isActive ? 2.5 : 2} />
+                <item.icon
+                  className={cn('h-5 w-5 shrink-0 transition-transform', isActive && 'scale-110')}
+                  strokeWidth={isActive ? 2.5 : 2}
+                />
                 {!isCollapsed && <span className='text-sm'>{item.label}</span>}
               </Link>
             );
@@ -317,15 +329,16 @@ export function DashboardLayout({
                 </span>
                 <span className='text-[10px] font-medium text-slate-400'>Professional Agent</span>
               </div>
-              <ChevronDown className='h-3.5 w-3.5 text-slate-400 ml-1 group-hover:text-slate-600 transition-colors' strokeWidth={2.5} />
+              <ChevronDown
+                className='h-3.5 w-3.5 text-slate-400 ml-1 group-hover:text-slate-600 transition-colors'
+                strokeWidth={2.5}
+              />
             </button>
           </div>
         </header>
 
         {/* Page Content - fills remaining height */}
-        <main className='flex-1 min-h-0 overflow-hidden bg-slate-50/50 p-0'>
-          {children}
-        </main>
+        <main className='flex-1 h-full overflow-x-hidden bg-slate-50/50 p-0'>{children}</main>
       </div>
     </div>
   );
