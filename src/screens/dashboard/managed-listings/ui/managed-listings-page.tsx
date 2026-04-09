@@ -130,7 +130,7 @@ export function ManagedListingsPage() {
 
   if (isLoading) {
     return (
-      <div className='flex min-h-screen items-center justify-center'>
+      <div className='flex h-full items-center justify-center'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-98 border-t-main-primary' />
       </div>
     );
@@ -138,7 +138,7 @@ export function ManagedListingsPage() {
 
   if (error) {
     return (
-      <div className='flex min-h-screen items-center justify-center'>
+      <div className='flex h-full items-center justify-center'>
         <div className='text-center'>
           <p className='text-lg font-semibold text-main-black'>{t('error.title')}</p>
           <p className='mt-2 text-sm text-main-secondary/60'>{error.message}</p>
@@ -160,7 +160,7 @@ export function ManagedListingsPage() {
   const sortOptions: SortOption[] = ['newest', 'oldest', 'priceAsc', 'priceDesc'];
 
   return (
-    <div className='flex h-[calc(100vh-96px)] overflow-hidden flex-col sm:flex-row'>
+    <div className='flex h-full overflow-hidden flex-col sm:flex-row'>
       {/* Left Sidebar - Properties List */}
       <aside
         className={cn(
