@@ -1036,7 +1036,7 @@ function Step3Content({
   });
 
   const syncPayOsMutation = useMutation({
-    mutationFn: () => billingApi.syncPayOsFromCheckoutOrder(checkout?.checkoutOrderId ?? ''),
+    mutationFn: () => billingApi.syncPayOsFromCheckoutOrder(checkout?.checkout_order_id ?? ''),
     onSuccess: (res) => {
       const txnStatus = (res.payload as { data?: TransactionStatusResponse }).data?.status;
       if (txnStatus === 'COMPLETED') {
@@ -1052,12 +1052,12 @@ function Step3Content({
 
   // Poll VNPay transaction status when checkout is created with VNPay
   React.useEffect(() => {
-    if (!checkout || checkout.paymentMethod !== 'VNPAY') return;
-    if (!checkout.checkoutOrderId) return;
+    if (!checkout || checkout.payment_method !== 'VNPAY') return;
+    if (!checkout.checkout_order_id) return;
 
     const interval = setInterval(() => {
       void queryClient.invalidateQueries({
-        queryKey: billingKeys.transactionStatus(checkout.checkoutOrderId),
+        queryKey: billingKeys.transactionStatus(checkout.checkout_order_id),
       });
     }, 3000);
 
@@ -1066,8 +1066,8 @@ function Step3Content({
 
   // When VNPay transaction completes, auto proceed to step 4
   const { data: vnpayStatusData } = useQuery({
-    ...billingQueries.transactionStatus(checkout?.checkoutOrderId ?? ''),
-    enabled: !!checkout && checkout.paymentMethod === 'VNPAY' && !!checkout.checkoutOrderId,
+    ...billingQueries.transactionStatus(checkout?.checkout_order_id ?? ''),
+    enabled: !!checkout && checkout.payment_method === 'VNPAY' && !!checkout.checkout_order_id,
   });
 
   React.useEffect(() => {
@@ -1116,7 +1116,7 @@ function Step3Content({
     // PayOS: tạo link ngay khi chọn — không cần bấm thêm mới thấy QR
     if (!selectedPlan || !selectedType) return;
     if (checkoutMutation.isPending) return;
-    if (checkout?.paymentMethod === 'PAYOS') return;
+    if (checkout?.payment_method === 'PAYOS') return;
 
     setCheckout(null);
     requestCheckout('PAYOS');
@@ -1260,7 +1260,7 @@ function Step3Content({
       )}
 
       {/* PayOS: show QR after checkout created */}
-      {selectedPayment === 'payos' && checkout && (checkout.qrCode || checkout.checkoutUrl) && (
+      {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
         <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
           <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
             Quét mã QR để thanh toán qua{' '}
@@ -1285,7 +1285,7 @@ function Step3Content({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                checkout.qrCode || checkout.checkoutUrl
+                checkout.qr_code || checkout.checkout_url
               )}&color=7065f0&bgcolor=ffffff`}
               alt='PayOS QR code'
               width={180}
@@ -1295,7 +1295,7 @@ function Step3Content({
           </div>
           <p className='text-xs text-grey-500'>Mã QR chỉ có giá trị trong 15 phút</p>
           <a
-            href={checkout.checkoutUrl}
+            href={checkout.checkout_url}
             target='_blank'
             rel='noopener noreferrer'
             className='flex items-center gap-1 text-xs text-blue-600 underline underline-offset-2'
@@ -1315,7 +1315,7 @@ function Step3Content({
             size='small'
             className='bg-primary text-white hover:bg-primary-dark'
             onClick={() => {
-              window.open(checkout.checkoutUrl, '_blank');
+              window.open(checkout.checkout_url, '_blank');
             }}
           >
             Chuyển sang VNPay thanh toán
@@ -1689,7 +1689,7 @@ function PurchaseWizard() {
         )}
         {step === 4 && (
           <Step4Content
-            transactionId={checkoutData?.checkoutOrderId ?? null}
+            transactionId={checkoutData?.checkout_order_id ?? null}
             plan={selectedPlan}
             onDone={handleDone}
           />
@@ -1877,9 +1877,9 @@ function TransactionsSection() {
           </thead>
           <tbody>
             {transactions.map((transaction) => (
-              <tr key={transaction.transactionId} className='border-b border-grey-100 hover:bg-grey-50 transition-colors'>
+              <tr key={transaction.transaction_id} className='border-b border-grey-100 hover:bg-grey-50 transition-colors'>
                 <td className='px-5 py-3 text-sm text-grey-600'>
-                  {formatDate(transaction.createdAt)}
+                  {formatDate(transaction.created_at)}
                 </td>
                 <td className='px-5 py-3 text-sm text-main-black'>
                   {transaction.description}

@@ -36,21 +36,21 @@ export interface CheckoutRequest {
 }
 
 export interface CheckoutResponse {
-  checkoutOrderId: string;
-  orderCode: number;
-  checkoutUrl: string;
+  checkout_order_id: string;
+  order_code: number;
+  checkout_url: string;
   /** Only present for PayOS */
-  qrCode?: string;
-  paymentMethod: PaymentMethodType;
-  planName: string;
+  qr_code?: string;
+  payment_method: PaymentMethodType;
+  plan_name: string;
   amount: number;
 }
 
 export interface TransactionStatusResponse {
-  transactionId: string;
+  transaction_id: string;
   status: PaymentStatus;
-  planCode: string;
-  planType: PlanType;
+  plan_code: string;
+  plan_type: PlanType;
 }
 
 /** Active feature subscription from GET /billing/subscriptions/me */
@@ -71,12 +71,12 @@ export interface ActiveSubscriptionResponse {
 }
 
 export interface TransactionResponse {
-  transactionId: string;
-  planCode: string;
-  planType: PlanType;
-  paymentMethod: PaymentMethodType;
+  transaction_id: string;
+  plan_code: string;
+  plan_type: PlanType;
+  payment_method: PaymentMethodType;
   status: PaymentStatus;
   amount: number;
-  createdAt: string;
+  created_at: string;
   description: string;
 }
