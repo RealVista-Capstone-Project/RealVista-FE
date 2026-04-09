@@ -22,7 +22,7 @@ export function DashboardPage() {
 
   if (status === 'loading') {
     return (
-      <div className='flex min-h-screen items-center justify-center'>
+      <div className='flex h-full items-center justify-center'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
       </div>
     );
@@ -30,7 +30,7 @@ export function DashboardPage() {
 
   if (!session) {
     return (
-      <div className='flex min-h-screen items-center justify-center'>
+      <div className='flex h-full items-center justify-center'>
         <p className='text-lg text-slate-600 dark:text-slate-400'>
           Please sign in to access the dashboard
         </p>

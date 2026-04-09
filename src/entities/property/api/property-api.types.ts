@@ -1,3 +1,30 @@
+export interface PropertySummaryResponse {
+  property_id: string;
+  property_type_id: string;
+  street_address: string;
+  status:
+  | 'DRAFT'
+  | 'PENDING'
+  | 'VERIFIED'
+  | 'REJECTED'
+  | 'AVAILABLE'
+  | 'RESERVED'
+  | 'SOLD'
+  | 'RENTED';
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  width_m: number | null;
+  length_m: number | null;
+  area_sqft: number | null;
+  description: string | null;
+  property_type_info: PropertyTypeInfo | null;
+  location_info: LocationInfo | null;
+  attributes: PropertyAttributeItem[] | null;
+  media: PropertyMediaItem[] | null;
+  amenities: PropertyAmenityItem[] | null;
+  owner_name?: string;
+  owner_phone?: string;
+}
 export interface PropertySearchRequest {
   north_lat: number;
   south_lat: number;
@@ -95,126 +122,6 @@ export interface PropertySearchResponse {
   timestamp: string;
 }
 
-export interface MyPropertiesSearchCriteria {
-  keyword?: string;
-  status?: string;
-  page: number;
-  size: number;
-}
-
-export interface PropertyTypeInfo {
-  property_type_id: string;
-  property_type_name: string | null;
-  property_type_code: string | null;
-  property_category_id: string | null;
-  property_category_name: string | null;
-  property_category_code: string | null;
-}
-
-export interface LocationInfo {
-  location_id: string;
-  city_name: string | null;
-  district_name: string | null;
-  ward_name: string | null;
-  latitude: number | null;
-  longitude: number | null;
-}
-
-export interface PropertyAttributeItem {
-  attribute_id: string;
-  attribute_code: string;
-  attribute_name: string;
-  data_type: string;
-  icon: string | null;
-  unit: string | null;
-  value_number: number | null;
-  value_text: string | null;
-  value_boolean: boolean | null;
-  display_value: string | null;
-}
-
-export interface PropertyMediaItem {
-  media_id: string;
-  media_type: string;
-  media_url: string;
-  thumbnail_url: string | null;
-  is_primary: boolean;
-  is_property_standard: boolean;
-  display_order: number;
-}
-
-export interface PropertyAmenityItem {
-  amenity_id: string;
-  amenity_name: string;
-  amenity_type: string | null;
-  description: string | null;
-}
-
-export interface PropertyAttributeRangeResponse {
-  range_id: string;
-  label: string;
-  min_value: number | null;
-  max_value: number | null;
-  display_order: number;
-}
-
-export interface PropertyAttributeDefinition {
-  attribute_id: string;
-  attribute_code: string;
-  attribute_name: string;
-  data_type: string;
-  icon: string | null;
-  unit: string | null;
-  ranges: PropertyAttributeRangeResponse[] | null;
-}
-
-export interface PropertySummaryResponse {
-  property_id: string;
-  property_type_id: string;
-  street_address: string;
-  status:
-    | 'DRAFT'
-    | 'PENDING'
-    | 'VERIFIED'
-    | 'REJECTED'
-    | 'AVAILABLE'
-    | 'RESERVED'
-    | 'SOLD'
-    | 'RENTED';
-  land_size_m2: number | null;
-  usable_size_m2: number | null;
-  width_m: number | null;
-  length_m: number | null;
-  area_sqft: number | null;
-  description: string | null;
-  property_type_info: PropertyTypeInfo | null;
-  location_info: LocationInfo | null;
-  attributes: PropertyAttributeItem[] | null;
-  media: PropertyMediaItem[] | null;
-  amenities: PropertyAmenityItem[] | null;
-  owner_name?: string;
-  owner_phone?: string;
-}
-
-export interface PageResponse<T> {
-  content: T[];
-  page: number;
-  size: number;
-  total_elements?: number;
-  total_pages?: number;
-  last?: boolean;
-  first?: boolean;
-  has_next?: boolean;
-  has_previous?: boolean;
-}
-
-export interface MyPropertiesResponse {
-  success: boolean;
-  message: string;
-  data: PageResponse<PropertySummaryResponse>;
-  timestamp: string;
-}
-
 export interface PropertyAttributeRequest {
   attribute_id?: string;
   attribute_code?: string;
@@ -226,8 +133,9 @@ export interface PropertyAttributeRequest {
 export interface PropertyMediaRequest {
   url: string;
   thumbnailUrl?: string;
-  type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
+  type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
   isThumbnail?: boolean;
+  metadata?: any;
 }
 
 export interface CreatePropertyRequest {
@@ -299,8 +207,9 @@ export interface PropertyDetailResponse {
     media_id: string;
     media_url: string;
     thumbnail_url: string | null;
-    media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT';
+    media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
     is_primary: boolean;
+    metadata?: any;
   }>;
   active_listings?: ListingSummaryDTO[];
 }
@@ -316,9 +225,167 @@ export interface PropertySummary {
   owner_phone?: string;
 }
 
+export interface Property3dOperation {
+  operation_id: string;
+  property_id?: string;
+  status?: string;
+  room_name?: string;
+  error_message?: string;
+  created_at?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+}
+
+export interface CreateProperty3dOperationRequest {
+  model: string;
+  display_name?: string;
+  room_name?: string;
+  images: Array<{
+    media_asset_id: string;
+    azimuth: number;
+  }>;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
+  timestamp: string;
+}
+
+export interface MyPropertiesSearchCriteria {
+  keyword?: string;
+  status?: string;
+  page: number;
+  size: number;
+}
+
+export interface OwnerAvailablePropertiesCriteria {
+  keyword?: string;
+  propertyTypeId?: string;
+  locationId?: string;
+  page: number;
+  size: number;
+}
+
+export interface PropertyTypeInfo {
+  property_type_id: string;
+  property_type_name: string | null;
+  property_type_code: string | null;
+  property_category_id: string | null;
+  property_category_name: string | null;
+  property_category_code: string | null;
+}
+
+export interface LocationInfo {
+  location_id: string;
+  city_name: string | null;
+  district_name: string | null;
+  ward_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PropertyAttributeItem {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: string;
+  icon: string | null;
+  unit: string | null;
+  value_number: number | null;
+  value_text: string | null;
+  value_boolean: boolean | null;
+  display_value: string | null;
+}
+
+export interface PropertyMediaItem {
+  media_id: string;
+  media_type: string;
+  media_url: string;
+  thumbnail_url: string | null;
+  is_primary: boolean;
+  is_property_standard: boolean;
+  display_order: number;
+}
+
+export interface PropertyAmenityItem {
+  amenity_id: string;
+  amenity_name: string;
+  amenity_type: 'ONSITE' | 'OFFSITE' | string | null;
+  description: string | null;
+  is_onsite?: boolean;
+  is_offsite?: boolean;
+}
+
+export interface PropertyAttributeRangeResponse {
+  range_id: string;
+  label: string;
+  min_value: number | null;
+  max_value: number | null;
+  display_order: number;
+}
+
+export interface PropertyAttributeDefinition {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: string;
+  icon: string | null;
+  unit: string | null;
+  ranges: PropertyAttributeRangeResponse[] | null;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  // snake_case (internal/legacy APIs)
+  total_elements?: number;
+  total_pages?: number;
+  // camelCase (new feed API)
+  totalElements?: number;
+  totalPages?: number;
+  last?: boolean;
+  first?: boolean;
+  has_next?: boolean;
+  has_previous?: boolean;
+}
+
+export interface MyPropertiesResponse {
+  success: boolean;
+  message: string;
+  data: PageResponse<PropertySummaryResponse>;
+  timestamp: string;
+}
+
+export interface OwnerPropertySummary {
+  property_id: string;
+  owner_id: string;
+  owner_name: string | null;
+  owner_phone: string | null;
+  owner_email?: string | null;
+  street_address: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  width_m?: number | null;
+  length_m?: number | null;
+  status: string;
+  /** API field name is "descriptions" (plural) */
+  descriptions: string | null;
+  property_type_info: PropertyTypeInfo | null;
+  location_info: LocationInfo | null;
+  media: PropertyMediaItem[] | null;
+  attributes: PropertyAttributeItem[] | null;
+  amenities?: PropertyAmenityItem[] | null;
+  has_active_proposal?: boolean;
+}
+
+export interface OwnerAvailablePropertiesResponse {
+  success: boolean;
+  message: string;
+  data: PageResponse<OwnerPropertySummary>;
   timestamp: string;
 }

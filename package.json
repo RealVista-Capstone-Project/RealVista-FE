@@ -40,6 +40,7 @@
     "embla-carousel-react": "^8.6.0",
     "firebase": "^12.8.0",
     "framer-motion": "^12.34.0",
+    "gitnexus": "^1.5.3",
     "input-otp": "^1.4.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.484.0",

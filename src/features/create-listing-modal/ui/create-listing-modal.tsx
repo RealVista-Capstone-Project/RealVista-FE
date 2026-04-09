@@ -295,6 +295,7 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         isPrimary: m.is_primary,
         isPropertyStandard: m.is_property_standard,
         displayOrder: m.display_order,
+        roomName: m.metadata?.room_name ?? null,
       })),
     };
   });

@@ -281,22 +281,22 @@ export function PropertyMapBasedSearchPage({
               priceFilter={{
                 label: t('anyPrice'),
                 value: 'any',
-                onClick: () => console.log('Price filter'),
+                onClick: () => {},
               }}
               bedsFilter={{
                 label: `2-4 ${t('beds')}`,
                 value: '2-4',
-                onClick: () => console.log('Beds filter'),
+                onClick: () => {},
               }}
               typeFilter={{
                 label: t('allTypes'),
                 value: 'all',
-                onClick: () => console.log('Type filter'),
+                onClick: () => {},
               }}
               sortFilter={{
                 label: t('newest'),
                 value: 'newest',
-                onClick: () => console.log('Sort filter'),
+                onClick: () => {},
               }}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
@@ -334,7 +334,9 @@ export function PropertyMapBasedSearchPage({
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={() => router.push(`/${locale}/listing/${property.slug || property.listing_id}`)}
+                    onClick={() =>
+                      router.push(`/${locale}/listing/${property.slug || property.listing_id}`)
+                    }
                     className={
                       selectedPropertyIds.includes(property.listing_id)
                         ? 'ring-2 ring-main-primary'
