@@ -9,6 +9,9 @@
     "joinButton": "Tham gia",
     "demoTitle": "Demo Chat WebSocket",
     "leaveRoom": "Rời phòng",
-    "testingNotes": "Ghi chú kiểm thử"
+    "testingNotes": "Ghi chú kiểm thử",
+    "messages": "Tin nhắn",
+    "noMessages": "Chưa có tin nhắn",
+    "viewAllMessages": "Xem tất cả tin nhắn"
   }
 }

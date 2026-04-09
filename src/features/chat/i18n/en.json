@@ -9,6 +9,9 @@
     "joinButton": "Join Room",
     "demoTitle": "WebSocket Chat Demo",
     "leaveRoom": "Leave Room",
-    "testingNotes": "Testing Notes"
+    "testingNotes": "Testing Notes",
+    "messages": "Messages",
+    "noMessages": "No messages yet",
+    "viewAllMessages": "View all messages"
   }
 }
