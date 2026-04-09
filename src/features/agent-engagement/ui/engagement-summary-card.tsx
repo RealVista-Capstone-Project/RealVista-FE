@@ -13,8 +13,11 @@ interface EngagementSummaryCardProps {
 }
 
 interface ParsedContent {
+  title?: string;
   message?: string;
-  offeredCommission?: string;
+  pitchContent?: string;
+  commissionRate?: number;
+  experienceYears?: number;
 }
 
 export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
@@ -26,9 +29,19 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
 
   const parsedContent: ParsedContent | null = (() => {
     if (!agent.content) return null;
-    try { return JSON.parse(agent.content) as ParsedContent; }
+    if (typeof agent.content === 'object') return agent.content as unknown as ParsedContent;
+    try {
+      const parsed = JSON.parse(agent.content);
+      // Handle potential double-serialization from older data or Hibernate quirks
+      if (typeof parsed === 'string') {
+        return JSON.parse(parsed) as ParsedContent;
+      }
+      return parsed as ParsedContent;
+    }
     catch { return null; }
   })();
+
+  const displayMessage = parsedContent?.message || parsedContent?.pitchContent;
 
   return (
     <Card className='border border-gray-100 shadow-sm rounded-2xl overflow-hidden'>
@@ -67,11 +80,11 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
         {/* Title + message */}
         <div className='mb-5'>
           <h3 className='text-sm font-bold text-gray-900'>
-            {t('detailPage.summaryTitle')}
+            {parsedContent?.title || t('detailPage.summaryTitle')}
           </h3>
-          {parsedContent?.message && (
+          {displayMessage && (
             <p className='text-sm text-gray-500 mt-1.5 leading-relaxed'>
-              {parsedContent.message}
+              {displayMessage}
             </p>
           )}
         </div>
