@@ -49,18 +49,6 @@ const ownerSidebarItems: SidebarMenuItem[] = [
   { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
   { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
   {
-    id: 'manage-agent',
-    label: 'Manage Agent',
-    href: ROUTES.dashboard.manageAgent,
-    icon: Users,
-  },
-  {
-    id: 'owner-properties',
-    label: 'Owner Properties',
-    href: ROUTES.dashboard.ownerProperties,
-    icon: Search,
-  },
-  {
     id: 'rental-contracts',
     label: 'Rental Contracts',
     href: ROUTES.dashboard.rentalContracts,

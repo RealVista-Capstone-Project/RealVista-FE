@@ -53,7 +53,7 @@ function ManageRentalContractContent() {
 
   if (isLoading) {
     return (
-      <div className='flex min-h-screen items-center justify-center bg-[#F6F4FF]'>
+      <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
         <div className='flex flex-col items-center gap-4'>
           <div className='h-10 w-10 animate-spin rounded-full border-[3px] border-main-primary border-t-transparent' />
           <p className='text-sm font-medium tracking-wide text-main-secondary/70'>{t('loading')}</p>
@@ -64,7 +64,7 @@ function ManageRentalContractContent() {
 
   if (isError) {
     return (
-      <div className='flex min-h-screen items-center justify-center bg-[#F6F4FF]'>
+      <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm'>
             <FileSearch className='h-8 w-8 text-main-primary' />
@@ -76,7 +76,7 @@ function ManageRentalContractContent() {
   }
 
   return (
-    <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(122,92,255,0.10),_transparent_28%),linear-gradient(180deg,#F6F4FF_0%,#F9F8FE_32%,#F7F7FD_100%)]'>
+    <div className='h-full overflow-y-auto bg-[radial-gradient(circle_at_top_left,_rgba(122,92,255,0.10),_transparent_28%),linear-gradient(180deg,#F6F4FF_0%,#F9F8FE_32%,#F7F7FD_100%)]'>
       <div className='mx-auto px-6 py-6'>
         <div className='mb-6 rounded-3xl border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(246,243,255,0.92))] p-6 shadow-[0_20px_60px_rgba(96,72,179,0.08)] backdrop-blur-md'>
           <div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
