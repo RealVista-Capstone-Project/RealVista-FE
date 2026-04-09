@@ -308,13 +308,13 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     <div
       ref={containerRef}
       className={cn(
-        'relative w-full h-full bg-slate-950 rounded-xl overflow-hidden group/viewer',
+        'relative w-full h-full rounded-xl overflow-hidden group/viewer',
         isFullscreen && 'rounded-none',
         className
       )}
     >
       {loading && (
-        <div className='absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-950 text-white'>
+        <div className='absolute inset-0 z-10 flex flex-col items-center justify-center  text-white'>
           <Loader2 className='w-8 h-8 animate-spin text-main-primary mb-4' />
           <p className='text-sm font-medium text-slate-400'>Initialising 3D World...</p>
         </div>
@@ -430,7 +430,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
 
       {/* Navigation Help Overlay */}
       {showHelp && (
-        <div className='absolute top-6 left-1/2 -translate-x-1/2 z-30 bg-slate-950/80 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl max-w-sm animate-in zoom-in-95 max-h-[80vh] overflow-auto'>
+        <div className='absolute top-6 left-1/2 -translate-x-1/2 z-30 /80 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl max-w-sm animate-in zoom-in-95 max-h-[80vh] overflow-auto'>
           <div className='flex justify-between items-center mb-3'>
             <h4 className='text-white text-sm font-bold'>Debug Info</h4>
             <button onClick={() => setShowHelp(false)} className='text-white/40 hover:text-white'>

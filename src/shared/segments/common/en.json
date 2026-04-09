@@ -423,7 +423,8 @@
       "roleRequired": "Please select your role",
       "invalidEmail": "Invalid email address",
       "ownerRequired": "Please search and select the correct Owner"
-    }
+    },
+    "otpExpiredError": "The OTP has expired. Please request a new one."
   },
   "ManageProposals": {
     "pageTitle": "Proposal Library",
@@ -499,7 +500,10 @@
     "highlight3Title": "Flexible",
     "highlight3Desc": "Easily update and reuse across multiple properties",
     "timelineCreate": "Initial creation",
-    "timelineUpdate": "Latest update"
+    "timelineUpdate": "Latest update",
+    "btnBack": "Back",
+    "formBadgeNew": "New Template",
+    "formBadgeUpdate": "Update Template"
   },
   "ApplyProposal": {
     "modalTitle": "Apply Proposal to Property",

@@ -16,7 +16,7 @@ import { AgentVerificationModal } from '@/features/property-management/ui/compon
 import type { PropertySummaryResponse, PropertyMediaItem } from '@/entities/property/api/property-api.types';
 
 export default function PropertyDashboardPage() {
-  const t = useTranslations('PropertyManagement');
+  const t = useTranslations('PropertyDashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
   const [pageSize] = useState(10);

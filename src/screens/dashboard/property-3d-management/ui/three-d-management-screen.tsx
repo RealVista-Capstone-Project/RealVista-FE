@@ -369,7 +369,7 @@ export function ThreeDManagementScreen({
                       </Button>
                     </div>
 
-                    <div className='aspect-video md:aspect-[21/9] bg-slate-900 overflow-hidden'>
+                    <div className='aspect-video md:aspect-[21/9] overflow-hidden'>
                       <SparkViewer
                         spzUrl={activeViewerData.url || ''}
                         metadata={activeViewerData.metadata}
