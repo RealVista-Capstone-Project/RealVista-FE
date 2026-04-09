@@ -1118,7 +1118,7 @@ function Step3Content({
     // PayOS: tạo link ngay khi chọn — không cần bấm thêm mới thấy QR
     if (!selectedPlan || !selectedType) return;
     if (checkoutMutation.isPending) return;
-    if (checkout?.payment_method === 'PAYOS') return;
+    if (checkout?.paymentMethod === 'PAYOS') return;
 
     setCheckout(null);
     requestCheckout('PAYOS');
