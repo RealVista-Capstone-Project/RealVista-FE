@@ -1021,13 +1021,8 @@ function Step3Content({
 
   const checkoutMutation = useMutation({
     mutationFn: billingApi.checkout,
-    onSuccess: (res) => {
-      const data = res.payload.data;
-      setCheckout(data);
-      onCheckoutCreated(data);
+    onSuccess: () => {
       setError(null);
-      // PayOS: hiển thị QR (không auto next)
-      // VNPay: hiển thị button (không auto next, user bấm button để next)
     },
     onError: (e: unknown) => {
       if (e instanceof HttpError && e.payload?.message) {
@@ -1093,13 +1088,16 @@ function Step3Content({
         {
           onSuccess: (res: { payload: { data: CheckoutResponse } }) => {
             const data = res.payload.data;
+            setCheckout(data);
+            setError(null);
             queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
+            onCheckoutCreated(data);
             onDone?.(data);
           },
         }
       );
     },
-    [checkoutMutation, queryClient, selectedPlan, selectedType]
+    [checkoutMutation, queryClient, selectedPlan, selectedType, onCheckoutCreated]
   );
 
   const handleSelectPayment = (method: PaymentMethod) => {
@@ -1261,7 +1259,7 @@ function Step3Content({
         </div>
       )}
 
-      {/* PayOS: show QR after checkout created (payload may use qrCode or VietQR string; fallback to payment URL) */}
+      {/* PayOS: show QR after checkout created */}
       {selectedPayment === 'payos' && checkout && (checkout.qrCode || checkout.checkoutUrl) && (
         <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
           <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
@@ -1370,8 +1368,14 @@ function Step4Content({
   React.useEffect(() => {
     if (statusData?.status === 'COMPLETED' && transactionId && !saveTransactionMutation.isPending) {
       saveTransactionMutation.mutate(transactionId);
-      queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
-      queryClient.invalidateQueries({ queryKey: ['billing', 'my-transactions'] });
+      // Refetch plans + subscriptions + transactions
+      Promise.all([
+        queryClient.refetchQueries({ queryKey: ['billing', 'my-subscriptions'] }),
+        queryClient.refetchQueries({ queryKey: ['billing', 'my-transactions'] }),
+        queryClient.refetchQueries({ queryKey: ['billing', 'plans'] }),
+      ]).catch((err) => {
+        console.error('Failed to refetch billing data:', err);
+      });
     }
   }, [statusData?.status, transactionId, queryClient, saveTransactionMutation]);
 
@@ -1451,7 +1455,7 @@ function Step4Content({
         {isSuccess && statusData && plan && (
           <div className='w-full rounded-xl border border-border bg-white p-6'>
             <div className='mb-6 flex items-center justify-between'>
-              <p className='text-base font-semibold text-main-black'>Hóa đơn</p>
+              <p className='text-base font-semibold text-main-black'>Chi tiết thanh toán</p>
               <span className='text-sm text-grey-600'>
                 {new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' }).replace('/', ' năm ')}
               </span>
@@ -1464,8 +1468,7 @@ function Step4Content({
                     <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Ngày</th>
                     <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Sự miêu tả</th>
                     <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Trạng thái</th>
-                    <th className='pb-4 text-right text-xs font-semibold text-grey-600'>Số lượng</th>
-                    <th className='pb-4 text-right text-xs font-semibold text-grey-600'>Hóa đơn</th>
+                    <th className='pb-4 text-right text-xs font-semibold text-grey-600'>Số tiền</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1473,17 +1476,9 @@ function Step4Content({
                     <td className='py-4 text-sm text-grey-700'>{new Date().toLocaleDateString('vi-VN')}</td>
                     <td className='py-4 text-sm text-grey-700'>{plan.name}</td>
                     <td className='py-4'>
-                      <span className='text-sm text-grey-700'>Trả</span>
+                      <span className='text-sm text-grey-700'>Đã thanh toán</span>
                     </td>
                     <td className='py-4 text-right text-sm font-semibold text-main-black'>{plan.priceLabel}</td>
-                    <td className='py-4'>
-                      <button
-                        type='button'
-                        className='flex items-center gap-1 text-right text-sm font-medium text-main-primary hover:opacity-80 transition-opacity'
-                      >
-                        Xem <ExternalLink className='size-4' />
-                      </button>
-                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -1527,9 +1522,13 @@ function PurchaseWizard() {
   const [selectedPayment, setSelectedPayment] = React.useState<PaymentMethod | null>(null);
   const [checkoutData, setCheckoutData] = React.useState<CheckoutResponse | null>(null);
   const [showLoginDialog, setShowLoginDialog] = React.useState(false);
+  const [pendingPlanId, setPendingPlanId] = React.useState<string | null>(null);
+  const [showConflictDialog, setShowConflictDialog] = React.useState(false);
+  const [conflictingPlan, setConflictingPlan] = React.useState<ActiveSubscriptionResponse | null>(null);
 
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
+  const mySubsQuery = useQuery(billingQueries.mySubscriptions());
 
   const rawPlans =
     selectedType === 'subscription'
@@ -1576,6 +1575,40 @@ function PurchaseWizard() {
   }, [step, selectedType, selectedPlanId, selectedPayment]);
 
   const handleTypeNext = () => { if (selectedType) { setSelectedPlanId(null); setStep(2); } };
+
+  // Check if user already has active subscription with same feature type
+  const checkSameTypeConflict = (planId: string) => {
+    if (selectedType !== 'subscription') return null; // Boost packages have no conflicts
+
+    const newPlan = rawPlans.find((p) => p.id === planId);
+    if (!newPlan || !newPlan.featureType) return null;
+
+    const activeSametype = (mySubsQuery.data ?? []).find(
+      (s) => s.status === 'ACTIVE' && s.feature_type === newPlan.featureType
+    );
+
+    return activeSametype ?? null;
+  };
+
+  const handleSelectPlan = (planId: string) => {
+    const conflict = checkSameTypeConflict(planId);
+    if (conflict) {
+      setPendingPlanId(planId);
+      setConflictingPlan(conflict);
+      setShowConflictDialog(true);
+    } else {
+      setSelectedPlanId(planId);
+    }
+  };
+
+  const handleConfirmPlanSwap = () => {
+    if (pendingPlanId) {
+      setSelectedPlanId(pendingPlanId);
+    }
+    setShowConflictDialog(false);
+    setPendingPlanId(null);
+    setConflictingPlan(null);
+  };
 
   const handlePlanNext = () => {
     if (!selectedPlanId) return;
@@ -1626,7 +1659,7 @@ function PurchaseWizard() {
           <Step2Content
             type={selectedType}
             selectedPlanId={selectedPlanId}
-            onSelectPlan={setSelectedPlanId}
+            onSelectPlan={handleSelectPlan}
             onNext={handlePlanNext}
             onRetry={() => {
               setStep(1);
@@ -1701,6 +1734,40 @@ function PurchaseWizard() {
           </div>
         </div>
       )}
+
+      {/* Conflict dialog: same feature type subscription already active */}
+      {showConflictDialog && conflictingPlan && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
+          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+            <h3 className='text-lg font-bold text-main-black'>Nâng cấp gói dịch vụ</h3>
+            <p className='mt-3 text-sm text-grey-600'>
+              Bạn đã có gói <span className='font-semibold text-main-black'>{conflictingPlan.package_name}</span> đang hoạt động.
+            </p>
+            <p className='mt-2 text-sm text-grey-600'>
+              Hủy gói hiện tại để mua gói mới?
+            </p>
+            <div className='mt-6 flex flex-col gap-3'>
+              <RealVistaButton
+                className='w-full bg-main-primary text-white hover:bg-main-primary-hover'
+                onClick={handleConfirmPlanSwap}
+              >
+                Đồng ý, hủy và mua gói mới
+              </RealVistaButton>
+              <button
+                type='button'
+                onClick={() => {
+                  setShowConflictDialog(false);
+                  setPendingPlanId(null);
+                  setConflictingPlan(null);
+                }}
+                className='text-sm font-medium text-grey-500 hover:text-main-black transition-colors'
+              >
+                Hủy bỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1738,11 +1805,13 @@ function TransactionsSection() {
   };
 
   const formatDate = (dateString: string): string => {
+    if (!dateString) return '—';
     try {
       const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return '—';
       return date.toLocaleDateString('vi-VN');
     } catch {
-      return dateString;
+      return '—';
     }
   };
 
