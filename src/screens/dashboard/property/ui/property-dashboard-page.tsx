@@ -67,8 +67,8 @@ export default function PropertyDashboardPage() {
   };
 
   return (
-    <div className='h-full'>
-      <div className='container mx-auto px-6 py-6'>
+    <div className='h-full flex-1'>
+      <div className='h-full flex-1 mx-auto px-6 py-6'>
         <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
           <div>
             <h1 className='text-3xl font-bold tracking-tight text-slate-900 dark:text-white'>
@@ -88,7 +88,7 @@ export default function PropertyDashboardPage() {
           </Link>
         </div>
 
-        <div className='bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4 items-center justify-between'>
+        <div className='bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4 items-center justify-between mt-3'>
           <div className='relative w-full sm:max-w-md'>
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
             <Input
@@ -136,7 +136,7 @@ export default function PropertyDashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className='bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden'>
+          <div className='mt-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800'>
             <div className='overflow-x-auto'>
               <table className='w-full text-sm text-left'>
                 <thead className='text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-800/50 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800'>
