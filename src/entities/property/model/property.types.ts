@@ -32,6 +32,7 @@ export interface PropertyImage {
   alt: string;
   type: 'photo' | '3d-tour' | 'video';
   isPrimary: boolean;
+  metadata?: any;
 }
 
 export interface Agent {

@@ -540,6 +540,9 @@
     "update": "Update Property",
     "create": "Create Property",
     "validation": {
+      "mediaQualityFail": "Some images do not meet AI quality standards",
+      "invalidNumber": "Value must be a valid number",
+      "numberMin": "Value cannot be less than 0",
       "cityRequired": "City is required",
       "districtRequired": "District is required",
       "wardRequired": "Ward is required",
@@ -548,15 +551,13 @@
       "usableSizeMin": "Usable size must be greater than 0",
       "widthMin": "Width cannot be negative",
       "lengthMin": "Length cannot be negative",
-      "mediaQualityFail": "Some images do not meet AI quality standards",
-      "invalidNumber": "Value must be a valid number",
-      "numberMin": "Value cannot be less than 0",
       "propertyTypeRequired": "Property type is required",
       "invalidUrl": "Invalid URL",
       "roleRequired": "Please select your role",
       "invalidEmail": "Invalid email address",
       "ownerRequired": "Please search and select the correct Owner"
-    }
+    },
+    "otpExpiredError": "The OTP has expired. Please request a new one."
   },
   "ManageProposals": {
     "pageTitle": "Proposal Library",
@@ -632,7 +633,10 @@
     "highlight3Title": "Flexible",
     "highlight3Desc": "Easily update and reuse across multiple properties",
     "timelineCreate": "Initial creation",
-    "timelineUpdate": "Latest update"
+    "timelineUpdate": "Latest update",
+    "btnBack": "Back",
+    "formBadgeNew": "New Template",
+    "formBadgeUpdate": "Update Template"
   },
   "ApplyProposal": {
     "modalTitle": "Apply Proposal to Property",

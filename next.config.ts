@@ -65,6 +65,16 @@ const nextConfig: NextConfig = {
         hostname: '**.cdn.digitaloceanspaces.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.firebasestorage.app',
+        pathname: '/**',
+      },
     ],
     dangerouslyAllowSVG: true,
   },

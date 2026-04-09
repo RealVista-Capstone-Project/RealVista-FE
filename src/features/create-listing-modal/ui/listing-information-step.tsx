@@ -199,6 +199,7 @@ export function ListingInformationStep({
       url: m.mediaUrl,
       thumbnailUrl: m.thumbnailUrl,
       type: m.mediaType,
+      roomName: m.roomName,
     }));
 
   // ── Validation ──

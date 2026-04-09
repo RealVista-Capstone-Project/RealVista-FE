@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import Image from 'next/image';
-import { Play, ImageIcon, X, Upload, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Play, ImageIcon, Box, X, Upload, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { MediaAnalysisEntry } from '@/shared/lib/hooks/use-media-analysis';
 
@@ -15,6 +14,7 @@ export interface ExistingMediaItem {
   url: string;
   thumbnailUrl?: string | null;
   type: 'IMAGE' | 'VIDEO' | string;
+  roomName?: string | null;
 }
 
 interface ExistingMediaGridProps {
@@ -44,6 +44,7 @@ export function ExistingMediaGrid({
       {items.map((media) => {
         const isSelected = selectedIds.has(media.id);
         const isVideo = media.type === 'VIDEO';
+        const is3D = media.type === 'THREE_D';
 
         return (
           <div
@@ -66,13 +67,24 @@ export function ExistingMediaGrid({
           >
             {/* Thumbnail */}
             {isVideo ? (
-              media.thumbnailUrl ? (
-                <Image src={media.thumbnailUrl} alt='' fill className='object-cover' sizes='(max-width: 640px) 50vw, 33vw' />
+              media.thumbnailUrl && media.thumbnailUrl !== 'null' ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={media.thumbnailUrl} alt='' className='absolute inset-0 h-full w-full object-cover' />
               ) : (
                 <video src={media.url} className='h-full w-full object-cover' muted playsInline />
               )
-            ) : media.url ? (
-              <Image src={media.url} alt='' fill className='object-cover' sizes='(max-width: 640px) 50vw, 33vw' />
+            ) : is3D ? (
+              media.thumbnailUrl && media.thumbnailUrl !== 'null' ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={media.thumbnailUrl} alt='' className='absolute inset-0 h-full w-full object-cover' />
+              ) : (
+                <div className='flex h-full w-full items-center justify-center bg-purple-96'>
+                  <Box className='h-8 w-8 text-main-secondary/30' />
+                </div>
+              )
+            ) : media.url && media.url !== 'null' ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={media.url} alt='' className='absolute inset-0 h-full w-full object-cover' />
             ) : (
               <div className='flex h-full w-full items-center justify-center bg-purple-96'>
                 <ImageIcon className='h-8 w-8 text-main-secondary/30' />
@@ -85,6 +97,22 @@ export function ExistingMediaGrid({
                 <div className='flex h-8 w-8 items-center justify-center rounded-full bg-black/50'>
                   <Play className='h-4 w-4 text-white' fill='white' />
                 </div>
+              </div>
+            )}
+
+            {/* 3D indicator */}
+            {is3D && (
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='flex h-8 w-8 items-center justify-center rounded-full bg-black/50'>
+                  <Box className='h-4 w-4 text-white' />
+                </div>
+              </div>
+            )}
+
+            {/* 3D badge */}
+            {is3D && (
+              <div className='absolute left-1.5 top-1.5 z-10 rounded-full bg-main-primary/80 px-2 py-0.5 text-[10px] font-semibold text-white'>
+                3D
               </div>
             )}
 
@@ -107,6 +135,7 @@ export function ExistingMediaGrid({
             </div>
 
             {/* Primary badge/button */}
+            {!is3D && (
             <button
               type='button'
               onClick={(e) => {
@@ -114,7 +143,8 @@ export function ExistingMediaGrid({
                 onSetPrimary(media.id);
               }}
               className={cn(
-                'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
+                'absolute left-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
+                media.roomName ? 'bottom-7' : 'bottom-1.5',
                 primaryId === media.id
                   ? 'bg-main-primary text-white'
                   : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
@@ -122,6 +152,14 @@ export function ExistingMediaGrid({
             >
               {primaryId === media.id ? labels.primary : labels.makePrimary}
             </button>
+            )}
+
+            {/* Room name bar */}
+            {media.roomName && (
+              <div className='absolute inset-x-0 bottom-0 z-10 truncate bg-black/50 px-2 py-1 text-[10px] font-medium text-white'>
+                {media.roomName}
+              </div>
+            )}
           </div>
         );
       })}
