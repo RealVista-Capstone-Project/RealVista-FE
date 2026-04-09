@@ -2,12 +2,21 @@
 
 import * as React from 'react';
 import {
-  ChevronLeft, Edit3, Trash2, Award, TrendingUp, CheckCircle2, Calendar,
-  Clock, ShieldCheck, RefreshCw, Sparkles, X,
+  ChevronLeft,
+  Edit3,
+  Trash2,
+  Award,
+  TrendingUp,
+  CheckCircle2,
+  Calendar,
+  Clock,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { AgentProposal, AgentProposalStatus } from '@/entities/agent-proposal/model/types';
 
 interface ProposalDetailViewProps {
@@ -19,15 +28,23 @@ interface ProposalDetailViewProps {
   onDelete: () => void;
 }
 
-function StatusBadge({ status, t }: { status: AgentProposalStatus; t: ReturnType<typeof useTranslations<'ManageProposals'>> }) {
+function StatusBadge({
+  status,
+  t,
+}: {
+  status: AgentProposalStatus;
+  t: ReturnType<typeof useTranslations<'ManageProposals'>>;
+}) {
   const isActive = status === AgentProposalStatus.ACTIVE;
   return (
-    <span className={cn(
-      'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
-      isActive
-        ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
-        : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
-    )}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
+        isActive
+          ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+          : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+      )}
+    >
       <span className={cn('size-1.5 rounded-full', isActive ? 'bg-emerald-500' : 'bg-amber-500')} />
       {isActive ? t('statusActive') : t('statusDraft')}
     </span>
@@ -35,8 +52,14 @@ function StatusBadge({ status, t }: { status: AgentProposalStatus; t: ReturnType
 }
 
 function MetricCard({
-  label, value, icon,
-}: { label: string; value: string; icon: React.ReactNode }) {
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}) {
   return (
     <div className='flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4'>
       <div className='flex items-center gap-2 text-xs text-slate-500'>
@@ -49,7 +72,12 @@ function MetricCard({
 }
 
 export function ProposalDetailView({
-  proposal, locale, isMobile, onBack, onEdit, onDelete,
+  proposal,
+  locale,
+  isMobile,
+  onBack,
+  onEdit,
+  onDelete,
 }: ProposalDetailViewProps) {
   const t = useTranslations('ManageProposals');
   const isActive = proposal.status === AgentProposalStatus.ACTIVE;
@@ -87,7 +115,7 @@ export function ProposalDetailView({
 
           <div className='flex items-center gap-2 shrink-0'>
             <div className='hidden sm:flex items-center gap-2 mr-2 border-r border-slate-100 pr-4'>
-               <button
+              <button
                 onClick={onDelete}
                 className='flex size-9 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-500 transition-all active:scale-95'
                 title={t('btnDelete')}
@@ -119,7 +147,6 @@ export function ProposalDetailView({
 
       {/* ── Body ── */}
       <div className='flex-1 overflow-y-auto px-6 py-6 space-y-8 bg-slate-50/30 scroll-smooth'>
-
         {/* Metrics row */}
         <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
           <MetricCard
@@ -144,6 +171,68 @@ export function ProposalDetailView({
           />
         </div>
 
+        {/* Specialty & Price Range */}
+        {proposal.specialty && (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4'>
+              <div className='flex size-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 shrink-0'>
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <p className='text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5'>
+                  {t('fieldSpecialty')}
+                </p>
+                <p className='text-sm font-bold text-slate-900'>
+                  {(() => {
+                    for (const cat of PROPERTY_TYPES) {
+                      const type = cat.types.find((t) => t.code === proposal.specialty);
+                      if (type) return type.label;
+                    }
+                    return proposal.specialty;
+                  })()}
+                </p>
+              </div>
+            </div>
+
+            {proposal.price_range && (
+              <div className='flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4'>
+                <div className='flex size-10 items-center justify-center rounded-lg bg-violet-50 text-violet-600 shrink-0'>
+                  <TrendingUp size={18} />
+                </div>
+                <div className='min-w-0 flex-1'>
+                  <p className='text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5'>
+                    {t('fieldPriceRange')}
+                  </p>
+                  <div className='flex items-center gap-3 text-xs font-bold text-slate-900 overflow-hidden'>
+                    {proposal.price_range.rent &&
+                      (proposal.price_range.rent.min > 0 || proposal.price_range.rent.max > 0) && (
+                        <div className='flex items-center gap-1.5 shrink-0'>
+                          <span className='text-[10px] text-indigo-500 font-medium'>
+                            {t('rentRange')}:
+                          </span>
+                          <span>
+                            {proposal.price_range.rent.min} - {proposal.price_range.rent.max}
+                          </span>
+                        </div>
+                      )}
+                    {proposal.price_range.sale &&
+                      (proposal.price_range.sale.min > 0 || proposal.price_range.sale.max > 0) && (
+                        <div className='flex items-center gap-1.5 shrink-0'>
+                          <span className='text-[10px] text-violet-500 font-medium'>
+                            {t('saleRange')}:
+                          </span>
+                          <span>
+                            {proposal.price_range.sale.min} - {proposal.price_range.sale.max}
+                          </span>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Pitch content */}
         <div className='group'>
           <h3 className='mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2'>
@@ -160,7 +249,7 @@ export function ProposalDetailView({
         {/* Activity Timeline */}
         <div>
           <h3 className='mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2'>
-             <div className='size-1 bg-slate-300 rounded-full' />
+            <div className='size-1 bg-slate-300 rounded-full' />
             {t('sectionActivity')}
           </h3>
           <div className='rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm'>
@@ -197,7 +286,12 @@ export function ProposalDetailView({
         </div>
 
         {isMobile && (
-          <Button variant='outline' size='sm' className='rounded-lg text-xs font-bold' onClick={onBack}>
+          <Button
+            variant='outline'
+            size='sm'
+            className='rounded-lg text-xs font-bold'
+            onClick={onBack}
+          >
             {t('btnClose')}
           </Button>
         )}
@@ -207,7 +301,11 @@ export function ProposalDetailView({
 }
 
 function TimelineItem({
-  icon, label, date, note, isLast = false,
+  icon,
+  label,
+  date,
+  note,
+  isLast = false,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -216,10 +314,7 @@ function TimelineItem({
   isLast?: boolean;
 }) {
   return (
-    <div className={cn(
-      'flex items-start gap-3 px-4 py-3',
-      !isLast && 'border-b border-slate-100',
-    )}>
+    <div className={cn('flex items-start gap-3 px-4 py-3', !isLast && 'border-b border-slate-100')}>
       <div className='mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-slate-100'>
         {icon}
       </div>

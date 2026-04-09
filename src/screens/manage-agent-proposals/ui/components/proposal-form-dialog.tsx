@@ -9,6 +9,16 @@ import {
 } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Textarea } from '@/shared/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+  SelectLabel,
+} from '@/shared/ui/select';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { AgentProposal, ApplyAgentProposalPayload } from '@/entities/agent-proposal/model/types';
 
 /* ─── Form validation ─── */
@@ -105,6 +115,11 @@ export function ProposalFormDialog({
     commission_rate: 1.5,
     experience_years: 3,
     pitch_content: '',
+    specialty: '',
+    price_range: {
+      rent: { min: 0, max: 0 },
+      sale: { min: 0, max: 0 },
+    },
   };
 
   const [form, setForm] = React.useState<ApplyAgentProposalPayload>(defaultForm);
@@ -120,6 +135,11 @@ export function ProposalFormDialog({
         commission_rate: initialData.commission_rate,
         experience_years: initialData.experience_years,
         pitch_content: initialData.pitch_content,
+        specialty: initialData.specialty || '',
+        price_range: initialData.price_range || {
+          rent: { min: 0, max: 0 },
+          sale: { min: 0, max: 0 },
+        },
       });
     } else {
       setForm(defaultForm);
@@ -143,9 +163,23 @@ export function ProposalFormDialog({
     }
   }, [form, touched, t]);
 
-  const update = (k: keyof ApplyAgentProposalPayload, v: string | number) => {
+  const update = (k: keyof ApplyAgentProposalPayload, v: any) => {
     setForm((prev) => ({ ...prev, [k]: v }));
     setTouched((prev) => ({ ...prev, [k]: true }));
+  };
+
+  const updatePriceRange = (type: 'rent' | 'sale', field: 'min' | 'max', value: number) => {
+    setForm((prev) => ({
+      ...prev,
+      price_range: {
+        ...prev.price_range,
+        [type]: {
+          ...prev.price_range?.[type],
+          [field]: value,
+        },
+      },
+    }));
+    setTouched((prev) => ({ ...prev, price_range: true }));
   };
 
   const isFormValid = Object.keys(validateForm(form, t)).length === 0;
@@ -153,7 +187,14 @@ export function ProposalFormDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Mark all fields as touched to show all errors
-    setTouched({ title: true, commission_rate: true, experience_years: true, pitch_content: true });
+    setTouched({
+      title: true,
+      commission_rate: true,
+      experience_years: true,
+      pitch_content: true,
+      specialty: true,
+      price_range: true,
+    });
     const allErrors = validateForm(form, t);
     setErrors(allErrors);
     if (Object.keys(allErrors).length > 0) return;
@@ -227,6 +268,110 @@ export function ProposalFormDialog({
                   <Award className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none' size={14} />
                 </div>
               </Field>
+            </div>
+<br />
+            {/* Specialty Field */}
+            <Field label={t('fieldSpecialty')} error={errors.specialty}>
+              <Select
+                value={form.specialty}
+                onValueChange={(v) => update('specialty', v)}
+              >
+                <SelectTrigger className={cn(errors.specialty ? INPUT_ERROR : INPUT_DEFAULT, 'h-10')}>
+                  <SelectValue placeholder={t('fieldSpecialtyPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROPERTY_TYPES.map((cat) => (
+                    <SelectGroup key={cat.code}>
+                      <SelectLabel className='text-[10px] font-bold text-slate-400 px-2 py-1.5 uppercase tracking-wider'>
+                        {cat.label}
+                      </SelectLabel>
+                      {cat.types.map((type) => (
+                        <SelectItem key={type.code} value={type.code} className='text-sm'>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+
+            {/* Price Range Fields */}
+            <div className='space-y-3.5'>
+              <div>
+                <label className='text-sm font-medium text-slate-700 block mb-1'>
+                  {t('fieldPriceRange')}
+                </label>
+                <p className='text-[11px] text-slate-400 mb-3 leading-relaxed'>
+                  {t('fieldPriceRangeDescription')}
+                </p>
+              </div>
+
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                {/* Rent Range */}
+                <div className='space-y-2 p-3 rounded-xl border border-slate-100 bg-slate-50/50'>
+                  <span className='text-[11px] font-bold text-indigo-600 uppercase tracking-wider'>
+                    {t('rentRange')}
+                  </span>
+                  <div className='flex items-center gap-2'>
+                    <div className='flex-1'>
+                      <span className='text-[9px] text-slate-400 block mb-1'>{t('minPrice')}</span>
+                      <input
+                        type='number'
+                        min='0'
+                        value={form.price_range?.rent?.min || 0}
+                        onChange={(e) => updatePriceRange('rent', 'min', parseInt(e.target.value) || 0)}
+                        className={INPUT_DEFAULT}
+                        placeholder='Min'
+                      />
+                    </div>
+                    <div className='mt-5 text-slate-300'>—</div>
+                    <div className='flex-1'>
+                      <span className='text-[9px] text-slate-400 block mb-1'>{t('maxPrice')}</span>
+                      <input
+                        type='number'
+                        min='0'
+                        value={form.price_range?.rent?.max || 0}
+                        onChange={(e) => updatePriceRange('rent', 'max', parseInt(e.target.value) || 0)}
+                        className={INPUT_DEFAULT}
+                        placeholder='Max'
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sale Range */}
+                <div className='space-y-2 p-3 rounded-xl border border-slate-100 bg-slate-50/50'>
+                  <span className='text-[11px] font-bold text-violet-600 uppercase tracking-wider'>
+                    {t('saleRange')}
+                  </span>
+                  <div className='flex items-center gap-2'>
+                    <div className='flex-1'>
+                      <span className='text-[9px] text-slate-400 block mb-1'>{t('minPrice')}</span>
+                      <input
+                        type='number'
+                        min='0'
+                        value={form.price_range?.sale?.min || 0}
+                        onChange={(e) => updatePriceRange('sale', 'min', parseInt(e.target.value) || 0)}
+                        className={INPUT_DEFAULT}
+                        placeholder='Min'
+                      />
+                    </div>
+                    <div className='mt-5 text-slate-300'>—</div>
+                    <div className='flex-1'>
+                      <span className='text-[9px] text-slate-400 block mb-1'>{t('maxPrice')}</span>
+                      <input
+                        type='number'
+                        min='0'
+                        value={form.price_range?.sale?.max || 0}
+                        onChange={(e) => updatePriceRange('sale', 'max', parseInt(e.target.value) || 0)}
+                        className={INPUT_DEFAULT}
+                        placeholder='Max'
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Pitch content */}

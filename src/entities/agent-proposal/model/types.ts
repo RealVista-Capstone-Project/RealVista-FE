@@ -13,6 +13,11 @@ export interface AgentProposal {
   experience_years: number;
   status: AgentProposalStatus;
   pitch_content: string;
+  specialty?: string;
+  price_range?: {
+    rent?: { min: number; max: number };
+    sale?: { min: number; max: number };
+  };
 
   created_at: string;
   updated_at: string;
@@ -23,6 +28,11 @@ export interface ApplyAgentProposalPayload {
   commission_rate: number;
   experience_years: number;
   pitch_content: string;
+  specialty?: string;
+  price_range?: {
+    rent?: { min: number; max: number };
+    sale?: { min: number; max: number };
+  };
 }
 
 export interface AgentProposalPageResponse {
