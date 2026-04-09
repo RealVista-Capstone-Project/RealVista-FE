@@ -43,9 +43,9 @@ export function ProfileDropdown({
   const t = useTranslations('Profile');
 
   const resolvedMenuItems = menuItems ?? [
-    { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}` },
-    { id: 'help', label: 'help', icon: HelpCircle },
-    { id: 'logout', label: 'logout', icon: LogOut },
+    { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}`, onClick: undefined },
+    { id: 'help', label: 'help', icon: HelpCircle, onClick: undefined },
+    { id: 'logout', label: 'logout', icon: LogOut, onClick: undefined },
   ];
 
   const handleLogout = async () => {
