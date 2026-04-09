@@ -42,6 +42,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/screens/buy/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/recommended-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/ai-chat-assistant/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/notification-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/chat/i18n/${locale}.json`)).default,
     },
   };

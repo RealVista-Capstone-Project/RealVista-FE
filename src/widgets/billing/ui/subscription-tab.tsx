@@ -11,6 +11,8 @@ import {
   CalendarDays,
   Loader2,
   ExternalLink,
+  LayoutGrid,
+  PackageSearch,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
@@ -588,11 +590,87 @@ function CurrentPlansSection() {
 // Horizontal stepper (wizard header)
 // ---------------------------------------------------------------------------
 
+const WIZARD_STEP_DEFS: { num: WizardStep; label: string; icon: React.ReactNode }[] = [
+  { num: 1, label: 'Loại gói',   icon: <LayoutGrid   className='size-4' /> },
+  { num: 2, label: 'Chọn gói',   icon: <PackageSearch className='size-4' /> },
+  { num: 3, label: 'Thanh toán', icon: <CreditCard    className='size-4' /> },
+  { num: 4, label: 'Kết quả',    icon: <CheckCircle2  className='size-4' /> },
+];
+
+function StepIconCircle({
+  active,
+  done,
+  reachable,
+  icon,
+}: {
+  active: boolean;
+  done: boolean;
+  reachable: boolean;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex size-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+        active
+          ? 'border-main-primary bg-main-primary text-white ring-4 ring-purple-94'
+          : done
+            ? 'border-main-primary bg-main-primary text-white'
+            : reachable
+              ? 'border-main-primary bg-white text-main-primary'
+              : 'border-grey-200 bg-white text-grey-400'
+      )}
+    >
+      {done ? <Check className='size-3.5' /> : icon}
+    </div>
+  );
+}
+
+function StepLabel({
+  num,
+  label,
+  active,
+  done,
+}: {
+  num: WizardStep;
+  label: string;
+  active: boolean;
+  done: boolean;
+}) {
+  return (
+    <div className='flex flex-col items-start gap-0.5'>
+      <span className='text-[9px] font-semibold uppercase tracking-wider text-grey-400'>
+        Bước {num}
+      </span>
+      <span
+        className={cn(
+          'text-start text-xs font-semibold leading-tight sm:text-sm',
+          active || done ? 'text-main-black' : 'text-grey-400'
+        )}
+      >
+        {label}
+      </span>
+      {active && (
+        <span className='mt-0.5 inline-flex items-center rounded-full bg-purple-94 px-2 py-0.5 text-[9px] font-bold text-main-primary'>
+          Đang thực hiện
+        </span>
+      )}
+      {done && (
+        <span className='mt-0.5 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-600'>
+          Hoàn thành
+        </span>
+      )}
+      {!active && !done && (
+        <span className='mt-0.5 inline-flex items-center rounded-full bg-grey-100 px-2 py-0.5 text-[9px] font-semibold text-grey-500'>
+          Chờ
+        </span>
+      )}
+    </div>
+  );
+}
+
 function HorizontalWizardSteps({
   activeStep,
-  typeSummary,
-  planSummary,
-  paymentSummary,
   onStepChange,
 }: {
   activeStep: WizardStep;
@@ -601,70 +679,51 @@ function HorizontalWizardSteps({
   paymentSummary?: React.ReactNode;
   onStepChange: (s: WizardStep) => void;
 }) {
-  const steps: {
-    num: WizardStep;
-    label: string;
-    reachable: boolean;
-    done: boolean;
-    summary?: React.ReactNode;
-  }[] = [
-    { num: 1, label: 'Loại gói', reachable: true, done: activeStep > 1, summary: typeSummary },
-    { num: 2, label: 'Chọn gói', reachable: activeStep >= 2, done: activeStep > 2, summary: planSummary },
-    { num: 3, label: 'Thanh toán', reachable: activeStep >= 3, done: activeStep > 3, summary: paymentSummary },
-    { num: 4, label: 'Kết quả', reachable: activeStep >= 4, done: false, summary: undefined },
-  ];
-
   return (
     <div className='mb-6 w-full overflow-x-auto pb-1'>
-      <div className='flex min-w-0 items-start justify-between gap-0.5 sm:gap-1'>
-        {steps.map((item, index) => (
-          <React.Fragment key={item.num}>
-            <button
-              type='button'
-              disabled={!item.reachable}
-              onClick={() => item.reachable && onStepChange(item.num)}
-              className={cn(
-                'flex min-w-0 max-w-[26%] flex-1 flex-col items-center gap-1.5 px-0.5 py-1 transition-opacity',
-                item.reachable ? 'cursor-pointer hover:opacity-90' : 'cursor-not-allowed opacity-60'
-              )}
+      <div className='flex min-w-0 items-start'>
+        {WIZARD_STEP_DEFS.map((item, index) => {
+          const done      = activeStep > item.num;
+          const active    = activeStep === item.num;
+          const reachable = activeStep >= item.num;
+          const isLast    = index === WIZARD_STEP_DEFS.length - 1;
+
+          return (
+            /* Each step slot is relative so the connector line can be absolutely positioned.
+               flex-1 on all but the last step so they share available width evenly. */
+            <div
+              key={item.num}
+              className={cn('relative', isLast ? 'shrink-0' : 'flex-1')}
             >
-              <div
-                className={cn(
-                  'flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors',
-                  activeStep === item.num
-                    ? 'bg-main-primary text-white ring-4 ring-purple-94'
-                    : item.done
-                      ? 'bg-main-primary text-white'
-                      : item.reachable
-                        ? 'border-2 border-main-primary bg-white text-main-primary'
-                        : 'border-2 border-grey-200 bg-white text-grey-400'
-                )}
-              >
-                {item.done && activeStep !== item.num ? <Check className='size-4' /> : item.num}
-              </div>
-              <span
-                className={cn(
-                  'w-full text-center text-[10px] font-semibold leading-tight sm:text-xs',
-                  activeStep === item.num || item.done ? 'text-main-black' : item.reachable ? 'text-main-black' : 'text-grey-400'
-                )}
-              >
-                {item.label}
-              </span>
-              {item.summary != null && item.summary !== '' && activeStep !== item.num && (
-                <span className='line-clamp-2 w-full text-center text-[9px] text-grey-500 sm:text-[10px]'>{item.summary}</span>
+              {/* Connector line — absolute so it sits flush between icons with no gap.
+                  left-8  = right edge of this step's icon circle (size-8 = 2rem)
+                  right-0 = left edge of next step's container (= next icon's left edge)
+                  top-4   = vertical centre of the icon circle (size-8 / 2 = 1rem) */}
+              {!isLast && (
+                <div
+                  aria-hidden
+                  className={cn(
+                    'absolute left-8 right-0 top-4 h-px transition-colors',
+                    done ? 'bg-main-primary' : 'bg-grey-200'
+                  )}
+                />
               )}
-            </button>
-            {index < steps.length - 1 && (
-              <div
+
+              <button
+                type='button'
+                disabled={!reachable}
+                onClick={() => reachable && onStepChange(item.num)}
                 className={cn(
-                  'mt-3.5 h-1 min-w-[6px] flex-1 shrink rounded-full sm:min-w-[12px]',
-                  steps[index]!.done ? 'bg-main-primary' : 'bg-grey-200'
+                  'group/step relative flex flex-col items-start gap-2.5 py-1 transition-opacity',
+                  reachable ? 'cursor-pointer hover:opacity-90' : 'cursor-not-allowed opacity-50'
                 )}
-                aria-hidden
-              />
-            )}
-          </React.Fragment>
-        ))}
+              >
+                <StepIconCircle active={active} done={done} reachable={reachable} icon={item.icon} />
+                <StepLabel num={item.num} label={item.label} active={active} done={done} />
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -846,29 +905,42 @@ function Step2Content({
       : rawPlans;
   }, [type, plansByFeatureType, selectedFeatureType, rawPlans]);
 
+  // Stable string key of active boost codes — avoids putting an object in useEffect deps
+  const activeBoostCodesKey = React.useMemo(
+    () => (myBoosts ?? []).filter((b) => b.status === 'ACTIVE').map((b) => b.code).join(','),
+    [myBoosts]
+  );
+
   const firstSelectableId = React.useMemo(() => {
-    if (type !== 'subscription') return rawPlans[0]?.id ?? '';
+    if (type === 'boost') {
+      const activeCodes = new Set(activeBoostCodesKey.split(',').filter(Boolean));
+      const ok = rawPlans.find((p) => !activeCodes.has(p.id));
+      return ok?.id ?? rawPlans[0]?.id ?? '';
+    }
     const ok = plansForFeatureType.find((p) => !isSubscriptionPlanBlocked(p, mySubs));
     return ok?.id ?? plansForFeatureType[0]?.id ?? '';
-  }, [type, rawPlans, plansForFeatureType, mySubs]);
+  }, [type, rawPlans, plansForFeatureType, mySubs, activeBoostCodesKey]);
 
   const activePlanId = selectedPlanId ?? firstSelectableId;
   const selectedPlan = plansForFeatureType.find((p) => p.id === activePlanId) ?? plansForFeatureType[0] ?? null;
 
   React.useEffect(() => {
-    if (rawPlans.length === 0) return;
+    if (!firstSelectableId) return;
     if (type === 'subscription') {
       const sel = plansForFeatureType.find((p) => p.id === selectedPlanId);
-      if (!selectedPlanId || (sel && isSubscriptionPlanBlocked(sel, mySubs))) {
-        if (firstSelectableId) onSelectPlan(firstSelectableId);
+      const currentIsBlocked = !!sel && isSubscriptionPlanBlocked(sel, mySubs);
+      if (!selectedPlanId || currentIsBlocked) {
+        onSelectPlan(firstSelectableId);
       }
       return;
     }
-    if (!selectedPlanId && rawPlans[0]) {
-      onSelectPlan(rawPlans[0].id);
+    // boost: default to first non-active plan
+    const activeCodes = new Set(activeBoostCodesKey.split(',').filter(Boolean));
+    if (!selectedPlanId || activeCodes.has(selectedPlanId)) {
+      onSelectPlan(firstSelectableId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, rawPlans.map((p) => p.id).join(','), firstSelectableId, mySubs, selectedFeatureType]);
+  }, [type, rawPlans.map((p) => p.id).join(','), firstSelectableId, mySubs, activeBoostCodesKey, selectedFeatureType]);
 
   if (isLoading) {
     return (
@@ -1060,7 +1132,7 @@ function Step2Content({
                 )}
               >
                 {(plan.isPopular || isCurrentActive) && (
-                  <span className='absolute -top-2.5 left-3 rounded-full bg-main-primary px-2 py-0.5 text-[10px] font-bold text-white'>
+                  <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-main-primary')}>
                     {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                   </span>
                 )}
@@ -1072,9 +1144,9 @@ function Step2Content({
                   <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
                   <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
                 </div>
-                {blocked && (
+                {blocked && !isCurrentActive && (
                   <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>
-                    {isCurrentActive ? 'Gói đang dùng' : 'Đang dùng gói cao hơn'}
+                    Đang dùng gói cao hơn
                   </span>
                 )}
               </button>
@@ -1677,7 +1749,7 @@ function PurchaseWizard() {
   const locale = useLocale();
 
   const [step, setStep] = React.useState<WizardStep>(1);
-  const [selectedType, setSelectedType] = React.useState<PackageType | null>(null);
+  const [selectedType, setSelectedType] = React.useState<PackageType | null>('subscription');
   const [selectedPlanId, setSelectedPlanId] = React.useState<string | null>(null);
   const [selectedPayment, setSelectedPayment] = React.useState<PaymentMethod | null>(null);
   const [checkoutData, setCheckoutData] = React.useState<CheckoutResponse | null>(null);
@@ -1699,11 +1771,6 @@ function PurchaseWizard() {
       : (boostQuery.data ?? []).map(mapBoostPackage);
 
   const selectedPlan = rawPlans.find((p) => p.id === selectedPlanId) ?? null;
-
-  const typeSummary =
-    selectedType === 'subscription' ? 'Gói tính năng' : selectedType === 'boost' ? 'Gói đẩy tin' : undefined;
-  const planSummary = selectedPlan ? `${selectedPlan.name} · ${selectedPlan.priceLabel}` : undefined;
-  const paymentSummary = selectedPayment === 'vnpay' ? 'VNPay' : selectedPayment === 'payos' ? 'PayOS' : undefined;
 
   // Load state from localStorage on mount
   React.useEffect(() => {
@@ -1762,29 +1829,29 @@ function PurchaseWizard() {
   };
 
   const handleSelectPlan = (planId: string) => {
-    const conflict = checkSameTypeConflict(planId);
-    if (conflict) {
-      setPendingPlanId(planId);
-      setConflictingPlan(conflict);
-      setShowConflictDialog(true);
-    } else {
-      setSelectedPlanId(planId);
-    }
+    setSelectedPlanId(planId);
   };
 
   const handleConfirmPlanSwap = () => {
-    if (pendingPlanId) {
-      setSelectedPlanId(pendingPlanId);
-    }
     setShowConflictDialog(false);
     setPendingPlanId(null);
     setConflictingPlan(null);
+    // Proceed to step 3 after confirming
+    setStep(3);
   };
 
   const handlePlanNext = () => {
     if (!selectedPlanId) return;
     if (!session?.user) {
       setShowLoginDialog(true);
+      return;
+    }
+    // Only show conflict dialog when the selected plan is the SAME type as an active plan
+    const conflict = checkSameTypeConflict(selectedPlanId);
+    if (conflict) {
+      setPendingPlanId(selectedPlanId);
+      setConflictingPlan(conflict);
+      setShowConflictDialog(true);
       return;
     }
     setStep(3);
@@ -1816,9 +1883,6 @@ function PurchaseWizard() {
 
       <HorizontalWizardSteps
         activeStep={step}
-        typeSummary={typeSummary}
-        planSummary={planSummary}
-        paymentSummary={paymentSummary}
         onStepChange={toggleStep}
       />
 
@@ -2082,11 +2146,46 @@ function TransactionsSection() {
 // ---------------------------------------------------------------------------
 
 export function SubscriptionTab() {
+  const [mainTab, setMainTab] = React.useState<'buy' | 'manage'>('buy');
+
   return (
     <div className='space-y-6'>
-      <CurrentPlansSection />
-      <PurchaseWizard />
-      <TransactionsSection />
+      {/* Top-level tab switcher */}
+      <div className='flex gap-1 rounded-xl bg-purple-96 p-1'>
+        <button
+          type='button'
+          onClick={() => setMainTab('buy')}
+          className={cn(
+            'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
+            mainTab === 'buy'
+              ? 'bg-white text-main-primary shadow-sm'
+              : 'text-grey-600 hover:text-main-black'
+          )}
+        >
+          Mua gói
+        </button>
+        <button
+          type='button'
+          onClick={() => setMainTab('manage')}
+          className={cn(
+            'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
+            mainTab === 'manage'
+              ? 'bg-white text-main-primary shadow-sm'
+              : 'text-grey-600 hover:text-main-black'
+          )}
+        >
+          Gói hiện tại
+        </button>
+      </div>
+
+      {mainTab === 'buy' && <PurchaseWizard />}
+
+      {mainTab === 'manage' && (
+        <div className='space-y-6'>
+          <CurrentPlansSection />
+          <TransactionsSection />
+        </div>
+      )}
     </div>
   );
 }

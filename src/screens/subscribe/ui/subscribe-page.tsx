@@ -1,32 +1,22 @@
 'use client';
 
 import { Suspense } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { BillingReturnQueryEffects } from '@/widgets/billing/ui/billing-return-query-effects';
 import { SubscriptionTab } from '@/widgets/billing/ui/subscription-tab';
+import { TopNavContainer } from '@/shared/ui/top-nav';
 
 function SubscribePageContent() {
-  const router = useRouter();
   const t = useTranslations('Subscribe');
 
   return (
     <>
       <BillingReturnQueryEffects />
+      <TopNavContainer variant='public' />
       <div className='min-h-screen bg-white'>
         {/* Header with background */}
         <div className='bg-gradient-to-r from-purple-96 to-purple-92 px-4 py-8 sm:px-6'>
           <div className='mx-auto w-full max-w-3xl'>
-            <button
-              type='button'
-              onClick={() => router.back()}
-              className='mb-4 inline-flex items-center gap-2 text-main-black hover:opacity-80 transition-opacity'
-              aria-label='Go back'
-            >
-              <ArrowLeft className='h-5 w-5' />
-              <span className='text-sm font-medium'>{t('backButton')}</span>
-            </button>
             <h1 className='text-3xl sm:text-4xl font-bold text-main-primary'>
               {t('headingPrefix')} <span className='text-main-primary'>{t('headingSuffix')}</span>
             </h1>
