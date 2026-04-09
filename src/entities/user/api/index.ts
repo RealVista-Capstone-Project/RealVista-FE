@@ -1,13 +1,19 @@
-import http from '@/shared/lib/http'
-import { ApiResponse } from '@/shared/types/api'
-import type { User, LoginCredentials, LoginResponse, UpdateUserData, UserSearchResponse } from '../model/types'
+import http from '@/shared/lib/http';
+import { ApiResponse } from '@/shared/types/api';
+import type {
+  User,
+  LoginCredentials,
+  LoginResponse,
+  UpdateUserData,
+  UserSearchResponse,
+} from '../model/types';
 
 /** Response shape from POST /auth/register */
 export interface RegisterResponse {
-  user_id: string
-  email: string
-  first_name: string
-  last_name: string
+  user_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
 }
 
 /**
@@ -33,8 +39,7 @@ export const userApi = {
   /**
    * Login user
    */
-  login: (credentials: LoginCredentials) =>
-    http.post<LoginResponse>('/auth/login', credentials),
+  login: (credentials: LoginCredentials) => http.post<LoginResponse>('/auth/login', credentials),
 
   /**
    * Logout user
@@ -45,12 +50,12 @@ export const userApi = {
    * Register new user
    */
   register: (data: {
-    email: string
-    password: string
-    first_name: string
-    last_name: string
-    phone_number: string
-    role: string
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    role: string;
   }) => http.post<RegisterResponse>('/auth/register', data),
 
   /**
@@ -68,17 +73,17 @@ export const userApi = {
    * Upload avatar
    */
   uploadAvatar: (file: File) => {
-    const formData = new FormData()
-    formData.append('avatar', file)
-    return http.post<{ url: string }>('/user/avatar', formData, { baseUrl: '' })
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return http.post<{ url: string }>('/user/avatar', formData, { baseUrl: '' });
   },
   /**
    * Search user by email (masked phone) for owner assignment
    */
   searchByEmail: (email: string) =>
     http.get<ApiResponse<UserSearchResponse>>(`/users/search?email=${email}`),
-} as const
+} as const;
 
 // Re-export query keys and queries
-export { userKeys } from './keys'
-export { userQueries } from './user.queries'
+export { userKeys } from './keys';
+export { userQueries } from './user.queries';

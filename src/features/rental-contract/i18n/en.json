@@ -1,0 +1,78 @@
+{
+  "RentalContract": {
+    "detailPanel": {
+      "title": "Contract Preview",
+      "previewAlt": "Contract preview for {tenantName}",
+      "previewBadge": "Preview",
+      "contractMeta": "DocuSign Envelope",
+      "leaseStart": "Lease Start",
+      "leaseEnd": "Lease End",
+      "envelopeId": "Envelope ID: {envelopeId}",
+      "signingProgress": {
+        "title": "Signing Progress",
+        "sent": "Sent for signing",
+        "ownerSigned": "Owner signed",
+        "tenantSigned": "Tenant signed",
+        "pending": "Pending"
+      },
+      "terminationReason": "Termination Reason",
+      "actionCardEyebrow": "Status Control",
+      "actionCardDescription": "Trigger the next DocuSign lifecycle step for this contract without leaving the dashboard."
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_renter": "Pending Renter",
+      "pending_landlord": "Pending Landlord",
+      "active": "Active",
+      "expired": "Expired",
+      "terminated": "Terminated",
+      "rejected": "Rejected"
+    },
+    "table": {
+      "status": "Status",
+      "tenant": "Tenant",
+      "monthlyRent": "Monthly Rent",
+      "createdDate": "Created Date",
+      "perMonth": "per month"
+    },
+    "statusActions": {
+      "updateStatus": "Update Status",
+      "sendForSigning": "Send For Signing",
+      "sendToLandlord": "Send to Landlord for Signing",
+      "sendToRenter": "Send to Renter for Signing",
+      "markActive": "Mark As Active",
+      "terminate": "Terminate Contract",
+      "noAvailableAction": "No Available Action",
+      "signNow": "Sign Now"
+    },
+    "statusActionHints": {
+      "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",
+      "sendToLandlord": "Initiate the DocuSign signing flow — you (landlord) will sign first.",
+      "sendToRenter": "Landlord has signed. Now send the contract to the renter to complete signing.",
+      "markActive": "Use this when DocuSign reports a completed signing ceremony.",
+      "terminate": "End the active contract early and keep a reason on file."
+    },
+    "statusDialog": {
+      "sendTitle": "Send contract for signing",
+      "sendDescription": "This will send the DocuSign envelope to {tenantName} and move the contract into pending signature.",
+      "activateTitle": "Mark contract as active",
+      "activateDescription": "Use this after DocuSign confirms both parties have signed the contract for {tenantName}.",
+      "terminateTitle": "Terminate rental contract",
+      "terminateDescription": "Add a short reason before terminating the active contract for {tenantName}.",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Write a clear note for this status update...",
+      "reasonHint": "Use at least 10 characters so the update history stays useful.",
+      "updating": "Updating..."
+    },
+    "toast": {
+      "updateSuccess": "Rental contract updated successfully",
+      "updateError": "Failed to update rental contract. Please try again.",
+      "signingUrlReady": "Signing URL is ready — opening DocuSign in a new tab.",
+      "signingUnavailable": "Signing is temporarily unavailable. Please try again later.",
+      "signingError": "Failed to load signing link. Please try again."
+    },
+    "common": {
+      "cancel": "Cancel"
+    }
+  }
+}
