@@ -243,8 +243,10 @@ export function ProposalFormDialog({
     if (mode === 'edit' && initialData) {
       setForm({
         title: initialData.title,
-        commission_rate: initialData.commission_rate,
-        experience_years: initialData.experience_years,
+        commission_rate:
+          typeof initialData.commission_rate === 'number' ? initialData.commission_rate : '',
+        experience_years:
+          typeof initialData.experience_years === 'number' ? initialData.experience_years : '',
         pitch_content: initialData.pitch_content,
         specialty: getAgentProposalSpecialtyCode(initialData),
         price_range: initialData.price_range || {
