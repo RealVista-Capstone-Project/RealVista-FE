@@ -1,0 +1,10 @@
+{
+  "Rent": {
+    "searchTitle": "Search Properties to Rent",
+    "searchWithMap": "View Map",
+    "searchWithSearchBar": "View List",
+    "resultsHeader": "Search Results",
+    "noResults": "No results found",
+    "noResultsHint": "Try adjusting your filters or search"
+  }
+}

@@ -143,8 +143,24 @@ export const propertyApi = {
   getOwnerAvailableProperties: (criteria: OwnerAvailablePropertiesCriteria) => {
     const queryParams = new URLSearchParams();
     if (criteria.keyword) queryParams.append('keyword', criteria.keyword);
-    if (criteria.propertyTypeId) queryParams.append('propertyTypeId', criteria.propertyTypeId);
-    if (criteria.locationId) queryParams.append('locationId', criteria.locationId);
+    if (criteria.property_type_id) queryParams.append('propertyTypeId', criteria.property_type_id);
+    if (criteria.location_id) queryParams.append('locationId', criteria.location_id);
+    if (criteria.listing_type) queryParams.append('listingType', criteria.listing_type);
+
+    // Price filters - flat params per API spec
+    if (criteria.min_rent_price !== undefined) {
+      queryParams.append('minRentPrice', criteria.min_rent_price.toString());
+    }
+    if (criteria.max_rent_price !== undefined) {
+      queryParams.append('maxRentPrice', criteria.max_rent_price.toString());
+    }
+    if (criteria.min_buy_price !== undefined) {
+      queryParams.append('minBuyPrice', criteria.min_buy_price.toString());
+    }
+    if (criteria.max_buy_price !== undefined) {
+      queryParams.append('maxBuyPrice', criteria.max_buy_price.toString());
+    }
+
     queryParams.append('page', criteria.page.toString());
     queryParams.append('size', criteria.size.toString());
 

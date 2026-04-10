@@ -24,10 +24,12 @@ import {
   CheckCircle2,
   ArrowLeft,
 } from 'lucide-react';
+import { formatVND } from '@/shared/lib/utils/format-currency';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { SubmitProposalModal } from './submit-proposal-modal';
 import { useSubmitProposalMutation } from '../hooks/use-submit-proposal';
+import { useOwnerPropertiesContext, type ListingType } from '../model/owner-properties-context';
 
 interface OwnerPropertySheetProps {
   property: OwnerPropertySummary | null;
@@ -57,6 +59,49 @@ function formatArea(size: number | null): string | null {
   return `${size} m²`;
 }
 
+function formatPriceRange(
+  priceRange: { min: number | null; max: number | null } | undefined
+): string | null {
+  if (!priceRange) return null;
+  const { min, max } = priceRange;
+  if (min && max) return `${formatVND(min)} – ${formatVND(max)}`;
+  if (min) return `${formatVND(min)}+`;
+  if (max) return `≤ ${formatVND(max)}`;
+  return null;
+}
+
+function PriceBadges({
+  property,
+  listingType,
+}: {
+  property: OwnerPropertySummary;
+  listingType: ListingType;
+}) {
+  const t = useTranslations('OwnerProperties');
+  const rentDisplay = formatPriceRange(property.price_range?.rent);
+  const buyDisplay = formatPriceRange(property.price_range?.buy);
+
+  const showRent = listingType === 'ALL' || listingType === 'RENT';
+  const showBuy = listingType === 'ALL' || listingType === 'SELL';
+
+  if (!rentDisplay && !buyDisplay) return null;
+
+  return (
+    <div className='flex flex-wrap gap-2'>
+      {showRent && rentDisplay && (
+        <span className='text-sm font-bold bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-200'>
+          {t('card.rent')}: {rentDisplay}
+        </span>
+      )}
+      {showBuy && buyDisplay && (
+        <span className='text-sm font-bold bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg border border-blue-200'>
+          {t('card.buy')}: {buyDisplay}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function InfoTile({
   label,
   value,
@@ -79,6 +124,7 @@ function InfoTile({
 
 export function OwnerPropertySheet({ property, onClose }: OwnerPropertySheetProps) {
   const t = useTranslations('OwnerProperties');
+  const { listingType } = useOwnerPropertiesContext();
   const [proposalModalOpen, setProposalModalOpen] = useState(false);
   const submitProposalMutation = useSubmitProposalMutation();
 
@@ -196,6 +242,9 @@ export function OwnerPropertySheet({ property, onClose }: OwnerPropertySheetProp
                   )}
                 </div>
               )}
+
+              {/* Price range */}
+              <PriceBadges property={property} listingType={listingType} />
 
               {/* Stats tiles */}
               <div className='grid grid-cols-2 gap-3'>
@@ -344,6 +393,7 @@ export function OwnerPropertySheet({ property, onClose }: OwnerPropertySheetProp
  */
 export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDetailPanelProps) {
   const t = useTranslations('OwnerProperties');
+  const { listingType } = useOwnerPropertiesContext();
   const [proposalModalOpen, setProposalModalOpen] = useState(false);
   const submitProposalMutation = useSubmitProposalMutation();
 
@@ -459,6 +509,9 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
                 )}
               </div>
             )}
+
+            {/* Price range */}
+            <PriceBadges property={property} listingType={listingType} />
 
             {/* Stats tiles */}
             <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>

@@ -4,14 +4,31 @@
     "error": "Không thể tải bất động sản. Vui lòng thử lại.",
     "pageTitle": "Bất động sản khả dụng",
     "pageSubtitle": "Duyệt các bất động sản từ chủ nhà đang tìm kiếm môi giới.",
+    "tabs": {
+      "all": "Tất cả",
+      "sell": "Bán",
+      "rent": "Cho thuê"
+    },
     "filter": {
+      "title": "Lọc",
       "searchPlaceholder": "Tìm theo địa chỉ, chủ nhà, hoặc loại...",
-      "resultCount": "Tìm thấy {count} bất động sản"
+      "resultCount": "Tìm thấy {count} bất động sản",
+      "rentPrice": "Giá cho thuê",
+      "buyPrice": "Giá mua",
+      "min": "Tối thiểu",
+      "max": "Tối đa",
+      "apply": "Áp dụng",
+      "clearAll": "Xóa tất cả",
+      "propertyType": "Loại bất động sản",
+      "allTypes": "Tất cả loại"
     },
     "card": {
       "bedrooms": "phòng ngủ",
       "viewDetails": "Xem chi tiết",
-      "proposed": "Đã ứng tuyển"
+      "proposed": "Đã ứng tuyển",
+      "priceFrom": "Giá từ",
+      "rent": "Thuê",
+      "buy": "Mua"
     },
     "empty": {
       "title": "Không tìm thấy bất động sản.",

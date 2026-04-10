@@ -147,38 +147,6 @@ export interface LocationInfo {
   longitude: number | null;
 }
 
-export interface PropertyAttributeItem {
-  attribute_id: string;
-  attribute_code: string;
-  attribute_name: string;
-  data_type: string;
-  icon: string | null;
-  unit: string | null;
-  value_number: number | null;
-  value_text: string | null;
-  value_boolean: boolean | null;
-  display_value: string | null;
-}
-
-export interface PropertyMediaItem {
-  media_id: string;
-  media_type: string;
-  media_url: string;
-  thumbnail_url: string | null;
-  is_primary: boolean;
-  is_property_standard: boolean;
-  display_order: number;
-}
-
-export interface PropertyAmenityItem {
-  amenity_id: string;
-  amenity_name: string;
-  amenity_type: 'ONSITE' | 'OFFSITE' | string | null;
-  description: string | null;
-  is_onsite?: boolean;
-  is_offsite?: boolean;
-}
-
 export interface PropertyAttributeRangeResponse {
   range_id: string;
   label: string;
@@ -388,8 +356,13 @@ export interface MyPropertiesSearchCriteria {
 
 export interface OwnerAvailablePropertiesCriteria {
   keyword?: string;
-  propertyTypeId?: string;
-  locationId?: string;
+  property_type_id?: string;
+  location_id?: string;
+  min_rent_price?: number;
+  max_rent_price?: number;
+  min_buy_price?: number;
+  max_buy_price?: number;
+  listing_type?: 'SELL' | 'RENT';
   page: number;
   size: number;
 }
@@ -422,7 +395,7 @@ export interface PropertyAttributeItem {
   value_number: number | null;
   value_text: string | null;
   value_boolean: boolean | null;
-  display_value: string | null;
+  display_value?: string | null;
 }
 
 export interface PropertyMediaItem {
@@ -438,10 +411,21 @@ export interface PropertyMediaItem {
 export interface PropertyAmenityItem {
   amenity_id: string;
   amenity_name: string;
-  amenity_type: 'ONSITE' | 'OFFSITE' | string | null;
-  description: string | null;
+  amenity_type?: 'ONSITE' | 'OFFSITE' | string | null;
+  description?: string | null;
   is_onsite?: boolean;
   is_offsite?: boolean;
+}
+
+export interface PropertyPriceRange {
+  rent?: {
+    min: number | null;
+    max: number | null;
+  };
+  buy?: {
+    min: number | null;
+    max: number | null;
+  };
 }
 
 export interface PropertyAttributeRangeResponse {
@@ -489,7 +473,7 @@ export interface OwnerPropertySummary {
   property_id: string;
   owner_id: string;
   owner_name: string | null;
-  owner_phone: string | null;
+  owner_phone?: string | null;
   owner_email?: string | null;
   street_address: string;
   latitude?: number | null;
@@ -499,8 +483,8 @@ export interface OwnerPropertySummary {
   width_m?: number | null;
   length_m?: number | null;
   status: string;
-  /** API field name is "descriptions" (plural) */
   descriptions: string | null;
+  price_range?: PropertyPriceRange | null;
   property_type_info: PropertyTypeInfo | null;
   location_info: LocationInfo | null;
   media: PropertyMediaItem[] | null;
