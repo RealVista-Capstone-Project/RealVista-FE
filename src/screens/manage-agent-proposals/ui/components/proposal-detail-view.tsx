@@ -61,7 +61,7 @@ function MetricCard({
   icon,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   icon: React.ReactNode;
 }) {
   return (
@@ -70,9 +70,7 @@ function MetricCard({
         {icon}
         <span className='font-medium line-clamp-2 leading-tight'>{label}</span>
       </div>
-      <p className='text-sm sm:text-base font-bold text-slate-900 break-words hyphens-auto'>
-        {value}
-      </p>
+      {value}
     </div>
   );
 }
@@ -93,6 +91,27 @@ export function ProposalDetailView({
   const hasRentRange = !!rentRange && (rentRange.min > 0 || rentRange.max > 0);
   const hasSaleRange = !!saleRange && (saleRange.min > 0 || saleRange.max > 0);
   const hasAnyPriceRange = hasRentRange || hasSaleRange;
+  const hasSpecialty = !!specialtyCode;
+  const hasAnyMetaCard = hasSpecialty || !!proposal.price_range;
+
+  const experienceValue =
+    typeof proposal.experience_years === 'number'
+      ? `${proposal.experience_years} ${t('years')}`
+      : null;
+  const commissionValue =
+    typeof proposal.commission_rate === 'number' ? `${proposal.commission_rate}%` : null;
+  const pitchEmpty = !proposal.pitch_content?.trim();
+
+  const renderMetricValue = (raw: string | null) => {
+    if (!raw) {
+      return (
+        <p className='text-sm sm:text-base font-semibold text-slate-400 italic'>
+          {t('notSpecified')}
+        </p>
+      );
+    }
+    return <p className='text-sm sm:text-base font-bold text-slate-900 break-words hyphens-auto'>{raw}</p>;
+  };
 
   const createdDate = new Date(proposal.created_at ?? proposal.updated_at);
   const updatedDate = new Date(proposal.updated_at);
@@ -166,50 +185,61 @@ export function ProposalDetailView({
         <div className='grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4'>
           <MetricCard
             label={t('metricExperience')}
-            value={`${proposal.experience_years} năm`}
+            value={renderMetricValue(experienceValue)}
             icon={<Award size={14} className='text-indigo-500' />}
           />
           <MetricCard
             label={t('metricCommission')}
-            value={`${proposal.commission_rate}%`}
+            value={renderMetricValue(commissionValue)}
             icon={<TrendingUp size={14} className='text-violet-500' />}
           />
           <MetricCard
             label={t('metricStatus')}
-            value={isActive ? t('statusActive') : t('statusDraft')}
+            value={
+              <p className='text-sm sm:text-base font-bold text-slate-900 break-words hyphens-auto'>
+                {isActive ? t('statusActive') : t('statusDraft')}
+              </p>
+            }
             icon={<CheckCircle2 size={14} className='text-emerald-500' />}
           />
           <MetricCard
             label={t('metricUpdated')}
-            value={updatedDate.toLocaleDateString(locale)}
+            value={
+              <p className='text-sm sm:text-base font-bold text-slate-900 break-words hyphens-auto'>
+                {updatedDate.toLocaleDateString(locale)}
+              </p>
+            }
             icon={<Calendar size={14} className='text-orange-500' />}
           />
         </div>
 
         {/* Specialty & Price Range */}
-        {(specialtyCode || proposal.price_range) && (
+        {hasAnyMetaCard && (
           <div className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2'>
-            {specialtyCode && (
-              <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
-                <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 sm:size-10'>
-                  <Sparkles size={18} />
-                </div>
-                <div className='min-w-0 flex-1'>
-                  <p className='mb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400'>
-                    {t('fieldSpecialty')}
-                  </p>
-                  <p className='text-sm font-bold leading-snug text-slate-900 break-words sm:text-base'>
-                    {(() => {
-                      for (const cat of PROPERTY_TYPES) {
-                        const type = cat.types.find((ty) => ty.code === specialtyCode);
-                        if (type) return type.label;
-                      }
-                      return specialtyCode;
-                    })()}
-                  </p>
-                </div>
+            <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
+              <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 sm:size-10'>
+                <Sparkles size={18} />
               </div>
-            )}
+              <div className='min-w-0 flex-1'>
+                <p className='mb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400'>
+                  {t('fieldSpecialty')}
+                </p>
+                <p className={cn(
+                  'text-sm font-bold leading-snug break-words sm:text-base',
+                  hasSpecialty ? 'text-slate-900' : 'text-slate-400 italic font-semibold'
+                )}>
+                  {hasSpecialty
+                    ? (() => {
+                        for (const cat of PROPERTY_TYPES) {
+                          const type = cat.types.find((ty) => ty.code === specialtyCode);
+                          if (type) return type.label;
+                        }
+                        return specialtyCode;
+                      })()
+                    : t('specialtyNotSpecified')}
+                </p>
+              </div>
+            </div>
 
             {proposal.price_range && (
               <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
@@ -262,9 +292,15 @@ export function ProposalDetailView({
             {t('sectionPitch')}
           </h3>
           <div className='rounded-xl border border-slate-100 bg-white p-4 shadow-sm ring-1 ring-slate-200/5 transition-shadow group-hover:shadow-md sm:rounded-2xl sm:p-6'>
-            <p className='text-sm font-medium leading-7 whitespace-pre-wrap text-slate-700 sm:text-base sm:leading-8'>
-              {proposal.pitch_content}
-            </p>
+            {pitchEmpty ? (
+              <p className='text-sm font-semibold leading-7 text-slate-400 italic sm:text-base sm:leading-8'>
+                {t('pitchNotSpecified')}
+              </p>
+            ) : (
+              <p className='text-sm font-medium leading-7 whitespace-pre-wrap text-slate-700 sm:text-base sm:leading-8'>
+                {proposal.pitch_content}
+              </p>
+            )}
           </div>
         </div>
 
