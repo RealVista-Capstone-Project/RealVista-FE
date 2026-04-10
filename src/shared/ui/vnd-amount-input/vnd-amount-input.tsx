@@ -13,6 +13,7 @@ import { formatVND } from '@/shared/lib/utils/format-currency';
 export interface VndAmountInputProps {
   value: number;
   onChange: (amountVnd: number) => void;
+  max?: number;
   className?: string;
   inputClassName?: string;
   error?: boolean;
@@ -28,6 +29,7 @@ export interface VndAmountInputProps {
 export function VndAmountInput({
   value,
   onChange,
+  max,
   className,
   inputClassName,
   error,
@@ -45,8 +47,11 @@ export function VndAmountInput({
 
   const handleChange = (raw: string) => {
     const nextDigits = sanitizeVndDigits(raw);
-    setDigits(nextDigits);
-    onChange(digitsToVndInteger(nextDigits));
+    const parsed = digitsToVndInteger(nextDigits);
+    const maxAllowed = typeof max === "number" && Number.isFinite(max) ? Math.max(0, max) : null;
+    const normalized = maxAllowed == null ? parsed : Math.min(parsed, maxAllowed);
+    setDigits(vndIntegerToDigitString(normalized));
+    onChange(normalized);
   };
 
   const amount = digitsToVndInteger(digits);

@@ -493,6 +493,7 @@ export function ProposalFormDialog({
                       <VndAmountInput
                         value={form.price_range?.rent?.min ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'min', n)}
+                        max={MAX_PRICE_RANGE_VND}
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -506,6 +507,7 @@ export function ProposalFormDialog({
                       <VndAmountInput
                         value={form.price_range?.rent?.max ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'max', n)}
+                        max={MAX_PRICE_RANGE_VND}
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -528,6 +530,7 @@ export function ProposalFormDialog({
                       <VndAmountInput
                         value={form.price_range?.sale?.min ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'min', n)}
+                        max={MAX_PRICE_RANGE_VND}
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -541,6 +544,7 @@ export function ProposalFormDialog({
                       <VndAmountInput
                         value={form.price_range?.sale?.max ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'max', n)}
+                        max={MAX_PRICE_RANGE_VND}
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
