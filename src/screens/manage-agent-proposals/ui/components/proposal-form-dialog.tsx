@@ -31,6 +31,8 @@ import {
 } from '@/entities/agent-proposal/model/types';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input';
 
+const MAX_PRICE_RANGE_VND = 999_999_999_999;
+
 /** Form model: commission / experience start empty until the user fills them. */
 type ProposalFormValues = Omit<
   ApplyAgentProposalPayload,
@@ -73,6 +75,17 @@ interface FormErrors {
   pitch_content?: string;
   specialty?: string;
   price_range?: string;
+}
+
+function hasPriceRangeAboveLimit(form: ProposalFormValues): boolean {
+  const rent = form.price_range?.rent;
+  const sale = form.price_range?.sale;
+  return (
+    (rent?.min ?? 0) > MAX_PRICE_RANGE_VND ||
+    (rent?.max ?? 0) > MAX_PRICE_RANGE_VND ||
+    (sale?.min ?? 0) > MAX_PRICE_RANGE_VND ||
+    (sale?.max ?? 0) > MAX_PRICE_RANGE_VND
+  );
 }
 
 function validateForm(
@@ -132,6 +145,8 @@ function validateForm(
     sale.min > sale.max;
   if (rentInvalid || saleInvalid) {
     errors.price_range = t('validation.priceRangeMinMax');
+  } else if (hasPriceRangeAboveLimit(form)) {
+    errors.price_range = t('validation.priceRangeMax');
   }
 
   return errors;
@@ -157,6 +172,8 @@ function validateDraftForm(
     sale != null && sale.min > 0 && sale.max > 0 && sale.min > sale.max;
   if (rentInvalid || saleInvalid) {
     errors.price_range = t('validation.priceRangeMinMax');
+  } else if (hasPriceRangeAboveLimit(form)) {
+    errors.price_range = t('validation.priceRangeMax');
   }
   return errors;
 }
@@ -284,13 +301,14 @@ export function ProposalFormDialog({
   };
 
   const updatePriceRange = (type: 'rent' | 'sale', field: 'min' | 'max', value: number) => {
+    const normalizedValue = Math.min(Math.max(0, value), MAX_PRICE_RANGE_VND);
     setForm((prev) => ({
       ...prev,
       price_range: {
         ...prev.price_range,
         [type]: {
           ...prev.price_range?.[type],
-          [field]: value,
+          [field]: normalizedValue,
         },
       },
     }));

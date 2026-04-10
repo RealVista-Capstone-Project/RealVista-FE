@@ -645,7 +645,8 @@
       "pitchRequired": "Nội dung thuyết minh là bắt buộc",
       "pitchTooShort": "Nội dung phải có ít nhất 50 ký tự",
       "pitchTooLong": "Nội dung không được vượt quá 2000 ký tự",
-      "priceRangeMinMax": "Giá tối thiểu không được lớn hơn giá tối đa"
+      "priceRangeMinMax": "Giá tối thiểu không được lớn hơn giá tối đa",
+      "priceRangeMax": "Khoảng giá không được vượt quá 999.999.999.999 VND"
     },
     "footerCreated": "Tạo lúc: {date}",
     "footerUpdated": "Cập nhật: {date}",
