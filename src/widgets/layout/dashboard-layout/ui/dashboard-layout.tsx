@@ -156,6 +156,12 @@ export function DashboardLayout({
     ) {
       return t('pageTitle.manageProposals');
     }
+    if (
+      pathname === ROUTES.dashboard.myEngagements ||
+      pathname.startsWith(ROUTES.dashboard.myEngagements)
+    ) {
+      return t('pageTitle.myEngagements');
+    }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
     }
