@@ -50,16 +50,16 @@ export function PropertyMapBasedSearchPage({
   const router = useRouter();
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const propertyType = searchParams.get('propertyType');
+  const propertyType = searchParams?.get('propertyType');
 
   const [filters, setFilters] = useState<PropertyFilterValues>(() => {
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
-    const rentalPeriod = searchParams.get('rentalPeriod') as RentalPeriod | null;
+    const minPrice = searchParams?.get('minPrice');
+    const maxPrice = searchParams?.get('maxPrice');
+    const rentalPeriod = searchParams?.get('rentalPeriod') as RentalPeriod | null;
 
     // Extract dynamic attributes from URL (attr_xxx)
     const attributes: Record<string, number | boolean | string | undefined> = {};
-    searchParams.forEach((value, key) => {
+    searchParams?.forEach((value, key) => {
       if (key.startsWith('attr_')) {
         const attrKey = key.slice(5).toUpperCase();
         // Try to parse as number or boolean
@@ -71,8 +71,8 @@ export function PropertyMapBasedSearchPage({
     });
 
     // Special case for legacy bedrooms/bathrooms if they exist in URL
-    const bedrooms = searchParams.get('bedrooms');
-    const bathrooms = searchParams.get('bathrooms');
+    const bedrooms = searchParams?.get('bedrooms');
+    const bathrooms = searchParams?.get('bathrooms');
     if (bedrooms) attributes['BEDROOMS'] = Number(bedrooms);
     if (bathrooms) attributes['BATHROOMS'] = Number(bathrooms);
 
@@ -331,6 +331,8 @@ export function PropertyMapBasedSearchPage({
                     attributes={property.attributes as ListingAttribute[]}
                     areaUnit='m²'
                     isFavorite={favoriteOverrides[property.listing_id] ?? property.is_favorite}
+                    boostTag={property.is_boosted ? property.boost_package : undefined}
+                    userType={property.user_type}
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}

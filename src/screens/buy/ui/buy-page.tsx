@@ -378,6 +378,8 @@ function BuyPageContent() {
                       address={listing.full_address || 'Unknown'}
                       attributes={listing.attributes as ListingAttribute[]}
                       isFavorite={listing.is_favorite ?? false}
+                      boostTag={listing.is_boosted ? (listing.boost_package as any) : undefined}
+                      userType={listing.user_type as any}
                       onToggleFavorite={handleToggleFavorite}
                       onClick={() => {
                         behaviorTracker.trackClick(listing.listing_id, {
