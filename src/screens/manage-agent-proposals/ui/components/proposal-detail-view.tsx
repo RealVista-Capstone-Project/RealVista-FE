@@ -257,8 +257,7 @@ export function ProposalDetailView({
                             {t('rentRange')}
                           </span>
                           <p className='mt-0.5 text-xs font-bold leading-relaxed text-slate-900 break-words sm:text-sm'>
-                            {formatVND(rentRange?.min ?? 0)} –{' '}
-                            {formatVND(rentRange?.max ?? 0)}
+                            {formatVND(rentRange?.min ?? 0)} VND – {formatVND(rentRange?.max ?? 0)} VND
                           </p>
                         </div>
                       )}
@@ -268,8 +267,7 @@ export function ProposalDetailView({
                             {t('saleRange')}
                           </span>
                           <p className='mt-0.5 text-xs font-bold leading-relaxed text-slate-900 break-words sm:text-sm'>
-                            {formatVND(saleRange?.min ?? 0)} –{' '}
-                            {formatVND(saleRange?.max ?? 0)}
+                            {formatVND(saleRange?.min ?? 0)} VND – {formatVND(saleRange?.max ?? 0)} VND
                           </p>
                         </div>
                       )}
