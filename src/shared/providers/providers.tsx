@@ -15,6 +15,7 @@ import { SubscriptionCTABanner } from '@/widgets/billing';
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
  * - Toaster: Displays toast notifications across the application
+ * - SubscriptionCTABanner: Renders subscription upgrade CTA for non-premium users
  *
  * @example
  * ```tsx
