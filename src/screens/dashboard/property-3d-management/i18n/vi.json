@@ -73,6 +73,12 @@
     "progressFailed": "Tạo thất bại",
     "progressCancelled": "Đã hủy tạo",
     "progressResuming": "Đang tiếp tục từ backend...",
-    "progressFailedUpload": "Không thể tải ảnh {current}"
+    "progressFailedUpload": "Không thể tải ảnh {current}",
+    "lockedTitle": "Bạn đã hết lượt tạo phòng 3D",
+    "lockedDescription": "Nâng cấp gói để tạo thêm phòng 3D và trưng bày bất động sản của bạn.",
+    "lockedCta": "Nâng cấp ngay",
+    "noSubscriptionTitle": "Mở khóa tính năng tạo Phòng 3D",
+    "noSubscriptionDescription": "Đăng ký gói 3D Tour để bắt đầu tạo trải nghiệm 3D sống động cho bất động sản của bạn.",
+    "noSubscriptionCta": "Khám phá gói 3D"
   }
 }

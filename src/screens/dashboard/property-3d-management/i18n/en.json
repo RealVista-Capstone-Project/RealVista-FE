@@ -73,6 +73,12 @@
     "progressFailed": "Generation failed",
     "progressCancelled": "Generation cancelled",
     "progressResuming": "Resuming tracking from backend...",
-    "progressFailedUpload": "Failed to upload image {current}"
+    "progressFailedUpload": "Failed to upload image {current}",
+    "lockedTitle": "You've used all your 3D room credits",
+    "lockedDescription": "Upgrade your plan to create more 3D rooms and showcase your properties.",
+    "lockedCta": "Upgrade Now",
+    "noSubscriptionTitle": "Unlock 3D Room Creation",
+    "noSubscriptionDescription": "Subscribe to a 3D Tour plan to start creating immersive 3D experiences for your properties.",
+    "noSubscriptionCta": "Explore 3D Plans"
   }
 }

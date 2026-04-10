@@ -29,7 +29,11 @@ import {
   Trash2,
   Check,
   X,
+  Lock,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { billingQueries } from '@/entities/billing';
+import type { ActiveSubscriptionResponse } from '@/entities/billing';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
@@ -117,6 +121,14 @@ export function ThreeDManagementScreen({
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+
+  // 3D Tour subscription gate
+  const { data: subscriptions, isLoading: subsLoading } = useQuery(billingQueries.mySubscriptions());
+
+  const threeDSub = subscriptions?.find(
+    (s: ActiveSubscriptionResponse) => s.feature_type === '3D_TOUR' && s.status === 'ACTIVE'
+  );
+  const isLocked = !subsLoading && (!threeDSub || (!threeDSub.unlimited && (threeDSub.remaining_quota ?? 0) <= 0));
 
   // Delete state
   const [roomToDelete, setRoomToDelete] = useState<RoomGroup | null>(null);
@@ -265,8 +277,9 @@ export function ThreeDManagementScreen({
                 onClick={() => setIsDialogOpen(true)}
                 size='lg'
                 className='rounded-xl shadow-md font-semibold gap-2'
+                disabled={isLocked}
               >
-                <Plus className='w-5 h-5' />
+                {isLocked ? <Lock className='w-5 h-5' /> : <Plus className='w-5 h-5' />}
                 {t('newRoom')}
               </Button>
             </div>
@@ -311,6 +324,28 @@ export function ThreeDManagementScreen({
         </div>
       </div>
 
+      {/* Subscription Gate Card */}
+      {isLocked && !subsLoading && (
+        <div className='container max-w-7xl mx-auto px-4 sm:px-6 mt-6'>
+          <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
+            <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
+            <h3 className='text-sm font-semibold text-main-black mb-1'>
+              {threeDSub ? t('lockedTitle') : t('noSubscriptionTitle')}
+            </h3>
+            <p className='text-xs text-grey-500 mb-4'>
+              {threeDSub ? t('lockedDescription') : t('noSubscriptionDescription')}
+            </p>
+            <button
+              type='button'
+              onClick={() => router.push(`/${locale}/subscribe`)}
+              className='inline-flex items-center justify-center rounded-lg bg-main-black text-white text-xs font-semibold px-6 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
+            >
+              {threeDSub ? t('lockedCta') : t('noSubscriptionCta')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className='container max-w-7xl mx-auto px-4 sm:px-6 py-8'>
         {opsLoading ? (
@@ -321,7 +356,7 @@ export function ThreeDManagementScreen({
             </p>
           </div>
         ) : roomGroups.length === 0 ? (
-          <EmptyState onCreateRoom={() => setIsDialogOpen(true)} t={t} />
+          <EmptyState onCreateRoom={() => setIsDialogOpen(true)} t={t} isLocked={isLocked} />
         ) : (
           <div className='space-y-8'>
             {/* 3D Viewer for selected room */}
@@ -451,7 +486,7 @@ export function ThreeDManagementScreen({
   );
 }
 
-function EmptyState({ onCreateRoom, t }: { onCreateRoom: () => void; t: any }) {
+function EmptyState({ onCreateRoom, t, isLocked }: { onCreateRoom: () => void; t: any; isLocked?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -472,8 +507,9 @@ function EmptyState({ onCreateRoom, t }: { onCreateRoom: () => void; t: any }) {
         onClick={onCreateRoom}
         size='lg'
         className='rounded-xl shadow-md font-semibold gap-2 px-8'
+        disabled={isLocked}
       >
-        <Plus className='w-5 h-5' />
+        {isLocked ? <Lock className='w-5 h-5' /> : <Plus className='w-5 h-5' />}
         {t('createFirstRoom')}
       </Button>
     </motion.div>
