@@ -1,10 +1,19 @@
 {
   "DashboardLayout": {
+    "menu": {
+      "dashboard": "Bảng điều khiển",
+      "insight": "Thống kê",
+      "listings": "Bài đăng của tôi",
+      "myEngagements": "Engagement của tôi",
+      "tenants": "Người thuê",
+      "messages": "Tin nhắn"
+    },
     "pageTitle": {
       "default": "RealVista",
       "dashboard": "Dashboard",
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
+      "myEngagements": "Engagement của tôi",
       "tenants": "Người thuê",
       "rentalContracts": "Hợp đồng thuê",
       "myContracts": "Hợp đồng của tôi",
@@ -181,12 +190,143 @@
       "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự"
     }
   },
-  "Notifications": {
-    "notifications": "Thông báo",
-    "new": "MỚI",
-    "noNotifications": "Chưa có thông báo nào",
-    "markAsRead": "Đánh dấu đã đọc",
-    "viewAll": "Xem tất cả thông báo"
+  "ProfileDropdown": {
+    "myProfile": "Hồ sơ của tôi",
+    "help": "Trợ giúp",
+    "logout": "Đăng xuất"
+  },
+  "Settings": {
+    "tabs": {
+      "profile": "Tài khoản của tôi",
+      "settings": "Cài đặt",
+      "subscription": "Gói dịch vụ"
+    },
+    "profileManagement": {
+      "title": "Quản lý hồ sơ",
+      "description": "Mỗi hồ sơ lưu riêng tìm kiếm và tuỳ chọn của bạn.",
+      "loading": "Đang tải hồ sơ...",
+      "defaultName": "Hồ sơ mặc định",
+      "activeBadge": "Đang dùng",
+      "switchButton": "Chuyển",
+      "addButton": "Thêm hồ sơ",
+      "namePlaceholder": "Tên hồ sơ mới",
+      "addConfirm": "Thêm",
+      "cancel": "Huỷ"
+    },
+    "myAccount": {
+      "title": "Tài khoản của tôi",
+      "updateButton": "Cập nhật hồ sơ",
+      "loading": "Đang tải...",
+      "avatar": "Ảnh đại diện",
+      "upload": "Tải lên",
+      "uploading": "Đang tải...",
+      "remove": "Xoá",
+      "firstName": "Họ",
+      "firstNamePlaceholder": "Nhập họ",
+      "lastName": "Tên",
+      "lastNamePlaceholder": "Nhập tên",
+      "businessName": "Tên doanh nghiệp / hiển thị",
+      "businessNamePlaceholder": "Nhập tên doanh nghiệp hoặc tên hiển thị",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "+84 000-000-0000",
+      "changePhone": "Thay đổi",
+      "changePhoneTitle": "Thay đổi số điện thoại",
+      "newPhone": "Số điện thoại",
+      "verify": "Xác minh",
+      "change": "Thay đổi",
+      "verifyAction": "Xác minh",
+      "changeAction": "Thay đổi",
+      "verified": "Đã xác minh",
+      "email": "Email",
+      "verifyEmailTitle": "Xác minh email",
+      "sendOtp": "Gửi mã OTP",
+      "resendOtp": "Gửi lại",
+      "otpSent": "Mã OTP đã được gửi tới email của bạn",
+      "otpLabel": "Mã OTP",
+      "otpPlaceholder": "Nhập mã 6 chữ số",
+      "otpCountdown": "Gửi lại sau {seconds}s",
+      "verifying": "Đang xác minh...",
+      "verifyOtp": "Xác minh",
+      "phoneOtpSent": "Mã OTP đã được gửi tới số điện thoại của bạn",
+      "tooManyOtpAttempts": "Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.",
+      "invalidPhoneNumber": "Số điện thoại không hợp lệ. Vui lòng dùng định dạng +84xxxxxxxxx.",
+      "recaptchaError": "Xác minh reCAPTCHA thất bại. Vui lòng thử lại.",
+      "password": "Mật khẩu",
+      "changePassword": "Đổi mật khẩu",
+      "currentPassword": "Mật khẩu hiện tại",
+      "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordPlaceholder": "Tối thiểu 8 ký tự, chữ hoa, chữ thường, số",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "cancel": "Huỷ",
+      "confirm": "Xác nhận",
+      "saving": "Đang lưu...",
+      "saveChanges": "Lưu thay đổi"
+    },
+    "linkedAccounts": {
+      "title": "Tài khoản liên kết",
+      "description": "Dùng để đăng nhập nhanh hơn.",
+      "google": "Đăng nhập bằng Google",
+      "remove": "Huỷ liên kết"
+    },
+    "deleteAccount": {
+      "title": "Xoá tài khoản",
+      "description": "Xoá tài khoản và toàn bộ dữ liệu của bạn",
+      "button": "Xoá tài khoản",
+      "dialogTitle": "Xoá tài khoản",
+      "dialogDescription": "Hành động này không thể hoàn tác. Tài khoản và toàn bộ dữ liệu của bạn sẽ bị xoá vĩnh viễn.",
+      "cancel": "Huỷ",
+      "confirm": "Xoá tài khoản",
+      "deleting": "Đang xoá..."
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "loading": "Đang tải...",
+      "inApp": "Thông báo trong ứng dụng",
+      "inAppDesc": "Nhận thông báo ngay trong ứng dụng",
+      "email": "Thông báo qua Email",
+      "emailDesc": "Nhận thông báo qua email",
+      "push": "Thông báo đẩy",
+      "pushDesc": "Nhận thông báo đẩy trên thiết bị của bạn"
+    },
+    "contactPreferences": {
+      "title": "Tuỳ chọn liên hệ",
+      "viaEmail": "Liên hệ qua Email",
+      "viaEmailDesc": "Cho phép người khác liên hệ qua email",
+      "viaPhone": "Liên hệ qua điện thoại",
+      "viaPhoneDesc": "Cho phép người khác liên hệ qua điện thoại",
+      "hidePhone": "Ẩn số điện thoại",
+      "hidePhoneDesc": "Ẩn số điện thoại với người dùng khác",
+      "hideEmail": "Ẩn Email",
+      "hideEmailDesc": "Ẩn địa chỉ email với người dùng khác"
+    },
+    "saveChanges": "Lưu thay đổi",
+    "saving": "Đang lưu...",
+    "subscription": {
+      "title": "Gói dịch vụ",
+      "comingSoon": "Các gói dịch vụ sắp ra mắt."
+    },
+    "toast": {
+      "profileUpdated": "Cập nhật hồ sơ thành công",
+      "profileUpdateFailed": "Cập nhật hồ sơ thất bại",
+      "settingsSaved": "Đã lưu cài đặt",
+      "settingsFailed": "Lưu cài đặt thất bại",
+      "profileCreated": "Tạo hồ sơ thành công",
+      "profileCreateFailed": "Tạo hồ sơ thất bại",
+      "profileDeleted": "Đã xoá hồ sơ",
+      "profileDeleteFailed": "Xoá hồ sơ thất bại",
+      "profileSwitched": "Đã chuyển hồ sơ hoạt động",
+      "profileSwitchFailed": "Chuyển hồ sơ thất bại",
+      "passwordChanged": "Đổi mật khẩu thành công",
+      "passwordChangeFailed": "Mật khẩu hiện tại không đúng hoặc không hợp lệ",
+      "accountDeleted": "Đã xoá tài khoản",
+      "accountDeleteFailed": "Xoá tài khoản thất bại",
+      "emailVerified": "Email đã được xác minh thành công!",
+      "phoneVerified": "Số điện thoại đã được xác minh thành công!",
+      "otpInvalid": "Mã OTP không hợp lệ hoặc đã hết hạn"
+    }
   },
   "Navigation": {
     "explore": "Khám phá",
@@ -194,6 +334,7 @@
     "buy": "Mua nhà",
     "sell": "Bán nhà",
     "favorited": "Yêu thích",
+    "subscribe": "Gói dịch vụ & thanh toán",
     "appointments": "Lịch hẹn",
     "login": "Đăng nhập",
     "signup": "Đăng ký"
@@ -229,10 +370,6 @@
     "filters": "Bộ lọc",
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
-    "resultsHeader": "Kết quả tìm kiếm",
-    "showingResults": "Hiển thị {count} bất động sản",
-    "noResults": "Không tìm thấy bất động sản",
-    "noResultsHint": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc mở rộng bộ lọc",
     "perMonth": "/ tháng"
   },
   "Buy": {
@@ -257,10 +394,6 @@
     "filters": "Bộ lọc",
     "sortBy": "Sắp xếp theo",
     "results": "kết quả",
-    "resultsHeader": "Kết quả tìm kiếm",
-    "showingResults": "Hiển thị {count} bất động sản",
-    "noResults": "Không tìm thấy bất động sản",
-    "noResultsHint": "Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc mở rộng bộ lọc",
     "totalPrice": "Tổng giá"
   },
   "PropertyDetail": {
@@ -337,14 +470,14 @@
     "addressPlaceholder": "Số nhà, tên đường...",
     "mapHelp": "Tìm kiếm địa chỉ để tự động ghim vị trí trên bản đồ.",
     "noLocation": "Ghim vị trí sẽ hiển thị ở đây sau khi tìm kiếm địa chỉ",
-    "landSize": "Diện tích đất",
-    "usableSize": "D.tích sử dụng",
+    "landSize": "Diện tích đất (m²)",
+    "usableSize": "Diện tích sử dụng (m²)",
     "width": "Mặt tiền (m)",
     "length": "Chiều dài (m)",
-    "propertyType": "Loại BĐS",
+    "propertyType": "Loại Bất động sản",
     "selectType": "Chọn loại hình",
     "selectOption": "Chọn {label}",
-    "additionalDetails": "Thông tin thêm",
+    "additionalDetails": "Thông tin bổ sung",
     "additionalDetailsDesc": "Chi tiết kỹ thuật và tính năng bổ sung của bất động sản.",
     "featuresAmenities": "Tính năng & Tiện ích",
     "amenities": "Tiện ích",

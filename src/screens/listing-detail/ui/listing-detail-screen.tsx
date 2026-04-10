@@ -63,7 +63,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const { isFavorite, toggleFavorite } = useListingFavorite(
     listing.listing_id,
-    listing.is_favorite ?? false,
+    listing.is_favorite ?? false
   );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
@@ -96,19 +96,19 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleBrowseNearby = () => {
-    console.log('Browse nearby');
+    // Browse nearby listings
   };
 
   const handleViewAllPhotos = () => {
-    console.log('View all photos');
+    // Open photo gallery
   };
 
   const handle3DTour = () => {
-    console.log('Open 3D tour');
+    // Open 3D tour
   };
 
   const handleVideo = () => {
-    console.log('Play video');
+    // Play video
   };
 
   const handleContact = () => {

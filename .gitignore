@@ -51,4 +51,8 @@ history/
 # bv (beads viewer) local config and caches
 .bv/
 
+.agent/
 .agents/
+.gitnexus
+.opencode
+skills-lock.json
