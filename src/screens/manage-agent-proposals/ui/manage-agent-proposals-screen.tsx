@@ -11,6 +11,8 @@ import {
   useSaveProposalDraftMutation,
 } from '@/features/agent-proposal/hooks/use-agent-proposal';
 import { AgentProposal, ApplyAgentProposalPayload } from '@/entities/agent-proposal/model/types';
+import { getAgentProposalSpecialtyCode } from '@/entities/agent-proposal/model/types';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
@@ -303,6 +305,15 @@ function TableRow({
   t: any;
 }) {
   const isActive = proposal.status === 'ACTIVE';
+  const specialtyCode = getAgentProposalSpecialtyCode(proposal);
+  const specialtyLabel = React.useMemo(() => {
+    if (!specialtyCode) return '';
+    for (const cat of PROPERTY_TYPES) {
+      const ty = cat.types.find((x) => x.code === specialtyCode);
+      if (ty) return ty.label;
+    }
+    return specialtyCode;
+  }, [specialtyCode]);
 
   return (
     <div
@@ -334,9 +345,16 @@ function TableRow({
         >
           {proposal.title}
         </p>
-        <p className='text-xs text-slate-400 mt-1 truncate line-clamp-1 italic'>
-          &quot;{proposal.pitch_content}&quot;
-        </p>
+        <div className='mt-1 flex items-center gap-2 min-w-0'>
+          {specialtyLabel && (
+            <span className='inline-flex max-w-[40%] items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 truncate'>
+              {specialtyLabel}
+            </span>
+          )}
+          <p className='text-xs text-slate-400 truncate line-clamp-1 italic min-w-0'>
+            &quot;{proposal.pitch_content}&quot;
+          </p>
+        </div>
       </div>
 
       {/* Stats */}

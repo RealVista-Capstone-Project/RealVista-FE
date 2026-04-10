@@ -1,10 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import { FileText, Award, Percent, Edit3, Trash2 } from 'lucide-react';
+import { FileText, Award, Percent, Edit3, Trash2, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
-import { AgentProposal, AgentProposalStatus } from '@/entities/agent-proposal/model/types';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
+import {
+  AgentProposal,
+  AgentProposalStatus,
+  getAgentProposalSpecialtyCode,
+} from '@/entities/agent-proposal/model/types';
 
 interface ProposalCardProps {
   proposal: AgentProposal;
@@ -20,6 +25,15 @@ export function ProposalCard({
 }: ProposalCardProps) {
   const t = useTranslations('ManageProposals');
   const isActive = proposal.status === AgentProposalStatus.ACTIVE;
+  const specialtyCode = getAgentProposalSpecialtyCode(proposal);
+  const specialtyLabel = React.useMemo(() => {
+    if (!specialtyCode) return '';
+    for (const cat of PROPERTY_TYPES) {
+      const ty = cat.types.find((x) => x.code === specialtyCode);
+      if (ty) return ty.label;
+    }
+    return specialtyCode;
+  }, [specialtyCode]);
 
   return (
     <div
@@ -68,6 +82,13 @@ export function ProposalCard({
             </div>
           )}
         </div>
+
+        {specialtyLabel && (
+          <div className='mt-1 flex items-center gap-1.5 text-[11px] text-slate-500'>
+            <Sparkles size={12} className='text-indigo-400' />
+            <span className='truncate'>{specialtyLabel}</span>
+          </div>
+        )}
 
         <div className='mt-1.5 flex items-center gap-3 text-xs text-slate-500'>
           <span className='flex items-center gap-1'>
