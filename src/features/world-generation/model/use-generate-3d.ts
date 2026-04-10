@@ -24,7 +24,7 @@ type UploadState = {
 const MAX_UPLOAD_RETRIES = 2;
 const POLL_INTERVAL = 5000; // 5 seconds
 
-export function useGenerate3d(propertyId: string) {
+export function useGenerate3d(propertyId: string, t?: (key: string, params?: Record<string, any>) => string) {
   const [state, setState] = useState<UploadState>({
     phase: 'idle',
     operationId: null,
@@ -52,7 +52,9 @@ export function useGenerate3d(propertyId: string) {
         error: op.status === 'FAILED' ? { message: op.error_message || 'Failed' } : undefined,
         metadata: {
           progress: {
-            description: op.status === 'PENDING' ? 'Processing on backend...' : 'Done',
+            description: op.status === 'PENDING'
+              ? (t ? t('progressPolling') : 'Processing on backend...')
+              : (t ? t('progressSucceeded') : 'Done'),
           },
         },
         response: op,
@@ -76,25 +78,25 @@ export function useGenerate3d(propertyId: string) {
         setState((prev) => ({
           ...prev,
           phase: 'failed',
-          error: operationStatus.error?.message || 'Generation failed on Marble side',
+          error: operationStatus.error?.message || (t ? t('progressFailed') : 'Generation failed on Marble side'),
         }));
       } else {
         setState((prev) => ({
           ...prev,
           phase: 'succeeded',
-          progressDescription: '3D World generated successfully!',
+          progressDescription: t ? t('progressSucceeded') : '3D World generated successfully!',
         }));
       }
     } else {
       const description =
-        operationStatus.metadata?.progress?.description || 'Generating 3D model...';
+        operationStatus.metadata?.progress?.description || (t ? t('progressPolling') : 'Generating 3D model...');
       if (description !== state.progressDescription) {
         setState((prev) => ({ ...prev, progressDescription: description }));
       }
     }
   } else if (state.phase === 'polling' && isPollError) {
     // Only fail hard if TanStack retries are exhausted, useQuery does retries internally
-    setState((prev) => ({ ...prev, phase: 'failed', error: 'Failed to poll operation status' }));
+    setState((prev) => ({ ...prev, phase: 'failed', error: t ? t('progressFailed') : 'Failed to poll operation status' }));
   }
 
   const cancel = useCallback(() => {
@@ -102,7 +104,7 @@ export function useGenerate3d(propertyId: string) {
     setState((prev) => ({
       ...prev,
       phase: prev.phase === 'uploading' ? 'idle' : prev.phase,
-      error: 'Generation cancelled',
+      error: t ? t('progressCancelled') : 'Generation cancelled',
     }));
   }, []);
 
@@ -127,7 +129,7 @@ export function useGenerate3d(propertyId: string) {
         uploadedCount: 0,
         totalImages: images.length,
         error: null,
-        progressDescription: 'Starting image upload...',
+        progressDescription: t ? t('progressStarting') : 'Starting image upload...',
       });
 
       const uploadedAssets: { media_asset_id: string; azimuth: number }[] = [];
@@ -139,7 +141,9 @@ export function useGenerate3d(propertyId: string) {
         setState((prev) => ({
           ...prev,
           uploadedCount: i,
-          progressDescription: `Uploading image ${i + 1} of ${images.length}...`,
+          progressDescription: t
+            ? t('progressUploading', { current: i + 1, total: images.length })
+            : `Uploading image ${i + 1} of ${images.length}...`,
         }));
 
         let lastError: any = null;
@@ -165,7 +169,9 @@ export function useGenerate3d(propertyId: string) {
           setState((prev) => ({
             ...prev,
             phase: 'failed',
-            error: lastError?.message || `Failed to upload image ${i + 1}`,
+            error: lastError?.message || (t
+              ? t('progressFailedUpload', { current: i + 1 })
+              : `Failed to upload image ${i + 1}`),
           }));
           return;
         }
@@ -178,7 +184,7 @@ export function useGenerate3d(propertyId: string) {
         ...prev,
         phase: 'requesting',
         uploadedCount: images.length,
-        progressDescription: 'Submitting 3D generation request to backend...',
+        progressDescription: t ? t('progressSubmitting') : 'Submitting 3D generation request to backend...',
       }));
 
       try {
@@ -199,13 +205,13 @@ export function useGenerate3d(propertyId: string) {
           ...prev,
           phase: 'polling',
           operationId: opId,
-          progressDescription: 'Operation accepted. Preparing 3D engine...',
+          progressDescription: t ? t('progressAccepted') : 'Operation accepted. Preparing 3D engine...',
         }));
       } catch (error: any) {
         setState((prev) => ({
           ...prev,
           phase: 'failed',
-          error: error.message || 'Failed to start generation',
+          error: error.message || (t ? t('progressFailed') : 'Failed to start generation'),
         }));
       }
     },
@@ -220,7 +226,7 @@ export function useGenerate3d(propertyId: string) {
       uploadedCount: 8, // Assuming resumed means already uploaded
       totalImages: 8,
       error: null,
-      progressDescription: 'Resuming tracking from backend...',
+      progressDescription: t ? t('progressResuming') : 'Resuming tracking from backend...',
     });
   }, []);
 

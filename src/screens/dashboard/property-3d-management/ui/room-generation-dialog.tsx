@@ -21,16 +21,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 const REQUIRED_IMAGES_COUNT = 8;
 const REQUIRED_AZIMUTHS = [0, 45, 90, 135, 180, 225, 270, 315];
 
-const SUGGESTED_ROOMS = [
-  'Living Room',
-  'Master Bedroom',
-  'Bedroom',
-  'Bathroom',
-  'Kitchen',
-  'Dining Room',
-  'Entrance',
-  'Balcony',
-];
+const SUGGESTED_ROOM_KEYS = [
+  'suggestedRoom_living',
+  'suggestedRoom_masterBedroom',
+  'suggestedRoom_bedroom',
+  'suggestedRoom_bathroom',
+  'suggestedRoom_kitchen',
+  'suggestedRoom_dining',
+  'suggestedRoom_entrance',
+  'suggestedRoom_balcony',
+] as const;
+
+// English names used as storage keys (must match what the backend stores)
+const SUGGESTED_ROOM_EN_VALUES: Record<string, string> = {
+  suggestedRoom_living: 'Living Room',
+  suggestedRoom_masterBedroom: 'Master Bedroom',
+  suggestedRoom_bedroom: 'Bedroom',
+  suggestedRoom_bathroom: 'Bathroom',
+  suggestedRoom_kitchen: 'Kitchen',
+  suggestedRoom_dining: 'Dining Room',
+  suggestedRoom_entrance: 'Entrance',
+  suggestedRoom_balcony: 'Balcony',
+};
 
 interface RoomGenerationDialogProps {
   propertyId: string;
@@ -55,7 +67,7 @@ export function RoomGenerationDialog({
     uploadedCount,
     generate,
     reset,
-  } = useGenerate3d(propertyId);
+  } = useGenerate3d(propertyId, t as any);
 
   const [roomName, setRoomName] = useState('');
   const [images, setImages] = useState<AzimuthImage[]>([]);
@@ -158,14 +170,17 @@ export function RoomGenerationDialog({
 
         {/* Chips for suggestions */}
         <div className='flex flex-wrap gap-2 pt-1'>
-          {SUGGESTED_ROOMS.filter((r) => !existingRoomNames.includes(r)).slice(0, 5).map((suggestion) => (
+          {SUGGESTED_ROOM_KEYS
+            .filter((key) => !existingRoomNames.includes(SUGGESTED_ROOM_EN_VALUES[key]))
+            .slice(0, 5)
+            .map((key) => (
             <button
-              key={suggestion}
+              key={key}
               type='button'
-              onClick={() => setRoomName(suggestion)}
+              onClick={() => setRoomName(SUGGESTED_ROOM_EN_VALUES[key])}
               className='text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors'
             >
-              {suggestion}
+              {t(key as any)}
             </button>
           ))}
         </div>
@@ -224,7 +239,7 @@ export function RoomGenerationDialog({
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={capturedImg.previewUrl}
-                          alt={`${roomName || 'Room'} angle ${azimuth}`}
+                          alt={`${roomName || t('roomNamePlaceholder')} ${t('angleLabel')} ${azimuth}`}
                           className='absolute inset-0 w-full h-full object-cover'
                         />
                         <button
@@ -247,7 +262,7 @@ export function RoomGenerationDialog({
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <span className='text-sm md:text-base font-bold tracking-tight'>{azimuth}&deg;</span>
-                        <span className='text-[10px] uppercase font-medium tracking-wider mt-0.5 opacity-70'>Angle</span>
+                        <span className='text-[10px] uppercase font-medium tracking-wider mt-0.5 opacity-70'>{t('angleLabel')}</span>
                       </button>
                     )}
                   </div>
@@ -341,7 +356,13 @@ export function RoomGenerationDialog({
 
           <div>
             <h3 className='text-xl font-bold tracking-tight text-foreground mb-2 capitalize'>
-              {phase === 'polling' ? t('processing') : phase}...
+              {phase === 'polling'
+                ? t('processing')
+                : phase === 'uploading'
+                  ? t('phaseUploading')
+                  : phase === 'requesting'
+                    ? t('phaseRequesting')
+                    : phase}...
             </h3>
             <p className='text-sm text-muted-foreground font-medium min-h-[2.5rem]'>
               {progressDescription}
@@ -366,9 +387,9 @@ export function RoomGenerationDialog({
             </div>
 
             <div className='flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>
-              <span className={phase === 'uploading' ? 'text-primary' : 'text-emerald-500'}>Upload</span>
-              <span className={phase === 'requesting' ? 'text-primary' : phase === 'polling' ? 'text-emerald-500' : ''}>Init</span>
-              <span className={phase === 'polling' ? 'text-primary animate-pulse' : ''}>Process</span>
+              <span className={phase === 'uploading' ? 'text-primary' : 'text-emerald-500'}>{t('phaseUploading')}</span>
+              <span className={phase === 'requesting' ? 'text-primary' : phase === 'polling' ? 'text-emerald-500' : ''}>{t('phaseRequesting')}</span>
+              <span className={phase === 'polling' ? 'text-primary animate-pulse' : ''}>{t('phaseProcessing')}</span>
             </div>
           </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { User, HelpCircle, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -8,6 +9,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn } from '@/shared/lib/utils';
+import { ROUTES } from '@/shared/config/routes';
 
 export interface ProfileMenuItem {
   id: string;
@@ -28,15 +30,9 @@ interface ProfileDropdownProps {
   className?: string;
 }
 
-const defaultMenuItems: ProfileMenuItem[] = [
-  { id: 'profile', label: 'profile', icon: User },
-  { id: 'help', label: 'help', icon: HelpCircle },
-  { id: 'logout', label: 'logout', icon: LogOut },
-];
-
 export function ProfileDropdown({
   user = { name: 'Giovanni', initials: 'GI' },
-  menuItems = defaultMenuItems,
+  menuItems,
   align = 'end',
   className,
 }: ProfileDropdownProps) {
@@ -45,6 +41,12 @@ export function ProfileDropdown({
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('Profile');
+
+  const resolvedMenuItems = menuItems ?? [
+    { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}`, onClick: undefined },
+    { id: 'help', label: 'help', icon: HelpCircle, onClick: undefined },
+    { id: 'logout', label: 'logout', icon: LogOut, onClick: undefined },
+  ];
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -76,9 +78,20 @@ export function ProfileDropdown({
           aria-label='User menu'
         >
           {/* Avatar */}
-          <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
-            <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
-          </div>
+          {user.avatar ? (
+            <Image
+              src={user.avatar}
+              alt={user.name}
+              width={32}
+              height={32}
+              className='size-8 rounded-full object-cover'
+              priority
+            />
+          ) : (
+            <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
+              <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
+            </div>
+          )}
 
           {/* Name */}
           <span className='text-base font-medium leading-[1.5] text-main-black'>{user.name}</span>
@@ -112,9 +125,9 @@ export function ProfileDropdown({
           )}
         >
           <div className='flex flex-col'>
-            {menuItems.map((item, index) => {
+            {resolvedMenuItems.map((item, index) => {
               const Icon = item.icon;
-              const isLast = index === menuItems.length - 1;
+              const isLast = index === resolvedMenuItems.length - 1;
 
               return (
                 <div key={item.id}>

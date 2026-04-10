@@ -17,6 +17,9 @@ export const userKeys = {
   // Current authenticated user
   current: () => [...userKeys.all, 'current'] as const,
 
+  // Current user (me) - full profile from /me endpoint
+  me: () => [...userKeys.all, 'me'] as const,
+
   // Current user's profile
   profile: () => [...userKeys.current(), 'profile'] as const,
 

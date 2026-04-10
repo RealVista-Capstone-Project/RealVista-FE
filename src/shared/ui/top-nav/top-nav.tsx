@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
-import { ChevronDown, Heart, Mail, Menu, X } from 'lucide-react';
+import { ChevronDown, Heart, Menu, CreditCard, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
@@ -24,7 +25,7 @@ export type NavItem = {
 
 type ProfileVariant = 'dropdown' | 'inline';
 
-interface TopNavProps {
+export interface TopNavProps {
   variant?: 'public' | 'dashboard';
   navItems?: NavItem[];
   logoHref?: string;
@@ -129,7 +130,7 @@ export function TopNav({
                 return (
                   <Link
                     key={item.id}
-                    href={item.href}
+                    href={`/${locale}${item.href}`}
                     className={cn(
                       'text-base leading-[1.5] transition-colors hover:text-main-primary',
                       isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
@@ -178,8 +179,25 @@ export function TopNav({
           </button>
         )}
 
-        {/* Chat Dropdown - only for public variant, hidden on mobile */}
         {showMessageButton && (
+          <button
+            type='button'
+            onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
+            className={cn(
+              'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
+              isRouteActive('/subscribe')
+                ? 'bg-main-primary text-white'
+                : 'bg-purple-98 text-main-black hover:bg-purple-92'
+            )}
+            aria-label={t('subscribe')}
+            title={t('subscribe')}
+          >
+            <CreditCard className='h-5 w-5' strokeWidth={2} />
+          </button>
+        )}
+
+        {/* Chat Dropdown - only for public variant and logged in users, hidden on mobile */}
+        {showMessageButton && isUserLoggedIn && (
           <div className='hidden lg:block'>
             <ChatDropdownContainer />
           </div>
@@ -202,9 +220,20 @@ export function TopNav({
               className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
               aria-label='Profile menu'
             >
-              <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
-                <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
-              </div>
+              {user.avatar ? (
+                <Image
+                  src={user.avatar}
+                  alt={user.name}
+                  width={32}
+                  height={32}
+                  className='size-8 rounded-full object-cover'
+                  priority
+                />
+              ) : (
+                <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
+                  <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
+                </div>
+              )}
               <span className='text-base font-medium leading-[1.5] text-main-black'>
                 {user.name}
               </span>

@@ -34,8 +34,11 @@ export function useChangePassword() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { oldPassword: string; newPassword: string }) =>
-      userApi.changePassword(data),
+    mutationFn: (data: { userId: string; oldPassword: string; newPassword: string }) =>
+      userApi.changePassword(data.userId, {
+        current_password: data.oldPassword,
+        new_password: data.newPassword,
+      }),
     onSuccess: () => {
       // Invalidate session queries
       queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
