@@ -123,12 +123,12 @@ export function ThreeDManagementScreen({
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
 
   // 3D Tour subscription gate
-  const { data: subscriptions, isLoading: subsLoading } = useQuery(billingQueries.mySubscriptions());
+  const { data: subscriptions, isLoading: subsLoading, isError: subsError } = useQuery(billingQueries.mySubscriptions());
 
   const threeDSub = subscriptions?.find(
     (s: ActiveSubscriptionResponse) => s.feature_type === '3D_TOUR' && s.status === 'ACTIVE'
   );
-  const isLocked = !subsLoading && (!threeDSub || (!threeDSub.unlimited && (threeDSub.remaining_quota ?? 0) <= 0));
+  const isLocked = !subsLoading && !subsError && (!threeDSub || (!threeDSub.unlimited && (threeDSub.remaining_quota ?? 0) <= 0));
 
   // Delete state
   const [roomToDelete, setRoomToDelete] = useState<RoomGroup | null>(null);
@@ -278,6 +278,7 @@ export function ThreeDManagementScreen({
                 size='lg'
                 className='rounded-xl shadow-md font-semibold gap-2'
                 disabled={isLocked}
+                title={isLocked ? t('lockedTitle') : undefined}
               >
                 {isLocked ? <Lock className='w-5 h-5' /> : <Plus className='w-5 h-5' />}
                 {t('newRoom')}
