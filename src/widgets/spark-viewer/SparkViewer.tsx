@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Loader2,
   RotateCcw,
@@ -23,6 +26,7 @@ interface SparkViewerProps {
 type SplatQuality = '100k' | '500k' | 'full_res' | 'low' | 'medium' | 'full' | 'default';
 
 export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerProps) {
+  const t = useTranslations('SparkViewer');
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
@@ -138,7 +142,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
 
   const handleResetView = () => {
     sendCommand('SPARK_RESET_VIEW');
-    toast.success('Camera reset');
+    toast.success(t('cameraReset'));
   };
 
   const handleToggleRotate = () => {
@@ -152,7 +156,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
 
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch((err) => {
-        toast.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        toast.error(t('fullscreenError', { error: err.message }));
       });
     } else {
       document.exitFullscreen();
@@ -316,7 +320,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       {loading && (
         <div className='absolute inset-0 z-10 flex flex-col items-center justify-center  text-white'>
           <Loader2 className='w-8 h-8 animate-spin text-main-primary mb-4' />
-          <p className='text-sm font-medium text-slate-400'>Initialising 3D World...</p>
+          <p className='text-sm font-medium text-slate-400'>{t('loading')}</p>
         </div>
       )}
 
@@ -330,7 +334,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       >
         {/* Interaction Controls */}
         <div className='flex items-center gap-1 border-r border-white/10 pr-3'>
-          <abbr title='Reset View'>
+          <abbr title={t('resetView')}>
             <RealVistaButton
               size='small'
               onClick={handleResetView}
@@ -340,7 +344,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
             </RealVistaButton>
           </abbr>
 
-          <abbr title={isRotating ? 'Stop Rotation' : 'Auto Rotate'}>
+          <abbr title={isRotating ? t('stopRotation') : t('autoRotate')}>
             <RealVistaButton
               size='small'
               onClick={handleToggleRotate}
@@ -357,7 +361,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
             </RealVistaButton>
           </abbr>
 
-          <abbr title='Fullscreen'>
+          <abbr title={isFullscreen ? t('exitFullscreen') : t('fullscreen')}>
             <RealVistaButton
               size='small'
               onClick={handleToggleFullscreen}
@@ -379,7 +383,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
             onClick={() => setShowQualityMenu(!showQualityMenu)}
             className='!bg-transparent !border-transparent py-1 px-3 hover:!bg-white/10 !rounded-full text-xs font-semibold text-white/90'
           >
-            Resolution{availableQualities.length > 0 && ` (${availableQualities.length})`}
+            {t('resolution')}{availableQualities.length > 0 && ` (${availableQualities.length})`}
             <ChevronUp
               className={cn('size-3 ml-1.5 transition-transform', showQualityMenu && 'rotate-180')}
             />
@@ -403,11 +407,11 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
                     )}
                   >
                     {q.toLowerCase() === 'full_res' || q.toLowerCase() === 'full'
-                      ? 'Full Resolution'
+                      ? t('fullResolution')
                       : q.toLowerCase() === '500k'
-                        ? 'Medium (500k)'
+                        ? t('medium')
                         : q.toLowerCase() === '100k'
-                          ? 'Low (100k)'
+                          ? t('low')
                           : q.charAt(0).toUpperCase() + q.slice(1)}
                   </button>
                 );
@@ -432,26 +436,26 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       {showHelp && (
         <div className='absolute top-6 left-1/2 -translate-x-1/2 z-30 /80 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl max-w-sm animate-in zoom-in-95 max-h-[80vh] overflow-auto'>
           <div className='flex justify-between items-center mb-3'>
-            <h4 className='text-white text-sm font-bold'>Debug Info</h4>
+            <h4 className='text-white text-sm font-bold'>{t('debugTitle')}</h4>
             <button onClick={() => setShowHelp(false)} className='text-white/40 hover:text-white'>
               <X className='size-4' />
             </button>
           </div>
           <div className='space-y-4 text-[10px] text-slate-300 font-mono'>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-main-primary mb-1'>Metadata Prop:</p>
+              <p className='text-main-primary mb-1'>{t('debugMetadata')}</p>
               <pre className='whitespace-pre-wrap break-all'>
                 {JSON.stringify(metadata, null, 2) || 'undefined'}
               </pre>
             </div>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-main-primary mb-1'>Extracted URLs:</p>
+              <p className='text-main-primary mb-1'>{t('debugUrls')}</p>
               <pre className='whitespace-pre-wrap break-all'>
                 {JSON.stringify(spzUrls, null, 2)}
               </pre>
             </div>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-main-primary mb-1'>Prop Types:</p>
+              <p className='text-main-primary mb-1'>{t('debugPropTypes')}</p>
               <p>metadata: {typeof metadata}</p>
               <p>spzUrl: {typeof spzUrl}</p>
             </div>
@@ -464,7 +468,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
         srcDoc={htmlContent}
         className='w-full h-full border-0 outline-none ph-no-capture'
         sandbox='allow-scripts allow-same-origin allow-popups'
-        title='3D Spark Viewer'
+        title={t('iframeTitle')}
         data-ph-no-capture='true'
       />
     </div>

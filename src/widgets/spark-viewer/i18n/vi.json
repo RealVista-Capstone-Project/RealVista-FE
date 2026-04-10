@@ -1,0 +1,21 @@
+{
+  "SparkViewer": {
+    "loading": "Đang khởi tạo thế giới 3D...",
+    "resetView": "Đặt lại góc nhìn",
+    "stopRotation": "Dừng xoay",
+    "autoRotate": "Tự động xoay",
+    "fullscreen": "Toàn màn hình",
+    "exitFullscreen": "Thoát toàn màn hình",
+    "resolution": "Độ phân giải",
+    "fullResolution": "Độ phân giải đầy đủ",
+    "medium": "Trung bình (500k)",
+    "low": "Thấp (100k)",
+    "cameraReset": "Đã đặt lại camera",
+    "fullscreenError": "Lỗi khi bật toàn màn hình: {error}",
+    "iframeTitle": "Trình xem 3D Spark",
+    "debugTitle": "Thông tin gỡ lỗi",
+    "debugMetadata": "Metadata:",
+    "debugUrls": "URL đã trích xuất:",
+    "debugPropTypes": "Kiểu prop:"
+  }
+}
