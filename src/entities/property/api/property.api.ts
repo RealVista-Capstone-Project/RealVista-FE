@@ -12,6 +12,7 @@ import type {
   PropertyAttributeDefinition,
   PropertyDetailResponse,
   PropertySearchResponse,
+  PropertyTypesResponse,
   UpdatePropertyRequest,
 } from './property-api.types';
 
@@ -170,5 +171,11 @@ export const propertyApi = {
         baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
       }
     );
+  },
+
+  getPropertyTypes: () => {
+    return http.get<PropertyTypesResponse>('properties/types', {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
   },
 };

@@ -499,3 +499,18 @@ export interface OwnerAvailablePropertiesResponse {
   data: PageResponse<OwnerPropertySummary>;
   timestamp: string;
 }
+
+export interface PropertyTypeInfoDTO {
+  property_type_id: string;
+  property_type_name: string;
+  property_type_code: string;
+  property_category_id: string;
+  property_category_name: string;
+  property_category_code: string;
+}
+
+export interface PropertyTypesResponse {
+  success: boolean;
+  message: string;
+  data: PropertyTypeInfoDTO[];
+}

@@ -6,11 +6,9 @@ import {
   useState,
   useMemo,
   useCallback,
-  useEffect,
-  useRef,
   type ReactNode,
 } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property';
 import type { OwnerPropertySummary } from '@/entities/property';
 import { useDebounce } from '@/shared/lib/hooks';
@@ -29,6 +27,8 @@ export interface PriceFilter {
 export interface PropertyTypeOption {
   id: string;
   name: string;
+  categoryId: string;
+  categoryName: string;
 }
 
 interface OwnerPropertiesContextValue {
@@ -47,6 +47,7 @@ interface OwnerPropertiesContextValue {
   propertyTypeId: string | null;
   setPropertyTypeId: (id: string | null) => void;
   availablePropertyTypes: PropertyTypeOption[];
+  isLoadingPropertyTypes: boolean;
   selectedProperty: OwnerPropertySummary | null;
   setSelectedProperty: (property: OwnerPropertySummary | null) => void;
   totalElements: number;
@@ -64,9 +65,21 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
   const debouncedPriceFilter = useDebounce(priceFilter, 500);
   const [selectedProperty, setSelectedProperty] = useState<OwnerPropertySummary | null>(null);
 
-  // Accumulate unique property types seen across all loaded pages
-  const seenTypesRef = useRef<Map<string, string>>(new Map());
-  const [availablePropertyTypes, setAvailablePropertyTypes] = useState<PropertyTypeOption[]>([]);
+  // Fetch all property types from dedicated endpoint
+  const { data: propertyTypesData, isLoading: isLoadingPropertyTypes } = useQuery(
+    propertyQueries.propertyTypes()
+  );
+
+  const availablePropertyTypes = useMemo<PropertyTypeOption[]>(
+    () =>
+      (propertyTypesData?.payload?.data ?? []).map((t) => ({
+        id: t.property_type_id,
+        name: t.property_type_name,
+        categoryId: t.property_category_id,
+        categoryName: t.property_category_name,
+      })),
+    [propertyTypesData]
+  );
 
   const queryResult = useInfiniteQuery(
     propertyQueries.ownerAvailableInfinite({
@@ -86,24 +99,6 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
     () => queryResult.data?.pages.flatMap((page) => page.payload.data.content) ?? [],
     [queryResult.data]
   );
-
-  // Build available property type list from all loaded properties
-  useEffect(() => {
-    let changed = false;
-    for (const p of properties) {
-      const id = p.property_type_info?.property_type_id;
-      const name = p.property_type_info?.property_type_name;
-      if (id && name && !seenTypesRef.current.has(id)) {
-        seenTypesRef.current.set(id, name);
-        changed = true;
-      }
-    }
-    if (changed) {
-      setAvailablePropertyTypes(
-        Array.from(seenTypesRef.current.entries()).map(([id, name]) => ({ id, name }))
-      );
-    }
-  }, [properties]);
 
   const totalElements = useMemo(() => {
     const lastPage = queryResult.data?.pages.at(-1);
@@ -157,6 +152,7 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
       propertyTypeId,
       setPropertyTypeId,
       availablePropertyTypes,
+      isLoadingPropertyTypes,
       selectedProperty,
       setSelectedProperty,
       totalElements,
@@ -175,6 +171,7 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
       listingType,
       propertyTypeId,
       availablePropertyTypes,
+      isLoadingPropertyTypes,
       selectedProperty,
       totalElements,
       handlePropertyClick,

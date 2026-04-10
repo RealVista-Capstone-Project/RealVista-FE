@@ -20,7 +20,8 @@
       "apply": "Áp dụng",
       "clearAll": "Xóa tất cả",
       "propertyType": "Loại bất động sản",
-      "allTypes": "Tất cả loại"
+      "allTypes": "Tất cả loại",
+      "errorMinMax": "Giá tối thiểu phải nhỏ hơn giá tối đa"
     },
     "card": {
       "bedrooms": "phòng ngủ",

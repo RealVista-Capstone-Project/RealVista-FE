@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   OwnerPropertiesProvider,
   useOwnerPropertiesContext,
@@ -15,13 +15,20 @@ import { Search, Home, Filter, X, DollarSign, Building, KeyRound } from 'lucide-
 import { useTranslations } from 'next-intl';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
-import { formatVND } from '@/shared/lib/utils/format-currency';
 
-function parseFormattedNumber(value: string): number | undefined {
-  const numericValue = value.replace(/[^0-9]/g, '');
-  if (!numericValue) return undefined;
-  const number = parseInt(numericValue, 10);
-  return isNaN(number) ? undefined : number;
+// Format a raw number as dot-separated thousands for display in inputs: 2500000 → "2.500.000"
+function formatInputNumber(value: string): string {
+  const digits = value.replace(/[^0-9]/g, '');
+  if (!digits) return '';
+  return parseInt(digits, 10).toLocaleString('vi-VN');
+}
+
+// Parse a dot-separated input string back to a number: "2.500.000" → 2500000
+function parseInputNumber(value: string): number | undefined {
+  const digits = value.replace(/[^0-9]/g, '');
+  if (!digits) return undefined;
+  const n = parseInt(digits, 10);
+  return isNaN(n) ? undefined : n;
 }
 
 interface LocalPriceFilter {
@@ -76,21 +83,40 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
     propertyTypeId,
     setPropertyTypeId,
     availablePropertyTypes,
+    isLoadingPropertyTypes,
   } = useOwnerPropertiesContext();
 
   const [localFilter, setLocalFilter] = useState<LocalPriceFilter>({
-    minRentPrice: priceFilter.minRentPrice ? formatVND(priceFilter.minRentPrice) : '',
-    maxRentPrice: priceFilter.maxRentPrice ? formatVND(priceFilter.maxRentPrice) : '',
-    minBuyPrice: priceFilter.minBuyPrice ? formatVND(priceFilter.minBuyPrice) : '',
-    maxBuyPrice: priceFilter.maxBuyPrice ? formatVND(priceFilter.maxBuyPrice) : '',
+    minRentPrice: priceFilter.minRentPrice ? formatInputNumber(String(priceFilter.minRentPrice)) : '',
+    maxRentPrice: priceFilter.maxRentPrice ? formatInputNumber(String(priceFilter.maxRentPrice)) : '',
+    minBuyPrice: priceFilter.minBuyPrice ? formatInputNumber(String(priceFilter.minBuyPrice)) : '',
+    maxBuyPrice: priceFilter.maxBuyPrice ? formatInputNumber(String(priceFilter.maxBuyPrice)) : '',
   });
 
+  // Min > max validation errors
+  const rentError =
+    localFilter.minRentPrice &&
+    localFilter.maxRentPrice &&
+    (parseInputNumber(localFilter.minRentPrice) ?? 0) >= (parseInputNumber(localFilter.maxRentPrice) ?? Infinity)
+      ? t('filter.errorMinMax')
+      : null;
+
+  const buyError =
+    localFilter.minBuyPrice &&
+    localFilter.maxBuyPrice &&
+    (parseInputNumber(localFilter.minBuyPrice) ?? 0) >= (parseInputNumber(localFilter.maxBuyPrice) ?? Infinity)
+      ? t('filter.errorMinMax')
+      : null;
+
+  const hasError = !!(rentError || buyError);
+
   const handleApply = () => {
+    if (hasError) return;
     const numericFilter: PriceFilter = {
-      minRentPrice: parseFormattedNumber(localFilter.minRentPrice),
-      maxRentPrice: parseFormattedNumber(localFilter.maxRentPrice),
-      minBuyPrice: parseFormattedNumber(localFilter.minBuyPrice),
-      maxBuyPrice: parseFormattedNumber(localFilter.maxBuyPrice),
+      minRentPrice: parseInputNumber(localFilter.minRentPrice),
+      maxRentPrice: parseInputNumber(localFilter.maxRentPrice),
+      minBuyPrice: parseInputNumber(localFilter.minBuyPrice),
+      maxBuyPrice: parseInputNumber(localFilter.maxBuyPrice),
     };
     setPriceFilter(numericFilter);
     onClose();
@@ -102,53 +128,93 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
     setPropertyTypeId(null);
   };
 
-  const updateLocalFilter = (key: keyof LocalPriceFilter, value: string) => {
-    setLocalFilter((prev) => ({ ...prev, [key]: value }));
+  // Format digits on every keystroke
+  const handlePriceChange = (key: keyof LocalPriceFilter, value: string) => {
+    setLocalFilter((prev) => ({ ...prev, [key]: formatInputNumber(value) }));
   };
 
   const showRentFilter = listingType === 'ALL' || listingType === 'RENT';
   const showBuyFilter = listingType === 'ALL' || listingType === 'SELL';
+
+  // Group types by category
+  const typesByCategory = useMemo(() => {
+    const map = new Map<string, { categoryName: string; types: typeof availablePropertyTypes }>();
+    for (const type of availablePropertyTypes) {
+      const existing = map.get(type.categoryId);
+      if (existing) {
+        existing.types.push(type);
+      } else {
+        map.set(type.categoryId, { categoryName: type.categoryName, types: [type] });
+      }
+    }
+    return Array.from(map.values());
+  }, [availablePropertyTypes]);
 
   if (!isOpen) return null;
 
   return (
     <div className='border-b border-purple-92/50 bg-white px-4 sm:px-5 pb-4 pt-3 space-y-4 animate-in slide-in-from-top-2 duration-200'>
 
-      {/* Property Type Pills */}
-      {availablePropertyTypes.length > 0 && (
-        <div className='space-y-2'>
-          <label className='text-xs font-semibold text-main-black uppercase tracking-wide'>
-            {t('filter.propertyType')}
-          </label>
+      {/* Property Type Pills — grouped by category */}
+      <div className='space-y-3'>
+        <label className='text-xs font-semibold text-main-black uppercase tracking-wide'>
+          {t('filter.propertyType')}
+        </label>
+
+        {isLoadingPropertyTypes ? (
+          /* Loading skeleton */
           <div className='flex flex-wrap gap-2'>
-            <button
-              onClick={() => setPropertyTypeId(null)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150',
-                propertyTypeId === null
-                  ? 'bg-main-primary text-white border-main-primary'
-                  : 'bg-purple-98 text-main-secondary border-purple-92 hover:border-main-primary/40 hover:text-main-black'
-              )}
-            >
-              {t('filter.allTypes')}
-            </button>
-            {availablePropertyTypes.map((type) => (
+            {[80, 100, 70, 110, 90].map((w, i) => (
+              <div
+                key={i}
+                className='h-7 rounded-full bg-purple-92/40 animate-pulse'
+                style={{ width: w }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className='space-y-2.5'>
+            {/* "All types" pill always first */}
+            <div className='flex flex-wrap gap-2'>
               <button
-                key={type.id}
-                onClick={() => setPropertyTypeId(propertyTypeId === type.id ? null : type.id)}
+                onClick={() => setPropertyTypeId(null)}
                 className={cn(
                   'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150',
-                  propertyTypeId === type.id
+                  propertyTypeId === null
                     ? 'bg-main-primary text-white border-main-primary'
                     : 'bg-purple-98 text-main-secondary border-purple-92 hover:border-main-primary/40 hover:text-main-black'
                 )}
               >
-                {type.name}
+                {t('filter.allTypes')}
               </button>
+            </div>
+
+            {typesByCategory.map((group) => (
+              <div key={group.categoryName} className='space-y-1.5'>
+                <span className='text-[10px] font-semibold text-main-secondary/60 uppercase tracking-widest'>
+                  {group.categoryName}
+                </span>
+                <div className='flex flex-wrap gap-2'>
+                  {group.types.map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setPropertyTypeId(propertyTypeId === type.id ? null : type.id)}
+                      className={cn(
+                        'px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150',
+                        propertyTypeId === type.id
+                          ? 'bg-main-primary text-white border-main-primary'
+                          : 'bg-purple-98 text-main-secondary border-purple-92 hover:border-main-primary/40 hover:text-main-black'
+                      )}
+                    >
+                      {type.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Rent Price Range */}
       {showRentFilter && (
@@ -156,21 +222,33 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
           <label className='text-xs font-semibold text-main-black uppercase tracking-wide flex items-center gap-1.5'>
             <DollarSign className='h-3.5 w-3.5 text-green-600' />
             {t('filter.rentPrice')}
+            <span className='font-normal text-main-secondary/50 normal-case tracking-normal'>(đ)</span>
           </label>
           <div className='grid grid-cols-2 gap-2'>
             <Input
+              inputMode='numeric'
               placeholder={t('filter.min')}
               value={localFilter.minRentPrice}
-              onChange={(e) => updateLocalFilter('minRentPrice', e.target.value)}
-              className='h-9 border-purple-92 bg-white focus:border-main-primary text-sm'
+              onChange={(e) => handlePriceChange('minRentPrice', e.target.value)}
+              className={cn(
+                'h-9 border-purple-92 bg-white focus:border-main-primary text-sm',
+                rentError && 'border-red-400 focus:border-red-400'
+              )}
             />
             <Input
+              inputMode='numeric'
               placeholder={t('filter.max')}
               value={localFilter.maxRentPrice}
-              onChange={(e) => updateLocalFilter('maxRentPrice', e.target.value)}
-              className='h-9 border-purple-92 bg-white focus:border-main-primary text-sm'
+              onChange={(e) => handlePriceChange('maxRentPrice', e.target.value)}
+              className={cn(
+                'h-9 border-purple-92 bg-white focus:border-main-primary text-sm',
+                rentError && 'border-red-400 focus:border-red-400'
+              )}
             />
           </div>
+          {rentError && (
+            <p className='text-[11px] text-red-500'>{rentError}</p>
+          )}
         </div>
       )}
 
@@ -180,21 +258,33 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
           <label className='text-xs font-semibold text-main-black uppercase tracking-wide flex items-center gap-1.5'>
             <DollarSign className='h-3.5 w-3.5 text-blue-600' />
             {t('filter.buyPrice')}
+            <span className='font-normal text-main-secondary/50 normal-case tracking-normal'>(đ)</span>
           </label>
           <div className='grid grid-cols-2 gap-2'>
             <Input
+              inputMode='numeric'
               placeholder={t('filter.min')}
               value={localFilter.minBuyPrice}
-              onChange={(e) => updateLocalFilter('minBuyPrice', e.target.value)}
-              className='h-9 border-purple-92 bg-white focus:border-main-primary text-sm'
+              onChange={(e) => handlePriceChange('minBuyPrice', e.target.value)}
+              className={cn(
+                'h-9 border-purple-92 bg-white focus:border-main-primary text-sm',
+                buyError && 'border-red-400 focus:border-red-400'
+              )}
             />
             <Input
+              inputMode='numeric'
               placeholder={t('filter.max')}
               value={localFilter.maxBuyPrice}
-              onChange={(e) => updateLocalFilter('maxBuyPrice', e.target.value)}
-              className='h-9 border-purple-92 bg-white focus:border-main-primary text-sm'
+              onChange={(e) => handlePriceChange('maxBuyPrice', e.target.value)}
+              className={cn(
+                'h-9 border-purple-92 bg-white focus:border-main-primary text-sm',
+                buyError && 'border-red-400 focus:border-red-400'
+              )}
             />
           </div>
+          {buyError && (
+            <p className='text-[11px] text-red-500'>{buyError}</p>
+          )}
         </div>
       )}
 
@@ -202,7 +292,8 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
       <div className='flex gap-2 pt-1'>
         <Button
           onClick={handleApply}
-          className='flex-1 h-9 bg-main-primary hover:bg-main-primary/90 text-sm'
+          disabled={hasError}
+          className='flex-1 h-9 bg-main-primary hover:bg-main-primary/90 text-sm disabled:opacity-50 disabled:cursor-not-allowed'
         >
           {t('filter.apply')}
         </Button>
@@ -350,11 +441,14 @@ function OwnerPropertiesContent() {
             <ListingTypeTabs />
           </div>
 
-          {/* Collapsible Filter Panel */}
-          <FilterPanel isOpen={filterOpen} onClose={() => setFilterOpen(false)} />
-
-          {/* Properties List */}
+          {/* Scrollable content: Filter Panel + Properties List */}
           <div className='flex-1 overflow-y-auto'>
+            {/* Collapsible Filter Panel — inside scroll area so price inputs are reachable */}
+            {filterOpen && (
+              <FilterPanel isOpen={filterOpen} onClose={() => setFilterOpen(false)} />
+            )}
+
+            {/* Properties List */}
             {properties.length === 0 ? (
               <div className='flex flex-col items-center justify-center gap-4 p-8 text-center'>
                 <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50'>
