@@ -43,6 +43,8 @@ export interface RealVistaListingCardProps {
   isFavorite?: boolean;
   statusTag?: 'SOLD' | 'RENTED';
   attributes?: ListingAttribute[];
+  boostTag?: string;
+  userType?: string;
   variant?: 'grid' | 'list';
   listingType?: 'RENT' | 'SALE';
   onToggleFavorite?: (id: string) => void;
@@ -64,6 +66,8 @@ export function RealVistaListingCard({
   isFavorite = false,
   statusTag,
   attributes,
+  boostTag,
+  userType,
   variant = 'grid',
   listingType = 'RENT',
   onToggleFavorite,
