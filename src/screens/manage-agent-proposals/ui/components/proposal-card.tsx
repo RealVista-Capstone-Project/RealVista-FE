@@ -102,11 +102,11 @@ export function ProposalCard({
         <div className='mt-1.5 flex items-center gap-3 text-xs text-slate-500'>
           <span className='flex items-center gap-1'>
             <Award size={11} className='text-indigo-400' />
-            {proposal.experience_years}yr
+            {t('metricExperience')}: {proposal.experience_years} năm
           </span>
           <span className='flex items-center gap-1'>
             <Percent size={11} className='text-indigo-400' />
-            {proposal.commission_rate}%
+            {t('metricCommission')}: {proposal.commission_rate}%
           </span>
           <span className={cn(
             'ml-auto inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',

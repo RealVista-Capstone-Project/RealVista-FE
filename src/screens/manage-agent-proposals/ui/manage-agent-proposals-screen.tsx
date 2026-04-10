@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Plus, X, FileText } from 'lucide-react';
+import { Search, Plus, X, FileText, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   useMyProposalsQuery,
@@ -306,10 +306,13 @@ function TableRow({
 }) {
   const isActive = proposal.status === 'ACTIVE';
   const specialtyCode = getAgentProposalSpecialtyCode(proposal);
-  const updatedLabel = React.useMemo(() => {
+  const updatedDateParts = React.useMemo(() => {
     const d = new Date(proposal.updated_at);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+    if (Number.isNaN(d.getTime())) return { day: '--', month: '--' };
+    return {
+      day: d.toLocaleDateString('vi-VN', { day: '2-digit' }),
+      month: d.toLocaleDateString('vi-VN', { month: '2-digit' }),
+    };
   }, [proposal.updated_at]);
   const specialtyLabel = React.useMemo(() => {
     if (!specialtyCode) return '';
@@ -331,13 +334,14 @@ function TableRow({
       {/* Updated at */}
       <div
         className={cn(
-          'flex size-10 shrink-0 items-center justify-center rounded-xl transition-all shadow-sm tabular-nums',
+          'flex size-10 shrink-0 flex-col items-center justify-center rounded-xl transition-all shadow-sm tabular-nums',
           isSelected
             ? 'bg-indigo-600 text-white scale-105'
             : 'bg-slate-100 text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600'
         )}
       >
-        <span className='text-[11px] font-bold leading-none'>{updatedLabel}</span>
+        <span className='text-[12px] font-bold leading-none'>{updatedDateParts.day}</span>
+        <span className='text-[9px] font-semibold leading-none opacity-80'>{updatedDateParts.month}</span>
       </div>
 
       {/* Title + meta */}
@@ -352,8 +356,9 @@ function TableRow({
         </p>
         <div className='mt-1 flex items-center gap-2 min-w-0'>
           {specialtyLabel && (
-            <span className='inline-flex max-w-[40%] items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 truncate'>
-              {specialtyLabel}
+            <span className='inline-flex max-w-[45%] items-center gap-1 rounded-full border border-indigo-100 bg-indigo-50/70 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-700'>
+              <Sparkles size={10} className='shrink-0 opacity-80' />
+              <span className='truncate'>{specialtyLabel}</span>
             </span>
           )}
           <p className='text-xs text-slate-400 truncate line-clamp-1 italic min-w-0'>
