@@ -15,12 +15,14 @@ interface AgentApplyProposalModalProps {
   propertyId: string;
   isOpen: boolean;
   onClose: () => void;
+  onSubmitSuccess?: () => void;
 }
 
 export function AgentApplyProposalModal({
   propertyId,
   isOpen,
   onClose,
+  onSubmitSuccess,
 }: AgentApplyProposalModalProps) {
   const t = useTranslations('ApplyProposal');
 
@@ -74,9 +76,11 @@ export function AgentApplyProposalModal({
       toast.success(t('toastSuccess'), {
         className: 'bg-white border-emerald-200 text-emerald-800 shadow-lg',
       });
+      onSubmitSuccess?.();
       onClose();
-    } catch (err) {
-      const errorMsg = (err as any)?.response?.data?.message || t('toastError');
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t('toastError');
       toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
