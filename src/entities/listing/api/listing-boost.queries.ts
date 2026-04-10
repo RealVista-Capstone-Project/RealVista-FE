@@ -1,6 +1,7 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingBoostApi } from './listing-boost.api';
 import { billingKeys } from '@/entities/billing/api/keys';
+import { listingKeys } from './keys';
 
 export const listingBoostKeys = {
   all: ['listing-boosts'] as const,
@@ -33,6 +34,7 @@ export function useApplyBoost() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: listingBoostKeys.byListing(variables.listingId) });
       queryClient.invalidateQueries({ queryKey: billingKeys.myBoosts() });
+      queryClient.invalidateQueries({ queryKey: listingKeys.detail(variables.listingId) });
     },
   });
 }
@@ -50,6 +52,7 @@ export function useRemoveBoost() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: listingBoostKeys.byListing(variables.listingId) });
       queryClient.invalidateQueries({ queryKey: billingKeys.myBoosts() });
+      queryClient.invalidateQueries({ queryKey: listingKeys.detail(variables.listingId) });
     },
   });
 }
