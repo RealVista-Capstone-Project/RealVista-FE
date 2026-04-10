@@ -26,6 +26,7 @@ export interface PropertyDetailScreenProps {
 export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) {
   const { data: response, isLoading, isError } = usePropertyDetail(propertyId);
   const [isApplyProposalOpen, setIsApplyProposalOpen] = useState(false);
+  const [isApplyProposalDisabledLocal, setIsApplyProposalDisabledLocal] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyDetail');
   const router = useRouter();
@@ -44,7 +45,8 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
     staleTime: 2 * 60 * 1000,
   });
 
-  const isApplyProposalDisabled = applyStateResponse?.payload?.data?.can_apply_proposal === false;
+  const isApplyProposalDisabled =
+    isApplyProposalDisabledLocal || applyStateResponse?.payload?.data?.can_apply_proposal === false;
 
   if (isLoading) {
     return (
@@ -168,6 +170,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
         propertyId={property.id}
         isOpen={isApplyProposalOpen}
         onClose={() => setIsApplyProposalOpen(false)}
+        onSubmitSuccess={() => setIsApplyProposalDisabledLocal(true)}
       />
     </div>
   );
