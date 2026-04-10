@@ -28,14 +28,16 @@ export interface AgentProposal {
 
 export interface ApplyAgentProposalPayload {
   title: string;
-  commission_rate: number;
-  experience_years: number;
+  commission_rate?: number | null;
+  experience_years?: number | null;
   pitch_content: string;
   specialty?: string;
   price_range?: {
     rent?: { min: number; max: number };
     sale?: { min: number; max: number };
   };
+  /** Omit or ACTIVE for publish; DRAFT for save draft. */
+  status?: AgentProposalStatus;
 }
 
 export interface AgentProposalPageResponse {

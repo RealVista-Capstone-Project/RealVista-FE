@@ -8,6 +8,7 @@ import {
   useCancelProposalMutation,
   useUpdateProposalMutation,
   useApplyProposalMutation,
+  useSaveProposalDraftMutation,
 } from '@/features/agent-proposal/hooks/use-agent-proposal';
 import { AgentProposal, ApplyAgentProposalPayload } from '@/entities/agent-proposal/model/types';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
@@ -69,6 +70,8 @@ export function ManageAgentProposalsScreen() {
   const createMutation = useApplyProposalMutation(() => setIsFormOpen(false));
 
   const updateMutation = useUpdateProposalMutation(() => setIsFormOpen(false));
+
+  const draftMutation = useSaveProposalDraftMutation(() => setIsFormOpen(false));
 
   const deleteMutation = useCancelProposalMutation(() => {
     // If the deleted item was selected, clear the detail panel
@@ -256,8 +259,18 @@ export function ManageAgentProposalsScreen() {
         onClose={() => setIsFormOpen(false)}
         mode={formMode}
         initialData={editTarget}
-        isLoading={createMutation.isPending || updateMutation.isPending}
+        isLoading={
+          createMutation.isPending ||
+          updateMutation.isPending ||
+          draftMutation.isPending
+        }
         onSubmit={handleFormSubmit}
+        onSaveDraft={(payload) =>
+          draftMutation.mutate({
+            id: formMode === 'edit' && editTarget ? editTarget.agent_proposal_id : undefined,
+            payload,
+          })
+        }
       />
 
       <DeleteProposalDialog

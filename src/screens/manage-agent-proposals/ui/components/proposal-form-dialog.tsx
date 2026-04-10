@@ -25,10 +25,45 @@ import {
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import {
   AgentProposal,
+  AgentProposalStatus,
   ApplyAgentProposalPayload,
   getAgentProposalSpecialtyCode,
 } from '@/entities/agent-proposal/model/types';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input';
+
+/** Form model: commission / experience start empty until the user fills them. */
+type ProposalFormValues = Omit<
+  ApplyAgentProposalPayload,
+  'commission_rate' | 'experience_years' | 'specialty' | 'status'
+> & {
+  commission_rate: number | '';
+  experience_years: number | '';
+  specialty: string;
+};
+
+function toSubmitPayload(form: ProposalFormValues): ApplyAgentProposalPayload {
+  return {
+    title: form.title.trim(),
+    commission_rate: form.commission_rate === '' ? 0 : Number(form.commission_rate),
+    experience_years: form.experience_years === '' ? 0 : Number(form.experience_years),
+    pitch_content: form.pitch_content,
+    specialty: form.specialty.trim(),
+    price_range: form.price_range,
+    status: AgentProposalStatus.ACTIVE,
+  };
+}
+
+function toDraftPayload(form: ProposalFormValues): ApplyAgentProposalPayload {
+  return {
+    title: form.title.trim(),
+    commission_rate: form.commission_rate === '' ? null : Number(form.commission_rate),
+    experience_years: form.experience_years === '' ? null : Number(form.experience_years),
+    pitch_content: form.pitch_content,
+    specialty: form.specialty.trim() || undefined,
+    price_range: form.price_range,
+    status: AgentProposalStatus.DRAFT,
+  };
+}
 
 /* ─── Form validation ─── */
 interface FormErrors {
@@ -41,7 +76,7 @@ interface FormErrors {
 }
 
 function validateForm(
-  form: ApplyAgentProposalPayload,
+  form: ProposalFormValues,
   t: ReturnType<typeof useTranslations<'ManageProposals'>>
 ): FormErrors {
   const errors: FormErrors = {};
@@ -50,20 +85,28 @@ function validateForm(
     errors.title = t('validation.titleRequired');
   } else if (form.title.trim().length < 5) {
     errors.title = t('validation.titleTooShort');
-  } else if (form.title.trim().length > 200) {
+  } else if (form.title.trim().length > 100) {
     errors.title = t('validation.titleTooLong');
   }
 
-  if (form.commission_rate <= 0) {
+  if (form.commission_rate === '') {
+    errors.commission_rate = t('validation.commissionRequired');
+  } else if (form.commission_rate <= 0) {
     errors.commission_rate = t('validation.commissionMin');
   } else if (form.commission_rate > 100) {
     errors.commission_rate = t('validation.commissionMax');
   }
 
-  if (form.experience_years < 0) {
+  if (form.experience_years === '') {
+    errors.experience_years = t('validation.experienceRequired');
+  } else if (form.experience_years < 0) {
     errors.experience_years = t('validation.experienceMin');
   } else if (form.experience_years > 60) {
     errors.experience_years = t('validation.experienceMax');
+  }
+
+  if (!form.specialty?.trim()) {
+    errors.specialty = t('validation.specialtyRequired');
   }
 
   if (!form.pitch_content.trim()) {
@@ -91,6 +134,30 @@ function validateForm(
     errors.price_range = t('validation.priceRangeMinMax');
   }
 
+  return errors;
+}
+
+/** Minimal checks for API draft save (server applies DRAFT rules). */
+function validateDraftForm(
+  form: ProposalFormValues,
+  t: ReturnType<typeof useTranslations<'ManageProposals'>>
+): FormErrors {
+  const errors: FormErrors = {};
+  if (!form.title.trim()) {
+    errors.title = t('validation.titleRequired');
+  } else if (form.title.trim().length > 100) {
+    errors.title = t('validation.titleTooLong');
+  }
+  const pr = form.price_range;
+  const rent = pr?.rent;
+  const sale = pr?.sale;
+  const rentInvalid =
+    rent != null && rent.min > 0 && rent.max > 0 && rent.min > rent.max;
+  const saleInvalid =
+    sale != null && sale.min > 0 && sale.max > 0 && sale.min > sale.max;
+  if (rentInvalid || saleInvalid) {
+    errors.price_range = t('validation.priceRangeMinMax');
+  }
   return errors;
 }
 
@@ -135,7 +202,10 @@ interface ProposalFormDialogProps {
   mode: 'create' | 'edit';
   initialData: AgentProposal | null;
   onSubmit: (payload: ApplyAgentProposalPayload) => void;
+  /** Publish / update as ACTIVE */
   isLoading: boolean;
+  /** Saves as DRAFT via create or update API */
+  onSaveDraft: (payload: ApplyAgentProposalPayload) => void;
 }
 
 export function ProposalFormDialog({
@@ -145,13 +215,14 @@ export function ProposalFormDialog({
   initialData,
   onSubmit,
   isLoading,
+  onSaveDraft,
 }: ProposalFormDialogProps) {
   const t = useTranslations('ManageProposals');
 
-  const defaultForm: ApplyAgentProposalPayload = {
+  const defaultForm: ProposalFormValues = {
     title: '',
-    commission_rate: 1.5,
-    experience_years: 3,
+    commission_rate: '',
+    experience_years: '',
     pitch_content: '',
     specialty: '',
     price_range: {
@@ -160,11 +231,11 @@ export function ProposalFormDialog({
     },
   };
 
-  const [form, setForm] = React.useState<ApplyAgentProposalPayload>(defaultForm);
+  const [form, setForm] = React.useState<ProposalFormValues>(defaultForm);
   const [errors, setErrors] = React.useState<FormErrors>({});
-  const [touched, setTouched] = React.useState<
-    Partial<Record<keyof ApplyAgentProposalPayload, boolean>>
-  >({});
+  const [touched, setTouched] = React.useState<Partial<Record<keyof ProposalFormValues, boolean>>>(
+    {}
+  );
 
   // Sync form with initialData when dialog opens
   React.useEffect(() => {
@@ -180,7 +251,7 @@ export function ProposalFormDialog({
           rent: { min: 0, max: 0 },
           sale: { min: 0, max: 0 },
         },
-      });
+      } satisfies ProposalFormValues);
     } else {
       setForm(defaultForm);
     }
@@ -194,16 +265,18 @@ export function ProposalFormDialog({
     if (Object.keys(touched).length > 0) {
       const newErrors = validateForm(form, t);
       const filteredErrors: FormErrors = {};
-      (Object.keys(touched) as Array<keyof ApplyAgentProposalPayload>).forEach((key) => {
-        if (touched[key] && newErrors[key]) {
-          (filteredErrors as any)[key] = (newErrors as any)[key];
+      (Object.keys(touched) as Array<keyof ProposalFormValues>).forEach((key) => {
+        if (touched[key] && newErrors[key as keyof FormErrors]) {
+          (filteredErrors as Record<string, string>)[key] = (newErrors as Record<string, string>)[
+            key
+          ];
         }
       });
       setErrors(filteredErrors);
     }
   }, [form, touched, t]);
 
-  const update = (k: keyof ApplyAgentProposalPayload, v: any) => {
+  const update = <K extends keyof ProposalFormValues>(k: K, v: ProposalFormValues[K]) => {
     setForm((prev) => ({ ...prev, [k]: v }));
     setTouched((prev) => ({ ...prev, [k]: true }));
   };
@@ -238,7 +311,15 @@ export function ProposalFormDialog({
     const allErrors = validateForm(form, t);
     setErrors(allErrors);
     if (Object.keys(allErrors).length > 0) return;
-    onSubmit(form);
+    onSubmit(toSubmitPayload(form));
+  };
+
+  const handleSaveDraft = () => {
+    setTouched((prev) => ({ ...prev, title: true, price_range: true }));
+    const draftErrors = validateDraftForm(form, t);
+    setErrors(draftErrors);
+    if (Object.keys(draftErrors).length > 0) return;
+    onSaveDraft(toDraftPayload(form));
   };
 
   return (
@@ -285,8 +366,16 @@ export function ProposalFormDialog({
                     step='0.1'
                     min='0'
                     max='100'
-                    value={form.commission_rate}
-                    onChange={(e) => update('commission_rate', parseFloat(e.target.value) || 0)}
+                    value={form.commission_rate === '' ? '' : form.commission_rate}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if (raw === '') {
+                        update('commission_rate', '');
+                        return;
+                      }
+                      const n = parseFloat(raw);
+                      update('commission_rate', Number.isFinite(n) ? n : '');
+                    }}
                     onBlur={() => setTouched((prev) => ({ ...prev, commission_rate: true }))}
                     className={cn(errors.commission_rate ? INPUT_ERROR : INPUT_DEFAULT, 'pr-8')}
                   />
@@ -302,8 +391,16 @@ export function ProposalFormDialog({
                     type='number'
                     min='0'
                     max='60'
-                    value={form.experience_years}
-                    onChange={(e) => update('experience_years', parseInt(e.target.value) || 0)}
+                    value={form.experience_years === '' ? '' : form.experience_years}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if (raw === '') {
+                        update('experience_years', '');
+                        return;
+                      }
+                      const n = parseInt(raw, 10);
+                      update('experience_years', Number.isNaN(n) ? '' : n);
+                    }}
                     onBlur={() => setTouched((prev) => ({ ...prev, experience_years: true }))}
                     className={cn(errors.experience_years ? INPUT_ERROR : INPUT_DEFAULT, 'pr-8')}
                   />
@@ -317,7 +414,10 @@ export function ProposalFormDialog({
             <br />
             {/* Specialty Field */}
             <Field label={t('fieldSpecialty')} error={errors.specialty}>
-              <Select value={form.specialty} onValueChange={(v) => update('specialty', v)}>
+              <Select
+                value={form.specialty || undefined}
+                onValueChange={(v) => update('specialty', v)}
+              >
                 <SelectTrigger
                   className={cn(errors.specialty ? INPUT_ERROR : INPUT_DEFAULT, 'h-10')}
                 >
@@ -484,7 +584,7 @@ export function ProposalFormDialog({
           </div>
 
           {/* ── Footer ── */}
-          <div className='flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/60 px-6 py-4'>
+          <div className='flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 bg-slate-50/60 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4'>
             <DialogClose asChild>
               <Button
                 type='button'
@@ -494,6 +594,15 @@ export function ProposalFormDialog({
                 {t('btnCancel')}
               </Button>
             </DialogClose>
+            <Button
+              type='button'
+              variant='outline'
+              disabled={isLoading}
+              onClick={handleSaveDraft}
+              className='h-9 rounded-lg border-slate-200 px-4 text-sm font-medium text-slate-700 hover:bg-slate-100'
+            >
+              {t('btnSaveDraft')}
+            </Button>
             <Button
               type='submit'
               disabled={isLoading || !isFormValid}
