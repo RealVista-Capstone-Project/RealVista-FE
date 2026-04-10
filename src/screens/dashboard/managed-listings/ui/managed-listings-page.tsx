@@ -68,6 +68,9 @@ export function ManagedListingsPage() {
   const { data: listingResponse, isLoading: isDetailLoading } = useQuery({
     ...listingQueries.detail(selectedListingId || ''),
     enabled: !!selectedListingId,
+    // Poll every 2 minutes so status changes from the expiry scheduler
+    // (which runs hourly) are reflected without a manual page refresh.
+    refetchInterval: 2 * 60 * 1000,
   });
 
   // Extract listing detail from response
