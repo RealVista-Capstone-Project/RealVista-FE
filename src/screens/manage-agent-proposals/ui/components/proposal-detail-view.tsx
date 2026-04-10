@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { cn } from '@/shared/lib/utils';
+import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { AgentProposal, AgentProposalStatus } from '@/entities/agent-proposal/model/types';
@@ -211,7 +211,8 @@ export function ProposalDetailView({
                             {t('rentRange')}:
                           </span>
                           <span>
-                            {proposal.price_range.rent.min} - {proposal.price_range.rent.max}
+                            {formatVND(proposal.price_range.rent.min)} –{' '}
+                            {formatVND(proposal.price_range.rent.max)}
                           </span>
                         </div>
                       )}
@@ -222,7 +223,8 @@ export function ProposalDetailView({
                             {t('saleRange')}:
                           </span>
                           <span>
-                            {proposal.price_range.sale.min} - {proposal.price_range.sale.max}
+                            {formatVND(proposal.price_range.sale.min)} –{' '}
+                            {formatVND(proposal.price_range.sale.max)}
                           </span>
                         </div>
                       )}

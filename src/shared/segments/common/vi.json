@@ -470,6 +470,7 @@
     "fieldSpecialtyPlaceholder": "Chọn loại hình bất động sản bạn am hiểu nhất",
     "fieldPriceRange": "Khoảng giá dự kiến",
     "fieldPriceRangeDescription": "Khoảng giá mà bạn thường xuyên giao dịch thành công",
+    "fieldPriceRangeHint": "Nhập đủ số tiền VND (ví dụ 15.000.000 tương đương 15 triệu).",
     "rentRange": "Thuê",
     "saleRange": "Bán",
     "minPrice": "Tối thiểu",
@@ -499,7 +500,8 @@
       "experienceMax": "Số năm kinh nghiệm không hợp lệ",
       "pitchRequired": "Nội dung thuyết minh là bắt buộc",
       "pitchTooShort": "Nội dung phải có ít nhất 50 ký tự",
-      "pitchTooLong": "Nội dung không được vượt quá 2000 ký tự"
+      "pitchTooLong": "Nội dung không được vượt quá 2000 ký tự",
+      "priceRangeMinMax": "Giá tối thiểu không được lớn hơn giá tối đa"
     },
     "footerCreated": "Tạo lúc: {date}",
     "footerUpdated": "Cập nhật: {date}",

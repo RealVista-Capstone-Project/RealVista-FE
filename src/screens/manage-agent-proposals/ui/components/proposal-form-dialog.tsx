@@ -24,6 +24,7 @@ import {
 } from '@/shared/ui/select';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { AgentProposal, ApplyAgentProposalPayload } from '@/entities/agent-proposal/model/types';
+import { VndAmountInput } from '@/shared/ui/vnd-amount-input';
 
 /* ─── Form validation ─── */
 interface FormErrors {
@@ -67,6 +68,23 @@ function validateForm(
     errors.pitch_content = t('validation.pitchTooShort');
   } else if (form.pitch_content.trim().length > 2000) {
     errors.pitch_content = t('validation.pitchTooLong');
+  }
+
+  const pr = form.price_range;
+  const rent = pr?.rent;
+  const sale = pr?.sale;
+  const rentInvalid =
+    rent != null &&
+    rent.min > 0 &&
+    rent.max > 0 &&
+    rent.min > rent.max;
+  const saleInvalid =
+    sale != null &&
+    sale.min > 0 &&
+    sale.max > 0 &&
+    sale.min > sale.max;
+  if (rentInvalid || saleInvalid) {
+    errors.price_range = t('validation.priceRangeMinMax');
   }
 
   return errors;
@@ -321,11 +339,19 @@ export function ProposalFormDialog({
             {/* Price Range Fields */}
             <div className='space-y-3.5'>
               <div>
-                <label className='text-sm font-medium text-slate-700 block mb-1'>
-                  {t('fieldPriceRange')}
-                </label>
-                <p className='text-[11px] text-slate-400 mb-3 leading-relaxed'>
+                <div className='flex items-start justify-between gap-2 mb-1'>
+                  <label className='text-sm font-medium text-slate-700'>
+                    {t('fieldPriceRange')}
+                  </label>
+                  {errors.price_range && (
+                    <span className='text-xs text-red-500 shrink-0'>{errors.price_range}</span>
+                  )}
+                </div>
+                <p className='text-[11px] text-slate-400 mb-1 leading-relaxed'>
                   {t('fieldPriceRangeDescription')}
+                </p>
+                <p className='text-[11px] text-slate-500 mb-3 leading-relaxed'>
+                  {t('fieldPriceRangeHint')}
                 </p>
               </div>
 
@@ -335,32 +361,28 @@ export function ProposalFormDialog({
                   <span className='text-[11px] font-bold text-indigo-600 uppercase tracking-wider'>
                     {t('rentRange')}
                   </span>
-                  <div className='flex items-center gap-2'>
-                    <div className='flex-1'>
+                  <div className='flex items-start gap-2'>
+                    <div className='flex-1 min-w-0'>
                       <span className='text-[9px] text-slate-400 block mb-1'>{t('minPrice')}</span>
-                      <input
-                        type='number'
-                        min='0'
-                        value={form.price_range?.rent?.min || 0}
-                        onChange={(e) =>
-                          updatePriceRange('rent', 'min', parseInt(e.target.value) || 0)
+                      <VndAmountInput
+                        value={form.price_range?.rent?.min ?? 0}
+                        onChange={(n) => updatePriceRange('rent', 'min', n)}
+                        inputClassName={
+                          errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
-                        className={INPUT_DEFAULT}
-                        placeholder='Min'
+                        placeholder={t('minPrice')}
                       />
                     </div>
-                    <div className='mt-5 text-slate-300'>—</div>
-                    <div className='flex-1'>
+                    <div className='shrink-0 pt-7 text-slate-300'>—</div>
+                    <div className='flex-1 min-w-0'>
                       <span className='text-[9px] text-slate-400 block mb-1'>{t('maxPrice')}</span>
-                      <input
-                        type='number'
-                        min='0'
-                        value={form.price_range?.rent?.max || 0}
-                        onChange={(e) =>
-                          updatePriceRange('rent', 'max', parseInt(e.target.value) || 0)
+                      <VndAmountInput
+                        value={form.price_range?.rent?.max ?? 0}
+                        onChange={(n) => updatePriceRange('rent', 'max', n)}
+                        inputClassName={
+                          errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
-                        className={INPUT_DEFAULT}
-                        placeholder='Max'
+                        placeholder={t('maxPrice')}
                       />
                     </div>
                   </div>
@@ -371,32 +393,28 @@ export function ProposalFormDialog({
                   <span className='text-[11px] font-bold text-violet-600 uppercase tracking-wider'>
                     {t('saleRange')}
                   </span>
-                  <div className='flex items-center gap-2'>
-                    <div className='flex-1'>
+                  <div className='flex items-start gap-2'>
+                    <div className='flex-1 min-w-0'>
                       <span className='text-[9px] text-slate-400 block mb-1'>{t('minPrice')}</span>
-                      <input
-                        type='number'
-                        min='0'
-                        value={form.price_range?.sale?.min || 0}
-                        onChange={(e) =>
-                          updatePriceRange('sale', 'min', parseInt(e.target.value) || 0)
+                      <VndAmountInput
+                        value={form.price_range?.sale?.min ?? 0}
+                        onChange={(n) => updatePriceRange('sale', 'min', n)}
+                        inputClassName={
+                          errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
-                        className={INPUT_DEFAULT}
-                        placeholder='Min'
+                        placeholder={t('minPrice')}
                       />
                     </div>
-                    <div className='mt-5 text-slate-300'>—</div>
-                    <div className='flex-1'>
+                    <div className='shrink-0 pt-7 text-slate-300'>—</div>
+                    <div className='flex-1 min-w-0'>
                       <span className='text-[9px] text-slate-400 block mb-1'>{t('maxPrice')}</span>
-                      <input
-                        type='number'
-                        min='0'
-                        value={form.price_range?.sale?.max || 0}
-                        onChange={(e) =>
-                          updatePriceRange('sale', 'max', parseInt(e.target.value) || 0)
+                      <VndAmountInput
+                        value={form.price_range?.sale?.max ?? 0}
+                        onChange={(n) => updatePriceRange('sale', 'max', n)}
+                        inputClassName={
+                          errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
-                        className={INPUT_DEFAULT}
-                        placeholder='Max'
+                        placeholder={t('maxPrice')}
                       />
                     </div>
                   </div>

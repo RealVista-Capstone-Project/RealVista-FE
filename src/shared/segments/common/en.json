@@ -467,6 +467,7 @@
     "fieldSpecialtyPlaceholder": "Select the property type you're most expert in",
     "fieldPriceRange": "Expected Price Range",
     "fieldPriceRangeDescription": "The price range you usually trade successfully in",
+    "fieldPriceRangeHint": "Enter the full amount in VND (e.g. 15,000,000 ≈ 15 million).",
     "rentRange": "Rent",
     "saleRange": "Sale",
     "minPrice": "Min",
@@ -496,7 +497,8 @@
       "experienceMax": "Invalid years of experience",
       "pitchRequired": "Pitch content is required",
       "pitchTooShort": "Content must be at least 50 characters",
-      "pitchTooLong": "Content must not exceed 2000 characters"
+      "pitchTooLong": "Content must not exceed 2000 characters",
+      "priceRangeMinMax": "Minimum price cannot be greater than maximum price"
     },
     "footerCreated": "Created: {date}",
     "footerUpdated": "Updated: {date}",
