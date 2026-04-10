@@ -23,7 +23,11 @@ import {
   SelectLabel,
 } from '@/shared/ui/select';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
-import { AgentProposal, ApplyAgentProposalPayload } from '@/entities/agent-proposal/model/types';
+import {
+  AgentProposal,
+  ApplyAgentProposalPayload,
+  getAgentProposalSpecialtyCode,
+} from '@/entities/agent-proposal/model/types';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input';
 
 /* ─── Form validation ─── */
@@ -171,7 +175,7 @@ export function ProposalFormDialog({
         commission_rate: initialData.commission_rate,
         experience_years: initialData.experience_years,
         pitch_content: initialData.pitch_content,
-        specialty: initialData.specialty || '',
+        specialty: getAgentProposalSpecialtyCode(initialData),
         price_range: initialData.price_range || {
           rent: { min: 0, max: 0 },
           sale: { min: 0, max: 0 },

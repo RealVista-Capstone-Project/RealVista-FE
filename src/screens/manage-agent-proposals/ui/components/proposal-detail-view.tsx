@@ -17,7 +17,11 @@ import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
-import { AgentProposal, AgentProposalStatus } from '@/entities/agent-proposal/model/types';
+import {
+  AgentProposal,
+  AgentProposalStatus,
+  getAgentProposalSpecialtyCode,
+} from '@/entities/agent-proposal/model/types';
 
 interface ProposalDetailViewProps {
   proposal: AgentProposal;
@@ -83,6 +87,7 @@ export function ProposalDetailView({
 }: ProposalDetailViewProps) {
   const t = useTranslations('ManageProposals');
   const isActive = proposal.status === AgentProposalStatus.ACTIVE;
+  const specialtyCode = getAgentProposalSpecialtyCode(proposal);
 
   const createdDate = new Date(proposal.created_at ?? proposal.updated_at);
   const updatedDate = new Date(proposal.updated_at);
@@ -177,7 +182,7 @@ export function ProposalDetailView({
         </div>
 
         {/* Specialty & Price Range */}
-        {proposal.specialty && (
+        {specialtyCode && (
           <div className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2'>
             <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
               <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 sm:size-10'>
@@ -190,10 +195,10 @@ export function ProposalDetailView({
                 <p className='text-sm font-bold leading-snug text-slate-900 break-words sm:text-base'>
                   {(() => {
                     for (const cat of PROPERTY_TYPES) {
-                      const type = cat.types.find((ty) => ty.code === proposal.specialty);
+                      const type = cat.types.find((ty) => ty.code === specialtyCode);
                       if (type) return type.label;
                     }
-                    return proposal.specialty;
+                    return specialtyCode;
                   })()}
                 </p>
               </div>

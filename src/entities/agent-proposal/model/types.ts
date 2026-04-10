@@ -13,7 +13,10 @@ export interface AgentProposal {
   experience_years: number;
   status: AgentProposalStatus;
   pitch_content: string;
+  /** Property type id (UUID string) from API — legacy / some responses. */
   specialty?: string;
+  /** Property type code — returned on list (get my proposals) for UI. */
+  specialty_code?: string;
   price_range?: {
     rent?: { min: number; max: number };
     sale?: { min: number; max: number };
@@ -43,4 +46,10 @@ export interface AgentProposalPageResponse {
   total_pages: number;
   last: boolean;
   first: boolean;
+}
+
+/** Prefer `specialty_code` (type code for selects/labels); fall back to `specialty`. */
+export function getAgentProposalSpecialtyCode(p: AgentProposal): string {
+  const raw = (p.specialty_code ?? p.specialty ?? '').trim();
+  return raw;
 }
