@@ -38,9 +38,7 @@ export function SubscriptionCTABanner() {
     return () => clearTimeout(timer);
   }, []);
 
-  const { data: subscriptions, isLoading } = useQuery({
-    ...billingQueries.mySubscriptions(),
-  });
+  const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
 
   const isOnTargetPage = ALLOWED_PATH_SUFFIXES.some((suffix) =>
     pathname.endsWith(suffix)
@@ -79,26 +77,28 @@ export function SubscriptionCTABanner() {
 
             {/* Text */}
             <div className='flex flex-col gap-1'>
-              <p className='text-sm font-bold text-zinc-900 leading-snug'>
+              <p className='text-sm font-bold text-main-black leading-snug'>
                 {t('title')}
               </p>
-              <p className='text-xs text-zinc-500 leading-snug'>
+              <p className='text-xs text-grey-500 leading-snug'>
                 {t('description')}
               </p>
             </div>
 
             {/* CTA Button */}
             <button
+              type='button'
               onClick={handleUpgrade}
-              className='w-full rounded-lg bg-zinc-900 text-white text-xs font-semibold py-2 hover:bg-zinc-700 transition-colors cursor-pointer'
+              className='w-full rounded-lg bg-main-black text-white text-xs font-semibold py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
             >
               {t('cta')}
             </button>
 
             {/* Dismiss */}
             <button
+              type='button'
               onClick={handleDismiss}
-              className='text-[11px] text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer text-center'
+              className='text-[11px] text-grey-400 hover:text-grey-600 transition-colors cursor-pointer text-center'
             >
               {t('dismiss')}
             </button>
