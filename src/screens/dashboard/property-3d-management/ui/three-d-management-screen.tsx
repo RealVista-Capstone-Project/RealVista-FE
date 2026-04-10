@@ -87,7 +87,7 @@ function getStatusConfig(status?: string, t?: any) {
       };
     default:
       return {
-        label: status || 'Unknown',
+        label: status || (t ? t('unknownStatus') : 'Unknown'),
         icon: Clock,
         className: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
         dotColor: 'bg-slate-400',
@@ -233,7 +233,7 @@ export function ThreeDManagementScreen({
                   router.push(`/${locale}/dashboard/property`)
                 }
                 className='p-2 hover:bg-accent rounded-xl transition-colors text-muted-foreground hover:text-foreground'
-                aria-label='Go back to properties'
+                aria-label={t('goBackAriaLabel')}
               >
                 <ArrowLeft className='w-5 h-5' />
               </button>
@@ -350,7 +350,7 @@ export function ThreeDManagementScreen({
                             </h2>
                             <div className='flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md'>
                               <span className='w-1.5 h-1.5 rounded-full bg-primary animate-pulse' />
-                              <span className='text-[10px] font-bold text-primary tracking-wider uppercase'>LIVE 3D</span>
+                              <span className='text-[10px] font-bold text-primary tracking-wider uppercase'>{t('live3dBadge')}</span>
                             </div>
                           </div>
                           <p className='text-xs text-white/50 font-medium'>
@@ -382,7 +382,7 @@ export function ThreeDManagementScreen({
                     <div className='h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent' />
                     <div className='flex items-center gap-2 text-[11px] font-medium text-muted-foreground uppercase tracking-widest'>
                       <div className='w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),1)]' />
-                      {t('viewing', { name: '' }).split(':')[0]}
+                      {t('viewingLabel')}
                     </div>
                     <div className='h-px flex-1 bg-gradient-to-r from-border via-border to-transparent' />
                   </div>

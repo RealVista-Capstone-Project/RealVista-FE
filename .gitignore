@@ -52,5 +52,7 @@ history/
 .bv/
 
 .agent/
+.agents/
 .gitnexus
 .opencode
+skills-lock.json

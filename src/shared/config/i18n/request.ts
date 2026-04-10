@@ -45,6 +45,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       // Widget segments
       ...(await import(`@/widgets/recommended-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/ai-chat-assistant/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/spark-viewer/i18n/${locale}.json`)).default,
     },
   };
 });
