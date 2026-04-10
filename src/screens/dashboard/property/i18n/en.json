@@ -20,6 +20,7 @@
     "editAction": "Edit",
     "3dAction": "3D Management",
     "viewAction": "View",
-    "verifyAction": "Verify"
+    "verifyAction": "Verify",
+    "threeDDotTooltip": "Create a 3D tour for this property"
   }
 }

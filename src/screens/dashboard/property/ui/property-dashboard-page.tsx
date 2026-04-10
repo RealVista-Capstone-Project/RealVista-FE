@@ -224,19 +224,28 @@ export default function PropertyDashboardPage() {
                               </span>
                             </Link>
                           </Button>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            className='h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-                            asChild
-                          >
-                            <Link href={`/dashboard/property/${property.property_id}/3d`}>
-                              <Box className='w-4 h-4' />
-                              <span className='sr-only'>
-                                {t('3dAction', { default: '3D Management' })}
+                          <div className='relative inline-flex'>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                              asChild
+                              title={!property.has_3d ? t('threeDDotTooltip') : undefined}
+                            >
+                              <Link href={`/dashboard/property/${property.property_id}/3d`}>
+                                <Box className='w-4 h-4' />
+                                <span className='sr-only'>
+                                  {t('3dAction', { default: '3D Management' })}
+                                </span>
+                              </Link>
+                            </Button>
+                            {!property.has_3d && (
+                              <span className='absolute -top-0.5 -right-0.5 flex h-3 w-3'>
+                                <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75' />
+                                <span className='relative inline-flex rounded-full h-3 w-3 bg-amber-500' />
                               </span>
-                            </Link>
-                          </Button>
+                            )}
+                          </div>
                           <Button
                             variant='ghost'
                             size='icon'

@@ -20,6 +20,7 @@
     "editAction": "Chỉnh sửa",
     "3dAction": "Quản lý 3D",
     "viewAction": "Xem",
-    "verifyAction": "Xác minh"
+    "verifyAction": "Xác minh",
+    "threeDDotTooltip": "Tạo tour 3D cho căn hộ này"
   }
 }
