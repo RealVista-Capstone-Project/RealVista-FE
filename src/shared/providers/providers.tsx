@@ -5,7 +5,6 @@ import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
 import { Toaster } from '@/shared/ui/sonner';
-import { SubscriptionCTABanner } from '@/widgets/billing';
 
 /**
  * App Providers Component
@@ -15,7 +14,9 @@ import { SubscriptionCTABanner } from '@/widgets/billing';
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
  * - Toaster: Displays toast notifications across the application
- * - SubscriptionCTABanner: Renders subscription upgrade CTA for non-premium users
+ *
+ * Note: SubscriptionCTABanner is rendered in the locale layout, inside
+ * NextIntlClientProvider, because it requires both QueryClient and next-intl context.
  *
  * @example
  * ```tsx
@@ -47,7 +48,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           {children}
           <Toaster richColors position='top-right' />
-          <SubscriptionCTABanner />
         </QueryClientProvider>
       </AuthTokenProvider>
     </SessionProvider>
