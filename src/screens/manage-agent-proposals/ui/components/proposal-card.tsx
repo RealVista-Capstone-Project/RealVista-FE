@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { FileText, Award, Percent, Edit3, Trash2, Sparkles } from 'lucide-react';
+import { Award, Percent, Edit3, Trash2, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
@@ -26,6 +26,11 @@ export function ProposalCard({
   const t = useTranslations('ManageProposals');
   const isActive = proposal.status === AgentProposalStatus.ACTIVE;
   const specialtyCode = getAgentProposalSpecialtyCode(proposal);
+  const updatedLabel = React.useMemo(() => {
+    const d = new Date(proposal.updated_at);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  }, [proposal.updated_at]);
   const specialtyLabel = React.useMemo(() => {
     if (!specialtyCode) return '';
     for (const cat of PROPERTY_TYPES) {
@@ -45,12 +50,14 @@ export function ProposalCard({
           : 'border-transparent hover:border-slate-200 hover:bg-slate-50',
       )}
     >
-      {/* Icon */}
+      {/* Updated at */}
       <div className={cn(
-        'mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors',
-        isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200',
+        'mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors tabular-nums',
+        isSelected
+          ? 'bg-indigo-600 text-white'
+          : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200',
       )}>
-        <FileText size={16} />
+        <span className='text-[10px] font-bold leading-none'>{updatedLabel}</span>
       </div>
 
       {/* Content */}
@@ -83,12 +90,14 @@ export function ProposalCard({
           )}
         </div>
 
-        {specialtyLabel && (
-          <div className='mt-1 flex items-center gap-1.5 text-[11px] text-slate-500'>
-            <Sparkles size={12} className='text-indigo-400' />
-            <span className='truncate'>{specialtyLabel}</span>
-          </div>
-        )}
+        <div className='mt-1 flex items-center gap-2 text-[11px] text-slate-500 min-w-0'>
+          {specialtyLabel && (
+            <span className='inline-flex max-w-[65%] items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600'>
+              <Sparkles size={11} className='text-indigo-400 shrink-0' />
+              <span className='truncate'>{specialtyLabel}</span>
+            </span>
+          )}
+        </div>
 
         <div className='mt-1.5 flex items-center gap-3 text-xs text-slate-500'>
           <span className='flex items-center gap-1'>

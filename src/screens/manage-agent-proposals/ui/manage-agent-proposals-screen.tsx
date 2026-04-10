@@ -306,6 +306,11 @@ function TableRow({
 }) {
   const isActive = proposal.status === 'ACTIVE';
   const specialtyCode = getAgentProposalSpecialtyCode(proposal);
+  const updatedLabel = React.useMemo(() => {
+    const d = new Date(proposal.updated_at);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  }, [proposal.updated_at]);
   const specialtyLabel = React.useMemo(() => {
     if (!specialtyCode) return '';
     for (const cat of PROPERTY_TYPES) {
@@ -323,16 +328,16 @@ function TableRow({
         isSelected ? 'bg-indigo-50/80 shadow-inner' : 'hover:bg-slate-50'
       )}
     >
-      {/* Icon */}
+      {/* Updated at */}
       <div
         className={cn(
-          'flex size-10 shrink-0 items-center justify-center rounded-xl transition-all shadow-sm',
+          'flex size-10 shrink-0 items-center justify-center rounded-xl transition-all shadow-sm tabular-nums',
           isSelected
             ? 'bg-indigo-600 text-white scale-105'
-            : 'bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600'
+            : 'bg-slate-100 text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600'
         )}
       >
-        <FileText size={18} />
+        <span className='text-[11px] font-bold leading-none'>{updatedLabel}</span>
       </div>
 
       {/* Title + meta */}
