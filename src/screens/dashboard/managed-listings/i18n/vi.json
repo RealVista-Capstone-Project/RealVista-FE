@@ -82,6 +82,36 @@
       "availableFrom": "Ngày trống",
       "availableImmediately": "Ngay lập tức",
       "notAvailable": "Không có"
+    },
+    "boost": {
+      "title": "Đẩy tin đăng",
+      "subtitle": "Tăng khả năng hiển thị tin đăng",
+      "featured": "Nổi bật",
+      "hotBadge": "Hot Badge",
+      "remaining": "Còn {count}",
+      "apply": "Áp dụng",
+      "remove": "Gỡ bỏ",
+      "removeConfirmTitle": "Gỡ bỏ đẩy tin",
+      "removeConfirmDescription": "Bạn có chắc muốn gỡ bỏ đẩy tin này? Quota sẽ được hoàn lại vào gói của bạn.",
+      "removeConfirmCancel": "Hủy",
+      "removeConfirmApprove": "Gỡ bỏ",
+      "noPackage": "Chưa có gói đẩy tin",
+      "noPackageDescription": "Bạn cần có gói đẩy tin đang hoạt động để đẩy tin đăng.",
+      "buyPackage": "Mua gói",
+      "active": "Đang hoạt động",
+      "applying": "Đang áp dụng...",
+      "removing": "Đang gỡ bỏ...",
+      "applyError": "Không thể áp dụng đẩy tin",
+      "removeError": "Không thể gỡ bỏ đẩy tin"
+    },
+    "lifetime": {
+      "title": "Thời hạn tin đăng",
+      "tooltip": "Tin đăng sẽ tự động chuyển về trạng thái nháp sau 14 ngày. Bạn có thể đăng lại bất cứ lúc nào để bắt đầu lại đếm ngược.",
+      "daysRemaining": "Còn {count} ngày",
+      "oneDayRemaining": "Còn 1 ngày",
+      "hoursRemaining": "Còn {count} giờ",
+      "expiresToday": "Hết hạn hôm nay",
+      "expired": "Đã hết hạn"
     }
   }
 }

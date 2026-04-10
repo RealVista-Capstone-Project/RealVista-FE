@@ -12,6 +12,8 @@ import { ListingStatusActions } from '@/features/listing-status';
 import { PropertyGallery } from '@/features/property-gallery';
 import { RentalFeatures } from '@/features/rental-features';
 import { useDeleteListing } from '@/features/edit-listing-modal/api/use-delete-listing';
+import { ListingLifetimeCard } from './listing-lifetime-card';
+import { ListingBoostSection } from './listing-boost-section';
 import { Link } from '@/shared/config/i18n/navigation';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
@@ -250,124 +252,117 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           <ListingMetricsCard listingId={listing.listing_id} />
         </div>
 
-        {/* Agent Information Card - Show when listing is created by agent (not property owner) */}
-        {showAgentInfo && (
-          <div className='mb-8 overflow-hidden rounded-xl border border-purple-92 bg-gradient-to-br from-purple-98 to-white shadow-sm'>
-            <div className='p-6'>
-              {/* Header */}
-              <div className='mb-4 flex items-center gap-2'>
-                <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-main-primary/10'>
-                  <Building2 className='h-4 w-4 text-main-primary' strokeWidth={2} />
-                </div>
-                <div>
-                  <h3 className='text-sm font-semibold text-main-black'>{t('agent.title')}</h3>
-                  <p className='text-xs text-main-secondary/60'>{t('agent.subtitle')}</p>
-                </div>
-              </div>
-
-              {/* Agent Card */}
-              <div className='flex items-start gap-4 rounded-lg border border-purple-92 bg-white p-4'>
-                {/* Avatar */}
-                <div className='relative shrink-0'>
-                  {listing.agent.avatar_url ? (
-                    <Image
-                      src={listing.agent.avatar_url}
-                      alt={listing.agent.full_name}
-                      width={56}
-                      height={56}
-                      className='h-14 w-14 rounded-full object-cover'
-                    />
-                  ) : (
-                    <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-main-primary to-purple-600'>
-                      <span className='text-lg font-bold text-white'>
-                        {listing.agent.first_name?.[0]}
-                        {listing.agent.last_name?.[0]}
-                      </span>
-                    </div>
-                  )}
-                  {listing.agent.is_verified && (
-                    <div className='absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white'>
-                      <BadgeCheck className='h-4 w-4 fill-blue-500 text-white' strokeWidth={2} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Agent Details */}
-                <div className='flex-1 space-y-3'>
-                  {/* Name and verification */}
+        {/* Agent + Boost - Side by Side */}
+        <div className='flex w-full gap-4 mb-8'>
+          {/* Agent Information Card */}
+          {showAgentInfo && (
+            <div className='flex-1 overflow-hidden rounded-xl border border-purple-92 bg-gradient-to-br from-purple-98 to-white shadow-sm'>
+              <div className='p-6'>
+                {/* Header */}
+                <div className='mb-4 flex items-center gap-2'>
+                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-main-primary/10'>
+                    <Building2 className='h-4 w-4 text-main-primary' strokeWidth={2} />
+                  </div>
                   <div>
-                    <h4 className='text-lg font-bold text-main-black'>
-                      {listing.agent.business_name || listing.agent.full_name}
-                    </h4>
-                    {listing.agent.business_name && listing.agent.full_name && (
-                      <p className='text-sm text-main-secondary/70'>{listing.agent.full_name}</p>
-                    )}
-                    {listing.agent.is_verified && (
-                      <div className='mt-1 flex items-center gap-1.5'>
-                        <BadgeCheck className='h-3.5 w-3.5 text-blue-500' strokeWidth={2} />
-                        <span className='text-xs font-medium text-blue-600'>
-                          {t('agent.verified')}
+                    <h3 className='text-sm font-semibold text-main-black'>{t('agent.title')}</h3>
+                    <p className='text-xs text-main-secondary/60'>{t('agent.subtitle')}</p>
+                  </div>
+                </div>
+
+                {/* Agent Card */}
+                <div className='flex items-start gap-4 rounded-lg border border-purple-92 bg-white p-4'>
+                  {/* Avatar */}
+                  <div className='relative shrink-0'>
+                    {listing.agent.avatar_url ? (
+                      <Image
+                        src={listing.agent.avatar_url}
+                        alt={listing.agent.full_name}
+                        width={56}
+                        height={56}
+                        className='h-14 w-14 rounded-full object-cover'
+                      />
+                    ) : (
+                      <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-main-primary to-purple-600'>
+                        <span className='text-lg font-bold text-white'>
+                          {listing.agent.first_name?.[0]}
+                          {listing.agent.last_name?.[0]}
                         </span>
                       </div>
                     )}
-                  </div>
-
-                  {/* Contact Information */}
-                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-                    {listing.agent.phone && (
-                      <div className='flex items-center gap-2 rounded-lg bg-purple-98 px-3 py-2'>
-                        <Phone className='h-4 w-4 shrink-0 text-main-primary' strokeWidth={2} />
-                        <div className='min-w-0 flex-1'>
-                          <p className='text-xs font-medium text-main-secondary/60'>
-                            {t('agent.phone')}
-                          </p>
-                          <p className='truncate text-sm font-semibold text-main-black'>
-                            {listing.agent.phone}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {listing.agent.email && (
-                      <div className='flex items-center gap-2 rounded-lg bg-purple-98 px-3 py-2'>
-                        <Mail className='h-4 w-4 shrink-0 text-main-primary' strokeWidth={2} />
-                        <div className='min-w-0 flex-1'>
-                          <p className='text-xs font-medium text-main-secondary/60'>
-                            {t('agent.email')}
-                          </p>
-                          <p className='truncate text-sm font-semibold text-main-black'>
-                            {listing.agent.email}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {listing.agent.company && (
-                      <div className='flex items-center gap-2 rounded-lg bg-purple-98 px-3 py-2 sm:col-span-2'>
-                        <Building2 className='h-4 w-4 shrink-0 text-main-primary' strokeWidth={2} />
-                        <div className='min-w-0 flex-1'>
-                          <p className='text-xs font-medium text-main-secondary/60'>
-                            {t('agent.company')}
-                          </p>
-                          <p className='truncate text-sm font-semibold text-main-black'>
-                            {listing.agent.company}
-                          </p>
-                        </div>
+                    {listing.agent.is_verified && (
+                      <div className='absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white'>
+                        <BadgeCheck className='h-4 w-4 fill-blue-500 text-white' strokeWidth={2} />
                       </div>
                     )}
                   </div>
 
-                  {/* Contact Button */}
-                  <button
-                    type='button'
-                    onClick={handleContact}
-                    className='w-full rounded-lg bg-main-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-main-primary/90 hover:shadow-md'
-                  >
-                    {t('agent.contact')}
-                  </button>
+                  {/* Agent Details */}
+                  <div className='flex-1 space-y-3'>
+                    {/* Name and verification */}
+                    <div>
+                      <h4 className='text-lg font-bold text-main-black'>
+                        {listing.agent.business_name || listing.agent.full_name}
+                      </h4>
+                      {listing.agent.business_name && listing.agent.full_name && (
+                        <p className='text-sm text-main-secondary/70'>{listing.agent.full_name}</p>
+                      )}
+                      {listing.agent.is_verified && (
+                        <div className='mt-1 flex items-center gap-1.5'>
+                          <BadgeCheck className='h-3.5 w-3.5 text-blue-500' strokeWidth={2} />
+                          <span className='text-xs font-medium text-blue-600'>
+                            {t('agent.verified')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className='space-y-2 text-sm'>
+                      {listing.agent.phone && (
+                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                          <Phone className='h-4 w-4' strokeWidth={2} />
+                          <span>{listing.agent.phone}</span>
+                        </div>
+                      )}
+                      {listing.agent.email && (
+                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                          <Mail className='h-4 w-4' strokeWidth={2} />
+                          <span>{listing.agent.email}</span>
+                        </div>
+                      )}
+                      {listing.agent.company && (
+                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                          <Building2 className='h-4 w-4' strokeWidth={2} />
+                          <span>{listing.agent.company}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Contact Button */}
+                    <button
+                      type='button'
+                      onClick={handleContact}
+                      className='mt-2 w-full rounded-lg bg-main-primary py-2.5 text-sm font-semibold text-white transition-all hover:bg-main-primary/90 hover:shadow-md'
+                    >
+                      {t('agent.contact')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Boost Section */}
+          {listing.status === 'PUBLISHED' && listing.published_at && (
+            <div className='flex flex-1 flex-col gap-4'>
+              {/* Listing Lifetime - Above Metrics */}
+              <div className='rounded-lg border border-purple-92 bg-purple-98/50 p-4'>
+                <ListingLifetimeCard listing={listing} />
+              </div>
+              <ListingBoostSection listing={listing} />
+            </div>
+          )}
+        </div>
 
         {/* Features Stats - Dynamic attributes from server */}
         <div className='mb-8 rounded-lg border border-purple-92 p-6'>
