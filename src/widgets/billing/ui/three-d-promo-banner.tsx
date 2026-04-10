@@ -82,6 +82,7 @@ export function ThreeDPromoBanner() {
               {/* Dismiss */}
               <button
                 type='button'
+                aria-label={t('dismiss')}
                 onClick={handleDismiss}
                 className='text-amber-400 hover:text-amber-600 transition-colors cursor-pointer shrink-0'
               >
