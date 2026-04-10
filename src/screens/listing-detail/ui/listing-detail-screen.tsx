@@ -56,10 +56,14 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const params = useParams();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
+  // RBAC maps backend 'AGENT' → frontend 'moderator', so we must check backendRoles
+  const backendRoles: string[] = (session?.user as any)?.backendRoles ?? [];
+  const isAgent = backendRoles.includes('AGENT');
+
 
   const { isFavorite, toggleFavorite } = useListingFavorite(
     listing.listing_id,
-    listing.is_favorite ?? false,
+    listing.is_favorite ?? false
   );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
@@ -92,19 +96,19 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   };
 
   const handleBrowseNearby = () => {
-    console.log('Browse nearby');
+    // Browse nearby listings
   };
 
   const handleViewAllPhotos = () => {
-    console.log('View all photos');
+    // Open photo gallery
   };
 
   const handle3DTour = () => {
-    console.log('Open 3D tour');
+    // Open 3D tour
   };
 
   const handleVideo = () => {
-    console.log('Play video');
+    // Play video
   };
 
   const handleContact = () => {
@@ -184,8 +188,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <PriceAndTour
                 price={property.price}
                 listingType={listing.listing_type}
+                phone={listing.agent.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                isAgent={isAgent}
               />
             </div>
 
@@ -206,8 +212,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <PriceAndTour
                 price={property.price}
                 listingType={listing.listing_type}
+                phone={listing.agent.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
+                isAgent={isAgent}
               />
             </div>
           </div>
@@ -259,7 +267,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             className='w-full xs:w-auto max-w-[200px]'
             onClick={handleContact}
           >
-            Apply Now
+            {'Apply Now'}
           </RealVistaButton>
         </div>
       </div>

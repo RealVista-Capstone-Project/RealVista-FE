@@ -1,6 +1,7 @@
 {
   "ManagedListings": {
     "title": "Listings",
+    "createButton": "Create Listing",
     "filter": "Filter",
     "filterPanel": {
       "status": "Status",
@@ -52,6 +53,8 @@
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
     "preview": "Preview",
+    "actions": "Actions",
+    "editListing": "Edit Listing",
     "backToList": "Back to list",
     "agent": {
       "title": "Listing Agent",
@@ -62,6 +65,13 @@
       "verified": "Verified Agent",
       "contact": "Contact Agent"
     },
+    "deleteListing": "Delete Listing",
+    "deleteConfirmTitle": "Delete Listing",
+    "deleteConfirmDescription": "Are you sure you want to delete this listing? This action cannot be undone.",
+    "deleteConfirmCancel": "Cancel",
+    "deleteConfirmApprove": "Delete",
+    "deleting": "Deleting...",
+    "aboutThisListing": "About this listing",
     "features": {
       "properties": "Properties",
       "rooms": "Rooms",
@@ -69,6 +79,8 @@
       "yearBuilt": "Year Built",
       "tenants": "Tenants",
       "request": "Request",
+      "availableFrom": "Date Available",
+      "availableImmediately": "Immediately",
       "notAvailable": "N/A"
     }
   }

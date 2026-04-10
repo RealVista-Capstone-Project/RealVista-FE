@@ -16,7 +16,7 @@ declare module 'next-auth' {
     id: string;
     email: string;
     accessToken?: string;
-    role?: 'user' | 'owner' | 'admin' | 'moderator';
+    role?: 'user' | 'owner' | 'admin' | 'moderator' | 'AGENT';
     avatar?: string;
     backendRoles?: string[];
   }
@@ -28,7 +28,7 @@ declare module 'next-auth' {
     user: {
       id: string;
       email: string;
-      role?: 'user' | 'owner' | 'admin' | 'moderator';
+      role?: 'user' | 'owner' | 'admin' | 'moderator' | 'AGENT';
       avatar?: string;
       accessToken?: string;
       backendRoles?: string[];

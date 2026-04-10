@@ -55,6 +55,26 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.digitaloceanspaces.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cdn.digitaloceanspaces.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.firebasestorage.app',
+        pathname: '/**',
+      },
     ],
     dangerouslyAllowSVG: true,
   },

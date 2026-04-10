@@ -1,6 +1,7 @@
 {
   "ManagedListings": {
-    "title": "Bài đăng",
+    "title": "Danh sách",
+    "createButton": "Tạo mới",
     "filter": "Lọc",
     "filterPanel": {
       "status": "Trạng thái",
@@ -49,10 +50,12 @@
     }
   },
   "ListingDetailPanel": {
-    "addressNotAvailable": "Địa chỉ không có sẵn",
+    "addressNotAvailable": "Không có địa chỉ",
     "showCalendar": "Lịch hẹn",
     "preview": "Xem trước",
-    "backToList": "Quay lại danh sách",
+    "actions": "Hành động",
+    "editListing": "Chỉnh sửa",
+    "backToList": "Trở lại danh sách",
     "agent": {
       "title": "Người môi giới",
       "subtitle": "Bài đăng này được quản lý bởi môi giới",
@@ -62,6 +65,13 @@
       "verified": "Môi giới đã xác thực",
       "contact": "Liên hệ môi giới"
     },
+    "deleteListing": "Xóa bài đăng",
+    "deleteConfirmTitle": "Xóa bài đăng",
+    "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.",
+    "deleteConfirmCancel": "Hủy",
+    "deleteConfirmApprove": "Xóa",
+    "deleting": "Đang xóa...",
+    "aboutThisListing": "Về bài đăng này",
     "features": {
       "properties": "Bất động sản",
       "rooms": "Phòng",
@@ -69,6 +79,8 @@
       "yearBuilt": "Năm xây dựng",
       "tenants": "Người thuê",
       "request": "Yêu cầu",
+      "availableFrom": "Ngày trống",
+      "availableImmediately": "Ngay lập tức",
       "notAvailable": "Không có"
     }
   }

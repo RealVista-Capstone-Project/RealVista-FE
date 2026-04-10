@@ -1,5 +1,12 @@
 import http from '@/shared/lib/http';
-import type { Listing, ApiResponse, PriceHistory, SimilarListingsResponse, PageResponse, ManagedListingSummary } from '../model/types';
+import type {
+  Listing,
+  ApiResponse,
+  PriceHistory,
+  SimilarListingsResponse,
+  PageResponse,
+  ManagedListingSummary,
+} from '../model/types';
 import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/managed-listing';
 
 /**
@@ -7,11 +14,10 @@ import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/
  * This is the data source layer - pure functions that make HTTP requests
  */
 export const listingApi = {
-  /**
-   * Get listing by ID (slug or listing_id)
-   * Returns the full API response with success, message, data, and timestamp
-   */
-  getById: (listingId: string) => http.get<ApiResponse<Listing>>(`/listings/${listingId}`),
+  getById: (listingId: string) =>
+    http.get<ApiResponse<Listing>>(`/listings/${listingId}`, {
+      next: { tags: ['listing-detail', listingId] },
+    }),
 
   /**
    * Get price history for a listing
@@ -64,12 +70,6 @@ export const listingApi = {
   // ==================== Status Update Operations ====================
 
   /**
-   * Submit listing for review (DRAFT → PENDING)
-   */
-  submitForReview: (listingId: string) =>
-    http.patch<ApiResponse<unknown>>(`/listings/${listingId}/submit-for-review`, undefined),
-
-  /**
    * Publish listing (DRAFT/PENDING → PUBLISHED)
    */
   publish: (listingId: string) =>
@@ -92,8 +92,29 @@ export const listingApi = {
    */
   markAsRented: (listingId: string) =>
     http.patch<ApiResponse<unknown>>(`/listings/${listingId}/mark-as-rented`, undefined),
+
+  /**
+   * Create a new listing (DRAFT status)
+   * Requires authentication
+   */
+  createListing: (data: Record<string, unknown>) =>
+    http.post<ApiResponse<unknown>>('/listings', data),
+
+  /**
+   * Update an existing listing (name, price, content, media)
+   * Requires authentication and ownership
+   */
+  updateListing: (listingId: string, data: Record<string, unknown>) =>
+    http.put<ApiResponse<unknown>>(`/listings/${listingId}`, data),
+
+  /**
+   * Delete a listing (soft delete)
+   * Requires authentication and ownership
+   */
+  deleteListing: (listingId: string) => http.delete<ApiResponse<void>>(`/listings/${listingId}`),
 } as const;
 
-// Re-export query keys and queries
+// Re-export query keys, queries, and actions
 export { listingKeys } from './keys';
 export { listingQueries } from './listing.queries';
+export * from './actions';

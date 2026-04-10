@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
 import { MapPin } from 'lucide-react';
@@ -26,16 +26,15 @@ import { formatVND } from '@/shared/lib/utils/format-currency';
 import {
   PropertyFiltersModal,
   type PropertyFilters as PropertyFilterValues,
+  type RentalPeriod,
 } from '@/shared/ui/property-filters-modal';
 import { HCM_CITY_CENTER } from '@/shared/constants';
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
-  category: [],
-  priceRange: { min: 1000, max: 1234567 },
-  bedrooms: 0,
-  bathrooms: 0,
+  priceRange: { min: 0, max: 20000000000 },
   rentalPeriod: 'any',
+  attributes: {},
 };
 
 export interface PropertyMapBasedSearchPageProps {
@@ -50,12 +49,48 @@ export function PropertyMapBasedSearchPage({
   const t = useTranslations('PropertySearch');
   const router = useRouter();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const propertyType = searchParams.get('propertyType');
+
+  const [filters, setFilters] = useState<PropertyFilterValues>(() => {
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const rentalPeriod = searchParams.get('rentalPeriod') as RentalPeriod | null;
+
+    // Extract dynamic attributes from URL (attr_xxx)
+    const attributes: Record<string, number | boolean | string | undefined> = {};
+    searchParams.forEach((value, key) => {
+      if (key.startsWith('attr_')) {
+        const attrKey = key.slice(5).toUpperCase();
+        // Try to parse as number or boolean
+        if (value === 'true') attributes[attrKey] = true;
+        else if (value === 'false') attributes[attrKey] = false;
+        else if (!isNaN(Number(value))) attributes[attrKey] = Number(value);
+        else attributes[attrKey] = value;
+      }
+    });
+
+    // Special case for legacy bedrooms/bathrooms if they exist in URL
+    const bedrooms = searchParams.get('bedrooms');
+    const bathrooms = searchParams.get('bathrooms');
+    if (bedrooms) attributes['BEDROOMS'] = Number(bedrooms);
+    if (bathrooms) attributes['BATHROOMS'] = Number(bathrooms);
+
+    return {
+      priceRange: {
+        min: minPrice ? Number(minPrice) : DEFAULT_FILTERS.priceRange.min,
+        max: maxPrice ? Number(maxPrice) : DEFAULT_FILTERS.priceRange.max,
+      },
+      rentalPeriod: rentalPeriod || DEFAULT_FILTERS.rentalPeriod,
+      attributes,
+    };
+  });
+
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
   const [hoveredPropertyIds, setHoveredPropertyIds] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
-  const [filters, setFilters] = useState<PropertyFilterValues>(DEFAULT_FILTERS);
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
@@ -69,15 +104,14 @@ export function PropertyMapBasedSearchPage({
       mapBounds
         ? {
             ...mapBounds,
-            search_text: searchValue,
+            search_text: searchValue || undefined,
             listing_type: initialListingType,
-            category: filters.category.length > 0 ? filters.category.join(',') : undefined,
-            min_price: filters.priceRange.min,
-            max_price: filters.priceRange.max,
-            // TODO: will be refactored with generic Attribute filters
-            bedrooms: filters.bedrooms > 0 ? filters.bedrooms : undefined,
-            bathrooms: filters.bathrooms > 0 ? filters.bathrooms : undefined,
-            rental_period: filters.rentalPeriod,
+            property_type: propertyType || undefined,
+            min_price: filters.priceRange.min > 0 ? filters.priceRange.min : undefined,
+            max_price: filters.priceRange.max < 20000000000 ? filters.priceRange.max : undefined,
+            bedrooms: (filters.attributes.BEDROOMS as number) || undefined,
+            bathrooms: (filters.attributes.BATHROOMS as number) || undefined,
+            rental_period: filters.rentalPeriod !== 'any' ? filters.rentalPeriod : undefined,
             page: currentPage,
             size: pageSize,
           }
@@ -91,7 +125,7 @@ export function PropertyMapBasedSearchPage({
   const totalElements = searchResponse?.payload.data.total_elements || 0;
 
   // Group properties by coordinates to handle duplicates
-  const groupedProperties = properties.reduce(
+  const groupedProperties = properties.reduce<Record<string, PropertyListingDto[]>>(
     (acc, property) => {
       const key = `${property.coordinates.latitude},${property.coordinates.longitude}`;
       if (!acc[key]) {
@@ -100,10 +134,10 @@ export function PropertyMapBasedSearchPage({
       acc[key].push(property);
       return acc;
     },
-    {} as Record<string, PropertyListingDto[]>
+    {}
   );
 
-  const propertyLocations: PropertyLocation[] = Object.values(groupedProperties).map((group) => {
+  const propertyLocations: PropertyLocation[] = Object.values(groupedProperties).map((group: PropertyListingDto[]) => {
     const firstProperty = group[0];
     const propertyIds = group.map((p) => p.listing_id);
 
@@ -165,7 +199,7 @@ export function PropertyMapBasedSearchPage({
       return;
     }
     const currentFavorite =
-      favoriteOverrides[id] ?? properties.find((p) => p.listing_id === id)?.is_favorite ?? false;
+      favoriteOverrides[id] ?? properties.find((p: PropertyListingDto) => p.listing_id === id)?.is_favorite ?? false;
     setFavoriteOverrides((prev) => ({ ...prev, [id]: !currentFavorite }));
     try {
       await bookmarkApi.toggleBookmark(id);
@@ -247,22 +281,22 @@ export function PropertyMapBasedSearchPage({
               priceFilter={{
                 label: t('anyPrice'),
                 value: 'any',
-                onClick: () => console.log('Price filter'),
+                onClick: () => {},
               }}
               bedsFilter={{
                 label: `2-4 ${t('beds')}`,
                 value: '2-4',
-                onClick: () => console.log('Beds filter'),
+                onClick: () => {},
               }}
               typeFilter={{
                 label: t('allTypes'),
                 value: 'all',
-                onClick: () => console.log('Type filter'),
+                onClick: () => {},
               }}
               sortFilter={{
                 label: t('newest'),
                 value: 'newest',
-                onClick: () => console.log('Sort filter'),
+                onClick: () => {},
               }}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
@@ -300,7 +334,9 @@ export function PropertyMapBasedSearchPage({
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}
-                    onClick={() => router.push(`/${locale}/listing/${property.slug || property.listing_id}`)}
+                    onClick={() =>
+                      router.push(`/${locale}/listing/${property.slug || property.listing_id}`)
+                    }
                     className={
                       selectedPropertyIds.includes(property.listing_id)
                         ? 'ring-2 ring-main-primary'
@@ -329,21 +365,14 @@ export function PropertyMapBasedSearchPage({
           open={filtersModalOpen}
           onOpenChange={setFiltersModalOpen}
           filters={filters}
+          propertyType={propertyType || undefined}
           onApply={handleApplyFilters}
           onReset={handleResetFilters}
           translations={{
             title: t('moreFiltersTitle'),
             category: t('category'),
-            categories: {
-              residential: t('categories.residential'),
-              commercial: t('categories.commercial'),
-              industrial: t('categories.industrial'),
-              land: t('categories.land'),
-            },
             priceRange: t('priceRange'),
             features: t('features'),
-            bedroom: t('bedroom'),
-            bathroom: t('bathroom'),
             rentalPeriod: {
               label: t('rentalPeriod.label'),
               any: t('rentalPeriod.any'),

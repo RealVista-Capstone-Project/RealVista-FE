@@ -3,19 +3,15 @@ import { hasLocale } from 'next-intl';
 import { routing } from './routing';
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  // Typically corresponds to the `[locale]` segment
   const requested = await requestLocale;
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
   return {
     locale,
     messages: {
-      // Shared segments
       ...(await import(`@/shared/segments/common/${locale}.json`)).default,
-      // UI components
       ...(await import(`@/shared/ui/profile-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/shared/ui/login-required-modal/i18n/${locale}.json`)).default,
-      // Feature segments
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
       ...(await import(`@/features/auth/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing-status/i18n/${locale}.json`)).default,
@@ -26,17 +22,30 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/rent-price-history/i18n/${locale}.json`)).default,
       ...(await import(`@/features/rental-features/i18n/${locale}.json`)).default,
       ...(await import(`@/features/agent-engagement/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/rental-contract/i18n/${locale}.json`)).default,
       // Screen segments
+      ...(await import(`@/screens/dashboard/property/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/dashboard/property-3d-management/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/favorited/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/manage-agent/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/subscribe/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/manage-rental-contract/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/create-rental-contract/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/lease-signing-complete/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/my-rental-contracts/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/owner-properties/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/managed-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing-analytics/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-search/i18n/${locale}.json`)).default,
       ...(await import(`@/features/engagement/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/buy/i18n/${locale}.json`)).default,
       // Widget segments
       ...(await import(`@/widgets/recommended-listings/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/ai-chat-assistant/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/notification-dropdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/chat/i18n/${locale}.json`)).default,
     },
   };
 });

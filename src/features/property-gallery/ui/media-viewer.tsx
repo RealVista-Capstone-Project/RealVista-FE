@@ -5,18 +5,21 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 
-import { X, Heart } from 'lucide-react';
+import { X, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { SharePopover } from '@/features/property-header/ui/share-popover';
 import { VisuallyHidden } from '@/shared/ui';
+
+import { SparkViewer } from '@/widgets/spark-viewer/SparkViewer';
+import type { PropertyImage } from '@/entities/property';
 
 export type MediaType = 'photos' | '3d-tour' | 'video';
 
 export interface MediaViewerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  images?: string[];
+  media?: PropertyImage[];
   defaultTab?: MediaType;
   onFavorite?: () => void;
   onRequestTour?: () => void;
@@ -53,7 +56,7 @@ MediaViewerOverlay.displayName = DialogPrimitive.Overlay.displayName;
 export function MediaViewer({
   open,
   onOpenChange,
-  images = [],
+  media = [],
   defaultTab = 'photos',
   onFavorite,
   onRequestTour,
@@ -63,21 +66,38 @@ export function MediaViewer({
   const [activeTab, setActiveTab] = React.useState<MediaType>(defaultTab);
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
-  const tabs: { id: MediaType; label: string }[] = [
-    { id: 'photos', label: t('photosTab') },
-    { id: '3d-tour', label: t('tour3DTab') },
-    { id: 'video', label: t('videoTab') },
+  // Categorize media
+  const photos = React.useMemo(() => media.filter((m) => m.type === 'photo'), [media]);
+  const videos = React.useMemo(() => media.filter((m) => m.type === 'video'), [media]);
+  const tours = React.useMemo(() => media.filter((m) => m.type === '3d-tour'), [media]);
+
+  const currentMediaItems = React.useMemo(() => {
+    if (activeTab === 'photos') return photos;
+    if (activeTab === 'video') return videos;
+    if (activeTab === '3d-tour') return tours;
+    return [];
+  }, [activeTab, photos, videos, tours]);
+
+  const tabs: { id: MediaType; label: string; count: number }[] = [
+    { id: 'photos', label: t('photosTab'), count: photos.length },
+    { id: '3d-tour', label: t('tour3DTab'), count: tours.length },
+    { id: 'video', label: t('videoTab'), count: videos.length },
   ];
 
+  // Reset index when tab changes
+  React.useEffect(() => {
+    setCurrentIndex(0);
+  }, [activeTab]);
+
   const handlePrevious = () => {
-    if (activeTab === 'photos' && images.length > 0) {
-      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+    if (currentMediaItems.length > 0) {
+      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : currentMediaItems.length - 1));
     }
   };
 
   const handleNext = () => {
-    if (activeTab === 'photos' && images.length > 0) {
-      setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+    if (currentMediaItems.length > 0) {
+      setCurrentIndex((prev) => (prev < currentMediaItems.length - 1 ? prev + 1 : 0));
     }
   };
 
@@ -86,6 +106,8 @@ export function MediaViewer({
     if (e.key === 'ArrowRight') handleNext();
     if (e.key === 'Escape') onOpenChange(false);
   };
+
+  const currentMedia = currentMediaItems[currentIndex];
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -110,21 +132,24 @@ export function MediaViewer({
               >
                 <X className='size-4' />
               </RealVistaButton>
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    'relative text-base font-medium transition-colors py-3',
-                    activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
-                  )}
-                >
-                  {tab.label}
-                  {activeTab === tab.id && (
-                    <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-main-primary rounded-full' />
-                  )}
-                </button>
-              ))}
+              {tabs.map(
+                (tab) =>
+                  tab.count > 0 && (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        'relative text-base font-medium transition-colors py-3',
+                        activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
+                      )}
+                    >
+                      {tab.label}
+                      {activeTab === tab.id && (
+                        <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-main-primary rounded-full' />
+                      )}
+                    </button>
+                  )
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -156,85 +181,105 @@ export function MediaViewer({
 
           {/* Main Content Area */}
           <div className='flex-1 relative overflow-hidden'>
-            {activeTab === 'photos' && images.length > 0 && (
-              <>
-                {/* Image */}
-                <div className='absolute inset-0 flex items-center justify-center p-4 md:p-8'>
+            <div className='absolute inset-0 flex items-center justify-center p-4 md:p-8'>
+              <div className='relative w-full h-full flex items-center justify-center'>
+                {activeTab === 'photos' && currentMedia && (
+                  <Image
+                    src={currentMedia.url}
+                    alt={currentMedia.alt || t('photoAlt', { index: currentIndex + 1 })}
+                    fill
+                    className='object-contain'
+                    priority
+                    sizes='100vw'
+                  />
+                )}
+
+                {activeTab === 'video' && currentMedia && (
+                  <video
+                    src={currentMedia.url}
+                    controls
+                    autoPlay
+                    className='max-w-full max-h-full rounded-lg shadow-2xl'
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+
+                {activeTab === '3d-tour' && currentMedia && (
                   <div className='relative w-full h-full'>
-                    <Image
-                      src={images[currentIndex]}
-                      alt={t('photoAlt', { index: currentIndex + 1 })}
-                      fill
-                      className='object-contain'
-                      priority
-                      sizes='100vw'
+                    {/* Room name badge — top-left overlay */}
+                    {currentMedia.metadata?.room_name && (
+                      <div className='absolute top-4 left-4 z-10 flex items-center gap-2 rounded-full bg-black/60 backdrop-blur-sm px-4 py-2 text-white text-sm font-semibold pointer-events-none'>
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          width='14'
+                          height='14'
+                          viewBox='0 0 24 24'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          className='opacity-80'
+                        >
+                          <path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z' />
+                        </svg>
+                        <span>{String(currentMedia.metadata.room_name)}</span>
+                        {currentMediaItems.length > 1 && (
+                          <span className='opacity-50 text-xs ml-1'>
+                            {currentIndex + 1}/{currentMediaItems.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <SparkViewer
+                      metadata={currentMedia.metadata}
+                      className='w-full h-full'
                     />
                   </div>
-                </div>
-
-                {/* Navigation Arrows */}
-                {images.length > 1 && (
-                  <>
-                    <button
-                      onClick={handlePrevious}
-                      className='absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors'
-                    >
-                      <svg
-                        width='24'
-                        height='24'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='white'
-                        strokeWidth='2'
-                      >
-                        <path d='M15 18l-6-6 6-6' />
-                      </svg>
-                    </button>
-
-                    <button
-                      onClick={handleNext}
-                      className='absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors'
-                    >
-                      <svg
-                        width='24'
-                        height='24'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='white'
-                        strokeWidth='2'
-                      >
-                        <path d='M9 18l6-6-6-6' />
-                      </svg>
-                    </button>
-                  </>
                 )}
 
-                {/* Counter */}
-                {images.length > 1 && (
-                  <div className='absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-main-black px-4 py-2 text-white text-sm'>
-                    <span>{currentIndex + 1}</span>
-                    <span>/</span>
-                    <span>{images.length}</span>
+                {activeTab === '3d-tour' && !currentMedia && (
+                  <div className='text-center text-white'>
+                    <p className='text-2xl font-bold mb-2'>{t('tour3DPlaceholder')}</p>
+                    <p className='text-white/60'>{t('tour3DPlaceholderDescription')}</p>
                   </div>
                 )}
+
+                {!currentMedia && activeTab !== '3d-tour' && (
+                  <div className='text-center text-white'>
+                    <p className='text-2xl font-bold mb-2'>{t('noMediaTitle') || 'No media available'}</p>
+                    <p className='text-white/60'>{t('noMediaDescription') || 'This content is not available.'}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Navigation Arrows */}
+            {currentMediaItems.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevious}
+                  className='absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors text-white'
+                >
+                  <ChevronLeft className='size-6' />
+                </button>
+
+                <button
+                  onClick={handleNext}
+                  className='absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 p-3 transition-colors text-white'
+                >
+                  <ChevronRight className='size-6' />
+                </button>
               </>
             )}
 
-            {activeTab === '3d-tour' && (
-              <div className='absolute inset-0 flex items-center justify-center text-white'>
-                <div className='text-center'>
-                  <p className='text-2xl font-bold mb-2'>{t('tour3DPlaceholder')}</p>
-                  <p className='text-white/60'>{t('tour3DPlaceholderDescription')}</p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'video' && (
-              <div className='absolute inset-0 flex items-center justify-center text-white'>
-                <div className='text-center'>
-                  <p className='text-2xl font-bold mb-2'>{t('videoPlaceholder')}</p>
-                  <p className='text-white/60'>{t('videoPlaceholderDescription')}</p>
-                </div>
+            {/* Counter */}
+            {currentMediaItems.length > 1 && (
+              <div className='absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-main-black px-4 py-2 text-white text-sm'>
+                <span>{currentIndex + 1}</span>
+                <span>/</span>
+                <span>{currentMediaItems.length}</span>
               </div>
             )}
           </div>

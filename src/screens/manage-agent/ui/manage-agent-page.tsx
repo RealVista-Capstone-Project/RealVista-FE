@@ -49,7 +49,7 @@ function ManageAgentContent() {
 
   if (isLoading) {
     return (
-      <div className='min-h-screen bg-[#F7F7FD] flex items-center justify-center'>
+      <div className='h-full bg-[#F7F7FD] flex items-center justify-center'>
         <div className='flex flex-col items-center gap-4'>
           <div className='h-10 w-10 rounded-full border-[3px] border-main-primary border-t-transparent animate-spin' />
           <p className='text-sm text-gray-500 font-medium tracking-wide'>
@@ -62,7 +62,7 @@ function ManageAgentContent() {
 
   if (isError) {
     return (
-      <div className='min-h-screen bg-[#F7F7FD] flex items-center justify-center'>
+      <div className='h-full bg-[#F7F7FD] flex items-center justify-center'>
         <div className='flex flex-col items-center gap-3 text-center max-w-xs'>
           <div className='h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center shadow-sm'>
             <Users className='h-8 w-8 text-red-400' />
@@ -74,7 +74,7 @@ function ManageAgentContent() {
   }
 
   return (
-    <div className='min-h-screen bg-[#F7F7FD] font-sans'>
+    <div className='h-full bg-[#F7F7FD] font-sans'>
       <div className='container mx-auto px-6 py-6'>
         <div className='flex flex-col lg:flex-row gap-6 items-start'>
           {/* Left Panel */}

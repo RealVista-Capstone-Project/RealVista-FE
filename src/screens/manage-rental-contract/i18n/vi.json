@@ -1,0 +1,34 @@
+{
+  "ManageRentalContract": {
+    "hero": {
+      "eyebrow": "Bảng hợp đồng của chủ nhà",
+      "title": "Quản lý hợp đồng thuê DocuSign với luồng ký rõ ràng",
+      "subtitle": "Theo dõi hợp đồng thuê phía chủ nhà, giám sát từng cột mốc ký trên DocuSign và đưa từng hợp đồng qua vòng đời được quản lý ngay trong dashboard.",
+      "createButton": "Tạo hợp đồng",
+      "stats": {
+        "totalContracts": "Số hợp đồng hiển thị",
+        "activeSelection": "Mục đang chọn"
+      },
+      "noSelection": "Chưa chọn hợp đồng"
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái",
+      "searchPlaceholder": "Tìm theo người thuê hoặc bất động sản..."
+    },
+    "table": {
+      "status": "Trạng thái",
+      "tenant": "Người thuê",
+      "monthlyRent": "Tiền thuê / tháng",
+      "createdDate": "Ngày tạo"
+    },
+    "empty": {
+      "title": "Không tìm thấy hợp đồng thuê nào.",
+      "subtitle": "Hãy thử bộ lọc trạng thái hoặc từ khóa khác."
+    },
+    "pagination": {
+      "showing": "Hiển thị {from}-{to} trên tổng số {total}"
+    },
+    "loading": "Đang tải hợp đồng thuê...",
+    "error": "Tải hợp đồng thuê thất bại. Vui lòng thử lại."
+  }
+}

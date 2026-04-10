@@ -1,0 +1,61 @@
+{
+  "OwnerProperties": {
+    "loading": "Loading properties...",
+    "error": "Failed to load properties. Please try again.",
+    "pageTitle": "Available Properties",
+    "pageSubtitle": "Browse properties from owners looking for an agent.",
+    "filter": {
+      "searchPlaceholder": "Search by address, owner, or type...",
+      "resultCount": "{count} properties found"
+    },
+    "card": {
+      "bedrooms": "beds",
+      "viewDetails": "View details",
+      "proposed": "Proposed"
+    },
+    "empty": {
+      "title": "No properties found.",
+      "subtitle": "Try adjusting your search or check back later.",
+      "selectProperty": "Select a property to view details",
+      "endOfList": "You've reached the end of the list"
+    },
+    "pagination": {
+      "showing": "Showing {from}-{to} of {total}"
+    },
+    "common": {
+      "na": "N/A",
+      "cancel": "Cancel"
+    },
+    "detailPanel": {
+      "title": "Property Details",
+      "propertyInfo": "Property Information",
+      "type": "Type",
+      "usableArea": "Usable Area",
+      "landArea": "Land Area",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "floors": "Floors",
+      "description": "Description",
+      "ownerInfo": "Owner Information",
+      "ownerName": "Owner",
+      "phone": "Phone",
+      "email": "Email",
+      "submitProposal": "Submit Proposal",
+      "alreadyProposed": "Proposal Already Sent",
+      "backToList": "Back to list"
+    },
+    "proposalModal": {
+      "title": "Submit Proposal",
+      "description": "Submit a proposal to handle this property for the owner.",
+      "commissionLabel": "Offered Commission",
+      "commissionPlaceholder": "e.g. 2% or 5,000,000 VND",
+      "messageLabel": "Your Message",
+      "messagePlaceholder": "Introduce yourself and explain why you are the best agent for this property...",
+      "submit": "Send Proposal"
+    },
+    "toast": {
+      "proposalSuccess": "Proposal submitted successfully! The owner will review your request.",
+      "proposalError": "Failed to submit proposal. Please try again."
+    }
+  }
+}

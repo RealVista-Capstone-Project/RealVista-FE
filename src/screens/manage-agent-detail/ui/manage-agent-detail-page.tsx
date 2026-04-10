@@ -25,7 +25,7 @@ export function ManageAgentDetailPage({ initialAgent }: ManageAgentDetailPagePro
   const [agent, setAgent] = useState<AgentEngagement>(initialAgent);
 
   return (
-    <div className='min-h-screen bg-[#F7F7FD] font-sans'>
+    <div className='h-full bg-[#F7F7FD] font-sans'>
       {/* Page Header */}
       <div className='bg-white border-b border-gray-100'>
         <div className='container mx-auto px-6 py-4 flex items-center gap-3'>

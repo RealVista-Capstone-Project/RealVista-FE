@@ -4,6 +4,7 @@ import { Box, Camera, Video } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/shared/lib/utils';
 import type { PropertyImage } from '@/entities/property';
 import { MediaViewer } from './media-viewer';
 
@@ -60,8 +61,6 @@ export function PropertyGallery({
     setMediaViewerOpen(true);
   };
 
-  const imageUrls = safeImages.map((img) => img.url);
-
   if (!mainImage) {
     return (
       <div className='flex items-center justify-center aspect-[4/3] rounded-xl border-2 border-dashed border-grey-300 bg-grey-100'>
@@ -73,8 +72,19 @@ export function PropertyGallery({
   return (
     <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
       {/* Hero Image */}
-      <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full'>
-        <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
+      <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-purple-98'>
+        {mainImage.type === 'video' ? (
+          <video
+            src={mainImage.url}
+            poster={mainImage.thumbnailUrl || undefined}
+            controls
+            playsInline
+            preload='metadata'
+            className='h-full w-full object-cover rounded-xl'
+          />
+        ) : (
+          <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
+        )}
 
         {/* Overlay Action Buttons */}
         <div className='absolute bottom-4 right-4 md:left-4 md:right-auto flex gap-2'>
@@ -141,31 +151,57 @@ export function PropertyGallery({
         </div>
       </div>
 
-      {/* Thumbnail row on mobile, sidebar on desktop */}
       <div className='flex flex-row gap-3 mt-2 sm:mt-0 sm:flex-col sm:gap-3 sm:h-full'>
-        {thumbnailImages.map((image) => (
-          <button
-            key={image.id}
-            onClick={() => setMainImage(image)}
-            className={`
-              group relative rounded-xl overflow-hidden w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1
-              border-2 border-transparent
-              hover:border-main-primary hover:p-1
-              transition-all duration-200 ease-out
-              ${mainImage.id === image.id ? 'border-main-primary p-1' : ''}
-            `}
-          >
-            <div className='relative w-full h-full rounded-lg overflow-hidden'>
-              <Image
-                src={image.url}
-                alt={image.alt}
-                fill
-                className='object-cover transition-transform duration-200 group-hover:scale-105'
-                sizes='(max-width: 768px) 100vw, 400px'
-              />
-            </div>
-          </button>
-        ))}
+        {thumbnailImages.map((image) => {
+          const isVideo = image.type === 'video';
+          const displayedUrl = isVideo ? image.thumbnailUrl : image.url;
+
+          return (
+            <button
+              key={image.id}
+              onClick={() => setMainImage(image)}
+              className={cn(
+                'group relative rounded-xl overflow-hidden w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 border-2 border-transparent transition-all duration-200 ease-out',
+                mainImage.id === image.id
+                  ? 'border-main-primary p-1'
+                  : 'hover:border-main-primary hover:p-1'
+              )}
+            >
+              <div className='relative w-full h-full rounded-lg overflow-hidden bg-purple-98'>
+                {displayedUrl ? (
+                  <Image
+                    src={displayedUrl}
+                    alt={image.alt}
+                    fill
+                    className='object-cover transition-transform duration-200 group-hover:scale-105'
+                    sizes='(max-width: 768px) 100vw, 400px'
+                  />
+                ) : (
+                  <div className='flex h-full w-full items-center justify-center'>
+                    <span className='text-[10px] sm:text-xs text-main-secondary/60'>
+                      {isVideo ? t('video') : t('noImage')}
+                    </span>
+                  </div>
+                )}
+                {isVideo && (
+                  <div className='absolute inset-0 flex items-center justify-center bg-black/20'>
+                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-main-primary shadow-sm'>
+                      <svg
+                        width='16'
+                        height='16'
+                        viewBox='0 0 24 24'
+                        fill='currentColor'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path d='M8 5V19L19 12L8 5Z' />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
 
         {/* Fill remaining space if less than 2 thumbnails */}
         {thumbnailImages.length < 2 &&
@@ -183,7 +219,7 @@ export function PropertyGallery({
       <MediaViewer
         open={mediaViewerOpen}
         onOpenChange={setMediaViewerOpen}
-        images={imageUrls}
+        media={safeImages}
         defaultTab={mediaViewerTab}
         onFavorite={onFavorite}
       />

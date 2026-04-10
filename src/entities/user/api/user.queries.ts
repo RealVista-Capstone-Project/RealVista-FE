@@ -1,6 +1,6 @@
-import { queryOptions } from '@tanstack/react-query'
-import { userApi } from './index'
-import { userKeys } from './keys'
+import { queryOptions } from '@tanstack/react-query';
+import { userApi } from './index';
+import { userKeys } from './keys';
 
 /**
  * User Query Factory
@@ -30,13 +30,27 @@ export const userQueries = {
     }),
 
   /**
-   * Get current authenticated user
+   * Get current authenticated user — returns raw UserProfile (snake_case)
    */
   current: () =>
     queryOptions({
       queryKey: userKeys.current(),
-      queryFn: () => userApi.getCurrent(),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      queryFn: async () => {
+        const response = await userApi.getMe();
+        return response.payload.data; // UserProfile with snake_case fields
+      },
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    }),
+
+  /**
+   * Get current user full profile from /me endpoint
+   */
+  me: () =>
+    queryOptions({
+      queryKey: userKeys.me(),
+      queryFn: () => userApi.getMe(),
+      staleTime: 5 * 60 * 1000,
       retry: 1,
     }),
 
@@ -49,4 +63,14 @@ export const userQueries = {
       queryFn: () => userApi.list(),
       staleTime: 2 * 60 * 1000, // 2 minutes
     }),
-} as const
+  /**
+   * Search user by email for owner assignment
+   */
+  searchByEmail: (email: string) =>
+    queryOptions({
+      queryKey: userKeys.search(email),
+      queryFn: () => userApi.searchByEmail(email),
+      staleTime: 1 * 60 * 1000, // 1 minute
+      enabled: !!email && email.includes('@'),
+    }),
+} as const;

@@ -8,30 +8,67 @@ export interface User {
   email: string
   name?: string
   avatar?: string
-  role?: 'user' | 'admin' | 'moderator'
+  role?: 'user' | 'admin' | 'moderator' | 'AGENT'
   emailVerified?: boolean
   createdAt: string
   updatedAt: string
 }
 
-export interface LoginCredentials {
+/** UserProfile matches the raw snake_case fields returned by the backend */
+export interface UserProfile {
+  user_id: string
   email: string
-  password: string
+  phone?: string
+  first_name?: string | null
+  last_name?: string | null
+  business_name?: string
+  full_name?: string
+  status: string
+  roles?: string[]
+  avatar_url?: string
+  is_email_verified?: boolean
+  is_phone_verified?: boolean
+  email_verified_at?: string | null
+  phone_verified_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface UpdateMeData {
+  email?: string
+  first_name?: string
+  last_name?: string
+  business_name?: string
+  avatar_url?: string
+  phone?: string
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
-  token: string
-  user: User
-  expiresIn: number
+  token: string;
+  user: User;
+  expiresIn: number;
 }
 
 export interface UpdateUserData {
-  name?: string
-  avatar?: string
+  name?: string;
+  avatar?: string;
 }
 
 export interface Session {
-  token: string
-  user: User
-  expiresAt: number
+  token: string;
+  user: User;
+  expiresAt: number;
+}
+
+export interface UserSearchResponse {
+  user_id: string;
+  email: string;
+  full_name: string;
+  masked_phone: string;
+  phone: string;
 }
