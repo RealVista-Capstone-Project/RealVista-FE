@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
 import { Toaster } from '@/shared/ui/sonner';
+import { SubscriptionCTABanner } from '@/widgets/billing';
 
 /**
  * App Providers Component
@@ -45,6 +46,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           {children}
           <Toaster richColors position='top-right' />
+          <SubscriptionCTABanner />
         </QueryClientProvider>
       </AuthTokenProvider>
     </SessionProvider>
