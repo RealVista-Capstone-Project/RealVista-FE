@@ -5,5 +5,11 @@
     "description": "Upgrade your plan to post more listings and reach more buyers.",
     "cta": "Upgrade Now",
     "dismiss": "Don't show again"
+  },
+  "ThreeDPromoBanner": {
+    "badge": "New Feature",
+    "title": "Properties with 3D tours get 3× more views",
+    "description": "Stand out from the competition with immersive 3D room tours that buyers love.",
+    "cta": "Explore 3D Plans"
   }
 }

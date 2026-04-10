@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property/api/property.queries';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { AgentVerificationModal } from '@/features/property-management/ui/components/agent-verification-modal';
+import { ThreeDPromoBanner } from '@/widgets/billing';
 import type {
   PropertySummaryResponse,
   PropertyMediaItem,
@@ -111,6 +112,12 @@ export default function PropertyDashboardPage() {
           </div>
         </div>
 
+        {/* 3D Tour promo banner */}
+        <div className='mt-3'>
+          <ThreeDPromoBanner />
+        </div>
+
+        {/* Loading / Empty / Table states */}
         {isLoading ? (
           <div className='flex justify-center p-12'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
