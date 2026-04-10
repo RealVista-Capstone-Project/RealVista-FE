@@ -1,0 +1,10 @@
+{
+  "Buy": {
+    "searchTitle": "Search Properties to Buy",
+    "searchWithMap": "View Map",
+    "searchWithSearchBar": "View List",
+    "resultsHeader": "Search Results",
+    "noResults": "No results found",
+    "noResultsHint": "Try adjusting your filters or search"
+  }
+}

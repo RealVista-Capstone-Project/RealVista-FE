@@ -14,6 +14,35 @@ export interface User {
   updatedAt: string
 }
 
+/** UserProfile matches the raw snake_case fields returned by the backend */
+export interface UserProfile {
+  user_id: string
+  email: string
+  phone?: string
+  first_name?: string | null
+  last_name?: string | null
+  business_name?: string
+  full_name?: string
+  status: string
+  roles?: string[]
+  avatar_url?: string
+  is_email_verified?: boolean
+  is_phone_verified?: boolean
+  email_verified_at?: string | null
+  phone_verified_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface UpdateMeData {
+  email?: string
+  first_name?: string
+  last_name?: string
+  business_name?: string
+  avatar_url?: string
+  phone?: string
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;

@@ -1,10 +1,12 @@
 import http from '@/shared/lib/http';
-import { ApiResponse } from '@/shared/types/api';
+import type { ApiResponse } from '@/shared/types/api';
 import type {
   User,
+  UserProfile,
   LoginCredentials,
   LoginResponse,
   UpdateUserData,
+  UpdateMeData,
   UserSearchResponse,
 } from '../model/types';
 
@@ -21,6 +23,16 @@ export interface RegisterResponse {
  * This is the data source layer - pure functions that make HTTP requests
  */
 export const userApi = {
+  /**
+   * Get current authenticated user (from /me endpoint)
+   */
+  getMe: () => http.get<ApiResponse<UserProfile>>('/me'),
+
+  /**
+   * Update current authenticated user
+   */
+  updateMe: (data: UpdateMeData) => http.patch<ApiResponse<UserProfile>>('/me', data),
+
   /**
    * Get current authenticated user
    */
@@ -66,8 +78,30 @@ export const userApi = {
   /**
    * Change password
    */
-  changePassword: (data: { oldPassword: string; newPassword: string }) =>
-    http.post('/user/change-password', data, {}),
+  changePassword: (userId: string, data: { current_password: string; new_password: string }) =>
+    http.put<ApiResponse<void>>(`/users/${userId}/password`, data),
+
+  /**
+   * Delete (soft-delete) current user account
+   */
+  deleteAccount: (userId: string) =>
+    http.delete<ApiResponse<void>>(`/users/${userId}`),
+
+
+  /**
+   * Send email OTP to the given email address (updates user's email if changed)
+   */
+  sendEmailOtp: (email: string) =>
+    http.post<ApiResponse<{ expirySeconds: number }>>('/me/send-email-otp', { email }),
+
+  /**
+   * Verify email with OTP
+   */
+  verifyEmail: (otp: string) =>
+    http.post<ApiResponse<UserProfile>>('/me/verify-email', { otp }),
+
+  verifyPhone: (phone?: string) =>
+    http.post<ApiResponse<UserProfile>>('/me/verify-phone', { phone }),
 
   /**
    * Upload avatar

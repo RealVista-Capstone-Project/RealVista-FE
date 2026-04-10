@@ -49,24 +49,17 @@ import { updateAuthTokenCache } from './get-auth-token';
 export function AuthTokenProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
 
+  // Update synchronously during render so the cache is ready before any child
+  // TanStack Query fires its fetch (microtask, before useEffect).
+  // Parent renders before children, so this runs before SettingsPage renders.
+  const token = (session as unknown as { user?: { accessToken?: string } })?.user?.accessToken || null;
+  updateAuthTokenCache(token);
+
+  // Keep useEffect as well to handle async session updates after render
   useEffect(() => {
-    // Extract accessToken from session (type-safe)
-    // Session object structure from NextAuth:
-    // {
-    //   user: {
-    //     id: string,
-    //     email: string,
-    //     name: string,
-    //     role: 'user' | 'admin' | 'moderator',
-    //     avatar?: string,
-    //     accessToken?: string  // <-- This is what we cache
-    //   },
-    //   expires: string
-    // }
-    const token = (session as unknown as { user?: { accessToken?: string } })?.user?.accessToken || null;
     updateAuthTokenCache(token);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.accessToken]); // Depend only on accessToken, not entire session
+  }, [token]);
 
   // Use fragment to avoid unnecessary DOM nodes
   return <>{children}</>;
