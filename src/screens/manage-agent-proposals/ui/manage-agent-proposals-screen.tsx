@@ -261,11 +261,7 @@ export function ManageAgentProposalsScreen() {
         onClose={() => setIsFormOpen(false)}
         mode={formMode}
         initialData={editTarget}
-        isLoading={
-          createMutation.isPending ||
-          updateMutation.isPending ||
-          draftMutation.isPending
-        }
+        isLoading={createMutation.isPending || updateMutation.isPending || draftMutation.isPending}
         onSubmit={handleFormSubmit}
         onSaveDraft={(payload) =>
           draftMutation.mutate({
@@ -306,13 +302,10 @@ function TableRow({
 }) {
   const isActive = proposal.status === 'ACTIVE';
   const specialtyCode = getAgentProposalSpecialtyCode(proposal);
-  const updatedDateParts = React.useMemo(() => {
+  const updatedLabel = React.useMemo(() => {
     const d = new Date(proposal.updated_at);
-    if (Number.isNaN(d.getTime())) return { day: '--', month: '--' };
-    return {
-      day: d.toLocaleDateString('vi-VN', { day: '2-digit' }),
-      month: d.toLocaleDateString('vi-VN', { month: '2-digit' }),
-    };
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('vi-VN');
   }, [proposal.updated_at]);
   const specialtyLabel = React.useMemo(() => {
     if (!specialtyCode) return '';
@@ -334,14 +327,14 @@ function TableRow({
       {/* Updated at */}
       <div
         className={cn(
-          'flex size-10 shrink-0 flex-col items-center justify-center rounded-xl transition-all shadow-sm tabular-nums',
-          isSelected
-            ? 'bg-indigo-600 text-white scale-105'
-            : 'bg-slate-100 text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600'
+          'w-[98px] shrink-0 text-center',
+          isSelected ? 'text-indigo-700' : 'text-slate-500'
         )}
       >
-        <span className='text-[12px] font-bold leading-none'>{updatedDateParts.day}</span>
-        <span className='text-[9px] font-semibold leading-none opacity-80'>{updatedDateParts.month}</span>
+        <p className='text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-0.5'>
+          {t('metricUpdated')}
+        </p>
+        <p className='text-sm font-bold text-slate-600 tabular-nums'>{updatedLabel}</p>
       </div>
 
       {/* Title + meta */}
