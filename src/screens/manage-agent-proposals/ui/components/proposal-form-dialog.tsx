@@ -120,7 +120,7 @@ function Field({
 }
 
 const INPUT_CLASS =
-  'w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all';
+  'w-full min-w-0 rounded-lg border bg-white px-3 py-2 text-sm tabular-nums text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all';
 const INPUT_DEFAULT = `${INPUT_CLASS} border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20`;
 const INPUT_ERROR = `${INPUT_CLASS} border-red-300 focus:border-red-500 focus:ring-red-500/20`;
 
@@ -239,7 +239,7 @@ export function ProposalFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-[600px] p-0 gap-0 rounded-2xl border border-slate-200 shadow-2xl overflow-hidden bg-white'>
+      <DialogContent className='w-[calc(100vw-1.5rem)] max-w-[min(100vw-1.5rem,52rem)] sm:w-full sm:max-w-[52rem] p-0 gap-0 rounded-2xl border border-slate-200 shadow-2xl overflow-hidden bg-white'>
         {/* ── Dialog Header ── */}
         <DialogHeader className='px-6 pt-6 pb-4 border-b border-slate-100'>
           <div className='flex items-center gap-3'>
@@ -355,15 +355,17 @@ export function ProposalFormDialog({
                 </p>
               </div>
 
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5'>
                 {/* Rent Range */}
-                <div className='space-y-2 p-3 rounded-xl border border-slate-100 bg-slate-50/50'>
+                <div className='space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 min-w-0'>
                   <span className='text-[11px] font-bold text-indigo-600 uppercase tracking-wider'>
                     {t('rentRange')}
                   </span>
-                  <div className='flex items-start gap-2'>
-                    <div className='flex-1 min-w-0'>
-                      <span className='text-[9px] text-slate-400 block mb-1'>{t('minPrice')}</span>
+                  <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4'>
+                    <div className='min-w-0'>
+                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                        {t('minPrice')}
+                      </span>
                       <VndAmountInput
                         value={form.price_range?.rent?.min ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'min', n)}
@@ -373,9 +375,10 @@ export function ProposalFormDialog({
                         placeholder={t('minPrice')}
                       />
                     </div>
-                    <div className='shrink-0 pt-7 text-slate-300'>—</div>
-                    <div className='flex-1 min-w-0'>
-                      <span className='text-[9px] text-slate-400 block mb-1'>{t('maxPrice')}</span>
+                    <div className='min-w-0'>
+                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                        {t('maxPrice')}
+                      </span>
                       <VndAmountInput
                         value={form.price_range?.rent?.max ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'max', n)}
@@ -389,13 +392,15 @@ export function ProposalFormDialog({
                 </div>
 
                 {/* Sale Range */}
-                <div className='space-y-2 p-3 rounded-xl border border-slate-100 bg-slate-50/50'>
+                <div className='space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 min-w-0'>
                   <span className='text-[11px] font-bold text-violet-600 uppercase tracking-wider'>
                     {t('saleRange')}
                   </span>
-                  <div className='flex items-start gap-2'>
-                    <div className='flex-1 min-w-0'>
-                      <span className='text-[9px] text-slate-400 block mb-1'>{t('minPrice')}</span>
+                  <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4'>
+                    <div className='min-w-0'>
+                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                        {t('minPrice')}
+                      </span>
                       <VndAmountInput
                         value={form.price_range?.sale?.min ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'min', n)}
@@ -405,9 +410,10 @@ export function ProposalFormDialog({
                         placeholder={t('minPrice')}
                       />
                     </div>
-                    <div className='shrink-0 pt-7 text-slate-300'>—</div>
-                    <div className='flex-1 min-w-0'>
-                      <span className='text-[9px] text-slate-400 block mb-1'>{t('maxPrice')}</span>
+                    <div className='min-w-0'>
+                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                        {t('maxPrice')}
+                      </span>
                       <VndAmountInput
                         value={form.price_range?.sale?.max ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'max', n)}
