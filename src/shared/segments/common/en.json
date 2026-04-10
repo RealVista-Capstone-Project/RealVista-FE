@@ -601,6 +601,7 @@
     "fieldPriceRange": "Expected Price Range",
     "fieldPriceRangeDescription": "The price range you usually trade successfully in",
     "fieldPriceRangeHint": "Enter the full amount in VND (e.g. 15,000,000 ≈ 15 million).",
+    "priceRangeNotSpecified": "Price range not specified",
     "rentRange": "Rent",
     "saleRange": "Sale",
     "minPrice": "Min",

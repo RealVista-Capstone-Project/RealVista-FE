@@ -88,6 +88,11 @@ export function ProposalDetailView({
   const t = useTranslations('ManageProposals');
   const isActive = proposal.status === AgentProposalStatus.ACTIVE;
   const specialtyCode = getAgentProposalSpecialtyCode(proposal);
+  const rentRange = proposal.price_range?.rent;
+  const saleRange = proposal.price_range?.sale;
+  const hasRentRange = !!rentRange && (rentRange.min > 0 || rentRange.max > 0);
+  const hasSaleRange = !!saleRange && (saleRange.min > 0 || saleRange.max > 0);
+  const hasAnyPriceRange = hasRentRange || hasSaleRange;
 
   const createdDate = new Date(proposal.created_at ?? proposal.updated_at);
   const updatedDate = new Date(proposal.updated_at);
@@ -182,27 +187,29 @@ export function ProposalDetailView({
         </div>
 
         {/* Specialty & Price Range */}
-        {specialtyCode && (
+        {(specialtyCode || proposal.price_range) && (
           <div className='grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2'>
-            <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
-              <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 sm:size-10'>
-                <Sparkles size={18} />
+            {specialtyCode && (
+              <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
+                <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 sm:size-10'>
+                  <Sparkles size={18} />
+                </div>
+                <div className='min-w-0 flex-1'>
+                  <p className='mb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400'>
+                    {t('fieldSpecialty')}
+                  </p>
+                  <p className='text-sm font-bold leading-snug text-slate-900 break-words sm:text-base'>
+                    {(() => {
+                      for (const cat of PROPERTY_TYPES) {
+                        const type = cat.types.find((ty) => ty.code === specialtyCode);
+                        if (type) return type.label;
+                      }
+                      return specialtyCode;
+                    })()}
+                  </p>
+                </div>
               </div>
-              <div className='min-w-0 flex-1'>
-                <p className='mb-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400'>
-                  {t('fieldSpecialty')}
-                </p>
-                <p className='text-sm font-bold leading-snug text-slate-900 break-words sm:text-base'>
-                  {(() => {
-                    for (const cat of PROPERTY_TYPES) {
-                      const type = cat.types.find((ty) => ty.code === specialtyCode);
-                      if (type) return type.label;
-                    }
-                    return specialtyCode;
-                  })()}
-                </p>
-              </div>
-            </div>
+            )}
 
             {proposal.price_range && (
               <div className='flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4'>
@@ -214,30 +221,33 @@ export function ProposalDetailView({
                     {t('fieldPriceRange')}
                   </p>
                   <div className='flex flex-col gap-2.5 text-xs font-bold text-slate-900 sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-4 sm:gap-y-2'>
-                    {proposal.price_range.rent &&
-                      (proposal.price_range.rent.min > 0 || proposal.price_range.rent.max > 0) && (
+                    {hasRentRange && (
                         <div className='min-w-0'>
                           <span className='text-[10px] font-medium text-indigo-500'>
                             {t('rentRange')}
                           </span>
                           <p className='mt-0.5 text-xs font-bold leading-relaxed text-slate-900 break-words sm:text-sm'>
-                            {formatVND(proposal.price_range.rent.min)} –{' '}
-                            {formatVND(proposal.price_range.rent.max)}
+                            {formatVND(rentRange?.min ?? 0)} –{' '}
+                            {formatVND(rentRange?.max ?? 0)}
                           </p>
                         </div>
                       )}
-                    {proposal.price_range.sale &&
-                      (proposal.price_range.sale.min > 0 || proposal.price_range.sale.max > 0) && (
+                    {hasSaleRange && (
                         <div className='min-w-0'>
                           <span className='text-[10px] font-medium text-violet-500'>
                             {t('saleRange')}
                           </span>
                           <p className='mt-0.5 text-xs font-bold leading-relaxed text-slate-900 break-words sm:text-sm'>
-                            {formatVND(proposal.price_range.sale.min)} –{' '}
-                            {formatVND(proposal.price_range.sale.max)}
+                            {formatVND(saleRange?.min ?? 0)} –{' '}
+                            {formatVND(saleRange?.max ?? 0)}
                           </p>
                         </div>
                       )}
+                    {!hasAnyPriceRange && (
+                      <p className='text-xs font-medium text-slate-500'>
+                        {t('priceRangeNotSpecified')}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
