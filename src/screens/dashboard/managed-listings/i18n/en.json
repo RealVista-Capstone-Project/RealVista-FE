@@ -82,6 +82,36 @@
       "availableFrom": "Date Available",
       "availableImmediately": "Immediately",
       "notAvailable": "N/A"
+    },
+    "boost": {
+      "title": "Listing Boosts",
+      "subtitle": "Boost your listing visibility",
+      "featured": "Featured",
+      "hotBadge": "Hot Badge",
+      "remaining": "{count} remaining",
+      "apply": "Apply",
+      "remove": "Remove",
+      "removeConfirmTitle": "Remove Boost",
+      "removeConfirmDescription": "Are you sure you want to remove this boost? The quota will be returned to your package.",
+      "removeConfirmCancel": "Cancel",
+      "removeConfirmApprove": "Remove",
+      "noPackage": "No Boost Package",
+      "noPackageDescription": "You need an active boost package to boost your listings.",
+      "buyPackage": "Buy Package",
+      "active": "Active",
+      "applying": "Applying...",
+      "removing": "Removing...",
+      "applyError": "Failed to Apply Boost",
+      "removeError": "Failed to Remove Boost"
+    },
+    "lifetime": {
+      "title": "Listing Lifetime",
+      "tooltip": "Published listings are automatically unpublished after 14 days. Republish anytime to reset the countdown.",
+      "daysRemaining": "{count} days remaining",
+      "oneDayRemaining": "1 day remaining",
+      "hoursRemaining": "{count} hours remaining",
+      "expiresToday": "Expires today",
+      "expired": "Expired"
     }
   }
 }
