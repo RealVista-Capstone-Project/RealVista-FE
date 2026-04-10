@@ -13,6 +13,14 @@ export interface AgentProposal {
   experience_years: number;
   status: AgentProposalStatus;
   pitch_content: string;
+  /** Property type id (UUID string) from API — legacy / some responses. */
+  specialty?: string;
+  /** Property type code — returned on list (get my proposals) for UI. */
+  specialty_code?: string;
+  price_range?: {
+    rent?: { min: number; max: number };
+    sale?: { min: number; max: number };
+  };
 
   created_at: string;
   updated_at: string;
@@ -20,9 +28,16 @@ export interface AgentProposal {
 
 export interface ApplyAgentProposalPayload {
   title: string;
-  commission_rate: number;
-  experience_years: number;
+  commission_rate?: number | null;
+  experience_years?: number | null;
   pitch_content: string;
+  specialty?: string;
+  price_range?: {
+    rent?: { min: number; max: number };
+    sale?: { min: number; max: number };
+  };
+  /** Omit or ACTIVE for publish; DRAFT for save draft. */
+  status?: AgentProposalStatus;
 }
 
 export interface AgentProposalPageResponse {
@@ -33,4 +48,10 @@ export interface AgentProposalPageResponse {
   total_pages: number;
   last: boolean;
   first: boolean;
+}
+
+/** Prefer `specialty_code` (type code for selects/labels); fall back to `specialty`. */
+export function getAgentProposalSpecialtyCode(p: AgentProposal): string {
+  const raw = (p.specialty_code ?? p.specialty ?? '').trim();
+  return raw;
 }
