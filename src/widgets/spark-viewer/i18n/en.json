@@ -1,0 +1,21 @@
+{
+  "SparkViewer": {
+    "loading": "Initialising 3D World...",
+    "resetView": "Reset View",
+    "stopRotation": "Stop Rotation",
+    "autoRotate": "Auto Rotate",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "resolution": "Resolution",
+    "fullResolution": "Full Resolution",
+    "medium": "Medium (500k)",
+    "low": "Low (100k)",
+    "cameraReset": "Camera reset",
+    "fullscreenError": "Error attempting to enable full-screen mode: {error}",
+    "iframeTitle": "3D Spark Viewer",
+    "debugTitle": "Debug Info",
+    "debugMetadata": "Metadata Prop:",
+    "debugUrls": "Extracted URLs:",
+    "debugPropTypes": "Prop Types:"
+  }
+}
