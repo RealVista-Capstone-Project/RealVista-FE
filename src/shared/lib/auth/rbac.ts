@@ -173,13 +173,14 @@ export function canAccessRoute(
  * getRedirectPathByRole('moderator') // '/dashboard'
  * ```
  */
+// TODO: Handle only BackendRole
 export function getRedirectPathByRole(role: UserRole | undefined): string {
   switch (role) {
     case 'owner':
       return '/manage-agent';
     case 'admin':
     case 'moderator':
-      return '/dashboard';
+      return '/dashboard/owner-properties';
     case 'user':
     default:
       return '/buy';
