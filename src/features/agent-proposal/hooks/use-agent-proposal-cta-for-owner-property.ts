@@ -28,18 +28,18 @@ export function useAgentProposalCtaForOwnerProperty(property: OwnerPropertySumma
   const isAgent = backendRoles.includes('AGENT');
   const initiatorId = session?.user?.id;
   const receiverId = property?.owner_id;
+  const targetPropertyId = property?.property_id;
 
   const { data: applyStateResponse } = useQuery({
-    queryKey: ['agent-proposal-apply-state', initiatorId, receiverId],
-    queryFn: () => agentEngagementApi.getAgentProposalApplyState(initiatorId!, receiverId!),
-    enabled: isAgent && !!initiatorId && !!receiverId,
+    queryKey: ['agent-proposal-apply-state', initiatorId, receiverId, targetPropertyId],
+    queryFn: () =>
+      agentEngagementApi.getAgentProposalApplyState(initiatorId!, receiverId!, targetPropertyId!),
+    enabled: isAgent && !!initiatorId && !!receiverId && !!targetPropertyId,
     staleTime: 2 * 60 * 1000,
   });
 
   const cannotApplyProposal =
-    applyBlockedLocal ||
-    applyStateResponse?.payload?.data?.can_apply_proposal === false ||
-    !!property?.has_active_proposal;
+    applyBlockedLocal || applyStateResponse?.payload?.data?.can_apply_proposal === false;
 
   const openApplyModal = useCallback(() => {
     if (!isAuthenticated(session)) {
@@ -53,12 +53,12 @@ export function useAgentProposalCtaForOwnerProperty(property: OwnerPropertySumma
   const onApplySubmitSuccess = useCallback(() => {
     setApplyBlockedLocal(true);
     queryClient.invalidateQueries({ queryKey: ['properties', 'owner-available'] });
-    if (initiatorId && receiverId) {
+    if (initiatorId && receiverId && targetPropertyId) {
       queryClient.invalidateQueries({
-        queryKey: ['agent-proposal-apply-state', initiatorId, receiverId],
+        queryKey: ['agent-proposal-apply-state', initiatorId, receiverId, targetPropertyId],
       });
     }
-  }, [queryClient, initiatorId, receiverId]);
+  }, [queryClient, initiatorId, receiverId, targetPropertyId]);
 
   return {
     isAgent,
