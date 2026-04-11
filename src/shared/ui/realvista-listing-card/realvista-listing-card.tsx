@@ -74,8 +74,12 @@ export function RealVistaListingCard({
   onToggleFavorite,
   onClick,
   className,
+  ...props
 }: RealVistaListingCardProps) {
   const t = useTranslations('PropertyCard');
+
+  // Handle various potential backend field names for boosting
+  const actualBoostTag = boostTag || (props as any).boost_tag || (props as any).boost_package;
 
   const [imgError, setImgError] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -251,7 +255,7 @@ export function RealVistaListingCard({
 
   // Shared Hot Badge (Premium Ribbon style) - High energy red theme
   const HotBadge = () =>
-    boostTag === 'HOT_BADGE' ? (
+    (actualBoostTag === 'HOT_BADGE' || actualBoostTag === 'HOT') && !isUnavailable ? (
       <div className='absolute -bottom-3.75 -left-2 z-10'>
         <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
           <div className='flex items-center gap-1.5'>
@@ -324,7 +328,7 @@ export function RealVistaListingCard({
         >
           {/* Unavailable overlay */}
           {isUnavailable && (
-            <div className='absolute inset-0 rounded-lg bg-white/60 z-[5] pointer-events-none' />
+            <div className='absolute inset-0 rounded-xl bg-white/60 z-[5] pointer-events-none' />
           )}
 
           {/* Image – fixed width */}
@@ -408,6 +412,10 @@ export function RealVistaListingCard({
             priority={false}
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+          {/* Unavailable overlay - Blur effect for sold/rented */}
+          {isUnavailable && (
+            <div className='absolute inset-0 bg-white/60 z-[5] pointer-events-none' />
+          )}
         </div>
 
         {/* Top Badges Row - Moved outside overflow-hidden to prevent clipping of the ribbon fold */}
