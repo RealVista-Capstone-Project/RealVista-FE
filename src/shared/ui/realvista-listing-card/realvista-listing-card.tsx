@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Bath, Heart, BedSingle } from 'lucide-react';
+import { Bath, Heart, BedSingle, Flame } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
 import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
+import { Badge } from '@/shared/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -293,6 +294,38 @@ export function RealVistaListingCard({
       </div>
     ) : null;
 
+  // Shared Hot Badge (Ribbon style)
+  const HotBadge = () =>
+    boostTag === 'HOT_BADGE' ? (
+      <div className='absolute -bottom-3.75 -left-2 z-10'>
+        <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
+          <div className='flex items-center gap-1'>
+            <Flame className='h-4 w-4 fill-white text-white' strokeWidth={2.5} />
+            <span
+              className='text-xs font-bold uppercase leading-4 tracking-[0.5px] text-white'
+              style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
+            >
+              HOT
+            </span>
+          </div>
+          <div className='absolute left-0 top-full h-1 w-1'>
+            <svg
+              width='8'
+              height='8'
+              viewBox='0 0 8 8'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+              preserveAspectRatio='none'
+              className='block'
+              style={{ overflow: 'visible' }}
+            >
+              <path d='M8 8L0 0H8V8Z' fill='#991b1b' />
+            </svg>
+          </div>
+        </div>
+      </div>
+    ) : null;
+
   // ── Confirm unfavorite dialog (shared between variants) ──
   const confirmDialog = (
     <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
@@ -340,9 +373,11 @@ export function RealVistaListingCard({
           )}
 
           {/* Image – fixed width */}
-          <div className='relative w-[280px] min-h-[200px] shrink-0'>
+          <div className='relative w-[280px] min-h-[200px] shrink-0 overflow-hidden'>
             <Image src={image} alt={title} fill className='object-cover' sizes='280px' />
-            <PopularBadge />
+          </div>
+          <div className='absolute left-0 top-0 h-full w-[280px] pointer-events-none z-10'>
+             {isUnavailable ? null : isPopular ? <PopularBadge /> : <HotBadge />}
           </div>
 
           {/* Details */}
@@ -406,22 +441,31 @@ export function RealVistaListingCard({
         )}
         onClick={handleCardClick}
       >
-        {/* Unavailable overlay */}
-        {isUnavailable && (
-          <div className='absolute inset-0 rounded-lg bg-white/60 z-[5] pointer-events-none' />
-        )}
-
-        {/* Property Image */}
-        <div className='relative aspect-[16/10] rounded-t-lg bg-gray-100'>
+        {/* Image Container */}
+        <div className='relative aspect-[4/3] w-full overflow-hidden'>
           <Image
-            src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image' : image}
+            src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=Image+Not+Found' : image}
             alt={title}
             fill
-            className='rounded-t-lg object-cover'
-            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+            className='object-cover transition-transform duration-700 group-hover:scale-110'
             onError={() => setImgError(true)}
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+            priority={false}
           />
-          <PopularBadge />
+          <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+        </div>
+
+        {/* Top Badges Row - Moved outside overflow-hidden to prevent clipping of the ribbon fold */}
+        <div className='absolute left-0 top-0 aspect-[4/3] w-full pointer-events-none z-10'>
+          {isUnavailable ? (
+            <StatusTag marginClass='-ml-4 mt-2 scale-[0.8] origin-left' paddingClass='px-4' />
+          ) : (
+            isPopular ? <PopularBadge /> : <HotBadge />
+          )}
+        </div>
+
+        <div className='absolute bottom-3 right-3'>
+          <FavoriteButton />
         </div>
 
         {/* Property Details */}
