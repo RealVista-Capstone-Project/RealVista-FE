@@ -317,7 +317,7 @@ export function RoomCard({
             </CardHeader>
 
             {/* Card content / actions — translateZ=20 */}
-            <CardItem translateZ={20} className='w-full px-6 pb-6 pt-0'>
+            <CardItem translateZ={20} className='w-full px-6 pt-0'>
               {room.latestOperation.status === 'FAILED' && (
                 <div className='text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/5 rounded-lg px-3 py-2.5 leading-relaxed'>
                   {room.latestOperation.error_message || t('failed')}

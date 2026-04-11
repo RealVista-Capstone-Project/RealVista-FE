@@ -301,8 +301,8 @@ export function DashboardLayout({
 
         />
 
-        {/* Page Content - fills remaining height */}
-        <main className='flex-1 overflow-hidden bg-slate-50/50 p-0'>{children}</main>
+        {/* Page Content - fills remaining height, scrollable */}
+        <main className='flex-1 overflow-y-auto bg-slate-50/50 p-0'>{children}</main>
       </div>
     </div>
   );
