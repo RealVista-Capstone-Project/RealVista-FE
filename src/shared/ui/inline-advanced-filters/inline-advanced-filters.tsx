@@ -28,7 +28,7 @@ export function InlineAdvancedFilters({
 
   // Derive the selected property type from URL params or state
   const selectedPropertyType = useMemo(() => {
-    return (filters as any).propertyType as string | undefined;
+    return filters.propertyType as string | undefined;
   }, [filters]);
 
   // Find attributes for the selected type
@@ -155,8 +155,8 @@ export function InlineAdvancedFilters({
               Loại bất động sản
             </label>
             <Select
-              value={(filters as any).propertyType || undefined}
-              onValueChange={(value) => setFilters({ ...filters, propertyType: value || undefined } as any)}
+              value={filters.propertyType || undefined}
+              onValueChange={(value) => setFilters({ ...filters, propertyType: value || undefined })}
             >
               <SelectTrigger className='w-full md:w-1/2 lg:w-1/3'>
                 <SelectValue placeholder='Tất cả loại' />

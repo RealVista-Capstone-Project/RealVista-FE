@@ -233,6 +233,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
                       area={listing.area}
                       attributes={listing.attributes}
                       listingType={listing.listing_type}
+                      boostTags={listing.is_boosted ? listing.boost_packages : undefined}
                       onClick={() => handleListingClick(listing)}
                       className='h-full transition-shadow duration-300 hover:shadow-lg'
                     />

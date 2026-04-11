@@ -26,9 +26,9 @@ type LandlordConfirmState = 'confirming' | 'confirmed' | 'confirm_error';
 export function LeaseSigningCompletePage() {
   const t = useTranslations('LeaseSigningComplete');
   const searchParams = useSearchParams();
-  const leaseId = searchParams.get('leaseId');
-  const event = searchParams.get('event');
-  const role = searchParams.get('role');
+  const leaseId = searchParams?.get('leaseId');
+  const event = searchParams?.get('event');
+  const role = searchParams?.get('role');
 
   // No event param = direct nav (dev/test); treat as success
   const isSuccess = !event || event === 'signing_complete';
