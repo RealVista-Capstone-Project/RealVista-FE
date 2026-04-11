@@ -1,0 +1,110 @@
+{
+  "Engagement": {
+    "page": {
+      "title": "Lời mời hợp tác",
+      "subtitle": "Theo dõi trạng thái các yêu cầu hợp tác",
+      "viewApplications": "Xem đơn đăng ký",
+      "loading": "Đang tải dữ liệu...",
+      "loadError": "Lỗi không tải được dữ liệu",
+      "createButton": "Mời hợp tác"
+    },
+    "tabs": {
+      "sent": "Gửi từ tôi",
+      "received": "Lời mời đến tôi"
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái",
+      "all": "Tất cả",
+      "searchPlaceholder": "Tìm kiếm theo địa chỉ nhà hoặc tên đối tác...",
+      "pickDate": "Chọn ngày",
+      "clearDate": "Xóa lọc ngày"
+    },
+    "table": {
+      "dateColumn": "Ngày gửi",
+      "propertyColumn": "Nhà / Địa chỉ",
+      "statusColumn": "Trạng thái",
+      "empty": "Không tìm thấy engagement nào.",
+      "clearDateFilter": "Xóa bộ lọc ngày"
+    },
+    "status": {
+      "SUBMITTED": "Đã gửi",
+      "ACCEPTED": "Chấp nhận",
+      "REJECTED": "Từ chối",
+      "CANCELLED": "Đã hủy",
+      "FINISHED": "Hoàn thành"
+    },
+    "listItem": {
+      "noTitle": "Chưa có tiêu đề",
+      "viewDetail": "Chi tiết",
+      "cancelTooltip": "Hủy yêu cầu"
+    },
+    "cancel": {
+      "button": "Hủy hợp tác",
+      "dialogTitle": "Xác nhận hủy hợp tác",
+      "dialogDescription": "Bạn có chắc chắn muốn hủy hợp tác này? Thao tác này không thể hoàn tác.",
+      "reasonPlaceholder": "Nhập lý do hủy hợp tác...",
+      "no": "Không",
+      "confirm": "Xác nhận hủy"
+    },
+    "accept": {
+      "button": "Chấp nhận",
+      "dialogTitle": "Xác nhận chấp nhận",
+      "dialogDescription": "Bạn có chắc chắn muốn chấp nhận engagement này?",
+      "no": "Không",
+      "confirm": "Xác nhận chấp nhận"
+    },
+    "reject": {
+      "button": "Từ chối",
+      "dialogTitle": "Xác nhận từ chối",
+      "dialogDescription": "Bạn có chắc chắn muốn từ chối engagement này? Thao tác này không thể hoàn tác.",
+      "no": "Không",
+      "confirm": "Xác nhận từ chối"
+    },
+    "overview": {
+      "title": "Tổng quan",
+      "last30Days": "30 ngày qua",
+      "total": "Tổng engagements",
+      "accepted": "Được chấp nhận",
+      "pendingRejected": "Đang chờ / Từ chối",
+      "pending": "chờ",
+      "rejected": "từ chối"
+    },
+    "outlook": {
+      "selectPrompt": "Chọn một engagement để xem chi tiết",
+      "messageTitle": "Tin nhắn",
+      "proposalTitle": "Đề xuất của Agent",
+      "commission": "Tỷ lệ hoa hồng",
+      "experience": "Kinh nghiệm",
+      "years": "năm",
+      "rentRange": "Khoảng giá cho thuê",
+      "saleRange": "Khoảng giá bán",
+      "bio": "Giới thiệu",
+      "finish": "Hoàn thành",
+      "invitationDetails": "Chi tiết lời mời",
+      "offeredCommission": "Hoa hồng đề xuất"
+    },
+    "detail": {
+      "panelTitle": "Chi tiết yêu cầu thuê",
+      "noTitle": "Chưa có tiêu đề",
+      "statusLabel": "Trạng thái",
+      "submittedDate": "Ngày gửi",
+      "updatedDate": "Cập nhật",
+      "requestType": "Loại yêu cầu",
+      "applicationTitle": "Tiêu đề đơn",
+      "income": "Thu nhập",
+      "incomePerMonth": "/th",
+      "leaseTerm": "Thời hạn thuê",
+      "leaseTermMonths": "{months} tháng",
+      "moveInDate": "Ngày chuyển vào",
+      "tenants": "Số người thuê",
+      "tenantNote": "Ghi chú từ người thuê",
+      "acceptedMessage": "Chúc mừng! Yêu cầu của bạn đã được chủ nhà chấp nhận.",
+      "rejectedMessage": "Rất tiếc, yêu cầu của bạn đã bị từ chối.",
+      "statusSubmitted": "Đã gửi",
+      "statusAccepted": "Được chấp nhận",
+      "statusRejected": "Từ chối",
+      "statusCancelled": "Đã hủy",
+      "statusFinished": "Hoàn thành"
+    }
+  }
+}
