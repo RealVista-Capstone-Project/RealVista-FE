@@ -1,0 +1,10 @@
+{
+  "Rent": {
+    "searchTitle": "Tìm Kiếm Bất Động Sản Cho Thuê",
+    "searchWithMap": "Xem Bản Đồ",
+    "searchWithSearchBar": "Xem Danh Sách",
+    "resultsHeader": "Kết quả tìm kiếm",
+    "noResults": "Không tìm thấy kết quả",
+    "noResultsHint": "Hãy thử thay đổi bộ lọc hoặc tìm kiếm của bạn"
+  }
+}
