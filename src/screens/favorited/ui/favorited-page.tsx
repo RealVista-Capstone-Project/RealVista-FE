@@ -45,6 +45,7 @@ function mapBookmarkListingToCardProps(item: BookmarkListingCardDTO) {
           ? ('RENTED' as const)
           : undefined,
     attributes: item.attributes,
+    boostTag: item.boost_tag,
   };
 }
 

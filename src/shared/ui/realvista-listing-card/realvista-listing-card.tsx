@@ -39,7 +39,6 @@ export interface RealVistaListingCardProps {
   bathrooms?: number;
   area?: number;
   areaUnit?: string;
-  isPopular?: boolean;
   isFavorite?: boolean;
   statusTag?: 'SOLD' | 'RENTED';
   attributes?: ListingAttribute[];
@@ -61,7 +60,6 @@ export function RealVistaListingCard({
   bathrooms = 0,
   area = 0,
   areaUnit = 'm²',
-  isPopular = false,
   isFavorite = false,
   statusTag,
   attributes,
@@ -71,7 +69,6 @@ export function RealVistaListingCard({
   onToggleFavorite,
   onClick,
   className,
-  ...props
 }: RealVistaListingCardProps) {
   const t = useTranslations('PropertyCard');
 
@@ -79,9 +76,6 @@ export function RealVistaListingCard({
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const isUnavailable = !!statusTag;
-
-  // Data awareness for Favorite page and different backend field names
-  const actualBoostTag = boostTag || (props as any).boost_tag || (props as any).boost_package;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -252,7 +246,7 @@ export function RealVistaListingCard({
 
   // Shared Hot Badge (Premium Ribbon style) - High energy red theme
   const HotBadge = () =>
-    (actualBoostTag === 'HOT_BADGE' || actualBoostTag === 'HOT') && !isUnavailable ? (
+    (boostTag === 'HOT_BADGE' || boostTag === 'HOT') && !isUnavailable ? (
       <div className='absolute -bottom-3.75 -left-2 z-10'>
         <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
           <div className='flex items-center gap-1.5'>
@@ -323,7 +317,7 @@ export function RealVistaListingCard({
           )}
           onClick={handleCardClick}
         >
-          {/* Unavailable overlay - Blur logic */}
+          {/* Unavailable overlay */}
           {isUnavailable && (
             <div className='absolute inset-0 rounded-xl bg-white/60 z-[5] pointer-events-none' />
           )}
@@ -332,6 +326,8 @@ export function RealVistaListingCard({
           <div className='relative w-[280px] min-h-[200px] shrink-0 overflow-hidden rounded-l-xl'>
             <Image src={image} alt={title} fill className='object-cover' sizes='280px' />
           </div>
+
+          {/* Badges Container - Outside overflow-hidden to allow ribbon fold */}
           <div className='absolute left-0 top-0 h-full w-[280px] pointer-events-none z-10'>
             <HotBadge />
           </div>
@@ -397,7 +393,12 @@ export function RealVistaListingCard({
         )}
         onClick={handleCardClick}
       >
-        {/* Image Container */}
+        {/* Unavailable overlay */}
+        {isUnavailable && (
+          <div className='absolute inset-0 rounded-xl bg-white/60 z-[5] pointer-events-none' />
+        )}
+
+        {/* Property Image Container */}
         <div className='relative aspect-[4/3] w-full overflow-hidden rounded-t-xl'>
           <Image
             src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image' : image}
@@ -408,14 +409,9 @@ export function RealVistaListingCard({
             sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
             priority={false}
           />
-          <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
-          {/* Unavailable overlay - Blur logic */}
-          {isUnavailable && (
-            <div className='absolute inset-0 bg-white/60 z-[5] pointer-events-none' />
-          )}
         </div>
 
-        {/* Top Badges Row */}
+        {/* Badges Container - Outside overflow-hidden to allow ribbon fold */}
         <div className='absolute left-0 top-0 aspect-[4/3] w-full pointer-events-none z-10'>
           <HotBadge />
         </div>
