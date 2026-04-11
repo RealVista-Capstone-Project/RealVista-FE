@@ -3,14 +3,14 @@ export interface PropertySummaryResponse {
   property_type_id: string;
   street_address: string;
   status:
-  | 'DRAFT'
-  | 'PENDING'
-  | 'VERIFIED'
-  | 'REJECTED'
-  | 'AVAILABLE'
-  | 'RESERVED'
-  | 'SOLD'
-  | 'RENTED';
+    | 'DRAFT'
+    | 'PENDING'
+    | 'VERIFIED'
+    | 'REJECTED'
+    | 'AVAILABLE'
+    | 'RESERVED'
+    | 'SOLD'
+    | 'RENTED';
   land_size_m2: number | null;
   usable_size_m2: number | null;
   width_m: number | null;
@@ -122,6 +122,100 @@ export interface PropertySearchResponse {
       };
     };
   };
+  timestamp: string;
+}
+
+export interface MyPropertiesSearchCriteria {
+  keyword?: string;
+  status?: string;
+  page: number;
+  size: number;
+}
+
+export interface PropertyTypeInfo {
+  property_type_id: string;
+  property_type_name: string | null;
+  property_type_code: string | null;
+  property_category_id: string | null;
+  property_category_name: string | null;
+  property_category_code: string | null;
+}
+
+export interface LocationInfo {
+  location_id: string;
+  city_name: string | null;
+  district_name: string | null;
+  ward_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PropertyAttributeRangeResponse {
+  range_id: string;
+  label: string;
+  min_value: number | null;
+  max_value: number | null;
+  display_order: number;
+}
+
+export interface PropertyAttributeDefinition {
+  attribute_id: string;
+  attribute_code: string;
+  attribute_name: string;
+  data_type: string;
+  icon: string | null;
+  unit: string | null;
+  ranges: PropertyAttributeRangeResponse[] | null;
+}
+
+export interface PropertySummaryResponse {
+  property_id: string;
+  property_type_id: string;
+  street_address: string;
+  status:
+    | 'DRAFT'
+    | 'PENDING'
+    | 'VERIFIED'
+    | 'REJECTED'
+    | 'AVAILABLE'
+    | 'RESERVED'
+    | 'SOLD'
+    | 'RENTED';
+  land_size_m2: number | null;
+  usable_size_m2: number | null;
+  width_m: number | null;
+  length_m: number | null;
+  area_sqft: number | null;
+  description: string | null;
+  property_type_info: PropertyTypeInfo | null;
+  location_info: LocationInfo | null;
+  attributes: PropertyAttributeItem[] | null;
+  media: PropertyMediaItem[] | null;
+  amenities: PropertyAmenityItem[] | null;
+  owner_name?: string;
+  owner_phone?: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  // snake_case (internal/legacy APIs)
+  total_elements?: number;
+  total_pages?: number;
+  // camelCase (new feed API)
+  totalElements?: number;
+  totalPages?: number;
+  last?: boolean;
+  first?: boolean;
+  has_next?: boolean;
+  has_previous?: boolean;
+}
+
+export interface MyPropertiesResponse {
+  success: boolean;
+  message: string;
+  data: PageResponse<PropertySummaryResponse>;
   timestamp: string;
 }
 
@@ -265,8 +359,13 @@ export interface MyPropertiesSearchCriteria {
 
 export interface OwnerAvailablePropertiesCriteria {
   keyword?: string;
-  propertyTypeId?: string;
-  locationId?: string;
+  property_type_id?: string;
+  location_id?: string;
+  min_rent_price?: number;
+  max_rent_price?: number;
+  min_buy_price?: number;
+  max_buy_price?: number;
+  listing_type?: 'SELL' | 'RENT';
   page: number;
   size: number;
 }
@@ -299,7 +398,7 @@ export interface PropertyAttributeItem {
   value_number: number | null;
   value_text: string | null;
   value_boolean: boolean | null;
-  display_value: string | null;
+  display_value?: string | null;
 }
 
 export interface PropertyMediaItem {
@@ -315,10 +414,21 @@ export interface PropertyMediaItem {
 export interface PropertyAmenityItem {
   amenity_id: string;
   amenity_name: string;
-  amenity_type: 'ONSITE' | 'OFFSITE' | string | null;
-  description: string | null;
+  amenity_type?: 'ONSITE' | 'OFFSITE' | string | null;
+  description?: string | null;
   is_onsite?: boolean;
   is_offsite?: boolean;
+}
+
+export interface PropertyPriceRange {
+  rent?: {
+    min: number | null;
+    max: number | null;
+  };
+  buy?: {
+    min: number | null;
+    max: number | null;
+  };
 }
 
 export interface PropertyAttributeRangeResponse {
@@ -366,7 +476,7 @@ export interface OwnerPropertySummary {
   property_id: string;
   owner_id: string;
   owner_name: string | null;
-  owner_phone: string | null;
+  owner_phone?: string | null;
   owner_email?: string | null;
   street_address: string;
   latitude?: number | null;
@@ -376,8 +486,8 @@ export interface OwnerPropertySummary {
   width_m?: number | null;
   length_m?: number | null;
   status: string;
-  /** API field name is "descriptions" (plural) */
   descriptions: string | null;
+  price_range?: PropertyPriceRange | null;
   property_type_info: PropertyTypeInfo | null;
   location_info: LocationInfo | null;
   media: PropertyMediaItem[] | null;
@@ -391,4 +501,19 @@ export interface OwnerAvailablePropertiesResponse {
   message: string;
   data: PageResponse<OwnerPropertySummary>;
   timestamp: string;
+}
+
+export interface PropertyTypeInfoDTO {
+  property_type_id: string;
+  property_type_name: string;
+  property_type_code: string;
+  property_category_id: string;
+  property_category_name: string;
+  property_category_code: string;
+}
+
+export interface PropertyTypesResponse {
+  success: boolean;
+  message: string;
+  data: PropertyTypeInfoDTO[];
 }
