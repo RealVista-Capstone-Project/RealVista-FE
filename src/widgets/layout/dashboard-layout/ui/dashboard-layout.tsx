@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Columns,
   FileText,
+  Handshake,
   LayoutDashboard,
   MessageCircle,
   TrendingUp,
@@ -56,6 +57,7 @@ const ownerSidebarItems: SidebarMenuItem[] = [
   },
   { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
   { id: 'manage-agent', label: 'Manage Agent', href: ROUTES.dashboard.manageAgent, icon: Users },
+  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
@@ -97,6 +99,7 @@ const agentSidebarItems: SidebarMenuItem[] = [
     href: ROUTES.dashboard.manageProposals,
     icon: FileText,
   },
+  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
