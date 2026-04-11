@@ -1,6 +1,4 @@
-export { billingApi } from './api/billing.api';
-export { billingQueries } from './api/billing.queries';
-export { billingKeys } from './api/keys';
+export { billingApi, billingQueries, billingKeys } from './api';
 export type {
   FeaturePackage,
   SubscriptionPlan,
@@ -15,3 +13,5 @@ export type {
   PaymentMethodType,
   PaymentStatus,
 } from './model/billing.types';
+export { useThreeDQuota } from './hooks/use-three-d-quota';
+export type { ThreeDQuota } from './hooks/use-three-d-quota';
