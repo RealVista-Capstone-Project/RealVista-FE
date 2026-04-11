@@ -301,43 +301,6 @@ export default function PropertyDashboardPage() {
           </Link>
         </div>
 
-        {/* Search + Status Filter */}
-        <div className='bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4 items-center justify-between mt-3'>
-          <div className='relative w-full sm:max-w-md'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-            <Input
-              placeholder={t('searchPlaceholder')}
-              className='pl-10 bg-slate-50 dark:bg-slate-900/50'
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-              }}
-            />
-          </div>
-          <div className='flex items-center gap-2'>
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
-                setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-              }}
-            >
-              <SelectTrigger className='w-[180px] rounded-lg border-grey-200'>
-                <SelectValue placeholder={t('filterStatus')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='ALL'>{t('allStatuses')}</SelectItem>
-                {PROPERTY_STATUSES.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {t(`status${status}` as Parameters<typeof t>[0])}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
         {/* 3D Tour promo banner */}
         <div className='mt-3'>
           <ThreeDPromoBanner />
@@ -352,6 +315,43 @@ export default function PropertyDashboardPage() {
             pagination={pagination}
             onPaginationChange={setPagination}
             isLoading={isLoading}
+            toolbar={
+              <div className='flex flex-col sm:flex-row gap-4 items-center justify-between'>
+                <div className='relative w-full sm:max-w-md'>
+                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
+                  <Input
+                    placeholder={t('searchPlaceholder')}
+                    className='pl-10 bg-slate-50 dark:bg-slate-900/50'
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                    }}
+                  />
+                </div>
+                <div className='flex items-center gap-2'>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(value) => {
+                      setStatusFilter(value);
+                      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                    }}
+                  >
+                    <SelectTrigger className='w-[180px] rounded-lg border-grey-200'>
+                      <SelectValue placeholder={t('filterStatus')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='ALL'>{t('allStatuses')}</SelectItem>
+                      {PROPERTY_STATUSES.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`status${status}` as Parameters<typeof t>[0])}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            }
             emptyIcon={
               <div className='w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4'>
                 <Home className='w-10 h-10 text-slate-400' />

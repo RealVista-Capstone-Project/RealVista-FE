@@ -30,6 +30,7 @@ export interface DataTableProps<TData> {
   emptyIcon?: React.ReactNode
   emptyTitle?: string
   emptyDescription?: string
+  toolbar?: React.ReactNode
   className?: string
 }
 
@@ -43,6 +44,7 @@ export function DataTable<TData>({
   emptyIcon,
   emptyTitle = 'No results',
   emptyDescription,
+  toolbar,
   className,
 }: DataTableProps<TData>) {
   const table = useReactTable({
@@ -59,9 +61,15 @@ export function DataTable<TData>({
   })
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800', className)}>
+      {/* Toolbar */}
+      {toolbar && (
+        <div className='p-6 border-b border-slate-200 dark:border-slate-800'>
+          {toolbar}
+        </div>
+      )}
       {/* Table */}
-      <div className='rounded-lg border border-grey-200'>
+      <div className='rounded-b-2xl overflow-hidden'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -135,7 +143,7 @@ export function DataTable<TData>({
 
       {/* Pagination */}
       {pageCount != null && pageCount >= 1 && (
-        <div className='flex items-center justify-between px-2'>
+        <div className='flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800'>
           <p className='text-sm text-grey-500'>
             Page {(pagination?.pageIndex ?? 0) + 1} of {pageCount}
           </p>
