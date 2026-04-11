@@ -27,6 +27,7 @@
     "3dAction": "3D Management",
     "viewAction": "View",
     "verifyAction": "Verify",
-    "threeDDotTooltip": "Create a 3D tour for this property"
+    "threeDDotTooltip": "Create a 3D tour for this property",
+    "pageInfo": "Page {current} of {total}"
   }
 }

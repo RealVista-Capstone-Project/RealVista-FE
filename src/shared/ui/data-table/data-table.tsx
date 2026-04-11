@@ -31,6 +31,8 @@ export interface DataTableProps<TData> {
   emptyTitle?: string
   emptyDescription?: string
   toolbar?: React.ReactNode
+  /** Override the "Page X of Y" label. Receives (currentPage, totalPages). */
+  pageInfoText?: (current: number, total: number) => string
   className?: string
 }
 
@@ -45,6 +47,7 @@ export function DataTable<TData>({
   emptyTitle = 'No results',
   emptyDescription,
   toolbar,
+  pageInfoText,
   className,
 }: DataTableProps<TData>) {
   const table = useReactTable({
@@ -61,17 +64,13 @@ export function DataTable<TData>({
   })
 
   return (
-    <div className={cn('bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800', className)}>
+    <div className={cn('px-2 py-2 space-y-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800', className)}>
       {/* Toolbar */}
-      {toolbar && (
-        <div className='p-6 border-b border-slate-200 dark:border-slate-800'>
-          {toolbar}
-        </div>
-      )}
+      {toolbar && toolbar}
       {/* Table */}
-      <div className='rounded-b-2xl overflow-hidden'>
+      <div className='rounded-b-2xl overflow-hidden rounded-md border border-slate-200 dark:border-slate-800'>
         <Table>
-          <TableHeader>
+          <TableHeader >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -79,9 +78,9 @@ export function DataTable<TData>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -143,9 +142,11 @@ export function DataTable<TData>({
 
       {/* Pagination */}
       {pageCount != null && pageCount >= 1 && (
-        <div className='flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800'>
+        <div className='flex items-center justify-between px-6'>
           <p className='text-sm text-grey-500'>
-            Page {(pagination?.pageIndex ?? 0) + 1} of {pageCount}
+            {pageInfoText
+              ? pageInfoText((pagination?.pageIndex ?? 0) + 1, pageCount!)
+              : `Page ${(pagination?.pageIndex ?? 0) + 1} of ${pageCount}`}
           </p>
           <div className='flex items-center gap-2'>
             <button

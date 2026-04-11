@@ -3,7 +3,7 @@
     "pageTitle": "Quản lý Bất động sản",
     "pageDesc": "Quản lý các danh sách bất động sản của bạn, thống kê lượt xem và trạng thái hoạt động.",
     "createNew": "Thêm Bất động sản",
-    "searchPlaceholder": "Tìm kiếm theo tiêu đề, vị trí hoặc ID...",
+    "searchPlaceholder": "Tìm kiếm theo tiêu đề, vị trí",
     "noProperties": "Không tìm thấy Bất động sản nào",
     "noPropertiesDesc": "Bạn chưa thêm bất kỳ bất động sản nào. Bấm vào nút bên dưới để bắt đầu.",
     "colImage": "Hình ảnh",
@@ -27,6 +27,7 @@
     "3dAction": "Quản lý 3D",
     "viewAction": "Xem",
     "verifyAction": "Xác minh",
-    "threeDDotTooltip": "Tạo tour 3D cho căn hộ này"
+    "threeDDotTooltip": "Tạo tour 3D cho căn hộ này",
+    "pageInfo": "Trang {current} / {total}"
   }
 }

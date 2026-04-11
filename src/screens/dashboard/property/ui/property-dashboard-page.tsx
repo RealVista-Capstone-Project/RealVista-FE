@@ -315,13 +315,14 @@ export default function PropertyDashboardPage() {
             pagination={pagination}
             onPaginationChange={setPagination}
             isLoading={isLoading}
+            pageInfoText={(current, total) => t('pageInfo', { current, total })}
             toolbar={
               <div className='flex flex-col sm:flex-row gap-4 items-center justify-between'>
                 <div className='relative w-full sm:max-w-md'>
                   <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
                   <Input
                     placeholder={t('searchPlaceholder')}
-                    className='pl-10 bg-slate-50 dark:bg-slate-900/50'
+                    className='pl-10 bg-white dark:bg-slate-900/50'
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
