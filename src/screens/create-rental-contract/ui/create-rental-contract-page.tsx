@@ -295,16 +295,30 @@ export function CreateRentalContractPage() {
           <WizardStepsCard
             steps={steps}
             currentStep={currentStep}
-            eyebrow={t('steps.eyebrow')}
-            title={t(`steps.titles.${currentStep}` as never)}
-            subtitle={t(`steps.descriptions.${currentStep}` as never)}
-            progressLabel={t('progress', { current: currentStep, total: steps.length })}
             onStepClick={setCurrentStep}
           />
 
           {/* Step content card */}
           <Card className='rounded-[30px] border-[#EAE1FF] bg-white/94 shadow-[0_24px_60px_rgba(96,72,179,0.10)]'>
             <CardContent className='p-6'>
+              {/* Step title + progress */}
+              <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
+                <div>
+                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-main-secondary/50'>
+                    {t('steps.eyebrow')}
+                  </p>
+                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-main-black'>
+                    {t(`steps.titles.${currentStep}` as never)}
+                  </h2>
+                  <p className='mt-1 max-w-xl text-sm leading-6 text-main-secondary/60'>
+                    {t(`steps.descriptions.${currentStep}` as never)}
+                  </p>
+                </div>
+                <div className='shrink-0 rounded-full border border-[#E7DDFF] bg-[#FAF8FF] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-main-primary/75'>
+                  {t('progress', { current: currentStep, total: steps.length })}
+                </div>
+              </div>
+
               {renderStepContent()}
 
               <WizardFooter
