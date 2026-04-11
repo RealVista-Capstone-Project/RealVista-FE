@@ -19,7 +19,8 @@
       "myContracts": "Hợp đồng của tôi",
       "messages": "Tin nhắn",
       "manageProposals": "Hồ sơ cá nhân",
-      "property": "Bất động sản"
+      "property": "Bất động sản",
+      "ownerProperties": "Bảng tin bất động sản"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

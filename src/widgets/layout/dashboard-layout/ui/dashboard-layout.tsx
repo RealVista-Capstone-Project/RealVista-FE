@@ -157,6 +157,12 @@ export function DashboardLayout({
       return t('pageTitle.manageProposals');
     }
     if (
+      pathname === ROUTES.dashboard.ownerProperties ||
+      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+    ) {
+      return t('pageTitle.ownerProperties');
+    }
+    if (
       pathname === ROUTES.dashboard.myEngagements ||
       pathname.startsWith(ROUTES.dashboard.myEngagements)
     ) {

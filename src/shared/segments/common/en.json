@@ -19,7 +19,8 @@
       "myContracts": "My Contracts",
       "messages": "Messages",
       "manageProposals": "Proposal Library",
-      "property": "Property"
+      "property": "Property",
+      "ownerProperties": "Owner properties & proposals"
     },
     "actionButton": {
       "addProperty": "Add a property",
