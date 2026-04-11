@@ -8,12 +8,28 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property';
 import type { OwnerPropertySummary } from '@/entities/property';
 import { useDebounce } from '@/shared/lib/hooks';
 
 const ITEMS_PER_PAGE = 10;
+
+export type ListingType = 'SELL' | 'RENT' | 'ALL';
+
+export interface PriceFilter {
+  minRentPrice?: number;
+  maxRentPrice?: number;
+  minBuyPrice?: number;
+  maxBuyPrice?: number;
+}
+
+export interface PropertyTypeOption {
+  id: string;
+  name: string;
+  categoryId: string;
+  categoryName: string;
+}
 
 interface OwnerPropertiesContextValue {
   properties: OwnerPropertySummary[];
@@ -24,6 +40,14 @@ interface OwnerPropertiesContextValue {
   fetchNextPage: () => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
+  priceFilter: PriceFilter;
+  setPriceFilter: (filter: PriceFilter) => void;
+  listingType: ListingType;
+  setListingType: (type: ListingType) => void;
+  propertyTypeId: string | null;
+  setPropertyTypeId: (id: string | null) => void;
+  availablePropertyTypes: PropertyTypeOption[];
+  isLoadingPropertyTypes: boolean;
   selectedProperty: OwnerPropertySummary | null;
   setSelectedProperty: (property: OwnerPropertySummary | null) => void;
   totalElements: number;
@@ -34,13 +58,39 @@ const OwnerPropertiesContext = createContext<OwnerPropertiesContextValue | null>
 
 export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQueryRaw] = useState('');
+  const [priceFilter, setPriceFilterRaw] = useState<PriceFilter>({});
+  const [listingType, setListingTypeRaw] = useState<ListingType>('ALL');
+  const [propertyTypeId, setPropertyTypeIdRaw] = useState<string | null>(null);
   const debouncedSearch = useDebounce(searchQuery, 400);
+  const debouncedPriceFilter = useDebounce(priceFilter, 500);
   const [selectedProperty, setSelectedProperty] = useState<OwnerPropertySummary | null>(null);
+
+  // Fetch all property types from dedicated endpoint
+  const { data: propertyTypesData, isLoading: isLoadingPropertyTypes } = useQuery(
+    propertyQueries.propertyTypes()
+  );
+
+  const availablePropertyTypes = useMemo<PropertyTypeOption[]>(
+    () =>
+      (propertyTypesData?.payload?.data ?? []).map((t) => ({
+        id: t.property_type_id,
+        name: t.property_type_name,
+        categoryId: t.property_category_id,
+        categoryName: t.property_category_name,
+      })),
+    [propertyTypesData]
+  );
 
   const queryResult = useInfiniteQuery(
     propertyQueries.ownerAvailableInfinite({
       size: ITEMS_PER_PAGE,
       keyword: debouncedSearch || undefined,
+      min_rent_price: debouncedPriceFilter.minRentPrice,
+      max_rent_price: debouncedPriceFilter.maxRentPrice,
+      min_buy_price: debouncedPriceFilter.minBuyPrice,
+      max_buy_price: debouncedPriceFilter.maxBuyPrice,
+      listing_type: listingType === 'ALL' ? undefined : listingType,
+      property_type_id: propertyTypeId ?? undefined,
     })
   );
 
@@ -58,6 +108,21 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
 
   const setSearchQuery = useCallback((q: string) => {
     setSearchQueryRaw(q);
+    setSelectedProperty(null);
+  }, []);
+
+  const setPriceFilter = useCallback((filter: PriceFilter) => {
+    setPriceFilterRaw(filter);
+    setSelectedProperty(null);
+  }, []);
+
+  const setListingType = useCallback((type: ListingType) => {
+    setListingTypeRaw(type);
+    setSelectedProperty(null);
+  }, []);
+
+  const setPropertyTypeId = useCallback((id: string | null) => {
+    setPropertyTypeIdRaw(id);
     setSelectedProperty(null);
   }, []);
 
@@ -80,6 +145,14 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
       fetchNextPage: queryResult.fetchNextPage,
       searchQuery,
       setSearchQuery,
+      priceFilter,
+      setPriceFilter,
+      listingType,
+      setListingType,
+      propertyTypeId,
+      setPropertyTypeId,
+      availablePropertyTypes,
+      isLoadingPropertyTypes,
       selectedProperty,
       setSelectedProperty,
       totalElements,
@@ -94,6 +167,11 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
       queryResult.fetchNextPage,
       searchQuery,
       setSearchQuery,
+      priceFilter,
+      listingType,
+      propertyTypeId,
+      availablePropertyTypes,
+      isLoadingPropertyTypes,
       selectedProperty,
       totalElements,
       handlePropertyClick,

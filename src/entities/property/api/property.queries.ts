@@ -41,4 +41,10 @@ export const propertyQueries = {
       },
       staleTime: 2 * 60 * 1000,
     }),
+  propertyTypes: () =>
+    queryOptions({
+      queryKey: ['properties', 'types'],
+      queryFn: () => propertyApi.getPropertyTypes(),
+      staleTime: 10 * 60 * 1000,
+    }),
 };

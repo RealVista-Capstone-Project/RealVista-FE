@@ -4,14 +4,32 @@
     "error": "Failed to load properties. Please try again.",
     "pageTitle": "Available Properties",
     "pageSubtitle": "Browse properties from owners looking for an agent.",
+    "tabs": {
+      "all": "All",
+      "sell": "For Sell",
+      "rent": "For Rent"
+    },
     "filter": {
+      "title": "Filter",
       "searchPlaceholder": "Search by address, owner, or type...",
-      "resultCount": "{count} properties found"
+      "resultCount": "{count} properties found",
+      "rentPrice": "Rental Price",
+      "buyPrice": "Purchase Price",
+      "min": "Min",
+      "max": "Max",
+      "apply": "Apply",
+      "clearAll": "Clear All",
+      "propertyType": "Property Type",
+      "allTypes": "All Types",
+      "errorMinMax": "Min price must be less than max price"
     },
     "card": {
       "bedrooms": "beds",
       "viewDetails": "View details",
-      "proposed": "Proposed"
+      "proposed": "Proposed",
+      "priceFrom": "Price from",
+      "rent": "Rent",
+      "buy": "Buy"
     },
     "empty": {
       "title": "No properties found.",
