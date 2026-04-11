@@ -12,6 +12,7 @@ export const mockSimilarProperties: Omit<
     id: '1',
     image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop',
     title: 'Faulkner Ave',
+    boostTags: ['FEATURED', 'HOT_BADGE'],
     address: '909 Woodland St, Michigan, IN',
     price: 4550,
     currency: '$',

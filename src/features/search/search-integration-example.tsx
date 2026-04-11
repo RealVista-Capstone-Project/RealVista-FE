@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { RealVistaPropertyListingSearchBar } from '@/shared/ui/realvista-property-listing-search-bar/realvista-property-listing-search-bar';
 import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
 
 export function SearchIntegrationExample() {
+  const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState<AdvancedSearchRequest>({
     listingType: 'SALE',
@@ -91,7 +93,7 @@ export function SearchIntegrationExample() {
               </p>
               {listing.is_boosted && (
                 <span className='inline-block mt-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded'>
-                  {listing.boost_package}
+                  {listing.boost_packages?.join(', ')}
                 </span>
               )}
             </div>

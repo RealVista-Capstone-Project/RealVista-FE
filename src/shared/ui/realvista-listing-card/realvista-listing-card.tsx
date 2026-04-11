@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Bath, Heart, BedSingle, Flame } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -42,7 +42,7 @@ export interface RealVistaListingCardProps {
   isFavorite?: boolean;
   statusTag?: 'SOLD' | 'RENTED';
   attributes?: ListingAttribute[];
-  boostTag?: string;
+  boostTags?: string[];
   userType?: 'AGENT' | 'OWNER';
   variant?: 'grid' | 'list';
   listingType?: 'RENT' | 'SALE';
@@ -64,7 +64,7 @@ export function RealVistaListingCard({
   isFavorite = false,
   statusTag,
   attributes,
-  boostTag,
+  boostTags,
   variant = 'grid',
   listingType = 'RENT',
   onToggleFavorite,
@@ -246,8 +246,15 @@ export function RealVistaListingCard({
   );
 
   // Shared Hot Badge (Premium Ribbon style) - High energy red theme
-  const HotBadge = () =>
-    (boostTag === 'HOT_BADGE' || boostTag === 'HOT') && !isUnavailable ? (
+  const HotBadge = () => {
+    const isHot = boostTags?.some((t) => {
+      const upper = t.toUpperCase();
+      return upper === 'HOT_BADGE' || upper === 'HOT';
+    });
+
+    if (!isHot || isUnavailable) return null;
+
+    return (
       <div className='absolute -bottom-3.75 -left-2 z-10'>
         <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
           <div className='flex items-center gap-1.5'>
@@ -275,7 +282,8 @@ export function RealVistaListingCard({
           </div>
         </div>
       </div>
-    ) : null;
+    );
+  };
 
   // ── Confirm unfavorite dialog (shared between variants) ──
   const confirmDialog = (

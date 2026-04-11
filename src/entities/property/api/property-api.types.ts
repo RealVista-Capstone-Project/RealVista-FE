@@ -71,7 +71,7 @@ export interface PropertyListingDto {
   bedrooms?: number;
   bathrooms?: number;
   is_boosted?: boolean;
-  boost_package?: 'FEATURED' | 'HOT_BADGE';
+  boost_packages?: string[];
   user_type?: 'AGENT' | 'OWNER';
   attributes?: Array<{
     attribute_id: string;

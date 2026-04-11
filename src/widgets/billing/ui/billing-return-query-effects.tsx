@@ -19,6 +19,7 @@ export function BillingReturnQueryEffects() {
 
   const vnPayForwardRef = useRef(false);
   useEffect(() => {
+    if (!searchParams) return;
     const hasVnp =
       searchParams.has('vnp_ResponseCode') ||
       searchParams.has('vnp_SecureHash') ||
@@ -35,6 +36,7 @@ export function BillingReturnQueryEffects() {
 
   const paymentNotifyShownRef = useRef(false);
   useEffect(() => {
+    if (!searchParams) return;
     const payment = searchParams.get('payment');
     if (!payment) {
       paymentNotifyShownRef.current = false;
@@ -44,6 +46,7 @@ export function BillingReturnQueryEffects() {
     const next = new URLSearchParams(searchParams.toString());
     next.delete('payment');
     const qs = next.toString();
+    if (!pathname) return;
     router.replace(qs ? `${pathname}?${qs}` : pathname);
 
     if (paymentNotifyShownRef.current) return;

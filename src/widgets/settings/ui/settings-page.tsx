@@ -38,10 +38,11 @@ export function SettingsPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const rawTab = searchParams.get('tab');
+  const rawTab = searchParams?.get('tab');
   const activeTab: Tab = rawTab === 'settings' ? 'settings' : 'profile';
 
   const setActiveTab = (tab: Tab) => {
+    if (!searchParams) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
     router.replace(`${pathname}?${params.toString()}`);

@@ -33,7 +33,7 @@ export interface BookmarkListingCardDTO {
   usable_size_m2: number | null;
   status?: string;
   is_boosted?: boolean;
-  boost_package?: string;
+  boost_packages?: string[];
   user_type?: string;
 }
 

@@ -331,7 +331,7 @@ export function PropertyMapBasedSearchPage({
                     attributes={property.attributes as ListingAttribute[]}
                     areaUnit='m²'
                     isFavorite={favoriteOverrides[property.listing_id] ?? property.is_favorite}
-                    boostTag={property.is_boosted ? property.boost_package : undefined}
+                    boostTags={property.is_boosted ? property.boost_packages : undefined}
                     userType={property.user_type}
                     variant={viewMode}
                     listingType={initialListingType}

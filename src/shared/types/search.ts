@@ -35,7 +35,7 @@ export interface ListingSearchResponse {
   thumbnail?: string;
   published_at: string;
   is_boosted: boolean;
-  boost_package?: string;
+  boost_packages?: string[];
   user_type: string;
   is_favorite?: boolean;
   attributes?: Array<{
