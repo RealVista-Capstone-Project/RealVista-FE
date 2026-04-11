@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, Search, DollarSign, SlidersHorizontal, X } from 'lucide-react';
 import {
@@ -109,6 +109,21 @@ function BuyPageContent() {
 
   const [searchCriteria, setSearchCriteria] = useState<AdvancedSearchRequest>(getInitialCriteria());
 
+  const performSearch = useCallback(async (criteria: AdvancedSearchRequest, page: number) => {
+    setIsLoading(true);
+    try {
+      const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
+      setListings(response?.content || []);
+      setTotalPages(response?.total_pages || 1);
+      setTotalResults(response?.total_elements || 0);
+    } catch (error) {
+      console.error('Failed to search properties:', error);
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [itemsPerPage]);
+
   // Effect to handle URL changes (e.g. back button)
   useEffect(() => {
     const page = Number(searchParams?.get('page')) || 1;
@@ -124,21 +139,6 @@ function BuyPageContent() {
 
     performSearch(criteria, page);
   }, [searchParams, getInitialCriteria, performSearch]);
-
-  const performSearch = useCallback(async (criteria: AdvancedSearchRequest, page: number) => {
-    setIsLoading(true);
-    try {
-      const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
-      setListings(response?.content || []);
-      setTotalPages(response?.total_pages || 1);
-      setTotalResults(response?.total_elements || 0);
-    } catch (error) {
-      console.error('Failed to search properties:', error);
-      setListings([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [itemsPerPage]);
 
   const updateUrl = (criteria: AdvancedSearchRequest, page: number) => {
     const params = new URLSearchParams();

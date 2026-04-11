@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MapPin, DollarSign, Search, SlidersHorizontal, X } from 'lucide-react';
 import {
@@ -110,22 +110,6 @@ function RentPageContent() {
 
   const [searchCriteria, setSearchCriteria] = useState<AdvancedSearchRequest>(getInitialCriteria());
 
-  // Effect to handle URL changes
-  useEffect(() => {
-    const page = Number(searchParams?.get('page')) || 1;
-    setCurrentPage(page);
-
-    // Update local state to match URL
-    setLocation(searchParams?.get('location') || '');
-    setMinPrice(searchParams?.get('minPrice') || '');
-    setMaxPrice(searchParams?.get('maxPrice') || '');
-
-    const criteria = getInitialCriteria();
-    setSearchCriteria(criteria);
-
-    performSearch(criteria, page);
-  }, [searchParams, getInitialCriteria, performSearch]);
-
   const performSearch = useCallback(async (criteria: AdvancedSearchRequest, page: number) => {
     setIsLoading(true);
     try {
@@ -142,6 +126,22 @@ function RentPageContent() {
       setIsLoading(false);
     }
   }, [itemsPerPage]);
+
+  // Effect to handle URL changes
+  useEffect(() => {
+    const page = Number(searchParams?.get('page')) || 1;
+    setCurrentPage(page);
+
+    // Update local state to match URL
+    setLocation(searchParams?.get('location') || '');
+    setMinPrice(searchParams?.get('minPrice') || '');
+    setMaxPrice(searchParams?.get('maxPrice') || '');
+
+    const criteria = getInitialCriteria();
+    setSearchCriteria(criteria);
+
+    performSearch(criteria, page);
+  }, [searchParams, getInitialCriteria, performSearch]);
 
   const updateUrl = (criteria: AdvancedSearchRequest, page: number) => {
     const params = new URLSearchParams();

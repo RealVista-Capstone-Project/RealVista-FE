@@ -53,12 +53,9 @@ export function useDeleteSavedSearch() {
         if (!old) return old;
         return {
           ...old,
-          payload: {
-            ...old.payload,
-            data: old.payload.data.filter((item) =>
-               (item.saved_search_id) !== id
-            )
-          }
+          data: old.data.filter((item) =>
+             (item.saved_search_id) !== id
+          )
         };
       });
 
