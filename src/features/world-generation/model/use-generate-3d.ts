@@ -43,7 +43,9 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
     queryFn: async () => {
       if (!state.operationId || !propertyId) return null;
       const res = await propertyApi.get3dOperations(propertyId);
-      const list = ('data' in res ? res.data : res) as Property3dOperation[];
+      // Both endpoints return ApiResponse<T>: { message, data: T }
+      // http.get wraps this in { status, payload } — so actual data is at res.payload.data
+      const list = ((res.payload as any)?.data ?? []) as Property3dOperation[];
       const op = list.find((o) => o.operation_id === state.operationId);
       if (!op) return null;
 
@@ -53,9 +55,7 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
         error: op.status === 'FAILED' ? { message: op.error_message || 'Failed' } : undefined,
         metadata: {
           progress: {
-            description: op.status === 'PENDING'
-              ? (t ? t('progressPolling') : 'Processing on backend...')
-              : (t ? t('progressSucceeded') : 'Done'),
+            description: t ? t('progressPolling') : 'Processing on backend...',
           },
         },
         response: op,
@@ -63,8 +63,11 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
     },
     enabled: state.phase === 'polling' && !!state.operationId,
     refetchInterval: (query) => {
-      // If it's done or error occurred, stop polling
-      if (!query.state.data || query.state.data.done || query.state.error) {
+      const d = query.state.data;
+      // null = operation not yet found in list — keep polling
+      // undefined = query hasn't run yet — keep polling
+      // d.done = terminal state (SUCCEEDED or FAILED) — stop
+      if (d != null && (d.done || query.state.error)) {
         return false;
       }
       return POLL_INTERVAL;
@@ -92,9 +95,8 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
       } else {
         const description =
           operationStatus.metadata?.progress?.description || (t ? t('progressPolling') : 'Generating 3D model...');
-        if (description !== state.progressDescription) {
-          setState((prev) => ({ ...prev, progressDescription: description }));
-        }
+        // Always update — functional updater is safe even if value hasn't changed
+        setState((prev) => ({ ...prev, progressDescription: description }));
       }
     } else if (state.phase === 'polling' && isPollError) {
       // Only fail hard if TanStack retries are exhausted, useQuery does retries internally
@@ -210,10 +212,10 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
           images: uploadedAssets,
         });
 
-        const opData = (
-          'data' in generationRes ? generationRes.data : generationRes
-        ) as Property3dOperation;
-        const opId = opData.operation_id;
+        // initiate3dOperation returns ApiResponse<Property3DGenerationDto>
+        // http.post wraps it in { status, payload } — actual data is at res.payload.data
+        const opData = (generationRes.payload as any)?.data as Property3dOperation;
+        const opId = opData?.operation_id;
 
         // Notify caller that the operation was created (e.g., for quota decrement)
         options?.onOperationCreated?.();
