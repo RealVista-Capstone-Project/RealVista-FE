@@ -75,6 +75,11 @@ const nextConfig: NextConfig = {
         hostname: '**.firebasestorage.app',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
     dangerouslyAllowSVG: true,
   },
