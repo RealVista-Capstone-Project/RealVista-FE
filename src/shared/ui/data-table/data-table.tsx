@@ -134,7 +134,7 @@ export function DataTable<TData>({
       </div>
 
       {/* Pagination */}
-      {pageCount != null && pageCount > 1 && (
+      {pageCount != null && pageCount >= 1 && (
         <div className='flex items-center justify-between px-2'>
           <p className='text-sm text-grey-500'>
             Page {(pagination?.pageIndex ?? 0) + 1} of {pageCount}
