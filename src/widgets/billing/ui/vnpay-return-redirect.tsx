@@ -14,6 +14,7 @@ export function VnPayReturnRedirect() {
   const locale = useLocale();
 
   useEffect(() => {
+    if (!searchParams) return;
     const q = searchParams.toString();
     const subscribeBase = `${env.NEXT_PUBLIC_URL.replace(/\/$/, '')}/${locale}/subscribe`;
     if (!q) {
