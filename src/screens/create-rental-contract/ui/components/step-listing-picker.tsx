@@ -168,9 +168,9 @@ export function StepListingPicker({
                         </div>
                       )}
                       <div className='absolute left-4 top-4'>
-                        <Badge className='rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-main-black shadow-sm'>
-                          {property.status}
-                        </Badge>
+                         <Badge className='rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-main-black shadow-sm'>
+                           {t(`listingPicker.status.${property.status}`)}
+                         </Badge>
                       </div>
                     </div>
 

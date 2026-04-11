@@ -167,10 +167,13 @@ export function CreateRentalContractPage() {
     }
   }, [form.tenantEmail, t]);
 
+  const isAgent = useMemo(() => {
+    const backendRoles: string[] = (session?.user as any)?.backendRoles ?? [];
+    return backendRoles.includes('AGENT');
+  }, [session?.user]);
+
   const buildPayload = (): CreateRentalContractPayload => {
     const sessionUserId = session?.user?.id ?? '';
-    const sessionRole = session?.user?.role ?? '';
-    const isAgent = sessionRole === 'AGENT' || sessionRole === 'owner' && form.landlordId !== sessionUserId;
 
     return {
       listing_id: form.propertyId,
@@ -195,7 +198,7 @@ export function CreateRentalContractPage() {
       tenantUserId: form.tenantUserId,
       // Owner of the property — comes from property.owner_id (Step 1), never the agent
       landlordId: form.landlordId,
-      // If an AGENT is creating this contract, record their ID; owners get null
+      // If an AGENT is creating this contract on behalf of an owner, record their ID; owners get null
       agentId: isAgent ? sessionUserId : null,
       monthlyRent: Number(form.monthlyRent),
       securityAmount: Number(form.securityDeposit) || undefined,
@@ -218,8 +221,14 @@ export function CreateRentalContractPage() {
     try {
       const contract = await createContractMutation.mutateAsync(buildPayload());
       const signing = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id });
-      setSigningModal({ url: signing.signing_url, redirectOnClose: true });
       toast.success(t('toast.sentSuccess'));
+      // Agents create the contract on behalf of the owner — they have nothing to sign,
+      // so skip the DocuSign modal and redirect straight to the contracts list.
+      if (isAgent) {
+        router.push(ROUTES.dashboard.rentalContracts);
+        return;
+      }
+      setSigningModal({ url: signing.signing_url, redirectOnClose: true });
     } catch {
       toast.error(t('toast.sentError'));
     }

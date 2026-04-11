@@ -1,4 +1,5 @@
 import { Phone, Video, MoreHorizontal } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import type { Conversation } from '../types';
 import { AvatarCircle } from './avatar-circle';
@@ -10,6 +11,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHeaderProps) {
+  const t = useTranslations('Messages');
   return (
     <div className='flex items-center justify-between border-b border-purple-92/50 bg-white px-6 py-3'>
       {/* Left: Avatar + Name */}
@@ -22,8 +24,8 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
         <div>
           <p className='text-sm font-bold text-main-black'>{conversation.name}</p>
           {conversation.isTyping && (
-            <p className='text-xs font-medium text-main-primary'>Dimas Eza Typing...</p>
-          )}
+              <p className='text-xs font-medium text-main-primary'>{t('typing')}</p>
+            )}
         </div>
       </div>
 

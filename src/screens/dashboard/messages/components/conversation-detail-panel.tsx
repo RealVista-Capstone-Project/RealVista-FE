@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, ChevronUp, Check, Plus, Building2, Clock, Eye } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import type { ConversationDetail } from '../types';
 
@@ -11,6 +12,7 @@ interface ConversationDetailPanelProps {
 }
 
 export function ConversationDetailPanel({ detail, onClose }: ConversationDetailPanelProps) {
+  const t = useTranslations('Messages');
   const [timelineOpen, setTimelineOpen] = useState(true);
 
   return (
@@ -57,7 +59,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
         {/* View contract */}
         <button className='flex items-center gap-2 rounded-xl border border-main-primary/30 px-5 py-2 text-sm font-semibold text-main-primary transition-colors hover:bg-purple-98'>
           <Eye className='size-4' />
-          View contract
+          {t('viewContract')}
         </button>
       </div>
 
@@ -74,7 +76,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
             <div className='flex size-6 items-center justify-center rounded-full border-2 border-grey-300'>
               <div className='size-2 rounded-full bg-grey-400' />
             </div>
-            <span className='text-sm font-bold text-main-black'>Activity timeline</span>
+            <span className='text-sm font-bold text-main-black'>{t('activityTimeline')}</span>
           </div>
           <ChevronUp
             className={cn(
@@ -143,7 +145,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
       {/* End contract button */}
       <div className='px-4 pb-6 pt-2'>
         <button className='w-full rounded-xl bg-main-primary py-3 text-sm font-bold text-white transition-colors hover:bg-main-primary-hover active:bg-main-primary-active'>
-          End contract
+          {t('endContract')}
         </button>
       </div>
     </div>

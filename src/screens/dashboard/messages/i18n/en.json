@@ -1,0 +1,15 @@
+{
+  "Messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Search Messages",
+    "pinnedMessages": "Pinned Messages",
+    "allMessages": "All Messages",
+    "typing": "Typing...",
+    "today": "Today",
+    "typeYourMessage": "Type your message",
+    "createContract": "Create contract",
+    "viewContract": "View contract",
+    "activityTimeline": "Activity timeline",
+    "endContract": "End contract"
+  }
+}

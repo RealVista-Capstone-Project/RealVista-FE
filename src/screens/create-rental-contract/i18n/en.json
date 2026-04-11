@@ -57,7 +57,17 @@
       "selected": "Selected",
       "selectAction": "Use this property",
       "emptyTitle": "No properties match this search",
-      "emptyDescription": "Try a different address keyword or check that you have available properties."
+      "emptyDescription": "Try a different address keyword or check that you have available properties.",
+      "status": {
+        "DRAFT": "Draft",
+        "PENDING": "Pending",
+        "VERIFIED": "Verified",
+        "REJECTED": "Rejected",
+        "AVAILABLE": "Available",
+        "RESERVED": "Reserved",
+        "SOLD": "Sold",
+        "RENTED": "Rented"
+      }
     },
     "tenantLookup": {
       "eyebrow": "Tenant Identification",

@@ -1,0 +1,15 @@
+{
+  "Messages": {
+    "title": "Tin nhắn",
+    "searchPlaceholder": "Tìm kiếm tin nhắn",
+    "pinnedMessages": "Tin nhắn đã ghim",
+    "allMessages": "Tất cả tin nhắn",
+    "typing": "đang nhập...",
+    "today": "Hôm nay",
+    "typeYourMessage": "Nhập tin nhắn của bạn",
+    "createContract": "Tạo hợp đồng",
+    "viewContract": "Xem hợp đồng",
+    "activityTimeline": "Lịch sử hoạt động",
+    "endContract": "Kết thúc hợp đồng"
+  }
+}

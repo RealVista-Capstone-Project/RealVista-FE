@@ -57,7 +57,17 @@
       "selected": "Đã chọn",
       "selectAction": "Dùng bất động sản này",
       "emptyTitle": "Không có bất động sản phù hợp",
-      "emptyDescription": "Hãy thử từ khóa địa chỉ khác hoặc kiểm tra danh sách bất động sản của bạn."
+      "emptyDescription": "Hãy thử từ khóa địa chỉ khác hoặc kiểm tra danh sách bất động sản của bạn.",
+      "status": {
+        "DRAFT": "Bản nháp",
+        "PENDING": "Chờ duyệt",
+        "VERIFIED": "Đã xác minh",
+        "REJECTED": "Bị từ chối",
+        "AVAILABLE": "Còn trống",
+        "RESERVED": "Đã đặt cọc",
+        "SOLD": "Đã bán",
+        "RENTED": "Đã cho thuê"
+      }
     },
     "tenantLookup": {
       "eyebrow": "Xác định người thuê",

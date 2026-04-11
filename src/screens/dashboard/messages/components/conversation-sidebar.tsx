@@ -1,4 +1,5 @@
 import { Search, Pin, Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { Conversation } from '../types';
 import { ConversationItem } from './conversation-item';
 
@@ -17,6 +18,7 @@ export function ConversationSidebar({
   onSearchChange,
   onSelectConversation,
 }: ConversationSidebarProps) {
+  const t = useTranslations('Messages');
   const pinnedConvs = conversations.filter((c) => c.isPinned);
   const allConvs = conversations.filter((c) => !c.isPinned);
 
@@ -31,7 +33,7 @@ export function ConversationSidebar({
     <aside className='flex w-80 shrink-0 flex-col border-r border-purple-92/50'>
       {/* Header */}
       <div className='flex items-center justify-between px-5 py-4'>
-        <h1 className='text-xl font-bold text-main-black'>Messages</h1>
+        <h1 className='text-xl font-bold text-main-black'>{t('title')}</h1>
         <button className='flex size-8 items-center justify-center rounded-lg text-grey-500 transition-colors hover:bg-purple-96 hover:text-main-primary'>
           <Plus className='size-5' />
         </button>
@@ -43,7 +45,7 @@ export function ConversationSidebar({
           <Search className='size-4 shrink-0 text-grey-400' />
           <input
             type='text'
-            placeholder='Search Messages'
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className='w-full bg-transparent text-sm text-main-black placeholder:text-grey-400 focus:outline-none'
@@ -59,7 +61,7 @@ export function ConversationSidebar({
             <div className='mb-2 flex items-center gap-1.5 px-2'>
               <Pin className='size-3 text-grey-400' />
               <span className='text-xs font-semibold uppercase tracking-wider text-grey-400'>
-                Pinned Messages
+                {t('pinnedMessages')}
               </span>
             </div>
             <div className='space-y-1'>
@@ -81,7 +83,7 @@ export function ConversationSidebar({
             <div className='mb-2 flex items-center gap-1.5 px-2'>
               <Pin className='size-3 text-grey-400' />
               <span className='text-xs font-semibold uppercase tracking-wider text-grey-400'>
-                All Messages
+                {t('allMessages')}
               </span>
             </div>
             <div className='space-y-1'>

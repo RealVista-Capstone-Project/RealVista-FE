@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { Plus, FileText, Smile, Paperclip, Mic } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { useAuthSession } from '@/features/auth/model';
 import { useRouter } from '@/shared/config/i18n/navigation';
@@ -14,6 +15,7 @@ interface MessageInputProps {
 }
 
 export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
+  const t = useTranslations('Messages');
   const { data: session } = useAuthSession();
   const router = useRouter();
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -76,7 +78,7 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
                   className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
                 >
                   <FileText className='size-4 shrink-0 text-main-primary' />
-                  Tạo hợp đồng
+                  {t('createContract')}
                 </button>
               </div>
             )}
@@ -85,7 +87,7 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
 
         <input
           type='text'
-          placeholder='Type your message'
+          placeholder={t('typeYourMessage')}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => {
