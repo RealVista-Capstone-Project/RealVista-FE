@@ -3,6 +3,7 @@ export enum EngagementStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   CANCELLED = 'CANCELLED',
+  FINISHED = 'FINISHED',
 }
 
 export enum EngagementType {
@@ -11,12 +12,30 @@ export enum EngagementType {
   OWNER_INVITATION = 'OWNER_INVITATION',
 }
 
+export interface EngagementContent {
+  title?: string;
+  message?: string;
+  commissionRate?: number;
+  experienceYears?: number;
+  pitchContent?: string;
+  specialty?: string;
+  priceRange?: {
+    rent?: { min?: number; max?: number };
+    sale?: { min?: number; max?: number };
+  };
+  offeredCommission?: string;
+  monthlyIncome?: number;
+  moveInDate?: string;
+  leaseTermMonths?: number;
+  note?: string;
+}
+
 export interface Engagement {
   engagementId: string;
   initiatorId: string;
   receiverId: string;
   engagementType: EngagementType;
-  content?: string; // JSON string containing tenant application details
+  content?: EngagementContent;
   listingId?: string;
   propertyId?: string;
   status: EngagementStatus;
@@ -25,6 +44,34 @@ export interface Engagement {
   listingTitle?: string;
   propertyAddress?: string;
   propertyImageUrl?: string;
+  propertyMediaUrls?: string[];
+
+  // Agent info (from HiredAgentResponse)
+  agentUserId?: string;
+  agentFullName?: string;
+  agentAvatarUrl?: string;
+  agentPhone?: string;
+  agentEmail?: string;
+  agentBio?: string;
+  agentSpecialties?: string;
+  agentServiceAreas?: string;
+  agentRating?: number;
+  agentYearsOfExperience?: number;
+  agentPropertiesSold?: number;
+
+  // Property details
+  propertyTypeName?: string;
+  propertyLocationName?: string;
+
+  // Engagement details
+  hiredAt?: string;
+  hasReview?: boolean;
+  cancellationReason?: string;
+
+  // Initiator / Receiver names for list views
+  initiatorName?: string;
+  receiverName?: string;
+  receiverAvatarUrl?: string;
 
   createdAt: string;
   updatedAt: string;
