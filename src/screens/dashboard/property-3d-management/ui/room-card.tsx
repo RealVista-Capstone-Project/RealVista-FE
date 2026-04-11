@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import {
   RefreshCw,
@@ -24,7 +24,7 @@ import type { Property3dOperation } from '@/entities/property/api/property-api.t
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -132,6 +132,33 @@ export function RoomCard({
   const [renameValue, setRenameValue] = useState(room.roomName);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // ── Tilt + shine effect ───────────────────────────────────────────────────
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(rawY, [-0.5, 0.5], [10, -10]), { stiffness: 300, damping: 30 });
+  const rotateY = useSpring(useTransform(rawX, [-0.5, 0.5], [-10, 10]), { stiffness: 300, damping: 30 });
+  const shineX = useTransform(rawX, [-0.5, 0.5], [0, 100]);
+  const shineY = useTransform(rawY, [-0.5, 0.5], [0, 100]);
+  const shineBackground = useTransform(
+    [shineX, shineY],
+    ([x, y]: number[]) =>
+      `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.12) 0%, transparent 60%)`
+  );
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    rawX.set((e.clientX - rect.left) / rect.width - 0.5);
+    rawY.set((e.clientY - rect.top) / rect.height - 0.5);
+  }, [rawX, rawY]);
+
+  const handleMouseLeave = useCallback(() => {
+    rawX.set(0);
+    rawY.set(0);
+  }, [rawX, rawY]);
+  // ─────────────────────────────────────────────────────────────────────────
+
   const hasModel = threeDMedia.some((m) => {
     const rName = m.metadata?.room_name || 'Unnamed Room';
     return rName === room.roomName;
@@ -174,19 +201,29 @@ export function RoomCard({
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.06 }}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 800 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className='will-change-transform'
     >
       <Card
         className={`
           group relative overflow-hidden transition-all duration-200 cursor-pointer
-          hover:shadow-md hover:border-primary/30 pt-0
-          ${isSelected ? 'ring-2 ring-primary/40 border-primary/30 shadow-md' : ''}
+          hover:shadow-xl hover:border-primary/30 pt-0
+          ${isSelected ? 'ring-2 ring-primary/40 border-primary/30 shadow-xl' : ''}
           ${!hasModel && room.latestOperation.status === 'SUCCEEDED' ? 'opacity-80' : ''}
         `}
         onClick={!isRenaming && hasModel ? onSelect : undefined}
       >
+        {/* Glossy shine overlay */}
+        <motion.div
+          className='pointer-events-none absolute inset-0 z-10 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+          style={{ background: shineBackground }}
+        />
         {/* Thumbnail / Skeleton */}
         {room.thumbnailUrl ? (
           <div className='relative w-full h-36 overflow-hidden bg-muted'>
