@@ -26,3 +26,4 @@ export * from './badge';
 export * from './visually-hidden';
 export * from './data-table';
 export * from './table';
+export * from './progress';

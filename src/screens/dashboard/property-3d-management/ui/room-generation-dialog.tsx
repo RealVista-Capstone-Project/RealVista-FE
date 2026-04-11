@@ -12,6 +12,7 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label/label';
+import { Progress } from '@/shared/ui/progress';
 import { useGenerate3d, AzimuthImage } from '@/features/world-generation/model/use-generate-3d';
 import { MarbleModel } from '@/shared/api/marble-client';
 import { Upload, X, Box, CheckCircle2, AlertTriangle, RotateCcw } from 'lucide-react';
@@ -388,21 +389,15 @@ export function RoomGenerationDialog({
           </div>
 
           <div className='space-y-3'>
-            <div className='w-full bg-secondary rounded-full h-2 overflow-hidden shadow-inner'>
-              <div
-                className='bg-primary h-2 rounded-full transition-all duration-500 ease-out relative overflow-hidden'
-                style={{
-                  width: phase === 'uploading'
-                    ? `${(uploadedCount / REQUIRED_IMAGES_COUNT) * 100}%`
-                    : phase === 'requesting' ? '10%'
-                    : phase === 'polling' ? '60%' : '10%'
-                }}
-              >
-                {phase === 'polling' && (
-                  <div className='absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-[shimmer_2s_infinite]' />
-                )}
-              </div>
-            </div>
+            <Progress
+              value={
+                phase === 'uploading'
+                  ? (uploadedCount / REQUIRED_IMAGES_COUNT) * 100
+                  : phase === 'requesting' ? 10
+                  : phase === 'polling' ? 60 : 10
+              }
+              className='h-2'
+            />
 
             <div className='grid grid-cols-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>
               <span className={cn('text-left', phase === 'uploading' ? 'text-primary' : 'text-emerald-500')}>{t('phaseUploading')}</span>

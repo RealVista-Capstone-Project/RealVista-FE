@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/ui/table'
+import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/lib/utils'
 
 export interface DataTableProps<TData> {
@@ -149,18 +150,15 @@ export function DataTable<TData>({
               : `Page ${(pagination?.pageIndex ?? 0) + 1} of ${pageCount}`}
           </p>
           <div className='flex items-center gap-2'>
-            <button
-              type='button'
-              className={cn(
-                'inline-flex h-9 w-9 items-center justify-center rounded-lg border border-grey-200 bg-white text-sm transition-colors',
-                'hover:bg-grey-50 disabled:opacity-40 disabled:cursor-not-allowed'
-              )}
+            <Button
+              variant='outline'
+              size='icon'
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
               aria-label='Previous page'
             >
               <ChevronLeft className='h-4 w-4' />
-            </button>
+            </Button>
 
             {/* Page number buttons */}
             {generatePageNumbers(
@@ -175,36 +173,29 @@ export function DataTable<TData>({
                   ...
                 </span>
               ) : (
-                <button
+                <Button
                   key={pageNum}
-                  type='button'
-                  className={cn(
-                    'inline-flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors',
-                    pageNum === (pagination?.pageIndex ?? 0) + 1
-                      ? 'bg-[#100A55] text-white'
-                      : 'border border-grey-200 bg-white text-grey-600 hover:bg-grey-50'
-                  )}
+                  variant={pageNum === (pagination?.pageIndex ?? 0) + 1 ? 'default' : 'outline'}
+                  size='icon'
+                  className={pageNum === (pagination?.pageIndex ?? 0) + 1 ? 'bg-[#100A55] text-white hover:bg-[#100A55]/90' : ''}
                   onClick={() =>
                     table.setPageIndex((pageNum as number) - 1)
                   }
                 >
                   {pageNum}
-                </button>
+                </Button>
               )
             )}
 
-            <button
-              type='button'
-              className={cn(
-                'inline-flex h-9 w-9 items-center justify-center rounded-lg border border-grey-200 bg-white text-sm transition-colors',
-                'hover:bg-grey-50 disabled:opacity-40 disabled:cursor-not-allowed'
-              )}
+            <Button
+              variant='outline'
+              size='icon'
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
               aria-label='Next page'
             >
               <ChevronRight className='h-4 w-4' />
-            </button>
+            </Button>
           </div>
         </div>
       )}
