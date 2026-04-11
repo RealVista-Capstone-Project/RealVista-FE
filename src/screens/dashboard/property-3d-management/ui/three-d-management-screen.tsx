@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import {
@@ -31,9 +31,8 @@ import {
   X,
   Lock,
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { billingQueries } from '@/entities/billing';
-import type { ActiveSubscriptionResponse } from '@/entities/billing';
+import { useThreeDQuota } from '@/entities/billing';
+import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
@@ -122,13 +121,29 @@ export function ThreeDManagementScreen({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
 
-  // 3D Tour subscription gate
-  const { data: subscriptions, isLoading: subsLoading, isError: subsError } = useQuery(billingQueries.mySubscriptions());
+  // 3D Tour subscription gate & quota
+  const {
+    remaining,
+    quotaLimit,
+    unlimited,
+    isLocked,
+    isLoading: subsLoading,
+    decrementQuota,
+    invalidateQuota,
+  } = useThreeDQuota();
 
-  const threeDSub = subscriptions?.find(
-    (s: ActiveSubscriptionResponse) => s.feature_type === '3D_TOUR' && s.status === 'ACTIVE'
-  );
-  const isLocked = !subsLoading && !subsError && (!threeDSub || (!threeDSub.unlimited && (threeDSub.remaining_quota ?? 0) <= 0));
+  const handleQuotaPreFlight = useCallback((): boolean => {
+    if (isLocked) {
+      toast.error(t('quotaExhausted'));
+      return false;
+    }
+    return true;
+  }, [isLocked, t]);
+
+  const handleOperationCreated = useCallback(() => {
+    decrementQuota();
+    invalidateQuota();
+  }, [decrementQuota, invalidateQuota]);
 
   // Delete state
   const [roomToDelete, setRoomToDelete] = useState<RoomGroup | null>(null);
@@ -283,6 +298,15 @@ export function ThreeDManagementScreen({
                 {isLocked ? <Lock className='w-5 h-5' /> : <Plus className='w-5 h-5' />}
                 {t('newRoom')}
               </Button>
+              {!isLocked && !subsLoading && (
+                <span className='text-xs text-muted-foreground'>
+                  {unlimited
+                    ? t('quotaUnlimited')
+                    : remaining != null && quotaLimit != null
+                      ? t('quotaRemaining', { remaining, total: quotaLimit })
+                      : null}
+                </span>
+              )}
             </div>
           </div>
 
@@ -331,17 +355,17 @@ export function ThreeDManagementScreen({
           <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
             <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
             <h3 className='text-sm font-semibold text-main-black mb-1'>
-              {threeDSub ? t('lockedTitle') : t('noSubscriptionTitle')}
+              {remaining != null ? t('lockedTitle') : t('noSubscriptionTitle')}
             </h3>
             <p className='text-xs text-grey-500 mb-4'>
-              {threeDSub ? t('lockedDescription') : t('noSubscriptionDescription')}
+              {remaining != null ? t('lockedDescription') : t('noSubscriptionDescription')}
             </p>
             <button
               type='button'
               onClick={() => router.push(`/${locale}/subscribe`)}
               className='inline-flex items-center justify-center rounded-lg bg-main-black text-white text-xs font-semibold px-6 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
             >
-              {threeDSub ? t('lockedCta') : t('noSubscriptionCta')}
+              {remaining != null ? t('lockedCta') : t('noSubscriptionCta')}
             </button>
           </div>
         </div>
@@ -456,6 +480,8 @@ export function ThreeDManagementScreen({
         onOpenChange={setIsDialogOpen}
         onComplete={handleGenerationComplete}
         existingRoomNames={roomGroups.map((r) => r.roomName)}
+        onPreFlight={handleQuotaPreFlight}
+        onOperationCreated={handleOperationCreated}
       />
 
       {/* Delete Confirmation Dialog */}
