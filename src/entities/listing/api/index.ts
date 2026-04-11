@@ -118,3 +118,10 @@ export const listingApi = {
 export { listingKeys } from './keys';
 export { listingQueries } from './listing.queries';
 export * from './actions';
+export { listingBoostApi } from './listing-boost.api';
+export {
+  listingBoostKeys,
+  listingBoostQueries,
+  useApplyBoost,
+  useRemoveBoost,
+} from './listing-boost.queries';

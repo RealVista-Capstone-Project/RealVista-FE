@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { PropertyHeader } from '@/features/property-header';
 import { PropertyGallery } from '@/features/property-gallery';
@@ -16,6 +17,7 @@ import { PropertyActiveListings } from '@/features/property-active-listings';
 import { mapPropertyResponseToProperty } from '@/entities/property/lib/property-response-to-property.mapper';
 import { Skeleton } from '@/shared/ui/skeleton/skeleton';
 import { ClipboardEdit, AlertCircle } from 'lucide-react';
+import { agentEngagementApi } from '@/entities/agent-engagement';
 
 export interface PropertyDetailScreenProps {
   propertyId: string;
@@ -24,14 +26,27 @@ export interface PropertyDetailScreenProps {
 export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) {
   const { data: response, isLoading, isError } = usePropertyDetail(propertyId);
   const [isApplyProposalOpen, setIsApplyProposalOpen] = useState(false);
+  const [isApplyProposalDisabledLocal, setIsApplyProposalDisabledLocal] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyDetail');
   const router = useRouter();
   const params = useParams();
 
   // RBAC check
-  const backendRoles: string[] = (session?.user as any)?.backendRoles ?? [];
+  const backendRoles: string[] = session?.user?.backendRoles ?? [];
   const isAgent = backendRoles.includes('AGENT');
+  const initiatorId = session?.user?.id;
+  const receiverId = response?.owner_id;
+
+  const { data: applyStateResponse } = useQuery({
+    queryKey: ['agent-proposal-apply-state', initiatorId, receiverId],
+    queryFn: () => agentEngagementApi.getAgentProposalApplyState(initiatorId!, receiverId!),
+    enabled: isAgent && !!initiatorId && !!receiverId,
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const isApplyProposalDisabled =
+    isApplyProposalDisabledLocal || applyStateResponse?.payload?.data?.can_apply_proposal === false;
 
   if (isLoading) {
     return (
@@ -105,6 +120,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
                    size='medium'
                   className='w-full bg-main-secondary flex items-center justify-center gap-2'
                   onClick={handleApplyProposal}
+                  disabled={isApplyProposalDisabled}
                 >
                   <ClipboardEdit className='h-5 w-5 shrink-0' />
                   {t('applyProposal') || 'Apply Proposal'}
@@ -139,6 +155,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
                   size='medium'
                   className='w-full bg-main-secondary flex items-center justify-center gap-2'
                   onClick={handleApplyProposal}
+                  disabled={isApplyProposalDisabled}
                 >
                   <ClipboardEdit className='h-5 w-5 shrink-0' />
                   {t('applyProposal') || 'Apply Proposal'}
@@ -153,6 +170,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
         propertyId={property.id}
         isOpen={isApplyProposalOpen}
         onClose={() => setIsApplyProposalOpen(false)}
+        onSubmitSuccess={() => setIsApplyProposalDisabledLocal(true)}
       />
     </div>
   );

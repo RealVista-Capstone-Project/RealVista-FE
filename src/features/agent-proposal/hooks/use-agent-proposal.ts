@@ -63,3 +63,31 @@ export const useUpdateProposalMutation = (onSuccessCallback?: () => void) => {
     },
   });
 };
+
+/** POST (create) or PUT (edit) with {@link ApplyAgentProposalPayload.status} DRAFT. */
+export const useSaveProposalDraftMutation = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+  const t = useTranslations('ManageProposals');
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      payload,
+    }: {
+      id?: string;
+      payload: ApplyAgentProposalPayload;
+    }) => {
+      if (id) return agentProposalApi.updateProposal(id, payload);
+      return agentProposalApi.applyProposal(payload);
+    },
+    onSuccess: () => {
+      toast.success(t('toastDraftSaved'));
+      queryClient.invalidateQueries({ queryKey: agentProposalKeys.all });
+      onSuccessCallback?.();
+    },
+    onError: (error: any) => {
+      const serverMsg = error?.response?.data?.message;
+      toast.error(serverMsg || t('toastDraftError'));
+    },
+  });
+};
