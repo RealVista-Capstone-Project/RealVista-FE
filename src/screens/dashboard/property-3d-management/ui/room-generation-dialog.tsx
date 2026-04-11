@@ -76,6 +76,7 @@ export function RoomGenerationDialog({
   } = useGenerate3d(propertyId, t as any);
 
   const [roomName, setRoomName] = useState('');
+  const [roomDisplayName, setRoomDisplayName] = useState('');
   const [images, setImages] = useState<AzimuthImage[]>([]);
   const [selectedModel, setSelectedModel] = useState<MarbleModel>('Marble 0.1-mini');
   const [isDragging, setIsDragging] = useState(false);
@@ -86,6 +87,7 @@ export function RoomGenerationDialog({
   useEffect(() => {
     if (open) {
       setRoomName('');
+      setRoomDisplayName('');
       setImages([]);
       setSelectedModel('Marble 0.1-mini');
       reset();
@@ -173,8 +175,11 @@ export function RoomGenerationDialog({
         <Input
           id='room-name'
           placeholder={t('roomNamePlaceholder')}
-          value={roomName}
-          onChange={(e) => setRoomName(e.target.value)}
+          value={roomDisplayName || roomName}
+          onChange={(e) => {
+            setRoomName(e.target.value);
+            setRoomDisplayName('');
+          }}
           className='bg-muted/50 border-border focus-visible:ring-primary'
         />
 
@@ -187,7 +192,10 @@ export function RoomGenerationDialog({
             <button
               key={key}
               type='button'
-              onClick={() => setRoomName(SUGGESTED_ROOM_EN_VALUES[key])}
+              onClick={() => {
+                setRoomName(SUGGESTED_ROOM_EN_VALUES[key]);
+                setRoomDisplayName(t(key as any));
+              }}
               className='text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors'
             >
               {t(key as any)}
@@ -396,10 +404,10 @@ export function RoomGenerationDialog({
               </div>
             </div>
 
-            <div className='flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>
-              <span className={phase === 'uploading' ? 'text-primary' : 'text-emerald-500'}>{t('phaseUploading')}</span>
-              <span className={phase === 'requesting' ? 'text-primary' : phase === 'polling' ? 'text-emerald-500' : ''}>{t('phaseRequesting')}</span>
-              <span className={phase === 'polling' ? 'text-primary animate-pulse' : ''}>{t('phaseProcessing')}</span>
+            <div className='grid grid-cols-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>
+              <span className={cn('text-left', phase === 'uploading' ? 'text-primary' : 'text-emerald-500')}>{t('phaseUploading')}</span>
+              <span className={cn('text-center', phase === 'requesting' ? 'text-primary' : phase === 'polling' ? 'text-emerald-500' : '')}>{t('phaseRequesting')}</span>
+              <span className={cn('text-right', phase === 'polling' ? 'text-primary animate-pulse' : '')}>{t('phaseProcessing')}</span>
             </div>
           </div>
 
