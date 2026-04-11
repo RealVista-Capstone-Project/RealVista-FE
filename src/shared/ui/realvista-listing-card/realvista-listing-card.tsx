@@ -43,6 +43,7 @@ export interface RealVistaListingCardProps {
   statusTag?: 'SOLD' | 'RENTED';
   attributes?: ListingAttribute[];
   boostTag?: string;
+  userType?: 'AGENT' | 'OWNER';
   variant?: 'grid' | 'list';
   listingType?: 'RENT' | 'SALE';
   onToggleFavorite?: (id: string) => void;
@@ -319,7 +320,7 @@ export function RealVistaListingCard({
         >
           {/* Unavailable overlay */}
           {isUnavailable && (
-            <div className='absolute inset-0 rounded-xl bg-white/60 z-[5] pointer-events-none' />
+            <div className='absolute inset-0 rounded-xl bg-white/40 backdrop-blur-[2px] z-[5] pointer-events-none' />
           )}
 
           {/* Image – fixed width */}
@@ -395,7 +396,7 @@ export function RealVistaListingCard({
       >
         {/* Unavailable overlay */}
         {isUnavailable && (
-          <div className='absolute inset-0 rounded-xl bg-white/60 z-[5] pointer-events-none' />
+          <div className='absolute inset-0 rounded-xl bg-white/40 backdrop-blur-[2px] z-[5] pointer-events-none' />
         )}
 
         {/* Property Image Container */}

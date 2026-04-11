@@ -32,7 +32,9 @@ export interface BookmarkListingCardDTO {
   area_sqft: number | null;
   usable_size_m2: number | null;
   status?: string;
-  boost_tag?: string;
+  is_boosted?: boolean;
+  boost_package?: string;
+  user_type?: string;
 }
 
 export interface BookmarkPageResponse {
