@@ -1,21 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useState } from 'react';
-import { ChevronDown, Heart, Menu, CreditCard, X } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
 import RealVistaLogo from '@/shared/assets/logo/logo';
-import { ProfileDropdown, Separator } from '@/shared/ui';
-import { ChatDropdownContainer } from '@/widgets/chat-dropdown';
-import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
+import { DashboardActions } from './top-nav-dashboard-actions';
+import { PublicActions } from './top-nav-public-actions';
 
 export type NavItem = {
   id: string;
@@ -23,7 +20,6 @@ export type NavItem = {
   href: string;
 };
 
-type ProfileVariant = 'dropdown' | 'inline';
 
 export interface TopNavProps {
   variant?: 'public' | 'dashboard';
@@ -34,7 +30,7 @@ export interface TopNavProps {
     initials: string;
     avatar?: string;
   };
-  profileVariant?: ProfileVariant;
+
   startContent?: React.ReactNode;
   className?: string;
 }
@@ -56,7 +52,6 @@ export function TopNav({
   navItems = variant === 'public' ? defaultNavItems : undefined,
   logoHref = ROUTES.buy,
   user = defaultUser,
-  profileVariant = variant === 'dashboard' ? 'inline' : 'dropdown',
   startContent,
   className,
 }: TopNavProps) {
@@ -65,10 +60,8 @@ export function TopNav({
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
-  const queryClient = useQueryClient();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showNavItems = variant === 'public' && navItems && navItems.length > 0;
-  const showMessageButton = variant === 'public';
   const isUserLoggedIn = !!session?.user;
 
   // Helper function to check if a route is active
@@ -146,130 +139,27 @@ export function TopNav({
         </div>
       </div>
 
-      {/* Right Actions */}
-      <div className='flex items-center gap-6'>
-        {/* Notification Dropdown - only shown when logged in, hidden on mobile for public variant */}
-        {isUserLoggedIn && (
-          <div className={cn(variant === 'public' && 'hidden lg:block')}>
-            <NotificationDropdownContainer />
-          </div>
-        )}
-
-        {/* Bookmark Button - only for public variant, shown when user is logged in, hidden on mobile */}
-        {showMessageButton && isUserLoggedIn && (
-          <button
-            type='button'
-            onClick={() => {
-              void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
-              router.push(`/${locale}${ROUTES.favorited}`);
-            }}
-            className={cn(
-              'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
-              isRouteActive('/favorited')
-                ? 'bg-main-primary text-white'
-                : 'bg-purple-98 text-main-black hover:bg-purple-92'
-            )}
-            aria-label='Bookmarks'
-            title='View bookmarks'
-          >
-            <Heart
-              className='h-5 w-5'
-              fill={isRouteActive('/favorited') ? 'currentColor' : 'none'}
-            />
-          </button>
-        )}
-
-        {showMessageButton && (
-          <button
-            type='button'
-            onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
-            className={cn(
-              'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
-              isRouteActive('/subscribe')
-                ? 'bg-main-primary text-white'
-                : 'bg-purple-98 text-main-black hover:bg-purple-92'
-            )}
-            aria-label={t('subscribe')}
-            title={t('subscribe')}
-          >
-            <CreditCard className='h-5 w-5' strokeWidth={2} />
-          </button>
-        )}
-
-        {/* Chat Dropdown - only for public variant and logged in users, hidden on mobile */}
-        {showMessageButton && isUserLoggedIn && (
-          <div className='hidden lg:block'>
-            <ChatDropdownContainer />
-          </div>
-        )}
-
-        {/* Divider - hidden on mobile for public variant */}
-        <div className={cn('flex h-10 items-center', variant === 'public' && 'hidden lg:flex')}>
-          <Separator orientation='vertical' className='h-6' />
-        </div>
-
-        {/* Profile - Dropdown or Inline when logged in, hidden on mobile for public variant */}
-        {isUserLoggedIn ? (
-          profileVariant === 'dropdown' ? (
-            <div className='hidden lg:block'>
-              <ProfileDropdown user={user} align='end' />
-            </div>
-          ) : (
-            <button
-              type='button'
-              className='flex h-12 w-[143px] items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2.5 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md'
-              aria-label='Profile menu'
-            >
-              {user.avatar ? (
-                <Image
-                  src={user.avatar}
-                  alt={user.name}
-                  width={32}
-                  height={32}
-                  className='size-8 rounded-full object-cover'
-                  priority
-                />
-              ) : (
-                <div className='flex size-8 items-center justify-center rounded-full bg-main-primary text-white'>
-                  <span className='text-base font-bold leading-[1.5]'>{user.initials}</span>
-                </div>
-              )}
-              <span className='text-base font-medium leading-[1.5] text-main-black'>
-                {user.name}
-              </span>
-              <ChevronDown className='h-4 w-4 shrink-0 text-main-black' strokeWidth={2} />
-            </button>
-          )
-        ) : (
-          /* Login and Sign up buttons - shown only when not logged in, public variant */
-          <div className='hidden lg:flex items-center gap-3'>
-            <Link
-              href={`/${locale}${ROUTES.login}`}
-              className='flex h-12 items-center justify-center px-6 rounded-lg border border-purple-92 bg-white font-medium text-main-primary transition-colors hover:bg-purple-98'
-            >
-              {t('login')}
-            </Link>
-            <Link
-              href={`/${locale}${ROUTES.register}`}
-              className='flex h-12 items-center justify-center px-6 rounded-lg bg-main-primary text-white font-medium transition-colors hover:bg-main-primary-hover'
-            >
-              {t('signup')}
-            </Link>
-          </div>
-        )}
-
-        {/* Hamburger Menu - only for public variant, visible on mobile */}
-        {variant === 'public' && (
-          <button
-            type='button'
-            onClick={() => setIsMobileMenuOpen(true)}
-            className='flex lg:hidden size-10 items-center justify-center text-main-black'
-            aria-label='Open menu'
-          >
-            <Menu className='h-6 w-6' strokeWidth={2} />
-          </button>
-        )}
-      </div>
+      {/* Right Actions — split per variant for clear, isolated logic */}
+      {variant === 'dashboard' ? (
+        <DashboardActions
+          user={user}
+          isUserLoggedIn={isUserLoggedIn}
+          locale={locale}
+          t={t}
+          router={router}
+          isRouteActive={isRouteActive}
+        />
+      ) : (
+        <PublicActions
+          user={user}
+          isUserLoggedIn={isUserLoggedIn}
+          locale={locale}
+          t={t}
+          router={router}
+          isRouteActive={isRouteActive}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+        />
+      )}
 
       {/* Mobile Menu Drawer */}
       {variant === 'public' && isMobileMenuOpen && (
@@ -341,6 +231,8 @@ export function TopNav({
     </header>
   );
 }
+
+// ─── Nav Item Dropdown ────────────────────────────────────────────────────────
 
 function NavItemDropdown({
   item,

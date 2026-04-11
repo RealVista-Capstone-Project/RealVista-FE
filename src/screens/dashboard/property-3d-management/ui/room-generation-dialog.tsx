@@ -52,6 +52,7 @@ interface RoomGenerationDialogProps {
   existingRoomNames?: string[];
   onPreFlight?: () => boolean;
   onOperationCreated?: () => void;
+  onInitiationError?: () => void;
 }
 
 export function RoomGenerationDialog({
@@ -62,6 +63,7 @@ export function RoomGenerationDialog({
   existingRoomNames = [],
   onPreFlight,
   onOperationCreated,
+  onInitiationError,
 }: RoomGenerationDialogProps) {
   const t = useTranslations('ThreeDManagement');
   const {
@@ -150,6 +152,7 @@ export function RoomGenerationDialog({
       generate(images, selectedModel, roomName.trim(), roomName.trim(), {
         onPreFlight,
         onOperationCreated,
+        onInitiationError,
       });
     }
   };

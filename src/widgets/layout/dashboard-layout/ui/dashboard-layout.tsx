@@ -4,7 +4,6 @@ import * as React from 'react';
 import Image from 'next/image';
 import {
   Calendar,
-  ChevronDown,
   Columns,
   FileText,
   LayoutDashboard,
@@ -15,14 +14,13 @@ import {
   Search,
   type LucideIcon,
 } from 'lucide-react';
-import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
-import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 import { useAuthSession } from '@/features/auth/model';
 import { ROUTES } from '@/shared/config/routes';
+import { TopNavContainer } from '@/shared/ui/top-nav/top-nav-container';
 
 export interface SidebarMenuItem {
   id: string;
@@ -35,11 +33,6 @@ export interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarItems?: SidebarMenuItem[];
   logoHref?: string;
-  user?: {
-    name: string;
-    initials: string;
-    avatar?: string;
-  };
   className?: string;
 }
 
@@ -100,16 +93,10 @@ const agentSidebarItems: SidebarMenuItem[] = [
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
-const defaultUser = {
-  name: 'Francis',
-  initials: 'FR',
-};
-
 export function DashboardLayout({
   children,
   sidebarItems,
   logoHref = ROUTES.homePage,
-  user = defaultUser,
   className,
 }: DashboardLayoutProps) {
   const { data: session } = useAuthSession();
@@ -306,42 +293,10 @@ export function DashboardLayout({
       {/* Main Content Area - Properly fills space without margin hacks */}
       <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
         {/* Top Nav */}
-        <header className='flex shrink-0 items-center justify-between bg-white px-8 py-3.5 border-b border-slate-100 shadow-sm shadow-slate-100/50 z-10'>
-          {/* Left Section */}
-          <div className='flex items-center gap-4'>
-            <span className='font-bold text-xl tracking-tight text-slate-800 translate-y-[-1px]'>
-              {pageTitle}
-            </span>
-          </div>
+        <TopNavContainer
+          variant='dashboard'
 
-          {/* Right Actions */}
-          <div className='flex items-center gap-5'>
-            {/* Notification Dropdown */}
-            <NotificationDropdownContainer />
-
-            {/* Divider */}
-            <Separator orientation='vertical' className='h-5 bg-slate-200' />
-            <button
-              type='button'
-              className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white pl-2 pr-3 py-1.5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md active:scale-95 group'
-              aria-label='Profile menu'
-            >
-              <div className='flex size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-xs ring-2 ring-indigo-50 shadow-inner group-hover:scale-105 transition-transform'>
-                {user.initials}
-              </div>
-              <div className='flex flex-col items-start translate-y-[-1px]'>
-                <span className='text-xs font-bold leading-none text-slate-800 mb-0.5'>
-                  {user.name}
-                </span>
-                <span className='text-[10px] font-medium text-slate-400'>Professional Agent</span>
-              </div>
-              <ChevronDown
-                className='h-3.5 w-3.5 text-slate-400 ml-1 group-hover:text-slate-600 transition-colors'
-                strokeWidth={2.5}
-              />
-            </button>
-          </div>
-        </header>
+        />
 
         {/* Page Content - fills remaining height */}
         <main className='flex-1 h-full overflow-x-hidden bg-slate-50/50 p-0'>{children}</main>

@@ -71,6 +71,7 @@
     "progressPolling": "Generating 3D model...",
     "progressSucceeded": "3D World generated successfully!",
     "progressFailed": "Generation failed",
+    "progressQuotaExhausted": "You have no remaining 3D room credits. Please upgrade your plan to continue.",
     "progressCancelled": "Generation cancelled",
     "progressResuming": "Resuming tracking from backend...",
     "progressFailedUpload": "Failed to upload image {current}",

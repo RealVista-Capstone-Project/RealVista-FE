@@ -228,7 +228,7 @@ All routes are defined as `const` for type safety and should be imported from th
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **RealVista-FE** (2811 symbols, 6061 relationships, 135 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **RealVista-FE** (2848 symbols, 6121 relationships, 126 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -244,7 +244,7 @@ This project is indexed by GitNexus as **RealVista-FE** (2811 symbols, 6061 rela
 
 1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
 2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/realvista-fe/process/{processName}` — trace the full execution flow step by step
+3. `READ gitnexus://repo/RealVista-FE/process/{processName}` — trace the full execution flow step by step
 4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
 
 ## When Refactoring
@@ -283,10 +283,10 @@ This project is indexed by GitNexus as **RealVista-FE** (2811 symbols, 6061 rela
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/realvista-fe/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/realvista-fe/clusters` | All functional areas |
-| `gitnexus://repo/realvista-fe/processes` | All execution flows |
-| `gitnexus://repo/realvista-fe/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/RealVista-FE/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/RealVista-FE/clusters` | All functional areas |
+| `gitnexus://repo/RealVista-FE/processes` | All execution flows |
+| `gitnexus://repo/RealVista-FE/process/{name}` | Step-by-step execution trace |
 
 ## Self-Check Before Finishing
 
