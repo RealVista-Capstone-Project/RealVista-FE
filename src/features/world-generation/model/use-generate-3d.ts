@@ -121,8 +121,20 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
   }, []);
 
   const generate = useCallback(
-    async (images: AzimuthImage[], model: MarbleModel, displayName?: string, roomName?: string) => {
+    async (
+      images: AzimuthImage[],
+      model: MarbleModel,
+      displayName?: string,
+      roomName?: string,
+      options?: { onPreFlight?: () => boolean; onOperationCreated?: () => void }
+    ) => {
       abortRef.current = false;
+
+      // Pre-flight quota check
+      if (options?.onPreFlight && !options.onPreFlight()) {
+        return;
+      }
+
       setState({
         phase: 'uploading',
         operationId: null,
@@ -199,6 +211,9 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
           'data' in generationRes ? generationRes.data : generationRes
         ) as Property3dOperation;
         const opId = opData.operation_id;
+
+        // Notify caller that the operation was created (e.g., for quota decrement)
+        options?.onOperationCreated?.();
 
         // Step 3: Switch to polling
         setState((prev) => ({
