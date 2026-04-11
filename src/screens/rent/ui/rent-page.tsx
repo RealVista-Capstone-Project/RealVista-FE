@@ -72,7 +72,7 @@ function RentPageContent() {
   const [maxPrice, setMaxPrice] = useState(searchParams?.get('maxPrice') || '');
 
   // Construct initial criteria from URL
-  const getInitialCriteria = (): AdvancedSearchRequest => {
+  const getInitialCriteria = useCallback((): AdvancedSearchRequest => {
     // Rebuild dynamicAttributes from URL params (attr_BEDROOMS, attr_BATHROOMS, etc.)
     const dynamicAttributes: Record<string, string> = {};
     searchParams?.forEach((value, key) => {
@@ -106,7 +106,7 @@ function RentPageContent() {
       has3D: searchParams?.get('has3D') === 'true',
       sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
     };
-  };
+  }, [searchParams]);
 
   const [searchCriteria, setSearchCriteria] = useState<AdvancedSearchRequest>(getInitialCriteria());
 
@@ -124,9 +124,9 @@ function RentPageContent() {
     setSearchCriteria(criteria);
 
     performSearch(criteria, page);
-  }, [searchParams]);
+  }, [searchParams, getInitialCriteria, performSearch]);
 
-  const performSearch = async (criteria: AdvancedSearchRequest, page: number) => {
+  const performSearch = useCallback(async (criteria: AdvancedSearchRequest, page: number) => {
     setIsLoading(true);
     try {
       const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
@@ -141,7 +141,7 @@ function RentPageContent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [itemsPerPage]);
 
   const updateUrl = (criteria: AdvancedSearchRequest, page: number) => {
     const params = new URLSearchParams();

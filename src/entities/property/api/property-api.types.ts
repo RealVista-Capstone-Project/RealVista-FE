@@ -200,7 +200,7 @@ export interface PropertyMediaRequest {
   thumbnailUrl?: string;
   type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
   isThumbnail?: boolean;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreatePropertyRequest {
@@ -274,7 +274,7 @@ export interface PropertyDetailResponse {
     thumbnail_url: string | null;
     media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
     is_primary: boolean;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
   }>;
   active_listings?: ListingSummaryDTO[];
 }

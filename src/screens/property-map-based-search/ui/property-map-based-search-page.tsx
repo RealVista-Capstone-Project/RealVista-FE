@@ -341,7 +341,7 @@ export function PropertyMapBasedSearchPage({
                     areaUnit='m²'
                     isFavorite={favoriteOverrides[property.listing_id] ?? property.is_favorite}
                     boostTags={property.is_boosted ? property.boost_packages : undefined}
-                    userType={property.user_type as any}
+                    userType={property.user_type as 'AGENT' | 'OWNER'}
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}

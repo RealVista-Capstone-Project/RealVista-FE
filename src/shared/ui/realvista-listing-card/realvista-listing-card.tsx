@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Bath, Heart, BedSingle, Flame } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';

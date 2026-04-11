@@ -14,7 +14,7 @@ export interface AdvancedSearchRequest {
   hasVideo?: boolean;
   has3D?: boolean;
   sortBy?: 'PRIORITY' | 'DATE_DESC' | 'PRICE_ASC' | 'PRICE_DESC';
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ListingSearchResponse {
