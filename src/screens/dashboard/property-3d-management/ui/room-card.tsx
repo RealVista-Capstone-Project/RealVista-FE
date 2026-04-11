@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import {
   RefreshCw,
@@ -24,7 +24,8 @@ import type { Property3dOperation } from '@/entities/property/api/property-api.t
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { CardContainer, CardBody } from '@/shared/ui/3d-card';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -132,33 +133,6 @@ export function RoomCard({
   const [renameValue, setRenameValue] = useState(room.roomName);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ── Tilt + shine effect ───────────────────────────────────────────────────
-  const cardRef = useRef<HTMLDivElement>(null);
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const rotateX = useSpring(useTransform(rawY, [-0.5, 0.5], [10, -10]), { stiffness: 300, damping: 30 });
-  const rotateY = useSpring(useTransform(rawX, [-0.5, 0.5], [-10, 10]), { stiffness: 300, damping: 30 });
-  const shineX = useTransform(rawX, [-0.5, 0.5], [0, 100]);
-  const shineY = useTransform(rawY, [-0.5, 0.5], [0, 100]);
-  const shineBackground = useTransform(
-    [shineX, shineY],
-    ([x, y]: number[]) =>
-      `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.12) 0%, transparent 60%)`
-  );
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    rawX.set((e.clientX - rect.left) / rect.width - 0.5);
-    rawY.set((e.clientY - rect.top) / rect.height - 0.5);
-  }, [rawX, rawY]);
-
-  const handleMouseLeave = useCallback(() => {
-    rawX.set(0);
-    rawY.set(0);
-  }, [rawX, rawY]);
-  // ─────────────────────────────────────────────────────────────────────────
-
   const hasModel = threeDMedia.some((m) => {
     const rName = m.metadata?.room_name || 'Unnamed Room';
     return rName === room.roomName;
@@ -200,16 +174,17 @@ export function RoomCard({
   };
 
   return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.06 }}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 800 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className='will-change-transform'
+    <CardContainer
+      className='w-full'
+      containerClassName='py-0'
     >
+      <CardBody className='w-full'>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: index * 0.06 }}
+          className='w-full'
+        >
       <Card
         className={`
           group relative overflow-hidden transition-all duration-200 cursor-pointer
@@ -222,7 +197,7 @@ export function RoomCard({
         {/* Glossy shine overlay */}
         <motion.div
           className='pointer-events-none absolute inset-0 z-10 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-300'
-          style={{ background: shineBackground }}
+          style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.10) 0%, transparent 60%)' }}
         />
         {/* Thumbnail / Skeleton */}
         {room.thumbnailUrl ? (
@@ -402,6 +377,8 @@ export function RoomCard({
             )}
         </CardContent>
       </Card>
-    </motion.div>
+        </motion.div>
+      </CardBody>
+    </CardContainer>
   );
 }
