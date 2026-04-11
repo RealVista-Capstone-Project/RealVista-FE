@@ -79,6 +79,9 @@
     "lockedCta": "Nâng cấp ngay",
     "noSubscriptionTitle": "Mở khóa tính năng tạo Phòng 3D",
     "noSubscriptionDescription": "Đăng ký gói 3D Tour để bắt đầu tạo trải nghiệm 3D sống động cho bất động sản của bạn.",
-    "noSubscriptionCta": "Khám phá gói 3D"
+    "noSubscriptionCta": "Khám phá gói 3D",
+    "quotaRemaining": "Còn {remaining} / {total} lượt",
+    "quotaUnlimited": "Không giới hạn",
+    "quotaExhausted": "Đã hết lượt tạo phòng 3D. Vui lòng nâng cấp gói đăng ký."
   }
 }

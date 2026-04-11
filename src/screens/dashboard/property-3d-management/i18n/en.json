@@ -79,6 +79,9 @@
     "lockedCta": "Upgrade Now",
     "noSubscriptionTitle": "Unlock 3D Room Creation",
     "noSubscriptionDescription": "Subscribe to a 3D Tour plan to start creating immersive 3D experiences for your properties.",
-    "noSubscriptionCta": "Explore 3D Plans"
+    "noSubscriptionCta": "Explore 3D Plans",
+    "quotaRemaining": "{remaining} of {total} remaining",
+    "quotaUnlimited": "Unlimited",
+    "quotaExhausted": "3D Tour quota exhausted. Please upgrade your subscription."
   }
 }
