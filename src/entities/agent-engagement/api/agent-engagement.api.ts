@@ -6,6 +6,7 @@ import type {
   GetAgentEngagementsParams,
   CreateReviewPayload,
   SubmitAgentProposalPayload,
+  AgentProposalApplyState,
 } from '../model/types';
 import type { ListingAttribute } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 
@@ -139,5 +140,10 @@ export const agentEngagementApi = {
       property_id: payload.property_id,
       message: payload.message,
     }),
+
+  getAgentProposalApplyState: (initiatorId: string, receiverId: string) =>
+    http.get<ApiResponse<AgentProposalApplyState>>(
+      `/engagements/agent-proposal/apply-state?initiator_id=${initiatorId}&receiver_id=${receiverId}`
+    ),
 } as const;
 

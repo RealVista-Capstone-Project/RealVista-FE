@@ -41,9 +41,11 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/property-search/i18n/${locale}.json`)).default,
       ...(await import(`@/features/engagement/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/buy/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/rent/i18n/${locale}.json`)).default,
       // Widget segments
       ...(await import(`@/widgets/recommended-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/ai-chat-assistant/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/spark-viewer/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/notification-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/chat/i18n/${locale}.json`)).default,
     },

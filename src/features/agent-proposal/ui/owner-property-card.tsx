@@ -1,16 +1,19 @@
 'use client';
 
 import type { OwnerPropertySummary } from '@/entities/property';
+import type { ListingType } from '@/features/agent-proposal/model/owner-properties-context';
 import { Badge } from '@/shared/ui/badge';
 import { cn } from '@/shared/lib/utils';
-import { MapPin, Ruler, Home, User, BedDouble, Building2, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { MapPin, Ruler, Home, BedDouble, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { formatVND } from '@/shared/lib/utils/format-currency';
 
 interface OwnerPropertyCardProps {
   property: OwnerPropertySummary;
   isSelected: boolean;
   onClick: (property: OwnerPropertySummary) => void;
   variant?: 'sidebar' | 'card';
+  listingType?: ListingType;
 }
 
 function getStatusStyle(status: string): string {
@@ -31,11 +34,30 @@ function formatArea(size: number | null): string | null {
   return `${size} m²`;
 }
 
+function formatRentPrice(priceRange: OwnerPropertySummary['price_range']): string | null {
+  if (!priceRange?.rent) return null;
+  const { min, max } = priceRange.rent;
+  if (min && max) return `${formatVND(min)} – ${formatVND(max)}`;
+  if (min) return `${formatVND(min)}+`;
+  if (max) return `≤ ${formatVND(max)}`;
+  return null;
+}
+
+function formatBuyPrice(priceRange: OwnerPropertySummary['price_range']): string | null {
+  if (!priceRange?.buy) return null;
+  const { min, max } = priceRange.buy;
+  if (min && max) return `${formatVND(min)} – ${formatVND(max)}`;
+  if (min) return `${formatVND(min)}+`;
+  if (max) return `≤ ${formatVND(max)}`;
+  return null;
+}
+
 export function OwnerPropertyCard({
   property,
   isSelected,
   onClick,
   variant = 'sidebar',
+  listingType = 'ALL',
 }: OwnerPropertyCardProps) {
   const t = useTranslations('OwnerProperties');
 
@@ -52,16 +74,21 @@ export function OwnerPropertyCard({
 
   const area = formatArea(property.usable_size_m2 ?? property.land_size_m2);
   const bedroomsAttr = property.attributes?.find((a) => a.attribute_code === 'BEDROOMS');
+  const rentPriceDisplay = formatRentPrice(property.price_range);
+  const buyPriceDisplay = formatBuyPrice(property.price_range);
+
+  const showRent = listingType === 'RENT' || (listingType === 'ALL' && !!rentPriceDisplay);
+  const showBuy = listingType === 'SELL' || (listingType === 'ALL' && !!buyPriceDisplay);
 
   return (
     <button
       type='button'
       onClick={() => onClick(property)}
       className={cn(
-        'group w-full text-left transition-colors',
+        'group w-full text-left transition-all duration-200',
         variant === 'sidebar'
           ? cn(
-              'flex flex-row items-stretch gap-0 p-4 sm:p-6 hover:bg-purple-98',
+              'flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 hover:bg-purple-98',
               isSelected ? 'bg-purple-96' : 'bg-white'
             )
           : cn(
@@ -72,8 +99,8 @@ export function OwnerPropertyCard({
             )
       )}
     >
-      {/* Thumbnail — fixed width + height left column */}
-      <div className='relative w-44 h-36 flex-shrink-0 bg-gray-100 overflow-hidden'>
+      {/* Thumbnail */}
+      <div className='relative w-40 h-32 flex-shrink-0 bg-gray-100 overflow-hidden'>
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -86,7 +113,7 @@ export function OwnerPropertyCard({
           </div>
         )}
         {/* Status badge */}
-        <div className='absolute top-2.5 left-2.5'>
+        <div className='absolute top-2 left-2'>
           <Badge
             variant='outline'
             className={cn(
@@ -99,45 +126,48 @@ export function OwnerPropertyCard({
         </div>
       </div>
 
-      {/* Content — flexible right column */}
-      <div className='flex-1 min-w-0 flex flex-col justify-between px-5 py-4 gap-3'>
-        {/* Top: address + type */}
-        <div className='flex items-start justify-between gap-3'>
+      {/* Content */}
+      <div className='flex-1 min-w-0 flex flex-col justify-between px-4 py-3 gap-2'>
+
+        {/* Row 1: address + type badge + proposed chip */}
+        <div className='flex items-start justify-between gap-2'>
           <div className='min-w-0 flex-1'>
             <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-main-primary transition-colors'>
               {property.street_address}
             </h3>
             {location && (
-              <div className='flex items-center gap-1 mt-1'>
+              <div className='flex items-center gap-1 mt-0.5'>
                 <MapPin className='h-3 w-3 text-gray-400 flex-shrink-0' />
                 <span className='text-xs text-gray-500 truncate'>{location}</span>
               </div>
             )}
           </div>
-          {property.property_type_info?.property_type_name && (
-            <span className='flex-shrink-0 text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
-              {property.property_type_info.property_type_name}
-            </span>
-          )}
-          {property.has_active_proposal && (
-            <span className='flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-lg border border-emerald-200'>
-              <CheckCircle2 className='h-3 w-3' />
-              {t('card.proposed')}
-            </span>
-          )}
+          <div className='flex items-center gap-1.5 flex-shrink-0'>
+            {property.property_type_info?.property_type_name && (
+              <span className='text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
+                {property.property_type_info.property_type_name}
+              </span>
+            )}
+            {property.has_active_proposal && (
+              <span className='flex items-center gap-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg border border-emerald-200'>
+                <CheckCircle2 className='h-3 w-3' />
+                {t('card.proposed')}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Middle: description */}
+        {/* Row 2: description */}
         {property.descriptions && (
           <p className='text-xs text-gray-500 leading-relaxed line-clamp-2'>
             {property.descriptions}
           </p>
         )}
 
-        {/* Bottom: stats + owner + arrow */}
-        <div className='flex items-center justify-between gap-3 pt-2 border-t border-gray-100'>
+        {/* Row 3: stats (left) + prices (right) */}
+        <div className='flex items-end justify-between gap-3 pt-1.5 border-t border-gray-100'>
           {/* Stats */}
-          <div className='flex items-center gap-4 text-xs text-gray-500'>
+          <div className='flex items-center gap-3 text-xs text-gray-500'>
             {area && (
               <div className='flex items-center gap-1'>
                 <Ruler className='h-3.5 w-3.5 text-gray-400' />
@@ -152,39 +182,23 @@ export function OwnerPropertyCard({
                 </span>
               </div>
             )}
-            {property.property_type_info?.property_category_name && (
-              <div className='flex items-center gap-1 hidden sm:flex'>
-                <Building2 className='h-3.5 w-3.5 text-gray-400' />
-                <span className='font-medium'>
-                  {property.property_type_info.property_category_name}
-                </span>
-              </div>
-            )}
           </div>
 
-          {/* Owner + CTA */}
-          <div className='flex items-center gap-3 flex-shrink-0'>
-            <div className='hidden sm:flex items-center gap-1.5'>
-              <div className='h-5 w-5 rounded-full bg-indigo-50 flex items-center justify-center'>
-                <User className='h-2.5 w-2.5 text-indigo-500' />
-              </div>
-              <span className='text-xs font-medium text-gray-600 max-w-[120px] truncate'>
-                {property.owner_name ?? t('common.na')}
+          {/* Prices — stacked vertically, right-aligned */}
+          <div className='flex flex-col items-end gap-1 flex-shrink-0'>
+            {showRent && rentPriceDisplay && (
+              <span className='text-[11px] font-bold bg-green-50 text-green-700 px-2.5 py-0.5 rounded-md border border-green-200 whitespace-nowrap'>
+                {t('card.rent')}: {rentPriceDisplay}
               </span>
-            </div>
-            <div
-              className={cn(
-                'flex items-center gap-1 text-xs font-semibold transition-colors',
-                isSelected
-                  ? 'text-main-primary'
-                  : 'text-gray-400 group-hover:text-main-primary'
-              )}
-            >
-              {t('card.viewDetails')}
-              <ArrowRight className='h-3 w-3' />
-            </div>
+            )}
+            {showBuy && buyPriceDisplay && (
+              <span className='text-[11px] font-bold bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-md border border-blue-200 whitespace-nowrap'>
+                {t('card.buy')}: {buyPriceDisplay}
+              </span>
+            )}
           </div>
         </div>
+
       </div>
     </button>
   );

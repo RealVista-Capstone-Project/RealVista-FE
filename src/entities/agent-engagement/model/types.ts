@@ -55,6 +55,11 @@ export interface SubmitAgentProposalPayload {
   message?: string;
 }
 
+export interface AgentProposalApplyState {
+  can_apply_proposal: boolean;
+  engagement_status: string | null;
+}
+
 export interface AgentEngagementPageResponse {
   content: AgentEngagement[];
   page: number;
