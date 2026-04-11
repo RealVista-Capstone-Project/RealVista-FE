@@ -59,3 +59,72 @@ export const useCancelEngagementMutation = (onSuccessCallback?: () => void) => {
     onError: () => toast.error('Hủy thất bại'),
   });
 };
+
+export const useFinishEngagementMutation = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const accessToken = getAccessToken(session as AuthSession | null);
+      if (!accessToken) {
+        throw new Error('Not authenticated');
+      }
+      return engagementApi.finishEngagement(id, accessToken);
+    },
+    onSuccess: () => {
+      toast.success('Đã hoàn thành engagement');
+      queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    },
+    onError: () => toast.error('Hoàn thành thất bại'),
+  });
+};
+
+export const useAcceptEngagementMutation = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const accessToken = getAccessToken(session as AuthSession | null);
+      if (!accessToken) {
+        throw new Error('Not authenticated');
+      }
+      return engagementApi.acceptEngagement(id, accessToken);
+    },
+    onSuccess: () => {
+      toast.success('Đã chấp nhận engagement');
+      queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    },
+    onError: () => toast.error('Chấp nhận thất bại'),
+  });
+};
+
+export const useRejectEngagementMutation = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const accessToken = getAccessToken(session as AuthSession | null);
+      if (!accessToken) {
+        throw new Error('Not authenticated');
+      }
+      return engagementApi.rejectEngagement(id, accessToken);
+    },
+    onSuccess: () => {
+      toast.success('Đã từ chối engagement');
+      queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    },
+    onError: () => toast.error('Từ chối thất bại'),
+  });
+};
