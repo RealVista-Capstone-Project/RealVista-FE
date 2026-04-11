@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Clock,
   CheckCircle2,
+  AlertTriangle,
   Layers,
   Sofa,
   BedDouble,
@@ -20,8 +21,10 @@ import {
 } from 'lucide-react';
 import { useUpdateRoomName } from '@/entities/property';
 import type { Property3dOperation } from '@/entities/property/api/property-api.types';
+import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import { CardTitle } from '@/shared/ui/card';
+import { Card, CardHeader, CardTitle } from '@/shared/ui/card';
+import { motion } from 'framer-motion';
 import { CardContainer, CardBody, CardItem } from '@/shared/ui/3d-card';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -113,7 +116,7 @@ export interface RoomCardProps {
 
 export function RoomCard({
   room,
-  index: _index,
+  index,
   isSelected,
   onSelect,
   onDelete,
@@ -171,194 +174,212 @@ export function RoomCard({
   };
 
   return (
-    <CardContainer className='w-full'>
-      <CardBody
-        className={`
-          bg-background relative group/card
-          dark:hover:shadow-2xl dark:hover:shadow-primary/10
-          dark:bg-black dark:border-white/[0.2] border-black/[0.1]
-          w-full h-auto rounded-xl border overflow-hidden
-          cursor-pointer transition-all duration-200
-          ${isSelected ? 'ring-2 ring-primary/40 border-primary/30 shadow-xl' : ''}
-          ${!hasModel && room.latestOperation.status === 'SUCCEEDED' ? 'opacity-80' : ''}
-        `}
-        onClick={!isRenaming && hasModel ? onSelect : undefined}
-      >
-        {/* Thumbnail / Skeleton — translateZ=100 */}
-        <CardItem translateZ='100' className='w-full'>
-          {room.thumbnailUrl ? (
-            <div className='relative w-full h-44 overflow-hidden'>
-              <Image
-                src={room.thumbnailUrl}
-                alt={room.roomName}
-                fill
-                className='object-cover transition-transform duration-500 group-hover/card:scale-105 group-hover/card:shadow-xl'
-                sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-              />
-              <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
-            </div>
-          ) : (
-            <div className='relative w-full h-44 overflow-hidden bg-muted animate-pulse'>
-              <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_1.8s_infinite]' />
-              <div className='absolute inset-0 flex items-center justify-center'>
-                <RoomIcon className='w-10 h-10 text-muted-foreground/30' />
-              </div>
-            </div>
-          )}
-        </CardItem>
+    <CardContainer className='w-full' containerClassName='py-0'>
+      <CardBody className='w-full'>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: index * 0.06 }}
+          className='w-full'
+        >
+          <Card
+            className={`
+              group relative overflow-hidden transition-all duration-200 cursor-pointer
+              hover:shadow-xl hover:border-primary/30 pt-0
+              ${isSelected ? 'ring-2 ring-primary/40 border-primary/30 shadow-xl' : ''}
+              ${!hasModel && room.latestOperation.status === 'SUCCEEDED' ? 'opacity-80' : ''}
+            `}
+            onClick={!isRenaming && hasModel ? onSelect : undefined}
+          >
+            {/* Glossy shine overlay */}
+            <motion.div
+              className='pointer-events-none absolute inset-0 z-10 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+              style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.10) 0%, transparent 60%)' }}
+            />
 
-        {/* Room name — translateZ=50 */}
-        <CardItem translateZ='50' className='w-full px-5 pt-4'>
-          <div className='flex items-center justify-between gap-2'>
-            <div className='flex items-center gap-2 min-w-0 flex-1'>
-              <div
-                className={`
-                  shrink-0 w-8 h-8 rounded-lg flex items-center justify-center
-                  ${room.hasSuccessful
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-muted text-muted-foreground'
-                  }
-                `}
-              >
-                <RoomIcon className='w-4 h-4' />
-              </div>
-              {isRenaming ? (
-                <div className='flex items-center gap-1 flex-1' onClick={(e) => e.stopPropagation()}>
-                  <input
-                    ref={inputRef}
-                    value={renameValue}
-                    onChange={(e) => setRenameValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') saveRename();
-                      if (e.key === 'Escape') cancelRename();
-                    }}
-                    className='flex-1 min-w-0 text-sm font-semibold border border-primary rounded-md px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary bg-background'
-                    disabled={updateMutation.isPending}
+            {/* Thumbnail / Skeleton — floats at translateZ=100 */}
+            <CardItem translateZ={100} className='w-full'>
+              {room.thumbnailUrl ? (
+                <div className='relative w-full h-36 overflow-hidden bg-muted'>
+                  <Image
+                    src={room.thumbnailUrl}
+                    alt={room.roomName}
+                    fill
+                    className='object-cover transition-transform duration-500 group-hover:scale-105'
+                    sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
                   />
-                  <button
-                    onClick={saveRename}
-                    disabled={updateMutation.isPending}
-                    className='shrink-0 p-1 rounded-md hover:bg-emerald-50 text-emerald-600 disabled:opacity-50'
-                    aria-label={t('saveRename')}
-                  >
-                    <Check className='w-3.5 h-3.5' />
-                  </button>
-                  <button
-                    onClick={cancelRename}
-                    disabled={updateMutation.isPending}
-                    className='shrink-0 p-1 rounded-md hover:bg-red-50 text-red-500 disabled:opacity-50'
-                    aria-label={t('cancelRename')}
-                  >
-                    <X className='w-3.5 h-3.5' />
-                  </button>
+                  <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
                 </div>
               ) : (
-                <div className='flex items-center gap-1.5 min-w-0'>
-                  <CardTitle className='text-base truncate'>
-                    {room.roomName === 'Unnamed Room' ? t('unnamedRoom') : room.roomName}
-                  </CardTitle>
-                  {room.operationId && (
-                    <button
-                      onClick={startRename}
-                      className='shrink-0 p-1 rounded-md opacity-0 group-hover/card:opacity-100 hover:bg-accent text-muted-foreground hover:text-foreground transition-all'
-                      aria-label={t('renameRoom')}
-                    >
-                      <Pencil className='w-3 h-3' />
-                    </button>
-                  )}
+                <div className='relative w-full h-36 overflow-hidden bg-muted animate-pulse'>
+                  <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_1.8s_infinite]' />
+                  <div className='absolute inset-0 flex items-center justify-center'>
+                    <RoomIcon className='w-10 h-10 text-muted-foreground/30' />
+                  </div>
                 </div>
               )}
-            </div>
+            </CardItem>
 
-            {/* Status badge + delete */}
-            <div className='relative flex items-center shrink-0'>
-              <Badge
-                variant='outline'
-                className={`text-[11px] transition-all duration-200 ease-out ${statusConfig.className} ${room.operationId && !isRenaming ? 'group-hover/card:-translate-x-7' : ''}`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusConfig.dotColor}`} />
-                {statusConfig.label}
-              </Badge>
-              {room.operationId && !isRenaming && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                  className='absolute right-0 p-1.5 rounded-md opacity-0 translate-x-1 group-hover/card:opacity-100 group-hover/card:translate-x-0 hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-all duration-200 ease-out'
-                  aria-label={t('deleteRoom')}
-                >
-                  <Trash2 className='w-3.5 h-3.5' />
-                </button>
+            {/* Room Header — title at translateZ=50, date at translateZ=60 */}
+            <CardHeader className='pb-3'>
+              <div className='flex items-start justify-between gap-2'>
+                <div className='flex items-center gap-3 min-w-0 flex-1'>
+                  <CardItem translateZ={50} className='shrink-0'>
+                    <div
+                      className={`
+                        w-11 h-11 rounded-xl flex items-center justify-center transition-colors duration-200
+                        ${room.hasSuccessful
+                          ? 'bg-primary/10 text-primary group-hover:bg-primary/15'
+                          : 'bg-muted text-muted-foreground'
+                        }
+                      `}
+                    >
+                      <RoomIcon className='w-5 h-5' />
+                    </div>
+                  </CardItem>
+                  <div className='min-w-0 flex-1'>
+                    <CardItem translateZ={50} className='w-full'>
+                      {isRenaming ? (
+                        <div className='flex items-center gap-1' onClick={(e) => e.stopPropagation()}>
+                          <input
+                            ref={inputRef}
+                            value={renameValue}
+                            onChange={(e) => setRenameValue(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveRename();
+                              if (e.key === 'Escape') cancelRename();
+                            }}
+                            className='flex-1 min-w-0 text-sm font-semibold border border-primary rounded-md px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary bg-background'
+                            disabled={updateMutation.isPending}
+                          />
+                          <button
+                            onClick={saveRename}
+                            disabled={updateMutation.isPending}
+                            className='shrink-0 p-1 rounded-md hover:bg-emerald-50 text-emerald-600 disabled:opacity-50'
+                            aria-label={t('saveRename')}
+                          >
+                            <Check className='w-3.5 h-3.5' />
+                          </button>
+                          <button
+                            onClick={cancelRename}
+                            disabled={updateMutation.isPending}
+                            className='shrink-0 p-1 rounded-md hover:bg-red-50 text-red-500 disabled:opacity-50'
+                            aria-label={t('cancelRename')}
+                          >
+                            <X className='w-3.5 h-3.5' />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className='flex items-center gap-1.5'>
+                          <CardTitle className='text-base truncate'>
+                            {room.roomName === 'Unnamed Room' ? t('unnamedRoom') : room.roomName}
+                          </CardTitle>
+                          {room.operationId && (
+                            <button
+                              onClick={startRename}
+                              className='shrink-0 p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground hover:text-foreground transition-all'
+                              aria-label={t('renameRoom')}
+                            >
+                              <Pencil className='w-3 h-3' />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </CardItem>
+                    {!isRenaming && createdDate && (
+                      <CardItem translateZ={60} className='w-full'>
+                        <p className='text-xs text-muted-foreground mt-0.5'>{createdDate}</p>
+                      </CardItem>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status badge + delete — translateZ=40 */}
+                <CardItem translateZ={40} className='relative flex items-center shrink-0'>
+                  <Badge
+                    variant='outline'
+                    className={`text-[11px] transition-all duration-200 ease-out ${statusConfig.className} ${room.operationId && !isRenaming ? 'group-hover:-translate-x-7' : ''}`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusConfig.dotColor}`} />
+                    {statusConfig.label}
+                  </Badge>
+                  {room.operationId && !isRenaming && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                      className='absolute right-0 p-1.5 rounded-md opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-all duration-200 ease-out'
+                      aria-label={t('deleteRoom')}
+                    >
+                      <Trash2 className='w-3.5 h-3.5' />
+                    </button>
+                  )}
+                </CardItem>
+              </div>
+            </CardHeader>
+
+            {/* Card content / actions — translateZ=20 */}
+            <CardItem translateZ={20} className='w-full px-6 pb-6 pt-0'>
+              {room.latestOperation.status === 'FAILED' && (
+                <div className='text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/5 rounded-lg px-3 py-2.5 leading-relaxed'>
+                  {room.latestOperation.error_message || t('failed')}
+                </div>
               )}
-            </div>
-          </div>
-        </CardItem>
 
-        {/* Created date — translateZ=60 */}
-        {!isRenaming && createdDate && (
-          <CardItem as='p' translateZ='60' className='text-xs text-muted-foreground px-5 mt-1'>
-            {createdDate}
-          </CardItem>
-        )}
+              {(room.latestOperation.status === 'PENDING' ||
+                room.latestOperation.status === 'GENERATING') && (
+                  <div className='space-y-2.5'>
+                    <div className='w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden'>
+                      <div className='bg-primary h-1.5 rounded-full animate-pulse w-2/3' />
+                    </div>
+                    <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
+                      <RefreshCw className='w-3 h-3 animate-spin' />
+                      {t('processing')}...
+                    </p>
+                  </div>
+                )}
 
-        {/* Footer actions — translateZ=20 */}
-        <div className='flex justify-between items-center mt-4 px-5 pb-5'>
-          {room.latestOperation.status === 'FAILED' && (
-            <CardItem translateZ={20} className='w-full'>
-              <div className='text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/5 rounded-lg px-3 py-2.5 leading-relaxed'>
-                {room.latestOperation.error_message || t('failed')}
-              </div>
+              {room.hasSuccessful && hasModel && (
+                <div className='flex items-center justify-between'>
+                  <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
+                    <CheckCircle2 className='w-3.5 h-3.5 text-emerald-500' />
+                    {t('modelAvailable')}
+                  </p>
+                  <Button
+                    variant='ghost'
+                    size='xs'
+                    className='text-primary hover:text-primary hover:bg-primary/10 font-medium'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelect();
+                    }}
+                  >
+                    {t('view')}
+                  </Button>
+                </div>
+              )}
+
+              {room.hasSuccessful && !hasModel && (
+                <div className='space-y-2.5'>
+                  <div className='w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden'>
+                    <div className='bg-emerald-500 h-1.5 rounded-full w-full' />
+                  </div>
+                  <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
+                    <Clock className='w-3.5 h-3.5 animate-pulse' />
+                    {t('syncing')}
+                  </p>
+                </div>
+              )}
+
+              {!room.hasSuccessful &&
+                room.latestOperation.status !== 'PENDING' &&
+                room.latestOperation.status !== 'GENERATING' &&
+                room.latestOperation.status !== 'FAILED' && (
+                  <p className='text-xs text-muted-foreground'>
+                    {room.operations.length} {t('processing')}
+                  </p>
+                )}
             </CardItem>
-          )}
-
-          {(room.latestOperation.status === 'PENDING' || room.latestOperation.status === 'GENERATING') && (
-            <CardItem translateZ={20} className='w-full space-y-2'>
-              <div className='w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden'>
-                <div className='bg-primary h-1.5 rounded-full animate-pulse w-2/3' />
-              </div>
-              <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
-                <RefreshCw className='w-3 h-3 animate-spin' />
-                {t('processing')}...
-              </p>
-            </CardItem>
-          )}
-
-          {room.hasSuccessful && hasModel && (
-            <>
-              <CardItem translateZ={20} className='text-xs text-muted-foreground flex items-center gap-1.5'>
-                <CheckCircle2 className='w-3.5 h-3.5 text-emerald-500' />
-                {t('modelAvailable')}
-              </CardItem>
-              <CardItem
-                translateZ={20}
-                as='button'
-                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onSelect(); }}
-                className='px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold'
-              >
-                {t('view')}
-              </CardItem>
-            </>
-          )}
-
-          {room.hasSuccessful && !hasModel && (
-            <CardItem translateZ={20} className='w-full space-y-2'>
-              <div className='w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden'>
-                <div className='bg-emerald-500 h-1.5 rounded-full w-full' />
-              </div>
-              <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
-                <Clock className='w-3.5 h-3.5 animate-pulse' />
-                {t('syncing')}
-              </p>
-            </CardItem>
-          )}
-
-          {!room.hasSuccessful &&
-            room.latestOperation.status !== 'PENDING' &&
-            room.latestOperation.status !== 'GENERATING' &&
-            room.latestOperation.status !== 'FAILED' && (
-              <CardItem translateZ={20} className='text-xs text-muted-foreground'>
-                {room.operations.length} {t('processing')}
-              </CardItem>
-            )}
-        </div>
+          </Card>
+        </motion.div>
       </CardBody>
     </CardContainer>
   );
