@@ -2,11 +2,16 @@
   "DashboardLayout": {
     "menu": {
       "dashboard": "Bảng điều khiển",
-      "insight": "Thống kê",
       "listings": "Bài đăng của tôi",
-      "myEngagements": "Engagement của tôi",
       "tenants": "Người thuê",
-      "messages": "Tin nhắn"
+      "rentalContracts": "Hợp đồng thuê",
+      "property": "Bất động sản",
+      "manageAgent": "Quản lý đại lý",
+      "myEngagements": "Hợp tác của tôi",
+      "messages": "Tin nhắn",
+      "myContracts": "Hợp đồng của tôi",
+      "ownerProperties": "Bất động sản chủ nhà",
+      "proposals": "Đề xuất của tôi"
     },
     "pageTitle": {
       "default": "RealVista",

@@ -9,7 +9,6 @@ import {
   Handshake,
   LayoutDashboard,
   MessageCircle,
-  TrendingUp,
   Users,
   Building2,
   Search,
@@ -37,64 +36,40 @@ export interface DashboardLayoutProps {
   className?: string;
 }
 
-const ownerSidebarItems: SidebarMenuItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: ROUTES.dashboard.root, icon: LayoutDashboard },
-  { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
-  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
-  { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
-  {
-    id: 'rental-contracts',
-    label: 'Rental Contracts',
-    href: ROUTES.dashboard.rentalContracts,
-    icon: FileText,
-  },
-  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
-  { id: 'manage-agent', label: 'Manage Agent', href: ROUTES.dashboard.manageAgent, icon: Users },
-  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
-  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
-];
+type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
 
-const tenantSidebarItems: SidebarMenuItem[] = [
-  { id: 'my-contracts', label: 'My Contracts', href: ROUTES.dashboard.myContracts, icon: FileText },
-  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
-  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
-];
+function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
+    { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+    { id: 'manage-agent', label: t('menu.manageAgent'), href: ROUTES.dashboard.manageAgent, icon: Users },
+    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+  ];
+}
 
-const agentSidebarItems: SidebarMenuItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: ROUTES.dashboard.root,
-    icon: LayoutDashboard,
-  },
-  {
-    id: 'owner-properties',
-    label: 'Owner Properties',
-    href: ROUTES.dashboard.ownerProperties,
-    icon: Search,
-  },
-  {
-    id: 'insight',
-    label: 'Insight',
-    href: ROUTES.dashboard.insight,
-    icon: TrendingUp,
-  },
-  {
-    id: 'listings',
-    label: 'My Listings',
-    href: ROUTES.dashboard.managedListings,
-    icon: Calendar,
-  },
-  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
-  {
-    id: 'proposals',
-    label: 'My Proposals',
-    href: ROUTES.dashboard.manageProposals,
-    icon: FileText,
-  },
-  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
-  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
-];
+function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+  ];
+}
+
+function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    { id: 'owner-properties', label: t('menu.ownerProperties'), href: ROUTES.dashboard.ownerProperties, icon: Search },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+    { id: 'proposals', label: t('menu.proposals'), href: ROUTES.dashboard.manageProposals, icon: FileText },
+    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+  ];
+}
 
 export function DashboardLayout({
   children,
@@ -113,10 +88,10 @@ export function DashboardLayout({
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
-    if (isAgent) return agentSidebarItems;
-    if (isTenant) return tenantSidebarItems;
-    return ownerSidebarItems;
-  }, [sidebarItems, isAgent, isTenant]);
+    if (isAgent) return getAgentSidebarItems(t);
+    if (isTenant) return getTenantSidebarItems(t);
+    return getOwnerSidebarItems(t);
+  }, [sidebarItems, isAgent, isTenant, t]);
 
   const pageTitle = React.useMemo(() => {
     if (
