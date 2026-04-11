@@ -22,6 +22,7 @@ export interface PropertySummaryResponse {
   attributes: PropertyAttributeItem[] | null;
   media: PropertyMediaItem[] | null;
   amenities: PropertyAmenityItem[] | null;
+  owner_id?: string;
   owner_name?: string;
   owner_phone?: string;
 }
@@ -189,6 +190,7 @@ export interface PropertySummaryResponse {
   attributes: PropertyAttributeItem[] | null;
   media: PropertyMediaItem[] | null;
   amenities: PropertyAmenityItem[] | null;
+  owner_id?: string;
   owner_name?: string;
   owner_phone?: string;
 }

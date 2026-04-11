@@ -3,10 +3,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { type CreateRentalContractPayload } from '@/entities/rental-contract';
-import { propertyQueries, type PropertySummaryResponse } from '@/entities/property';
+import { type PropertySummaryResponse } from '@/entities/property';
 import { userApi } from '@/entities/user';
 import {
   useCreateRentalContractMutation,
@@ -28,8 +27,6 @@ import { WizardFooter } from './components/wizard-footer';
 
 type WizardStep = 1 | 2 | 3 | 4;
 
-const ITEMS_PER_PAGE = 6;
-
 interface FormState {
   propertyId: string;
   propertyTitle: string;
@@ -38,6 +35,7 @@ interface FormState {
   bedrooms: string;
   bathrooms: string;
   thumbnailUrl: string;
+  landlordId: string;   // owner_id from the selected property
   tenantName: string;
   tenantEmail: string;
   tenantPhone: string;
@@ -57,6 +55,7 @@ const INITIAL_FORM_STATE: FormState = {
   bedrooms: '0',
   bathrooms: '0',
   thumbnailUrl: '',
+  landlordId: '',
   tenantName: '',
   tenantEmail: '',
   tenantPhone: '',
@@ -79,6 +78,8 @@ function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormSta
     bedrooms: String(getAttributeNumber(property, 'bedrooms')),
     bathrooms: String(getAttributeNumber(property, 'bathrooms')),
     thumbnailUrl: getPropertyThumbnail(property) ?? '',
+    // Use owner_id returned by the API when available
+    landlordId: property.owner_id ?? '',
   };
 }
 
@@ -93,24 +94,8 @@ export function CreateRentalContractPage() {
 
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [form, setForm] = useState<FormState>(() => ({ ...INITIAL_FORM_STATE }));
-  const [listingSearch, setListingSearch] = useState('');
   const [tenantLookupLoading, setTenantLookupLoading] = useState(false);
-  const [propertyPage, setPropertyPage] = useState(1);
   const [signingModal, setSigningModal] = useState<{ url: string; redirectOnClose: boolean } | null>(null);
-
-  // ── Properties query ───────────────────────────────────────────────────────
-
-  const { data: propertiesData, isLoading: propertiesLoading } = useQuery(
-    propertyQueries.myProperties({
-      keyword: listingSearch || undefined,
-      page: propertyPage - 1,
-      size: ITEMS_PER_PAGE,
-    })
-  );
-
-  const propertiesResponse = propertiesData?.payload?.data;
-  const properties = propertiesResponse?.content ?? [];
-  const totalPages = propertiesResponse?.total_pages ?? 0;
 
   // ── Steps config ───────────────────────────────────────────────────────────
 
@@ -182,32 +167,42 @@ export function CreateRentalContractPage() {
     }
   }, [form.tenantEmail, t]);
 
-  const buildPayload = (): CreateRentalContractPayload => ({
-    listing_id: form.propertyId,
-    property: {
-      id: form.propertyId,
+  const buildPayload = (): CreateRentalContractPayload => {
+    const sessionUserId = session?.user?.id ?? '';
+    const sessionRole = session?.user?.role ?? '';
+    const isAgent = sessionRole === 'AGENT' || sessionRole === 'owner' && form.landlordId !== sessionUserId;
+
+    return {
       listing_id: form.propertyId,
-      title: form.propertyTitle,
-      address: form.propertyAddress,
-      listingType: form.propertyType,
-      bedrooms: Number(form.bedrooms) || undefined,
-      bathrooms: Number(form.bathrooms) || undefined,
-    },
-    tenant: {
-      id: form.tenantUserId,
-      user_id: form.tenantUserId,
-      fullName: form.tenantName,
-      email: form.tenantEmail,
-      phoneNumber: form.tenantPhone || null,
-      avatarUrl: null,
-    },
-    tenantUserId: form.tenantUserId,
-    landlordId: session?.user?.id ?? '',
-    monthlyRent: Number(form.monthlyRent),
-    securityAmount: Number(form.securityDeposit) || undefined,
-    startDate: form.leaseStartDate,
-    endDate: form.leaseEndDate,
-  });
+      property: {
+        id: form.propertyId,
+        listing_id: form.propertyId,
+        title: form.propertyTitle,
+        address: form.propertyAddress,
+        listingType: form.propertyType,
+        bedrooms: Number(form.bedrooms) || undefined,
+        bathrooms: Number(form.bathrooms) || undefined,
+      },
+      tenant: {
+        id: form.tenantUserId,
+        user_id: form.tenantUserId,
+        fullName: form.tenantName,
+        email: form.tenantEmail,
+        phoneNumber: form.tenantPhone || null,
+        avatarUrl: null,
+      },
+      // Tenant's user ID — set from email lookup in Step 2
+      tenantUserId: form.tenantUserId,
+      // Owner of the property — comes from property.owner_id (Step 1), never the agent
+      landlordId: form.landlordId,
+      // If an AGENT is creating this contract, record their ID; owners get null
+      agentId: isAgent ? sessionUserId : null,
+      monthlyRent: Number(form.monthlyRent),
+      securityAmount: Number(form.securityDeposit) || undefined,
+      startDate: form.leaseStartDate,
+      endDate: form.leaseEndDate,
+    };
+  };
 
   const saveDraft = async () => {
     try {
@@ -238,17 +233,10 @@ export function CreateRentalContractPage() {
     if (currentStep === 1) {
       return (
         <StepListingPicker
-          properties={properties}
-          isLoading={propertiesLoading}
           selectedPropertyId={form.propertyId}
-          listingSearch={listingSearch}
-          propertyPage={propertyPage}
-          totalPages={totalPages}
-          onSearchChange={(v) => { setListingSearch(v); setPropertyPage(1); }}
           onSelectProperty={(property) =>
             setForm((prev) => ({ ...prev, ...applyPropertyToForm(property) }))
           }
-          onPageChange={setPropertyPage}
           t={(key, values) => t(key as never, values as never)}
         />
       );

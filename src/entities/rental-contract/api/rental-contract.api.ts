@@ -107,7 +107,7 @@ export const rentalContractApi = {
       property_id: payload.listing_id,
       renter_id: payload.tenantUserId,
       landlord_id: payload.landlordId,
-      agent_id: null,
+      agent_id: payload.agentId ?? null,
       lease_start_date: payload.startDate,
       lease_end_date: payload.endDate,
       lease_duration_months: calcDurationMonths(payload.startDate, payload.endDate),

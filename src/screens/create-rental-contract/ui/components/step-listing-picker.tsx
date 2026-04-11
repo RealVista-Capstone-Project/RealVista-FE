@@ -1,17 +1,36 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
-import { Bath, BedDouble, Building2, Check, ChevronLeft, ChevronRight, Loader2, MapPin, Search } from 'lucide-react';
+import {
+  Bath,
+  BedDouble,
+  Building2,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  MapPin,
+  Search,
+} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { Badge, Button, Input } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import type { PropertySummaryResponse } from '@/entities/property';
+import { useDebounce } from '@/shared/lib/hooks/use-debounce';
+import { propertyQueries } from '@/entities/property/api/property.queries';
+import type { PropertySummaryResponse } from '@/entities/property/api/property-api.types';
 import { ListingMetaChip } from './shared';
 
-function getPropertyThumbnail(property: PropertySummaryResponse): string | null {
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+export function getPropertyThumbnail(property: PropertySummaryResponse): string | null {
   const standardMedia = (property.media ?? []).filter((m) => m.is_property_standard);
-  const primary = standardMedia.find((m) => m.is_primary) ?? standardMedia[0] ?? property.media?.[0];
+  const primary =
+    standardMedia.find((m) => m.is_primary) ?? standardMedia[0] ?? property.media?.[0];
   return primary?.thumbnail_url ?? primary?.media_url ?? null;
 }
 
-function getPropertyAddress(property: PropertySummaryResponse): string {
+export function getPropertyAddress(property: PropertySummaryResponse): string {
   const parts = [
     property.street_address,
     property.location_info?.ward_name,
@@ -21,38 +40,59 @@ function getPropertyAddress(property: PropertySummaryResponse): string {
   return parts.join(', ');
 }
 
-function getAttributeNumber(property: PropertySummaryResponse, code: string): number {
+export function getAttributeNumber(property: PropertySummaryResponse, code: string): number {
   const attr = (property.attributes ?? []).find((a) => a.attribute_code === code);
   return attr?.value_number ?? 0;
 }
 
-export { getPropertyThumbnail, getPropertyAddress, getAttributeNumber };
+// ── Constants ──────────────────────────────────────────────────────────────────
+
+const ITEMS_PER_PAGE = 6;
+
+// ── Props ──────────────────────────────────────────────────────────────────────
 
 interface StepListingPickerProps {
-  properties: PropertySummaryResponse[];
-  isLoading: boolean;
   selectedPropertyId: string;
-  listingSearch: string;
-  propertyPage: number;
-  totalPages: number;
-  onSearchChange: (value: string) => void;
   onSelectProperty: (property: PropertySummaryResponse) => void;
-  onPageChange: (page: number) => void;
   t: (key: string, values?: Record<string, unknown>) => string;
 }
 
+// ── Component ──────────────────────────────────────────────────────────────────
+
 export function StepListingPicker({
-  properties,
-  isLoading,
   selectedPropertyId,
-  listingSearch,
-  propertyPage,
-  totalPages,
-  onSearchChange,
   onSelectProperty,
-  onPageChange,
   t,
 }: StepListingPickerProps) {
+  const [searchInput, setSearchInput] = useState('');
+  const [page, setPage] = useState(1); // 1-based UI page
+
+  // Debounce search so we don't fire on every keystroke
+  const debouncedSearch = useDebounce(searchInput, 400);
+
+  // Reset to page 1 whenever the search term changes
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    setPage(1);
+  };
+
+  // Query: uses propertyApi.getMyProperties → GET /api/v1/properties/me
+  const { data, isLoading, isFetching } = useQuery(
+    propertyQueries.myProperties({
+      keyword: debouncedSearch || undefined,
+      page: page - 1, // API is 0-based
+      size: ITEMS_PER_PAGE,
+    })
+  );
+
+  const pageData = data?.payload?.data;
+  const properties: PropertySummaryResponse[] = pageData?.content ?? [];
+
+  // Handle both snake_case (total_pages) and camelCase (totalPages) responses
+  const totalPages = pageData?.total_pages ?? pageData?.totalPages ?? 0;
+
+  const loading = isLoading || isFetching;
+
   return (
     <div className='space-y-4'>
       {/* Search header */}
@@ -62,14 +102,18 @@ export function StepListingPicker({
             <p className='text-xs font-semibold uppercase tracking-[0.2em] text-main-primary/70'>
               {t('listingPicker.eyebrow')}
             </p>
-            <h3 className='mt-2 text-lg font-semibold text-main-black'>{t('listingPicker.title')}</h3>
-            <p className='mt-1 text-sm leading-6 text-main-secondary/65'>{t('listingPicker.description')}</p>
+            <h3 className='mt-2 text-lg font-semibold text-main-black'>
+              {t('listingPicker.title')}
+            </h3>
+            <p className='mt-1 text-sm leading-6 text-main-secondary/65'>
+              {t('listingPicker.description')}
+            </p>
           </div>
           <div className='relative w-full md:max-w-xs'>
             <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-main-secondary/45' />
             <Input
-              value={listingSearch}
-              onChange={(e) => onSearchChange(e.target.value)}
+              value={searchInput}
+              onChange={(e) => handleSearchChange(e.target.value)}
               placeholder={t('listingPicker.searchPlaceholder')}
               className='h-11 rounded-2xl border-[#E5DFFC] bg-white pl-9'
             />
@@ -77,12 +121,15 @@ export function StepListingPicker({
         </div>
       </div>
 
-      {/* Property cards */}
-      {isLoading ? (
+      {/* Loading skeleton */}
+      {loading && (
         <div className='flex items-center justify-center rounded-3xl border border-dashed border-[#DDD2FF] bg-[#FBF9FF] px-5 py-16'>
           <Loader2 className='h-6 w-6 animate-spin text-main-primary/60' />
         </div>
-      ) : (
+      )}
+
+      {/* Property cards */}
+      {!loading && (
         <>
           <div className='grid gap-4'>
             {properties.map((property) => {
@@ -106,9 +153,15 @@ export function StepListingPicker({
                   )}
                 >
                   <div className='grid gap-0 md:grid-cols-[220px_1fr]'>
+                    {/* Thumbnail */}
                     <div className='relative min-h-[180px] bg-[#F4EEFF]'>
                       {thumbnail ? (
-                        <Image src={thumbnail} alt={property.street_address} fill className='object-cover' />
+                        <Image
+                          src={thumbnail}
+                          alt={property.street_address}
+                          fill
+                          className='object-cover'
+                        />
                       ) : (
                         <div className='flex h-full items-center justify-center text-main-secondary/30'>
                           <Building2 className='h-12 w-12' />
@@ -121,13 +174,11 @@ export function StepListingPicker({
                       </div>
                     </div>
 
+                    {/* Details */}
                     <div className='flex flex-col justify-between p-5'>
                       <div>
                         <div className='flex flex-wrap items-start justify-between gap-3'>
                           <div>
-                            <p className='text-[11px] font-semibold uppercase tracking-[0.16em] text-main-secondary/45'>
-                              {property.property_id}
-                            </p>
                             <h4 className='mt-2 text-xl font-semibold tracking-[-0.03em] text-main-black'>
                               {property.street_address}
                             </h4>
@@ -160,11 +211,15 @@ export function StepListingPicker({
                         <span
                           className={cn(
                             'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
-                            isSelected ? 'bg-main-primary text-white' : 'bg-[#F3EEFF] text-main-primary'
+                            isSelected
+                              ? 'bg-main-primary text-white'
+                              : 'bg-[#F3EEFF] text-main-primary'
                           )}
                         >
                           {isSelected && <Check className='h-3.5 w-3.5' />}
-                          {isSelected ? t('listingPicker.selected') : t('listingPicker.selectAction')}
+                          {isSelected
+                            ? t('listingPicker.selected')
+                            : t('listingPicker.selectAction')}
                         </span>
                       </div>
                     </div>
@@ -173,34 +228,41 @@ export function StepListingPicker({
               );
             })}
 
+            {/* Empty state */}
             {properties.length === 0 && (
               <div className='rounded-3xl border border-dashed border-[#DDD2FF] bg-[#FBF9FF] px-5 py-10 text-center'>
-                <p className='text-sm font-semibold text-main-black'>{t('listingPicker.emptyTitle')}</p>
-                <p className='mt-2 text-sm leading-6 text-main-secondary/65'>{t('listingPicker.emptyDescription')}</p>
+                <Building2 className='mx-auto mb-3 h-10 w-10 text-main-secondary/25' />
+                <p className='text-sm font-semibold text-main-black'>
+                  {t('listingPicker.emptyTitle')}
+                </p>
+                <p className='mt-2 text-sm leading-6 text-main-secondary/65'>
+                  {t('listingPicker.emptyDescription')}
+                </p>
               </div>
             )}
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className='flex items-center justify-center gap-2 pt-2'>
               <Button
                 type='button'
                 variant='outline'
                 className='h-9 w-9 rounded-xl border-[#DED1FF] p-0'
-                disabled={propertyPage <= 1}
-                onClick={() => onPageChange(propertyPage - 1)}
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
                 <ChevronLeft className='h-4 w-4' />
               </Button>
               <span className='text-sm text-main-secondary/70'>
-                {propertyPage} / {totalPages}
+                {page} / {totalPages}
               </span>
               <Button
                 type='button'
                 variant='outline'
                 className='h-9 w-9 rounded-xl border-[#DED1FF] p-0'
-                disabled={propertyPage >= totalPages}
-                onClick={() => onPageChange(propertyPage + 1)}
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               >
                 <ChevronRight className='h-4 w-4' />
               </Button>

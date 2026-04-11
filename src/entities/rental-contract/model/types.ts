@@ -140,8 +140,12 @@ export interface CreateRentalContractPayload {
   listing_id: string;
   property: RentalContractProperty;
   tenant: RentalContractTenant;
+  /** ID of the tenant/renter user */
   tenantUserId: string;
+  /** ID of the property owner (from property.owner_id) — never the agent */
   landlordId: string;
+  /** ID of the agent who initiated the contract on behalf of the owner (optional) */
+  agentId?: string | null;
   monthlyRent: number;
   securityAmount?: number;
   startDate: string;

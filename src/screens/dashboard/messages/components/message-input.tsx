@@ -22,7 +22,7 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
 
   // Only owner and AGENT may see contract creation
   const canCreateContract =
-    session?.user?.role === 'owner' || session?.user?.role === 'AGENT';
+    session?.user?.role === 'owner' || session?.user?.backendRoles == 'AGENT';
 
   // Close popover when clicking outside
   useEffect(() => {
