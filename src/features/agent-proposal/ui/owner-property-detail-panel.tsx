@@ -1,6 +1,8 @@
 'use client';
 
-import type { OwnerPropertySummary } from '@/entities/property';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import type { OwnerPropertySummary, PropertyMediaItem } from '@/entities/property';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Separator } from '@/shared/ui/separator';
@@ -55,6 +57,39 @@ function formatPriceRange(
   if (min) return `${formatVND(min)}+`;
   if (max) return `≤ ${formatVND(max)}`;
   return null;
+}
+
+function isUsableImageUrl(url: string | null | undefined): url is string {
+  return typeof url === 'string' && url.trim() !== '' && url !== 'null';
+}
+
+/** Prefer a real image URL; primary VIDEO / tour uses thumbnail, not media_url. */
+function getOwnerPropertyHeroImageUrl(media: PropertyMediaItem[] | null): string | null {
+  if (!media?.length) return null;
+
+  const urlForItem = (m: PropertyMediaItem): string | null => {
+    const type = (m.media_type || '').toUpperCase();
+    if (type === 'IMAGE') {
+      return isUsableImageUrl(m.media_url) ? m.media_url : null;
+    }
+    if (type === 'VIDEO' || type === 'VIRTUAL_TOUR' || type === 'THREE_D') {
+      return isUsableImageUrl(m.thumbnail_url) ? m.thumbnail_url : null;
+    }
+    if (type === 'DOCUMENT') return null;
+    return isUsableImageUrl(m.media_url) ? m.media_url : null;
+  };
+
+  const tryItems = (items: PropertyMediaItem[]) => {
+    for (const m of items) {
+      const u = urlForItem(m);
+      if (u) return u;
+    }
+    return null;
+  };
+
+  const fromPrimary = tryItems(media.filter((m) => m.is_primary));
+  if (fromPrimary) return fromPrimary;
+  return tryItems(media);
 }
 
 function PriceBadges({
@@ -118,8 +153,12 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
     propertyId,
   } = useAgentProposalCtaForOwnerProperty(property);
 
-  const thumbnailUrl =
-    property.media?.find((m) => m.is_primary)?.media_url ?? property.media?.[0]?.media_url;
+  const heroImageUrl = getOwnerPropertyHeroImageUrl(property.media);
+  const [heroImageError, setHeroImageError] = useState(false);
+
+  useEffect(() => {
+    setHeroImageError(false);
+  }, [property.property_id, heroImageUrl]);
 
   const location = [
     property.location_info?.ward_name,
@@ -153,11 +192,15 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
 
         {/* Hero image */}
         <div className='relative h-56 w-full flex-shrink-0 bg-gray-100'>
-          {thumbnailUrl ? (
-            <img
-              src={thumbnailUrl}
+          {heroImageUrl && !heroImageError ? (
+            <Image
+              src={heroImageUrl}
               alt={property.street_address}
-              className='h-full w-full object-cover'
+              fill
+              className='object-cover'
+              sizes='(max-width: 640px) 100vw, min(720px, 55vw)'
+              priority
+              onError={() => setHeroImageError(true)}
             />
           ) : (
             <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
