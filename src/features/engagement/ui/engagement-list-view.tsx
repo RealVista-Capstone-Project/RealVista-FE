@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 import { Engagement, EngagementStatus, EngagementType } from '@/entities/engagement/model/types';
 import { AvatarWithInitials } from './avatar-with-initials';
 import { EngagementSearchHeader, EngagementTab } from './engagement-search-header';
@@ -79,7 +81,7 @@ interface EngagementListViewProps {
   onStatusFilterChange: (value: string) => void;
   selectedEngagement: Engagement | null;
   onSelect: (engagement: Engagement) => void;
-  onCancel: (id: string) => void;
+  onCancel: (id: string, reason?: string) => void;
   onFinish: (id: string) => void;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
@@ -123,7 +125,7 @@ function CardActions({
 }: {
   eng: Engagement;
   currentUserId?: string;
-  onCancel: (id: string) => void;
+  onCancel: (id: string, reason?: string) => void;
   onFinish: (id: string) => void;
   onAccept: (id: string) => void;
   onReject: (id: string) => void;
@@ -143,7 +145,7 @@ function CardActions({
   return (
     <div className='flex flex-col gap-1.5 min-w-[110px]'>
       {canCancelSubmitted && (
-        <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='xs' />
+        <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='xs' status={st} />
       )}
 
       {canAcceptReject && (
@@ -214,7 +216,7 @@ function CardActions({
       )}
 
       {canCancelAccepted && (
-        <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='xs' />
+        <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='xs' status={st} />
       )}
       {canFinish && (
         <Button
@@ -234,12 +236,17 @@ function CancelDialog({
   onCancel,
   t,
   size = 'xs',
+  status,
 }: {
   engId: string;
-  onCancel: (id: string) => void;
+  onCancel: (id: string, reason?: string) => void;
   t: ReturnType<typeof useTranslations<'Engagement'>>;
   size?: 'xs' | 'sm';
+  status: EngagementStatus;
 }) {
+  const [reason, setReason] = React.useState('');
+  const needsReason = status === EngagementStatus.ACCEPTED;
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -262,6 +269,15 @@ function CancelDialog({
           </DialogTitle>
           <DialogDescription>{t('cancel.dialogDescription')}</DialogDescription>
         </DialogHeader>
+        {needsReason && (
+          <textarea
+            className='w-full rounded-md border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300'
+            rows={3}
+            placeholder={t('cancel.reasonPlaceholder')}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        )}
         <DialogFooter>
           <DialogClose asChild>
             <Button variant='outline'>{t('cancel.no')}</Button>
@@ -269,7 +285,8 @@ function CancelDialog({
           <DialogClose asChild>
             <Button
               variant='destructive'
-              onClick={(e) => { e.stopPropagation(); onCancel(engId); }}
+              disabled={needsReason && !reason.trim()}
+              onClick={(e) => { e.stopPropagation(); onCancel(engId, reason.trim() || undefined); }}
             >
               {t('cancel.confirm')}
             </Button>
@@ -310,7 +327,7 @@ export const EngagementListView = ({
 
   if (isLoading) {
     return (
-      <div className='h-screen flex items-center justify-center text-gray-500'>
+      <div className='h-full flex items-center justify-center text-gray-500'>
         {t('page.loading')}
       </div>
     );
@@ -318,14 +335,14 @@ export const EngagementListView = ({
 
   if (isError) {
     return (
-      <div className='h-screen flex items-center justify-center text-red-500'>
+      <div className='h-full flex items-center justify-center text-red-500'>
         {t('page.loadError')}
       </div>
     );
   }
 
   return (
-    <div className='h-screen flex flex-col bg-gray-50'>
+    <div className='h-full flex flex-col bg-gray-50'>
       <EngagementHeaderSection />
       <EngagementSearchHeader
         tab={tab}
@@ -801,7 +818,7 @@ export const EngagementListView = ({
                 return (
                   <div className='pt-3 border-t border-gray-100 flex gap-3'>
                     {canCancelSubmitted && (
-                      <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='sm' />
+                      <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='sm' status={st} />
                     )}
                     {canAcceptReject && (
                       <>
@@ -821,7 +838,7 @@ export const EngagementListView = ({
                       </>
                     )}
                     {canCancelAccepted && (
-                      <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='sm' />
+                      <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} size='sm' status={st} />
                     )}
                     {canFinish && (
                       <Button

@@ -42,6 +42,7 @@
       "button": "Hủy hợp tác",
       "dialogTitle": "Xác nhận hủy hợp tác",
       "dialogDescription": "Bạn có chắc chắn muốn hủy hợp tác này? Thao tác này không thể hoàn tác.",
+      "reasonPlaceholder": "Nhập lý do hủy hợp tác...",
       "no": "Không",
       "confirm": "Xác nhận hủy"
     },

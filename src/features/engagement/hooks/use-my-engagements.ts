@@ -42,12 +42,12 @@ export const useCancelEngagementMutation = (onSuccessCallback?: () => void) => {
   const { data: session } = useSession();
 
   return useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
       const accessToken = getAccessToken(session as AuthSession | null);
       if (!accessToken) {
         throw new Error('Not authenticated');
       }
-      return engagementApi.cancelEngagement(id, accessToken);
+      return engagementApi.cancelEngagement(id, accessToken, reason);
     },
     onSuccess: () => {
       toast.success('Đã hủy engagement thành công');

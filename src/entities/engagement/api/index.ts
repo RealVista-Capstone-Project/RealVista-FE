@@ -18,10 +18,10 @@ export const engagementApi = {
     return list.map(mapToEngagement);
   },
 
-  cancelEngagement: async (id: string, accessToken: string): Promise<void> => {
+  cancelEngagement: async (id: string, accessToken: string, reason?: string): Promise<void> => {
     await http.put<ApiResponse<void>>(
       `${BASE_URL}/${id}/cancel`,
-      {},
+      reason ? { reason } : {},
       authHeader(accessToken)
     );
   },

@@ -33,7 +33,7 @@ interface MyEngagementsContextValue {
   paginatedEngagements: Engagement[];
   totalPages: number;
   ITEMS_PER_PAGE: number;
-  handleCancel: (id: string) => void;
+  handleCancel: (id: string, reason?: string) => void;
   handleFinish: (id: string) => void;
   handleAccept: (id: string) => void;
   handleReject: (id: string) => void;
@@ -60,8 +60,8 @@ export const MyEngagementsProvider: React.FC<{ children: React.ReactNode }> = ({
   const acceptMutation = useAcceptEngagementMutation(() => setSelectedEngagement(null));
   const rejectMutation = useRejectEngagementMutation(() => setSelectedEngagement(null));
 
-  const handleCancel = (id: string) => {
-    cancelMutation.mutate(id);
+  const handleCancel = (id: string, reason?: string) => {
+    cancelMutation.mutate({ id, reason });
   };
 
   const handleFinish = (id: string) => {

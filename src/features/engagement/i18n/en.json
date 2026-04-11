@@ -42,6 +42,7 @@
       "button": "Cancel Request",
       "dialogTitle": "Confirm cancellation",
       "dialogDescription": "Are you sure you want to cancel this rental request? This action cannot be undone.",
+      "reasonPlaceholder": "Enter a reason for cancellation...",
       "no": "No",
       "confirm": "Confirm cancel"
     },
