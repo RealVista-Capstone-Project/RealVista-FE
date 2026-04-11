@@ -19,7 +19,6 @@ export const mockSimilarProperties: Omit<
     bathrooms: 3,
     area: 810,
     areaUnit: 'm²',
-    isPopular: true,
     isFavorite: false,
   },
   {
@@ -33,7 +32,6 @@ export const mockSimilarProperties: Omit<
     bathrooms: 2,
     area: 68,
     areaUnit: 'm²',
-    isPopular: false,
     isFavorite: false,
   },
   {
@@ -47,7 +45,6 @@ export const mockSimilarProperties: Omit<
     bathrooms: 1,
     area: 57,
     areaUnit: 'm²',
-    isPopular: false,
     isFavorite: false,
   },
 ];

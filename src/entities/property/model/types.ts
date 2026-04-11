@@ -8,5 +8,4 @@ export interface PropertyListingCardType {
   bathrooms: number;
   area: number;
   areaUnit: string;
-  isPopular?: boolean;
 }
