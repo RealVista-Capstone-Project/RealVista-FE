@@ -50,6 +50,8 @@ interface RoomGenerationDialogProps {
   onOpenChange: (open: boolean) => void;
   onComplete: () => void;
   existingRoomNames?: string[];
+  onPreFlight?: () => boolean;
+  onOperationCreated?: () => void;
 }
 
 export function RoomGenerationDialog({
@@ -58,6 +60,8 @@ export function RoomGenerationDialog({
   onOpenChange,
   onComplete,
   existingRoomNames = [],
+  onPreFlight,
+  onOperationCreated,
 }: RoomGenerationDialogProps) {
   const t = useTranslations('ThreeDManagement');
   const {
@@ -143,7 +147,10 @@ export function RoomGenerationDialog({
     }
     if (images.length === REQUIRED_IMAGES_COUNT) {
       // Pass the room name as both display name and room name
-      generate(images, selectedModel, roomName.trim(), roomName.trim());
+      generate(images, selectedModel, roomName.trim(), roomName.trim(), {
+        onPreFlight,
+        onOperationCreated,
+      });
     }
   };
 
