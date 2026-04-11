@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shared/ui/dialog';
-import { AlertCircle, X, MapPin, Home, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { AlertCircle, X, MapPin, Home, CheckCircle2, XCircle, Clock, Trophy } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { formatCurrency, formatDate } from '@/features/tenant-application/lib/utils';
@@ -39,6 +39,7 @@ const statusStyle: Record<EngagementStatus, { bg: string; text: string; icon: Re
   [EngagementStatus.ACCEPTED]:  { bg: 'bg-green-50', text: 'text-green-600', icon: <CheckCircle2 className='h-3.5 w-3.5' /> },
   [EngagementStatus.REJECTED]:  { bg: 'bg-red-50',   text: 'text-red-500',   icon: <XCircle className='h-3.5 w-3.5' /> },
   [EngagementStatus.CANCELLED]: { bg: 'bg-gray-100', text: 'text-gray-400',  icon: <XCircle className='h-3.5 w-3.5' /> },
+  [EngagementStatus.FINISHED]:  { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: <Trophy className='h-3.5 w-3.5' /> },
 };
 
 export const EngagementDetailPanel = ({
@@ -55,11 +56,12 @@ export const EngagementDetailPanel = ({
     [EngagementStatus.ACCEPTED]:  t('detail.statusAccepted'),
     [EngagementStatus.REJECTED]:  t('detail.statusRejected'),
     [EngagementStatus.CANCELLED]: t('detail.statusCancelled'),
+    [EngagementStatus.FINISHED]:  t('detail.statusFinished'),
   };
 
   let content: ContentFields | null = null;
   if (engagement.content) {
-    try { content = JSON.parse(engagement.content) as ContentFields; } catch { /* skip */ }
+    content = engagement.content as unknown as ContentFields;
   }
 
   return (

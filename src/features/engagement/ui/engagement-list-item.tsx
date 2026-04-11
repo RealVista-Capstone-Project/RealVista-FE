@@ -14,10 +14,10 @@ import {
   DialogTrigger,
 } from '@/shared/ui/dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip/tooltip';
-import { AlertCircle, FileText, Home, XCircle } from 'lucide-react';
+import { AlertCircle, FileText, Home, XCircle, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, type Locale } from 'date-fns';
 import { vi as viLocale, enUS } from 'date-fns/locale';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -53,6 +53,7 @@ export const EngagementListItem = ({
     [EngagementStatus.ACCEPTED]:  { label: t('status.ACCEPTED'),  className: 'bg-green-50 text-green-600 border-green-100' },
     [EngagementStatus.REJECTED]:  { label: t('status.REJECTED'),  className: 'bg-red-50 text-red-500 border-red-100' },
     [EngagementStatus.CANCELLED]: { label: t('status.CANCELLED'), className: 'bg-gray-100 text-gray-400 border-gray-200' },
+    [EngagementStatus.FINISHED]:  { label: t('status.FINISHED'),  className: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
   };
 
   const badge = statusBadge[engagement.status];

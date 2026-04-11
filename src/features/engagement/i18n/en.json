@@ -5,7 +5,12 @@
       "subtitle": "Track the status of your rental requests",
       "viewApplications": "View Applications",
       "loading": "Loading...",
-      "loadError": "Failed to load data"
+      "loadError": "Failed to load data",
+      "createButton": "Invite Collaboration"
+    },
+    "tabs": {
+      "sent": "Sent",
+      "received": "Received"
     },
     "filter": {
       "allStatuses": "All statuses",
@@ -25,7 +30,8 @@
       "SUBMITTED": "Submitted",
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected",
-      "CANCELLED": "Cancelled"
+      "CANCELLED": "Cancelled",
+      "FINISHED": "Finished"
     },
     "listItem": {
       "noTitle": "No title",
@@ -39,6 +45,20 @@
       "no": "No",
       "confirm": "Confirm cancel"
     },
+    "accept": {
+      "button": "Accept",
+      "dialogTitle": "Confirm acceptance",
+      "dialogDescription": "Are you sure you want to accept this engagement?",
+      "no": "No",
+      "confirm": "Confirm"
+    },
+    "reject": {
+      "button": "Reject",
+      "dialogTitle": "Confirm rejection",
+      "dialogDescription": "Are you sure you want to reject this engagement? This action cannot be undone.",
+      "no": "No",
+      "confirm": "Confirm rejection"
+    },
     "overview": {
       "title": "Overview",
       "last30Days": "Last 30 days",
@@ -47,6 +67,20 @@
       "pendingRejected": "Pending / Rejected",
       "pending": "pending",
       "rejected": "rejected"
+    },
+    "outlook": {
+      "selectPrompt": "Select an engagement to view details",
+      "messageTitle": "Message",
+      "proposalTitle": "Agent Proposal",
+      "commission": "Commission Rate",
+      "experience": "Experience",
+      "years": "years",
+      "rentRange": "Rent Price Range",
+      "saleRange": "Sale Price Range",
+      "bio": "About",
+      "finish": "Finish",
+      "invitationDetails": "Invitation Details",
+      "offeredCommission": "Offered Commission"
     },
     "detail": {
       "panelTitle": "Rental Request Detail",
@@ -68,7 +102,8 @@
       "statusSubmitted": "Submitted",
       "statusAccepted": "Accepted",
       "statusRejected": "Rejected",
-      "statusCancelled": "Cancelled"
+      "statusCancelled": "Cancelled",
+      "statusFinished": "Finished"
     }
   }
 }

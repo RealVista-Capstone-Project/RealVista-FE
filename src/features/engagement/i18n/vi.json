@@ -1,16 +1,21 @@
 {
   "Engagement": {
     "page": {
-      "title": "Quản lý Engagement",
-      "subtitle": "Theo dõi trạng thái các yêu cầu thuê nhà bạn đã gửi",
+      "title": "Lời mời hợp tác",
+      "subtitle": "Theo dõi trạng thái các yêu cầu hợp tác",
       "viewApplications": "Xem đơn đăng ký",
       "loading": "Đang tải dữ liệu...",
-      "loadError": "Lỗi không tải được dữ liệu"
+      "loadError": "Lỗi không tải được dữ liệu",
+      "createButton": "Mời hợp tác"
+    },
+    "tabs": {
+      "sent": "Gửi từ tôi",
+      "received": "Lời mời đến tôi"
     },
     "filter": {
       "allStatuses": "Tất cả trạng thái",
       "all": "Tất cả",
-      "searchPlaceholder": "Tìm kiếm theo tên nhà hoặc địa chỉ...",
+      "searchPlaceholder": "Tìm kiếm theo địa chỉ nhà hoặc tên đối tác...",
       "pickDate": "Chọn ngày",
       "clearDate": "Xóa lọc ngày"
     },
@@ -25,7 +30,8 @@
       "SUBMITTED": "Đã gửi",
       "ACCEPTED": "Chấp nhận",
       "REJECTED": "Từ chối",
-      "CANCELLED": "Đã hủy"
+      "CANCELLED": "Đã hủy",
+      "FINISHED": "Hoàn thành"
     },
     "listItem": {
       "noTitle": "Chưa có tiêu đề",
@@ -33,11 +39,25 @@
       "cancelTooltip": "Hủy yêu cầu"
     },
     "cancel": {
-      "button": "Hủy yêu cầu",
-      "dialogTitle": "Xác nhận hủy yêu cầu",
-      "dialogDescription": "Bạn có chắc chắn muốn hủy yêu cầu thuê này? Thao tác này không thể hoàn tác.",
+      "button": "Hủy hợp tác",
+      "dialogTitle": "Xác nhận hủy hợp tác",
+      "dialogDescription": "Bạn có chắc chắn muốn hủy hợp tác này? Thao tác này không thể hoàn tác.",
       "no": "Không",
       "confirm": "Xác nhận hủy"
+    },
+    "accept": {
+      "button": "Chấp nhận",
+      "dialogTitle": "Xác nhận chấp nhận",
+      "dialogDescription": "Bạn có chắc chắn muốn chấp nhận engagement này?",
+      "no": "Không",
+      "confirm": "Xác nhận chấp nhận"
+    },
+    "reject": {
+      "button": "Từ chối",
+      "dialogTitle": "Xác nhận từ chối",
+      "dialogDescription": "Bạn có chắc chắn muốn từ chối engagement này? Thao tác này không thể hoàn tác.",
+      "no": "Không",
+      "confirm": "Xác nhận từ chối"
     },
     "overview": {
       "title": "Tổng quan",
@@ -47,6 +67,20 @@
       "pendingRejected": "Đang chờ / Từ chối",
       "pending": "chờ",
       "rejected": "từ chối"
+    },
+    "outlook": {
+      "selectPrompt": "Chọn một engagement để xem chi tiết",
+      "messageTitle": "Tin nhắn",
+      "proposalTitle": "Đề xuất của Agent",
+      "commission": "Tỷ lệ hoa hồng",
+      "experience": "Kinh nghiệm",
+      "years": "năm",
+      "rentRange": "Khoảng giá cho thuê",
+      "saleRange": "Khoảng giá bán",
+      "bio": "Giới thiệu",
+      "finish": "Hoàn thành",
+      "invitationDetails": "Chi tiết lời mời",
+      "offeredCommission": "Hoa hồng đề xuất"
     },
     "detail": {
       "panelTitle": "Chi tiết yêu cầu thuê",
@@ -68,7 +102,8 @@
       "statusSubmitted": "Đã gửi",
       "statusAccepted": "Được chấp nhận",
       "statusRejected": "Từ chối",
-      "statusCancelled": "Đã hủy"
+      "statusCancelled": "Đã hủy",
+      "statusFinished": "Hoàn thành"
     }
   }
 }
