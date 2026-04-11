@@ -6,7 +6,7 @@ import { Heart, CreditCard, Menu, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
-import { ProfileDropdown, Separator } from '@/shared/ui';
+import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
 import { ChatDropdownContainer } from '@/widgets/chat-dropdown';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
@@ -37,6 +37,7 @@ export function PublicActions({
   onOpenMobileMenu,
 }: PublicActionsProps) {
   const queryClient = useQueryClient();
+  const menuItems = useProfileMenuItems();
 
   return (
     <div className='flex items-center gap-6'>
@@ -102,7 +103,7 @@ export function PublicActions({
       {/* Profile / Auth */}
       {isUserLoggedIn ? (
         <div className='hidden lg:block'>
-          <ProfileDropdown user={user} align='end' />
+          <ProfileDropdown user={user} align='end' menuItems={menuItems} />
         </div>
       ) : (
         /* Login + Sign-up — shown only when logged out, hidden on mobile */

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { ChevronDown, CreditCard } from 'lucide-react';
-import { ProfileDropdown, Separator } from '@/shared/ui';
+import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 import { cn } from '@/shared/lib/utils';
 import { ROUTES } from '@/shared/config/routes';
@@ -29,6 +29,8 @@ export function DashboardActions({
   router,
   isRouteActive,
 }: DashboardActionsProps) {
+  const menuItems = useProfileMenuItems();
+
   if (!isUserLoggedIn) return null;
 
   return (
@@ -57,7 +59,7 @@ export function DashboardActions({
       </div>
 
       {/* Profile — dropdown */}
-      <ProfileDropdown user={user} align='end' />
+      <ProfileDropdown user={user} align='end' menuItems={menuItems} />
     </div>
   );
 }
