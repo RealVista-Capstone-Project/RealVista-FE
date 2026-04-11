@@ -88,7 +88,9 @@ export function PropertyMapBasedSearchPage({
 
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<string[]>([]);
   const [hoveredPropertyIds, setHoveredPropertyIds] = useState<string[]>([]);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(
+    searchParams?.get('search_text') || searchParams?.get('location') || ''
+  );
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
@@ -101,21 +103,21 @@ export function PropertyMapBasedSearchPage({
 
   const { data: searchResponse, isLoading } = useQuery({
     ...propertyQueries.search(
-      mapBounds
-        ? {
-            ...mapBounds,
-            search_text: searchValue || undefined,
-            listing_type: initialListingType,
-            property_type: propertyType || undefined,
-            min_price: filters.priceRange.min > 0 ? filters.priceRange.min : undefined,
-            max_price: filters.priceRange.max < 20000000000 ? filters.priceRange.max : undefined,
-            bedrooms: (filters.attributes.BEDROOMS as number) || undefined,
-            bathrooms: (filters.attributes.BATHROOMS as number) || undefined,
-            rental_period: filters.rentalPeriod !== 'any' ? filters.rentalPeriod : undefined,
-            page: currentPage,
-            size: pageSize,
-          }
-        : ({} as PropertySearchRequest) // Skip query until map bounds are ready
+      {
+        ...(mapBounds || {}),
+        search_text: searchValue || undefined,
+        listing_type: initialListingType,
+        property_category: searchParams?.get('propertyCategory') || undefined,
+        property_type: propertyType || undefined,
+        min_price: (filters.priceRange.min > 0) ? filters.priceRange.min : undefined,
+        max_price: (filters.priceRange.max < 20000000000) ? filters.priceRange.max : undefined,
+        bedrooms: (filters.attributes.BEDROOMS as number) || undefined,
+        bathrooms: (filters.attributes.BATHROOMS as number) || undefined,
+        area: (filters.attributes.AREA as number) || undefined,
+        rental_period: filters.rentalPeriod !== 'any' ? filters.rentalPeriod : undefined,
+        page: currentPage,
+        size: pageSize,
+      } as PropertySearchRequest
     ),
     placeholderData: keepPreviousData, // Keep previous data while fetching new page for better UX
   });
@@ -127,7 +129,9 @@ export function PropertyMapBasedSearchPage({
   // Group properties by coordinates to handle duplicates
   const groupedProperties = properties.reduce<Record<string, PropertyListingDto[]>>(
     (acc, property) => {
-      const key = `${property.coordinates.latitude},${property.coordinates.longitude}`;
+      const lat = property.coordinates?.latitude ?? 0;
+      const lng = property.coordinates?.longitude ?? 0;
+      const key = `${lat},${lng}`;
       if (!acc[key]) {
         acc[key] = [];
       }
@@ -156,10 +160,11 @@ export function PropertyMapBasedSearchPage({
     return {
       id: firstProperty.listing_id,
       ids: propertyIds,
-      lat: firstProperty.coordinates.latitude,
-      lng: firstProperty.coordinates.longitude,
+      lat: firstProperty.coordinates?.latitude ?? 0,
+      lng: firstProperty.coordinates?.longitude ?? 0,
       price: firstProperty.price,
       label,
+      isBoosted: group.some((p) => p.is_boosted),
     };
   });
 
@@ -279,19 +284,23 @@ export function PropertyMapBasedSearchPage({
           <div className='mt-6'>
             <PropertyFilters
               priceFilter={{
-                label: t('anyPrice'),
-                value: 'any',
-                onClick: () => {},
+                label: filters.priceRange.min > 0 || filters.priceRange.max < 20000000000
+                  ? `${formatVND(filters.priceRange.min)} - ${formatVND(filters.priceRange.max)}`
+                  : t('anyPrice'),
+                value: 'price',
+                onClick: () => setFiltersModalOpen(true),
               }}
               bedsFilter={{
-                label: `2-4 ${t('beds')}`,
-                value: '2-4',
-                onClick: () => {},
+                label: filters.attributes.BEDROOMS
+                  ? `${filters.attributes.BEDROOMS}+ ${t('beds')}`
+                  : t('beds'),
+                value: 'beds',
+                onClick: () => setFiltersModalOpen(true),
               }}
               typeFilter={{
-                label: t('allTypes'),
-                value: 'all',
-                onClick: () => {},
+                label: propertyType || t('allTypes'),
+                value: 'type',
+                onClick: () => setFiltersModalOpen(true),
               }}
               sortFilter={{
                 label: t('newest'),
@@ -327,12 +336,12 @@ export function PropertyMapBasedSearchPage({
                     title={property.name}
                     address={property.full_address}
                     price={property.price}
-                    image={property.thumbnail_url}
+                    image={property.thumbnail ?? ''}
                     attributes={property.attributes as ListingAttribute[]}
                     areaUnit='m²'
                     isFavorite={favoriteOverrides[property.listing_id] ?? property.is_favorite}
                     boostTags={property.is_boosted ? property.boost_packages : undefined}
-                    userType={property.user_type}
+                    userType={property.user_type as any}
                     variant={viewMode}
                     listingType={initialListingType}
                     onToggleFavorite={handleToggleFavorite}

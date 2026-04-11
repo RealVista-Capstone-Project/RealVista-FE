@@ -19,21 +19,21 @@ import {
   bookmarkApi,
   bookmarkKeys,
   bookmarkQueries,
-  type BookmarkListingCardDTO,
   type GetBookmarksParams,
 } from '@/entities/bookmark';
+import { type ListingSearchResponse } from '@/shared/types/search';
 
 const ITEMS_PER_PAGE = 9;
 
 /**
  * Transforms a bookmark listing DTO to card props format
  */
-function mapBookmarkListingToCardProps(item: BookmarkListingCardDTO) {
+function mapBookmarkListingToCardProps(item: ListingSearchResponse) {
   return {
     id: item.listing_id,
     slug: item.slug,
-    image: item.primary_image_url ?? '',
-    title: item.title,
+    image: item.thumbnail ?? '',
+    title: item.name,
     address: item.full_address,
     price: item.price,
     listingType: item.listing_type,

@@ -14,6 +14,7 @@ export interface PropertyLocation {
   price: number;
   currency?: string;
   label?: string;
+  isBoosted?: boolean;
 }
 
 interface PropertyMapProps {
@@ -112,6 +113,7 @@ export function PropertyMap({
                     ? (property.ids || [property.id]).some((id) => hoveredPropertyIds.includes(id))
                     : false
                 }
+                isBoosted={property.isBoosted}
                 onClick={() => onPropertyClick?.(property.ids || [property.id])}
               />
             </AdvancedMarker>

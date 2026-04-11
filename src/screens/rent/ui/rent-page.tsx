@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MapPin, DollarSign, Search, SlidersHorizontal } from 'lucide-react';
+import { MapPin, DollarSign, Search, SlidersHorizontal, X } from 'lucide-react';
 import {
   RealVistaListingCard,
   type ListingAttribute,
@@ -250,15 +250,25 @@ function RentPageContent() {
                   <MapPin className='w-4 h-4 text-main-primary' />
                   Địa điểm
                 </label>
-                <input
-                  type='text'
-                  placeholder='Hà Nội, Việt Nam'
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-                  maxLength={100}
-                />
+                  <div className='relative'>
+                    <input
+                      type='text'
+                      placeholder='Hà Nội, Việt Nam'
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
+                      className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary pr-10'
+                      maxLength={100}
+                    />
+                    {location && (
+                      <button
+                        onClick={() => setLocation('')}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-main-black transition-colors'
+                      >
+                        <X className='h-4 w-4' />
+                      </button>
+                    )}
+                  </div>
               </div>
 
               {/* Min Price */}
