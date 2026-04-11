@@ -109,7 +109,7 @@ function usePropertyColumns(
           const property = row.original;
           const typeName = property.property_type_info?.property_type_name ?? '\u2014';
           return (
-            <span className='inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-800 dark:text-slate-200'>
+            <span className='inline-flex items-center rounded-md bg-indigo-100 dark:bg-indigo-900/40 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 ring-1 ring-inset ring-indigo-300 dark:ring-indigo-700'>
               {typeName}
             </span>
           );

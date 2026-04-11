@@ -5,7 +5,7 @@
     "createNew": "Create Property",
     "searchPlaceholder": "Search by title, location or ID...",
     "noProperties": "No Properties Found",
-    "noPropertiesDesc": "You haven't added any properties yet. Click the button below to get started.",
+    "noPropertiesDesc": "You haven't added any properties yet.",
     "colImage": "Image",
     "colAddress": "Property Details",
     "colType": "Type",
