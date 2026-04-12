@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   notificationQueries,
+  notificationKeys,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   mapToNotification,
@@ -19,12 +21,15 @@ export function NotificationDropdownContainer() {
   const { data: session } = useSession();
   const token = session?.user?.accessToken as string | undefined;
 
+  const t = useTranslations('Notifications');
+
   const router = useRouter();
   const params = useParams();
   const locale = (params?.locale as string | undefined) ?? 'en';
 
   const markAllRead = useMarkAllNotificationsRead();
   const markRead = useMarkNotificationRead();
+  const queryClient = useQueryClient();
 
   // ── Initial HTTP fetch ───────────────────────────────────────────────────
   // Pass token directly into queryFn to bypass the in-memory sync cache
@@ -57,18 +62,21 @@ export function NotificationDropdownContainer() {
     return [...wsOnly, ...httpMapped];
   }, [rawItems, wsNotifications]);
 
-  // ── WebSocket real-time channel ──────────────────────────────────────────
-  useNotificationWebSocket({
-    token,
-    onNewNotification: (incoming) => {
-      setWsNotifications((prev) => {
-        if (prev.some((n) => n.id === incoming.id)) return prev;
-        return [incoming, ...prev];
-      });
-    },
-  });
-
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  /**
+   * Navigate to the 3D management page for a property, optionally jumping
+   * straight to a specific room by appending ?roomName=<name>.
+   */
+  const navigateTo3d = useCallback(
+    (entityId: string, metadata: Record<string, string> | null) => {
+      const roomName = metadata?.roomName ?? metadata?.room_name;
+      const base = `/${locale}/dashboard/property/${entityId}/3d`;
+      router.push(roomName ? `${base}?roomName=${encodeURIComponent(roomName)}` : base);
+    },
+    [locale, router]
+  );
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleMarkAllRead = () => {
@@ -86,7 +94,7 @@ export function NotificationDropdownContainer() {
 
     if (n.eventType === 'PROPERTY_3D_GENERATED' || n.eventType === 'PROPERTY_3D_FAILED') {
       if (n.entityId) {
-        router.push(`/${locale}/dashboard/property/${n.entityId}/3d`);
+        navigateTo3d(n.entityId, n.metadata);
       }
     } else if (n.eventType.includes('TOUR')) {
       router.push(`/${locale}/appointments`);
@@ -94,6 +102,28 @@ export function NotificationDropdownContainer() {
       router.push(`/${locale}/property/${n.metadata.listingId}`);
     }
   };
+
+  // ── WebSocket real-time channel ──────────────────────────────────────────
+  useNotificationWebSocket({
+    token,
+    toastViewLabel: t('toastView'),
+    onNewNotification: (incoming) => {
+      setWsNotifications((prev) => {
+        if (prev.some((n) => n.id === incoming.id)) return prev;
+        return [incoming, ...prev];
+      });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
+    },
+    onNotificationAction: (incoming) => {
+      if (
+        (incoming.eventType === 'PROPERTY_3D_GENERATED' ||
+          incoming.eventType === 'PROPERTY_3D_FAILED') &&
+        incoming.entityId
+      ) {
+        navigateTo3d(incoming.entityId, incoming.metadata);
+      }
+    },
+  });
 
   // ── Loading state ────────────────────────────────────────────────────────
   if (isLoading) {
