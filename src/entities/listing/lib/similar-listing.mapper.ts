@@ -39,7 +39,6 @@ export function mapSimilarListingToCardProps(listing: SimilarListing): SimilarLi
     area: listing.area,
     areaUnit: 'm²',
     listingType: listing.listing_type,
-    isPopular: false,
     isFavorite: false,
   };
 }

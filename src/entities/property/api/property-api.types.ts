@@ -50,38 +50,9 @@ export interface PropertySearchRequest {
   size?: number;
 }
 
-export interface PropertyListingDto {
-  listing_id: string;
-  slug: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  street_address: string | null;
-  ward_name: string | null;
-  district_name: string | null;
-  city_name: string | null;
-  full_address: string;
-  price: number;
-  listing_type: 'RENT' | 'SALE';
-  name: string;
-  thumbnail_url: string;
-  size_m2: number;
-  property_type: string;
-  is_favorite: boolean;
-  bedrooms?: number;
-  bathrooms?: number;
-  attributes?: Array<{
-    attribute_id: string;
-    attribute_code: string;
-    attribute_name: string;
-    icon: string | null;
-    unit: string | null;
-    value_number: number | null;
-    value_text: string | null;
-    value_boolean: boolean | null;
-  }>;
-}
+import { type ListingSearchResponse } from '@/shared/types/search';
+
+export type PropertyListingDto = ListingSearchResponse;
 
 export interface PropertySearchResponse {
   success: boolean;
@@ -231,7 +202,7 @@ export interface PropertyMediaRequest {
   thumbnailUrl?: string;
   type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
   isThumbnail?: boolean;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreatePropertyRequest {
@@ -305,7 +276,7 @@ export interface PropertyDetailResponse {
     thumbnail_url: string | null;
     media_type: 'IMAGE' | 'VIDEO' | 'VIRTUAL_TOUR' | 'DOCUMENT' | 'THREE_D';
     is_primary: boolean;
-    metadata?: any;
+    metadata?: Record<string, unknown>;
   }>;
   active_listings?: ListingSummaryDTO[];
 }

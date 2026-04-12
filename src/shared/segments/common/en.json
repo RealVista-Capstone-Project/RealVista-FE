@@ -336,6 +336,7 @@
     "favorited": "Favorited",
     "subscribe": "Plans & billing",
     "appointments": "Appointments",
+    "myEngagements": "My Engagements",
     "login": "Login",
     "signup": "Sign up"
   },
@@ -346,7 +347,14 @@
     "confirmUnfavoriteTitle": "Remove from favorites?",
     "confirmUnfavoriteMessage": "Are you sure you want to remove this property from your favorites?",
     "unfavorite": "Remove",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "featured": "Featured",
+    "hot": "Hot",
+    "verifiedAgent": "Verified Agent",
+    "status": {
+      "SOLD": "Sold",
+      "RENTED": "Rented"
+    }
   },
   "Rent": {
     "searchTitle": "Search properties to rent",

@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Columns,
   FileText,
+  Handshake,
   LayoutDashboard,
   MessageCircle,
   TrendingUp,
@@ -56,6 +57,7 @@ const ownerSidebarItems: SidebarMenuItem[] = [
   },
   { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
   { id: 'manage-agent', label: 'Manage Agent', href: ROUTES.dashboard.manageAgent, icon: Users },
+  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
@@ -97,6 +99,7 @@ const agentSidebarItems: SidebarMenuItem[] = [
     href: ROUTES.dashboard.manageProposals,
     icon: FileText,
   },
+  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
   { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
 ];
 
@@ -344,7 +347,7 @@ export function DashboardLayout({
         </header>
 
         {/* Page Content - fills remaining height */}
-        <main className='flex-1 h-full overflow-x-hidden bg-slate-50/50 p-0'>{children}</main>
+        <main className='flex-1 overflow-hidden bg-slate-50/50 p-0'>{children}</main>
       </div>
     </div>
   );

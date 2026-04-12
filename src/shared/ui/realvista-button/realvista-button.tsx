@@ -80,7 +80,6 @@ function RealVistaButton({
 
   // Show icon only for primary and secondary variants when withIcon is true
   const showIcon = withIcon && (variant === 'primary' || variant === 'secondary');
-  const iconSize = size === 'small' ? 16 : 20;
 
   return (
     <Comp

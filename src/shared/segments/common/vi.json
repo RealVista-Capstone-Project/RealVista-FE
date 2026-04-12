@@ -336,6 +336,7 @@
     "favorited": "Yêu thích",
     "subscribe": "Gói dịch vụ & thanh toán",
     "appointments": "Lịch hẹn",
+    "myEngagements": "Engagement của tôi",
     "login": "Đăng nhập",
     "signup": "Đăng ký"
   },
@@ -346,7 +347,14 @@
     "confirmUnfavoriteTitle": "Bỏ yêu thích?",
     "confirmUnfavoriteMessage": "Bạn có chắc muốn bỏ yêu thích bất động sản này không?",
     "unfavorite": "Bỏ yêu thích",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "featured": "Nổi bật",
+    "hot": "Hot",
+    "verifiedAgent": "Môi giới xác thực",
+    "status": {
+      "SOLD": "Đã bán",
+      "RENTED": "Đã cho thuê"
+    }
   },
   "Rent": {
     "searchTitle": "Tìm kiếm bất động sản cho thuê",

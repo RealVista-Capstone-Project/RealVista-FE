@@ -12,7 +12,7 @@ export interface SearchCriteria {
   has3D?: boolean;
   sortBy?: string;
   dynamicAttributes?: Record<string, boolean | string>;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface SavedSearchDto {

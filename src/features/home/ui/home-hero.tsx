@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 

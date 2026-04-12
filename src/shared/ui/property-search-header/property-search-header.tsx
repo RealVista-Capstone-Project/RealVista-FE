@@ -67,8 +67,16 @@ export function PropertySearchHeader({
             placeholder={searchPlaceholder}
             value={searchValue}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            className='h-12 w-full rounded-lg border-[1.5px] border-purple-92 bg-white pl-12 pr-4 text-base font-normal leading-[1.5] text-main-black outline-none transition-colors placeholder:text-grey-500 focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+            className='h-12 w-full rounded-lg border-[1.5px] border-purple-92 bg-white pl-12 pr-10 text-base font-normal leading-[1.5] text-main-black outline-none transition-colors placeholder:text-grey-500 focus:border-main-primary focus:ring-1 focus:ring-main-primary'
           />
+          {searchValue && (
+            <button
+              onClick={() => onSearchChange?.('')}
+              className='absolute right-3 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-grey-100 text-grey-500 hover:bg-grey-200 hover:text-main-black transition-colors'
+            >
+              <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><line x1='18' y1='6' x2='6' y2='18'></line><line x1='6' y1='6' x2='18' y2='18'></line></svg>
+            </button>
+          )}
         </div>
         <Button
           type='button'
