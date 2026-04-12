@@ -103,17 +103,22 @@ export function NotificationDropdownContainer() {
     }
   };
 
+  const onNewNotification = useCallback(
+    (notification: Notification) => {
+      setWsNotifications((prev) => {
+        if (prev.some((n) => n.id === notification.id)) return prev;
+        return [notification, ...prev];
+      });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
+    },
+    [queryClient]
+  );
+
   // ── WebSocket real-time channel ──────────────────────────────────────────
   useNotificationWebSocket({
     token,
     toastViewLabel: t('toastView'),
-    onNewNotification: (incoming) => {
-      setWsNotifications((prev) => {
-        if (prev.some((n) => n.id === incoming.id)) return prev;
-        return [incoming, ...prev];
-      });
-      queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
-    },
+    onNewNotification,
     onNotificationAction: (incoming) => {
       if (
         (incoming.eventType === 'PROPERTY_3D_GENERATED' ||
