@@ -38,9 +38,13 @@ import {
 export function ThreeDManagementScreen({
   propertyId,
   locale,
+  initialRoomName,
 }: {
   propertyId: string;
   locale: string;
+  /** When set (e.g. from a notification deep-link ?roomName=…), auto-select
+   *  and open the viewer for this room once the room list is loaded. */
+  initialRoomName?: string;
 }) {
   const t = useTranslations('ThreeDManagement');
   const router = useRouter();
@@ -143,6 +147,13 @@ export function ThreeDManagementScreen({
       metadata: matching?.metadata || null
     };
   }, [selectedRoom, threeDMediaItems]);
+
+  // Auto-select room from deep-link param (e.g. notification tap → ?roomName=Kitchen)
+  useEffect(() => {
+    if (!initialRoomName || roomGroups.length === 0) return;
+    const match = roomGroups.find((r) => r.roomName === initialRoomName);
+    if (match) setSelectedRoom(match.roomName);
+  }, [initialRoomName, roomGroups]);
 
   // Auto-refetch detail when any operation succeeds
   useEffect(() => {

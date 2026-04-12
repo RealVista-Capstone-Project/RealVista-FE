@@ -30,7 +30,7 @@ export interface TopNavProps {
     initials: string;
     avatar?: string;
   };
-
+  pageTitle?: string;
   startContent?: React.ReactNode;
   className?: string;
 }
@@ -52,6 +52,7 @@ export function TopNav({
   navItems = variant === 'public' ? defaultNavItems : undefined,
   logoHref = ROUTES.buy,
   user = defaultUser,
+  pageTitle = 'RealVista',
   startContent,
   className,
 }: TopNavProps) {
@@ -90,7 +91,7 @@ export function TopNav({
           {/* Logo - hide logo text for dashboard variant */}
           {variant === 'dashboard' ? (
             <span className='font-bold text-xl lg:text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
-              RealVista
+              {pageTitle}
             </span>
           ) : (
             <Link href={`/${locale}${logoHref}`} className='flex items-center gap-2'>

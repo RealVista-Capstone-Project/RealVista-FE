@@ -127,6 +127,24 @@ export function DashboardLayout({
     ) {
       return t('pageTitle.myEngagements');
     }
+    if (
+      pathname === ROUTES.dashboard.property ||
+      pathname.startsWith(ROUTES.dashboard.property)
+    ) {
+      return t('pageTitle.property');
+    }
+    if (
+      pathname === ROUTES.dashboard.manageAgent ||
+      pathname.startsWith(ROUTES.dashboard.manageAgent)
+    ) {
+      return t('pageTitle.manageAgent');
+    }
+    if (
+      pathname === ROUTES.dashboard.ownerProperties ||
+      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+    ) {
+      return t('pageTitle.ownerProperties');
+    }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
     }
@@ -273,7 +291,7 @@ export function DashboardLayout({
         {/* Top Nav */}
         <TopNavContainer
           variant='dashboard'
-
+          pageTitle={pageTitle}
         />
 
         {/* Page Content - fills remaining height, scrollable */}
