@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { conversationQueries } from '@/entities/conversation';
+import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import type { ConversationListItemResponse } from '@/entities/conversation';
+import { useChatWebSocket } from '@/features/chat';
 import type { Conversation } from './types';
 import { ChatHeader } from './components/chat-header';
 import { ChatMessages } from './components/chat-messages';
@@ -35,6 +36,7 @@ function mapConversation(item: ConversationListItemResponse): Conversation {
 
   return {
     id: item.conversation_id,
+    otherUserId: item.other_user?.user_id ?? '',
     name,
     avatar: item.other_user?.avatar_url ?? undefined,
     initials: initials || '?',
@@ -87,6 +89,12 @@ export function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
 
+  // ── WebSocket connection (receive-only — invalidates query cache on new messages) ──
+  const { isConnected, sendTyping } = useChatWebSocket();
+
+  // ── HTTP send mutation ────────────────────────────────────────────────────
+  const { mutate: sendMessage, isPending: isSending } = useSendMessage();
+
   // ── Fetch real conversations ──────────────────────────────────────────────
   const { data: convData, isLoading } = useQuery(conversationQueries.list());
 
@@ -101,6 +109,29 @@ export function MessagesPage() {
   const [activeConvId, setActiveConvId] = useState<string>('');
   const effectiveActiveId = activeConvId || conversations[0]?.id || '';
   const activeConv = conversations.find((c) => c.id === effectiveActiveId) ?? conversations[0];
+
+  // ── Send handler ──────────────────────────────────────────────────────────
+  const handleSubmit = useCallback(() => {
+    const content = messageInput.trim();
+    if (!content || !activeConv?.otherUserId) return;
+
+    sendMessage(
+      {
+        recipient_user_id: activeConv.otherUserId,
+        message_type: 'TEXT',
+        content,
+      },
+      {
+        onSuccess: () => setMessageInput(''),
+      }
+    );
+  }, [messageInput, activeConv, sendMessage]);
+
+  // ── Typing handler ────────────────────────────────────────────────────────
+  const handleTyping = useCallback(() => {
+    if (!effectiveActiveId || !activeConv?.otherUserId) return;
+    sendTyping(effectiveActiveId, activeConv.otherUserId);
+  }, [effectiveActiveId, activeConv, sendTyping]);
 
   if (isLoading) {
     return (
@@ -136,7 +167,10 @@ export function MessagesPage() {
             <MessageInput
               value={messageInput}
               onChange={setMessageInput}
-              onSubmit={() => setMessageInput('')}
+              onSubmit={handleSubmit}
+              onTyping={handleTyping}
+              isSending={isSending}
+              isConnected={isConnected}
             />
           </>
         )}

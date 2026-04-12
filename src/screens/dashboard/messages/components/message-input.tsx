@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Plus, FileText, Mic } from 'lucide-react';
+import { Plus, FileText, Mic, Send, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { useAuthSession } from '@/features/auth/model';
@@ -12,9 +12,19 @@ interface MessageInputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  onTyping?: () => void;
+  isSending?: boolean;
+  isConnected?: boolean;
 }
 
-export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
+export function MessageInput({
+  value,
+  onChange,
+  onSubmit,
+  onTyping,
+  isSending = false,
+  isConnected = false,
+}: MessageInputProps) {
   const t = useTranslations('Messages');
   const { data: session } = useAuthSession();
   const router = useRouter();
@@ -24,7 +34,7 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
 
   // Only owner and AGENT may see contract creation
   const canCreateContract =
-    session?.user?.role === 'owner' || session?.user?.backendRoles == 'AGENT';
+    session?.user?.role === 'owner' || session?.user?.backendRoles?.includes('AGENT');
 
   // Close popover when clicking outside
   useEffect(() => {
@@ -44,6 +54,8 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [popoverOpen]);
+
+  const canSend = value.trim().length > 0 && !isSending;
 
   return (
     <div className='border-t border-purple-92/50 bg-white px-6 py-4'>
@@ -87,17 +99,34 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
           type='text'
           placeholder={t('typeYourMessage')}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          disabled={isSending}
+          onChange={(e) => {
+            onChange(e.target.value);
+            onTyping?.();
+          }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && value.trim()) {
+            if (e.key === 'Enter' && canSend) {
               onSubmit();
             }
           }}
-          className='flex-1 bg-transparent text-sm text-main-black placeholder:text-grey-400 focus:outline-none'
+          className='flex-1 bg-transparent text-sm text-main-black placeholder:text-grey-400 focus:outline-none disabled:opacity-50'
         />
-        <button className='shrink-0 text-grey-400 transition-colors hover:text-main-primary'>
-          <Mic className='size-5' />
-        </button>
+
+        {/* Send / Mic button */}
+        {canSend ? (
+          <button
+            onClick={onSubmit}
+            disabled={isSending}
+            className='shrink-0 text-main-primary transition-colors hover:text-main-primary/70 disabled:opacity-50'
+            aria-label='Send message'
+          >
+            {isSending ? <Loader2 className='size-5 animate-spin' /> : <Send className='size-5' />}
+          </button>
+        ) : (
+          <button className='shrink-0 text-grey-400 transition-colors hover:text-main-primary'>
+            <Mic className='size-5' />
+          </button>
+        )}
       </div>
     </div>
   );

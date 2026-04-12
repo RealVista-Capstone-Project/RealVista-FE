@@ -11,6 +11,8 @@
     "viewContract": "Xem hợp đồng",
     "activityTimeline": "Lịch sử hoạt động",
     "endContract": "Kết thúc hợp đồng",
-    "noMessages": "Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!"
+    "noMessages": "Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!",
+    "connected": "Đã kết nối",
+    "connecting": "Đang kết nối..."
   }
 }

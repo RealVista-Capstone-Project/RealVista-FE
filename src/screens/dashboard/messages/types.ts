@@ -38,6 +38,7 @@ export interface Message {
 
 export interface Conversation {
   id: string;
+  otherUserId: string;
   name: string;
   avatar?: string;
   initials?: string;

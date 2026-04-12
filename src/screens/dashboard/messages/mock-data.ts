@@ -42,6 +42,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
 export const MOCK_CONVERSATIONS: Conversation[] = [
   {
     id: 'c1',
+    otherUserId: '',
     name: 'Matriks Studio',
     initials: 'M',
     avatarBg: 'bg-main-primary',
@@ -54,6 +55,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c2',
+    otherUserId: '',
     name: 'Matriks Lab',
     initials: 'ML',
     avatarBg: 'bg-slate-400',
@@ -64,6 +66,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c3',
+    otherUserId: '',
     name: 'Work, Work, Work',
     initials: 'WW',
     avatarBg: 'bg-slate-700',
@@ -72,6 +75,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c4',
+    otherUserId: '',
     name: 'Hisyam',
     initials: 'HI',
     avatarBg: 'bg-emerald-500',
@@ -80,6 +84,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c5',
+    otherUserId: '',
     name: 'Dimas Eza',
     initials: 'DE',
     avatarBg: 'bg-purple-500',
@@ -88,6 +93,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c6',
+    otherUserId: '',
     name: 'Nick Jo',
     initials: 'NJ',
     avatarBg: 'bg-slate-500',
@@ -96,6 +102,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c7',
+    otherUserId: '',
     name: 'Ellaslls',
     initials: 'EL',
     avatarBg: 'bg-pink-400',
@@ -104,6 +111,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c8',
+    otherUserId: '',
     name: 'Dips',
     initials: 'DI',
     avatarBg: 'bg-blue-500',
@@ -112,6 +120,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
   },
   {
     id: 'c9',
+    otherUserId: '',
     name: 'Nopals',
     initials: 'NO',
     avatarBg: 'bg-orange-400',

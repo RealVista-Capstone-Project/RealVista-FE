@@ -11,6 +11,8 @@
     "viewContract": "View contract",
     "activityTimeline": "Activity timeline",
     "endContract": "End contract",
-    "noMessages": "No messages yet. Say hello!"
+    "noMessages": "No messages yet. Say hello!",
+    "connected": "Connected",
+    "connecting": "Connecting..."
   }
 }
