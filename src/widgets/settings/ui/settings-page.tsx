@@ -90,6 +90,22 @@ function mergeWorkingAreaTags(existing: string[], incoming: string[]): string[] 
   return merged;
 }
 
+/** Aligned with backend / domain: whole years, realistic career length. */
+const AGENT_MIN_YEARS_EXPERIENCE = 0;
+const AGENT_MAX_YEARS_EXPERIENCE = 60;
+
+type AgentYearsExperienceIssue = 'out_of_range' | 'invalid_format' | null;
+
+function getAgentYearsExperienceIssue(raw: string): AgentYearsExperienceIssue {
+  const trimmed = raw.trim();
+  if (trimmed === '') return null;
+  if (!/^\d+$/.test(trimmed)) return 'invalid_format';
+  const n = Number.parseInt(trimmed, 10);
+  if (Number.isNaN(n)) return 'invalid_format';
+  if (n < AGENT_MIN_YEARS_EXPERIENCE || n > AGENT_MAX_YEARS_EXPERIENCE) return 'out_of_range';
+  return null;
+}
+
 export interface SettingsPageProps {
   /** Agent dashboard uses the same flows but hides buyer customer profiles and adds professional fields. */
   variant?: 'default' | 'agentDashboard';
@@ -244,6 +260,11 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     return FLAT_PROPERTY_TYPES.filter((t) => selected.has(t.code));
   }, [agentSpecialtyCodes]);
 
+  const yearsExperienceIssue = useMemo(
+    () => getAgentYearsExperienceIssue(agentProfessionalForm.years_of_experience),
+    [agentProfessionalForm.years_of_experience]
+  );
+
   const toggleAgentSpecialty = useCallback((code: string) => {
     setAgentSpecialtyCodes((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
@@ -360,6 +381,23 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     },
     onError: () => toast.error(t('toast.agentProfileUpdateFailed')),
   });
+
+  const saveAgentProfessionalProfile = useCallback(() => {
+    const issue = getAgentYearsExperienceIssue(agentProfessionalForm.years_of_experience);
+    const rangeT = {
+      min: AGENT_MIN_YEARS_EXPERIENCE,
+      max: AGENT_MAX_YEARS_EXPERIENCE,
+    };
+    if (issue === 'out_of_range') {
+      toast.error(t('agentProfessional.yearsExperienceErrorOutOfRange', rangeT));
+      return;
+    }
+    if (issue === 'invalid_format') {
+      toast.error(t('agentProfessional.yearsExperienceErrorInvalid'));
+      return;
+    }
+    updateAgentProfileMutation.mutate();
+  }, [agentProfessionalForm.years_of_experience, t, updateAgentProfileMutation]);
 
   const deleteProfileMutation = useMutation({
     mutationFn: (profileId: string) => customerProfileApi.delete(profileId),
@@ -881,26 +919,48 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                       </p>
                     </div>
                     <div className='space-y-2 max-w-xs'>
-                      <Label className='text-sm text-grey-500'>{t('agentProfessional.yearsExperience')}</Label>
+                      <Label className='text-sm text-grey-500' htmlFor='agent-years-experience'>
+                        {t('agentProfessional.yearsExperience')}
+                      </Label>
+                      <p className='text-xs text-grey-400 leading-relaxed'>
+                        {t('agentProfessional.yearsExperienceHint', {
+                          min: AGENT_MIN_YEARS_EXPERIENCE,
+                          max: AGENT_MAX_YEARS_EXPERIENCE,
+                        })}
+                      </p>
                       <Input
-                        type='number'
-                        min={0}
+                        id='agent-years-experience'
+                        type='text'
                         inputMode='numeric'
+                        autoComplete='off'
+                        aria-invalid={yearsExperienceIssue != null}
                         value={agentProfessionalForm.years_of_experience}
-                        onChange={(e) =>
-                          setAgentProfessionalForm((f) => ({
-                            ...f,
-                            years_of_experience: e.target.value.replace(/\D/g, '').slice(0, 3),
-                          }))
-                        }
+                        onChange={(e) => {
+                          const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+                          setAgentProfessionalForm((f) => ({ ...f, years_of_experience: v }));
+                        }}
                         placeholder={t('agentProfessional.yearsPlaceholder')}
+                        className={yearsExperienceIssue ? 'border-red-400 focus-visible:ring-red-200' : undefined}
                       />
+                      {yearsExperienceIssue === 'out_of_range' && (
+                        <p className='text-xs text-red-600' role='alert'>
+                          {t('agentProfessional.yearsExperienceErrorOutOfRange', {
+                            min: AGENT_MIN_YEARS_EXPERIENCE,
+                            max: AGENT_MAX_YEARS_EXPERIENCE,
+                          })}
+                        </p>
+                      )}
+                      {yearsExperienceIssue === 'invalid_format' && (
+                        <p className='text-xs text-red-600' role='alert'>
+                          {t('agentProfessional.yearsExperienceErrorInvalid')}
+                        </p>
+                      )}
                     </div>
                     <div className='flex justify-end pt-2'>
                       <Button
                         type='button'
-                        onClick={() => updateAgentProfileMutation.mutate()}
-                        disabled={updateAgentProfileMutation.isPending}
+                        onClick={saveAgentProfessionalProfile}
+                        disabled={updateAgentProfileMutation.isPending || yearsExperienceIssue != null}
                         className='bg-main-primary text-white hover:bg-main-primary/90'
                       >
                         {updateAgentProfileMutation.isPending
