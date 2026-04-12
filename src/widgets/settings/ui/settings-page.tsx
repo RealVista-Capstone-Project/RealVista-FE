@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { Settings, User, Trash2, Plus, ChevronRight, ChevronDown, RefreshCw, Upload } from 'lucide-react';
+import { Settings, User, Trash2, Plus, ChevronRight, ChevronDown, RefreshCw, Upload, X } from 'lucide-react';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -26,6 +26,13 @@ import type { UpdateMeData } from '@/entities/user/model/types';
 import type { UpdateSettingPreferenceData } from '@/entities/setting-preference/model/types';
 import type { CustomerProfile } from '@/entities/customer-profile/model/types';
 import { firebaseApp } from '@/shared/config/firebase';
+import { cn } from '@/shared/lib/utils';
+import {
+  FLAT_PROPERTY_TYPES,
+  PROPERTY_TYPES,
+  parseSpecialtiesToCodes,
+  serializeSpecialtyLabels,
+} from '@/shared/config/property-types';
 
 interface MediaUploadResponse {
   media_url: string;
@@ -135,10 +142,10 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
 
   const [agentProfessionalForm, setAgentProfessionalForm] = useState({
     bio: '',
-    specialties: '',
     service_areas: '',
     years_of_experience: '',
   });
+  const [agentSpecialtyCodes, setAgentSpecialtyCodes] = useState<string[]>([]);
 
   // Hydrate form from API data
   useEffect(() => {
@@ -171,12 +178,25 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     if (!agentProfile) return;
     setAgentProfessionalForm({
       bio: agentProfile.bio ?? '',
-      specialties: agentProfile.specialties ?? '',
       service_areas: agentProfile.service_areas ?? '',
       years_of_experience:
         agentProfile.years_of_experience != null ? String(agentProfile.years_of_experience) : '',
     });
-  }, [agentProfile]);
+    if (isAgentDashboard) {
+      setAgentSpecialtyCodes(parseSpecialtiesToCodes(agentProfile.specialties));
+    }
+  }, [agentProfile, isAgentDashboard]);
+
+  const orderedSelectedSpecialties = useMemo(() => {
+    const selected = new Set(agentSpecialtyCodes);
+    return FLAT_PROPERTY_TYPES.filter((t) => selected.has(t.code));
+  }, [agentSpecialtyCodes]);
+
+  const toggleAgentSpecialty = useCallback((code: string) => {
+    setAgentSpecialtyCodes((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
+  }, []);
 
   useEffect(() => {
     if (isEditingProfile) return;
@@ -244,7 +264,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
         years_of_experience?: number;
       } = {
         bio: agentProfessionalForm.bio,
-        specialties: agentProfessionalForm.specialties,
+        specialties: serializeSpecialtyLabels(agentSpecialtyCodes),
         service_areas: agentProfessionalForm.service_areas,
       };
       const y = agentProfessionalForm.years_of_experience.trim();
@@ -632,17 +652,74 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                         className='resize-y min-h-[100px]'
                       />
                     </div>
-                    <div className='space-y-2'>
-                      <Label className='text-sm text-grey-500'>{t('agentProfessional.specialties')}</Label>
-                      <Textarea
-                        value={agentProfessionalForm.specialties}
-                        onChange={(e) =>
-                          setAgentProfessionalForm((f) => ({ ...f, specialties: e.target.value }))
-                        }
-                        placeholder={t('agentProfessional.specialtiesPlaceholder')}
-                        rows={2}
-                        className='resize-y min-h-[72px]'
-                      />
+                    <div className='space-y-3'>
+                      <div>
+                        <Label className='text-sm text-grey-500'>{t('agentProfessional.specialties')}</Label>
+                        <p className='text-xs text-grey-400 mt-1 leading-relaxed'>
+                          {t('agentProfessional.specialtiesHint')}
+                        </p>
+                      </div>
+                      <div
+                        className={cn(
+                          'min-h-[52px] rounded-xl border border-dashed border-border bg-purple-98/30 px-3 py-2.5',
+                          orderedSelectedSpecialties.length === 0 && 'flex items-center'
+                        )}
+                      >
+                        {orderedSelectedSpecialties.length === 0 ? (
+                          <span className='text-sm text-grey-400'>{t('agentProfessional.specialtiesEmpty')}</span>
+                        ) : (
+                          <div className='flex flex-wrap gap-2'>
+                            {orderedSelectedSpecialties.map((item) => (
+                              <span
+                                key={item.code}
+                                className='group inline-flex items-center gap-1 rounded-full border border-main-primary/25 bg-white pl-3 pr-1 py-1 text-sm font-medium text-main-primary shadow-sm ring-1 ring-purple-92/40'
+                              >
+                                <span className='max-w-[200px] truncate'>{item.label}</span>
+                                <button
+                                  type='button'
+                                  onClick={() => toggleAgentSpecialty(item.code)}
+                                  className='flex size-7 shrink-0 items-center justify-center rounded-full text-grey-400 transition-colors hover:bg-purple-98 hover:text-main-primary'
+                                  aria-label={t('agentProfessional.specialtiesRemoveAria', { label: item.label })}
+                                >
+                                  <X className='size-3.5' strokeWidth={2.5} />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className='space-y-4'>
+                        {PROPERTY_TYPES.map((category) => (
+                          <div
+                            key={category.code}
+                            className='rounded-xl border border-border/80 bg-gradient-to-br from-white to-purple-98/40 p-4 shadow-sm shadow-purple-92/10'
+                          >
+                            <p className='mb-3 text-[11px] font-bold uppercase tracking-wider text-main-primary/80'>
+                              {category.label}
+                            </p>
+                            <div className='flex flex-wrap gap-2'>
+                              {category.types.map((type) => {
+                                const isOn = agentSpecialtyCodes.includes(type.code);
+                                return (
+                                  <button
+                                    key={type.code}
+                                    type='button'
+                                    onClick={() => toggleAgentSpecialty(type.code)}
+                                    className={cn(
+                                      'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
+                                      isOn
+                                        ? 'bg-main-primary text-white shadow-md shadow-main-primary/25 ring-2 ring-main-primary/20'
+                                        : 'border border-border bg-white text-grey-600 hover:border-main-primary/35 hover:bg-purple-98/80 hover:text-main-black'
+                                    )}
+                                  >
+                                    {type.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     <div className='space-y-2'>
                       <Label className='text-sm text-grey-500'>{t('agentProfessional.serviceAreas')}</Label>
