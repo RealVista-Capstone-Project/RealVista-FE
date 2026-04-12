@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/shared/lib/websocket';
 import { mapWsPayloadToNotification, type Notification, type NotificationWsPayload } from '@/entities/notification';
+import { billingKeys } from '@/entities/billing';
 
 const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_ENDPOINT ?? 'http://localhost:8080/ws';
 const NOTIFICATION_DESTINATION = '/user/queue/notifications';
@@ -13,6 +15,13 @@ interface UseNotificationWebSocketOptions {
   token: string | undefined;
   /** Called with the mapped Notification when a new frame arrives */
   onNewNotification: (notification: Notification) => void;
+  /**
+   * Called when the user clicks a toast action button (e.g. "View" on a 3D
+   * notification). Receives the full Notification so the caller can navigate.
+   */
+  onNotificationAction?: (notification: Notification) => void;
+  /** Localized label for the toast action button shown on 3D notifications */
+  toastViewLabel: string;
 }
 
 /**
@@ -21,15 +30,21 @@ interface UseNotificationWebSocketOptions {
  *  1. Maps the raw NotificationResponse to a Notification
  *  2. Calls onNewNotification so the container can prepend it to local state
  *  3. Shows a toast (deduplicated by notificationId to prevent double-fire)
+ *     For 3D-related events the toast includes a "View" action button.
  */
 export function useNotificationWebSocket({
   token,
   onNewNotification,
+  onNotificationAction,
+  toastViewLabel,
 }: UseNotificationWebSocketOptions) {
   const seenIds = useRef<Set<string>>(new Set());
-  // Keep a stable ref to the callback so the subscription closure is not stale
+  const queryClient = useQueryClient();
+  // Keep stable refs to callbacks so the subscription closure is never stale
   const onNewNotificationRef = useRef(onNewNotification);
   onNewNotificationRef.current = onNewNotification;
+  const onNotificationActionRef = useRef(onNotificationAction);
+  onNotificationActionRef.current = onNotificationAction;
 
   const { isConnected, subscribe } = useWebSocket({
     endpoint: WS_ENDPOINT,
@@ -53,10 +68,26 @@ export function useNotificationWebSocket({
           const notification = mapWsPayloadToNotification(raw);
           onNewNotificationRef.current(notification);
 
+          const is3dEvent =
+            notification.eventType === 'PROPERTY_3D_GENERATED' ||
+            notification.eventType === 'PROPERTY_3D_FAILED';
+
           toast.info(notification.title, {
             description: notification.message,
             duration: 5000,
+            ...(is3dEvent && onNotificationActionRef.current
+              ? {
+                  action: {
+                    label: toastViewLabel,
+                    onClick: () => onNotificationActionRef.current!(notification),
+                  },
+                }
+              : {}),
           });
+
+          if (is3dEvent) {
+            queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
+          }
         } catch {
           // Silently ignore malformed frames
         }
@@ -66,5 +97,5 @@ export function useNotificationWebSocket({
     return () => {
       unsubscribe();
     };
-  }, [isConnected, subscribe]);
+  }, [isConnected, subscribe, queryClient]);
 }
