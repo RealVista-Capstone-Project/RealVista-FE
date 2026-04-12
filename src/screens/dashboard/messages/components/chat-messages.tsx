@@ -139,10 +139,11 @@ export function ChatMessages({ conversationId }: ChatMessagesProps) {
     return result;
   }, [messages, t]);
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when the latest message changes
+  const lastMessageId = messages.at(-1)?.id;
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length]);
+  }, [lastMessageId]);
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (messagesLoading) {
