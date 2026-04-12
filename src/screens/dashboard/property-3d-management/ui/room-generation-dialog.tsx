@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -22,28 +22,40 @@ import { motion, AnimatePresence } from 'framer-motion';
 const REQUIRED_IMAGES_COUNT = 8;
 const REQUIRED_AZIMUTHS = [0, 45, 90, 135, 180, 225, 270, 315];
 
-const SUGGESTED_ROOM_KEYS = [
-  'suggestedRoom_living',
-  'suggestedRoom_masterBedroom',
-  'suggestedRoom_bedroom',
-  'suggestedRoom_bathroom',
-  'suggestedRoom_kitchen',
-  'suggestedRoom_dining',
-  'suggestedRoom_entrance',
-  'suggestedRoom_balcony',
+// English names used as storage keys (must match what the backend stores)
+const QUICK_FILL_ROOM_VALUES = [
+  'Living Room',
+  'Master Bedroom',
+  'Bedroom',
+  'Bathroom',
+  'Kitchen',
+  'Dining Room',
+  'Entrance',
+  'Balcony',
 ] as const;
 
-// English names used as storage keys (must match what the backend stores)
-const SUGGESTED_ROOM_EN_VALUES: Record<string, string> = {
-  suggestedRoom_living: 'Living Room',
-  suggestedRoom_masterBedroom: 'Master Bedroom',
-  suggestedRoom_bedroom: 'Bedroom',
-  suggestedRoom_bathroom: 'Bathroom',
-  suggestedRoom_kitchen: 'Kitchen',
-  suggestedRoom_dining: 'Dining Room',
-  suggestedRoom_entrance: 'Entrance',
-  suggestedRoom_balcony: 'Balcony',
-};
+// Localized display labels — index matches QUICK_FILL_ROOM_VALUES
+const QUICK_FILL_ROOM_LABELS_EN = [
+  'Living Room',
+  'Master Bedroom',
+  'Bedroom',
+  'Bathroom',
+  'Kitchen',
+  'Dining Room',
+  'Entrance',
+  'Balcony',
+] as const;
+
+const QUICK_FILL_ROOM_LABELS_VI = [
+  'Phòng khách',
+  'Phòng ngủ chính',
+  'Phòng ngủ',
+  'Phòng tắm',
+  'Nhà bếp',
+  'Phòng ăn',
+  'Lối vào',
+  'Ban công',
+] as const;
 
 interface RoomGenerationDialogProps {
   propertyId: string;
@@ -67,6 +79,8 @@ export function RoomGenerationDialog({
   onInitiationError,
 }: RoomGenerationDialogProps) {
   const t = useTranslations('ThreeDManagement');
+  const locale = useLocale();
+  const quickFillLabels = locale === 'vi' ? QUICK_FILL_ROOM_LABELS_VI : QUICK_FILL_ROOM_LABELS_EN;
   const {
     phase,
     progressDescription,
@@ -186,20 +200,21 @@ export function RoomGenerationDialog({
 
         {/* Chips for suggestions */}
         <div className='flex flex-wrap gap-2 pt-1'>
-          {SUGGESTED_ROOM_KEYS
-            .filter((key) => !existingRoomNames.includes(SUGGESTED_ROOM_EN_VALUES[key]))
+          {QUICK_FILL_ROOM_VALUES
+            .map((value, index) => ({ value, label: quickFillLabels[index] }))
+            .filter(({ value }) => !existingRoomNames.includes(value))
             .slice(0, 5)
-            .map((key) => (
+            .map(({ value, label }) => (
             <button
-              key={key}
+              key={value}
               type='button'
               onClick={() => {
-                setRoomName(SUGGESTED_ROOM_EN_VALUES[key]);
-                setRoomDisplayName(t(key as any));
+                setRoomName(value);
+                setRoomDisplayName(label);
               }}
               className='text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors'
             >
-              {t(key as any)}
+              {label}
             </button>
           ))}
         </div>
