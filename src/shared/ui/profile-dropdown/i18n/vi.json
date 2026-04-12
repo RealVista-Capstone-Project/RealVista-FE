@@ -5,6 +5,8 @@
     "logout": "Đăng xuất",
     "loggingOut": "Đang đăng xuất...",
     "logoutSuccess": "Đăng xuất thành công",
-    "logoutFailed": "Lỗi đăng xuất. Vui lòng thử lại"
+    "logoutFailed": "Lỗi đăng xuất. Vui lòng thử lại",
+    "dashboard": "Đến Bảng điều khiển",
+    "home": "Về Trang chủ"
   }
 }

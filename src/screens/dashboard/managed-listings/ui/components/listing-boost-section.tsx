@@ -11,7 +11,7 @@ import {
   useApplyBoost,
   useRemoveBoost,
 } from '@/entities/listing/api/listing-boost.queries';
-import { billingQueries } from '@/entities/billing/api/billing.queries';
+import { billingQueries } from '@/entities/billing/api';
 import { Link } from '@/shared/config/i18n/navigation';
 import { toast } from 'sonner';
 import {

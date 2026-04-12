@@ -25,6 +25,7 @@ export interface PropertySummaryResponse {
   owner_id?: string;
   owner_name?: string;
   owner_phone?: string;
+  has_3d?: boolean;
 }
 export interface PropertySearchRequest {
   north_lat: number;

@@ -49,6 +49,7 @@ function resolvePropertyImage(item: Engagement): string | undefined {
   return undefined;
 }
 import { cn } from '@/shared/lib/utils';
+import { formatVND } from '@/shared/lib/utils/format-currency';
 import { format, parseISO, type Locale } from 'date-fns';
 import { vi as viLocale, enUS } from 'date-fns/locale';
 import { useTranslations, useLocale } from 'next-intl';
@@ -106,9 +107,9 @@ function fmtShortDate(dateStr: string | undefined, dateLocale: Locale): string {
   }
 }
 
-function fmtPrice(value?: number): string {
+function fmtPrice(value?: number | null): string {
   if (value == null) return '—';
-  return value.toLocaleString('vi-VN');
+  return formatVND(value);
 }
 
 /* ------------------------------------------------------------------ */
@@ -514,7 +515,7 @@ export const EngagementListView = ({
                                 <div className='text-xs'>
                                   <div className='text-gray-500 mb-0.5'>{t('outlook.saleRange')}</div>
                                   <span className='font-semibold text-gray-900'>
-                                    {fmtPrice(c.priceRange.sale.min)} - {fmtPrice(c.priceRange.sale.max)} VND
+                                    {fmtPrice(c.priceRange.sale.min)} VND – {fmtPrice(c.priceRange.sale.max)} VND
                                   </span>
                                 </div>
                               )}
@@ -522,7 +523,7 @@ export const EngagementListView = ({
                                 <div className='text-xs'>
                                   <div className='text-gray-500 mb-0.5'>{t('outlook.rentRange')}</div>
                                   <span className='font-semibold text-gray-900'>
-                                    {fmtPrice(c.priceRange.rent.min)} - {fmtPrice(c.priceRange.rent.max)} VND
+                                    {fmtPrice(c.priceRange.rent.min)} VND – {fmtPrice(c.priceRange.rent.max)} VND
                                   </span>
                                 </div>
                               )}
@@ -725,8 +726,8 @@ export const EngagementListView = ({
                           <div className='flex justify-between text-xs'>
                             <span className='text-gray-500'>{t('outlook.rentRange')}</span>
                             <span className='font-medium text-gray-900'>
-                              {fmtPrice(engContent.priceRange.rent.min)} -{' '}
-                              {fmtPrice(engContent.priceRange.rent.max)} VND
+                              {fmtPrice(engContent.priceRange.rent.min)} –{' '}
+                              {fmtPrice(engContent.priceRange.rent.max)}
                             </span>
                           </div>
                         )}
@@ -734,8 +735,8 @@ export const EngagementListView = ({
                           <div className='flex justify-between text-xs'>
                             <span className='text-gray-500'>{t('outlook.saleRange')}</span>
                             <span className='font-medium text-gray-900'>
-                              {fmtPrice(engContent.priceRange.sale.min)} -{' '}
-                              {fmtPrice(engContent.priceRange.sale.max)} VND
+                              {fmtPrice(engContent.priceRange.sale.min)} –{' '}
+                              {fmtPrice(engContent.priceRange.sale.max)}
                             </span>
                           </div>
                         )}

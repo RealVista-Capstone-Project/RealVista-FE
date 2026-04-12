@@ -5,6 +5,8 @@
     "logout": "Logout",
     "loggingOut": "Logging out...",
     "logoutSuccess": "Logged out successfully",
-    "logoutFailed": "Failed to logout. Please try again"
+    "logoutFailed": "Failed to logout. Please try again",
+    "dashboard": "Go to Dashboard",
+    "home": "Go to Home"
   }
 }

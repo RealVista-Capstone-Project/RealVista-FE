@@ -4,26 +4,23 @@ import * as React from 'react';
 import Image from 'next/image';
 import {
   Calendar,
-  ChevronDown,
   Columns,
   FileText,
   Handshake,
   LayoutDashboard,
   MessageCircle,
-  TrendingUp,
   Users,
   Building2,
   Search,
   type LucideIcon,
 } from 'lucide-react';
-import { Separator } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
-import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 import { useAuthSession } from '@/features/auth/model';
 import { ROUTES } from '@/shared/config/routes';
+import { TopNavContainer } from '@/shared/ui/top-nav/top-nav-container';
 
 export interface SidebarMenuItem {
   id: string;
@@ -36,83 +33,48 @@ export interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarItems?: SidebarMenuItem[];
   logoHref?: string;
-  user?: {
-    name: string;
-    initials: string;
-    avatar?: string;
-  };
   className?: string;
 }
 
-const ownerSidebarItems: SidebarMenuItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: ROUTES.dashboard.root, icon: LayoutDashboard },
-  { id: 'insight', label: 'Insight', href: ROUTES.dashboard.insight, icon: TrendingUp },
-  { id: 'listings', label: 'My Listings', href: ROUTES.dashboard.managedListings, icon: Calendar },
-  { id: 'tenants', label: 'Tenants', href: ROUTES.dashboard.tenants, icon: Users },
-  {
-    id: 'rental-contracts',
-    label: 'Rental Contracts',
-    href: ROUTES.dashboard.rentalContracts,
-    icon: FileText,
-  },
-  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
-  { id: 'manage-agent', label: 'Manage Agent', href: ROUTES.dashboard.manageAgent, icon: Users },
-  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
-  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
-];
+type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
 
-const tenantSidebarItems: SidebarMenuItem[] = [
-  { id: 'my-contracts', label: 'My Contracts', href: ROUTES.dashboard.myContracts, icon: FileText },
-  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
-  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
-];
+function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
+    { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+    { id: 'manage-agent', label: t('menu.manageAgent'), href: ROUTES.dashboard.manageAgent, icon: Users },
+    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+  ];
+}
 
-const agentSidebarItems: SidebarMenuItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: ROUTES.dashboard.root,
-    icon: LayoutDashboard,
-  },
-  {
-    id: 'owner-properties',
-    label: 'Owner Properties',
-    href: ROUTES.dashboard.ownerProperties,
-    icon: Search,
-  },
-  {
-    id: 'insight',
-    label: 'Insight',
-    href: ROUTES.dashboard.insight,
-    icon: TrendingUp,
-  },
-  {
-    id: 'listings',
-    label: 'My Listings',
-    href: ROUTES.dashboard.managedListings,
-    icon: Calendar,
-  },
-  { id: 'property', label: 'Property', href: ROUTES.dashboard.property, icon: Building2 },
-  {
-    id: 'proposals',
-    label: 'My Proposals',
-    href: ROUTES.dashboard.manageProposals,
-    icon: FileText,
-  },
-  { id: 'my-engagements', label: 'Hợp tác', href: ROUTES.dashboard.myEngagements, icon: Handshake },
-  { id: 'messages', label: 'Message', href: ROUTES.dashboard.messages, icon: MessageCircle },
-];
+function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+  ];
+}
 
-const defaultUser = {
-  name: 'Francis',
-  initials: 'FR',
-};
+function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    { id: 'owner-properties', label: t('menu.ownerProperties'), href: ROUTES.dashboard.ownerProperties, icon: Search },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+    { id: 'proposals', label: t('menu.proposals'), href: ROUTES.dashboard.manageProposals, icon: FileText },
+    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+  ];
+}
 
 export function DashboardLayout({
   children,
   sidebarItems,
   logoHref = ROUTES.homePage,
-  user = defaultUser,
   className,
 }: DashboardLayoutProps) {
   const { data: session } = useAuthSession();
@@ -126,10 +88,10 @@ export function DashboardLayout({
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
-    if (isAgent) return agentSidebarItems;
-    if (isTenant) return tenantSidebarItems;
-    return ownerSidebarItems;
-  }, [sidebarItems, isAgent, isTenant]);
+    if (isAgent) return getAgentSidebarItems(t);
+    if (isTenant) return getTenantSidebarItems(t);
+    return getOwnerSidebarItems(t);
+  }, [sidebarItems, isAgent, isTenant, t]);
 
   const pageTitle = React.useMemo(() => {
     if (
@@ -160,10 +122,40 @@ export function DashboardLayout({
       return t('pageTitle.manageProposals');
     }
     if (
+      pathname === ROUTES.dashboard.ownerProperties ||
+      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+    ) {
+      return t('pageTitle.ownerProperties');
+    }
+    if (
+      pathname === ROUTES.dashboard.agentSetting ||
+      pathname.startsWith(ROUTES.dashboard.agentSetting)
+    ) {
+      return t('pageTitle.agentSetting');
+    }
+    if (
       pathname === ROUTES.dashboard.myEngagements ||
       pathname.startsWith(ROUTES.dashboard.myEngagements)
     ) {
       return t('pageTitle.myEngagements');
+    }
+    if (
+      pathname === ROUTES.dashboard.property ||
+      pathname.startsWith(ROUTES.dashboard.property)
+    ) {
+      return t('pageTitle.property');
+    }
+    if (
+      pathname === ROUTES.dashboard.manageAgent ||
+      pathname.startsWith(ROUTES.dashboard.manageAgent)
+    ) {
+      return t('pageTitle.manageAgent');
+    }
+    if (
+      pathname === ROUTES.dashboard.ownerProperties ||
+      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+    ) {
+      return t('pageTitle.ownerProperties');
     }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
@@ -176,6 +168,11 @@ export function DashboardLayout({
     if (href === ROUTES.dashboard.root) return pathname === ROUTES.dashboard.root;
     return pathname.startsWith(href);
   };
+
+  const settingsHref = backendRoles.includes('AGENT')
+    ? ROUTES.dashboard.agentSetting
+    : ROUTES.settings;
+  const isSettingsFooterActive = isItemActive(settingsHref);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -284,9 +281,12 @@ export function DashboardLayout({
         {/* Footer */}
         <div className='border-t border-purple-92/50 p-3'>
           <Link
-            href={ROUTES.settings}
+            href={settingsHref}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-main-secondary/60 transition-all hover:bg-purple-98 hover:text-main-secondary',
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
+              isSettingsFooterActive
+                ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
+                : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
@@ -309,45 +309,13 @@ export function DashboardLayout({
       {/* Main Content Area - Properly fills space without margin hacks */}
       <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
         {/* Top Nav */}
-        <header className='flex shrink-0 items-center justify-between bg-white px-8 py-3.5 border-b border-slate-100 shadow-sm shadow-slate-100/50 z-10'>
-          {/* Left Section */}
-          <div className='flex items-center gap-4'>
-            <span className='font-bold text-xl tracking-tight text-slate-800 translate-y-[-1px]'>
-              {pageTitle}
-            </span>
-          </div>
+        <TopNavContainer
+          variant='dashboard'
+          pageTitle={pageTitle}
+        />
 
-          {/* Right Actions */}
-          <div className='flex items-center gap-5'>
-            {/* Notification Dropdown */}
-            <NotificationDropdownContainer />
-
-            {/* Divider */}
-            <Separator orientation='vertical' className='h-5 bg-slate-200' />
-            <button
-              type='button'
-              className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white pl-2 pr-3 py-1.5 shadow-sm transition-all hover:border-slate-300 hover:shadow-md active:scale-95 group'
-              aria-label='Profile menu'
-            >
-              <div className='flex size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-xs ring-2 ring-indigo-50 shadow-inner group-hover:scale-105 transition-transform'>
-                {user.initials}
-              </div>
-              <div className='flex flex-col items-start translate-y-[-1px]'>
-                <span className='text-xs font-bold leading-none text-slate-800 mb-0.5'>
-                  {user.name}
-                </span>
-                <span className='text-[10px] font-medium text-slate-400'>Professional Agent</span>
-              </div>
-              <ChevronDown
-                className='h-3.5 w-3.5 text-slate-400 ml-1 group-hover:text-slate-600 transition-colors'
-                strokeWidth={2.5}
-              />
-            </button>
-          </div>
-        </header>
-
-        {/* Page Content - fills remaining height */}
-        <main className='flex-1 overflow-hidden bg-slate-50/50 p-0'>{children}</main>
+        {/* Page Content - fills remaining height, scrollable */}
+        <main className='flex-1 overflow-y-auto bg-slate-50/50 p-0'>{children}</main>
       </div>
     </div>
   );
