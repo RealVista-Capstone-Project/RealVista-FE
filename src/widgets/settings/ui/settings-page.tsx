@@ -3,6 +3,7 @@
 import {
   useState,
   useEffect,
+  useLayoutEffect,
   useRef,
   useCallback,
   useMemo,
@@ -104,6 +105,18 @@ function getAgentYearsExperienceIssue(raw: string): AgentYearsExperienceIssue {
   if (Number.isNaN(n)) return 'invalid_format';
   if (n < AGENT_MIN_YEARS_EXPERIENCE || n > AGENT_MAX_YEARS_EXPERIENCE) return 'out_of_range';
   return null;
+}
+
+function sortedSpecialtyCodesKey(codes: string[]): string {
+  return [...codes].map((c) => c.toUpperCase()).sort().join('|');
+}
+
+function sortedWorkingAreaTagsKey(tags: string[]): string {
+  return [...tags]
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean)
+    .sort()
+    .join('\x1e');
 }
 
 export interface SettingsPageProps {
@@ -241,7 +254,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     }
   }, [settings]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!agentProfile) return;
     setAgentProfessionalForm({
       bio: agentProfile.bio ?? '',
@@ -264,6 +277,41 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     () => getAgentYearsExperienceIssue(agentProfessionalForm.years_of_experience),
     [agentProfessionalForm.years_of_experience]
   );
+
+  const agentProfessionalBaseline = useMemo(() => {
+    if (!agentProfile || !isAgentDashboard) return null;
+    return {
+      bio: agentProfile.bio ?? '',
+      yearsText:
+        agentProfile.years_of_experience != null ? String(agentProfile.years_of_experience) : '',
+      specialtyCodes: parseSpecialtiesToCodes(agentProfile.specialties),
+      workingAreaTags: parseWorkingAreaTags(agentProfile.service_areas),
+    };
+  }, [agentProfile, isAgentDashboard]);
+
+  const isAgentProfessionalDirty = useMemo(() => {
+    if (!agentProfessionalBaseline) return false;
+    if (agentProfessionalForm.bio !== agentProfessionalBaseline.bio) return true;
+    if (agentProfessionalForm.years_of_experience.trim() !== agentProfessionalBaseline.yearsText.trim()) {
+      return true;
+    }
+    if (sortedSpecialtyCodesKey(agentSpecialtyCodes) !== sortedSpecialtyCodesKey(agentProfessionalBaseline.specialtyCodes)) {
+      return true;
+    }
+    if (
+      sortedWorkingAreaTagsKey(agentWorkingAreaTags) !==
+      sortedWorkingAreaTagsKey(agentProfessionalBaseline.workingAreaTags)
+    ) {
+      return true;
+    }
+    return false;
+  }, [
+    agentProfessionalBaseline,
+    agentProfessionalForm.bio,
+    agentProfessionalForm.years_of_experience,
+    agentSpecialtyCodes,
+    agentWorkingAreaTags,
+  ]);
 
   const toggleAgentSpecialty = useCallback((code: string) => {
     setAgentSpecialtyCodes((prev) =>
@@ -383,6 +431,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   });
 
   const saveAgentProfessionalProfile = useCallback(() => {
+    if (!isAgentProfessionalDirty) return;
     const issue = getAgentYearsExperienceIssue(agentProfessionalForm.years_of_experience);
     const rangeT = {
       min: AGENT_MIN_YEARS_EXPERIENCE,
@@ -397,7 +446,12 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       return;
     }
     updateAgentProfileMutation.mutate();
-  }, [agentProfessionalForm.years_of_experience, t, updateAgentProfileMutation]);
+  }, [
+    agentProfessionalForm.years_of_experience,
+    isAgentProfessionalDirty,
+    t,
+    updateAgentProfileMutation,
+  ]);
 
   const deleteProfileMutation = useMutation({
     mutationFn: (profileId: string) => customerProfileApi.delete(profileId),
@@ -960,8 +1014,12 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                       <Button
                         type='button'
                         onClick={saveAgentProfessionalProfile}
-                        disabled={updateAgentProfileMutation.isPending || yearsExperienceIssue != null}
-                        className='bg-main-primary text-white hover:bg-main-primary/90'
+                        disabled={
+                          updateAgentProfileMutation.isPending ||
+                          yearsExperienceIssue != null ||
+                          !isAgentProfessionalDirty
+                        }
+                        className='bg-main-primary text-white hover:bg-main-primary/90 disabled:opacity-50'
                       >
                         {updateAgentProfileMutation.isPending
                           ? t('agentProfessional.savingProfessional')
