@@ -1,11 +1,29 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  type ClipboardEvent,
+} from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { Settings, User, Trash2, Plus, ChevronRight, ChevronDown, RefreshCw, Upload, X } from 'lucide-react';
+import {
+  Settings,
+  User,
+  Trash2,
+  Plus,
+  ChevronRight,
+  ChevronDown,
+  RefreshCw,
+  Upload,
+  X,
+  MapPin,
+} from 'lucide-react';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -40,6 +58,37 @@ interface MediaUploadResponse {
 }
 
 type Tab = 'profile' | 'settings';
+
+function parseWorkingAreaTags(raw: string | null | undefined): string[] {
+  if (!raw?.trim()) return [];
+  const parts = raw.split(/[,;\n\r|]+/).map((s) => s.trim()).filter(Boolean);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const p of parts) {
+    const key = p.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(p);
+  }
+  return out;
+}
+
+function serializeWorkingAreaTags(tags: string[]): string {
+  return tags.join(', ');
+}
+
+function mergeWorkingAreaTags(existing: string[], incoming: string[]): string[] {
+  const seen = new Set(existing.map((t) => t.toLowerCase()));
+  const merged = [...existing];
+  for (const t of incoming) {
+    const k = t.toLowerCase();
+    if (!seen.has(k) && t.trim()) {
+      seen.add(k);
+      merged.push(t.trim());
+    }
+  }
+  return merged;
+}
 
 export interface SettingsPageProps {
   /** Agent dashboard uses the same flows but hides buyer customer profiles and adds professional fields. */
@@ -142,10 +191,12 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
 
   const [agentProfessionalForm, setAgentProfessionalForm] = useState({
     bio: '',
-    service_areas: '',
     years_of_experience: '',
   });
   const [agentSpecialtyCodes, setAgentSpecialtyCodes] = useState<string[]>([]);
+  const [agentWorkingAreaTags, setAgentWorkingAreaTags] = useState<string[]>([]);
+  const [workingAreaInput, setWorkingAreaInput] = useState('');
+  const workingAreaInputRef = useRef<HTMLInputElement>(null);
 
   // Hydrate form from API data
   useEffect(() => {
@@ -178,12 +229,13 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     if (!agentProfile) return;
     setAgentProfessionalForm({
       bio: agentProfile.bio ?? '',
-      service_areas: agentProfile.service_areas ?? '',
       years_of_experience:
         agentProfile.years_of_experience != null ? String(agentProfile.years_of_experience) : '',
     });
     if (isAgentDashboard) {
       setAgentSpecialtyCodes(parseSpecialtiesToCodes(agentProfile.specialties));
+      setAgentWorkingAreaTags(parseWorkingAreaTags(agentProfile.service_areas));
+      setWorkingAreaInput('');
     }
   }, [agentProfile, isAgentDashboard]);
 
@@ -196,6 +248,32 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     setAgentSpecialtyCodes((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
     );
+  }, []);
+
+  const addWorkingAreaTag = useCallback(() => {
+    const next = workingAreaInput.trim();
+    if (!next) return;
+    setAgentWorkingAreaTags((prev) => {
+      if (prev.some((t) => t.toLowerCase() === next.toLowerCase())) return prev;
+      return [...prev, next];
+    });
+    setWorkingAreaInput('');
+    queueMicrotask(() => workingAreaInputRef.current?.focus());
+  }, [workingAreaInput]);
+
+  const removeWorkingAreaTag = useCallback((tag: string) => {
+    setAgentWorkingAreaTags((prev) => prev.filter((t) => t !== tag));
+  }, []);
+
+  const onWorkingAreaPaste = useCallback((e: ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text');
+    if (!/[,;\n\r|]/.test(text)) return;
+    e.preventDefault();
+    const parsed = parseWorkingAreaTags(text);
+    if (parsed.length === 0) return;
+    setAgentWorkingAreaTags((prev) => mergeWorkingAreaTags(prev, parsed));
+    setWorkingAreaInput('');
+    queueMicrotask(() => workingAreaInputRef.current?.focus());
   }, []);
 
   useEffect(() => {
@@ -265,7 +343,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       } = {
         bio: agentProfessionalForm.bio,
         specialties: serializeSpecialtyLabels(agentSpecialtyCodes),
-        service_areas: agentProfessionalForm.service_areas,
+        service_areas: serializeWorkingAreaTags(agentWorkingAreaTags),
       };
       const y = agentProfessionalForm.years_of_experience.trim();
       if (y !== '') {
@@ -721,17 +799,86 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                         ))}
                       </div>
                     </div>
-                    <div className='space-y-2'>
-                      <Label className='text-sm text-grey-500'>{t('agentProfessional.serviceAreas')}</Label>
-                      <Textarea
-                        value={agentProfessionalForm.service_areas}
-                        onChange={(e) =>
-                          setAgentProfessionalForm((f) => ({ ...f, service_areas: e.target.value }))
-                        }
-                        placeholder={t('agentProfessional.serviceAreasPlaceholder')}
-                        rows={2}
-                        className='resize-y min-h-[72px]'
-                      />
+                    <div className='space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple-98 text-main-primary ring-1 ring-purple-92/50'>
+                          <MapPin className='size-4' strokeWidth={2} />
+                        </div>
+                        <div className='min-w-0 flex-1'>
+                          <Label className='text-sm font-medium text-main-black'>
+                            {t('agentProfessional.workingArea')}
+                          </Label>
+                          <p className='text-xs text-grey-400 mt-1 leading-relaxed'>
+                            {t('agentProfessional.workingAreaHint')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className='overflow-hidden rounded-xl border border-border/90 bg-gradient-to-b from-white to-purple-98/25 shadow-sm shadow-purple-92/10'>
+                        <div
+                          className={cn(
+                            'min-h-[56px] px-3 py-2.5',
+                            agentWorkingAreaTags.length === 0 && 'flex items-center'
+                          )}
+                        >
+                          {agentWorkingAreaTags.length === 0 ? (
+                            <p className='text-sm text-grey-400 pl-1'>{t('agentProfessional.workingAreaEmpty')}</p>
+                          ) : (
+                            <ul className='flex flex-wrap gap-2' aria-label={t('agentProfessional.workingArea')}>
+                              {agentWorkingAreaTags.map((tag) => (
+                                <li key={tag}>
+                                  <span className='inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-white py-1 pl-2.5 pr-1 text-sm text-main-black shadow-sm ring-1 ring-purple-92/30'>
+                                    <MapPin
+                                      className='size-3 shrink-0 text-main-primary/70'
+                                      aria-hidden
+                                      strokeWidth={2.5}
+                                    />
+                                    <span className='max-w-[220px] truncate' title={tag}>
+                                      {tag}
+                                    </span>
+                                    <button
+                                      type='button'
+                                      onClick={() => removeWorkingAreaTag(tag)}
+                                      className='flex size-7 shrink-0 items-center justify-center rounded-full text-grey-400 transition-colors hover:bg-red-50 hover:text-red-600'
+                                      aria-label={t('agentProfessional.workingAreaRemoveAria', { label: tag })}
+                                    >
+                                      <X className='size-3.5' strokeWidth={2.5} />
+                                    </button>
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        <div className='flex flex-col gap-2 border-t border-border/80 bg-grey-50/80 p-3 sm:flex-row sm:items-center'>
+                          <Input
+                            ref={workingAreaInputRef}
+                            value={workingAreaInput}
+                            onChange={(e) => setWorkingAreaInput(e.target.value)}
+                            onPaste={onWorkingAreaPaste}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addWorkingAreaTag();
+                              }
+                            }}
+                            placeholder={t('agentProfessional.workingAreaInputPlaceholder')}
+                            className='h-10 flex-1 border-border bg-white'
+                            autoComplete='off'
+                          />
+                          <Button
+                            type='button'
+                            variant='outline'
+                            onClick={addWorkingAreaTag}
+                            disabled={!workingAreaInput.trim()}
+                            className='h-10 shrink-0 border-main-primary/30 text-main-primary hover:bg-purple-98 hover:text-main-primary sm:min-w-[88px]'
+                          >
+                            {t('agentProfessional.workingAreaAdd')}
+                          </Button>
+                        </div>
+                      </div>
+                      <p className='text-[11px] text-grey-400 leading-relaxed'>
+                        {t('agentProfessional.workingAreaPasteHint')}
+                      </p>
                     </div>
                     <div className='space-y-2 max-w-xs'>
                       <Label className='text-sm text-grey-500'>{t('agentProfessional.yearsExperience')}</Label>
