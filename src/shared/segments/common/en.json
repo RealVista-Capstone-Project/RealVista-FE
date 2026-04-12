@@ -24,7 +24,9 @@
       "myContracts": "My Contracts",
       "messages": "Messages",
       "manageProposals": "Proposal Library",
-      "property": "Property"
+      "property": "Property",
+      "ownerProperties": "Owner properties & proposals",
+      "agentSetting": "Agent profile & settings"
     },
     "actionButton": {
       "addProperty": "Add a property",
@@ -313,6 +315,36 @@
       "title": "Subscription",
       "comingSoon": "Subscription plans coming soon."
     },
+    "agentProfessional": {
+      "title": "Professional profile",
+      "description": "Information shown to property owners and clients.",
+      "loading": "Loading agent profile...",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell clients about your experience and approach.",
+      "specialties": "Specialties",
+      "specialtiesPlaceholder": "e.g. Luxury homes, new developments, investment",
+      "specialtiesHint": "Choose the property types you focus on. Selected types appear as tags above.",
+      "specialtiesEmpty": "No property types selected — pick from the categories below.",
+      "specialtiesRemoveAria": "Remove {label}",
+      "serviceAreas": "Service areas",
+      "serviceAreasPlaceholder": "Neighborhoods, districts, or cities you cover",
+      "workingArea": "Working area",
+      "workingAreaHint": "List places where you actively work so owners and clients know your coverage.",
+      "workingAreaEmpty": "No areas yet — add districts, wards, or cities below.",
+      "workingAreaInputPlaceholder": "e.g. District 1, Ho Chi Minh City",
+      "workingAreaAdd": "Add",
+      "workingAreaRemoveAria": "Remove {label}",
+      "workingAreaPasteHint": "Tip: paste a comma- or line-separated list to add several areas at once.",
+      "yearsExperience": "Years of experience",
+      "yearsExperienceHint": "Whole years only, from {min} to {max}. Leave empty if you prefer not to say.",
+      "yearsExperienceErrorOutOfRange": "Enter a realistic value between {min} and {max} years.",
+      "yearsExperienceErrorInvalid": "Use digits only (whole years).",
+      "yearsPlaceholder": "e.g. 5",
+      "statsRating": "Rating",
+      "statsSold": "Properties sold",
+      "saveProfessional": "Save professional profile",
+      "savingProfessional": "Saving..."
+    },
     "toast": {
       "profileUpdated": "Profile updated successfully",
       "profileUpdateFailed": "Failed to update profile",
@@ -330,7 +362,9 @@
       "accountDeleteFailed": "Failed to delete account",
       "emailVerified": "Email verified successfully!",
       "phoneVerified": "Phone number verified successfully!",
-      "otpInvalid": "Invalid or expired OTP code"
+      "otpInvalid": "Invalid or expired OTP code",
+      "agentProfileUpdated": "Professional profile updated",
+      "agentProfileUpdateFailed": "Could not update professional profile"
     }
   },
   "Navigation": {
