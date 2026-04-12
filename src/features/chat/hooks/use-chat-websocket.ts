@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { IMessage } from '@stomp/stompjs';
-import { useWebSocket } from '@/shared/lib/websocket';
+import { useWebSocket, useWebSocketUpdater } from '@/shared/lib/websocket';
 import { useAuthSession } from '@/features/auth/model/use-auth-session';
 import { conversationKeys } from '@/entities/conversation';
 import type { ChatWebSocketMessage, WebSocketMessage, SendMessageResponse } from '../model/types';
@@ -23,6 +23,7 @@ import type { ChatWebSocketMessage, WebSocketMessage, SendMessageResponse } from
 export function useChatWebSocket() {
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();
+  const { setState: setWsState, setConnected } = useWebSocketUpdater();
 
   // Local state for typing indicators (conversationId -> Set of userIds)
   // We expose a helper to check if a specific user is typing in a conversation
@@ -36,6 +37,16 @@ export function useChatWebSocket() {
     token: session?.user?.accessToken,
     onConnect: () => {
       console.log('[Chat] Connected to WebSocket');
+      setWsState('connected');
+      setConnected(true);
+    },
+    onDisconnect: () => {
+      setWsState('disconnected');
+      setConnected(false);
+    },
+    onError: () => {
+      setWsState('disconnected');
+      setConnected(false);
     },
   });
 

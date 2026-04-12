@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import type { ConversationListItemResponse } from '@/entities/conversation';
-import { useChatWebSocket } from '@/features/chat';
+import { useWebSocketState } from '@/shared/lib/websocket';
 import type { Conversation } from './types';
 import { ChatHeader } from './components/chat-header';
 import { ChatMessages } from './components/chat-messages';
@@ -89,8 +89,11 @@ export function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
 
-  // ── WebSocket connection (receive-only — invalidates query cache on new messages) ──
-  const { isConnected, sendTyping } = useChatWebSocket();
+  // ── Read WS connection state from global Zustand store.
+  //    The single WS connection is owned by ChatWindowRenderer in DashboardLayout.
+  //    useChatWebSocket() there already invalidates query cache on new messages,
+  //    so ChatMessages re-renders in real-time without owning its own connection.
+  const { isConnected } = useWebSocketState();
 
   // ── HTTP send mutation ────────────────────────────────────────────────────
   const { mutate: sendMessage, isPending: isSending } = useSendMessage();
@@ -127,12 +130,6 @@ export function MessagesPage() {
     );
   }, [messageInput, activeConv, sendMessage]);
 
-  // ── Typing handler ────────────────────────────────────────────────────────
-  const handleTyping = useCallback(() => {
-    if (!effectiveActiveId || !activeConv?.otherUserId) return;
-    sendTyping(effectiveActiveId, activeConv.otherUserId);
-  }, [effectiveActiveId, activeConv, sendTyping]);
-
   if (isLoading) {
     return (
       <div className='flex h-[calc(100vh-6rem)] items-center justify-center rounded-2xl border border-purple-92/50 bg-white shadow-sm'>
@@ -168,7 +165,6 @@ export function MessagesPage() {
               value={messageInput}
               onChange={setMessageInput}
               onSubmit={handleSubmit}
-              onTyping={handleTyping}
               isSending={isSending}
               isConnected={isConnected}
             />
