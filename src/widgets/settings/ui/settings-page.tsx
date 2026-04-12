@@ -1,22 +1,43 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  type ClipboardEvent,
+} from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { Settings, User, Trash2, Plus, ChevronRight, ChevronDown, RefreshCw, Upload } from 'lucide-react';
+import {
+  Settings,
+  User,
+  Trash2,
+  Plus,
+  ChevronRight,
+  ChevronDown,
+  RefreshCw,
+  Upload,
+  X,
+  MapPin,
+} from 'lucide-react';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { Textarea } from '@/shared/ui/textarea';
 import { Switch } from '@/shared/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/shared/ui/dialog';
 import { userApi, userQueries } from '@/entities/user/api';
 import { settingPreferenceApi, settingPreferenceQueries } from '@/entities/setting-preference/api';
 import { customerProfileApi, customerProfileQueries } from '@/entities/customer-profile/api';
+import { agentProfileApi, agentProfileKeys, agentProfileQueries } from '@/entities/agent-profile/api';
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api';
 import { BillingReturnQueryEffects } from '@/widgets/billing/ui/billing-return-query-effects';
@@ -24,6 +45,13 @@ import type { UpdateMeData } from '@/entities/user/model/types';
 import type { UpdateSettingPreferenceData } from '@/entities/setting-preference/model/types';
 import type { CustomerProfile } from '@/entities/customer-profile/model/types';
 import { firebaseApp } from '@/shared/config/firebase';
+import { cn } from '@/shared/lib/utils';
+import {
+  FLAT_PROPERTY_TYPES,
+  PROPERTY_TYPES,
+  parseSpecialtiesToCodes,
+  serializeSpecialtyLabels,
+} from '@/shared/config/property-types';
 
 interface MediaUploadResponse {
   media_url: string;
@@ -32,11 +60,79 @@ interface MediaUploadResponse {
 
 type Tab = 'profile' | 'settings';
 
-export function SettingsPage() {
+function parseWorkingAreaTags(raw: string | null | undefined): string[] {
+  if (!raw?.trim()) return [];
+  const parts = raw.split(/[,;\n\r|]+/).map((s) => s.trim()).filter(Boolean);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const p of parts) {
+    const key = p.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(p);
+  }
+  return out;
+}
+
+function serializeWorkingAreaTags(tags: string[]): string {
+  return tags.join(', ');
+}
+
+function mergeWorkingAreaTags(existing: string[], incoming: string[]): string[] {
+  const seen = new Set(existing.map((t) => t.toLowerCase()));
+  const merged = [...existing];
+  for (const t of incoming) {
+    const k = t.toLowerCase();
+    if (!seen.has(k) && t.trim()) {
+      seen.add(k);
+      merged.push(t.trim());
+    }
+  }
+  return merged;
+}
+
+/** Aligned with backend / domain: whole years, realistic career length. */
+const AGENT_MIN_YEARS_EXPERIENCE = 0;
+const AGENT_MAX_YEARS_EXPERIENCE = 60;
+
+type AgentYearsExperienceIssue = 'out_of_range' | 'invalid_format' | null;
+
+function getAgentYearsExperienceIssue(raw: string): AgentYearsExperienceIssue {
+  const trimmed = raw.trim();
+  if (trimmed === '') return null;
+  if (!/^\d+$/.test(trimmed)) return 'invalid_format';
+  const n = Number.parseInt(trimmed, 10);
+  if (Number.isNaN(n)) return 'invalid_format';
+  if (n < AGENT_MIN_YEARS_EXPERIENCE || n > AGENT_MAX_YEARS_EXPERIENCE) return 'out_of_range';
+  return null;
+}
+
+function sortedSpecialtyCodesKey(codes: string[]): string {
+  return [...codes].map((c) => c.toUpperCase()).sort().join('|');
+}
+
+function sortedWorkingAreaTagsKey(tags: string[]): string {
+  return [...tags]
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean)
+    .sort()
+    .join('\x1e');
+}
+
+export interface SettingsPageProps {
+  /** Agent dashboard uses the same flows but hides buyer customer profiles and adds professional fields. */
+  variant?: 'default' | 'agentDashboard';
+}
+
+export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const t = useTranslations('Settings');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isAgentDashboard = variant === 'agentDashboard';
+  const phoneRecaptchaContainerId = isAgentDashboard
+    ? 'agent-dashboard-phone-recaptcha'
+    : 'settings-phone-recaptcha';
 
   const rawTab = searchParams?.get('tab');
   const activeTab: Tab = rawTab === 'settings' ? 'settings' : 'profile';
@@ -88,11 +184,19 @@ export function SettingsPage() {
   // Data queries
   const { data: meResponse, isLoading: meLoading } = useQuery({ ...userQueries.me(), enabled: isAuthenticated });
   const { data: settingsResponse, isLoading: settingsLoading } = useQuery({ ...settingPreferenceQueries.me(), enabled: isAuthenticated });
-  const { data: profilesResponse, isLoading: profilesLoading } = useQuery({ ...customerProfileQueries.me(), enabled: isAuthenticated });
+  const { data: profilesResponse, isLoading: profilesLoading } = useQuery({
+    ...customerProfileQueries.me(),
+    enabled: isAuthenticated && !isAgentDashboard,
+  });
+  const { data: agentProfileResponse, isLoading: agentProfileLoading } = useQuery({
+    ...agentProfileQueries.me(),
+    enabled: isAuthenticated && isAgentDashboard,
+  });
 
   const me = meResponse?.payload?.data;
   const settings = settingsResponse?.payload?.data;
   const profiles = profilesResponse?.payload?.data ?? [];
+  const agentProfile = agentProfileResponse?.payload?.data;
 
   // Form state for My Account
   const [profileForm, setProfileForm] = useState({
@@ -113,6 +217,15 @@ export function SettingsPage() {
     hidePhoneNumber: true,
     hideEmail: true,
   });
+
+  const [agentProfessionalForm, setAgentProfessionalForm] = useState({
+    bio: '',
+    years_of_experience: '',
+  });
+  const [agentSpecialtyCodes, setAgentSpecialtyCodes] = useState<string[]>([]);
+  const [agentWorkingAreaTags, setAgentWorkingAreaTags] = useState<string[]>([]);
+  const [workingAreaInput, setWorkingAreaInput] = useState('');
+  const workingAreaInputRef = useRef<HTMLInputElement>(null);
 
   // Hydrate form from API data
   useEffect(() => {
@@ -140,6 +253,97 @@ export function SettingsPage() {
       });
     }
   }, [settings]);
+
+  useLayoutEffect(() => {
+    if (!agentProfile) return;
+    setAgentProfessionalForm({
+      bio: agentProfile.bio ?? '',
+      years_of_experience:
+        agentProfile.years_of_experience != null ? String(agentProfile.years_of_experience) : '',
+    });
+    if (isAgentDashboard) {
+      setAgentSpecialtyCodes(parseSpecialtiesToCodes(agentProfile.specialties));
+      setAgentWorkingAreaTags(parseWorkingAreaTags(agentProfile.service_areas));
+      setWorkingAreaInput('');
+    }
+  }, [agentProfile, isAgentDashboard]);
+
+  const orderedSelectedSpecialties = useMemo(() => {
+    const selected = new Set(agentSpecialtyCodes);
+    return FLAT_PROPERTY_TYPES.filter((t) => selected.has(t.code));
+  }, [agentSpecialtyCodes]);
+
+  const yearsExperienceIssue = useMemo(
+    () => getAgentYearsExperienceIssue(agentProfessionalForm.years_of_experience),
+    [agentProfessionalForm.years_of_experience]
+  );
+
+  const agentProfessionalBaseline = useMemo(() => {
+    if (!agentProfile || !isAgentDashboard) return null;
+    return {
+      bio: agentProfile.bio ?? '',
+      yearsText:
+        agentProfile.years_of_experience != null ? String(agentProfile.years_of_experience) : '',
+      specialtyCodes: parseSpecialtiesToCodes(agentProfile.specialties),
+      workingAreaTags: parseWorkingAreaTags(agentProfile.service_areas),
+    };
+  }, [agentProfile, isAgentDashboard]);
+
+  const isAgentProfessionalDirty = useMemo(() => {
+    if (!agentProfessionalBaseline) return false;
+    if (agentProfessionalForm.bio !== agentProfessionalBaseline.bio) return true;
+    if (agentProfessionalForm.years_of_experience.trim() !== agentProfessionalBaseline.yearsText.trim()) {
+      return true;
+    }
+    if (sortedSpecialtyCodesKey(agentSpecialtyCodes) !== sortedSpecialtyCodesKey(agentProfessionalBaseline.specialtyCodes)) {
+      return true;
+    }
+    if (
+      sortedWorkingAreaTagsKey(agentWorkingAreaTags) !==
+      sortedWorkingAreaTagsKey(agentProfessionalBaseline.workingAreaTags)
+    ) {
+      return true;
+    }
+    return false;
+  }, [
+    agentProfessionalBaseline,
+    agentProfessionalForm.bio,
+    agentProfessionalForm.years_of_experience,
+    agentSpecialtyCodes,
+    agentWorkingAreaTags,
+  ]);
+
+  const toggleAgentSpecialty = useCallback((code: string) => {
+    setAgentSpecialtyCodes((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
+  }, []);
+
+  const addWorkingAreaTag = useCallback(() => {
+    const next = workingAreaInput.trim();
+    if (!next) return;
+    setAgentWorkingAreaTags((prev) => {
+      if (prev.some((t) => t.toLowerCase() === next.toLowerCase())) return prev;
+      return [...prev, next];
+    });
+    setWorkingAreaInput('');
+    queueMicrotask(() => workingAreaInputRef.current?.focus());
+  }, [workingAreaInput]);
+
+  const removeWorkingAreaTag = useCallback((tag: string) => {
+    setAgentWorkingAreaTags((prev) => prev.filter((t) => t !== tag));
+  }, []);
+
+  const onWorkingAreaPaste = useCallback((e: ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text');
+    if (!/[,;\n\r|]/.test(text)) return;
+    e.preventDefault();
+    const parsed = parseWorkingAreaTags(text);
+    if (parsed.length === 0) return;
+    setAgentWorkingAreaTags((prev) => mergeWorkingAreaTags(prev, parsed));
+    setWorkingAreaInput('');
+    queueMicrotask(() => workingAreaInputRef.current?.focus());
+  }, []);
 
   useEffect(() => {
     if (isEditingProfile) return;
@@ -197,6 +401,57 @@ export function SettingsPage() {
     },
     onError: () => toast.error(t('toast.profileCreateFailed')),
   });
+
+  const updateAgentProfileMutation = useMutation({
+    mutationFn: () => {
+      const payload: {
+        bio: string;
+        specialties: string;
+        service_areas: string;
+        years_of_experience?: number;
+      } = {
+        bio: agentProfessionalForm.bio,
+        specialties: serializeSpecialtyLabels(agentSpecialtyCodes),
+        service_areas: serializeWorkingAreaTags(agentWorkingAreaTags),
+      };
+      const y = agentProfessionalForm.years_of_experience.trim();
+      if (y !== '') {
+        const n = parseInt(y, 10);
+        if (!Number.isNaN(n)) {
+          payload.years_of_experience = n;
+        }
+      }
+      return agentProfileApi.updateMine(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: agentProfileKeys.me() });
+      toast.success(t('toast.agentProfileUpdated'));
+    },
+    onError: () => toast.error(t('toast.agentProfileUpdateFailed')),
+  });
+
+  const saveAgentProfessionalProfile = useCallback(() => {
+    if (!isAgentProfessionalDirty) return;
+    const issue = getAgentYearsExperienceIssue(agentProfessionalForm.years_of_experience);
+    const rangeT = {
+      min: AGENT_MIN_YEARS_EXPERIENCE,
+      max: AGENT_MAX_YEARS_EXPERIENCE,
+    };
+    if (issue === 'out_of_range') {
+      toast.error(t('agentProfessional.yearsExperienceErrorOutOfRange', rangeT));
+      return;
+    }
+    if (issue === 'invalid_format') {
+      toast.error(t('agentProfessional.yearsExperienceErrorInvalid'));
+      return;
+    }
+    updateAgentProfileMutation.mutate();
+  }, [
+    agentProfessionalForm.years_of_experience,
+    isAgentProfessionalDirty,
+    t,
+    updateAgentProfileMutation,
+  ]);
 
   const deleteProfileMutation = useMutation({
     mutationFn: (profileId: string) => customerProfileApi.delete(profileId),
@@ -354,7 +609,7 @@ export function SettingsPage() {
   const initRecaptcha = useCallback(() => {
     // Reuse existing verifier if available — same pattern as agent-verification-modal
     if (recaptchaVerifier.current) return recaptchaVerifier.current;
-    const container = document.getElementById('settings-phone-recaptcha');
+    const container = document.getElementById(phoneRecaptchaContainerId);
     if (!container) {
       console.error('[Settings] Recaptcha container not found in DOM');
       return null;
@@ -380,7 +635,7 @@ export function SettingsPage() {
       console.error('[Settings] Failed to initialize Recaptcha:', err);
       return null;
     }
-  }, [auth]);
+  }, [auth, phoneRecaptchaContainerId]);
 
   const startPhoneCountdown = useCallback((seconds: number) => {
     setPhoneOtpCountdown(seconds);
@@ -531,7 +786,253 @@ export function SettingsPage() {
         <div className='w-full max-w-[700px] px-8'>
         {activeTab === 'profile' && (
           <div className='space-y-6'>
-            {/* Profile Management */}
+            {isAgentDashboard && (
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <h2 className='text-base font-semibold text-main-black mb-1'>{t('agentProfessional.title')}</h2>
+                <p className='text-sm text-grey-500 mb-4'>{t('agentProfessional.description')}</p>
+                {agentProfileLoading ? (
+                  <div className='text-sm text-grey-400'>{t('agentProfessional.loading')}</div>
+                ) : (
+                  <div className='space-y-4'>
+                    <div className='flex flex-wrap gap-6 text-sm'>
+                      <div>
+                        <span className='text-grey-500'>{t('agentProfessional.statsRating')}: </span>
+                        <span className='font-medium text-main-black'>
+                          {agentProfile?.rating != null && agentProfile.rating !== ''
+                            ? String(agentProfile.rating)
+                            : '—'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className='text-grey-500'>{t('agentProfessional.statsSold')}: </span>
+                        <span className='font-medium text-main-black'>
+                          {agentProfile?.properties_sold != null ? agentProfile.properties_sold : '—'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-grey-500'>{t('agentProfessional.bio')}</Label>
+                      <Textarea
+                        value={agentProfessionalForm.bio}
+                        onChange={(e) =>
+                          setAgentProfessionalForm((f) => ({ ...f, bio: e.target.value }))
+                        }
+                        placeholder={t('agentProfessional.bioPlaceholder')}
+                        rows={4}
+                        className='resize-y min-h-[100px]'
+                      />
+                    </div>
+                    <div className='space-y-3'>
+                      <div>
+                        <Label className='text-sm text-grey-500'>{t('agentProfessional.specialties')}</Label>
+                        <p className='text-xs text-grey-400 mt-1 leading-relaxed'>
+                          {t('agentProfessional.specialtiesHint')}
+                        </p>
+                      </div>
+                      <div
+                        className={cn(
+                          'min-h-[52px] rounded-xl border border-dashed border-border bg-purple-98/30 px-3 py-2.5',
+                          orderedSelectedSpecialties.length === 0 && 'flex items-center'
+                        )}
+                      >
+                        {orderedSelectedSpecialties.length === 0 ? (
+                          <span className='text-sm text-grey-400'>{t('agentProfessional.specialtiesEmpty')}</span>
+                        ) : (
+                          <div className='flex flex-wrap gap-2'>
+                            {orderedSelectedSpecialties.map((item) => (
+                              <span
+                                key={item.code}
+                                className='group inline-flex items-center gap-1 rounded-full border border-main-primary/25 bg-white pl-3 pr-1 py-1 text-sm font-medium text-main-primary shadow-sm ring-1 ring-purple-92/40'
+                              >
+                                <span className='max-w-[200px] truncate'>{item.label}</span>
+                                <button
+                                  type='button'
+                                  onClick={() => toggleAgentSpecialty(item.code)}
+                                  className='flex size-7 shrink-0 items-center justify-center rounded-full text-grey-400 transition-colors hover:bg-purple-98 hover:text-main-primary'
+                                  aria-label={t('agentProfessional.specialtiesRemoveAria', { label: item.label })}
+                                >
+                                  <X className='size-3.5' strokeWidth={2.5} />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className='space-y-4'>
+                        {PROPERTY_TYPES.map((category) => (
+                          <div
+                            key={category.code}
+                            className='rounded-xl border border-border/80 bg-gradient-to-br from-white to-purple-98/40 p-4 shadow-sm shadow-purple-92/10'
+                          >
+                            <p className='mb-3 text-[11px] font-bold uppercase tracking-wider text-main-primary/80'>
+                              {category.label}
+                            </p>
+                            <div className='flex flex-wrap gap-2'>
+                              {category.types.map((type) => {
+                                const isOn = agentSpecialtyCodes.includes(type.code);
+                                return (
+                                  <button
+                                    key={type.code}
+                                    type='button'
+                                    onClick={() => toggleAgentSpecialty(type.code)}
+                                    className={cn(
+                                      'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
+                                      isOn
+                                        ? 'bg-main-primary text-white shadow-md shadow-main-primary/25 ring-2 ring-main-primary/20'
+                                        : 'border border-border bg-white text-grey-600 hover:border-main-primary/35 hover:bg-purple-98/80 hover:text-main-black'
+                                    )}
+                                  >
+                                    {type.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className='space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple-98 text-main-primary ring-1 ring-purple-92/50'>
+                          <MapPin className='size-4' strokeWidth={2} />
+                        </div>
+                        <div className='min-w-0 flex-1'>
+                          <Label className='text-sm font-medium text-main-black'>
+                            {t('agentProfessional.workingArea')}
+                          </Label>
+                          <p className='text-xs text-grey-400 mt-1 leading-relaxed'>
+                            {t('agentProfessional.workingAreaHint')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className='overflow-hidden rounded-xl border border-border/90 bg-gradient-to-b from-white to-purple-98/25 shadow-sm shadow-purple-92/10'>
+                        <div
+                          className={cn(
+                            'min-h-[56px] px-3 py-2.5',
+                            agentWorkingAreaTags.length === 0 && 'flex items-center'
+                          )}
+                        >
+                          {agentWorkingAreaTags.length === 0 ? (
+                            <p className='text-sm text-grey-400 pl-1'>{t('agentProfessional.workingAreaEmpty')}</p>
+                          ) : (
+                            <ul className='flex flex-wrap gap-2' aria-label={t('agentProfessional.workingArea')}>
+                              {agentWorkingAreaTags.map((tag) => (
+                                <li key={tag}>
+                                  <span className='inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-white py-1 pl-2.5 pr-1 text-sm text-main-black shadow-sm ring-1 ring-purple-92/30'>
+                                    <MapPin
+                                      className='size-3 shrink-0 text-main-primary/70'
+                                      aria-hidden
+                                      strokeWidth={2.5}
+                                    />
+                                    <span className='max-w-[220px] truncate' title={tag}>
+                                      {tag}
+                                    </span>
+                                    <button
+                                      type='button'
+                                      onClick={() => removeWorkingAreaTag(tag)}
+                                      className='flex size-7 shrink-0 items-center justify-center rounded-full text-grey-400 transition-colors hover:bg-red-50 hover:text-red-600'
+                                      aria-label={t('agentProfessional.workingAreaRemoveAria', { label: tag })}
+                                    >
+                                      <X className='size-3.5' strokeWidth={2.5} />
+                                    </button>
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        <div className='flex flex-col gap-2 border-t border-border/80 bg-grey-50/80 p-3 sm:flex-row sm:items-center'>
+                          <Input
+                            ref={workingAreaInputRef}
+                            value={workingAreaInput}
+                            onChange={(e) => setWorkingAreaInput(e.target.value)}
+                            onPaste={onWorkingAreaPaste}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addWorkingAreaTag();
+                              }
+                            }}
+                            placeholder={t('agentProfessional.workingAreaInputPlaceholder')}
+                            className='h-10 flex-1 border-border bg-white'
+                            autoComplete='off'
+                          />
+                          <Button
+                            type='button'
+                            variant='outline'
+                            onClick={addWorkingAreaTag}
+                            disabled={!workingAreaInput.trim()}
+                            className='h-10 shrink-0 border-main-primary/30 text-main-primary hover:bg-purple-98 hover:text-main-primary sm:min-w-[88px]'
+                          >
+                            {t('agentProfessional.workingAreaAdd')}
+                          </Button>
+                        </div>
+                      </div>
+                      <p className='text-[11px] text-grey-400 leading-relaxed'>
+                        {t('agentProfessional.workingAreaPasteHint')}
+                      </p>
+                    </div>
+                    <div className='space-y-2 max-w-xs'>
+                      <Label className='text-sm text-grey-500' htmlFor='agent-years-experience'>
+                        {t('agentProfessional.yearsExperience')}
+                      </Label>
+                      <p className='text-xs text-grey-400 leading-relaxed'>
+                        {t('agentProfessional.yearsExperienceHint', {
+                          min: AGENT_MIN_YEARS_EXPERIENCE,
+                          max: AGENT_MAX_YEARS_EXPERIENCE,
+                        })}
+                      </p>
+                      <Input
+                        id='agent-years-experience'
+                        type='text'
+                        inputMode='numeric'
+                        autoComplete='off'
+                        aria-invalid={yearsExperienceIssue != null}
+                        value={agentProfessionalForm.years_of_experience}
+                        onChange={(e) => {
+                          const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+                          setAgentProfessionalForm((f) => ({ ...f, years_of_experience: v }));
+                        }}
+                        placeholder={t('agentProfessional.yearsPlaceholder')}
+                        className={yearsExperienceIssue ? 'border-red-400 focus-visible:ring-red-200' : undefined}
+                      />
+                      {yearsExperienceIssue === 'out_of_range' && (
+                        <p className='text-xs text-red-600' role='alert'>
+                          {t('agentProfessional.yearsExperienceErrorOutOfRange', {
+                            min: AGENT_MIN_YEARS_EXPERIENCE,
+                            max: AGENT_MAX_YEARS_EXPERIENCE,
+                          })}
+                        </p>
+                      )}
+                      {yearsExperienceIssue === 'invalid_format' && (
+                        <p className='text-xs text-red-600' role='alert'>
+                          {t('agentProfessional.yearsExperienceErrorInvalid')}
+                        </p>
+                      )}
+                    </div>
+                    <div className='flex justify-end pt-2'>
+                      <Button
+                        type='button'
+                        onClick={saveAgentProfessionalProfile}
+                        disabled={
+                          updateAgentProfileMutation.isPending ||
+                          yearsExperienceIssue != null ||
+                          !isAgentProfessionalDirty
+                        }
+                        className='bg-main-primary text-white hover:bg-main-primary/90 disabled:opacity-50'
+                      >
+                        {updateAgentProfileMutation.isPending
+                          ? t('agentProfessional.savingProfessional')
+                          : t('agentProfessional.saveProfessional')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Profile Management (buyer / multi-profile) — hidden on agent dashboard */}
+            {!isAgentDashboard && (
             <section className='bg-white rounded-xl border border-border p-6'>
               <div className='flex items-center justify-between mb-2'>
                 <h2 className='text-base font-semibold text-main-black'>{t('profileManagement.title')}</h2>
@@ -634,6 +1135,7 @@ export function SettingsPage() {
                 </div>
               )}
             </section>
+            )}
 
             {/* My Account */}
             <section className='bg-white rounded-xl border border-border p-6'>
@@ -769,7 +1271,7 @@ export function SettingsPage() {
                       </span>
                     </button>
                     {/* Recaptcha container must always be in DOM for Firebase to work */}
-                    <div id='settings-phone-recaptcha' />
+                    <div id={phoneRecaptchaContainerId} />
                     {isChangingPhone && (
                       <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
                         <div className='space-y-1.5'>

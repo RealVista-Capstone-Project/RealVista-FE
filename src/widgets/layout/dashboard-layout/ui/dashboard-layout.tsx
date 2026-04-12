@@ -160,6 +160,18 @@ export function DashboardLayout({
       return t('pageTitle.manageProposals');
     }
     if (
+      pathname === ROUTES.dashboard.ownerProperties ||
+      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+    ) {
+      return t('pageTitle.ownerProperties');
+    }
+    if (
+      pathname === ROUTES.dashboard.agentSetting ||
+      pathname.startsWith(ROUTES.dashboard.agentSetting)
+    ) {
+      return t('pageTitle.agentSetting');
+    }
+    if (
       pathname === ROUTES.dashboard.myEngagements ||
       pathname.startsWith(ROUTES.dashboard.myEngagements)
     ) {
@@ -176,6 +188,11 @@ export function DashboardLayout({
     if (href === ROUTES.dashboard.root) return pathname === ROUTES.dashboard.root;
     return pathname.startsWith(href);
   };
+
+  const settingsHref = backendRoles.includes('AGENT')
+    ? ROUTES.dashboard.agentSetting
+    : ROUTES.settings;
+  const isSettingsFooterActive = isItemActive(settingsHref);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -284,9 +301,12 @@ export function DashboardLayout({
         {/* Footer */}
         <div className='border-t border-purple-92/50 p-3'>
           <Link
-            href={ROUTES.settings}
+            href={settingsHref}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-main-secondary/60 transition-all hover:bg-purple-98 hover:text-main-secondary',
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
+              isSettingsFooterActive
+                ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
+                : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
@@ -347,7 +367,7 @@ export function DashboardLayout({
         </header>
 
         {/* Page Content - fills remaining height */}
-        <main className='flex-1 overflow-hidden bg-slate-50/50 p-0'>{children}</main>
+        <main className='flex-1 min-h-0 overflow-y-auto bg-slate-50/50 p-0'>{children}</main>
       </div>
     </div>
   );

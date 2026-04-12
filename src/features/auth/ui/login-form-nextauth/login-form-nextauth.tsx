@@ -35,6 +35,8 @@ import { Eye, EyeOff } from 'lucide-react';
  * }
  * ```
  */
+
+// TODO: Handle only BackendRole
 export function LoginFormNextAuth() {
   const t = useTranslations('Auth');
   const router = useRouter();

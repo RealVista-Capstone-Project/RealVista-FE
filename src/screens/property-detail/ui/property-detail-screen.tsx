@@ -37,11 +37,13 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
   const isAgent = backendRoles.includes('AGENT');
   const initiatorId = session?.user?.id;
   const receiverId = response?.owner_id;
+  const applyStatePropertyId = response?.property_id ?? propertyId;
 
   const { data: applyStateResponse } = useQuery({
-    queryKey: ['agent-proposal-apply-state', initiatorId, receiverId],
-    queryFn: () => agentEngagementApi.getAgentProposalApplyState(initiatorId!, receiverId!),
-    enabled: isAgent && !!initiatorId && !!receiverId,
+    queryKey: ['agent-proposal-apply-state', initiatorId, receiverId, applyStatePropertyId],
+    queryFn: () =>
+      agentEngagementApi.getAgentProposalApplyState(initiatorId!, receiverId!, applyStatePropertyId),
+    enabled: isAgent && !!initiatorId && !!receiverId && !!applyStatePropertyId,
     staleTime: 2 * 60 * 1000,
   });
 

@@ -141,9 +141,15 @@ export const agentEngagementApi = {
       message: payload.message,
     }),
 
-  getAgentProposalApplyState: (initiatorId: string, receiverId: string) =>
-    http.get<ApiResponse<AgentProposalApplyState>>(
-      `/engagements/agent-proposal/apply-state?initiator_id=${initiatorId}&receiver_id=${receiverId}`
-    ),
+  getAgentProposalApplyState: (initiatorId: string, receiverId: string, propertyId: string) => {
+    const params = new URLSearchParams({
+      initiator_id: initiatorId,
+      receiver_id: receiverId,
+      property_id: propertyId,
+    });
+    return http.get<ApiResponse<AgentProposalApplyState>>(
+      `/engagements/agent-proposal/apply-state?${params.toString()}`
+    );
+  },
 } as const;
 

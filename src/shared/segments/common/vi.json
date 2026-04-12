@@ -19,7 +19,9 @@
       "myContracts": "Hợp đồng của tôi",
       "messages": "Tin nhắn",
       "manageProposals": "Hồ sơ cá nhân",
-      "property": "Bất động sản"
+      "property": "Bất động sản",
+      "ownerProperties": "Bảng tin bất động sản",
+      "agentSetting": "Hồ sơ & cài đặt môi giới"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
@@ -308,6 +310,36 @@
       "title": "Gói dịch vụ",
       "comingSoon": "Các gói dịch vụ sắp ra mắt."
     },
+    "agentProfessional": {
+      "title": "Hồ sơ nghề nghiệp",
+      "description": "Thông tin hiển thị với chủ nhà và khách hàng.",
+      "loading": "Đang tải hồ sơ môi giới...",
+      "bio": "Giới thiệu",
+      "bioPlaceholder": "Chia sẻ kinh nghiệm và phong cách làm việc của bạn.",
+      "specialties": "Lĩnh vực chuyên môn",
+      "specialtiesPlaceholder": "VD: Nhà cao cấp, dự án mới, đầu tư",
+      "specialtiesHint": "Chọn loại bất động sản bạn chuyên về. Các mục đã chọn hiển thị dạng thẻ phía trên.",
+      "specialtiesEmpty": "Chưa chọn loại nào — chọn từ các nhóm bên dưới.",
+      "specialtiesRemoveAria": "Bỏ {label}",
+      "serviceAreas": "Khu vực phục vụ",
+      "serviceAreasPlaceholder": "Quận, khu vực hoặc thành phố bạn phụ trách",
+      "workingArea": "Khu vực làm việc",
+      "workingAreaHint": "Thêm từng nơi bạn thường làm việc để chủ nhà và khách biết phạm vi phục vụ.",
+      "workingAreaEmpty": "Chưa có khu vực nào — thêm quận, phường hoặc thành phố bên dưới.",
+      "workingAreaInputPlaceholder": "VD: Quận 1, TP.HCM",
+      "workingAreaAdd": "Thêm",
+      "workingAreaRemoveAria": "Bỏ {label}",
+      "workingAreaPasteHint": "Mẹo: dán danh sách cách nhau bởi dấu phẩy hoặc xuống dòng để thêm nhiều khu vực cùng lúc.",
+      "yearsExperience": "Số năm kinh nghiệm",
+      "yearsExperienceHint": "Chỉ nhập số năm nguyên, từ {min} đến {max}. Để trống nếu không muốn hiển thị.",
+      "yearsExperienceErrorOutOfRange": "Nhập giá trị hợp lý từ {min} đến {max} năm.",
+      "yearsExperienceErrorInvalid": "Chỉ dùng chữ số (số năm nguyên).",
+      "yearsPlaceholder": "VD: 5",
+      "statsRating": "Đánh giá",
+      "statsSold": "Bất động sản đã bán",
+      "saveProfessional": "Lưu hồ sơ nghề nghiệp",
+      "savingProfessional": "Đang lưu..."
+    },
     "toast": {
       "profileUpdated": "Cập nhật hồ sơ thành công",
       "profileUpdateFailed": "Cập nhật hồ sơ thất bại",
@@ -325,7 +357,9 @@
       "accountDeleteFailed": "Xoá tài khoản thất bại",
       "emailVerified": "Email đã được xác minh thành công!",
       "phoneVerified": "Số điện thoại đã được xác minh thành công!",
-      "otpInvalid": "Mã OTP không hợp lệ hoặc đã hết hạn"
+      "otpInvalid": "Mã OTP không hợp lệ hoặc đã hết hạn",
+      "agentProfileUpdated": "Đã cập nhật hồ sơ nghề nghiệp",
+      "agentProfileUpdateFailed": "Không thể cập nhật hồ sơ nghề nghiệp"
     }
   },
   "Navigation": {
