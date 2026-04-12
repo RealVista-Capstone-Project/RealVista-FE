@@ -84,7 +84,11 @@ export function NotificationDropdownContainer() {
       );
     }
 
-    if (n.eventType.includes('TOUR')) {
+    if (n.eventType === 'PROPERTY_3D_GENERATED' || n.eventType === 'PROPERTY_3D_FAILED') {
+      if (n.entityId) {
+        router.push(`/${locale}/dashboard/property/${n.entityId}/3d`);
+      }
+    } else if (n.eventType.includes('TOUR')) {
       router.push(`/${locale}/appointments`);
     } else if (n.metadata?.listingId) {
       router.push(`/${locale}/property/${n.metadata.listingId}`);
