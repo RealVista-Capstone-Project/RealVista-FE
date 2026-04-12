@@ -17,7 +17,7 @@ export function ConversationItem({ conv, isActive, onClick }: ConversationItemPr
         isActive ? 'bg-purple-96' : 'hover:bg-purple-98'
       )}
     >
-      <AvatarCircle initials={conv.initials} avatarBg={conv.avatarBg} />
+      <AvatarCircle initials={conv.initials} avatarBg={conv.avatarBg} src={conv.avatar} />
       <div className='min-w-0 flex-1'>
         <div className='flex items-center justify-between'>
           <span className='truncate text-sm font-semibold text-main-black'>{conv.name}</span>

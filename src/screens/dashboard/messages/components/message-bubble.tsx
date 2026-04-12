@@ -12,7 +12,7 @@ export function MessageBubble({ msg }: MessageBubbleProps) {
   return (
     <div className={cn('flex gap-3', isMe && 'flex-row-reverse')}>
       {!isMe && (
-        <AvatarCircle initials={msg.sender.initials} avatarBg={msg.sender.avatarBg} size='md' />
+        <AvatarCircle initials={msg.sender.initials} avatarBg={msg.sender.avatarBg} src={msg.sender.avatar} size='md' />
       )}
 
       <div className={cn('flex max-w-[65%] flex-col gap-1', isMe && 'items-end')}>

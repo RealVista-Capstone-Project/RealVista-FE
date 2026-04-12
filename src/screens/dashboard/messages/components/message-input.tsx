@@ -59,6 +59,10 @@ export function MessageInput({
 
   return (
     <div className='border-t border-purple-92/50 bg-white px-6 py-4'>
+      {/* Offline banner */}
+      {!isConnected && (
+        <p className='mb-2 text-center text-xs text-grey-400'>{t('connecting')}</p>
+      )}
       <div className='flex items-center gap-3 rounded-2xl border border-purple-92 bg-white px-4 py-3 shadow-sm focus-within:border-main-primary/50 focus-within:ring-2 focus-within:ring-main-primary/10'>
         {/* Plus button with popover — only rendered for owner / AGENT */}
         {canCreateContract && (

@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { conversationQueries } from '@/entities/conversation';
 import type { MessageResponse } from '@/entities/conversation';
-import { userQueries } from '@/entities/user/api';
+import { useAuthSession } from '@/features/auth/model';
 import type { Message, Participant } from '../types';
 import { MessageBubble } from './message-bubble';
 
@@ -100,8 +100,8 @@ export function ChatMessages({ conversationId }: ChatMessagesProps) {
   );
 
   // Get the current user to determine "isMe"
-  const { data: meResponse } = useQuery(userQueries.me());
-  const currentUserId: string | undefined = (meResponse?.payload as any)?.data?.user_id;
+  const { data: session } = useAuthSession();
+  const currentUserId: string | undefined = session?.user?.id;
 
   // Map API responses to local Message type
   const messages = useMemo<MappedMessage[]>(() => {

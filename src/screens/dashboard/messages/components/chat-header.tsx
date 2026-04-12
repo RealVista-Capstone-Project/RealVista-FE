@@ -19,6 +19,7 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
         <AvatarCircle
           initials={conversation.initials}
           avatarBg={conversation.avatarBg}
+          src={conversation.avatar}
           size='md'
         />
         <div>
