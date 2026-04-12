@@ -10,6 +10,7 @@
     "createContract": "Create contract",
     "viewContract": "View contract",
     "activityTimeline": "Activity timeline",
-    "endContract": "End contract"
+    "endContract": "End contract",
+    "noMessages": "No messages yet. Say hello!"
   }
 }

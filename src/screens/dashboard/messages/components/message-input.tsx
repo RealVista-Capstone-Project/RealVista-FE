@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Plus, FileText, Smile, Paperclip, Mic } from 'lucide-react';
+import { Plus, FileText, Mic } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import { useAuthSession } from '@/features/auth/model';
@@ -56,9 +56,7 @@ export function MessageInput({ value, onChange, onSubmit }: MessageInputProps) {
               onClick={() => setPopoverOpen((v) => !v)}
               className={cn(
                 'flex size-5 items-center justify-center rounded-full transition-colors',
-                popoverOpen
-                  ? 'bg-main-primary text-white'
-                  : 'text-grey-400 hover:text-main-primary'
+                popoverOpen ? 'bg-main-primary text-white' : 'text-grey-400 hover:text-main-primary'
               )}
               aria-label='More actions'
             >

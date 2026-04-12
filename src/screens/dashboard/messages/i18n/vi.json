@@ -10,6 +10,7 @@
     "createContract": "Tạo hợp đồng",
     "viewContract": "Xem hợp đồng",
     "activityTimeline": "Lịch sử hoạt động",
-    "endContract": "Kết thúc hợp đồng"
+    "endContract": "Kết thúc hợp đồng",
+    "noMessages": "Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!"
   }
 }

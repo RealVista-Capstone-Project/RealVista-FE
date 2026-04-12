@@ -11,7 +11,7 @@ import { ChatMessages } from './components/chat-messages';
 import { ConversationDetailPanel } from './components/conversation-detail-panel';
 import { ConversationSidebar } from './components/conversation-sidebar';
 import { MessageInput } from './components/message-input';
-import { MOCK_CONVERSATION_DETAIL, MOCK_MESSAGES } from './mock-data';
+import { MOCK_CONVERSATION_DETAIL } from './mock-data';
 
 // ── Mapper ─────────────────────────────────────────────────────────────────────
 
@@ -131,7 +131,7 @@ export function MessagesPage() {
               onToggleDetail={() => setShowDetail((v) => !v)}
             />
 
-            <ChatMessages messages={MOCK_MESSAGES} />
+            <ChatMessages conversationId={effectiveActiveId} />
 
             <MessageInput
               value={messageInput}
