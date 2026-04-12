@@ -49,10 +49,11 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     ? 'agent-dashboard-phone-recaptcha'
     : 'settings-phone-recaptcha';
 
-  const rawTab = searchParams.get('tab');
+  const rawTab = searchParams?.get('tab');
   const activeTab: Tab = rawTab === 'settings' ? 'settings' : 'profile';
 
   const setActiveTab = (tab: Tab) => {
+    if (!searchParams) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
     router.replace(`${pathname}?${params.toString()}`);

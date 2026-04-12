@@ -1,7 +1,8 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { savedSearchApi } from './saved-search.api';
 import { savedSearchKeys } from './keys';
-import type { SaveSearchRequest } from './saved-search-api.types';
+import type { ApiResponse } from '@/shared/types/api-response';
+import type { SavedSearchDto, SaveSearchRequest } from './saved-search-api.types';
 
 export const savedSearchQueries = {
   list: () =>
@@ -20,11 +21,12 @@ export function useSaveSearch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: savedSearchKeys.lists() });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       // 409 SAVED_SEARCH_DUPLICATE: swallow silently, sync cache so button flips to "already saved"
-      const errorCode = error?.response?.data?.payload?.errorCode
-        ?? error?.response?.data?.errorCode;
-      if (error?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
+      const apiError = error as { response?: { data?: { payload?: { errorCode?: string }, errorCode?: string }, status?: number } };
+      const errorCode = apiError?.response?.data?.payload?.errorCode
+        ?? apiError?.response?.data?.errorCode;
+      if (apiError?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
         queryClient.invalidateQueries({ queryKey: savedSearchKeys.lists() });
         // Do NOT throw — re-throwing in React Query onError causes unhandled rejections
       }
@@ -47,16 +49,13 @@ export function useDeleteSavedSearch() {
       const previousData = queryClient.getQueryData(savedSearchKeys.lists());
 
       // Optimistically update to the new value
-      queryClient.setQueryData(savedSearchKeys.lists(), (old: any) => {
+      queryClient.setQueryData(savedSearchKeys.lists(), (old: ApiResponse<SavedSearchDto[]> | undefined) => {
         if (!old) return old;
         return {
           ...old,
-          payload: {
-            ...old.payload,
-            data: old.payload.data.filter((item: any) =>
-               (item.saved_search_id || item.savedSearchId) !== id
-            )
-          }
+          data: old.data.filter((item) =>
+             (item.saved_search_id) !== id
+          )
         };
       });
 

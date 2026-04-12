@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MapPin, Search, DollarSign, SlidersHorizontal } from 'lucide-react';
+import { MapPin, Search, DollarSign, SlidersHorizontal, X } from 'lucide-react';
 import {
   RealVistaListingCard,
   type ListingAttribute,
@@ -71,7 +71,7 @@ function BuyPageContent() {
   const [maxPrice, setMaxPrice] = useState(searchParams?.get('maxPrice') || '');
 
   // Construct initial criteria from URL
-  const getInitialCriteria = (): AdvancedSearchRequest => {
+  const getInitialCriteria = useCallback((): AdvancedSearchRequest => {
     // Rebuild dynamicAttributes from URL params (attr_BEDROOMS, attr_BATHROOMS, etc.)
     const dynamicAttributes: Record<string, string> = {};
     searchParams?.forEach((value, key) => {
@@ -105,9 +105,24 @@ function BuyPageContent() {
       has3D: searchParams?.get('has3D') === 'true',
       sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
     };
-  };
+  }, [searchParams]);
 
   const [searchCriteria, setSearchCriteria] = useState<AdvancedSearchRequest>(getInitialCriteria());
+
+  const performSearch = useCallback(async (criteria: AdvancedSearchRequest, page: number) => {
+    setIsLoading(true);
+    try {
+      const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
+      setListings(response?.content || []);
+      setTotalPages(response?.total_pages || 1);
+      setTotalResults(response?.total_elements || 0);
+    } catch (error) {
+      console.error('Failed to search properties:', error);
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [itemsPerPage]);
 
   // Effect to handle URL changes (e.g. back button)
   useEffect(() => {
@@ -123,24 +138,7 @@ function BuyPageContent() {
     setSearchCriteria(criteria);
 
     performSearch(criteria, page);
-  }, [searchParams]);
-
-  const performSearch = async (criteria: AdvancedSearchRequest, page: number) => {
-    setIsLoading(true);
-    try {
-      const response = await SearchAPI.searchListings(criteria, page - 1, itemsPerPage);
-      setListings(response?.content || []);
-      setTotalPages(response?.total_pages || 1);
-      setTotalResults(response?.total_elements || 0);
-    } catch (error) {
-      console.error('Search failed:', error);
-      setListings([]);
-      setTotalPages(1);
-      setTotalResults(0);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [searchParams, getInitialCriteria, performSearch]);
 
   const updateUrl = (criteria: AdvancedSearchRequest, page: number) => {
     const params = new URLSearchParams();
@@ -252,15 +250,25 @@ function BuyPageContent() {
                   <MapPin className='w-4 h-4 text-main-primary' />
                   Địa điểm
                 </label>
-                <input
-                  type='text'
-                  placeholder='Hà Nội, Việt Nam'
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-                  maxLength={100}
-                />
+                  <div className='relative'>
+                    <input
+                      type='text'
+                      placeholder='Hà Nội, Việt Nam'
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
+                      className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary pr-10'
+                      maxLength={100}
+                    />
+                    {location && (
+                      <button
+                        onClick={() => setLocation('')}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-main-black transition-colors'
+                      >
+                        <X className='h-4 w-4' />
+                      </button>
+                    )}
+                  </div>
               </div>
 
               {/* Min Price */}
@@ -378,6 +386,8 @@ function BuyPageContent() {
                       address={listing.full_address || 'Unknown'}
                       attributes={listing.attributes as ListingAttribute[]}
                       isFavorite={listing.is_favorite ?? false}
+                      boostTags={listing.is_boosted ? listing.boost_packages : undefined}
+                      userType={listing.user_type as any}
                       onToggleFavorite={handleToggleFavorite}
                       onClick={() => {
                         behaviorTracker.trackClick(listing.listing_id, {

@@ -226,7 +226,7 @@ export function PropertySearchStep() {
                         <div className='flex items-center gap-4'>
                           <div className='size-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F0EFFB] relative'>
                             <NextImage
-                              src={p.thumbnail_url || '/placeholder-property.jpg'}
+                              src={p.thumbnail || '/placeholder-property.jpg'}
                               alt={p.street_address || p.full_address}
                               fill
                               className='object-cover'

@@ -11,7 +11,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 2,
     area: 5,
     areaUnit: 'x7 m²',
-    isPopular: true,
   },
   {
     id: '2',
@@ -23,7 +22,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 2,
     area: 6,
     areaUnit: 'x7.5 m²',
-    isPopular: true,
   },
   {
     id: '3',
@@ -35,7 +33,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 3,
     area: 8,
     areaUnit: 'x10 m²',
-    isPopular: true,
   },
   {
     id: '4',
@@ -80,7 +77,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 3,
     area: 9,
     areaUnit: 'x12 m²',
-    isPopular: true,
   },
   {
     id: '8',
@@ -114,7 +110,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 3,
     area: 8,
     areaUnit: 'x11 m²',
-    isPopular: true,
   },
   {
     id: '11',
@@ -137,7 +132,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 4,
     area: 10,
     areaUnit: 'x13 m²',
-    isPopular: true,
   },
   {
     id: '13',
@@ -149,7 +143,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 3,
     area: 9,
     areaUnit: 'x10 m²',
-    isPopular: true,
   },
   {
     id: '14',
@@ -172,7 +165,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 4,
     area: 12,
     areaUnit: 'x15 m²',
-    isPopular: true,
   },
   {
     id: '16',
@@ -184,7 +176,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 4,
     area: 11,
     areaUnit: 'x14 m²',
-    isPopular: true,
   },
   {
     id: '17',
@@ -207,7 +198,6 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 3,
     area: 8,
     areaUnit: 'x12 m²',
-    isPopular: true,
   },
   {
     id: '19',
@@ -230,6 +220,5 @@ export const mockProperties: PropertyListingCardType[] = [
     bathrooms: 4,
     area: 11,
     areaUnit: 'x13.5 m²',
-    isPopular: true,
   },
 ];
