@@ -28,6 +28,8 @@ export const ROUTES = {
     manageProposals: '/dashboard/manage-proposals',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
     ownerProperties: '/dashboard/owner-properties',
+    /** Agent-only dashboard profile & account settings */
+    agentSetting: '/dashboard/setting',
   },
   leases: {
     signingComplete: '/leases/signing-complete',

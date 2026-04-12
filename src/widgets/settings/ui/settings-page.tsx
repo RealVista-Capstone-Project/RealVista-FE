@@ -12,11 +12,13 @@ import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { Textarea } from '@/shared/ui/textarea';
 import { Switch } from '@/shared/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/shared/ui/dialog';
 import { userApi, userQueries } from '@/entities/user/api';
 import { settingPreferenceApi, settingPreferenceQueries } from '@/entities/setting-preference/api';
 import { customerProfileApi, customerProfileQueries } from '@/entities/customer-profile/api';
+import { agentProfileApi, agentProfileKeys, agentProfileQueries } from '@/entities/agent-profile/api';
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api';
 import { BillingReturnQueryEffects } from '@/widgets/billing/ui/billing-return-query-effects';
@@ -32,11 +34,20 @@ interface MediaUploadResponse {
 
 type Tab = 'profile' | 'settings';
 
-export function SettingsPage() {
+export interface SettingsPageProps {
+  /** Agent dashboard uses the same flows but hides buyer customer profiles and adds professional fields. */
+  variant?: 'default' | 'agentDashboard';
+}
+
+export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const t = useTranslations('Settings');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isAgentDashboard = variant === 'agentDashboard';
+  const phoneRecaptchaContainerId = isAgentDashboard
+    ? 'agent-dashboard-phone-recaptcha'
+    : 'settings-phone-recaptcha';
 
   const rawTab = searchParams.get('tab');
   const activeTab: Tab = rawTab === 'settings' ? 'settings' : 'profile';
@@ -87,11 +98,19 @@ export function SettingsPage() {
   // Data queries
   const { data: meResponse, isLoading: meLoading } = useQuery({ ...userQueries.me(), enabled: isAuthenticated });
   const { data: settingsResponse, isLoading: settingsLoading } = useQuery({ ...settingPreferenceQueries.me(), enabled: isAuthenticated });
-  const { data: profilesResponse, isLoading: profilesLoading } = useQuery({ ...customerProfileQueries.me(), enabled: isAuthenticated });
+  const { data: profilesResponse, isLoading: profilesLoading } = useQuery({
+    ...customerProfileQueries.me(),
+    enabled: isAuthenticated && !isAgentDashboard,
+  });
+  const { data: agentProfileResponse, isLoading: agentProfileLoading } = useQuery({
+    ...agentProfileQueries.me(),
+    enabled: isAuthenticated && isAgentDashboard,
+  });
 
   const me = meResponse?.payload?.data;
   const settings = settingsResponse?.payload?.data;
   const profiles = profilesResponse?.payload?.data ?? [];
+  const agentProfile = agentProfileResponse?.payload?.data;
 
   // Form state for My Account
   const [profileForm, setProfileForm] = useState({
@@ -111,6 +130,13 @@ export function SettingsPage() {
     contactViaPhone: false,
     hidePhoneNumber: true,
     hideEmail: true,
+  });
+
+  const [agentProfessionalForm, setAgentProfessionalForm] = useState({
+    bio: '',
+    specialties: '',
+    service_areas: '',
+    years_of_experience: '',
   });
 
   // Hydrate form from API data
@@ -139,6 +165,17 @@ export function SettingsPage() {
       });
     }
   }, [settings]);
+
+  useEffect(() => {
+    if (!agentProfile) return;
+    setAgentProfessionalForm({
+      bio: agentProfile.bio ?? '',
+      specialties: agentProfile.specialties ?? '',
+      service_areas: agentProfile.service_areas ?? '',
+      years_of_experience:
+        agentProfile.years_of_experience != null ? String(agentProfile.years_of_experience) : '',
+    });
+  }, [agentProfile]);
 
   useEffect(() => {
     if (isEditingProfile) return;
@@ -195,6 +232,34 @@ export function SettingsPage() {
       toast.success(t('toast.profileCreated'));
     },
     onError: () => toast.error(t('toast.profileCreateFailed')),
+  });
+
+  const updateAgentProfileMutation = useMutation({
+    mutationFn: () => {
+      const payload: {
+        bio: string;
+        specialties: string;
+        service_areas: string;
+        years_of_experience?: number;
+      } = {
+        bio: agentProfessionalForm.bio,
+        specialties: agentProfessionalForm.specialties,
+        service_areas: agentProfessionalForm.service_areas,
+      };
+      const y = agentProfessionalForm.years_of_experience.trim();
+      if (y !== '') {
+        const n = parseInt(y, 10);
+        if (!Number.isNaN(n)) {
+          payload.years_of_experience = n;
+        }
+      }
+      return agentProfileApi.updateMine(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: agentProfileKeys.me() });
+      toast.success(t('toast.agentProfileUpdated'));
+    },
+    onError: () => toast.error(t('toast.agentProfileUpdateFailed')),
   });
 
   const deleteProfileMutation = useMutation({
@@ -353,7 +418,7 @@ export function SettingsPage() {
   const initRecaptcha = useCallback(() => {
     // Reuse existing verifier if available — same pattern as agent-verification-modal
     if (recaptchaVerifier.current) return recaptchaVerifier.current;
-    const container = document.getElementById('settings-phone-recaptcha');
+    const container = document.getElementById(phoneRecaptchaContainerId);
     if (!container) {
       console.error('[Settings] Recaptcha container not found in DOM');
       return null;
@@ -379,7 +444,7 @@ export function SettingsPage() {
       console.error('[Settings] Failed to initialize Recaptcha:', err);
       return null;
     }
-  }, [auth]);
+  }, [auth, phoneRecaptchaContainerId]);
 
   const startPhoneCountdown = useCallback((seconds: number) => {
     setPhoneOtpCountdown(seconds);
@@ -530,7 +595,101 @@ export function SettingsPage() {
         <div className='w-full max-w-[700px] px-8'>
         {activeTab === 'profile' && (
           <div className='space-y-6'>
-            {/* Profile Management */}
+            {isAgentDashboard && (
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <h2 className='text-base font-semibold text-main-black mb-1'>{t('agentProfessional.title')}</h2>
+                <p className='text-sm text-grey-500 mb-4'>{t('agentProfessional.description')}</p>
+                {agentProfileLoading ? (
+                  <div className='text-sm text-grey-400'>{t('agentProfessional.loading')}</div>
+                ) : (
+                  <div className='space-y-4'>
+                    <div className='flex flex-wrap gap-6 text-sm'>
+                      <div>
+                        <span className='text-grey-500'>{t('agentProfessional.statsRating')}: </span>
+                        <span className='font-medium text-main-black'>
+                          {agentProfile?.rating != null && agentProfile.rating !== ''
+                            ? String(agentProfile.rating)
+                            : '—'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className='text-grey-500'>{t('agentProfessional.statsSold')}: </span>
+                        <span className='font-medium text-main-black'>
+                          {agentProfile?.properties_sold != null ? agentProfile.properties_sold : '—'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-grey-500'>{t('agentProfessional.bio')}</Label>
+                      <Textarea
+                        value={agentProfessionalForm.bio}
+                        onChange={(e) =>
+                          setAgentProfessionalForm((f) => ({ ...f, bio: e.target.value }))
+                        }
+                        placeholder={t('agentProfessional.bioPlaceholder')}
+                        rows={4}
+                        className='resize-y min-h-[100px]'
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-grey-500'>{t('agentProfessional.specialties')}</Label>
+                      <Textarea
+                        value={agentProfessionalForm.specialties}
+                        onChange={(e) =>
+                          setAgentProfessionalForm((f) => ({ ...f, specialties: e.target.value }))
+                        }
+                        placeholder={t('agentProfessional.specialtiesPlaceholder')}
+                        rows={2}
+                        className='resize-y min-h-[72px]'
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-grey-500'>{t('agentProfessional.serviceAreas')}</Label>
+                      <Textarea
+                        value={agentProfessionalForm.service_areas}
+                        onChange={(e) =>
+                          setAgentProfessionalForm((f) => ({ ...f, service_areas: e.target.value }))
+                        }
+                        placeholder={t('agentProfessional.serviceAreasPlaceholder')}
+                        rows={2}
+                        className='resize-y min-h-[72px]'
+                      />
+                    </div>
+                    <div className='space-y-2 max-w-xs'>
+                      <Label className='text-sm text-grey-500'>{t('agentProfessional.yearsExperience')}</Label>
+                      <Input
+                        type='number'
+                        min={0}
+                        inputMode='numeric'
+                        value={agentProfessionalForm.years_of_experience}
+                        onChange={(e) =>
+                          setAgentProfessionalForm((f) => ({
+                            ...f,
+                            years_of_experience: e.target.value.replace(/\D/g, '').slice(0, 3),
+                          }))
+                        }
+                        placeholder={t('agentProfessional.yearsPlaceholder')}
+                      />
+                    </div>
+                    <div className='flex justify-end pt-2'>
+                      <Button
+                        type='button'
+                        onClick={() => updateAgentProfileMutation.mutate()}
+                        disabled={updateAgentProfileMutation.isPending}
+                        className='bg-main-primary text-white hover:bg-main-primary/90'
+                      >
+                        {updateAgentProfileMutation.isPending
+                          ? t('agentProfessional.savingProfessional')
+                          : t('agentProfessional.saveProfessional')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Profile Management (buyer / multi-profile) — hidden on agent dashboard */}
+            {!isAgentDashboard && (
             <section className='bg-white rounded-xl border border-border p-6'>
               <div className='flex items-center justify-between mb-2'>
                 <h2 className='text-base font-semibold text-main-black'>{t('profileManagement.title')}</h2>
@@ -633,6 +792,7 @@ export function SettingsPage() {
                 </div>
               )}
             </section>
+            )}
 
             {/* My Account */}
             <section className='bg-white rounded-xl border border-border p-6'>
@@ -768,7 +928,7 @@ export function SettingsPage() {
                       </span>
                     </button>
                     {/* Recaptcha container must always be in DOM for Firebase to work */}
-                    <div id='settings-phone-recaptcha' />
+                    <div id={phoneRecaptchaContainerId} />
                     {isChangingPhone && (
                       <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
                         <div className='space-y-1.5'>
