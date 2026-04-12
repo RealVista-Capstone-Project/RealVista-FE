@@ -1,7 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { uploadImage, MarbleApiError, MarbleModel } from '@/shared/api/marble-client';
 import { propertyApi } from '@/entities/property';
+import { HttpError } from '@/shared/lib/http/http';
 import { Property3dOperation } from '@/entities/property/api/property-api.types';
 
 type GenerationPhase = 'idle' | 'uploading' | 'requesting' | 'polling' | 'succeeded' | 'failed';
@@ -42,7 +43,9 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
     queryFn: async () => {
       if (!state.operationId || !propertyId) return null;
       const res = await propertyApi.get3dOperations(propertyId);
-      const list = ('data' in res ? res.data : res) as Property3dOperation[];
+      // Both endpoints return ApiResponse<T>: { message, data: T }
+      // http.get wraps this in { status, payload } — so actual data is at res.payload.data
+      const list = ((res.payload as any)?.data ?? []) as Property3dOperation[];
       const op = list.find((o) => o.operation_id === state.operationId);
       if (!op) return null;
 
@@ -52,9 +55,7 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
         error: op.status === 'FAILED' ? { message: op.error_message || 'Failed' } : undefined,
         metadata: {
           progress: {
-            description: op.status === 'PENDING'
-              ? (t ? t('progressPolling') : 'Processing on backend...')
-              : (t ? t('progressSucceeded') : 'Done'),
+            description: t ? t('progressPolling') : 'Processing on backend...',
           },
         },
         response: op,
@@ -62,8 +63,11 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
     },
     enabled: state.phase === 'polling' && !!state.operationId,
     refetchInterval: (query) => {
-      // If it's done or error occurred, stop polling
-      if (!query.state.data || query.state.data.done || query.state.error) {
+      const d = query.state.data;
+      // null = operation not yet found in list — keep polling
+      // undefined = query hasn't run yet — keep polling
+      // d.done = terminal state (SUCCEEDED or FAILED) — stop
+      if (d != null && (d.done || query.state.error)) {
         return false;
       }
       return POLL_INTERVAL;
@@ -71,33 +75,34 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
     refetchIntervalInBackground: false,
   });
 
-  // Watch operationStatus and transition phase if done
-  if (state.phase === 'polling' && operationStatus) {
-    if (operationStatus.done) {
-      if (operationStatus.error) {
-        setState((prev) => ({
-          ...prev,
-          phase: 'failed',
-          error: operationStatus.error?.message || (t ? t('progressFailed') : 'Generation failed on Marble side'),
-        }));
+  // Watch operationStatus and transition phase if done — must be in useEffect, not render body
+  useEffect(() => {
+    if (state.phase === 'polling' && operationStatus) {
+      if (operationStatus.done) {
+        if (operationStatus.error) {
+          setState((prev) => ({
+            ...prev,
+            phase: 'failed',
+            error: operationStatus.error?.message || (t ? t('progressFailed') : 'Generation failed on Marble side'),
+          }));
+        } else {
+          setState((prev) => ({
+            ...prev,
+            phase: 'succeeded',
+            progressDescription: t ? t('progressSucceeded') : '3D World generated successfully!',
+          }));
+        }
       } else {
-        setState((prev) => ({
-          ...prev,
-          phase: 'succeeded',
-          progressDescription: t ? t('progressSucceeded') : '3D World generated successfully!',
-        }));
-      }
-    } else {
-      const description =
-        operationStatus.metadata?.progress?.description || (t ? t('progressPolling') : 'Generating 3D model...');
-      if (description !== state.progressDescription) {
+        const description =
+          operationStatus.metadata?.progress?.description || (t ? t('progressPolling') : 'Generating 3D model...');
+        // Always update — functional updater is safe even if value hasn't changed
         setState((prev) => ({ ...prev, progressDescription: description }));
       }
+    } else if (state.phase === 'polling' && isPollError) {
+      // Only fail hard if TanStack retries are exhausted, useQuery does retries internally
+      setState((prev) => ({ ...prev, phase: 'failed', error: t ? t('progressFailed') : 'Failed to poll operation status' }));
     }
-  } else if (state.phase === 'polling' && isPollError) {
-    // Only fail hard if TanStack retries are exhausted, useQuery does retries internally
-    setState((prev) => ({ ...prev, phase: 'failed', error: t ? t('progressFailed') : 'Failed to poll operation status' }));
-  }
+  }, [operationStatus, isPollError, state.phase]);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const cancel = useCallback(() => {
     abortRef.current = true;
@@ -121,8 +126,20 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
   }, []);
 
   const generate = useCallback(
-    async (images: AzimuthImage[], model: MarbleModel, displayName?: string, roomName?: string) => {
+    async (
+      images: AzimuthImage[],
+      model: MarbleModel,
+      displayName?: string,
+      roomName?: string,
+      options?: { onPreFlight?: () => boolean; onOperationCreated?: () => void; onInitiationError?: () => void }
+    ) => {
       abortRef.current = false;
+
+      // Pre-flight quota check
+      if (options?.onPreFlight && !options.onPreFlight()) {
+        return;
+      }
+
       setState({
         phase: 'uploading',
         operationId: null,
@@ -195,10 +212,13 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
           images: uploadedAssets,
         });
 
-        const opData = (
-          'data' in generationRes ? generationRes.data : generationRes
-        ) as Property3dOperation;
-        const opId = opData.operation_id;
+        // initiate3dOperation returns ApiResponse<Property3DGenerationDto>
+        // http.post wraps it in { status, payload } — actual data is at res.payload.data
+        const opData = (generationRes.payload as any)?.data as Property3dOperation;
+        const opId = opData?.operation_id;
+
+        // Notify caller that the operation was created (e.g., for quota decrement)
+        options?.onOperationCreated?.();
 
         // Step 3: Switch to polling
         setState((prev) => ({
@@ -208,10 +228,26 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
           progressDescription: t ? t('progressAccepted') : 'Operation accepted. Preparing 3D engine...',
         }));
       } catch (error: any) {
+        let errorMessage: string;
+        if (error instanceof HttpError) {
+          // Jackson serializes camelCase as snake_case (SNAKE_CASE naming strategy on BE)
+          const errorCode = (error.payload?.error_code ?? error.payload?.errorCode) as string | undefined;
+          if (errorCode === 'QUOTA_EXHAUSTED' || errorCode === 'ILLEGAL_STATE') {
+            // ILLEGAL_STATE is the legacy code before InsufficientQuotaException was added
+            errorMessage = t ? t('progressQuotaExhausted') : 'No remaining 3D room credits. Please upgrade your plan.';
+          } else {
+            // Never surface raw server messages to end users
+            errorMessage = t ? t('progressFailed') : 'Failed to start generation';
+          }
+        } else {
+          errorMessage = t ? t('progressFailed') : 'Failed to start generation';
+        }
+        // Notify caller so it can refresh quota display regardless of error type
+        options?.onInitiationError?.();
         setState((prev) => ({
           ...prev,
           phase: 'failed',
-          error: error.message || (t ? t('progressFailed') : 'Failed to start generation'),
+          error: errorMessage,
         }));
       }
     },

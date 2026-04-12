@@ -24,6 +24,7 @@ export interface PropertySummaryResponse {
   amenities: PropertyAmenityItem[] | null;
   owner_name?: string;
   owner_phone?: string;
+  has_3d?: boolean;
 }
 export interface PropertySearchRequest {
   north_lat: number;

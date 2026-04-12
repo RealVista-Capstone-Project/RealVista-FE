@@ -77,6 +77,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '**.marble.worldlabs.ai',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: '**.googleusercontent.com',
         pathname: '/**',
       },

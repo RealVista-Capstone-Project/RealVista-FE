@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import {
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label/label';
+import { Progress } from '@/shared/ui/progress';
 import { useGenerate3d, AzimuthImage } from '@/features/world-generation/model/use-generate-3d';
 import { MarbleModel } from '@/shared/api/marble-client';
 import { Upload, X, Box, CheckCircle2, AlertTriangle, RotateCcw } from 'lucide-react';
@@ -21,28 +22,40 @@ import { motion, AnimatePresence } from 'framer-motion';
 const REQUIRED_IMAGES_COUNT = 8;
 const REQUIRED_AZIMUTHS = [0, 45, 90, 135, 180, 225, 270, 315];
 
-const SUGGESTED_ROOM_KEYS = [
-  'suggestedRoom_living',
-  'suggestedRoom_masterBedroom',
-  'suggestedRoom_bedroom',
-  'suggestedRoom_bathroom',
-  'suggestedRoom_kitchen',
-  'suggestedRoom_dining',
-  'suggestedRoom_entrance',
-  'suggestedRoom_balcony',
+// English names used as storage keys (must match what the backend stores)
+const QUICK_FILL_ROOM_VALUES = [
+  'Living Room',
+  'Master Bedroom',
+  'Bedroom',
+  'Bathroom',
+  'Kitchen',
+  'Dining Room',
+  'Entrance',
+  'Balcony',
 ] as const;
 
-// English names used as storage keys (must match what the backend stores)
-const SUGGESTED_ROOM_EN_VALUES: Record<string, string> = {
-  suggestedRoom_living: 'Living Room',
-  suggestedRoom_masterBedroom: 'Master Bedroom',
-  suggestedRoom_bedroom: 'Bedroom',
-  suggestedRoom_bathroom: 'Bathroom',
-  suggestedRoom_kitchen: 'Kitchen',
-  suggestedRoom_dining: 'Dining Room',
-  suggestedRoom_entrance: 'Entrance',
-  suggestedRoom_balcony: 'Balcony',
-};
+// Localized display labels — index matches QUICK_FILL_ROOM_VALUES
+const QUICK_FILL_ROOM_LABELS_EN = [
+  'Living Room',
+  'Master Bedroom',
+  'Bedroom',
+  'Bathroom',
+  'Kitchen',
+  'Dining Room',
+  'Entrance',
+  'Balcony',
+] as const;
+
+const QUICK_FILL_ROOM_LABELS_VI = [
+  'Phòng khách',
+  'Phòng ngủ chính',
+  'Phòng ngủ',
+  'Phòng tắm',
+  'Nhà bếp',
+  'Phòng ăn',
+  'Lối vào',
+  'Ban công',
+] as const;
 
 interface RoomGenerationDialogProps {
   propertyId: string;
@@ -50,6 +63,9 @@ interface RoomGenerationDialogProps {
   onOpenChange: (open: boolean) => void;
   onComplete: () => void;
   existingRoomNames?: string[];
+  onPreFlight?: () => boolean;
+  onOperationCreated?: () => void;
+  onInitiationError?: () => void;
 }
 
 export function RoomGenerationDialog({
@@ -58,8 +74,13 @@ export function RoomGenerationDialog({
   onOpenChange,
   onComplete,
   existingRoomNames = [],
+  onPreFlight,
+  onOperationCreated,
+  onInitiationError,
 }: RoomGenerationDialogProps) {
   const t = useTranslations('ThreeDManagement');
+  const locale = useLocale();
+  const quickFillLabels = locale === 'vi' ? QUICK_FILL_ROOM_LABELS_VI : QUICK_FILL_ROOM_LABELS_EN;
   const {
     phase,
     progressDescription,
@@ -70,6 +91,7 @@ export function RoomGenerationDialog({
   } = useGenerate3d(propertyId, t as any);
 
   const [roomName, setRoomName] = useState('');
+  const [roomDisplayName, setRoomDisplayName] = useState('');
   const [images, setImages] = useState<AzimuthImage[]>([]);
   const [selectedModel, setSelectedModel] = useState<MarbleModel>('Marble 0.1-mini');
   const [isDragging, setIsDragging] = useState(false);
@@ -80,6 +102,7 @@ export function RoomGenerationDialog({
   useEffect(() => {
     if (open) {
       setRoomName('');
+      setRoomDisplayName('');
       setImages([]);
       setSelectedModel('Marble 0.1-mini');
       reset();
@@ -143,7 +166,11 @@ export function RoomGenerationDialog({
     }
     if (images.length === REQUIRED_IMAGES_COUNT) {
       // Pass the room name as both display name and room name
-      generate(images, selectedModel, roomName.trim(), roomName.trim());
+      generate(images, selectedModel, roomName.trim(), roomName.trim(), {
+        onPreFlight,
+        onOperationCreated,
+        onInitiationError,
+      });
     }
   };
 
@@ -163,24 +190,31 @@ export function RoomGenerationDialog({
         <Input
           id='room-name'
           placeholder={t('roomNamePlaceholder')}
-          value={roomName}
-          onChange={(e) => setRoomName(e.target.value)}
+          value={roomDisplayName || roomName}
+          onChange={(e) => {
+            setRoomName(e.target.value);
+            setRoomDisplayName('');
+          }}
           className='bg-muted/50 border-border focus-visible:ring-primary'
         />
 
         {/* Chips for suggestions */}
         <div className='flex flex-wrap gap-2 pt-1'>
-          {SUGGESTED_ROOM_KEYS
-            .filter((key) => !existingRoomNames.includes(SUGGESTED_ROOM_EN_VALUES[key]))
+          {QUICK_FILL_ROOM_VALUES
+            .map((value, index) => ({ value, label: quickFillLabels[index] }))
+            .filter(({ value }) => !existingRoomNames.includes(value))
             .slice(0, 5)
-            .map((key) => (
+            .map(({ value, label }) => (
             <button
-              key={key}
+              key={value}
               type='button'
-              onClick={() => setRoomName(SUGGESTED_ROOM_EN_VALUES[key])}
+              onClick={() => {
+                setRoomName(value);
+                setRoomDisplayName(label);
+              }}
               className='text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors'
             >
-              {t(key as any)}
+              {label}
             </button>
           ))}
         </div>
@@ -370,26 +404,20 @@ export function RoomGenerationDialog({
           </div>
 
           <div className='space-y-3'>
-            <div className='w-full bg-secondary rounded-full h-2 overflow-hidden shadow-inner'>
-              <div
-                className='bg-primary h-2 rounded-full transition-all duration-500 ease-out relative overflow-hidden'
-                style={{
-                  width: phase === 'uploading'
-                    ? `${(uploadedCount / REQUIRED_IMAGES_COUNT) * 100}%`
-                    : phase === 'requesting' ? '10%'
-                    : phase === 'polling' ? '60%' : '10%'
-                }}
-              >
-                {phase === 'polling' && (
-                  <div className='absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-[shimmer_2s_infinite]' />
-                )}
-              </div>
-            </div>
+            <Progress
+              value={
+                phase === 'uploading'
+                  ? (uploadedCount / REQUIRED_IMAGES_COUNT) * 100
+                  : phase === 'requesting' ? 10
+                  : phase === 'polling' ? 60 : 10
+              }
+              className='h-2'
+            />
 
-            <div className='flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>
-              <span className={phase === 'uploading' ? 'text-primary' : 'text-emerald-500'}>{t('phaseUploading')}</span>
-              <span className={phase === 'requesting' ? 'text-primary' : phase === 'polling' ? 'text-emerald-500' : ''}>{t('phaseRequesting')}</span>
-              <span className={phase === 'polling' ? 'text-primary animate-pulse' : ''}>{t('phaseProcessing')}</span>
+            <div className='grid grid-cols-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>
+              <span className={cn('text-left', phase === 'uploading' ? 'text-primary' : 'text-emerald-500')}>{t('phaseUploading')}</span>
+              <span className={cn('text-center', phase === 'requesting' ? 'text-primary' : phase === 'polling' ? 'text-emerald-500' : '')}>{t('phaseRequesting')}</span>
+              <span className={cn('text-right', phase === 'polling' ? 'text-primary animate-pulse' : '')}>{t('phaseProcessing')}</span>
             </div>
           </div>
 

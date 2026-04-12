@@ -4,6 +4,7 @@
     "new": "new",
     "markAsRead": "Mark all as read",
     "noNotifications": "No notifications yet",
-    "viewAll": "View all notifications"
+    "viewAll": "View all notifications",
+    "toastView": "View"
   }
 }

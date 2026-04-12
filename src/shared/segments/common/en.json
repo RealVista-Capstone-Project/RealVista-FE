@@ -2,11 +2,16 @@
   "DashboardLayout": {
     "menu": {
       "dashboard": "Dashboard",
-      "insight": "Insight",
       "listings": "My Listings",
-      "myEngagements": "My Engagements",
       "tenants": "Tenants",
-      "messages": "Messages"
+      "rentalContracts": "Rental Contracts",
+      "property": "Property",
+      "manageAgent": "Manage Agent",
+      "myEngagements": "My Engagements",
+      "messages": "Messages",
+      "myContracts": "My Contracts",
+      "ownerProperties": "Owner Properties",
+      "proposals": "My Proposals"
     },
     "pageTitle": {
       "default": "RealVista",

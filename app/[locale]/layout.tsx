@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/shared/config/i18n/routing';
 import { Providers } from '@/shared/providers';
 import { setRequestLocale, getMessages } from 'next-intl/server';
+import { SubscriptionCTABanner } from '@/widgets/billing';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-plus-jakarta-sans',
@@ -43,6 +44,7 @@ export default async function RootLayout({
         <Providers>
           <NextIntlClientProvider messages={messages} locale={locale}>
             {children}
+            <SubscriptionCTABanner />
           </NextIntlClientProvider>
         </Providers>
       </body>
