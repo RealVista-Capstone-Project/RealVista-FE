@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { conversationQueries, useSendMessage } from '@/entities/conversation';
-import type { ConversationListItemResponse } from '@/entities/conversation';
+import { conversationQueries, useSendMessage, conversationKeys } from '@/entities/conversation';
+import type { ConversationListItemResponse, MessageResponse } from '@/entities/conversation';
 import { useWebSocketState } from '@/shared/lib/websocket';
 import type { Conversation } from './types';
 import { ChatHeader } from './components/chat-header';
@@ -113,6 +113,29 @@ export function MessagesPage() {
   const effectiveActiveId = activeConvId || conversations[0]?.id || '';
   const activeConv = conversations.find((c) => c.id === effectiveActiveId) ?? conversations[0];
 
+  // ── Extract listing_id from cached messages of the active conversation ────
+  //    <ChatMessages> already loaded these — zero extra network cost.
+  const queryClient = useQueryClient();
+  const activeListingId = useMemo(() => {
+    if (!effectiveActiveId) return undefined;
+    const cached = queryClient.getQueryData<any>(conversationKeys.messages(effectiveActiveId));
+    const msgs: MessageResponse[] =
+      (cached as any)?.messages ??
+      (cached as any)?.payload?.messages ??
+      (cached as any)?.payload?.data?.messages ??
+      [];
+    if (!Array.isArray(msgs)) return undefined;
+    // Find the most recent LISTING_CARD message (API returns newest-first)
+    const cardMsg = msgs.find((m) => m.message_type === 'LISTING_CARD' && m.metadata);
+    if (!cardMsg?.metadata) return undefined;
+    try {
+      const parsed = JSON.parse(cardMsg.metadata);
+      return (parsed as { id?: string }).id ?? undefined;
+    } catch {
+      return undefined;
+    }
+  }, [effectiveActiveId, queryClient]);
+
   // ── Send handler ──────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {
     const content = messageInput.trim();
@@ -167,6 +190,9 @@ export function MessagesPage() {
               onSubmit={handleSubmit}
               isSending={isSending}
               isConnected={isConnected}
+              otherUserId={activeConv?.otherUserId}
+              otherUserName={activeConv?.name}
+              listingId={activeListingId}
             />
           </>
         )}

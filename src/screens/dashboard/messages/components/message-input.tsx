@@ -15,6 +15,12 @@ interface MessageInputProps {
   onTyping?: () => void;
   isSending?: boolean;
   isConnected?: boolean;
+  /** ID of the other conversation participant — used to pre-fill tenant in contract wizard */
+  otherUserId?: string;
+  /** Display name of the other participant */
+  otherUserName?: string;
+  /** listing_id extracted from a LISTING_CARD message in this conversation */
+  listingId?: string;
 }
 
 export function MessageInput({
@@ -24,6 +30,9 @@ export function MessageInput({
   onTyping,
   isSending = false,
   isConnected = false,
+  otherUserId,
+  otherUserName,
+  listingId,
 }: MessageInputProps) {
   const t = useTranslations('Messages');
   const { data: session } = useAuthSession();
@@ -87,7 +96,14 @@ export function MessageInput({
                 <button
                   onClick={() => {
                     setPopoverOpen(false);
-                    router.push(ROUTES.dashboard.createRentalContract);
+                    const params = new URLSearchParams();
+                    if (otherUserId) params.set('tenantUserId', otherUserId);
+                    if (otherUserName) params.set('tenantName', otherUserName);
+                    if (listingId) params.set('listingId', listingId);
+                    const query = params.toString();
+                    router.push(
+                      `${ROUTES.dashboard.createRentalContract}${query ? `?${query}` : ''}`
+                    );
                   }}
                   className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
                 >

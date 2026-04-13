@@ -1,11 +1,14 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { type CreateRentalContractPayload } from '@/entities/rental-contract';
 import { type PropertySummaryResponse } from '@/entities/property';
+import { listingQueries } from '@/entities/listing';
 import { userApi } from '@/entities/user';
 import {
   useCreateRentalContractMutation,
@@ -83,19 +86,82 @@ function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormSta
   };
 }
 
+/** Maps a full Listing API response to the same FormState fields as applyPropertyToForm */
+function applyListingToForm(listing: import('@/entities/listing').Listing): Partial<FormState> {
+  const primaryMedia = listing.media?.find((m) => m.is_primary) ?? listing.media?.[0];
+  const addressParts = [
+    listing.property.street_address,
+    listing.location.district_name,
+    listing.location.city_name,
+  ].filter(Boolean);
+  const bedroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bedrooms');
+  const bathroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bathrooms');
+
+  return {
+    propertyId: listing.property_id ?? listing.listing_id,
+    propertyTitle: listing.name ?? listing.property.street_address,
+    propertyAddress: addressParts.join(', '),
+    propertyType: listing.property_type?.property_type_name ?? '',
+    bedrooms: String(bedroomsAttr?.value_number ?? 0),
+    bathrooms: String(bathroomsAttr?.value_number ?? 0),
+    thumbnailUrl: primaryMedia?.thumbnail_url ?? primaryMedia?.media_url ?? '',
+    landlordId: listing.user_id ?? '',
+  };
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export function CreateRentalContractPage() {
   const t = useTranslations('CreateRentalContract');
   const router = useRouter();
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const createContractMutation = useCreateRentalContractMutation();
   const sendToLandlordMutation = useSendToLandlordMutation();
 
-  const [currentStep, setCurrentStep] = useState<WizardStep>(1);
-  const [form, setForm] = useState<FormState>(() => ({ ...INITIAL_FORM_STATE }));
+  // ── Pre-fill context from ?listingId=&tenantUserId=&tenantName= ───────────
+  const prefillListingId  = searchParams.get('listingId')    ?? '';
+  const prefillTenantId   = searchParams.get('tenantUserId') ?? '';
+  const prefillTenantName = searchParams.get('tenantName')   ?? '';
+
+  // Fetch the listing so we can populate Step 1 fields
+  const { data: listingResponse } = useQuery({
+    ...listingQueries.detail(prefillListingId),
+    enabled: !!prefillListingId,
+  });
+  const prefillListing =
+    (listingResponse as any)?.payload?.data ??
+    (listingResponse as any)?.data ??
+    null;
+
+  // Determine start step: skip straight to Step 3 (Lease Terms) when both
+  // listing + tenant are pre-filled; skip to Step 2 when only tenant is known.
+  const initialStep = useMemo<WizardStep>(() => {
+    if (prefillListingId && prefillTenantId) return 3;
+    if (prefillTenantId) return 2;
+    return 1;
+  }, [prefillListingId, prefillTenantId]);
+
+  const [currentStep, setCurrentStep] = useState<WizardStep>(initialStep);
+  const [form, setForm] = useState<FormState>(() => ({
+    ...INITIAL_FORM_STATE,
+    // Seed tenant fields immediately so Step 2 shows them without lookup
+    ...(prefillTenantId
+      ? {
+          tenantUserId: prefillTenantId,
+          tenantName: prefillTenantName,
+          tenantLookupDone: true,
+        }
+      : {}),
+  }));
   const [tenantLookupLoading, setTenantLookupLoading] = useState(false);
   const [signingModal, setSigningModal] = useState<{ url: string; redirectOnClose: boolean } | null>(null);
+
+  // Apply listing data once it loads (Step 1 pre-fill)
+  useEffect(() => {
+    if (!prefillListing) return;
+    setForm((prev) => ({ ...prev, ...applyListingToForm(prefillListing) }));
+  }, [prefillListing]);
 
   // ── Steps config ───────────────────────────────────────────────────────────
 
