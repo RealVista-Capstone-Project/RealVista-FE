@@ -24,7 +24,7 @@ export function SellPage() {
   const t = useTranslations('Sell');
   const locale = useLocale();
   const router = useRouter();
-  const { data: session } = useAuthSession();
+  const { data: session, update } = useAuthSession();
 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -56,6 +56,7 @@ export function SellPage() {
     try {
       if (!isOwner) {
         await userApi.addOwnerRole();
+        await update({ backendRoles: [...backendRoles, 'OWNER'] });
       }
       setShowConfirmDialog(false);
       router.push(`/${locale}${ROUTES.dashboard.property}/create`);

@@ -139,7 +139,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     /**
      * JWT callback - adds custom fields to token
      */
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === 'update' && session) {
+        return { ...token, ...session };
+      }
       if (user) {
         // First login, add user data to token (type-safe)
         token.id = user.id;
