@@ -36,7 +36,7 @@ function BuyPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();
@@ -103,7 +103,7 @@ function BuyPageContent() {
           : undefined,
       hasVideo: searchParams?.get('hasVideo') === 'true',
       has3D: searchParams?.get('has3D') === 'true',
-      sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
+      sortBy: (searchParams?.get('sortBy') as AdvancedSearchRequest['sortBy']) || 'PRIORITY',
     };
   }, [searchParams]);
 
@@ -201,6 +201,19 @@ function BuyPageContent() {
   const handlePageChange = (page: number) => {
     updateUrl(searchCriteria, page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleResetFilters = () => {
+    setLocation('');
+    setMinPrice('');
+    setMaxPrice('');
+
+    const defaultCriteria: AdvancedSearchRequest = {
+      listingType: 'SALE' as const,
+      sortBy: 'PRIORITY',
+    };
+
+    updateUrl(defaultCriteria, 1);
   };
 
   if (isMapView) {
@@ -333,7 +346,15 @@ function BuyPageContent() {
             open={isFiltersOpen}
             onOpenChange={setIsFiltersOpen}
             onApplyFilters={handleAdvancedFiltersApply}
-            initialFilters={searchCriteria}
+            initialFilters={{
+              ...searchCriteria,
+              location: location || undefined,
+              price: [
+                minPrice ? Number(minPrice) : null,
+                maxPrice ? Number(maxPrice) : null
+              ]
+            }}
+            onReset={handleResetFilters}
           />
         </div>
       </section>
@@ -387,7 +408,7 @@ function BuyPageContent() {
                       attributes={listing.attributes as ListingAttribute[]}
                       isFavorite={listing.is_favorite ?? false}
                       boostTags={listing.is_boosted ? listing.boost_packages : undefined}
-                      userType={listing.user_type as any}
+                      userType={listing.user_type as string}
                       onToggleFavorite={handleToggleFavorite}
                       onClick={() => {
                         behaviorTracker.trackClick(listing.listing_id, {

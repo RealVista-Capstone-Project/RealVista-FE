@@ -13,7 +13,6 @@ import {
   SheetTitle,
 } from '@/shared/ui/sheet/sheet';
 import { Input } from '@/shared/ui/input/input';
-import { Checkbox } from '@/shared/ui/checkbox/checkbox';
 import {
   Select,
   SelectContent,
@@ -38,6 +37,7 @@ interface AdvancedSearchFiltersProps {
   onOpenChange: (open: boolean) => void;
   onApplyFilters: (filters: AdvancedSearchRequest) => void;
   initialFilters?: AdvancedSearchRequest;
+  onReset?: () => void;
   className?: string;
 }
 
@@ -46,6 +46,7 @@ export function AdvancedSearchFilters({
   onOpenChange,
   onApplyFilters,
   initialFilters,
+  onReset,
   className,
 }: AdvancedSearchFiltersProps) {
   const [filters, setFilters] = useState<AdvancedSearchRequest>(
@@ -54,13 +55,15 @@ export function AdvancedSearchFilters({
       sortBy: 'PRIORITY',
     }
   );
+  const [resetKey, setResetKey] = useState(0);
 
-  // Sync state with props when opening
+  // Sync state with props ONLY when opening to prevent infinite update loops
   useEffect(() => {
     if (open && initialFilters) {
       setFilters(initialFilters);
     }
-  }, [open, initialFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]); // Only sync on open
 
   const handleApply = () => {
     onApplyFilters(filters);
@@ -68,15 +71,26 @@ export function AdvancedSearchFilters({
   };
 
   const handleReset = () => {
+    // Explicitly reset everything to ensure a clean state
     setFilters({
       listingType: filters.listingType || 'SALE',
       sortBy: 'PRIORITY',
+      propertyType: undefined,
+      propertyCategory: undefined,
+      location: undefined,
+      price: undefined,
+      area: undefined,
+      dynamicAttributes: undefined,
+      hasVideo: false,
+      has3D: false,
     });
+    setResetKey((prev) => prev + 1);
+    if (onReset) onReset();
   };
 
   // Derive the selected property type from state
   const selectedPropertyType = useMemo(() => {
-    return (filters as any).propertyType as string | undefined;
+    return filters.propertyType as string | undefined;
   }, [filters]);
 
   // Find attributes for the selected type
@@ -176,14 +190,28 @@ export function AdvancedSearchFilters({
         </SheetHeader>
 
         <div className='flex-1 overflow-y-auto p-6 space-y-6'>
+          {/* Location Field - Mirrored from outside */}
+          <div className='space-y-3'>
+            <Label>Địa điểm</Label>
+            <Input
+              type='text'
+              placeholder='Hà Nội, Việt Nam'
+              value={filters.location || ''}
+              onChange={(e) =>
+                setFilters({ ...filters, location: e.target.value || undefined })
+              }
+              maxLength={100}
+            />
+          </div>
 
-            {/* Property Type Selector */}
+          {/* Property Type Selector */}
           <div className='space-y-3'>
             <Label>Loại bất động sản</Label>
             <Select
-              value={(filters as any).propertyType || undefined}
+              key={`property-type-${resetKey}`}
+              value={filters.propertyType || undefined}
               onValueChange={(value) =>
-                setFilters({ ...filters, propertyType: value || undefined } as any)
+                setFilters({ ...filters, propertyType: value || undefined })
               }
             >
               <SelectTrigger>
@@ -213,7 +241,7 @@ export function AdvancedSearchFilters({
                   type='number'
                   placeholder='Giá tối thiểu'
                   value={filters.price?.[0] || ''}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFilters({
                       ...filters,
                       price: [
@@ -230,7 +258,7 @@ export function AdvancedSearchFilters({
                   type='number'
                   placeholder='Giá tối đa'
                   value={filters.price?.[1] || ''}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setFilters({
                       ...filters,
                       price: [
@@ -353,6 +381,7 @@ export function AdvancedSearchFilters({
           <div className='space-y-3'>
             <Label>Sắp xếp theo</Label>
             <Select
+              key={`sort-by-${resetKey}`}
               value={filters.sortBy || 'PRIORITY'}
               onValueChange={(value) =>
                 setFilters({
