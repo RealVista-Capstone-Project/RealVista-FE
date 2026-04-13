@@ -56,11 +56,8 @@ export class WebSocketService {
     this.options = {
       endpoint: options.endpoint,
       token: (options as WebSocketServiceOptions).token,
-      useSTOMP: options.useSTOMP ?? true,
       connectionTimeout: options.connectionTimeout ?? 5000,
-      autoReconnect: options.autoReconnect ?? true,
       reconnectDelay: options.reconnectDelay ?? 3000,
-      maxReconnectAttempts: options.maxReconnectAttempts ?? 5,
       headers: options.headers ?? {},
       debug: options.debug ?? false,
     };
@@ -352,20 +349,10 @@ export class WebSocketService {
 
   /**
    * Get authentication headers
-   * Prioritizes token from options, then localStorage
    */
   private getAuthHeaders(): { [key: string]: string } {
-    // 1. Use token from options if provided
     if (this.options.token) {
       return { Authorization: `Bearer ${this.options.token}` };
-    }
-
-    // 2. Fallback to localStorage (for backward compatibility)
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sessionToken');
-      if (token) {
-        return { Authorization: `Bearer ${token}` };
-      }
     }
     return {};
   }

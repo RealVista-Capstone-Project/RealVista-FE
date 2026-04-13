@@ -76,9 +76,7 @@ describe('WebSocketService', () => {
       const testService = new WebSocketService({
         endpoint: 'ws://localhost:8080/ws',
         connectionTimeout: 10000,
-        autoReconnect: false,
         reconnectDelay: 5000,
-        maxReconnectAttempts: 10,
         debug: true,
         ...mockCallbacks,
       });
@@ -116,24 +114,16 @@ describe('WebSocketService', () => {
       expect(mockClientInstance.activate).toHaveBeenCalledTimes(1);
     });
 
-    it('should include auth headers when sessionToken exists', () => {
-      const mockToken = 'test-jwt-token';
-      const getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => {
-        if (key === 'sessionToken') return mockToken;
-        return null;
-      });
-
+    it('should not include auth headers when no token is provided', () => {
       service.connect();
 
       expect(Client).toHaveBeenCalledWith(
         expect.objectContaining({
-          connectHeaders: expect.objectContaining({
-            Authorization: `Bearer ${mockToken}`,
+          connectHeaders: expect.not.objectContaining({
+            Authorization: expect.any(String),
           }),
         })
       );
-
-      getItemSpy.mockRestore();
     });
   });
 
