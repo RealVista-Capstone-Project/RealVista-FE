@@ -51,6 +51,14 @@ export function VndAmountInput({
     onChange(normalized);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Prevent characters that are definitely not for price (., -, e, +, etc)
+    if (['.', '-', 'e', '+', ','].includes(e.key)) {
+      e.preventDefault();
+    }
+    onKeyDown?.(e);
+  };
+
   const amount = digitsToVndInteger(digits);
   const preview =
     previewText ?? (amount > 0 ? `≈ ${formatVND(amount)}` : '');
@@ -66,6 +74,7 @@ export function VndAmountInput({
         placeholder={placeholder}
         value={formatVndDigitsForDisplay(digits)}
         onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
         aria-invalid={error}
         className={cn(
           'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',

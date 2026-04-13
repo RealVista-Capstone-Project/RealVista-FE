@@ -13,6 +13,7 @@ export interface PropertySearchHeaderProps {
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   onMoreFilters?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   homeLabel?: string;
   searchLabel?: string;
   moreFiltersLabel?: string;
@@ -28,6 +29,7 @@ export function PropertySearchHeader({
   searchValue = '',
   onSearchChange,
   onMoreFilters,
+  onKeyDown,
   homeLabel = 'Home',
   searchLabel = 'Search',
   moreFiltersLabel = 'More filters',
@@ -67,6 +69,7 @@ export function PropertySearchHeader({
             placeholder={searchPlaceholder}
             value={searchValue}
             onChange={(e) => onSearchChange?.(e.target.value)}
+            onKeyDown={onKeyDown}
             className='h-12 w-full rounded-lg border-[1.5px] border-purple-92 bg-white pl-12 pr-10 text-base font-normal leading-[1.5] text-main-black outline-none transition-colors placeholder:text-grey-500 focus:border-main-primary focus:ring-1 focus:ring-main-primary'
           />
           {searchValue && (

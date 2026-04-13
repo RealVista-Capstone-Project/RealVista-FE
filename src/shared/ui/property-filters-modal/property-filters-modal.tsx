@@ -31,6 +31,7 @@ export interface PropertyFiltersModalProps {
   onOpenChange: (open: boolean) => void;
   filters: PropertyFilters;
   propertyType?: string;
+  listingType?: 'RENT' | 'SALE';
   onApply: (filters: PropertyFilters) => void;
   onReset: () => void;
   translations: {
@@ -131,6 +132,7 @@ export function PropertyFiltersModal({
   onOpenChange,
   filters,
   propertyType,
+  listingType,
   onApply,
   onReset,
   translations,
@@ -271,38 +273,40 @@ export function PropertyFiltersModal({
             </div>
           )}
 
-          {/* Rental Period */}
-          <div className='space-y-3'>
-            <h3 className='text-sm font-semibold text-[#4D5461]'>
-              {translations.rentalPeriod.label}
-            </h3>
-            <div className='space-y-1'>
-              <RadioOption
-                selected={localFilters.rentalPeriod === 'any'}
-                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: 'any' })}
-              >
-                {translations.rentalPeriod.any}
-              </RadioOption>
-              <RadioOption
-                selected={localFilters.rentalPeriod === '1-12'}
-                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '1-12' })}
-              >
-                {translations.rentalPeriod['1-12']}
-              </RadioOption>
-              <RadioOption
-                selected={localFilters.rentalPeriod === '13-24'}
-                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '13-24' })}
-              >
-                {translations.rentalPeriod['13-24']}
-              </RadioOption>
-              <RadioOption
-                selected={localFilters.rentalPeriod === '24+'}
-                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '24+' })}
-              >
-                {translations.rentalPeriod['24+']}
-              </RadioOption>
+          {/* Rental Period - Only for RENT */}
+          {listingType === 'RENT' && (
+            <div className='space-y-3'>
+              <h3 className='text-sm font-semibold text-[#4D5461]'>
+                {translations.rentalPeriod.label}
+              </h3>
+              <div className='space-y-1'>
+                <RadioOption
+                  selected={localFilters.rentalPeriod === 'any'}
+                  onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: 'any' })}
+                >
+                  {translations.rentalPeriod.any}
+                </RadioOption>
+                <RadioOption
+                  selected={localFilters.rentalPeriod === '1-12'}
+                  onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '1-12' })}
+                >
+                  {translations.rentalPeriod['1-12']}
+                </RadioOption>
+                <RadioOption
+                  selected={localFilters.rentalPeriod === '13-24'}
+                  onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '13-24' })}
+                >
+                  {translations.rentalPeriod['13-24']}
+                </RadioOption>
+                <RadioOption
+                  selected={localFilters.rentalPeriod === '24+'}
+                  onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: '24+' })}
+                >
+                  {translations.rentalPeriod['24+']}
+                </RadioOption>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Sticky footer */}

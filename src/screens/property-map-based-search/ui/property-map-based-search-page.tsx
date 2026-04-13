@@ -5,13 +5,14 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
-import { MapPin } from 'lucide-react';
+import { ChevronLeft, Search } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
+import { Skeleton } from '@/shared/ui/skeleton';
 import {
   RealVistaListingCard,
   type ListingAttribute,
@@ -29,6 +30,7 @@ import {
   type RentalPeriod,
 } from '@/shared/ui/property-filters-modal';
 import { HCM_CITY_CENTER } from '@/shared/constants';
+import { FLAT_PROPERTY_TYPES } from '@/shared/config/property-types';
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
@@ -255,6 +257,11 @@ export function PropertyMapBasedSearchPage({
             searchPlaceholder={t('searchPlaceholder')}
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setCurrentPage(1);
+              }
+            }}
             onMoreFilters={() => setFiltersModalOpen(true)}
             homeLabel={t('home')}
             searchLabel={t('search')}
@@ -267,46 +274,43 @@ export function PropertyMapBasedSearchPage({
                   variant='secondary'
                   className='w-full justify-between gap-3 border-[1.5px] bg-white px-4 py-3 h-auto text-base font-medium text-main-secondary opacity-70 hover:bg-white hover:opacity-100 sm:w-auto cursor-pointer'
                 >
-                  <span>{t('searchWithSearchBar')}</span>
+                  <span>Quay lại</span>
                   <div className='relative flex h-5 w-5 items-center justify-center'>
                     {/* Background circle */}
                     <div className='absolute inset-0 rounded-full bg-purple-96'></div>
                     {/* Icon */}
-                    <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+                    <ChevronLeft className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
                   </div>
                 </RealVistaButton>
               )
             }
           />
 
-          {/* Filters */}
-          {/* TODO: Please implement filters */}
-          <div className='mt-6'>
+          {/* Filters Container */}
+          <div className='mt-6 sticky top-0 z-10 bg-purple-98/80 backdrop-blur-md py-2 px-1'>
             <PropertyFilters
-              priceFilter={{
-                label: filters.priceRange.min > 0 || filters.priceRange.max < 20000000000
+              priceRange={{
+                min: filters.priceRange.min,
+                max: filters.priceRange.max,
+              }}
+              onPriceChange={(min, max) => {
+                setFilters({
+                  ...filters,
+                  priceRange: { min, max },
+                });
+                setCurrentPage(1);
+              }}
+              priceLabel={
+                filters.priceRange.min > 0 || filters.priceRange.max < 20000000000
                   ? `${formatVND(filters.priceRange.min)} - ${formatVND(filters.priceRange.max)}`
-                  : t('anyPrice'),
-                value: 'price',
-                onClick: () => setFiltersModalOpen(true),
-              }}
-              bedsFilter={{
-                label: filters.attributes.BEDROOMS
-                  ? `${filters.attributes.BEDROOMS}+ ${t('beds')}`
-                  : t('beds'),
-                value: 'beds',
-                onClick: () => setFiltersModalOpen(true),
-              }}
-              typeFilter={{
-                label: propertyType || t('allTypes'),
-                value: 'type',
-                onClick: () => setFiltersModalOpen(true),
-              }}
-              sortFilter={{
-                label: t('newest'),
-                value: 'newest',
-                onClick: () => {},
-              }}
+                  : t('priceRange')
+              }
+              typeLabel={
+                propertyType
+                  ? FLAT_PROPERTY_TYPES.find((t) => t.code === propertyType)?.label || propertyType
+                  : 'Loại bất động sản'
+              }
+              onMoreFilters={() => setFiltersModalOpen(true)}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
@@ -318,9 +322,29 @@ export function PropertyMapBasedSearchPage({
             className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col gap-4'}`}
           >
             {isLoading ? (
-              <div className='col-span-full flex justify-center py-10'>
-                {/* TODO: Add proper loading skeleton */}
-                <span className='loading loading-spinner loading-lg'>Loading...</span>
+              <div className='col-span-full grid grid-cols-1 md:grid-cols-2 gap-6'>
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className='flex flex-col gap-3 rounded-2xl border border-purple-92 bg-white p-3'>
+                    <Skeleton className='aspect-[4/3] w-full rounded-xl' />
+                    <div className='space-y-2 px-1'>
+                      <Skeleton className='h-6 w-3/4' />
+                      <Skeleton className='h-4 w-1/2' />
+                      <div className='flex gap-2 pt-2'>
+                        <Skeleton className='h-8 w-20 rounded-full' />
+                        <Skeleton className='h-8 w-20 rounded-full' />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : properties.length === 0 ? (
+              <div className='col-span-full flex flex-col items-center justify-center py-20 text-center opacity-60'>
+                 <div className='mb-4 rounded-full bg-purple-96 p-6'>
+                    <Search className='h-10 w-10 text-main-primary' />
+                 </div>
+                 <h3 className='text-xl font-bold text-main-black'>Không tìm thấy kết quả</h3>
+                 <p className='text-grey-500'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
+                 <RealVistaButton variant='link' onClick={handleResetFilters} className='mt-2'>Xóa tất cả bộ lọc</RealVistaButton>
               </div>
             ) : (
               properties.map((property: PropertyListingDto) => (
@@ -377,6 +401,7 @@ export function PropertyMapBasedSearchPage({
           onOpenChange={setFiltersModalOpen}
           filters={filters}
           propertyType={propertyType || undefined}
+          listingType={initialListingType}
           onApply={handleApplyFilters}
           onReset={handleResetFilters}
           translations={{
