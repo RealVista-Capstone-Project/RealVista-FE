@@ -208,6 +208,7 @@ describe('WebSocketService', () => {
         '/topic/test',
         expect.any(Function)
       );
+      expect(mockClientInstance.subscribe).toHaveBeenCalledTimes(1);
     });
 
     it('should cancel a pending subscription before it is flushed', () => {

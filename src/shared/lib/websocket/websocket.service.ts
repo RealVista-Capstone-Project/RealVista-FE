@@ -299,12 +299,12 @@ export class WebSocketService {
 
     this.state = 'connected';
 
+    // Resubscribe to all destinations
+    this.resubscribeAll();
+
     // Flush pending subscriptions (registered before connection was established)
     const pending = this.pendingSubscriptions.splice(0);
     pending.forEach((opts) => this.subscribe(opts));
-
-    // Resubscribe to all destinations
-    this.resubscribeAll();
 
     this.callbacks.onConnect();
   }
