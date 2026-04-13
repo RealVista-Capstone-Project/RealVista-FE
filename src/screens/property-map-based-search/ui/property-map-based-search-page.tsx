@@ -118,7 +118,8 @@ export function PropertyMapBasedSearchPage({
         bathrooms: (filters.attributes.BATHROOMS as number) || undefined,
         area: (filters.attributes.AREA as number) || undefined,
         rental_period: filters.rentalPeriod !== 'any' ? filters.rentalPeriod : undefined,
-        sort: sortBy,
+        sort_by: sortBy === 'PRICE_ASC' || sortBy === 'PRICE_DESC' ? 'price' : sortBy === 'NEWEST' ? 'created_at' : 'priority',
+        sort_direction: sortBy === 'PRICE_ASC' ? 'asc' : 'desc',
         page: currentPage,
         size: pageSize,
       } as PropertySearchRequest
@@ -181,8 +182,17 @@ export function PropertyMapBasedSearchPage({
     }
   };
 
-  const handleApplyFilters = (newFilters: PropertyFilterValues) => {
+  const handleApplyFilters = (newFilters: PropertyFilterValues, newPropertyType?: string) => {
     setFilters(newFilters);
+    if (newPropertyType !== propertyType) {
+        const params = new URLSearchParams(searchParams?.toString());
+        if (newPropertyType) {
+            params.set('propertyType', newPropertyType);
+        } else {
+            params.delete('propertyType');
+        }
+        router.push(`?${params.toString()}`);
+    }
     setCurrentPage(1);
   };
 
