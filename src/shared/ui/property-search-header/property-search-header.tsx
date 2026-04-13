@@ -38,14 +38,6 @@ export function PropertySearchHeader({
 }: PropertySearchHeaderProps) {
   return (
     <div className={cn('space-y-6', className)}>
-      {/* Breadcrumbs */}
-      <nav className='flex items-center gap-2 text-sm'>
-        <Link href='/' className='text-grey-500 transition-colors hover:text-main-primary'>
-          {homeLabel}
-        </Link>
-        <ChevronRight className='h-4 w-4 text-grey-500' />
-        <span className='font-medium text-main-black'>{searchLabel}</span>
-      </nav>
 
       {/* Title and Property Count */}
       <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>

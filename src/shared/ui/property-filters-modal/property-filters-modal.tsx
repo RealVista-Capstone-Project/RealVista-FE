@@ -87,8 +87,8 @@ function Stepper({
         >
           <Minus className='h-4 w-4' strokeWidth={2.5} />
         </button>
-        <span className='min-w-[60px] text-center text-base font-bold text-main-black'>
-            {value === 0 ? 'Tất cả' : `${value}+`}
+        <span className='min-w-[60px] text-center text-xl font-bold text-main-black tracking-tight'>
+            {value === 0 ? 'Tất cả' : value}
         </span>
         <button
           type='button'
@@ -198,21 +198,22 @@ export function PropertyFiltersModal({
                 </button>
                 {PROPERTY_TYPES.map((cat) => {
                     const Icon = CATEGORY_ICONS[cat.code] || Home;
+                    const displayLabel = cat.code === 'RESIDENTIAL' ? 'Nhà ở' : cat.label.replace('Bất động sản ', '');
+                    const capitalizedLabel = displayLabel.charAt(0).toUpperCase() + displayLabel.slice(1);
+                    
                     return cat.types.slice(0, 1).map(type => (
                         <button
                            key={cat.code}
                            onClick={() => setSelectedType(type.code)}
                            className={cn(
-                             'flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-[1.5px] transition-all duration-200',
+                             'flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-[1.5px] transition-all duration-300',
                              selectedType === type.code || (selectedType && FLAT_PROPERTY_TYPES.find(t => t.code === selectedType)?.categoryCode === cat.code)
-                                ? 'bg-main-primary/5 border-main-primary text-main-primary shadow-sm' 
+                                ? 'bg-main-primary/5 border-main-primary text-main-primary shadow-sm scale-105' 
                                 : 'bg-white border-purple-92 text-grey-500 hover:border-main-primary/50'
                            )}
                         >
-                           <div className='p-2 rounded-xl bg-purple-96'>
-                                <Icon className='h-6 w-6' />
-                           </div>
-                           <span className='text-xs font-bold text-center truncate w-full'>{cat.label.replace('Bất động sản ', '')}</span>
+                           <Icon className={cn('h-6 w-6', selectedType === type.code && 'text-main-primary')} />
+                           <span className='text-xs font-bold text-center truncate w-full'>{capitalizedLabel}</span>
                         </button>
                     ))
                 })}
@@ -222,18 +223,18 @@ export function PropertyFiltersModal({
              {selectedType && (
                 <div className='mt-4 flex flex-wrap gap-2'>
                     {PROPERTY_TYPES.find(c => c.types.some(t => t.code === selectedType))?.types.map(t => (
-                        <button
-                          key={t.code}
-                          onClick={() => setSelectedType(t.code)}
-                          className={cn(
-                            'px-4 py-2 rounded-full text-xs font-medium border-1.5 transition-all',
-                            selectedType === t.code
-                                ? 'bg-main-primary text-white border-main-primary'
-                                : 'bg-white text-grey-600 border-purple-92 hover:border-main-primary/50'
-                          )}
-                        >
-                          {t.label}
-                        </button>
+                    <button
+                      key={t.code}
+                      onClick={() => setSelectedType(t.code)}
+                      className={cn(
+                        'px-5 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-300',
+                        selectedType === t.code
+                            ? 'bg-main-primary/10 text-main-primary border-main-primary shadow-sm'
+                            : 'bg-white text-grey-600 border-purple-92 hover:border-main-primary/30'
+                      )}
+                    >
+                      {t.label}
+                    </button>
                     ))}
                 </div>
              )}
