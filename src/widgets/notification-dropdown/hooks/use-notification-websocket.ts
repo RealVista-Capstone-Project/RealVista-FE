@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/shared/lib/websocket';
-import { mapWsPayloadToNotification, type Notification, type NotificationWsPayload } from '@/entities/notification';
+import { mapWsPayloadToNotification, type Notification, type NotificationWsPayload, NotificationEventType } from '@/entities/notification';
 import { billingKeys } from '@/entities/billing';
 
 const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_ENDPOINT ?? 'http://localhost:8080/ws';
@@ -67,8 +67,8 @@ export function useNotificationWebSocket({
           onNewNotificationRef.current(notification);
 
           const is3dEvent =
-            notification.eventType === 'PROPERTY_3D_GENERATED' ||
-            notification.eventType === 'PROPERTY_3D_FAILED';
+            notification.eventType === NotificationEventType.PROPERTY_3D_GENERATED ||
+            notification.eventType === NotificationEventType.PROPERTY_3D_FAILED;
 
           toast.info(notification.title, {
             description: notification.message,

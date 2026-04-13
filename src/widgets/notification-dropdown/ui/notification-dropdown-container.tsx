@@ -12,6 +12,7 @@ import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   mapToNotification,
+  NotificationEventType,
   type Notification,
   type NotificationResponse,
 } from '@/entities/notification';
@@ -93,7 +94,7 @@ export function NotificationDropdownContainer() {
       );
     }
 
-    if (n.eventType === 'PROPERTY_3D_GENERATED' || n.eventType === 'PROPERTY_3D_FAILED') {
+    if (n.eventType === NotificationEventType.PROPERTY_3D_GENERATED || n.eventType === NotificationEventType.PROPERTY_3D_FAILED) {
       if (n.entityId) {
         navigateTo3d(n.entityId, n.metadata);
       }
@@ -138,8 +139,8 @@ export function NotificationDropdownContainer() {
     onNewNotification,
     onNotificationAction: (incoming) => {
       if (
-        (incoming.eventType === 'PROPERTY_3D_GENERATED' ||
-          incoming.eventType === 'PROPERTY_3D_FAILED') &&
+        (incoming.eventType === NotificationEventType.PROPERTY_3D_GENERATED ||
+          incoming.eventType === NotificationEventType.PROPERTY_3D_FAILED) &&
         incoming.entityId
       ) {
         navigateTo3d(incoming.entityId, incoming.metadata);

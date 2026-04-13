@@ -51,6 +51,33 @@ export interface Notification {
   metadata: Record<string, string> | null;
 }
 
+/**
+ * Known notification event type constants.
+ * Matches EventType enum in realvista-be.
+ */
+export const NotificationEventType = {
+  NEW_LISTING: 'NEW_LISTING',
+  PRICE_CHANGE: 'PRICE_CHANGE',
+  APPOINTMENT_REMINDER: 'APPOINTMENT_REMINDER',
+  APPOINTMENT_CONFIRMED: 'APPOINTMENT_CONFIRMED',
+  APPOINTMENT_CANCELLED: 'APPOINTMENT_CANCELLED',
+  NEW_TOUR_REQUEST: 'NEW_TOUR_REQUEST',
+  NEW_MESSAGE: 'NEW_MESSAGE',
+  LISTING_EXPIRED: 'LISTING_EXPIRED',
+  LISTING_EXPIRING_SOON: 'LISTING_EXPIRING_SOON',
+  LISTING_SOLD: 'LISTING_SOLD',
+  SYSTEM: 'SYSTEM',
+  PROPERTY_3D_GENERATED: 'PROPERTY_3D_GENERATED',
+  PROPERTY_3D_FAILED: 'PROPERTY_3D_FAILED',
+  LISTING_RENTED: 'LISTING_RENTED',
+  LEASE_TERMINATED: 'LEASE_TERMINATED',
+  NEW_AGENT_PROPOSAL: 'NEW_AGENT_PROPOSAL',
+  AGENT_PROPOSAL_ACCEPTED: 'AGENT_PROPOSAL_ACCEPTED',
+  AGENT_PROPOSAL_REJECTED: 'AGENT_PROPOSAL_REJECTED',
+} as const;
+
+export type NotificationEventTypeValue = typeof NotificationEventType[keyof typeof NotificationEventType];
+
 /** Map a raw REST NotificationResponse (snake_case) to the UI Notification type */
 export function mapToNotification(raw: NotificationResponse): Notification {
   let metadata: Record<string, string> | null = null;
