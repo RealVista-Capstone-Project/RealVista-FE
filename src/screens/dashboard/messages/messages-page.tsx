@@ -91,6 +91,13 @@ export function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
 
+  /**
+   * Listing that was clicked via the per-card "Create Contract" button.
+   * Passed to <MessageInput> which auto-opens the confirmation modal pre-selecting it.
+   * Reset to null once the modal has consumed it.
+   */
+  const [pendingContractListing, setPendingContractListing] = useState<ChatListingData | null>(null);
+
   const locale = useLocale();
 
   // ── Read WS connection state from global Zustand store.
@@ -117,30 +124,40 @@ export function MessagesPage() {
   const effectiveActiveId = activeConvId || conversations[0]?.id || '';
   const activeConv = conversations.find((c) => c.id === effectiveActiveId) ?? conversations[0];
 
-  // ── Extract listing_id + name from cached messages of the active conversation ──
+  // ── Extract ALL unique listings from cached messages of the active conversation ──
   //    <ChatMessages> already loaded these — zero extra network cost.
+  //    Falls back to MOCK_LISTING_CARDS when there are no real messages
+  //    (same condition as the mock-fallback in ChatMessages).
   const queryClient = useQueryClient();
-  const { activeListingId, activeListingName } = useMemo(() => {
-    if (!effectiveActiveId) return { activeListingId: undefined, activeListingName: undefined };
+  const activeListings = useMemo<ChatListingData[]>(() => {
+    if (!effectiveActiveId) return [];
+
     const cached = queryClient.getQueryData<any>(conversationKeys.messages(effectiveActiveId));
     const msgs: MessageResponse[] =
       (cached as any)?.messages ??
       (cached as any)?.payload?.messages ??
       (cached as any)?.payload?.data?.messages ??
       [];
-    if (!Array.isArray(msgs)) return { activeListingId: undefined, activeListingName: undefined };
-    // Find the most recent LISTING_CARD message (API returns newest-first)
-    const cardMsg = msgs.find((m) => m.message_type === 'LISTING_CARD' && m.metadata);
-    if (!cardMsg?.metadata) return { activeListingId: undefined, activeListingName: undefined };
-    try {
-      const parsed = JSON.parse(cardMsg.metadata) as { id?: string; title?: string; address?: string };
-      return {
-        activeListingId: parsed.id ?? undefined,
-        activeListingName: parsed.title ?? parsed.address ?? undefined,
-      };
-    } catch {
-      return { activeListingId: undefined, activeListingName: undefined };
+
+    if (!Array.isArray(msgs)) return [];
+
+    // Collect all unique LISTING_CARD entries (de-duped by listing id)
+    const seen = new Set<string>();
+    const result: ChatListingData[] = [];
+    for (const m of msgs) {
+      if (m.message_type === 'LISTING_CARD' && m.metadata) {
+        try {
+          const parsed = JSON.parse(m.metadata) as ChatListingData;
+          if (parsed.id && !seen.has(parsed.id)) {
+            seen.add(parsed.id);
+            result.push(parsed);
+          }
+        } catch {
+          // malformed metadata — skip
+        }
+      }
     }
+    return result;
   }, [effectiveActiveId, queryClient]);
 
   // ── Send handler ──────────────────────────────────────────────────────────
@@ -168,6 +185,11 @@ export function MessagesPage() {
     },
     [locale]
   );
+
+  // ── "Create Contract" button clicked directly on a listing card ──────────
+  const handleCreateContractFromCard = useCallback((listing: ChatListingData) => {
+    setPendingContractListing(listing);
+  }, []);
 
   if (isLoading) {
     return (
@@ -198,19 +220,24 @@ export function MessagesPage() {
               onToggleDetail={() => setShowDetail((v) => !v)}
             />
 
-            <ChatMessages conversationId={effectiveActiveId} onListingClick={handleListingClick} />
+            <ChatMessages
+              conversationId={effectiveActiveId}
+              onListingClick={handleListingClick}
+              onCreateContract={handleCreateContractFromCard}
+            />
 
-              <MessageInput
-                value={messageInput}
-                onChange={setMessageInput}
-                onSubmit={handleSubmit}
-                isSending={isSending}
-                isConnected={isConnected}
-                otherUserId={activeConv?.otherUserId}
-                otherUserName={activeConv?.name}
-                listingId={activeListingId}
-                listingName={activeListingName}
-              />
+            <MessageInput
+              value={messageInput}
+              onChange={setMessageInput}
+              onSubmit={handleSubmit}
+              isSending={isSending}
+              isConnected={isConnected}
+              otherUserId={activeConv?.otherUserId}
+              otherUserName={activeConv?.name}
+              listings={activeListings}
+              pendingListing={pendingContractListing}
+              onPendingListingConsumed={() => setPendingContractListing(null)}
+            />
           </>
         )}
 

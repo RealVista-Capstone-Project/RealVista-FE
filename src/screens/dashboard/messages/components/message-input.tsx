@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useMemo } from 'react';
-import { Plus, FileText, Mic, Send, Loader2, AlertTriangle, Building2, User } from 'lucide-react';
+import { Plus, FileText, Mic, Send, Loader2, AlertTriangle, Building2, User, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
@@ -22,6 +22,7 @@ import {
   RentalContractStatus,
   type RentalContract,
 } from '@/entities/rental-contract';
+import type { ChatListingData } from '@/entities/contact';
 
 // ── Status label helper ────────────────────────────────────────────────────────
 
@@ -48,10 +49,19 @@ interface MessageInputProps {
   otherUserId?: string;
   /** Display name of the other participant */
   otherUserName?: string;
-  /** listing_id extracted from a LISTING_CARD message in this conversation */
-  listingId?: string;
-  /** Listing display name (property title / address) for the modal preview */
-  listingName?: string;
+  /**
+   * All unique listing cards found in this conversation.
+   * The modal will show a picker when there are multiple listings.
+   */
+  listings?: ChatListingData[];
+  /**
+   * When set, the modal will open immediately with this listing pre-selected.
+   * Used when the user clicks "Create Contract" directly on a listing card.
+   * Parent must reset this to null after opening the modal.
+   */
+  pendingListing?: ChatListingData | null;
+  /** Called when the modal auto-opens due to pendingListing so parent can reset state */
+  onPendingListingConsumed?: () => void;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -65,14 +75,18 @@ export function MessageInput({
   isConnected = false,
   otherUserId,
   otherUserName,
-  listingId,
-  listingName,
+  listings = [],
+  pendingListing,
+  onPendingListingConsumed,
 }: MessageInputProps) {
   const t = useTranslations('Messages');
   const { data: session } = useAuthSession();
   const router = useRouter();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<ChatListingData | null>(
+    listings[0] ?? null
+  );
   const popoverRef = useRef<HTMLDivElement>(null);
   const plusBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -81,6 +95,22 @@ export function MessageInput({
     session?.user?.role === 'owner' || session?.user?.backendRoles?.includes('AGENT');
 
   const landlordId = (session?.user as any)?.id ?? '';
+
+  // ── Auto-open modal when a pending listing is set from a card button ──────
+  useEffect(() => {
+    if (pendingListing) {
+      setSelectedListing(pendingListing);
+      setModalOpen(true);
+      onPendingListingConsumed?.();
+    }
+  }, [pendingListing, onPendingListingConsumed]);
+
+  // ── Sync selectedListing default when listings change ────────────────────
+  useEffect(() => {
+    if (!selectedListing && listings.length > 0) {
+      setSelectedListing(listings[0]);
+    }
+  }, [listings, selectedListing]);
 
   // ── Fetch landlord contracts — only when modal is open ────────────────────
   const { data: contractsData, isLoading: contractsLoading } = useQuery({
@@ -96,13 +126,13 @@ export function MessageInput({
     );
   }, [contractsData]);
 
-  // Find any existing contract for this listing + tenant pair
+  // Find any existing contract for the currently selected listing + tenant pair
   const existingContract: RentalContract | undefined = useMemo(() => {
-    if (!listingId || !otherUserId) return undefined;
+    if (!selectedListing?.id || !otherUserId) return undefined;
     return allContracts.find(
-      (c) => c.listing_id === listingId && c.tenant.id === otherUserId
+      (c) => c.listing_id === selectedListing.id && c.tenant.id === otherUserId
     );
-  }, [allContracts, listingId, otherUserId]);
+  }, [allContracts, selectedListing, otherUserId]);
 
   // Close popover when clicking outside
   useEffect(() => {
@@ -131,7 +161,7 @@ export function MessageInput({
     const params = new URLSearchParams();
     if (otherUserId) params.set('tenantUserId', otherUserId);
     if (otherUserName) params.set('tenantName', otherUserName);
-    if (listingId) params.set('listingId', listingId);
+    if (selectedListing?.id) params.set('listingId', selectedListing.id);
     const query = params.toString();
     router.push(`${ROUTES.dashboard.createRentalContract}${query ? `?${query}` : ''}`);
   }
@@ -171,6 +201,8 @@ export function MessageInput({
                 <button
                   onClick={() => {
                     setPopoverOpen(false);
+                    // Reset to first listing when opening from + menu
+                    setSelectedListing(listings[0] ?? null);
                     setModalOpen(true);
                   }}
                   className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
@@ -230,20 +262,65 @@ export function MessageInput({
             </DialogDescription>
           </DialogHeader>
 
-          {/* Pre-fill summary */}
           <div className='space-y-3 py-1'>
-            {/* Listing row */}
-            <div className='flex items-start gap-3 rounded-2xl border border-[#EAE1FF] bg-[#FBF9FF] px-4 py-3'>
-              <Building2 className='mt-0.5 size-4 shrink-0 text-main-primary/70' />
-              <div className='min-w-0 flex-1'>
+            {/* ── Listing picker — shown when conversation has multiple listings ── */}
+            {listings.length > 1 && (
+              <div className='space-y-2'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
-                  {t('contractModal.listingLabel')}
+                  {t('contractModal.listingPickerLabel')}
                 </p>
-                <p className='mt-0.5 truncate text-sm font-medium text-main-black'>
-                  {listingName ?? listingId ?? t('contractModal.noListing')}
-                </p>
+                <div className='max-h-52 space-y-1.5 overflow-y-auto pr-0.5'>
+                  {listings.map((listing) => {
+                    const isSelected = selectedListing?.id === listing.id;
+                    return (
+                      <button
+                        key={listing.id}
+                        type='button'
+                        onClick={() => setSelectedListing(listing)}
+                        className={cn(
+                          'flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-all',
+                          isSelected
+                            ? 'border-main-primary bg-[#FBF9FF] ring-1 ring-main-primary/30'
+                            : 'border-[#EAE1FF] bg-white hover:border-main-primary/40 hover:bg-[#FBF9FF]/60'
+                        )}
+                      >
+                        <Building2
+                          className={cn(
+                            'size-4 shrink-0',
+                            isSelected ? 'text-main-primary' : 'text-main-secondary/40'
+                          )}
+                        />
+                        <div className='min-w-0 flex-1'>
+                          <p className='truncate text-sm font-medium text-main-black'>
+                            {listing.title}
+                          </p>
+                          <p className='truncate text-xs text-grey-400'>{listing.address}</p>
+                        </div>
+                        {isSelected && (
+                          <Check className='size-4 shrink-0 text-main-primary' />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* ── Pre-fill summary ── */}
+            {/* Listing row (single listing or no picker) */}
+            {listings.length <= 1 && (
+              <div className='flex items-start gap-3 rounded-2xl border border-[#EAE1FF] bg-[#FBF9FF] px-4 py-3'>
+                <Building2 className='mt-0.5 size-4 shrink-0 text-main-primary/70' />
+                <div className='min-w-0 flex-1'>
+                  <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+                    {t('contractModal.listingLabel')}
+                  </p>
+                  <p className='mt-0.5 truncate text-sm font-medium text-main-black'>
+                    {selectedListing?.title ?? selectedListing?.id ?? t('contractModal.noListing')}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Tenant row */}
             <div className='flex items-start gap-3 rounded-2xl border border-[#EAE1FF] bg-[#FBF9FF] px-4 py-3'>
@@ -293,7 +370,7 @@ export function MessageInput({
             </Button>
             <Button
               onClick={navigateToWizard}
-              disabled={contractsLoading}
+              disabled={contractsLoading || !selectedListing}
               className='rounded-xl bg-main-primary text-white hover:bg-main-primary/90'
             >
               {t('contractModal.proceed')}

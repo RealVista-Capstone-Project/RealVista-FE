@@ -14,6 +14,7 @@ import { MessageBubble } from './message-bubble';
 interface ChatMessagesProps {
   conversationId: string;
   onListingClick?: (listing: ChatListingData) => void;
+  onCreateContract?: (listing: ChatListingData) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -102,7 +103,7 @@ function mapMessageResponse(raw: MessageResponse, currentUserId?: string): Mappe
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function ChatMessages({ conversationId, onListingClick }: ChatMessagesProps) {
+export function ChatMessages({ conversationId, onListingClick, onCreateContract }: ChatMessagesProps) {
   const t = useTranslations('Messages');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -189,7 +190,12 @@ export function ChatMessages({ conversationId, onListingClick }: ChatMessagesPro
             </div>
 
             {group.msgs.map((msg) => (
-              <MessageBubble key={msg.id} msg={msg} onListingClick={onListingClick} />
+              <MessageBubble
+                key={msg.id}
+                msg={msg}
+                onListingClick={onListingClick}
+                onCreateContract={onCreateContract}
+              />
             ))}
           </div>
         ))}

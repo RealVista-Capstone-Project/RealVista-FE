@@ -23,6 +23,7 @@
       "noTenant": "Không xác định được người thuê",
       "existingWarningTitle": "Đã tìm thấy hợp đồng",
       "existingWarningBody": "Đã có hợp đồng {status} cho bất động sản và người thuê này. Bạn vẫn có thể tạo hợp đồng mới.",
+      "listingPickerLabel": "Chọn bất động sản",
       "proceed": "Tiếp tục đến trình hướng dẫn",
       "cancel": "Hủy",
       "statusDraft": "nháp",

@@ -1,14 +1,16 @@
 import { cn } from '@/shared/lib/utils';
 import { ChatListingCard } from '@/features/chat-listing-card';
 import type { Message } from '../types';
+import type { ChatListingData } from '@/entities/contact';
 import { AvatarCircle } from './avatar-circle';
 
 interface MessageBubbleProps {
   msg: Message;
-  onListingClick?: (listing: import('@/entities/contact').ChatListingData) => void;
+  onListingClick?: (listing: ChatListingData) => void;
+  onCreateContract?: (listing: ChatListingData) => void;
 }
 
-export function MessageBubble({ msg, onListingClick }: MessageBubbleProps) {
+export function MessageBubble({ msg, onListingClick, onCreateContract }: MessageBubbleProps) {
   const isMe = msg.sender.id === 'me';
 
   return (
@@ -54,6 +56,7 @@ export function MessageBubble({ msg, onListingClick }: MessageBubbleProps) {
             <ChatListingCard
               listing={msg.listing}
               onClick={(l) => onListingClick?.(l)}
+              onCreateContract={isMe ? undefined : onCreateContract}
             />
           </div>
         )}

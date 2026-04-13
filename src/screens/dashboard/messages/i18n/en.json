@@ -23,6 +23,7 @@
       "noTenant": "No tenant identified",
       "existingWarningTitle": "Existing contract found",
       "existingWarningBody": "There is already a {status} contract for this property and tenant. You can still create a new one.",
+      "listingPickerLabel": "Select a property",
       "proceed": "Proceed to wizard",
       "cancel": "Cancel",
       "statusDraft": "draft",
