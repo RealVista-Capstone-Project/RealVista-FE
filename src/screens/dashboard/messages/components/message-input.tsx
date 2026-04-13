@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useState, useEffect, useMemo } from 'react';
-import { Plus, FileText, Mic, Send, Loader2, AlertTriangle, Building2, User, Check } from 'lucide-react';
+import { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import { Plus, FileText, Mic, Send, Loader2, AlertTriangle, Building2, User, Check, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
@@ -23,6 +23,9 @@ import {
   type RentalContract,
 } from '@/entities/rental-contract';
 import type { ChatListingData } from '@/entities/contact';
+import { listingApi } from '@/entities/listing';
+import { extractListingId } from '@/entities/listing';
+import type { ListingData } from '@/entities/listing/model/types';
 
 // ── Status label helper ────────────────────────────────────────────────────────
 
@@ -36,12 +39,58 @@ const STATUS_KEY_MAP: Record<RentalContractStatus, string> = {
   [RentalContractStatus.REJECTED]: 'contractModal.statusRejected',
 };
 
+// ── Listing URL detection ─────────────────────────────────────────────────────
+
+/**
+ * Returns the listing slug if the text is (or contains) a listing detail URL,
+ * otherwise returns null.
+ * Matches: /{locale}/listing/{slug}  (absolute or relative, with/without origin)
+ */
+function detectListingSlug(text: string): string | null {
+  const trimmed = text.trim();
+  // Match /en/listing/some-slug or /vi/listing/some-slug (and with https://... prefix)
+  const match = trimmed.match(/\/[a-z]{2}\/listing\/([^\s?#]+)/);
+  return match?.[1] ?? null;
+}
+
+/** Map a full ListingData API object to the compact ChatListingData shape */
+function toCardData(listing: ListingData): ChatListingData {
+  const primaryMedia =
+    listing.media?.find((m) => m.is_primary) ?? listing.media?.[0];
+
+  const beds = listing.attributes?.find((a) => a.attribute_code === 'bedrooms')?.value_number;
+  const bathrooms = listing.attributes?.find((a) => a.attribute_code === 'bathrooms')?.value_number;
+
+  const addressParts = [
+    listing.location?.ward_name,
+    listing.location?.district_name,
+    listing.location?.city_name,
+  ].filter(Boolean);
+
+  return {
+    id: listing.listing_id,
+    title: listing.name,
+    slug: listing.slug,
+    image: primaryMedia?.media_url ?? '',
+    price: listing.price,
+    address: addressParts.join(', '),
+    beds: beds ?? undefined,
+    bathrooms: bathrooms ?? undefined,
+    area: listing.property?.usable_size_m2 ?? undefined,
+    ownerId: listing.user_id ?? undefined,
+    agentId: listing.agent?.user_id ?? undefined,
+    listingStatus: listing.status ?? undefined,
+  };
+}
+
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 interface MessageInputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  /** Called instead of onSubmit when the pasted URL resolved to a listing card */
+  onSubmitListingCard: (listing: ChatListingData) => void;
   onTyping?: () => void;
   isSending?: boolean;
   isConnected?: boolean;
@@ -49,18 +98,13 @@ interface MessageInputProps {
   otherUserId?: string;
   /** Display name of the other participant */
   otherUserName?: string;
-  /**
-   * All unique listing cards found in this conversation.
-   * The modal will show a picker when there are multiple listings.
-   */
+  /** All unique listing cards found in this conversation */
   listings?: ChatListingData[];
   /**
-   * When set, the modal will open immediately with this listing pre-selected.
-   * Used when the user clicks "Create Contract" directly on a listing card.
-   * Parent must reset this to null after opening the modal.
+   * When set, the modal opens immediately with this listing pre-selected.
+   * Parent must reset to null after opening.
    */
   pendingListing?: ChatListingData | null;
-  /** Called when the modal auto-opens due to pendingListing so parent can reset state */
   onPendingListingConsumed?: () => void;
 }
 
@@ -70,6 +114,7 @@ export function MessageInput({
   value,
   onChange,
   onSubmit,
+  onSubmitListingCard,
   onTyping,
   isSending = false,
   isConnected = false,
@@ -82,6 +127,8 @@ export function MessageInput({
   const t = useTranslations('Messages');
   const { data: session } = useAuthSession();
   const router = useRouter();
+
+  // ── Popover / modal state ─────────────────────────────────────────────────
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState<ChatListingData | null>(
@@ -90,10 +137,103 @@ export function MessageInput({
   const popoverRef = useRef<HTMLDivElement>(null);
   const plusBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Only owner and AGENT may see contract creation
+  // ── Listing URL preview state ─────────────────────────────────────────────
+  /** The resolved slug from the pasted URL (drives the fetch) */
+  const [detectedSlug, setDetectedSlug] = useState<string | null>(null);
+  /** true once user explicitly dismissed the preview for this input value */
+  const [previewDismissed, setPreviewDismissed] = useState(false);
+  /** The fully resolved card data (set when fetch succeeds) */
+  const [resolvedCard, setResolvedCard] = useState<ChatListingData | null>(null);
+  /** Raw API data — kept to check ownership against conversation participants */
+  const [rawListingData, setRawListingData] = useState<ListingData | null>(null);
+  /** Fetch error flag */
+  const [cardFetchError, setCardFetchError] = useState(false);
+  /** true when user clicked "Send anyway" on the unrelated-listing warning */
+  const [sendAnywayConfirmed, setSendAnywayConfirmed] = useState(false);
+
+  // ── Debounce: detect listing URL while user types ─────────────────────────
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      const slug = detectListingSlug(value);
+      if (!slug) {
+        setDetectedSlug(null);
+        setResolvedCard(null);
+        setCardFetchError(false);
+        setPreviewDismissed(false);
+        return;
+      }
+      // Only re-trigger if the slug actually changed
+      setDetectedSlug((prev) => (prev === slug ? prev : slug));
+    }, 400);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [value]);
+
+  // Reset dismissed state when slug changes
+  useEffect(() => {
+    setPreviewDismissed(false);
+    setResolvedCard(null);
+    setRawListingData(null);
+    setCardFetchError(false);
+    setSendAnywayConfirmed(false);
+  }, [detectedSlug]);
+
+  // ── Fetch the listing when a slug is detected ─────────────────────────────
+  const listingIdFromSlug = detectedSlug ? extractListingId(detectedSlug) : null;
+  const [isFetchingCard, setIsFetchingCard] = useState(false);
+
+  useEffect(() => {
+    if (!listingIdFromSlug || previewDismissed) return;
+
+    let cancelled = false;
+    setIsFetchingCard(true);
+    setCardFetchError(false);
+
+    listingApi.getById(listingIdFromSlug).then((res) => {
+      if (cancelled) return;
+      const data: ListingData = (res as any)?.payload?.data ?? (res as any)?.data ?? res;
+      if (data?.listing_id) {
+        setRawListingData(data);
+        setResolvedCard(toCardData(data));
+      } else {
+        setCardFetchError(true);
+      }
+      setIsFetchingCard(false);
+    }).catch(() => {
+      if (!cancelled) {
+        setCardFetchError(true);
+        setIsFetchingCard(false);
+      }
+    });
+
+    return () => { cancelled = true; };
+  }, [listingIdFromSlug, previewDismissed]);
+
+  const showPreview = !!detectedSlug && !previewDismissed;
+
+  // ── Ownership check ───────────────────────────────────────────────────────
+  /**
+   * True when the fetched listing belongs to neither the current user nor the
+   * other conversation participant (agent.user_id or user_id).
+   */
+  const isUnrelatedListing = useMemo(() => {
+    if (!rawListingData || !resolvedCard) return false;
+    const ids = new Set([
+      rawListingData.agent?.user_id,
+      rawListingData.user_id,
+    ].filter(Boolean));
+    const currentUserId = (session?.user as any)?.id ?? '';
+    return !ids.has(currentUserId) && !ids.has(otherUserId ?? '');
+  }, [rawListingData, resolvedCard, session, otherUserId]);
+
+  // ── Auth / role ───────────────────────────────────────────────────────────
   const canCreateContract =
     session?.user?.role === 'owner' || session?.user?.backendRoles?.includes('AGENT');
-
   const landlordId = (session?.user as any)?.id ?? '';
 
   // ── Auto-open modal when a pending listing is set from a card button ──────
@@ -126,7 +266,6 @@ export function MessageInput({
     );
   }, [contractsData]);
 
-  // Find any existing contract for the currently selected listing + tenant pair
   const existingContract: RentalContract | undefined = useMemo(() => {
     if (!selectedListing?.id || !otherUserId) return undefined;
     return allContracts.find(
@@ -134,10 +273,9 @@ export function MessageInput({
     );
   }, [allContracts, selectedListing, otherUserId]);
 
-  // Close popover when clicking outside
+  // ── Close popover when clicking outside ──────────────────────────────────
   useEffect(() => {
     if (!popoverOpen) return;
-
     function handleOutsideClick(e: MouseEvent) {
       if (
         popoverRef.current &&
@@ -148,12 +286,23 @@ export function MessageInput({
         setPopoverOpen(false);
       }
     }
-
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [popoverOpen]);
 
   const canSend = value.trim().length > 0 && !isSending;
+
+  // ── Send handler — routes to card send or plain text ─────────────────────
+  const handleSend = useCallback(() => {
+    if (!canSend) return;
+    if (resolvedCard && showPreview) {
+      // Block send if listing is unrelated and user hasn't explicitly confirmed
+      if (isUnrelatedListing && !sendAnywayConfirmed) return;
+      onSubmitListingCard(resolvedCard);
+    } else {
+      onSubmit();
+    }
+  }, [canSend, resolvedCard, showPreview, isUnrelatedListing, sendAnywayConfirmed, onSubmitListingCard, onSubmit]);
 
   // ── Navigate to wizard ────────────────────────────────────────────────────
   function navigateToWizard() {
@@ -166,7 +315,6 @@ export function MessageInput({
     router.push(`${ROUTES.dashboard.createRentalContract}${query ? `?${query}` : ''}`);
   }
 
-  // ── Existing contract status label ────────────────────────────────────────
   const existingStatusLabel = existingContract
     ? t(STATUS_KEY_MAP[existingContract.status] as never)
     : '';
@@ -177,6 +325,80 @@ export function MessageInput({
       {!isConnected && (
         <p className='mb-2 text-center text-xs text-grey-400'>{t('connecting')}</p>
       )}
+
+      {/* ── Listing URL preview banner ────────────────────────────────────── */}
+      {showPreview && (
+        <div className='mb-3 overflow-hidden rounded-xl border border-[#EAE1FF] bg-[#FBF9FF]'>
+          {/* Header row */}
+          <div className='flex items-center justify-between px-3 py-2'>
+            <span className='text-xs font-semibold text-main-primary'>
+              {t('listingPreview.label')}
+            </span>
+            <button
+              type='button'
+              onClick={() => setPreviewDismissed(true)}
+              className='text-grey-400 transition-colors hover:text-main-black'
+              aria-label={t('listingPreview.dismiss')}
+            >
+              <X className='size-3.5' />
+            </button>
+          </div>
+
+          {/* Content */}
+          {isFetchingCard && (
+            <div className='flex items-center gap-2 border-t border-[#EAE1FF] px-3 py-2'>
+              <Loader2 className='size-3.5 animate-spin text-main-primary/60' />
+              <span className='text-xs text-grey-400'>{t('listingPreview.fetching')}</span>
+            </div>
+          )}
+
+          {!isFetchingCard && cardFetchError && (
+            <div className='flex items-center gap-2 border-t border-amber-200 bg-amber-50 px-3 py-2'>
+              <AlertTriangle className='size-3.5 shrink-0 text-amber-500' />
+              <span className='text-xs text-amber-700'>{t('listingPreview.error')}</span>
+            </div>
+          )}
+
+          {!isFetchingCard && resolvedCard && (
+            <div className='flex items-center gap-3 border-t border-[#EAE1FF] px-3 py-2'>
+              {resolvedCard.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={resolvedCard.image}
+                  alt={resolvedCard.title}
+                  className='h-10 w-14 shrink-0 rounded-md object-cover'
+                />
+              )}
+              <div className='min-w-0 flex-1'>
+                <p className='truncate text-xs font-semibold text-main-black'>{resolvedCard.title}</p>
+                <p className='truncate text-xs text-grey-400'>{resolvedCard.address}</p>
+              </div>
+              <span className='shrink-0 text-xs font-bold text-main-primary'>
+                {resolvedCard.price?.toLocaleString()}
+              </span>
+            </div>
+          )}
+
+          {/* Unrelated listing warning */}
+          {!isFetchingCard && resolvedCard && isUnrelatedListing && !sendAnywayConfirmed && (
+            <div className='flex items-center justify-between gap-2 border-t border-amber-200 bg-amber-50 px-3 py-2'>
+              <div className='flex min-w-0 items-center gap-2'>
+                <AlertTriangle className='size-3.5 shrink-0 text-amber-500' />
+                <span className='text-xs text-amber-700'>{t('listingPreview.unrelatedWarning')}</span>
+              </div>
+              <button
+                type='button'
+                onClick={() => setSendAnywayConfirmed(true)}
+                className='shrink-0 text-xs font-semibold text-amber-700 underline underline-offset-2 transition-colors hover:text-amber-900'
+              >
+                {t('listingPreview.sendAnyway')}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Input row ────────────────────────────────────────────────────── */}
       <div className='flex items-center gap-3 rounded-2xl border border-purple-92 bg-white px-4 py-3 shadow-sm focus-within:border-main-primary/50 focus-within:ring-2 focus-within:ring-main-primary/10'>
         {/* Plus button with popover — only rendered for owner / AGENT */}
         {canCreateContract && (
@@ -201,7 +423,6 @@ export function MessageInput({
                 <button
                   onClick={() => {
                     setPopoverOpen(false);
-                    // Reset to first listing when opening from + menu
                     setSelectedListing(listings[0] ?? null);
                     setModalOpen(true);
                   }}
@@ -226,7 +447,7 @@ export function MessageInput({
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && canSend) {
-              onSubmit();
+              handleSend();
             }
           }}
           className='flex-1 bg-transparent text-sm text-main-black placeholder:text-grey-400 focus:outline-none disabled:opacity-50'
@@ -235,7 +456,7 @@ export function MessageInput({
         {/* Send / Mic button */}
         {canSend ? (
           <button
-            onClick={onSubmit}
+            onClick={handleSend}
             disabled={isSending}
             className='shrink-0 text-main-primary transition-colors hover:text-main-primary/70 disabled:opacity-50'
             aria-label='Send message'
@@ -263,7 +484,7 @@ export function MessageInput({
           </DialogHeader>
 
           <div className='space-y-3 py-1'>
-            {/* ── Listing picker — shown when conversation has multiple listings ── */}
+            {/* Listing picker — shown when conversation has multiple listings */}
             {listings.length > 1 && (
               <div className='space-y-2'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
@@ -296,9 +517,7 @@ export function MessageInput({
                           </p>
                           <p className='truncate text-xs text-grey-400'>{listing.address}</p>
                         </div>
-                        {isSelected && (
-                          <Check className='size-4 shrink-0 text-main-primary' />
-                        )}
+                        {isSelected && <Check className='size-4 shrink-0 text-main-primary' />}
                       </button>
                     );
                   })}
@@ -306,8 +525,7 @@ export function MessageInput({
               </div>
             )}
 
-            {/* ── Pre-fill summary ── */}
-            {/* Listing row (single listing or no picker) */}
+            {/* Single listing row */}
             {listings.length <= 1 && (
               <div className='flex items-start gap-3 rounded-2xl border border-[#EAE1FF] bg-[#FBF9FF] px-4 py-3'>
                 <Building2 className='mt-0.5 size-4 shrink-0 text-main-primary/70' />

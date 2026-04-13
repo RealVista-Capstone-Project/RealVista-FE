@@ -8,6 +8,7 @@ import { conversationQueries, useSendMessage, conversationKeys } from '@/entitie
 import type { ConversationListItemResponse, MessageResponse } from '@/entities/conversation';
 import type { ChatListingData } from '@/entities/contact';
 import { useWebSocketState } from '@/shared/lib/websocket';
+import { useAuthSession } from '@/features/auth/model';
 import type { Conversation } from './types';
 import { ChatHeader } from './components/chat-header';
 import { ChatMessages } from './components/chat-messages';
@@ -100,6 +101,12 @@ export function MessagesPage() {
 
   const locale = useLocale();
 
+  // ── Current user ──────────────────────────────────────────────────────────
+  const { data: session } = useAuthSession();
+  const currentUserId: string | undefined = (session?.user as any)?.id;
+  const canCreateContract =
+    session?.user?.role === 'owner' || session?.user?.backendRoles?.includes('AGENT');
+
   // ── Read WS connection state from global Zustand store.
   //    The single WS connection is owned by ChatWindowRenderer in DashboardLayout.
   //    useChatWebSocket() there already invalidates query cache on new messages,
@@ -126,8 +133,6 @@ export function MessagesPage() {
 
   // ── Extract ALL unique listings from cached messages of the active conversation ──
   //    <ChatMessages> already loaded these — zero extra network cost.
-  //    Falls back to MOCK_LISTING_CARDS when there are no real messages
-  //    (same condition as the mock-fallback in ChatMessages).
   const queryClient = useQueryClient();
   const activeListings = useMemo<ChatListingData[]>(() => {
     if (!effectiveActiveId) return [];
@@ -160,6 +165,22 @@ export function MessagesPage() {
     return result;
   }, [effectiveActiveId, queryClient]);
 
+  /**
+   * Subset of activeListings eligible for the "Create Contract" modal picker:
+   * - owned by the current user (ownerId or agentId match)
+   * - status is PUBLISHED (available)
+   * Legacy cards without ownerId/agentId/listingStatus are included as a safe fallback.
+   */
+  const ownedListings = useMemo<ChatListingData[]>(() => {
+    if (!currentUserId) return [];
+    return activeListings.filter((l) => {
+      if (!l.ownerId && !l.agentId) return false; // no ownership data — exclude
+      if (l.ownerId !== currentUserId && l.agentId !== currentUserId) return false;
+      if (l.listingStatus && l.listingStatus !== 'PUBLISHED') return false;
+      return true;
+    });
+  }, [activeListings, currentUserId]);
+
   // ── Send handler ──────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {
     const content = messageInput.trim();
@@ -176,6 +197,26 @@ export function MessagesPage() {
       }
     );
   }, [messageInput, activeConv, sendMessage]);
+
+  // ── Send listing card handler ─────────────────────────────────────────────
+  const handleSubmitListingCard = useCallback(
+    (listing: ChatListingData) => {
+      if (!activeConv?.otherUserId) return;
+
+      sendMessage(
+        {
+          recipient_user_id: activeConv.otherUserId,
+          message_type: 'LISTING_CARD',
+          content: '',
+          metadata: JSON.stringify(listing),
+        },
+        {
+          onSuccess: () => setMessageInput(''),
+        }
+      );
+    },
+    [activeConv, sendMessage]
+  );
 
   // ── Listing card click — navigate to listing detail page ─────────────────
   const handleListingClick = useCallback(
@@ -223,18 +264,20 @@ export function MessagesPage() {
             <ChatMessages
               conversationId={effectiveActiveId}
               onListingClick={handleListingClick}
-              onCreateContract={handleCreateContractFromCard}
+              onCreateContract={canCreateContract ? handleCreateContractFromCard : undefined}
+              currentUserId={currentUserId}
             />
 
             <MessageInput
               value={messageInput}
               onChange={setMessageInput}
               onSubmit={handleSubmit}
+              onSubmitListingCard={handleSubmitListingCard}
               isSending={isSending}
               isConnected={isConnected}
               otherUserId={activeConv?.otherUserId}
               otherUserName={activeConv?.name}
-              listings={activeListings}
+              listings={ownedListings}
               pendingListing={pendingContractListing}
               onPendingListingConsumed={() => setPendingContractListing(null)}
             />

@@ -8,10 +8,30 @@ interface MessageBubbleProps {
   msg: Message;
   onListingClick?: (listing: ChatListingData) => void;
   onCreateContract?: (listing: ChatListingData) => void;
+  /** Current user's ID — used to gate "Create Contract" to listing owner/agent only */
+  currentUserId?: string;
 }
 
-export function MessageBubble({ msg, onListingClick, onCreateContract }: MessageBubbleProps) {
+export function MessageBubble({ msg, onListingClick, onCreateContract, currentUserId }: MessageBubbleProps) {
   const isMe = msg.sender.id === 'me';
+
+  /**
+   * Show "Create Contract" when:
+   * 1. The current user owns or manages this listing (ownerId / agentId match)
+   *    — if the card has no ownership data (legacy messages), fall back to showing the button
+   * 2. Listing status is PUBLISHED (available) — or unknown (legacy fallback)
+   *
+   * Note: role-gating (owner/agent only) is handled upstream in messages-page.tsx
+   * by passing onCreateContract={undefined} for buyers/tenants, so no isMe check needed.
+   */
+  const canCreateContractForListing = (listing: ChatListingData): boolean => {
+    if (!currentUserId) return false;
+    // Require ownership data — cards without it cannot be verified
+    if (!listing.ownerId && !listing.agentId) return false;
+    if (listing.ownerId !== currentUserId && listing.agentId !== currentUserId) return false;
+    if (listing.listingStatus && listing.listingStatus !== 'PUBLISHED') return false;
+    return true;
+  };
 
   return (
     <div className={cn('flex gap-3', isMe && 'flex-row-reverse')}>
@@ -56,7 +76,9 @@ export function MessageBubble({ msg, onListingClick, onCreateContract }: Message
             <ChatListingCard
               listing={msg.listing}
               onClick={(l) => onListingClick?.(l)}
-              onCreateContract={isMe ? undefined : onCreateContract}
+              onCreateContract={
+                canCreateContractForListing(msg.listing) ? onCreateContract : undefined
+              }
             />
           </div>
         )}

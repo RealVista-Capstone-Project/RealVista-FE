@@ -14,6 +14,14 @@
     "noMessages": "No messages yet. Say hello!",
     "connected": "Connected",
     "connecting": "Connecting...",
+    "listingPreview": {
+      "label": "Send as listing card",
+      "dismiss": "Dismiss",
+      "fetching": "Loading listing...",
+      "error": "Could not load listing — will send as plain text",
+      "unrelatedWarning": "This listing isn't associated with this conversation.",
+      "sendAnyway": "Send anyway"
+    },
     "contractModal": {
       "title": "Create Rental Contract",
       "description": "Review the details below before proceeding to the contract wizard.",

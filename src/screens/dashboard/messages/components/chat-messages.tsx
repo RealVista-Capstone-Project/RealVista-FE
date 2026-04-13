@@ -15,6 +15,8 @@ interface ChatMessagesProps {
   conversationId: string;
   onListingClick?: (listing: ChatListingData) => void;
   onCreateContract?: (listing: ChatListingData) => void;
+  /** Current user's ID — used to gate the "Create Contract" button by listing ownership */
+  currentUserId?: string;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -103,7 +105,7 @@ function mapMessageResponse(raw: MessageResponse, currentUserId?: string): Mappe
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function ChatMessages({ conversationId, onListingClick, onCreateContract }: ChatMessagesProps) {
+export function ChatMessages({ conversationId, onListingClick, onCreateContract, currentUserId: currentUserIdProp }: ChatMessagesProps) {
   const t = useTranslations('Messages');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -114,7 +116,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract 
 
   // Get the current user to determine "isMe"
   const { data: session } = useAuthSession();
-  const currentUserId: string | undefined = session?.user?.id;
+  const currentUserId: string | undefined = currentUserIdProp ?? session?.user?.id;
 
   // Map API responses to local Message type
   const messages = useMemo<MappedMessage[]>(() => {
@@ -195,6 +197,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract 
                 msg={msg}
                 onListingClick={onListingClick}
                 onCreateContract={onCreateContract}
+                currentUserId={currentUserId}
               />
             ))}
           </div>

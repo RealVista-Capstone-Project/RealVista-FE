@@ -14,6 +14,14 @@
     "noMessages": "Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!",
     "connected": "Đã kết nối",
     "connecting": "Đang kết nối...",
+    "listingPreview": {
+      "label": "Gửi dưới dạng thẻ bất động sản",
+      "dismiss": "Bỏ qua",
+      "fetching": "Đang tải thông tin...",
+      "error": "Không thể tải thông tin — sẽ gửi dưới dạng văn bản thường",
+      "unrelatedWarning": "Tin đăng này không liên quan đến cuộc trò chuyện.",
+      "sendAnyway": "Vẫn gửi"
+    },
     "contractModal": {
       "title": "Tạo hợp đồng thuê",
       "description": "Xem lại thông tin bên dưới trước khi tiếp tục đến trình hướng dẫn tạo hợp đồng.",
