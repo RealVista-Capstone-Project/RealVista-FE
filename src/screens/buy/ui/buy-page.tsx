@@ -409,7 +409,7 @@ function BuyPageContent() {
                       attributes={listing.attributes as ListingAttribute[]}
                       isFavorite={listing.is_favorite ?? false}
                       boostTags={listing.is_boosted ? listing.boost_packages : undefined}
-                      userType={listing.user_type as string}
+                      userType={listing.user_type as 'AGENT' | 'OWNER'}
                       onToggleFavorite={handleToggleFavorite}
                       onClick={() => {
                         behaviorTracker.trackClick(listing.listing_id, {
