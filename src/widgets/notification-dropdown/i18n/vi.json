@@ -1,10 +1,16 @@
 {
   "Notifications": {
-    "notifications": "Thông báo",
-    "new": "mới",
-    "markAsRead": "Đánh dấu tất cả đã đọc",
-    "noNotifications": "Chưa có thông báo nào",
-    "viewAll": "Xem tất cả thông báo",
-    "toastView": "Xem"
+    "notifications": "Th\u00f4ng b\u00e1o",
+    "new": "m\u1edbi",
+    "markAsRead": "\u0110\u00e1nh d\u1ea5u t\u1ea5t c\u1ea3 \u0111\u00e3 \u0111\u1ecdc",
+    "noNotifications": "Ch\u01b0a c\u00f3 th\u00f4ng b\u00e1o n\u00e0o",
+    "viewAll": "Xem t\u1ea5t c\u1ea3 th\u00f4ng b\u00e1o",
+    "toastView": "Xem",
+    "loading": "\u0110ang t\u1ea3i th\u00f4ng b\u00e1o\u2026",
+    "error": "Kh\u00f4ng th\u1ec3 t\u1ea3i th\u00f4ng b\u00e1o.",
+    "noNotificationsPage": "Ch\u01b0a c\u00f3 th\u00f4ng b\u00e1o n\u00e0o.",
+    "previous": "Tr\u01b0\u1edbc",
+    "next": "Ti\u1ebfp",
+    "pageOf": "Trang {page} / {totalPages}"
   }
 }

@@ -15,13 +15,14 @@ import {
   NotificationEventType,
   type Notification,
   type NotificationResponse,
+  type NotificationPageResponse,
 } from '@/entities/notification';
 import { useNotificationWebSocket } from '../hooks/use-notification-websocket';
 import { NotificationDropdown } from './notification-dropdown';
 
 export function NotificationDropdownContainer() {
   const { data: session } = useSession();
-  const token = session?.user?.accessToken as string | undefined;
+  const token = session?.user?.accessToken;
 
   const t = useTranslations('Notifications');
 
@@ -47,9 +48,7 @@ export function NotificationDropdownContainer() {
   // Backend returns paginated: { success, data: { content: NotificationResponse[], ... } }
   const rawItems: NotificationResponse[] = useMemo(() => {
     if (!data) return [];
-    // data.data is the paginated page object; content holds the actual array
-    const page = (data as { data?: { content?: NotificationResponse[] } })?.data;
-    const arr = page?.content;
+    const arr = (data as NotificationPageResponse).data?.content;
     return Array.isArray(arr) ? arr : [];
   }, [data]);
 

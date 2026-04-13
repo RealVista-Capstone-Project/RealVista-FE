@@ -1,6 +1,6 @@
 import http from '@/shared/lib/http';
 import { env } from '@/shared/lib/env';
-import type { NotificationResponse } from '../model/types';
+import type { NotificationResponse, NotificationPageResponse } from '../model/types';
 
 /**
  * Notification API
@@ -14,7 +14,7 @@ export const notificationApi = {
    * Use this from React Query's queryFn to avoid the AuthTokenProvider race condition
    * where session is available but the cache hasn't been set yet.
    */
-  listWithToken: (token: string, params?: { page?: number; size?: number }) => {
+  listWithToken: (token: string, params?: { page?: number; size?: number }): Promise<NotificationPageResponse> => {
     const url = new URL(`${env.NEXT_PUBLIC_API_ENDPOINT}/notifications`);
     if (params?.page !== undefined) url.searchParams.set('page', String(params.page));
     if (params?.size !== undefined) url.searchParams.set('size', String(params.size));
@@ -25,7 +25,7 @@ export const notificationApi = {
       },
     }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
+      return res.json() as Promise<NotificationPageResponse>;
     });
   },
 

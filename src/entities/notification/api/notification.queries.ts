@@ -30,6 +30,9 @@ export function useMarkAllNotificationsRead() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
     },
+    onError: (err: unknown) => {
+      console.error('[Notification] Failed to mark all as read:', err);
+    },
   });
 }
 
@@ -39,6 +42,9 @@ export function useMarkNotificationRead() {
     mutationFn: (id: string) => notificationApi.markRead(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
+    },
+    onError: (err: unknown) => {
+      console.error('[Notification] Failed to mark notification as read:', err);
     },
   });
 }

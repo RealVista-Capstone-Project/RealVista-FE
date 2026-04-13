@@ -1,6 +1,7 @@
 'use client';
 
 import { X, Home, UserCheck, Calendar, Bell } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Notification } from '@/entities/notification';
 
@@ -10,13 +11,15 @@ interface NotificationItemProps {
   onDelete?: (id: string) => void;
 }
 
-function getNotificationIcon(eventType: string) {
+const DEFAULT_ICON_ENTRY = { Icon: Bell as LucideIcon, bg: 'bg-grey-400' };
+
+function getNotificationIcon(eventType: Notification['eventType']): { Icon: LucideIcon; bg: string } {
   if (eventType.includes('TOUR')) return { Icon: Calendar, bg: 'bg-emerald-500' };
   if (eventType.includes('APPLICATION')) return { Icon: UserCheck, bg: 'bg-orange-400' };
   if (eventType.includes('DRAFT') || eventType.includes('LISTING')) {
     return { Icon: Home, bg: 'bg-main-primary' };
   }
-  return { Icon: Bell, bg: 'bg-grey-400' };
+  return DEFAULT_ICON_ENTRY;
 }
 
 function formatNotificationDate(date: Date): string {

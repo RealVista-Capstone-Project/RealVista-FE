@@ -3,16 +3,18 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { notificationApi, notificationKeys, mapToNotification } from '@/entities/notification';
-import type { NotificationResponse, Notification } from '@/entities/notification';
+import type { NotificationResponse, NotificationPageResponse, Notification } from '@/entities/notification';
 import { NotificationItem } from '@/widgets/notification-dropdown/ui/notification-item';
 
 const PAGE_SIZE = 20;
 
 export default function NotificationsPage() {
   const { data: session } = useSession();
-  const token = session?.user?.accessToken as string | undefined;
+  const token = session?.user?.accessToken;
   const queryClient = useQueryClient();
+  const t = useTranslations('Notifications');
 
   const [page, setPage] = useState(0);
 
@@ -25,14 +27,12 @@ export default function NotificationsPage() {
 
   const rawItems: NotificationResponse[] = useMemo(() => {
     if (!data) return [];
-    const pageObj = (data as { data?: { content?: NotificationResponse[] } })?.data;
-    const arr = pageObj?.content;
+    const arr = (data as NotificationPageResponse).data?.content;
     return Array.isArray(arr) ? arr : [];
   }, [data]);
 
   const totalPages: number = useMemo(() => {
-    const pageObj = (data as { data?: { totalPages?: number } })?.data;
-    return pageObj?.totalPages ?? 1;
+    return (data as NotificationPageResponse | undefined)?.data?.totalPages ?? 1;
   }, [data]);
 
   const notifications: Notification[] = useMemo(
@@ -79,7 +79,7 @@ export default function NotificationsPage() {
   if (isLoading) {
     return (
       <main className='min-h-screen bg-grey-100 flex items-center justify-center'>
-        <p className='text-sm text-grey-400'>Loading notifications…</p>
+        <p className='text-sm text-grey-400'>{t('loading')}</p>
       </main>
     );
   }
@@ -87,7 +87,7 @@ export default function NotificationsPage() {
   if (isError) {
     return (
       <main className='min-h-screen bg-grey-100 flex items-center justify-center'>
-        <p className='text-sm text-red-500'>Failed to load notifications.</p>
+        <p className='text-sm text-red-500'>{t('error')}</p>
       </main>
     );
   }
@@ -96,21 +96,21 @@ export default function NotificationsPage() {
     <main className='min-h-screen bg-grey-100 py-8 px-4 sm:px-6 lg:px-8'>
       <div className='mx-auto max-w-2xl'>
         <div className='flex items-center justify-between mb-6'>
-          <h1 className='text-xl font-semibold text-main-black'>Notifications</h1>
+          <h1 className='text-xl font-semibold text-main-black'>{t('notifications')}</h1>
           {notifications.some((n) => !n.isRead) && (
             <button
               type='button'
               onClick={handleMarkAllRead}
               className='text-sm text-main-primary hover:underline'
             >
-              Mark all as read
+              {t('markAsRead')}
             </button>
           )}
         </div>
 
         <div className='rounded-xl bg-white border border-border overflow-hidden divide-y divide-border'>
           {notifications.length === 0 ? (
-            <p className='px-6 py-10 text-center text-sm text-grey-400'>No notifications yet.</p>
+            <p className='px-6 py-10 text-center text-sm text-grey-400'>{t('noNotificationsPage')}</p>
           ) : (
             notifications.map((n) => (
               <NotificationItem
@@ -134,10 +134,10 @@ export default function NotificationsPage() {
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               className='px-4 py-2 text-sm rounded-lg border border-border bg-white text-main-black disabled:opacity-40 hover:bg-purple-98'
             >
-              Previous
+              {t('previous')}
             </button>
             <span className='text-sm text-grey-500'>
-              Page {page + 1} of {totalPages}
+              {t('pageOf', { page: page + 1, totalPages })}
             </span>
             <button
               type='button'
@@ -145,7 +145,7 @@ export default function NotificationsPage() {
               onClick={() => setPage((p) => p + 1)}
               className='px-4 py-2 text-sm rounded-lg border border-border bg-white text-main-black disabled:opacity-40 hover:bg-purple-98'
             >
-              Next
+              {t('next')}
             </button>
           </div>
         )}

@@ -51,6 +51,21 @@ export interface Notification {
   metadata: Record<string, string> | null;
 }
 
+/** Paginated page object returned inside the API wrapper */
+export interface NotificationPage {
+  content: NotificationResponse[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+}
+
+/** Top-level API response for GET /notifications */
+export interface NotificationPageResponse {
+  success: boolean;
+  data: NotificationPage;
+}
+
 /**
  * Known notification event type constants.
  * Matches EventType enum in realvista-be.
