@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
+  notificationApi,
   notificationQueries,
   notificationKeys,
   useMarkAllNotificationsRead,
@@ -114,6 +115,22 @@ export function NotificationDropdownContainer() {
     [queryClient]
   );
 
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (!token) return;
+      try {
+        await notificationApi.deleteNotification(id, token);
+        // Remove from local WS state
+        setWsNotifications((prev) => prev.filter((n) => n.id !== id));
+        // Invalidate the HTTP cache so the list refetches without the deleted item
+        queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
+      } catch {
+        // Silently ignore — item stays in list; backend will reflect true state on refetch
+      }
+    },
+    [token, queryClient]
+  );
+
   // ── WebSocket real-time channel ──────────────────────────────────────────
   useNotificationWebSocket({
     token,
@@ -149,6 +166,7 @@ export function NotificationDropdownContainer() {
       unreadCount={unreadCount}
       onMarkAllRead={handleMarkAllRead}
       onNotificationClick={handleNotificationClick}
+      onDelete={handleDelete}
       onViewAll={() => router.push(`/${locale}/notifications`)}
     />
   );
