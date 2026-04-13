@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw, Sparkles } from 'lucide-react';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
@@ -100,6 +100,24 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const t = useTranslations('RecommendedListings');
   const queryClient = useQueryClient();
 
+  // ── Auto-reload toggle (persisted to localStorage) ───────────
+  const [autoReload, setAutoReload] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const stored = localStorage.getItem('recommendation_auto_reload');
+    return stored === null ? true : stored === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('recommendation_auto_reload', String(autoReload));
+  }, [autoReload]);
+
+  // ── Favorite overrides (optimistic local state) ───────────────
+  const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
+
+  const handleToggleFavorite = (id: string) => {
+    setFavoriteOverrides((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const listingType = sourcePage === 'buy' ? 'BUY' : 'RENT';
 
   const {
@@ -112,11 +130,11 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
     enabled: authStatus === 'authenticated',
   });
 
-  // Poll status every 10s automatically — no toggle needed
+  // Poll status every 10s — only when autoReload is on
   const { data: statusResponse } = useQuery({
     ...recommendationQueries.status(),
-    enabled: authStatus === 'authenticated',
-    refetchInterval: 10000,
+    enabled: authStatus === 'authenticated' && autoReload,
+    refetchInterval: autoReload ? 10000 : false,
   });
 
   const refreshMutation = useMutation({
@@ -127,11 +145,10 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   });
 
   useEffect(() => {
-    if (statusResponse?.payload?.data?.threshold_met && !refreshMutation.isPending) {
-      // Auto-reload: threshold met → refresh AI cache silently
+    if (autoReload && statusResponse?.payload?.data?.threshold_met && !refreshMutation.isPending) {
       refreshMutation.mutate();
     }
-  }, [statusResponse?.payload?.data?.threshold_met, refreshMutation]);
+  }, [statusResponse?.payload?.data?.threshold_met, refreshMutation, autoReload]);
 
   const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
 
@@ -182,6 +199,24 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
               </h2>
             </div>
             <div className='flex items-center gap-2'>
+              {/* Auto-reload pill toggle */}
+              <button
+                type='button'
+                onClick={() => setAutoReload((v) => !v)}
+                className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                  autoReload
+                    ? 'bg-main-primary/10 border-main-primary text-main-primary'
+                    : 'bg-white border-purple-90 text-grey-400'
+                }`}
+                aria-label='Toggle auto-reload'
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                    autoReload ? 'bg-main-primary animate-pulse' : 'bg-grey-300'
+                  }`}
+                />
+                Auto
+              </button>
               <CarouselNavButtons />
               <Button
                 variant='outline'
@@ -262,6 +297,8 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
                       attributes={listing.attributes}
                       listingType={listing.listing_type}
                       boostTags={listing.is_boosted ? listing.boost_packages : undefined}
+                      isFavorite={favoriteOverrides[listing.listing_id] ?? listing.is_favorite ?? false}
+                      onToggleFavorite={handleToggleFavorite}
                       onClick={() => handleListingClick(listing)}
                       className='h-full transition-shadow duration-300 hover:shadow-lg'
                     />
