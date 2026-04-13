@@ -46,8 +46,8 @@ export default function NotificationsPage() {
       try {
         await notificationApi.markReadWithToken(id, token);
         queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
-      } catch {
-        // ignore
+      } catch (err) {
+        console.error('[NotificationsPage] Failed to mark notification as read:', err);
       }
     },
     [token, queryClient]
@@ -59,8 +59,8 @@ export default function NotificationsPage() {
       try {
         await notificationApi.deleteNotification(id, token);
         queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
-      } catch {
-        // ignore
+      } catch (err) {
+        console.error('[NotificationsPage] Failed to delete notification:', err);
       }
     },
     [token, queryClient]
@@ -71,8 +71,8 @@ export default function NotificationsPage() {
     try {
       await notificationApi.markAllReadWithToken(token);
       queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('[NotificationsPage] Failed to mark all notifications as read:', err);
     }
   }, [token, queryClient]);
 

@@ -124,8 +124,8 @@ export function NotificationDropdownContainer() {
         setWsNotifications((prev) => prev.filter((n) => n.id !== id));
         // Invalidate the HTTP cache so the list refetches without the deleted item
         queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
-      } catch {
-        // Silently ignore — item stays in list; backend will reflect true state on refetch
+      } catch (err) {
+        console.error('[NotificationDropdown] Failed to delete notification:', err);
       }
     },
     [token, queryClient]

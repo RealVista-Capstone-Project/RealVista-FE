@@ -86,8 +86,10 @@ export function useNotificationWebSocket({
           if (is3dEvent) {
             queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
           }
-        } catch {
-          // Silently ignore malformed frames
+        } catch (err) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('[NotificationWS] Failed to parse frame body:', err);
+          }
         }
       },
     });
