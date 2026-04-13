@@ -15,6 +15,9 @@ import { Toaster } from '@/shared/ui/sonner';
  * - QueryClientProvider: TanStack Query for server state management
  * - Toaster: Displays toast notifications across the application
  *
+ * Note: SubscriptionCTABanner is rendered in the locale layout, inside
+ * NextIntlClientProvider, because it requires both QueryClient and next-intl context.
+ *
  * @example
  * ```tsx
  * import { Providers } from '@/shared/providers';

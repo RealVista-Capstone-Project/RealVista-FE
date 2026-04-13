@@ -1,15 +1,31 @@
 import { getRequestConfig } from 'next-intl/server';
 import { hasLocale } from 'next-intl';
 import { routing } from './routing';
+import { mergeRecordDeep } from './merge-messages';
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
+  const enCommon = (await import(`@/shared/segments/common/en.json`)).default as Record<string, unknown>;
+  const localeCommon = (await import(`@/shared/segments/common/${locale}.json`)).default as Record<string, unknown>;
+
+  const commonMessages: Record<string, unknown> =
+    locale === 'en'
+      ? { ...localeCommon }
+      : {
+          ...enCommon,
+          ...localeCommon,
+          Settings: mergeRecordDeep(
+            (enCommon.Settings as Record<string, unknown>) ?? {},
+            (localeCommon.Settings as Record<string, unknown>) ?? {}
+          ),
+        };
+
   return {
     locale,
     messages: {
-      ...(await import(`@/shared/segments/common/${locale}.json`)).default,
+      ...commonMessages,
       ...(await import(`@/shared/ui/profile-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/shared/ui/login-required-modal/i18n/${locale}.json`)).default,
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
@@ -48,6 +64,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/widgets/ai-chat-assistant/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/spark-viewer/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/notification-dropdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/billing/i18n/${locale}.json`)).default,
       ...(await import(`@/features/chat/i18n/${locale}.json`)).default,
     },
   };

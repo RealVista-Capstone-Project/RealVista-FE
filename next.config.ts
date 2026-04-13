@@ -75,6 +75,16 @@ const nextConfig: NextConfig = {
         hostname: '**.firebasestorage.app',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.marble.worldlabs.ai',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
     dangerouslyAllowSVG: true,
   },

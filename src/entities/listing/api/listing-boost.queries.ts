@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingBoostApi } from './listing-boost.api';
-import { billingKeys } from '@/entities/billing/api/keys';
+import { billingKeys } from '@/entities/billing/api';
 import { listingKeys } from './keys';
 
 export const listingBoostKeys = {

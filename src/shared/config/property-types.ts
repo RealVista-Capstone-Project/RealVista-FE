@@ -284,6 +284,62 @@ export const PROPERTY_TYPES: PropertyCategory[] = [
   },
 ];
 
+/** All concrete property types with category context (for pickers, agent specialties, etc.). */
+export interface FlatPropertyType {
+  code: string;
+  label: string;
+  categoryCode: string;
+  categoryLabel: string;
+}
+
+export const FLAT_PROPERTY_TYPES: FlatPropertyType[] = PROPERTY_TYPES.flatMap((cat) =>
+  cat.types.map((type) => ({
+    code: type.code,
+    label: type.label,
+    categoryCode: cat.code,
+    categoryLabel: cat.label,
+  }))
+);
+
+const SPECIALTY_CODE_BY_UPPER = new Map(
+  FLAT_PROPERTY_TYPES.map((t) => [t.code.toUpperCase(), t.code])
+);
+const SPECIALTY_CODE_BY_LABEL_LOWER = new Map(
+  FLAT_PROPERTY_TYPES.map((t) => [t.label.trim().toLowerCase(), t.code])
+);
+
+const SPECIALTY_LABEL_BY_CODE = new Map(
+  FLAT_PROPERTY_TYPES.map((t) => [t.code, t.label])
+);
+
+/**
+ * Parse stored agent specialties (comma-separated PROPERTY_TYPES labels, or legacy codes) into canonical codes for UI state.
+ */
+export function parseSpecialtiesToCodes(raw: string | null | undefined): string[] {
+  if (!raw?.trim()) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const part of raw.split(',')) {
+    const token = part.trim();
+    if (!token) continue;
+    let code = SPECIALTY_CODE_BY_UPPER.get(token.toUpperCase());
+    if (!code) code = SPECIALTY_CODE_BY_LABEL_LOWER.get(token.toLowerCase());
+    if (code && !seen.has(code)) {
+      seen.add(code);
+      out.push(code);
+    }
+  }
+  return out;
+}
+
+/** Persist selected type codes as comma-separated PROPERTY_TYPES labels (matches DB / backend text field). */
+export function serializeSpecialtyLabels(codes: string[]): string {
+  if (codes.length === 0) return '';
+  return codes
+    .map((code) => SPECIALTY_LABEL_BY_CODE.get(code) ?? code)
+    .join(', ');
+}
+
 export const ATTRIBUTE_LABELS: Record<PropertyAttribute, string> = {
   BEDROOMS: 'Phòng ngủ',
   BATHROOMS: 'Phòng tắm',

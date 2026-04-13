@@ -204,49 +204,55 @@ export function AgentApplyProposalModal({
               </div>
             </div>
           ) : (
-            <div className='p-8 space-y-6 flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300'>
-              <div className='size-16 rounded-3xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-1 border border-indigo-100 shadow-sm'>
-                <SendHorizonal size={30} strokeWidth={2.5} className='-rotate-12 translate-x-0.5' />
-              </div>
-              <div>
-                <h3 className='text-xl font-bold text-slate-900'>{t('confirmTitle')}</h3>
-                <p className='text-sm text-slate-500 mt-2 max-w-[360px] mx-auto leading-relaxed'>
-                  {t('confirmDesc')}
-                </p>
+            <div className='flex flex-1 min-h-0 flex-col p-8 animate-in fade-in slide-in-from-bottom-2 duration-300'>
+              <div className='flex shrink-0 flex-col items-center text-center space-y-6'>
+                <div className='size-16 rounded-3xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-1 border border-indigo-100 shadow-sm'>
+                  <SendHorizonal size={30} strokeWidth={2.5} className='-rotate-12 translate-x-0.5' />
+                </div>
+                <div>
+                  <h3 className='text-xl font-bold text-slate-900'>{t('confirmTitle')}</h3>
+                  <p className='text-sm text-slate-500 mt-2 max-w-[360px] mx-auto leading-relaxed'>
+                    {t('confirmDesc')}
+                  </p>
+                </div>
               </div>
 
-              {selectedProposal && (
-                <div className='w-full max-w-[420px] bg-indigo-50/40 rounded-2xl p-5 border border-indigo-100 flex flex-col items-start text-left shadow-sm'>
-                  <span className='text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2'>{t('selectedLabel')}</span>
-                  <p className='text-base font-bold text-slate-900 line-clamp-2 leading-snug'>{selectedProposal.title}</p>
-                  <div className='flex gap-6 mt-4 w-full'>
-                    <div className='flex-1'>
-                      <p className='text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5'>{t('experienceLabel')}</p>
-                      <p className='text-sm font-bold text-slate-700'>{selectedProposal.experience_years} {t('years')}</p>
+              <div className='mt-6 flex min-h-0 flex-1 flex-col items-center overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]'>
+                <div className='flex w-full max-w-[420px] flex-col items-center space-y-6 pb-1'>
+                  {selectedProposal && (
+                    <div className='w-full bg-indigo-50/40 rounded-2xl p-5 border border-indigo-100 flex flex-col items-start text-left shadow-sm'>
+                      <span className='text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2'>{t('selectedLabel')}</span>
+                      <p className='text-base font-bold text-slate-900 line-clamp-2 leading-snug'>{selectedProposal.title}</p>
+                      <div className='flex gap-6 mt-4 w-full'>
+                        <div className='flex-1'>
+                          <p className='text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5'>{t('experienceLabel')}</p>
+                          <p className='text-sm font-bold text-slate-700'>{selectedProposal.experience_years} {t('years')}</p>
+                        </div>
+                        <div className='flex-1'>
+                          <p className='text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5'>{t('commissionLabel')}</p>
+                          <p className='text-sm font-bold text-slate-700'>{selectedProposal.commission_rate}%</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className='flex-1'>
-                      <p className='text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5'>{t('commissionLabel')}</p>
-                      <p className='text-sm font-bold text-slate-700'>{selectedProposal.commission_rate}%</p>
-                    </div>
+                  )}
+
+                  {/* Personal Message Input */}
+                  <div className='w-full flex flex-col items-start text-left'>
+                    <label className='text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5'>
+                      <SendHorizonal size={12} className='text-indigo-500' />
+                      {t('personalMessageLabel')}
+                    </label>
+                    <textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder={t('messagePlaceholder')}
+                      className='w-full min-h-[120px] p-4 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 transition-all resize-none placeholder:text-slate-400'
+                    />
+                    <p className='text-[10px] text-slate-400 mt-2 italic'>
+                      * {t('messageHint')}
+                    </p>
                   </div>
                 </div>
-              )}
-
-              {/* Personal Message Input */}
-              <div className='w-full max-w-[420px] flex flex-col items-start text-left'>
-                <label className='text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5'>
-                  <SendHorizonal size={12} className='text-indigo-500' />
-                  {t('personalMessageLabel')}
-                </label>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={t('messagePlaceholder')}
-                  className='w-full min-h-[120px] p-4 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 transition-all resize-none placeholder:text-slate-400'
-                />
-                <p className='text-[10px] text-slate-400 mt-2 italic'>
-                  * {t('messageHint')}
-                </p>
               </div>
             </div>
           )}
