@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { 
-  Minus, Plus, Home, Building2, Factory, Map as MapIcon, X,
+  Home, Building2, Factory, Map as MapIcon,
   BedSingle, Bath, Maximize, Layers, Trees, Car, Waves, 
   Wind, Wifi, ChefHat, Dumbbell, Compass, Sun, ShieldCheck, 
   Warehouse, Layout, Star
@@ -88,62 +88,34 @@ const ATTRIBUTE_ICONS: Record<string, any> = {
   LAND_DEPTH: Maximize,
 };
 
-function Stepper({
-  label,
+function NumberSelector({
   value,
   onChange,
-  icon: Icon,
-  min = 0,
-  max = 10,
+  maxLevels = 5,
 }: {
-  label: string;
   value: number;
   onChange: (value: number) => void;
-  icon?: any;
-  min?: number;
-  max?: number;
+  maxLevels?: number;
 }) {
+  const options = [0, ...Array.from({ length: maxLevels }, (_, i) => i + 1)];
+  
   return (
-    <div className='flex items-center justify-between py-5 border-b border-purple-92/50 last:border-0 hover:bg-main-primary/[0.02] -mx-4 px-4 transition-colors rounded-xl'>
-      <div className='flex items-center gap-3'>
-        {Icon && (
-          <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-purple-96 text-main-primary'>
-            <Icon className='h-5 w-5' strokeWidth={2} />
-          </div>
-        )}
-        <span className='text-base font-semibold text-main-black'>{label}</span>
-      </div>
-      <div className='flex items-center gap-5'>
+    <div className='flex flex-wrap gap-2'>
+      {options.map((opt) => (
         <button
+          key={opt}
           type='button'
-          onClick={() => onChange(Math.max(min, value - 1))}
-          disabled={value <= min}
+          onClick={() => onChange(opt)}
           className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-full border border-purple-92 bg-white shadow-sm transition-all active:scale-90',
-            value <= min
-              ? 'opacity-30 cursor-not-allowed border-grey-200'
-              : 'text-main-black hover:border-main-primary hover:text-main-primary cursor-pointer'
+            'flex h-10 min-w-[3rem] items-center justify-center rounded-full border-1.5 px-3 text-sm font-bold transition-all duration-200',
+            value === opt
+              ? 'bg-main-primary text-white border-main-primary'
+              : 'bg-white text-main-black border-purple-92 hover:border-main-primary/50'
           )}
         >
-          <Minus className='h-4 w-4' strokeWidth={2.5} />
+          {opt === 0 ? 'Bất kỳ' : `${opt}+`}
         </button>
-        <span className='min-w-[40px] text-center text-xl font-black text-main-black tabular-nums'>
-            {value === 0 ? 'Tất cả' : value}
-        </span>
-        <button
-          type='button'
-          onClick={() => onChange(Math.min(max, value + 1))}
-          disabled={value >= max}
-          className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-full border border-purple-92 bg-white shadow-sm transition-all active:scale-90',
-            value >= max
-              ? 'opacity-30 cursor-not-allowed border-grey-200'
-              : 'text-main-black hover:border-main-primary hover:text-main-primary cursor-pointer'
-          )}
-        >
-          <Plus className='h-4 w-4' strokeWidth={2.5} />
-        </button>
-      </div>
+      ))}
     </div>
   );
 }
@@ -161,24 +133,20 @@ export function PropertyFiltersModal({
   const [localFilters, setLocalFilters] = useState<PropertyFilters>(filters);
   const [selectedType, setSelectedType] = useState<string | undefined>(propertyType);
 
-  // Find the selected property type configuration
   const typeConfig = useMemo(() => 
     PROPERTY_TYPES.flatMap((cat) => cat.types).find((t) => t.code === selectedType),
     [selectedType]
   );
   
-  // Dynamic features to show
   const relevantAttributes = useMemo(() => {
     const base: PropertyAttribute[] = ['BEDROOMS', 'BATHROOMS'];
     const typeSpecific = typeConfig?.attributes || [];
-    // Only show interesting number/boolean attributes to keep it clean
     return Array.from(new Set([...base, ...typeSpecific])).filter(attr => {
        const type = ATTRIBUTE_TYPES[attr];
        return type === 'number' || type === 'boolean';
-    }).slice(0, 10); // Don't overflow
+    }).slice(0, 10);
   }, [typeConfig]);
 
-  // Reset local state when modal opens
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
       setLocalFilters(filters);
@@ -202,29 +170,27 @@ export function PropertyFiltersModal({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side='right'
-        className='flex flex-col p-0 gap-0 w-full sm:max-w-[580px] rounded-l-3xl shadow-2xl border-none outline-none'
+        className='flex flex-col p-0 gap-0 w-full sm:max-w-[440px] border-none outline-none'
       >
-        {/* Header */}
-        <SheetHeader className='px-10 pt-10 pb-6 border-b border-purple-92'>
+        <SheetHeader className='px-6 pt-6 pb-4 border-b border-purple-92'>
             <div className='flex items-center justify-between'>
-                <SheetTitle className='text-3xl font-black text-main-black tracking-tight'>
+                <SheetTitle className='text-xl font-bold text-main-black'>
                     {translations.title}
                 </SheetTitle>
             </div>
         </SheetHeader>
 
-        {/* Content area */}
-        <div className='flex-1 overflow-y-auto px-10 py-8 space-y-12 custom-scrollbar'>
+        <div className='flex-1 overflow-y-auto px-6 py-6 space-y-8 custom-scrollbar'>
           
-          {/* Category Picker */}
-          <section className='space-y-6'>
+          {/* Category Section */}
+          <section className='space-y-4'>
              <div className='flex items-center justify-between'>
-                <h3 className='text-xl font-bold text-main-black'>Loại bất động sản</h3>
+                <h3 className='text-base font-bold text-main-black'>Loại bất động sản</h3>
                 {selectedType && (
-                    <Button variant='link' className='h-auto p-0 text-main-primary font-bold' onClick={() => setSelectedType(undefined)}>Xóa</Button>
+                    <button className='text-xs font-bold text-main-primary' onClick={() => setSelectedType(undefined)}>Xóa</button>
                 )}
              </div>
-             <div className='grid grid-cols-2 sm:grid-cols-4 gap-4'>
+             <div className='grid grid-cols-4 gap-2'>
                 {PROPERTY_TYPES.map((cat) => {
                     const Icon = CATEGORY_ICONS[cat.code] || Home;
                     const displayLabel = cat.code === 'RESIDENTIAL' ? 'Nhà ở' : cat.label.replace('Bất động sản ', '');
@@ -236,51 +202,43 @@ export function PropertyFiltersModal({
                            key={cat.code}
                            onClick={() => setSelectedType(cat.types[0].code)}
                            className={cn(
-                             'group flex flex-col items-center justify-center gap-3 p-5 rounded-[24px] border-2 transition-all duration-300',
+                             'flex flex-col items-center justify-center gap-2 p-2 rounded-xl border-1.5 transition-all duration-200',
                              isSelected
-                                ? 'bg-main-primary/5 border-main-primary text-main-primary shadow-lg shadow-main-primary/5 scale-105' 
-                                : 'bg-white border-purple-92 text-grey-500 hover:border-main-primary/40 hover:bg-main-primary/[0.02]'
+                                ? 'bg-main-primary/5 border-main-primary text-main-primary shadow-sm' 
+                                : 'bg-white border-purple-92 text-grey-500 hover:border-main-primary/40'
                            )}
                         >
-                           <div className={cn(
-                               'p-3 rounded-2xl transition-colors',
-                               isSelected ? 'bg-main-primary text-white' : 'bg-purple-96 text-grey-500 group-hover:bg-main-primary/10 group-hover:text-main-primary'
-                           )}>
-                                <Icon className='h-7 w-7' strokeWidth={2.5} />
-                           </div>
-                           <span className='text-xs font-black tracking-wide uppercase'>{capitalizedLabel}</span>
+                           <Icon className='h-5 w-5' strokeWidth={2.5} />
+                           <span className='text-[10px] font-bold text-center uppercase tracking-tight'>{capitalizedLabel}</span>
                         </button>
                     )
                 })}
              </div>
 
-             {/* Sub-type selector if a category is selected */}
              {selectedType && (
-                <div className='animate-in fade-in slide-in-from-top-2 duration-300'>
-                    <div className='flex flex-wrap gap-2.5 p-1'>
-                        {PROPERTY_TYPES.find(c => c.types.some(t => t.code === selectedType))?.types.map(t => (
-                            <button
-                            key={t.code}
-                            onClick={() => setSelectedType(t.code)}
-                            className={cn(
-                                'px-5 py-2.5 rounded-full text-sm font-bold border-2 transition-all duration-300',
-                                selectedType === t.code
-                                    ? 'bg-main-primary text-white border-main-primary shadow-md'
-                                    : 'bg-white text-grey-600 border-purple-92 hover:border-main-primary/30'
-                            )}
-                            >
-                            {t.label}
-                            </button>
-                        ))}
-                    </div>
+                <div className='flex flex-wrap gap-1.5'>
+                    {PROPERTY_TYPES.find(c => c.types.some(t => t.code === selectedType))?.types.map(t => (
+                        <button
+                          key={t.code}
+                          onClick={() => setSelectedType(t.code)}
+                          className={cn(
+                            'px-3 py-1.5 rounded-lg text-xs font-bold border-1.5 transition-all',
+                            selectedType === t.code
+                                ? 'bg-main-primary text-white border-main-primary'
+                                : 'bg-white text-grey-600 border-purple-92 hover:border-main-primary/30'
+                          )}
+                        >
+                          {t.label}
+                        </button>
+                    ))}
                 </div>
              )}
           </section>
 
           {/* Features Section */}
           <section className='space-y-6'>
-            <h3 className='text-xl font-bold text-main-black'>{translations.features}</h3>
-            <div className='space-y-1'>
+            <h3 className='text-base font-bold text-main-black'>{translations.features}</h3>
+            <div className='space-y-6'>
               {relevantAttributes.map((attrKey) => {
                 const label = ATTRIBUTE_LABELS[attrKey] || attrKey;
                 const type = ATTRIBUTE_TYPES[attrKey];
@@ -288,34 +246,33 @@ export function PropertyFiltersModal({
                 const Icon = ATTRIBUTE_ICONS[attrKey];
 
                 if (type === 'number') {
+                  const labelWithUnit = attrKey === 'AREA' ? `${label} (m²)` : label;
                   return (
-                    <Stepper
-                        key={attrKey}
-                        label={attrKey === 'AREA' ? `${label} (m²)` : label}
-                        icon={Icon}
-                        value={(currentValue as number) || 0}
-                        onChange={(value) =>
-                        setLocalFilters({
-                            ...localFilters,
-                            attributes: { ...localFilters.attributes, [attrKey]: value },
-                        })
-                        }
-                        min={0}
-                        max={attrKey === 'AREA' ? 1000 : 20}
-                    />
+                    <div key={attrKey} className='space-y-3'>
+                        <div className='flex items-center gap-2 text-main-black'>
+                            {Icon && <Icon className='h-4 w-4 text-grey-400' />}
+                            <span className='text-sm font-bold'>{labelWithUnit}</span>
+                        </div>
+                        <NumberSelector
+                            value={(currentValue as number) || 0}
+                            onChange={(value) =>
+                            setLocalFilters({
+                                ...localFilters,
+                                attributes: { ...localFilters.attributes, [attrKey]: value },
+                            })
+                            }
+                            maxLevels={attrKey === 'BEDROOMS' || attrKey === 'BATHROOMS' ? 5 : 4}
+                        />
+                    </div>
                   );
                 }
 
                 if (type === 'boolean') {
                   return (
-                    <div key={attrKey} className='flex items-center justify-between py-5 border-b border-purple-92/50 last:border-0 hover:bg-main-primary/[0.02] -mx-4 px-4 transition-colors rounded-xl'>
-                      <div className='flex items-center gap-3'>
-                         {Icon && (
-                            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-purple-96 text-main-primary'>
-                                <Icon className='h-5 w-5' strokeWidth={2} />
-                            </div>
-                         )}
-                        <span className='text-base font-semibold text-main-black'>{label}</span>
+                    <div key={attrKey} className='flex items-center justify-between'>
+                      <div className='flex items-center gap-2 text-main-black'>
+                         {Icon && <Icon className='h-4 w-4 text-grey-400' />}
+                         <span className='text-sm font-bold'>{label}</span>
                       </div>
                       <Switch
                         checked={!!currentValue}
@@ -335,21 +292,21 @@ export function PropertyFiltersModal({
             </div>
           </section>
 
-          {/* Rental Period - Only for RENT */}
+          {/* Rental Period */}
           {listingType === 'RENT' && (
-            <section className='space-y-6 pb-4'>
-              <h3 className='text-xl font-bold text-main-black'>
+            <section className='space-y-4'>
+              <h3 className='text-base font-bold text-main-black'>
                 {translations.rentalPeriod.label}
               </h3>
-              <div className='grid grid-cols-2 gap-4'>
+              <div className='grid grid-cols-2 gap-2'>
                 {['any', '1-12', '13-24', '24+'].map((period) => (
                     <button
                         key={period}
                         onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: period as RentalPeriod })}
                         className={cn(
-                            'flex items-center justify-center px-4 py-4 rounded-2xl border-2 transition-all duration-200',
+                            'flex items-center justify-center px-4 py-2.5 rounded-xl border-1.5 text-sm transition-all',
                             localFilters.rentalPeriod === period
-                                ? 'bg-main-primary/5 border-main-primary text-main-primary shadow-sm font-black'
+                                ? 'bg-main-primary text-white border-main-primary font-bold'
                                 : 'bg-white border-purple-92 text-grey-500 hover:border-main-primary/40'
                         )}
                     >
@@ -361,22 +318,21 @@ export function PropertyFiltersModal({
           )}
         </div>
 
-        {/* Footer */}
-        <SheetFooter className='p-10 border-t border-purple-92 bg-white flex items-center gap-6'>
+        <SheetFooter className='p-6 border-t border-purple-92 bg-white flex flex-col gap-3'>
+          <Button
+            type='button'
+            onClick={handleApply}
+            className='w-full h-11 rounded-xl bg-main-primary py-3 text-sm font-bold text-white hover:bg-main-primary/90'
+          >
+            {translations.apply}
+          </Button>
           <Button
             type='button'
             onClick={handleReset}
             variant="outline"
-            className='flex-1 h-14 rounded-2xl text-base font-bold border-purple-92 hover:bg-grey-50 text-grey-600 transition-all active:scale-95'
+            className='w-full h-11 rounded-xl text-sm font-bold border-purple-92 text-grey-600'
           >
             {translations.reset}
-          </Button>
-          <Button
-            type='button'
-            onClick={handleApply}
-            className='flex-[2] h-14 rounded-2xl bg-main-primary py-3 text-base font-bold text-white hover:bg-main-primary/90 shadow-xl shadow-main-primary/30 transition-all active:scale-95'
-          >
-            {translations.apply}
           </Button>
         </SheetFooter>
       </SheetContent>
