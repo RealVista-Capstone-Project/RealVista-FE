@@ -61,5 +61,10 @@
     "backToDashboard": "Quay lại Bảng điều khiển",
     "message": "Bạn không có quyền xem trang này.",
     "goBack": "Quay lại Trang chủ"
+  },
+  "notFound": {
+    "title": "Trang không tồn tại",
+    "description": "Trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
+    "backToHome": "Về trang chủ"
   }
 }

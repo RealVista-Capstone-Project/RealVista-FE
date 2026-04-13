@@ -120,9 +120,9 @@ export function AgentApplyProposalModal({
         </DialogHeader>
 
         {/* Content Body */}
-        <div className='max-h-[60vh] overflow-hidden flex flex-col'>
+        <div className='max-h-[60vh] overflow-y-auto flex flex-col'>
           {step === 1 ? (
-            <div className='flex flex-col flex-1 min-h-[400px]'>
+            <div className='flex flex-col flex-1 min-h-0'>
               {/* Search Bar */}
               <div className='px-6 py-4 border-b border-slate-50 bg-white'>
                 <div className='relative group'>

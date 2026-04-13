@@ -1,0 +1,32 @@
+{
+  "Sell": {
+    "sectionTitle": "My Properties",
+    "sectionSubtitle": "Easily manage and list your properties for sale. Create a new listing or continue managing your existing properties on the RealVista platform.",
+    "card1Title": "Create New Property",
+    "card1Desc": "Add a new property and start listing it on the system.",
+    "card1Button": "Add New",
+    "card2Title": "Already Have a Property",
+    "card2Desc": "Go to the dashboard to manage your existing properties.",
+    "card2Button": "Go to Dashboard",
+    "card2Disabled": "Only available for property Owners",
+    "confirmTitle": "Go to Dashboard",
+    "confirmDesc": "You will be redirected to the Dashboard to create a new property listing. Continue?",
+    "confirmYes": "Yes, continue",
+    "confirmNo": "No, go back",
+    "addingRole": "Processing...",
+    "roleAddSuccess": "Owner role granted successfully!",
+    "typesTitle": "For all types of properties",
+    "typesSubtitle": "Whatever type of property you own, RealVista helps you list it quickly and effectively.",
+    "types": [
+      { "label": "Townhouse", "desc": "Row houses, terraced houses, shopfront homes" },
+      { "label": "Apartment", "desc": "Studio, 1–4 bedroom units, penthouses" },
+      { "label": "Land plot", "desc": "Residential land, project plots, agricultural land" },
+      { "label": "Villa", "desc": "Detached, semi-detached, and premium linked villas" },
+      { "label": "Boarding house & rooms", "desc": "Rental rooms, full-house rentals" },
+      { "label": "Building & office", "desc": "Shophouse, office space, commercial premises" }
+    ],
+    "ctaTitle": "What are you waiting for?",
+    "ctaSubtitle": "Thousands of buyers are searching for properties every day. List yours today to reach potential customers as fast as possible.",
+    "ctaButton": "Create a property now"
+  }
+}

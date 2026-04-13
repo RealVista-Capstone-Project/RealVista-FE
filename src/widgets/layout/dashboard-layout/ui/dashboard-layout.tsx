@@ -188,6 +188,13 @@ export function DashboardLayout({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
     <div className={cn('flex h-screen w-full overflow-hidden bg-slate-50', className)}>
       <ChatWindowRenderer />
@@ -347,7 +354,7 @@ export function DashboardLayout({
         </header>
 
         {/* Page Content - fills remaining height */}
-        <main className='flex-1 overflow-hidden bg-slate-50/50 p-0'>{children}</main>
+        <main className='flex-1 overflow-y-auto bg-slate-50/50 p-0'>{children}</main>
       </div>
     </div>
   );

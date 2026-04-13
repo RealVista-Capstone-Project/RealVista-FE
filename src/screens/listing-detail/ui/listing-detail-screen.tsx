@@ -8,6 +8,7 @@ import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
 import { PropertyAbout } from '@/features/property-about';
 import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
+import { PriceHistoryChart } from '@/features/listing';
 import type { Property } from '@/entities/property';
 import type { Listing } from '@/entities/listing';
 import { mapListingToProperty } from '@/entities/listing/lib/listing-to-property.mapper';
@@ -95,10 +96,6 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
     toggleFavorite();
   };
 
-  const handleBrowseNearby = () => {
-    // Browse nearby listings
-  };
-
   const handleViewAllPhotos = () => {
     // Open photo gallery
   };
@@ -164,7 +161,6 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
           property={property}
           onFavorite={handleFavorite}
           isFavorite={isFavorite}
-          onBrowseNearby={handleBrowseNearby}
         />
 
         {/* Gallery Section */}
@@ -204,6 +200,9 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             {property.costBreakdown && (
               <MonthlyCostBreakdown costBreakdown={property.costBreakdown} />
             )}
+
+            {/* Price History Chart Section */}
+            <PriceHistoryChart listingId={listing.listing_id} />
           </div>
 
           {/* Desktop: Price & Tour Sidebar */}
