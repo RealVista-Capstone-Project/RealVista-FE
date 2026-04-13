@@ -113,26 +113,29 @@ export function MessagesPage() {
   const effectiveActiveId = activeConvId || conversations[0]?.id || '';
   const activeConv = conversations.find((c) => c.id === effectiveActiveId) ?? conversations[0];
 
-  // ── Extract listing_id from cached messages of the active conversation ────
+  // ── Extract listing_id + name from cached messages of the active conversation ──
   //    <ChatMessages> already loaded these — zero extra network cost.
   const queryClient = useQueryClient();
-  const activeListingId = useMemo(() => {
-    if (!effectiveActiveId) return undefined;
+  const { activeListingId, activeListingName } = useMemo(() => {
+    if (!effectiveActiveId) return { activeListingId: undefined, activeListingName: undefined };
     const cached = queryClient.getQueryData<any>(conversationKeys.messages(effectiveActiveId));
     const msgs: MessageResponse[] =
       (cached as any)?.messages ??
       (cached as any)?.payload?.messages ??
       (cached as any)?.payload?.data?.messages ??
       [];
-    if (!Array.isArray(msgs)) return undefined;
+    if (!Array.isArray(msgs)) return { activeListingId: undefined, activeListingName: undefined };
     // Find the most recent LISTING_CARD message (API returns newest-first)
     const cardMsg = msgs.find((m) => m.message_type === 'LISTING_CARD' && m.metadata);
-    if (!cardMsg?.metadata) return undefined;
+    if (!cardMsg?.metadata) return { activeListingId: undefined, activeListingName: undefined };
     try {
-      const parsed = JSON.parse(cardMsg.metadata);
-      return (parsed as { id?: string }).id ?? undefined;
+      const parsed = JSON.parse(cardMsg.metadata) as { id?: string; title?: string; address?: string };
+      return {
+        activeListingId: parsed.id ?? undefined,
+        activeListingName: parsed.title ?? parsed.address ?? undefined,
+      };
     } catch {
-      return undefined;
+      return { activeListingId: undefined, activeListingName: undefined };
     }
   }, [effectiveActiveId, queryClient]);
 
@@ -184,16 +187,17 @@ export function MessagesPage() {
 
             <ChatMessages conversationId={effectiveActiveId} />
 
-            <MessageInput
-              value={messageInput}
-              onChange={setMessageInput}
-              onSubmit={handleSubmit}
-              isSending={isSending}
-              isConnected={isConnected}
-              otherUserId={activeConv?.otherUserId}
-              otherUserName={activeConv?.name}
-              listingId={activeListingId}
-            />
+              <MessageInput
+                value={messageInput}
+                onChange={setMessageInput}
+                onSubmit={handleSubmit}
+                isSending={isSending}
+                isConnected={isConnected}
+                otherUserId={activeConv?.otherUserId}
+                otherUserName={activeConv?.name}
+                listingId={activeListingId}
+                listingName={activeListingName}
+              />
           </>
         )}
 

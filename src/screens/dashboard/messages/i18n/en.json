@@ -13,6 +13,25 @@
     "endContract": "End contract",
     "noMessages": "No messages yet. Say hello!",
     "connected": "Connected",
-    "connecting": "Connecting..."
+    "connecting": "Connecting...",
+    "contractModal": {
+      "title": "Create Rental Contract",
+      "description": "Review the details below before proceeding to the contract wizard.",
+      "listingLabel": "Property",
+      "tenantLabel": "Tenant",
+      "noListing": "No listing selected from this conversation",
+      "noTenant": "No tenant identified",
+      "existingWarningTitle": "Existing contract found",
+      "existingWarningBody": "There is already a {status} contract for this property and tenant. You can still create a new one.",
+      "proceed": "Proceed to wizard",
+      "cancel": "Cancel",
+      "statusDraft": "draft",
+      "statusPendingRenter": "pending tenant signature",
+      "statusPendingLandlord": "pending landlord signature",
+      "statusActive": "active",
+      "statusExpired": "expired",
+      "statusTerminated": "terminated",
+      "statusRejected": "rejected"
+    }
   }
 }

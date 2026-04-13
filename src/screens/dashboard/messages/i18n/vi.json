@@ -13,6 +13,25 @@
     "endContract": "Kết thúc hợp đồng",
     "noMessages": "Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!",
     "connected": "Đã kết nối",
-    "connecting": "Đang kết nối..."
+    "connecting": "Đang kết nối...",
+    "contractModal": {
+      "title": "Tạo hợp đồng thuê",
+      "description": "Xem lại thông tin bên dưới trước khi tiếp tục đến trình hướng dẫn tạo hợp đồng.",
+      "listingLabel": "Bất động sản",
+      "tenantLabel": "Người thuê",
+      "noListing": "Không có tin đăng nào được chọn từ cuộc trò chuyện này",
+      "noTenant": "Không xác định được người thuê",
+      "existingWarningTitle": "Đã tìm thấy hợp đồng",
+      "existingWarningBody": "Đã có hợp đồng {status} cho bất động sản và người thuê này. Bạn vẫn có thể tạo hợp đồng mới.",
+      "proceed": "Tiếp tục đến trình hướng dẫn",
+      "cancel": "Hủy",
+      "statusDraft": "nháp",
+      "statusPendingRenter": "chờ người thuê ký",
+      "statusPendingLandlord": "chờ chủ nhà ký",
+      "statusActive": "đang hoạt động",
+      "statusExpired": "đã hết hạn",
+      "statusTerminated": "đã chấm dứt",
+      "statusRejected": "đã từ chối"
+    }
   }
 }
