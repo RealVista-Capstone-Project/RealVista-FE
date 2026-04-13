@@ -105,7 +105,9 @@ export function MessagesPage() {
   const { data: session } = useAuthSession();
   const currentUserId: string | undefined = (session?.user as any)?.id;
   const canCreateContract =
-    session?.user?.role === 'owner' || session?.user?.backendRoles?.includes('AGENT');
+    session?.user?.role === 'owner' ||
+    session?.user?.role === 'AGENT' ||
+    session?.user?.backendRoles?.includes('AGENT');
 
   // ── Read WS connection state from global Zustand store.
   //    The single WS connection is owned by ChatWindowRenderer in DashboardLayout.
@@ -172,14 +174,15 @@ export function MessagesPage() {
    * Legacy cards without ownerId/agentId/listingStatus are included as a safe fallback.
    */
   const ownedListings = useMemo<ChatListingData[]>(() => {
-    if (!currentUserId) return [];
+    if (!currentUserId || !canCreateContract) return [];
     return activeListings.filter((l) => {
-      if (!l.ownerId && !l.agentId) return false; // no ownership data — exclude
+      // Legacy cards without ownership data: include as fallback (role gate is upstream)
+      if (!l.ownerId && !l.agentId) return true;
       if (l.ownerId !== currentUserId && l.agentId !== currentUserId) return false;
       if (l.listingStatus && l.listingStatus !== 'PUBLISHED') return false;
       return true;
     });
-  }, [activeListings, currentUserId]);
+  }, [activeListings, currentUserId, canCreateContract]);
 
   // ── Send handler ──────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {

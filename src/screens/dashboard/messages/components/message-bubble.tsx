@@ -26,8 +26,10 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
    */
   const canCreateContractForListing = (listing: ChatListingData): boolean => {
     if (!currentUserId) return false;
-    // Require ownership data — cards without it cannot be verified
-    if (!listing.ownerId && !listing.agentId) return false;
+    // Legacy cards without ownership metadata: fall back to showing the button.
+    // The role gate (owner/AGENT only) is enforced upstream in messages-page.tsx
+    // by passing onCreateContract={undefined} for buyers/tenants.
+    if (!listing.ownerId && !listing.agentId) return true;
     if (listing.ownerId !== currentUserId && listing.agentId !== currentUserId) return false;
     if (listing.listingStatus && listing.listingStatus !== 'PUBLISHED') return false;
     return true;
