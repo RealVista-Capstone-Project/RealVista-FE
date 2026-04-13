@@ -45,6 +45,7 @@ export class WebSocketService {
   };
   private callbacks: WebSocketCallbacks;
   private subscriptions: Map<string, StoredSubscription> = new Map();
+  private pendingSubscriptions: SubscriptionOptions[] = [];
   private connectionTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
@@ -146,6 +147,7 @@ export class WebSocketService {
     }
 
     // Unsubscribe from all subscriptions
+    this.pendingSubscriptions = [];
     this.unsubscribeAll();
 
     // Deactivate STOMP client
@@ -166,8 +168,12 @@ export class WebSocketService {
    */
   subscribe(options: SubscriptionOptions): () => void {
     if (!this.client || !this.client.connected) {
-      // Return a no-op unsubscribe function
-      return () => {};
+      // Queue the subscription — will be flushed in onConnected()
+      this.pendingSubscriptions.push(options);
+      return () => {
+        const idx = this.pendingSubscriptions.indexOf(options);
+        if (idx !== -1) this.pendingSubscriptions.splice(idx, 1);
+      };
     }
 
     const { destination, onMessage, id } = options;
@@ -292,6 +298,10 @@ export class WebSocketService {
     }
 
     this.state = 'connected';
+
+    // Flush pending subscriptions (registered before connection was established)
+    const pending = this.pendingSubscriptions.splice(0);
+    pending.forEach((opts) => this.subscribe(opts));
 
     // Resubscribe to all destinations
     this.resubscribeAll();
