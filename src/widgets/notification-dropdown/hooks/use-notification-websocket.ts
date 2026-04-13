@@ -46,7 +46,7 @@ export function useNotificationWebSocket({
   const onNotificationActionRef = useRef(onNotificationAction);
   onNotificationActionRef.current = onNotificationAction;
 
-  const { subscribe } = useWebSocket({
+  const { subscribe, isConnected } = useWebSocket({
     endpoint: WS_ENDPOINT,
     token,
   });
@@ -95,5 +95,5 @@ export function useNotificationWebSocket({
     return () => {
       unsubscribe();
     };
-  }, [subscribe, queryClient, toastViewLabel]);
+  }, [subscribe, isConnected, queryClient, toastViewLabel]);
 }
