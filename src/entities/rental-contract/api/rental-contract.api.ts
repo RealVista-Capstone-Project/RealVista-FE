@@ -25,6 +25,8 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     listing_id: lease.property_id,
     owner_id: lease.landlord_id,
     agent_id: lease.agent_id,
+    landlordName: lease.landlord_full_name,
+    landlordEmail: lease.landlord_email,
     tenant: {
       id: lease.renter_id,
       fullName: lease.renter_full_name,

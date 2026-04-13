@@ -32,6 +32,8 @@ export interface RentalContract {
   listing_id: string;
   owner_id: string;
   agent_id?: string | null;
+  landlordName?: string;
+  landlordEmail?: string;
   tenant: RentalContractTenant;
   property: RentalContractProperty;
   monthlyRent: number;

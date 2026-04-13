@@ -94,7 +94,7 @@
       "propertyBanner": "Property",
       "partiesTitle": "Parties",
       "ownerLabel": "Owner",
-      "ownerYou": "You (contract creator)",
+      "ownerFallback": "Loading owner...",
       "tenantLabel": "Tenant",
       "financialsTitle": "Financial terms",
       "monthlyRentLabel": "Monthly rent",

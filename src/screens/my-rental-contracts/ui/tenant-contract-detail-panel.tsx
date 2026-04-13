@@ -177,6 +177,29 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
 
               <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
                 <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
+                  {t('detailPanel.partiesTitle')}
+                </p>
+                <div className='mt-3 space-y-3'>
+                  <div>
+                    <p className='text-xs text-main-secondary/50'>{t('detailPanel.ownerLabel')}</p>
+                    <p className='mt-0.5 text-sm font-medium text-main-black'>
+                      {contract.landlordName || contract.owner_id}
+                    </p>
+                    {contract.landlordEmail && (
+                      <p className='text-xs text-main-secondary/50'>{contract.landlordEmail}</p>
+                    )}
+                  </div>
+                  <div className='h-px bg-[#F0E8FF]' />
+                  <div>
+                    <p className='text-xs text-main-secondary/50'>{t('detailPanel.tenantLabel')}</p>
+                    <p className='mt-0.5 text-sm font-medium text-main-black'>{contract.tenant.fullName}</p>
+                    <p className='text-xs text-main-secondary/50'>{contract.tenant.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
+                <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
                   {t('detailPanel.signingProgressTitle')}
                 </p>
                 <div className='mt-3 space-y-3'>

@@ -39,6 +39,8 @@ interface FormState {
   bathrooms: string;
   thumbnailUrl: string;
   landlordId: string;   // owner_id from the selected property
+  landlordName: string; // full name of the property owner (fetched from user profile)
+  landlordEmail: string; // email of the property owner
   tenantName: string;
   tenantEmail: string;
   tenantPhone: string;
@@ -59,6 +61,8 @@ const INITIAL_FORM_STATE: FormState = {
   bathrooms: '0',
   thumbnailUrl: '',
   landlordId: '',
+  landlordName: '',
+  landlordEmail: '',
   tenantName: '',
   tenantEmail: '',
   tenantPhone: '',
@@ -81,8 +85,10 @@ function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormSta
     bedrooms: String(getAttributeNumber(property, 'bedrooms')),
     bathrooms: String(getAttributeNumber(property, 'bathrooms')),
     thumbnailUrl: getPropertyThumbnail(property) ?? '',
-    // Use owner_id returned by the API when available
+    // Use owner_id / owner_name returned by the API — never the agent's identity
     landlordId: property.owner_id ?? '',
+    landlordName: property.owner_name ?? '',
+    landlordEmail: '',
   };
 }
 
@@ -94,8 +100,11 @@ function applyListingToForm(listing: import('@/entities/listing').Listing): Part
     listing.location.district_name,
     listing.location.city_name,
   ].filter(Boolean);
-  const bedroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bedrooms');
-  const bathroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bathrooms');
+  const bedroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bedrooms' || a.attribute_code === 'BEDROOMS');
+  const bathroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bathrooms' || a.attribute_code === 'BATHROOMS');
+
+  // property_owner is the real owner; user_id is the agent when is_created_by_owner === false
+  const owner = listing.property_owner;
 
   return {
     propertyId: listing.property_id ?? listing.listing_id,
@@ -105,7 +114,9 @@ function applyListingToForm(listing: import('@/entities/listing').Listing): Part
     bedrooms: String(bedroomsAttr?.value_number ?? 0),
     bathrooms: String(bathroomsAttr?.value_number ?? 0),
     thumbnailUrl: primaryMedia?.thumbnail_url ?? primaryMedia?.media_url ?? '',
-    landlordId: listing.user_id ?? '',
+    landlordId: owner?.user_id ?? listing.user_id ?? '',
+    landlordName: owner?.full_name ?? '',
+    landlordEmail: owner?.email ?? '',
   };
 }
 

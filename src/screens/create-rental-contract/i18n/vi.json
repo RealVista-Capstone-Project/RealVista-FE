@@ -94,7 +94,7 @@
       "propertyBanner": "Bất động sản",
       "partiesTitle": "Các bên",
       "ownerLabel": "Chủ nhà",
-      "ownerYou": "Bạn (người tạo hợp đồng)",
+      "ownerFallback": "Đang tải thông tin chủ nhà...",
       "tenantLabel": "Người thuê",
       "financialsTitle": "Điều khoản tài chính",
       "monthlyRentLabel": "Tiền thuê hàng tháng",

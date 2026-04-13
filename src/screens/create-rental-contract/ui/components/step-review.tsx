@@ -10,6 +10,8 @@ interface ReviewFormSnapshot {
   propertyType: string;
   bedrooms: string;
   bathrooms: string;
+  landlordName: string;
+  landlordEmail: string;
   tenantName: string;
   tenantEmail: string;
   monthlyRent: string;
@@ -92,7 +94,12 @@ export function StepReview({ form, t }: StepReviewProps) {
           <div className='mt-3 space-y-3'>
             <div>
               <p className='text-xs text-main-secondary/50'>{t('review.ownerLabel')}</p>
-              <p className='mt-0.5 text-sm font-medium text-main-black'>{t('review.ownerYou')}</p>
+              <p className='mt-0.5 text-sm font-medium text-main-black'>
+                {form.landlordName || t('review.ownerFallback')}
+              </p>
+              {form.landlordEmail && (
+                <p className='text-xs text-main-secondary/50'>{form.landlordEmail}</p>
+              )}
             </div>
             <div className='h-px bg-[#F0E8FF]' />
             <div>
