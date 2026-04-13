@@ -31,6 +31,7 @@ import {
   ATTRIBUTE_TYPES,
   PropertyAttribute,
 } from '@/shared/config/property-types';
+import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
 
 interface AdvancedSearchFiltersProps {
   open: boolean;
@@ -236,40 +237,28 @@ export function AdvancedSearchFilters({
           <div className='space-y-3'>
             <Label>Khoảng giá</Label>
             <div className='grid grid-cols-2 gap-3'>
-              <div className='space-y-1.5'>
-                <Input
-                  type='number'
-                  placeholder='Giá tối thiểu'
-                  value={filters.price?.[0] || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFilters({
-                      ...filters,
-                      price: [
-                        e.target.value ? Number(e.target.value) : null,
-                        filters.price?.[1] || null,
-                      ],
-                    })
-                  }
-                  maxLength={15}
-                />
-              </div>
-              <div className='space-y-1.5'>
-                <Input
-                  type='number'
-                  placeholder='Giá tối đa'
-                  value={filters.price?.[1] || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFilters({
-                      ...filters,
-                      price: [
-                        filters.price?.[0] || null,
-                        e.target.value ? Number(e.target.value) : null,
-                      ],
-                    })
-                  }
-                  maxLength={15}
-                />
-              </div>
+              <VndAmountInput
+                placeholder='Giá tối thiểu'
+                value={filters.price?.[0] || 0}
+                onChange={(val) =>
+                  setFilters({
+                    ...filters,
+                    price: [val || null, filters.price?.[1] || null],
+                  })
+                }
+                hidePreview
+              />
+              <VndAmountInput
+                placeholder='Giá tối đa'
+                value={filters.price?.[1] || 0}
+                onChange={(val) =>
+                  setFilters({
+                    ...filters,
+                    price: [filters.price?.[0] || null, val || null],
+                  })
+                }
+                hidePreview
+              />
             </div>
           </div>
 

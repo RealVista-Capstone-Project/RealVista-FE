@@ -17,6 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
+import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
 import { useHideFooter } from '@/widgets/layout';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
@@ -290,14 +291,13 @@ function RentPageContent() {
                   <DollarSign className='w-4 h-4 text-main-primary' />
                   Giá tối thiểu
                 </label>
-                <input
-                  type='number'
-                  placeholder='5,000,000 VNĐ'
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
+                <VndAmountInput
+                  placeholder='Thấp nhất'
+                  value={Number(minPrice) || 0}
+                  onChange={(val) => setMinPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-                  maxLength={15}
+                  hidePreview
+                  inputClassName='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
                 />
               </div>
 
@@ -307,14 +307,13 @@ function RentPageContent() {
                   <DollarSign className='w-4 h-4 text-main-primary' />
                   Giá tối đa
                 </label>
-                <input
-                  type='number'
-                  placeholder='25,000,000 VNĐ'
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
+                <VndAmountInput
+                  placeholder='Cao nhất'
+                  value={Number(maxPrice) || 0}
+                  onChange={(val) => setMaxPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-                  maxLength={15}
+                  hidePreview
+                  inputClassName='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
                 />
               </div>
 

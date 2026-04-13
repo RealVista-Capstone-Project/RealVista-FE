@@ -12,6 +12,8 @@ import {
   ATTRIBUTE_TYPES
 } from '@/shared/config/property-types';
 import { Switch } from '@/shared/ui/switch/switch';
+import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
+import { Label } from '@/shared/ui/label/label';
 
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
 
@@ -194,6 +196,26 @@ export function PropertyFiltersModal({
               title={translations.priceRange}
               step={100000000}
             />
+            <div className='mt-4 grid grid-cols-2 gap-4'>
+              <div className='space-y-1'>
+                <Label className='text-xs text-grey-500'>Tối thiểu</Label>
+                <VndAmountInput
+                  value={priceMin}
+                  onChange={(val) => setPriceMin(val)}
+                  placeholder='0'
+                  hidePreview
+                />
+              </div>
+              <div className='space-y-1'>
+                <Label className='text-xs text-grey-500'>Tối đa</Label>
+                <VndAmountInput
+                  value={priceMax}
+                  onChange={(val) => setPriceMax(val)}
+                  placeholder='20 tỷ'
+                  hidePreview
+                />
+              </div>
+            </div>
           </div>
 
           {/* Features - Dynamic based on propertyType */}
