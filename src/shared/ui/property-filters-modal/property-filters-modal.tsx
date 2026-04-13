@@ -88,34 +88,43 @@ const ATTRIBUTE_ICONS: Record<string, any> = {
   LAND_DEPTH: Maximize,
 };
 
-function NumberSelector({
+/**
+ * Premium Segmented Control for numbers 0-5+
+ */
+function SegmentedSelector({
   value,
   onChange,
-  maxLevels = 5,
+  maxItems = 6, // 0 to 5+
 }: {
   value: number;
   onChange: (value: number) => void;
-  maxLevels?: number;
+  maxItems?: number;
 }) {
-  const options = [0, ...Array.from({ length: maxLevels }, (_, i) => i + 1)];
+  const options = Array.from({ length: maxItems }, (_, i) => i);
   
   return (
-    <div className='flex flex-wrap gap-2'>
-      {options.map((opt) => (
-        <button
-          key={opt}
-          type='button'
-          onClick={() => onChange(opt)}
-          className={cn(
-            'flex h-10 min-w-[3rem] items-center justify-center rounded-full border-1.5 px-3 text-sm font-bold transition-all duration-200',
-            value === opt
-              ? 'bg-main-primary text-white border-main-primary'
-              : 'bg-white text-main-black border-purple-92 hover:border-main-primary/50'
-          )}
-        >
-          {opt === 0 ? 'Bất kỳ' : `${opt}+`}
-        </button>
-      ))}
+    <div className='relative flex h-10 w-full items-center gap-1 rounded-xl bg-purple-96 p-1'>
+      {options.map((opt) => {
+        const isActive = value === opt;
+        return (
+          <button
+            key={opt}
+            type='button'
+            onClick={() => onChange(opt)}
+            className={cn(
+              'relative z-10 flex flex-1 items-center justify-center text-sm font-bold transition-all duration-300',
+              isActive ? 'text-white' : 'text-grey-500 hover:text-main-black'
+            )}
+          >
+            {opt === 0 ? 'Bất kỳ' : `${opt}${opt === maxItems - 1 ? '+' : ''}`}
+            {isActive && (
+              <div 
+                className='absolute inset-0 -z-10 rounded-lg bg-main-primary shadow-md animate-in fade-in zoom-in-95 duration-200' 
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -138,13 +147,16 @@ export function PropertyFiltersModal({
     [selectedType]
   );
   
-  const relevantAttributes = useMemo(() => {
-    const base: PropertyAttribute[] = ['BEDROOMS', 'BATHROOMS'];
+  // Categorize attributes for better UX
+  const { essentials, comfort } = useMemo(() => {
+    const base: PropertyAttribute[] = ['BEDROOMS', 'BATHROOMS', 'FLOORS'];
     const typeSpecific = typeConfig?.attributes || [];
-    return Array.from(new Set([...base, ...typeSpecific])).filter(attr => {
-       const type = ATTRIBUTE_TYPES[attr];
-       return type === 'number' || type === 'boolean';
-    }).slice(0, 10);
+    const all = Array.from(new Set([...base, ...typeSpecific]));
+    
+    return {
+      essentials: all.filter(attr => ATTRIBUTE_TYPES[attr] === 'number').slice(0, 4),
+      comfort: all.filter(attr => ATTRIBUTE_TYPES[attr] === 'boolean').slice(0, 8)
+    };
   }, [typeConfig]);
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -170,167 +182,172 @@ export function PropertyFiltersModal({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side='right'
-        className='flex flex-col p-0 gap-0 w-full sm:max-w-[440px] border-none outline-none'
+        className='flex flex-col p-0 gap-0 w-full sm:max-w-[420px] border-none outline-none overflow-hidden'
       >
-        <SheetHeader className='px-6 pt-6 pb-4 border-b border-purple-92'>
-            <div className='flex items-center justify-between'>
-                <SheetTitle className='text-xl font-bold text-main-black'>
-                    {translations.title}
-                </SheetTitle>
-            </div>
+        <SheetHeader className='px-6 pt-6 pb-4'>
+            <SheetTitle className='text-xl font-bold tracking-tight text-main-black'>
+                {translations.title}
+            </SheetTitle>
         </SheetHeader>
 
-        <div className='flex-1 overflow-y-auto px-6 py-6 space-y-8 custom-scrollbar'>
-          
-          {/* Category Section */}
-          <section className='space-y-4'>
-             <div className='flex items-center justify-between'>
-                <h3 className='text-base font-bold text-main-black'>Loại bất động sản</h3>
-                {selectedType && (
-                    <button className='text-xs font-bold text-main-primary' onClick={() => setSelectedType(undefined)}>Xóa</button>
-                )}
-             </div>
-             <div className='grid grid-cols-4 gap-2'>
-                {PROPERTY_TYPES.map((cat) => {
-                    const Icon = CATEGORY_ICONS[cat.code] || Home;
-                    const displayLabel = cat.code === 'RESIDENTIAL' ? 'Nhà ở' : cat.label.replace('Bất động sản ', '');
-                    const capitalizedLabel = displayLabel.charAt(0).toUpperCase() + displayLabel.slice(1);
-                    const isSelected = selectedType && FLAT_PROPERTY_TYPES.find(t => t.code === selectedType)?.categoryCode === cat.code;
-                    
-                    return (
-                        <button
-                           key={cat.code}
-                           onClick={() => setSelectedType(cat.types[0].code)}
-                           className={cn(
-                             'flex flex-col items-center justify-center gap-2 p-2 rounded-xl border-1.5 transition-all duration-200',
-                             isSelected
-                                ? 'bg-main-primary/5 border-main-primary text-main-primary shadow-sm' 
-                                : 'bg-white border-purple-92 text-grey-500 hover:border-main-primary/40'
-                           )}
-                        >
-                           <Icon className='h-5 w-5' strokeWidth={2.5} />
-                           <span className='text-[10px] font-bold text-center uppercase tracking-tight'>{capitalizedLabel}</span>
-                        </button>
-                    )
-                })}
-             </div>
-
-             {selectedType && (
-                <div className='flex flex-wrap gap-1.5'>
-                    {PROPERTY_TYPES.find(c => c.types.some(t => t.code === selectedType))?.types.map(t => (
-                        <button
-                          key={t.code}
-                          onClick={() => setSelectedType(t.code)}
-                          className={cn(
-                            'px-3 py-1.5 rounded-lg text-xs font-bold border-1.5 transition-all',
-                            selectedType === t.code
-                                ? 'bg-main-primary text-white border-main-primary'
-                                : 'bg-white text-grey-600 border-purple-92 hover:border-main-primary/30'
-                          )}
-                        >
-                          {t.label}
-                        </button>
-                    ))}
-                </div>
-             )}
-          </section>
-
-          {/* Features Section */}
-          <section className='space-y-6'>
-            <h3 className='text-base font-bold text-main-black'>{translations.features}</h3>
-            <div className='space-y-6'>
-              {relevantAttributes.map((attrKey) => {
-                const label = ATTRIBUTE_LABELS[attrKey] || attrKey;
-                const type = ATTRIBUTE_TYPES[attrKey];
-                const currentValue = localFilters.attributes[attrKey];
-                const Icon = ATTRIBUTE_ICONS[attrKey];
-
-                if (type === 'number') {
-                  const labelWithUnit = attrKey === 'AREA' ? `${label} (m²)` : label;
-                  return (
-                    <div key={attrKey} className='space-y-3'>
-                        <div className='flex items-center gap-2 text-main-black'>
-                            {Icon && <Icon className='h-4 w-4 text-grey-400' />}
-                            <span className='text-sm font-bold'>{labelWithUnit}</span>
-                        </div>
-                        <NumberSelector
-                            value={(currentValue as number) || 0}
-                            onChange={(value) =>
-                            setLocalFilters({
-                                ...localFilters,
-                                attributes: { ...localFilters.attributes, [attrKey]: value },
-                            })
-                            }
-                            maxLevels={attrKey === 'BEDROOMS' || attrKey === 'BATHROOMS' ? 5 : 4}
-                        />
-                    </div>
-                  );
-                }
-
-                if (type === 'boolean') {
-                  return (
-                    <div key={attrKey} className='flex items-center justify-between'>
-                      <div className='flex items-center gap-2 text-main-black'>
-                         {Icon && <Icon className='h-4 w-4 text-grey-400' />}
-                         <span className='text-sm font-bold'>{label}</span>
-                      </div>
-                      <Switch
-                        checked={!!currentValue}
-                        onCheckedChange={(checked) =>
-                          setLocalFilters({
-                            ...localFilters,
-                            attributes: { ...localFilters.attributes, [attrKey]: checked },
-                          })
-                        }
-                      />
-                    </div>
-                  );
-                }
-
-                return null;
-              })}
-            </div>
-          </section>
-
-          {/* Rental Period */}
-          {listingType === 'RENT' && (
+        <div className='flex-1 overflow-y-auto custom-scrollbar'>
+          <div className='px-6 py-4 space-y-10'>
+            
+            {/* 1. Category Picker - More Compact */}
             <section className='space-y-4'>
-              <h3 className='text-base font-bold text-main-black'>
-                {translations.rentalPeriod.label}
-              </h3>
-              <div className='grid grid-cols-2 gap-2'>
-                {['any', '1-12', '13-24', '24+'].map((period) => (
-                    <button
-                        key={period}
-                        onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: period as RentalPeriod })}
-                        className={cn(
-                            'flex items-center justify-center px-4 py-2.5 rounded-xl border-1.5 text-sm transition-all',
-                            localFilters.rentalPeriod === period
-                                ? 'bg-main-primary text-white border-main-primary font-bold'
-                                : 'bg-white border-purple-92 text-grey-500 hover:border-main-primary/40'
-                        )}
-                    >
-                        {period === 'any' ? translations.rentalPeriod.any : translations.rentalPeriod[period as '1-12']}
-                    </button>
-                ))}
-              </div>
+                <div className='flex items-center justify-between'>
+                    <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.category}</h3>
+                    {selectedType && (
+                        <button className='text-xs font-bold text-main-primary hover:underline' onClick={() => setSelectedType(undefined)}>Xóa bộ lọc</button>
+                    )}
+                </div>
+                <div className='grid grid-cols-4 gap-3'>
+                    {PROPERTY_TYPES.map((cat) => {
+                        const Icon = CATEGORY_ICONS[cat.code] || Home;
+                        const isSelected = selectedType && FLAT_PROPERTY_TYPES.find(t => t.code === selectedType)?.categoryCode === cat.code;
+                        const label = cat.code === 'RESIDENTIAL' ? 'Nhà ở' : cat.label.replace('Bất động sản ', '');
+                        const capitalizedLabel = label.charAt(0).toUpperCase() + label.slice(1);
+
+                        return (
+                            <button
+                                key={cat.code}
+                                onClick={() => setSelectedType(cat.types[0].code)}
+                                className={cn(
+                                    'flex flex-col items-center gap-2 transition-all group',
+                                    isSelected ? 'scale-105' : 'hover:-translate-y-1'
+                                )}
+                            >
+                                <div className={cn(
+                                    'flex h-12 w-12 items-center justify-center rounded-2xl border-1.5 transition-all duration-300',
+                                    isSelected ? 'border-main-primary bg-main-primary/5 text-main-primary shadow-sm' : 'border-purple-92 bg-white text-grey-500 group-hover:border-main-primary/50'
+                                )}>
+                                    <Icon className='h-6 w-6' strokeWidth={isSelected ? 2.5 : 2} />
+                                </div>
+                                <span className={cn('text-[10px] font-bold uppercase tracking-tight', isSelected ? 'text-main-primary' : 'text-grey-500')}>
+                                    {capitalizedLabel}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {selectedType && (
+                    <div className='flex flex-wrap gap-2 pt-2 animate-in fade-in slide-in-from-top-1'>
+                        {PROPERTY_TYPES.find(c => c.types.some(t => t.code === selectedType))?.types.map(t => (
+                            <button
+                                key={t.code}
+                                onClick={() => setSelectedType(t.code)}
+                                className={cn(
+                                    'px-3.5 py-1.5 rounded-lg text-xs font-bold border-1.5 transition-all',
+                                    selectedType === t.code
+                                        ? 'bg-main-primary text-white border-main-primary shadow-sm'
+                                        : 'bg-white text-grey-500 border-purple-92 hover:border-main-primary/30'
+                                )}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </section>
-          )}
+
+            {/* 2. Essential Features (Numbers) */}
+            <section className='space-y-6'>
+                <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.features}</h3>
+                <div className='space-y-6'>
+                    {essentials.map((attrKey) => {
+                        const Icon = ATTRIBUTE_ICONS[attrKey];
+                        const label = ATTRIBUTE_LABELS[attrKey];
+                        return (
+                            <div key={attrKey} className='space-y-3'>
+                                <div className='flex items-center gap-2'>
+                                    {Icon && <Icon className='h-4 w-4 text-grey-400' />}
+                                    <span className='text-[13px] font-bold text-main-black'>{label}</span>
+                                </div>
+                                <SegmentedSelector 
+                                    value={(localFilters.attributes[attrKey] as number) || 0}
+                                    onChange={(val) => setLocalFilters({
+                                        ...localFilters,
+                                        attributes: { ...localFilters.attributes, [attrKey]: val }
+                                    })}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+
+            {/* 3. Comfort Features (Booleans) */}
+            <section className='space-y-4'>
+                <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>Tiện nghi & Dịch vụ</h3>
+                <div className='grid grid-cols-1 gap-2'>
+                    {comfort.map((attrKey) => {
+                        const Icon = ATTRIBUTE_ICONS[attrKey];
+                        const label = ATTRIBUTE_LABELS[attrKey];
+                        const isChecked = !!localFilters.attributes[attrKey];
+                        return (
+                            <div 
+                                key={attrKey} 
+                                className={cn(
+                                    'flex items-center justify-between rounded-xl px-4 py-3 transition-colors',
+                                    isChecked ? 'bg-main-primary/[0.03]' : 'hover:bg-grey-50'
+                                )}
+                            >
+                                <div className='flex items-center gap-3'>
+                                    {Icon && <Icon className={cn('h-4.5 w-4.5', isChecked ? 'text-main-primary' : 'text-grey-400')} />}
+                                    <span className={cn('text-sm font-medium', isChecked ? 'text-main-black font-semibold' : 'text-grey-600')}>{label}</span>
+                                </div>
+                                <Switch 
+                                    checked={isChecked}
+                                    onCheckedChange={(checked) => setLocalFilters({
+                                        ...localFilters,
+                                        attributes: { ...localFilters.attributes, [attrKey]: checked }
+                                    })}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+
+            {/* 4. Rental Period if RENT */}
+            {listingType === 'RENT' && (
+                <section className='space-y-4'>
+                    <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.rentalPeriod.label}</h3>
+                    <div className='grid grid-cols-2 gap-2'>
+                        {['any', '1-12', '13-24', '24+'].map((period) => (
+                            <button
+                                key={period}
+                                onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: period as RentalPeriod })}
+                                className={cn(
+                                    'flex h-11 items-center justify-center rounded-xl border-1.5 text-sm font-bold transition-all',
+                                    localFilters.rentalPeriod === period
+                                        ? 'bg-main-primary text-white border-main-primary shadow-sm'
+                                        : 'bg-white text-grey-500 border-purple-92 hover:border-main-primary/30'
+                                )}
+                            >
+                                {period === 'any' ? translations.rentalPeriod.any : translations.rentalPeriod[period as '1-12']}
+                            </button>
+                        ))}
+                    </div>
+                </section>
+            )}
+          </div>
         </div>
 
         <SheetFooter className='p-6 border-t border-purple-92 bg-white flex flex-col gap-3'>
           <Button
             type='button'
             onClick={handleApply}
-            className='w-full h-11 rounded-xl bg-main-primary py-3 text-sm font-bold text-white hover:bg-main-primary/90'
+            className='w-full h-12 rounded-xl bg-main-primary text-sm font-bold text-white shadow-lg shadow-main-primary/20 hover:bg-main-primary/90 transition-all active:scale-95'
           >
             {translations.apply}
           </Button>
           <Button
             type='button'
             onClick={handleReset}
-            variant="outline"
-            className='w-full h-11 rounded-xl text-sm font-bold border-purple-92 text-grey-600'
+            variant="ghost"
+            className='w-full h-10 rounded-xl text-sm font-bold text-grey-500 hover:text-main-black transition-colors'
           >
             {translations.reset}
           </Button>
