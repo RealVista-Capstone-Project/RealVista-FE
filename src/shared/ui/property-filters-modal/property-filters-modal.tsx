@@ -166,12 +166,6 @@ export function PropertyFiltersModal({
                 <SheetTitle className='text-2xl font-black text-main-black'>
                     {translations.title}
                 </SheetTitle>
-                <button 
-                  onClick={() => onOpenChange(false)}
-                  className='rounded-full p-2 hover:bg-grey-100 transition-colors'
-                >
-                    <X className='h-6 w-6 text-main-black' />
-                </button>
             </div>
         </SheetHeader>
 

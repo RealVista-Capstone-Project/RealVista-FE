@@ -319,7 +319,7 @@ export function RealVistaListingCard({
       <>
         <div
           className={cn(
-            'relative flex rounded-xl border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md overflow-hidden',
+            'relative flex rounded-xl border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md',
             !isUnavailable && onClick && 'cursor-pointer',
             isUnavailable && 'cursor-default',
             className
