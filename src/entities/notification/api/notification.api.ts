@@ -30,4 +30,20 @@ export const notificationApi = {
 
   /** Mark a single notification as read */
   markRead: (id: string) => http.put<void>(`/notifications/${id}/read`, {}),
+
+  /**
+   * Delete a notification by ID.
+   * Uses raw fetch with explicit token to avoid the in-memory sync-cache
+   * race condition (same pattern as listWithToken).
+   */
+  deleteNotification: (id: string, token: string): Promise<void> =>
+    fetch(`${env.NEXT_PUBLIC_API_ENDPOINT}/notifications/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    }),
 } as const;
