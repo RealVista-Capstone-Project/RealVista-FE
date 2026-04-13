@@ -5,7 +5,7 @@ import { AvatarCircle } from './avatar-circle';
 
 interface MessageBubbleProps {
   msg: Message;
-  onListingClick?: (listingId: string) => void;
+  onListingClick?: (listing: import('@/entities/contact').ChatListingData) => void;
 }
 
 export function MessageBubble({ msg, onListingClick }: MessageBubbleProps) {
@@ -53,7 +53,7 @@ export function MessageBubble({ msg, onListingClick }: MessageBubbleProps) {
           <div className={cn('mt-1', isMe ? 'mr-0' : 'ml-0')}>
             <ChatListingCard
               listing={msg.listing}
-              onClick={(l) => onListingClick?.(l.id)}
+              onClick={(l) => onListingClick?.(l)}
             />
           </div>
         )}

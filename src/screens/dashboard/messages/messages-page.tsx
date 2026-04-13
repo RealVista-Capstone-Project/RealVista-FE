@@ -3,8 +3,10 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { conversationQueries, useSendMessage, conversationKeys } from '@/entities/conversation';
 import type { ConversationListItemResponse, MessageResponse } from '@/entities/conversation';
+import type { ChatListingData } from '@/entities/contact';
 import { useWebSocketState } from '@/shared/lib/websocket';
 import type { Conversation } from './types';
 import { ChatHeader } from './components/chat-header';
@@ -89,6 +91,8 @@ export function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
 
+  const locale = useLocale();
+
   // ── Read WS connection state from global Zustand store.
   //    The single WS connection is owned by ChatWindowRenderer in DashboardLayout.
   //    useChatWebSocket() there already invalidates query cache on new messages,
@@ -156,6 +160,15 @@ export function MessagesPage() {
     );
   }, [messageInput, activeConv, sendMessage]);
 
+  // ── Listing card click — navigate to listing detail page ─────────────────
+  const handleListingClick = useCallback(
+    (listing: ChatListingData) => {
+      const slug = listing.slug ?? listing.id;
+      window.open(`/${locale}/listing/${slug}`, '_blank', 'noopener,noreferrer');
+    },
+    [locale]
+  );
+
   if (isLoading) {
     return (
       <div className='flex h-[calc(100vh-6rem)] items-center justify-center rounded-2xl border border-purple-92/50 bg-white shadow-sm'>
@@ -185,7 +198,7 @@ export function MessagesPage() {
               onToggleDetail={() => setShowDetail((v) => !v)}
             />
 
-            <ChatMessages conversationId={effectiveActiveId} />
+            <ChatMessages conversationId={effectiveActiveId} onListingClick={handleListingClick} />
 
               <MessageInput
                 value={messageInput}

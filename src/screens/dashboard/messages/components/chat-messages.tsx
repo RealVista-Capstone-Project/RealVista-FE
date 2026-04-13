@@ -13,7 +13,7 @@ import { MessageBubble } from './message-bubble';
 
 interface ChatMessagesProps {
   conversationId: string;
-  onListingClick?: (listingId: string) => void;
+  onListingClick?: (listing: ChatListingData) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
