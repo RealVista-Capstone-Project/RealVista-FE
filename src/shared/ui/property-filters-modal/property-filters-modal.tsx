@@ -5,15 +5,13 @@ import { Minus, Plus } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/shared/ui/sheet';
-import { PriceRangeSlider } from '@/shared/ui/price-range-slider';
 import {
   PROPERTY_TYPES,
   ATTRIBUTE_LABELS,
-  ATTRIBUTE_TYPES
+  ATTRIBUTE_TYPES,
+  PropertyAttribute
 } from '@/shared/config/property-types';
 import { Switch } from '@/shared/ui/switch/switch';
-import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
-import { Label } from '@/shared/ui/label/label';
 
 export type RentalPeriod = 'any' | '1-12' | '13-24' | '24+';
 
@@ -51,8 +49,6 @@ export interface PropertyFiltersModalProps {
   };
 }
 
-
-
 function Stepper({
   value,
   onChange,
@@ -79,7 +75,7 @@ function Stepper({
       >
         <Minus className='h-4 w-4' strokeWidth={2} />
       </button>
-      <span className='w-8 text-center text-base font-bold text-main-black'>{value}</span>
+      <span className='w-8 text-center text-base font-bold text-main-black'>{value === 0 ? 'Tất cả' : `${value}+`}</span>
       <button
         type='button'
         onClick={() => onChange(Math.min(max, value + 1))}
@@ -138,28 +134,24 @@ export function PropertyFiltersModal({
   translations,
 }: PropertyFiltersModalProps) {
   const [localFilters, setLocalFilters] = useState<PropertyFilters>(filters);
-  const [priceMin, setPriceMin] = useState(filters.priceRange.min);
-  const [priceMax, setPriceMax] = useState(filters.priceRange.max);
 
   // Find the selected property type configuration
   const typeConfig = PROPERTY_TYPES.flatMap((cat) => cat.types).find((t) => t.code === propertyType);
-  const relevantAttributes = typeConfig?.attributes || [];
+  
+  // Default attributes if none are relevant
+  const baseAttributes: PropertyAttribute[] = ['BEDROOMS', 'BATHROOMS'];
+  const relevantAttributes = Array.from(new Set([...baseAttributes, ...(typeConfig?.attributes || [])]));
 
-  // Reset local state when modal opens or filters change
+  // Reset local state when modal opens
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
       setLocalFilters(filters);
-      setPriceMin(filters.priceRange.min);
-      setPriceMax(filters.priceRange.max);
     }
     onOpenChange(newOpen);
   };
 
   const handleApply = () => {
-    onApply({
-      ...localFilters,
-      priceRange: { min: priceMin, max: priceMax },
-    });
+    onApply(localFilters);
     onOpenChange(false);
   };
 
@@ -183,103 +175,65 @@ export function PropertyFiltersModal({
 
         {/* Scrollable content area */}
         <div className='flex-1 overflow-y-auto px-6 pb-6 space-y-6'>
+          
+          {/* Features Section */}
+          <div className='space-y-4 pb-6 border-b border-grey-100'>
+            <h3 className='text-sm font-bold text-main-black'>{translations.features}</h3>
+            <div className='grid grid-cols-1 gap-y-5'>
+              {relevantAttributes.map((attrKey) => {
+                const label = ATTRIBUTE_LABELS[attrKey];
+                const type = ATTRIBUTE_TYPES[attrKey];
+                const currentValue = localFilters.attributes[attrKey];
 
+                if (type === 'number') {
+                  const labelWithUnit = attrKey === 'AREA' ? `${label} (m²)` : label;
+                  return (
+                    <div key={attrKey} className='flex items-center justify-between'>
+                      <span className='text-base font-medium text-main-black'>{labelWithUnit}</span>
+                      <Stepper
+                        value={(currentValue as number) || 0}
+                        onChange={(value) =>
+                          setLocalFilters({
+                            ...localFilters,
+                            attributes: { ...localFilters.attributes, [attrKey]: value },
+                          })
+                        }
+                        min={0}
+                        max={attrKey === 'BEDROOMS' || attrKey === 'BATHROOMS' ? 10 : 100}
+                      />
+                    </div>
+                  );
+                }
 
-          {/* Price Range */}
-          <div className='pb-6 border-b border-grey-100'>
-            <PriceRangeSlider
-              minValue={0}
-              maxValue={20000000000}
-              currentMin={priceMin}
-              currentMax={priceMax}
-              onMinChange={setPriceMin}
-              onMaxChange={setPriceMax}
-              histogramData={[6, 8, 8, 12, 21, 35, 38, 56, 48, 32, 23, 48, 23, 17, 12, 6]}
-              title={translations.priceRange}
-              step={100000000}
-            />
-            <div className='mt-4 grid grid-cols-2 gap-4'>
-              <div className='space-y-1'>
-                <Label className='text-xs text-grey-500'>Tối thiểu</Label>
-                <VndAmountInput
-                  value={priceMin}
-                  onChange={(val) => setPriceMin(val)}
-                  placeholder='0'
-                  hidePreview
-                />
-              </div>
-              <div className='space-y-1'>
-                <Label className='text-xs text-grey-500'>Tối đa</Label>
-                <VndAmountInput
-                  value={priceMax}
-                  onChange={(val) => setPriceMax(val)}
-                  placeholder='20 tỷ'
-                  hidePreview
-                />
-              </div>
+                if (type === 'boolean') {
+                  return (
+                    <div key={attrKey} className='flex items-center justify-between'>
+                      <span className='text-base font-medium text-main-black'>{label}</span>
+                      <Switch
+                        checked={!!currentValue}
+                        onCheckedChange={(checked) =>
+                          setLocalFilters({
+                            ...localFilters,
+                            attributes: { ...localFilters.attributes, [attrKey]: checked },
+                          })
+                        }
+                      />
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
             </div>
           </div>
 
-          {/* Features - Dynamic based on propertyType */}
-          {relevantAttributes.length > 0 && (
-            <div className='space-y-4 pb-6 border-b border-grey-100'>
-              <h3 className='text-sm font-semibold text-[#4D5461]'>{translations.features}</h3>
-              <div className='grid grid-cols-1 gap-y-4 gap-x-6'>
-                {relevantAttributes.map((attrKey) => {
-                  const label = ATTRIBUTE_LABELS[attrKey];
-                  const type = ATTRIBUTE_TYPES[attrKey];
-                  const currentValue = localFilters.attributes[attrKey];
-
-                  if (type === 'number') {
-                    return (
-                      <div key={attrKey} className='flex items-center justify-between'>
-                        <span className='text-base font-normal text-main-black'>{label}</span>
-                        <Stepper
-                          value={(currentValue as number) || 0}
-                          onChange={(value) =>
-                            setLocalFilters({
-                              ...localFilters,
-                              attributes: { ...localFilters.attributes, [attrKey]: value },
-                            })
-                          }
-                          min={0}
-                          max={20}
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (type === 'boolean') {
-                    return (
-                      <div key={attrKey} className='flex items-center justify-between'>
-                        <span className='text-base font-normal text-main-black'>{label}</span>
-                        <Switch
-                          checked={!!currentValue}
-                          onCheckedChange={(checked) =>
-                            setLocalFilters({
-                              ...localFilters,
-                              attributes: { ...localFilters.attributes, [attrKey]: checked },
-                            })
-                          }
-                        />
-                      </div>
-                    );
-                  }
-
-                  // Handle text/other attributes if needed, e.g., with a simple Select
-                  return null;
-                })}
-              </div>
-            </div>
-          )}
-
           {/* Rental Period - Only for RENT */}
           {listingType === 'RENT' && (
-            <div className='space-y-3'>
-              <h3 className='text-sm font-semibold text-[#4D5461]'>
+            <div className='space-y-4'>
+              <h3 className='text-sm font-bold text-main-black'>
                 {translations.rentalPeriod.label}
               </h3>
-              <div className='space-y-1'>
+              <div className='grid grid-cols-2 gap-x-4 gap-y-1'>
                 <RadioOption
                   selected={localFilters.rentalPeriod === 'any'}
                   onClick={() => setLocalFilters({ ...localFilters, rentalPeriod: 'any' })}

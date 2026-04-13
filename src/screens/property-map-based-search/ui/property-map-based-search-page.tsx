@@ -96,7 +96,7 @@ export function PropertyMapBasedSearchPage({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<string>(searchParams?.get('sortBy') || 'NEWEST');
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
@@ -117,6 +117,7 @@ export function PropertyMapBasedSearchPage({
         bathrooms: (filters.attributes.BATHROOMS as number) || undefined,
         area: (filters.attributes.AREA as number) || undefined,
         rental_period: filters.rentalPeriod !== 'any' ? filters.rentalPeriod : undefined,
+        sort: sortBy,
         page: currentPage,
         size: pageSize,
       } as PropertySearchRequest
@@ -310,6 +311,11 @@ export function PropertyMapBasedSearchPage({
                   ? FLAT_PROPERTY_TYPES.find((t) => t.code === propertyType)?.label || propertyType
                   : 'Loại bất động sản'
               }
+              sortBy={sortBy}
+              onSortChange={(val) => {
+                setSortBy(val);
+                setCurrentPage(1);
+              }}
               onMoreFilters={() => setFiltersModalOpen(true)}
               viewMode={viewMode}
               onViewModeChange={setViewMode}

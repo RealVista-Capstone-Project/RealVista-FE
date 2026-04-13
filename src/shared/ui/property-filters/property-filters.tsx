@@ -19,10 +19,11 @@ export interface PropertyFiltersProps {
   // Basic properties
   typeLabel: string;
   sortLabel?: string;
+  sortBy?: string;
+  onSortChange?: (value: string) => void;
   
   // Handlers
   onMoreFilters: () => void;
-  onSortClick?: () => void;
   
   // View mode
   viewMode?: ViewMode;
@@ -45,7 +46,7 @@ function FilterChip({
   return (
     <button
       type='button'
-      onClick={onClick}
+      onClick={active ? undefined : onClick}
       className={cn(
         'flex items-center gap-2 rounded-full border-[1.5px] px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap',
         active 
@@ -68,9 +69,19 @@ export function PropertyFilters({
   viewMode = 'grid',
   onViewModeChange,
   sortLabel = 'Mới nhất',
-  onSortClick,
+  sortBy = 'NEWEST',
+  onSortChange,
   className,
 }: PropertyFiltersProps) {
+  const sortOptions = [
+    { label: 'Mới nhất', value: 'NEWEST' },
+    { label: 'Giá thấp đến cao', value: 'PRICE_ASC' },
+    { label: 'Giá cao đến thấp', value: 'PRICE_DESC' },
+    { label: 'Ưu tiên', value: 'PRIORITY' },
+  ];
+
+  const currentSortLabel = sortOptions.find(opt => opt.value === sortBy)?.label || sortLabel;
+
   return (
     <div className={cn('flex items-center justify-between gap-4', className)}>
       {/* Filter Chips */}
@@ -122,8 +133,35 @@ export function PropertyFilters({
         {/* Type Filter */}
         <FilterChip label={typeLabel} onClick={onMoreFilters} />
         
-        {/* Sort Filter */}
-        <FilterChip label={sortLabel} onClick={onSortClick} />
+        {/* Sort Filter Popover */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className='cursor-pointer'>
+              <FilterChip 
+                label={currentSortLabel} 
+                active={sortBy !== 'NEWEST'} 
+              />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className='w-56 p-2' align='start'>
+            <div className='flex flex-col'>
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => onSortChange?.(opt.value)}
+                  className={cn(
+                    'flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                    sortBy === opt.value 
+                      ? 'bg-main-primary/5 text-main-primary' 
+                      : 'text-main-black hover:bg-grey-100'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* More Filters button */}
         <button

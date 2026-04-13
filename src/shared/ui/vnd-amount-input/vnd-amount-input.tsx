@@ -34,6 +34,7 @@ export function VndAmountInput({
   id,
   previewText,
   hidePreview,
+  onKeyDown,
   ...props
 }: VndAmountInputProps) {
   const [digits, setDigits] = React.useState(() => vndIntegerToDigitString(value));
