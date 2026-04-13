@@ -19,10 +19,13 @@ export interface SavedSearchDto {
   saved_search_id: string;
   search_type: SearchType;
   criteria: SearchCriteria;
+  board_id?: string;
   created_at: string;
 }
 
 export interface SaveSearchRequest {
   search_type: SearchType;
   criteria: SearchCriteria;
+  board_id?: string;
+  profile_id?: string;
 }

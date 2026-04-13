@@ -40,7 +40,7 @@ export function SubscriptionCTABanner() {
 
   const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
 
-  const isOnTargetPage = ALLOWED_PATH_SUFFIXES.some((suffix) =>
+  const isOnTargetPage = pathname != null && ALLOWED_PATH_SUFFIXES.some((suffix) =>
     pathname.endsWith(suffix)
   );
 

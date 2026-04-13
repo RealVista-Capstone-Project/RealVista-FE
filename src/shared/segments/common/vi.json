@@ -377,7 +377,8 @@
     "appointments": "Lịch hẹn",
     "myEngagements": "Engagement của tôi",
     "login": "Đăng nhập",
-    "signup": "Đăng ký"
+    "signup": "Đăng ký",
+    "switchPersona": "Chuyển Profile"
   },
   "PropertyCard": {
     "beds": "Phòng ngủ",
@@ -732,5 +733,11 @@
     "personalMessageLabel": "Lời nhắn cá nhân",
     "messagePlaceholder": "Giới thiệu bản thân và giải thích lý do tại sao bạn phù hợp với bất động sản này...",
     "messageHint": "Lời nhắn này sẽ được gửi kèm với mẫu đề xuất mà bạn đã chọn."
+  },
+  "SavedSearch": {
+    "duplicateAlert": "Tìm kiếm này đã được lưu trước đó trong nhóm này",
+    "success": "Đã lưu tìm kiếm thành công",
+    "error": "Lưu tìm kiếm thất bại. Vui lòng thử lại sau.",
+    "buttonLabel": "Lưu tìm kiếm"
   }
 }

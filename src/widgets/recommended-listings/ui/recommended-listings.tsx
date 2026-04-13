@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw, Sparkles } from 'lucide-react';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { Skeleton } from '@/shared/ui/skeleton/skeleton';
@@ -102,13 +103,18 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const {
     data: response,
     isLoading,
+    isFetching,
     isError,
   } = useQuery({
     ...recommendationQueries.forUser(6),
     enabled: authStatus === 'authenticated',
   });
 
-  const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
+  const { data: statusResponse } = useQuery({
+    ...recommendationQueries.status(),
+    enabled: authStatus === 'authenticated',
+    refetchInterval: 10000,
+  });
 
   const refreshMutation = useMutation({
     mutationFn: () => recommendationApi.refreshRecommendations(6),
@@ -116,6 +122,15 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
       queryClient.invalidateQueries({ queryKey: recommendationKeys.all });
     },
   });
+
+  useEffect(() => {
+    if (statusResponse?.payload?.data?.threshold_met && !refreshMutation.isPending) {
+      // Use the refresh API to actually reset BE counter and evict BE cache
+      refreshMutation.mutate();
+    }
+  }, [statusResponse?.payload?.data?.threshold_met, refreshMutation]);
+
+  const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
 
   const handleListingClick = (listing: RecommendedListingDTO) => {
     behaviorTracker.trackClick(listing.listing_id, {
@@ -180,23 +195,33 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
           </div>
 
           {/* Loading State - Horizontal skeleton cards */}
-          {isLoading && (
-            <div className='flex gap-4 overflow-hidden'>
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className='w-[300px] flex-shrink-0'>
-                  <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6'>
-                    <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
-                    <Skeleton className='h-8 w-3/4 mb-3' />
-                    <Skeleton className='h-6 w-1/2 mb-4' />
-                    <Skeleton className='h-px w-full mb-4' />
-                    <div className='flex gap-4 justify-center'>
-                      <Skeleton className='h-5 w-12' />
-                      <Skeleton className='h-5 w-12' />
-                      <Skeleton className='h-5 w-12' />
+          {(isLoading || isFetching) && (
+            <div className='flex gap-4 overflow-hidden relative'>
+              {/* Optional slight slide/fade for skeleton */}
+              <AnimatePresence>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0 }}
+                  className='flex gap-4'
+                >
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className='w-[300px] flex-shrink-0'>
+                      <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6'>
+                        <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
+                        <Skeleton className='h-8 w-3/4 mb-3' />
+                        <Skeleton className='h-6 w-1/2 mb-4' />
+                        <Skeleton className='h-px w-full mb-4' />
+                        <div className='flex gap-4 justify-center'>
+                          <Skeleton className='h-5 w-12' />
+                          <Skeleton className='h-5 w-12' />
+                          <Skeleton className='h-5 w-12' />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </div>
           )}
 
@@ -209,7 +234,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
           )}
 
           {/* Recommendations Carousel */}
-          {!isLoading && !isError && recommendations.length > 0 && (
+          {(!isLoading && !isFetching && !isError && recommendations.length > 0) && (
             <CarouselContent className='-ml-4'>
               {recommendations.map((listing, index) => (
                 <CarouselItem

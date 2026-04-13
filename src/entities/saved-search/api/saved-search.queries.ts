@@ -21,12 +21,14 @@ export function useSaveSearch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: savedSearchKeys.lists() });
     },
-    onError: (error: unknown) => {
+    onError: (error: any) => {
       // 409 SAVED_SEARCH_DUPLICATE: swallow silently, sync cache so button flips to "already saved"
-      const apiError = error as { response?: { data?: { payload?: { errorCode?: string }, errorCode?: string }, status?: number } };
-      const errorCode = apiError?.response?.data?.payload?.errorCode
-        ?? apiError?.response?.data?.errorCode;
-      if (apiError?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
+      const payload = error?.response?.data;
+      const errorCode = payload?.payload?.error_code 
+        ?? payload?.error_code 
+        ?? payload?.errorCode;
+        
+      if (error?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
         queryClient.invalidateQueries({ queryKey: savedSearchKeys.lists() });
         // Do NOT throw — re-throwing in React Query onError causes unhandled rejections
       }
