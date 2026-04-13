@@ -99,8 +99,8 @@ export function NotificationDropdownContainer() {
       }
     } else if (n.eventType.includes('TOUR')) {
       router.push(`/${locale}/appointments`);
-    } else if (n.metadata?.listingId) {
-      router.push(`/${locale}/property/${n.metadata.listingId}`);
+    } else if (n.metadata?.listing_id) {
+      router.push(`/${locale}/property/${n.metadata.listing_id}`);
     }
   };
 
