@@ -255,7 +255,7 @@ export function RealVistaListingCard({
     if (!isHot || isUnavailable) return null;
 
     return (
-      <div className='absolute -bottom-3.75 -left-2 z-10'>
+      <div className='absolute -bottom-2 -left-2 z-10'>
         <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
           <div className='flex items-center gap-1.5'>
             <Flame className='h-4 w-4 fill-white text-white' strokeWidth={2.5} />

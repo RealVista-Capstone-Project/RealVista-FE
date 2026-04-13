@@ -98,7 +98,6 @@ export function PropertyMapBasedSearchPage({
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>(searchParams?.get('sortBy') || 'NEWEST');
-  const [showSearchArea, setShowSearchArea] = useState(false);
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
@@ -241,7 +240,6 @@ export function PropertyMapBasedSearchPage({
           onPropertyClick={handlePropertyClick}
           defaultCenter={HCM_CITY_CENTER}
           onBoundsChange={(bounds) => {
-            setShowSearchArea(true); // Show button when user moves map
             setMapBounds(
               (prev) =>
                 ({
@@ -254,20 +252,6 @@ export function PropertyMapBasedSearchPage({
             );
           }}
         />
-        {showSearchArea && (
-          <div className='absolute left-1/2 top-10 z-20 -translate-x-1/2'>
-            <button
-              onClick={() => {
-                setShowSearchArea(false);
-                setCurrentPage(1);
-              }}
-              className='flex items-center gap-2 rounded-full bg-main-primary px-6 py-3 text-sm font-bold text-white shadow-xl hover:bg-main-primary/90 transition-all active:scale-95'
-            >
-              <Search className='h-4 w-4' />
-              Tìm kiếm ở khu vực này
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Right Side - Property Listings */}
@@ -285,7 +269,6 @@ export function PropertyMapBasedSearchPage({
             searchValue={searchValue}
             onSearchChange={(val) => {
                 setSearchValue(val);
-                setShowSearchArea(false);
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
