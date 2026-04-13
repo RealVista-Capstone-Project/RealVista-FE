@@ -61,7 +61,7 @@ export function useNotificationWebSocket({
           const raw = JSON.parse(frame.body) as NotificationWsPayload;
 
           // Deduplicate — backend may fire over both WS and FCM
-          const id = raw.notificationId ?? raw.notification_id ?? '';
+          const id = raw.notification_id;
           if (!id || seenIds.current.has(id)) return;
           seenIds.current.add(id);
 

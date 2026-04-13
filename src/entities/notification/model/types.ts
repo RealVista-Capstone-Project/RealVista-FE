@@ -23,24 +23,17 @@ export interface NotificationResponse {
 
 /**
  * Raw shape received from the STOMP WebSocket frame.
- * Backend may send camelCase over WS even if REST uses snake_case.
- * Accept both shapes to be safe.
+ * Backend now sends snake_case exclusively.
  */
 export interface NotificationWsPayload {
-  notificationId?: string;
-  notification_id?: string;
+  notification_id: string;
   title: string;
   message: string;
-  eventType?: string;
   event_type?: string;
-  entityType?: string;
   entity_type?: string;
-  entityId?: string;
   entity_id?: string;
-  isRead?: boolean;
   is_read?: boolean;
   metadata?: string;
-  createdAt?: string;
   created_at?: string;
 }
 
@@ -81,7 +74,7 @@ export function mapToNotification(raw: NotificationResponse): Notification {
   };
 }
 
-/** Map a raw WS payload (camelCase or snake_case) to the UI Notification type */
+/** Map a raw WS payload (snake_case) to the UI Notification type */
 export function mapWsPayloadToNotification(raw: NotificationWsPayload): Notification {
   let metadata: Record<string, string> | null = null;
   try {
@@ -91,14 +84,14 @@ export function mapWsPayloadToNotification(raw: NotificationWsPayload): Notifica
     // silently ignore
   }
   return {
-    id: raw.notificationId ?? raw.notification_id ?? '',
-    eventType: raw.eventType ?? raw.event_type ?? '',
-    entityType: raw.entityType ?? raw.entity_type ?? '',
-    entityId: raw.entityId ?? raw.entity_id ?? '',
+    id: raw.notification_id,
+    eventType: raw.event_type ?? '',
+    entityType: raw.entity_type ?? '',
+    entityId: raw.entity_id ?? '',
     title: raw.title,
     message: raw.message,
-    createdAt: new Date(raw.createdAt ?? raw.created_at ?? ''),
-    isRead: raw.isRead ?? raw.is_read ?? false,
+    createdAt: new Date(raw.created_at ?? ''),
+    isRead: raw.is_read ?? false,
     metadata,
   };
 }
