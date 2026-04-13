@@ -21,6 +21,7 @@ export interface SavedSearchDto {
   criteria: SearchCriteria;
   board_id?: string;
   created_at: string;
+  is_recommendation: boolean;
 }
 
 export interface SaveSearchRequest {
@@ -28,4 +29,5 @@ export interface SaveSearchRequest {
   criteria: SearchCriteria;
   board_id?: string;
   profile_id?: string;
+  is_recommendation?: boolean;
 }

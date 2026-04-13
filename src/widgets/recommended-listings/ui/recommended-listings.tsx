@@ -100,16 +100,19 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const t = useTranslations('RecommendedListings');
   const queryClient = useQueryClient();
 
+  const listingType = sourcePage === 'buy' ? 'BUY' : 'RENT';
+
   const {
     data: response,
     isLoading,
     isFetching,
     isError,
   } = useQuery({
-    ...recommendationQueries.forUser(6),
+    ...recommendationQueries.forUser(6, listingType),
     enabled: authStatus === 'authenticated',
   });
 
+  // Poll status every 10s automatically — no toggle needed
   const { data: statusResponse } = useQuery({
     ...recommendationQueries.status(),
     enabled: authStatus === 'authenticated',
@@ -117,7 +120,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   });
 
   const refreshMutation = useMutation({
-    mutationFn: () => recommendationApi.refreshRecommendations(6),
+    mutationFn: () => recommendationApi.refreshRecommendations(6, listingType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recommendationKeys.all });
     },
@@ -125,7 +128,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
 
   useEffect(() => {
     if (statusResponse?.payload?.data?.threshold_met && !refreshMutation.isPending) {
-      // Use the refresh API to actually reset BE counter and evict BE cache
+      // Auto-reload: threshold met → refresh AI cache silently
       refreshMutation.mutate();
     }
   }, [statusResponse?.payload?.data?.threshold_met, refreshMutation]);

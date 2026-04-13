@@ -35,6 +35,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
   const [selectedProfileId, setSelectedProfileId] = useState<string>('');
   const [isAddingProfile, setIsAddingProfile] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
+  const [isRecommendation, setIsRecommendation] = useState(false);
 
   const { data: session } = useAuthSession();
   const { mutate: saveSearch, isPending } = useSaveSearch();
@@ -84,7 +85,8 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
         search_type: searchType,
         criteria: criteria as any,
         board_id: boardId.trim() || 'Mặc định',
-        profile_id: selectedProfileId || undefined
+        profile_id: selectedProfileId || undefined,
+        is_recommendation: isRecommendation
       },
       {
         onSuccess: () => {
@@ -201,6 +203,18 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
                 value={boardId}
                 onChange={(e) => setBoardId(e.target.value)}
                 placeholder='Nhập tên nhóm...'
+              />
+            </div>
+            <div className='flex items-center justify-between p-3 rounded-xl bg-purple-96 border border-main-primary/10 mt-2'>
+              <div className='space-y-0.5'>
+                <p className='text-sm font-bold text-main-black'>Sử dụng cho gợi ý AI</p>
+                <p className='text-xs text-grey-500'>Đánh dấu để AI ưu tiên gợi ý dựa trên tiêu chí này</p>
+              </div>
+              <input
+                type='checkbox'
+                checked={isRecommendation}
+                onChange={(e) => setIsRecommendation(e.target.checked)}
+                className='h-5 w-5 accent-main-primary cursor-pointer'
               />
             </div>
           </div>

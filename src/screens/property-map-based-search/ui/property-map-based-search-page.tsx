@@ -248,6 +248,7 @@ export function PropertyMapBasedSearchPage({
             );
           }}
         />
+
       </div>
 
       {/* Right Side - Property Listings */}
