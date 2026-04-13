@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { conversationQueries, useSendMessage, conversationKeys } from '@/entities/conversation';
+import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import type { ConversationListItemResponse, MessageResponse } from '@/entities/conversation';
 import type { ChatListingData } from '@/entities/contact';
 import { useWebSocketState } from '@/shared/lib/websocket';
@@ -104,10 +104,8 @@ export function MessagesPage() {
   // ── Current user ──────────────────────────────────────────────────────────
   const { data: session } = useAuthSession();
   const currentUserId: string | undefined = (session?.user as any)?.id;
-  const canCreateContract =
-    session?.user?.role === 'owner' ||
-    session?.user?.role === 'AGENT' ||
-    session?.user?.backendRoles?.includes('AGENT');
+  const backendRoles: string[] = session?.user?.backendRoles ?? [];
+  const canCreateContract = backendRoles.includes('OWNER') || backendRoles.includes('AGENT');
 
   // ── Read WS connection state from global Zustand store.
   //    The single WS connection is owned by ChatWindowRenderer in DashboardLayout.
@@ -133,17 +131,19 @@ export function MessagesPage() {
   const effectiveActiveId = activeConvId || conversations[0]?.id || '';
   const activeConv = conversations.find((c) => c.id === effectiveActiveId) ?? conversations[0];
 
-  // ── Extract ALL unique listings from cached messages of the active conversation ──
-  //    <ChatMessages> already loaded these — zero extra network cost.
-  const queryClient = useQueryClient();
-  const activeListings = useMemo<ChatListingData[]>(() => {
-    if (!effectiveActiveId) return [];
+  // ── Extract ALL unique listings from active conversation messages ─────────
+  //    Use useQuery (same key as ChatMessages) so this re-computes reactively
+  //    when messages are fetched. The old useMemo+getQueryData pattern never
+  //    re-ran because queryClient is a stable singleton reference.
+  const { data: messagesResponse } = useQuery({
+    ...conversationQueries.messages(effectiveActiveId),
+    enabled: !!effectiveActiveId,
+  });
 
-    const cached = queryClient.getQueryData<any>(conversationKeys.messages(effectiveActiveId));
+  const activeListings = useMemo<ChatListingData[]>(() => {
     const msgs: MessageResponse[] =
-      (cached as any)?.messages ??
-      (cached as any)?.payload?.messages ??
-      (cached as any)?.payload?.data?.messages ??
+      (messagesResponse?.payload as any)?.messages ??
+      (messagesResponse?.payload as any)?.data?.messages ??
       [];
 
     if (!Array.isArray(msgs)) return [];
@@ -165,7 +165,7 @@ export function MessagesPage() {
       }
     }
     return result;
-  }, [effectiveActiveId, queryClient]);
+  }, [messagesResponse]);
 
   /**
    * Subset of activeListings eligible for the "Create Contract" modal picker:
@@ -176,9 +176,14 @@ export function MessagesPage() {
   const ownedListings = useMemo<ChatListingData[]>(() => {
     if (!currentUserId || !canCreateContract) return [];
     return activeListings.filter((l) => {
-      // Legacy cards without ownership data: include as fallback (role gate is upstream)
-      if (!l.ownerId && !l.agentId) return true;
-      if (l.ownerId !== currentUserId && l.agentId !== currentUserId) return false;
+      console.log('l', l);
+      const ownerSet = !!l.ownerId;
+      const agentSet = !!l.agentId;
+      if (ownerSet || agentSet) {
+        const ownerMatch = ownerSet && l.ownerId === currentUserId;
+        const agentMatch = agentSet && l.agentId === currentUserId;
+        if (!ownerMatch && !agentMatch) return false;
+      }
       if (l.listingStatus && l.listingStatus !== 'PUBLISHED') return false;
       return true;
     });

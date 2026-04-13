@@ -5,6 +5,7 @@ import {
   type CreateRentalContractPayload,
   type DocuSignApiResponse,
   type DocuSignSigningResponse,
+  type GetAgentContractsParams,
   type GetRentalContractsParams,
   type GetRenterContractsParams,
   type LeaseApiResponse,
@@ -157,6 +158,37 @@ export const rentalContractApi = {
 
     const result = await http.get<LeasesApiResponse>(
       `/leases/renter/${renterId}?${query.toString()}`
+    );
+
+    const apiData = result.payload.data;
+    const mapped = apiData.content.map(mapLeaseToContract);
+
+    return {
+      payload: {
+        data: {
+          content: mapped,
+          page: apiData.page,
+          size: apiData.size,
+          total_elements: apiData.total_elements,
+          total_pages: apiData.total_pages,
+          first: apiData.first,
+          last: apiData.last,
+        },
+      },
+    };
+  },
+
+  // ── List (agent side) ────────────────────────────────────────────────────
+  async getAgentContracts(
+    params: GetAgentContractsParams
+  ): Promise<{ payload: { data: RentalContractPageResponse } }> {
+    const { agentId, page = 0, size = 10, status } = params;
+
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) query.set('status', status);
+
+    const result = await http.get<LeasesApiResponse>(
+      `/leases/agent/${agentId}?${query.toString()}`
     );
 
     const apiData = result.payload.data;

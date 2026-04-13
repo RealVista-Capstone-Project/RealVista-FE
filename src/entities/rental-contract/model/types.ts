@@ -168,6 +168,14 @@ export interface GetRenterContractsParams {
   search?: string;
 }
 
+export interface GetAgentContractsParams {
+  agentId: string;
+  page?: number;
+  size?: number;
+  status?: RentalContractStatus;
+  search?: string;
+}
+
 export interface RentalContractPageResponse {
   content: RentalContract[];
   page: number;

@@ -26,11 +26,18 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
    */
   const canCreateContractForListing = (listing: ChatListingData): boolean => {
     if (!currentUserId) return false;
-    // Legacy cards without ownership metadata: fall back to showing the button.
-    // The role gate (owner/AGENT only) is enforced upstream in messages-page.tsx
-    // by passing onCreateContract={undefined} for buyers/tenants.
-    if (!listing.ownerId && !listing.agentId) return true;
-    if (listing.ownerId !== currentUserId && listing.agentId !== currentUserId) return false;
+
+    // If the card carries ownership data, at least one field must match.
+    // Only a field that is explicitly set (non-empty) can disqualify the user.
+    const ownerSet = !!listing.ownerId;
+    const agentSet = !!listing.agentId;
+    if (ownerSet || agentSet) {
+      const ownerMatch = ownerSet && listing.ownerId === currentUserId;
+      const agentMatch = agentSet && listing.agentId === currentUserId;
+      if (!ownerMatch && !agentMatch) return false;
+    }
+    // No ownership data at all (legacy card) → allowed; role gate is upstream.
+
     if (listing.listingStatus && listing.listingStatus !== 'PUBLISHED') return false;
     return true;
   };

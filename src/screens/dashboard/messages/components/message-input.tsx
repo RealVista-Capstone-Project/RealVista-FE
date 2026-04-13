@@ -233,7 +233,9 @@ export function MessageInput({
 
   // ── Auth / role ───────────────────────────────────────────────────────────
   const canCreateContract =
-    session?.user?.role === 'owner' || session?.user?.backendRoles?.includes('AGENT');
+    (session?.user?.backendRoles ?? []).includes('OWNER') ||
+    (session?.user?.backendRoles ?? []).includes('AGENT');
+  console.log('canCreateContract', canCreateContract);
   const landlordId = (session?.user as any)?.id ?? '';
 
   // ── Auto-open modal when a pending listing is set from a card button ──────

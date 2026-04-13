@@ -273,11 +273,13 @@ export function CreateRentalContractPage() {
     };
   };
 
+  const contractsRoute = isAgent ? ROUTES.dashboard.myContracts : ROUTES.dashboard.rentalContracts;
+
   const saveDraft = async () => {
     try {
       await createContractMutation.mutateAsync(buildPayload());
       toast.success(t('toast.draftSaved'));
-      router.push(ROUTES.dashboard.rentalContracts);
+      router.push(contractsRoute);
     } catch {
       toast.error(t('toast.draftError'));
     }
@@ -291,7 +293,7 @@ export function CreateRentalContractPage() {
       // Agents create the contract on behalf of the owner — they have nothing to sign,
       // so skip the DocuSign modal and redirect straight to the contracts list.
       if (isAgent) {
-        router.push(ROUTES.dashboard.rentalContracts);
+        router.push(contractsRoute);
         return;
       }
       setSigningModal({ url: signing.signing_url, redirectOnClose: true });
@@ -350,7 +352,7 @@ export function CreateRentalContractPage() {
         {/* Back button — no giant card wrapper */}
         <ContractPageHeader
           label={t('backToContracts')}
-          onBack={() => router.push(ROUTES.dashboard.rentalContracts)}
+          onBack={() => router.push(contractsRoute)}
         />
 
         <div className='space-y-6'>
@@ -408,7 +410,7 @@ export function CreateRentalContractPage() {
           onClose={() => {
             const shouldRedirect = signingModal.redirectOnClose;
             setSigningModal(null);
-            if (shouldRedirect) router.push(ROUTES.dashboard.rentalContracts);
+            if (shouldRedirect) router.push(contractsRoute);
           }}
         />
       )}
