@@ -35,13 +35,13 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
   const [selectedProfileId, setSelectedProfileId] = useState<string>('');
   const [isAddingProfile, setIsAddingProfile] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
-  
+
   const { data: session } = useAuthSession();
   const { mutate: saveSearch, isPending } = useSaveSearch();
   const queryClient = useQueryClient();
 
   const t = useTranslations('SavedSearch');
-  
+
   const { mutate: createProfile, isPending: isCreatingProfile } = useMutation({
     mutationFn: (name: string) => customerProfileApi.create({ profile_name: name }),
     onSuccess: (res) => {
@@ -80,11 +80,11 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
 
   const submitSaveSearch = () => {
     saveSearch(
-      { 
-        search_type: searchType, 
-        criteria: criteria as any, 
+      {
+        search_type: searchType,
+        criteria: criteria as any,
         board_id: boardId.trim() || 'Mặc định',
-        profile_id: selectedProfileId || undefined 
+        profile_id: selectedProfileId || undefined
       },
       {
         onSuccess: () => {
@@ -93,10 +93,10 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
         },
         onError: (error: any) => {
           const payload = error?.response?.data;
-          const errorCode = payload?.payload?.error_code 
-            ?? payload?.error_code 
+          const errorCode = payload?.payload?.error_code
+            ?? payload?.error_code
             ?? payload?.errorCode;
-            
+
           if (error?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
             toast.error(t('duplicateAlert'));
             return;
@@ -121,7 +121,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
         <span className='hidden sm:inline'>{t('buttonLabel')}</span>
       </Button>
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
-      
+
       <Dialog open={showBoardModal} onOpenChange={setShowBoardModal}>
         <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
@@ -147,7 +147,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
                     </button>
                   )}
                 </div>
-                
+
                 {isAddingProfile ? (
                   <div className='flex items-center gap-2 mt-1'>
                     <Input
@@ -157,8 +157,8 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
                       className='h-10 text-sm'
                       autoFocus
                     />
-                    <Button 
-                      size='sm' 
+                    <Button
+                      size='sm'
                       onClick={() => {
                         if (newProfileName.trim()) createProfile(newProfileName.trim());
                       }}
@@ -167,9 +167,9 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
                     >
                       Lưu
                     </Button>
-                    <Button 
-                      size='sm' 
-                      variant='ghost' 
+                    <Button
+                      size='sm'
+                      variant='ghost'
                       onClick={() => setIsAddingProfile(false)}
                       className='h-10 shrink-0'
                     >
