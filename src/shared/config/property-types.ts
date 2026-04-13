@@ -61,7 +61,8 @@ export type PropertyAttribute =
   | 'IRRIGATION'
   | 'ACCESS_ROAD'
   | 'LOADING_DOCKS'
-  | 'CRANE';
+  | 'CRANE'
+  | 'AREA';
 
 export interface PropertyType {
   code: string;
@@ -404,6 +405,7 @@ export const ATTRIBUTE_LABELS: Record<PropertyAttribute, string> = {
   ACCESS_ROAD: 'Đường vào',
   LOADING_DOCKS: 'Bến bãi',
   CRANE: 'Cần trục',
+  AREA: 'Diện tích',
 };
 
 export const ATTRIBUTE_TYPES: Record<PropertyAttribute, 'number' | 'boolean' | 'text'> = {
@@ -470,4 +472,5 @@ export const ATTRIBUTE_TYPES: Record<PropertyAttribute, 'number' | 'boolean' | '
   ACCESS_ROAD: 'text',
   LOADING_DOCKS: 'number',
   CRANE: 'boolean',
+  AREA: 'number',
 };

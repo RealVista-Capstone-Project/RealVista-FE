@@ -7,6 +7,7 @@ import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-quer
 import { bookmarkApi } from '@/entities/bookmark';
 import { ChevronLeft, Search } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
+import { Button } from '@/shared/ui/button/button';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
@@ -207,11 +208,6 @@ export function PropertyMapBasedSearchPage({
     document.getElementById('property-listings-top')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-    setCurrentPage(1);
-  };
-
   const handleToggleFavorite = async (id: string) => {
     if (!session?.user) {
       setShowLoginModal(true);
@@ -362,7 +358,7 @@ export function PropertyMapBasedSearchPage({
                  </div>
                  <h3 className='text-xl font-bold text-main-black'>Không tìm thấy kết quả</h3>
                  <p className='text-grey-500'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
-                 <RealVistaButton variant='link' onClick={handleResetFilters} className='mt-2'>Xóa tất cả bộ lọc</RealVistaButton>
+                 <Button variant='link' onClick={handleResetFilters} className='mt-2 text-main-primary font-bold'>Xóa tất cả bộ lọc</Button>
               </div>
             ) : (
               properties.map((property: PropertyListingDto) => (
