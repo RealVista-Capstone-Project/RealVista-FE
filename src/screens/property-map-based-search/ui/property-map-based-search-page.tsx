@@ -272,8 +272,6 @@ export function PropertyMapBasedSearchPage({
               }
             }}
             onMoreFilters={() => setFiltersModalOpen(true)}
-            homeLabel={t('home')}
-            searchLabel={t('search')}
             moreFiltersLabel={t('moreFilters')}
             action={
               onBack && (

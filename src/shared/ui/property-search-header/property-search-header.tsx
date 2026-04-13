@@ -6,7 +6,7 @@ import { Search, Settings2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Input } from '@/shared/ui/input';
 
-interface PropertySearchHeaderProps {
+export interface PropertySearchHeaderProps {
   title: string;
   propertyCount: number;
   propertyCountLabel: string;
