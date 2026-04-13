@@ -8,10 +8,12 @@ import { conversationQueries } from '@/entities/conversation';
 import type { MessageResponse } from '@/entities/conversation';
 import { useAuthSession } from '@/features/auth/model';
 import type { Message, Participant } from '../types';
+import type { ChatListingData } from '@/entities/contact';
 import { MessageBubble } from './message-bubble';
 
 interface ChatMessagesProps {
   conversationId: string;
+  onListingClick?: (listingId: string) => void;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -78,19 +80,29 @@ function mapMessageResponse(raw: MessageResponse, currentUserId?: string): Mappe
     avatarBg: stringToAvatarBg(raw.sender.name),
   };
 
+  let listing: ChatListingData | undefined;
+  if (raw.message_type === 'LISTING_CARD' && raw.metadata) {
+    try {
+      listing = JSON.parse(raw.metadata) as ChatListingData;
+    } catch {
+      // malformed metadata — skip card
+    }
+  }
+
   return {
     id: raw.message_id,
     sender,
     text: raw.content ?? '',
     time: formatTime(raw.created_at),
     isLink: !!raw.content?.includes('https://'),
+    listing,
     _isoCreatedAt: raw.created_at,
   };
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function ChatMessages({ conversationId }: ChatMessagesProps) {
+export function ChatMessages({ conversationId, onListingClick }: ChatMessagesProps) {
   const t = useTranslations('Messages');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -177,7 +189,7 @@ export function ChatMessages({ conversationId }: ChatMessagesProps) {
             </div>
 
             {group.msgs.map((msg) => (
-              <MessageBubble key={msg.id} msg={msg} />
+              <MessageBubble key={msg.id} msg={msg} onListingClick={onListingClick} />
             ))}
           </div>
         ))}

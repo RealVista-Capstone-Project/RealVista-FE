@@ -1,3 +1,5 @@
+import type { ChatListingData } from '@/entities/contact';
+
 export interface TimelineEvent {
   id: string;
   icon: 'check' | 'plus';
@@ -34,6 +36,7 @@ export interface Message {
   time: string;
   reactions?: { emoji: string; count: number }[];
   isLink?: boolean;
+  listing?: ChatListingData;
 }
 
 export interface Conversation {
