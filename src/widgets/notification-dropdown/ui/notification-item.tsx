@@ -36,10 +36,13 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
   return (
     <div
       className={cn(
-        'relative w-full flex items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-purple-98 group',
-        !notification.isRead && 'bg-purple-98/40'
+        'w-full flex items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-purple-98 group border-l-4',
+        !notification.isRead
+          ? 'bg-purple-98/40 border-main-primary'
+          : 'border-transparent'
       )}
     >
+      {/* Clickable content area */}
       <button
         type='button'
         onClick={() => onClick?.(notification)}
@@ -65,7 +68,7 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
           </p>
         </div>
 
-        {/* Right: event-type icon */}
+        {/* Right: event-type icon — inside button so click navigates */}
         <div className='shrink-0'>
           <div
             className={cn(
@@ -78,6 +81,7 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
         </div>
       </button>
 
+      {/* Far right: delete button — in flow, never overlaps icon */}
       {onDelete && (
         <button
           type='button'
@@ -86,7 +90,7 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
             e.stopPropagation();
             onDelete(notification.id);
           }}
-          className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-red-500 hover:bg-red-50'
+          className='shrink-0 self-start mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-red-500 hover:bg-red-50'
         >
           <X className='h-3.5 w-3.5' strokeWidth={2.5} />
         </button>
