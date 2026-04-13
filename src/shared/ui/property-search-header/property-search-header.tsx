@@ -1,100 +1,79 @@
 'use client';
 
-import { ChevronRight, Search } from 'lucide-react';
-import Link from 'next/link';
-import { cn } from '@/shared/lib/utils';
-import { Button } from '@/shared/ui/button/button';
+import * as React from 'react';
+import { Search, Settings2 } from 'lucide-react';
 
-export interface PropertySearchHeaderProps {
-  title?: string;
-  propertyCount?: number;
-  propertyCountLabel?: string;
+import { cn } from '@/shared/lib/utils';
+import { Input } from '@/shared/ui/input';
+
+interface PropertySearchHeaderProps {
+  title: string;
+  propertyCount: number;
+  propertyCountLabel: string;
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
-  onMoreFilters?: () => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  homeLabel?: string;
-  searchLabel?: string;
+  onMoreFilters?: () => void;
   moreFiltersLabel?: string;
   action?: React.ReactNode;
   className?: string;
 }
 
+/**
+ * Header for property search pages
+ * Displays title, total count, breadcrumbs (optional), and search controls
+ */
 export function PropertySearchHeader({
-  title = 'Search properties',
-  propertyCount = 0,
-  propertyCountLabel = 'properties available to rent',
-  searchPlaceholder = 'Search...',
-  searchValue = '',
+  title,
+  propertyCount,
+  propertyCountLabel,
+  searchPlaceholder = 'Tìm kiếm...',
+  searchValue,
   onSearchChange,
-  onMoreFilters,
   onKeyDown,
-  homeLabel = 'Home',
-  searchLabel = 'Search',
-  moreFiltersLabel = 'More filters',
+  onMoreFilters,
+  moreFiltersLabel = 'Bộ lọc',
   action,
   className,
 }: PropertySearchHeaderProps) {
   return (
-    <div className={cn('space-y-6', className)}>
-
-      {/* Title and Property Count */}
-      <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
-        <div>
-          <h1 className='mb-1 text-3xl font-bold leading-[1.25] tracking-[-1px] text-main-black'>
-            {title}
-          </h1>
-          <p className='text-base font-normal leading-[1.5] text-grey-500'>
-            {propertyCount.toLocaleString()} {propertyCountLabel}
-          </p>
+    <div className={cn('flex flex-col gap-6', className)}>
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-3'>
+            <h1 className='text-2xl font-bold tracking-tight text-main-black sm:text-3xl'>
+              {title}
+            </h1>
+            {action && <div className='flex shrink-0 items-center'>{action}</div>}
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='h-2 w-2 rounded-full bg-main-primary' />
+            <p className='text-sm font-medium text-grey-500'>
+              <span className='font-bold text-main-primary'>{propertyCount}</span> {propertyCountLabel}
+            </p>
+          </div>
         </div>
-        {action && <div>{action}</div>}
       </div>
 
-      {/* Search Bar with More Filters */}
-      <div className='flex gap-3'>
+      <div className='flex items-center gap-3'>
         <div className='relative flex-1'>
-          <Search className='absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-grey-500' />
-          <input
-            type='text'
-            placeholder={searchPlaceholder}
+          <Search className='absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-grey-400' />
+          <Input
             value={searchValue}
             onChange={(e) => onSearchChange?.(e.target.value)}
             onKeyDown={onKeyDown}
-            className='h-12 w-full rounded-lg border-[1.5px] border-purple-92 bg-white pl-12 pr-10 text-base font-normal leading-[1.5] text-main-black outline-none transition-colors placeholder:text-grey-500 focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+            placeholder={searchPlaceholder}
+            className='h-12 w-full border-purple-92 bg-white pl-12 pr-4 text-base font-medium shadow-sm transition-all focus:border-main-primary focus:ring-4 focus:ring-main-primary/5'
           />
-          {searchValue && (
-            <button
-              onClick={() => onSearchChange?.('')}
-              className='absolute right-3 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full bg-grey-100 text-grey-500 hover:bg-grey-200 hover:text-main-black transition-colors'
-            >
-              <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><line x1='18' y1='6' x2='6' y2='18'></line><line x1='6' y1='6' x2='18' y2='18'></line></svg>
-            </button>
-          )}
         </div>
-        <Button
-          type='button'
+        <button
           onClick={onMoreFilters}
-          className='flex h-12 items-center gap-2 rounded-lg bg-main-primary px-6 text-base font-bold leading-[1.5] text-white transition-colors hover:bg-main-primary/90'
+          className='flex h-12 items-center gap-2 rounded-full border-[1.5px] border-purple-92 bg-white px-5 font-bold text-main-black transition-all hover:border-main-primary sm:hidden'
         >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='20'
-            height='20'
-            viewBox='0 0 20 20'
-            fill='none'
-          >
-            <path
-              d='M4.16667 5.83333H15.8333M6.66667 10H13.3333M9.16667 14.1667H10.8333'
-              stroke='white'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-          </svg>
-          {moreFiltersLabel}
-        </Button>
+          <Settings2 className='h-5 w-5' />
+          <span className='hidden xs:inline'>{moreFiltersLabel}</span>
+        </button>
       </div>
     </div>
   );

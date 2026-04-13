@@ -15,31 +15,31 @@ export interface PropertyFiltersProps {
   priceRange: { min: number; max: number };
   onPriceChange: (min: number, max: number) => void;
   priceLabel: string;
-  
+
   // Basic properties
   typeLabel: string;
   sortLabel?: string;
   sortBy?: string;
   onSortChange?: (value: string) => void;
-  
+
   // Handlers
   onMoreFilters: () => void;
-  
+
   // View mode
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
-  
+
   className?: string;
 }
 
-function FilterChip({ 
-  label, 
-  onClick, 
+function FilterChip({
+  label,
+  onClick,
   active,
   icon: Icon = ChevronDown
-}: { 
-  label: string; 
-  onClick?: () => void; 
+}: {
+  label: string;
+  onClick?: () => void;
   active?: boolean;
   icon?: React.ElementType;
 }) {
@@ -49,8 +49,8 @@ function FilterChip({
       onClick={active ? undefined : onClick}
       className={cn(
         'flex items-center gap-2 rounded-full border-[1.5px] px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap',
-        active 
-          ? 'border-main-primary bg-main-primary/5 text-main-primary' 
+        active
+          ? 'border-main-primary bg-main-primary/5 text-main-primary'
           : 'border-purple-92 bg-white text-main-black hover:border-main-primary/50'
       )}
     >
@@ -80,7 +80,7 @@ export function PropertyFilters({
     { label: 'Ưu tiên', value: 'PRIORITY' },
   ];
 
-  const currentSortLabel = sortOptions.find(opt => opt.value === sortBy)?.label || sortLabel;
+  const currentSortLabel = sortOptions.find((opt) => opt.value === sortBy)?.label || sortLabel;
 
   return (
     <div className={cn('flex items-center justify-between gap-4', className)}>
@@ -90,9 +90,9 @@ export function PropertyFilters({
         <Popover>
           <PopoverTrigger asChild>
             <div className='cursor-pointer'>
-              <FilterChip 
-                label={priceLabel} 
-                active={priceRange.min > 0 || priceRange.max < 20000000000} 
+              <FilterChip
+                label={priceLabel}
+                active={priceRange.min > 0 || priceRange.max < 20000000000}
               />
             </div>
           </PopoverTrigger>
@@ -108,7 +108,7 @@ export function PropertyFilters({
                       onChange={(val) => onPriceChange(Math.max(0, Math.trunc(val)), priceRange.max)}
                       placeholder='0'
                       hidePreview
-                      inputClassName="h-12 text-lg font-medium"
+                      inputClassName='h-12 text-lg font-medium'
                     />
                   </div>
                   <div className='space-y-2'>
@@ -118,12 +118,12 @@ export function PropertyFilters({
                       onChange={(val) => onPriceChange(priceRange.min, Math.max(0, Math.trunc(val)))}
                       placeholder='Bất kỳ'
                       hidePreview
-                      inputClassName="h-12 text-lg font-medium"
+                      inputClassName='h-12 text-lg font-medium'
                     />
                   </div>
                 </div>
                 <div className='flex justify-end gap-2 border-t border-purple-92 pt-4'>
-                   <Button variant="link" size="sm" className='text-sm font-bold text-main-primary h-auto p-0' onClick={() => onPriceChange(0, 20000000000)}>Xóa tất cả</Button>
+                   <Button variant='link' size='sm' className='text-sm font-bold text-main-primary h-auto p-0' onClick={() => onPriceChange(0, 20000000000)}>Xóa tất cả</Button>
                 </div>
               </div>
             </div>
@@ -132,14 +132,14 @@ export function PropertyFilters({
 
         {/* Type Filter */}
         <FilterChip label={typeLabel} onClick={onMoreFilters} />
-        
+
         {/* Sort Filter Popover */}
         <Popover>
           <PopoverTrigger asChild>
             <div className='cursor-pointer'>
-              <FilterChip 
-                label={currentSortLabel} 
-                active={sortBy !== 'NEWEST'} 
+              <FilterChip
+                label={currentSortLabel}
+                active={sortBy !== 'NEWEST'}
               />
             </div>
           </PopoverTrigger>
@@ -151,8 +151,8 @@ export function PropertyFilters({
                   onClick={() => onSortChange?.(opt.value)}
                   className={cn(
                     'flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                    sortBy === opt.value 
-                      ? 'bg-main-primary/5 text-main-primary' 
+                    sortBy === opt.value
+                      ? 'bg-main-primary/5 text-main-primary'
                       : 'text-main-black hover:bg-grey-100'
                   )}
                 >
