@@ -96,6 +96,7 @@ export function PropertyMapBasedSearchPage({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [mapBounds, setMapBounds] = useState<PropertySearchRequest | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>(searchParams?.get('sortBy') || 'NEWEST');
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
   const [showLoginModal, setShowLoginModal] = useState(false);
