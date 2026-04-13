@@ -3,7 +3,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
 import { notificationApi, notificationKeys, mapToNotification } from '@/entities/notification';
 import type { NotificationResponse, Notification } from '@/entities/notification';
 import { NotificationItem } from '@/widgets/notification-dropdown/ui/notification-item';
@@ -13,15 +12,13 @@ const PAGE_SIZE = 20;
 export default function NotificationsPage() {
   const { data: session } = useSession();
   const token = session?.user?.accessToken as string | undefined;
-  const params = useParams();
-  const locale = (params?.locale as string | undefined) ?? 'en';
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(0);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [...notificationKeys.list(), 'full-page', page],
-    queryFn: () => notificationApi.listWithToken(token ?? ''),
+    queryFn: () => notificationApi.listWithToken(token ?? '', { page, size: PAGE_SIZE }),
     enabled: !!token,
     staleTime: 30 * 1000,
   });
@@ -47,7 +44,7 @@ export default function NotificationsPage() {
     async (id: string) => {
       if (!token) return;
       try {
-        await notificationApi.markRead(id);
+        await notificationApi.markReadWithToken(id, token);
         queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
       } catch {
         // ignore
@@ -70,13 +67,14 @@ export default function NotificationsPage() {
   );
 
   const handleMarkAllRead = useCallback(async () => {
+    if (!token) return;
     try {
-      await notificationApi.markAllRead();
+      await notificationApi.markAllReadWithToken(token);
       queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
     } catch {
       // ignore
     }
-  }, [queryClient]);
+  }, [token, queryClient]);
 
   if (isLoading) {
     return (
