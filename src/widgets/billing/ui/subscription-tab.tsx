@@ -13,6 +13,8 @@ import {
   ExternalLink,
   LayoutGrid,
   PackageSearch,
+  Clock,
+  RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
@@ -1283,20 +1285,67 @@ function Step3Content({
     },
   });
 
+  // Refs to distinguish manual clicks from auto-poll (only show toast on manual)
+  const isManualSyncRef = React.useRef(false);
+  const syncPayOsMutationRef = React.useRef<ReturnType<typeof useMutation<
+    { payload: { data?: TransactionStatusResponse } },
+    Error, void, unknown
+  >> | null>(null);
+
   const syncPayOsMutation = useMutation({
     mutationFn: () => billingApi.syncPayOsFromCheckoutOrder(checkout?.checkout_order_id ?? ''),
     onSuccess: (res) => {
       const txnStatus = (res.payload as { data?: TransactionStatusResponse }).data?.status;
       if (txnStatus === 'COMPLETED') {
         onNext();
-      } else {
-        toast.info('Chưa nhận được thanh toán. Vui lòng thử lại sau.');
+      } else if (isManualSyncRef.current) {
+        toast.info('Chưa nhận được thanh toán. Vui lòng thử lại sau ít phút.');
       }
+      isManualSyncRef.current = false;
     },
     onError: () => {
-      toast.error('Không thể kiểm tra trạng thái PayOS');
+      if (isManualSyncRef.current) {
+        toast.error('Không thể kiểm tra trạng thái PayOS');
+      }
+      isManualSyncRef.current = false;
     },
   });
+  syncPayOsMutationRef.current = syncPayOsMutation;
+
+  // Auto-poll PayOS every 10 s while checkout is active — mirrors VNPay behaviour
+  React.useEffect(() => {
+    if (!checkout?.checkout_order_id || checkout.payment_method !== 'PAYOS') return;
+    const id = setInterval(() => {
+      if (!syncPayOsMutationRef.current?.isPending) {
+        syncPayOsMutationRef.current?.mutate();
+      }
+    }, 10_000);
+    return () => clearInterval(id);
+  }, [checkout?.checkout_order_id, checkout?.payment_method]);
+
+  // PayOS: countdown to QR expiry driven by expired_at from server
+  const [secondsLeft, setSecondsLeft] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (!checkout?.expired_at) {
+      setSecondsLeft(null);
+      return;
+    }
+    const calcRemaining = () =>
+      Math.max(0, checkout.expired_at! - Math.floor(Date.now() / 1000));
+    setSecondsLeft(calcRemaining());
+    const id = setInterval(() => {
+      const remaining = calcRemaining();
+      setSecondsLeft(remaining);
+      if (remaining === 0) clearInterval(id);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [checkout?.expired_at]);
+
+  const formatCountdown = (s: number) => {
+    const m = Math.floor(s / 60);
+    const ss = String(s % 60).padStart(2, '0');
+    return `${m}:${ss}`;
+  };
 
   // Poll VNPay transaction status when checkout is created with VNPay
   React.useEffect(() => {
@@ -1511,46 +1560,96 @@ function Step3Content({
       {/* PayOS: show QR after checkout created */}
       {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
         <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
-          <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
-            Quét mã QR để thanh toán qua{' '}
-            <span className='text-blue-600'>PayOS</span>
-            {!syncPayOsMutation.isPending && (
-              <button
-                type='button'
-                onClick={() => syncPayOsMutation.mutate()}
-                disabled={syncPayOsMutation.isPending}
-                className='inline-flex items-center text-grey-700 hover:text-grey-500 transition-colors disabled:opacity-50'
-                title='Kiểm tra thanh toán'
-                aria-label='Confirm payment'
+          {secondsLeft === 0 ? (
+            /* Expired state — user may have already scanned and transferred */
+            <div className='flex flex-col items-center gap-3 text-center px-6'>
+              <div className='flex items-center gap-1.5 text-sm font-medium text-red-500'>
+                <Clock className='size-4' />
+                Mã QR đã hết hạn
+              </div>
+              <p className='text-xs text-grey-500'>
+                Nếu bạn đã chuyển khoản, nhấn kiểm tra thanh toán.
+                <br />Chưa chuyển? Tạo mã QR mới để tiếp tục.
+              </p>
+              <div className='flex items-center gap-2'>
+                <button
+                  type='button'
+                  onClick={() => { isManualSyncRef.current = true; syncPayOsMutation.mutate(); }}
+                  disabled={syncPayOsMutation.isPending}
+                  className='inline-flex items-center gap-1.5 rounded-lg border border-main-primary px-4 py-2 text-sm font-semibold text-main-primary hover:bg-purple-98 disabled:opacity-50 transition-colors'
+                >
+                  {syncPayOsMutation.isPending
+                    ? <Loader2 className='size-3.5 animate-spin' />
+                    : <CreditCard className='size-3.5' />}
+                  Kiểm tra thanh toán
+                </button>
+                <button
+                  type='button'
+                  onClick={() => { setCheckout(null); requestCheckout('PAYOS'); }}
+                  disabled={isLoading}
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-main-primary px-4 py-2 text-sm font-semibold text-white hover:bg-main-primary-hover disabled:opacity-50 transition-colors'
+                >
+                  <RefreshCw className='size-3.5' />
+                  Tạo mã QR mới
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Active QR state */
+            <>
+              <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
+                Quét mã QR để thanh toán qua{' '}
+                <span className='text-blue-600'>PayOS</span>
+                {!syncPayOsMutation.isPending && (
+                  <button
+                    type='button'
+                    onClick={() => { isManualSyncRef.current = true; syncPayOsMutation.mutate(); }}
+                    disabled={syncPayOsMutation.isPending}
+                    className='inline-flex items-center text-grey-700 hover:text-grey-500 transition-colors disabled:opacity-50'
+                    title='Kiểm tra thanh toán'
+                    aria-label='Confirm payment'
+                  >
+                    <CreditCard className='size-4' />
+                  </button>
+                )}
+                {syncPayOsMutation.isPending && (
+                  <Loader2 className='size-4 animate-spin text-grey-700' />
+                )}
+              </p>
+              <div className='rounded-xl border-4 border-white p-1 shadow-md'>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                    checkout.qr_code || checkout.checkout_url
+                  )}&color=7065f0&bgcolor=ffffff`}
+                  alt='PayOS QR code'
+                  width={180}
+                  height={180}
+                  className='rounded-lg'
+                />
+              </div>
+              <p className={cn(
+                'flex items-center gap-1 text-xs',
+                secondsLeft === null ? 'text-grey-500'
+                  : secondsLeft > 300 ? 'text-grey-500'
+                  : secondsLeft > 60 ? 'text-yellow-600'
+                  : 'text-red-500'
+              )}>
+                <Clock className='size-3' />
+                {secondsLeft !== null
+                  ? `Mã QR hết hạn sau ${formatCountdown(secondsLeft)}`
+                  : 'Mã QR chỉ có giá trị trong 10 phút'}
+              </p>
+              <a
+                href={checkout.checkout_url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='flex items-center gap-1 text-xs text-blue-600 underline underline-offset-2'
               >
-                <CreditCard className='size-4' />
-              </button>
-            )}
-            {syncPayOsMutation.isPending && (
-              <Loader2 className='size-4 animate-spin text-grey-700' />
-            )}
-          </p>
-          <div className='rounded-xl border-4 border-white p-1 shadow-md'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                checkout.qr_code || checkout.checkout_url
-              )}&color=7065f0&bgcolor=ffffff`}
-              alt='PayOS QR code'
-              width={180}
-              height={180}
-              className='rounded-lg'
-            />
-          </div>
-          <p className='text-xs text-grey-500'>Mã QR chỉ có giá trị trong 15 phút</p>
-          <a
-            href={checkout.checkout_url}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='flex items-center gap-1 text-xs text-blue-600 underline underline-offset-2'
-          >
-            Mở PayOS <ExternalLink className='size-3' />
-          </a>
+                Mở PayOS <ExternalLink className='size-3' />
+              </a>
+            </>
+          )}
         </div>
       )}
 
