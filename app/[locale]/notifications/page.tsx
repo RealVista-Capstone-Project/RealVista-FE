@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { notificationApi, notificationKeys, mapToNotification } from '@/entities/notification';
 import type { NotificationResponse, NotificationPageResponse, Notification } from '@/entities/notification';
 import { NotificationItem } from '@/widgets/notification-dropdown/ui/notification-item';
+import { Pagination } from '@/shared/ui/realvista-pagination';
 
 const PAGE_SIZE = 20;
 
@@ -127,26 +128,15 @@ export default function NotificationsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className='mt-6 flex items-center justify-center gap-3'>
-            <button
-              type='button'
-              disabled={page === 0}
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              className='px-4 py-2 text-sm rounded-lg border border-border bg-white text-main-black disabled:opacity-40 hover:bg-purple-98'
-            >
-              {t('previous')}
-            </button>
-            <span className='text-sm text-grey-500'>
-              {t('pageOf', { page: page + 1, totalPages })}
-            </span>
-            <button
-              type='button'
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage((p) => p + 1)}
-              className='px-4 py-2 text-sm rounded-lg border border-border bg-white text-main-black disabled:opacity-40 hover:bg-purple-98'
-            >
-              {t('next')}
-            </button>
+          <div className='mt-6'>
+            <Pagination
+              currentPage={page + 1}
+              totalPages={totalPages}
+              onPageChange={(p) => {
+                setPage(p - 1);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
           </div>
         )}
       </div>
