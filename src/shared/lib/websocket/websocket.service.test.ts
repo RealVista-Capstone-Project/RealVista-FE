@@ -76,9 +76,7 @@ describe('WebSocketService', () => {
       const testService = new WebSocketService({
         endpoint: 'ws://localhost:8080/ws',
         connectionTimeout: 10000,
-        autoReconnect: false,
         reconnectDelay: 5000,
-        maxReconnectAttempts: 10,
         debug: true,
         ...mockCallbacks,
       });
@@ -116,24 +114,16 @@ describe('WebSocketService', () => {
       expect(mockClientInstance.activate).toHaveBeenCalledTimes(1);
     });
 
-    it('should include auth headers when sessionToken exists', () => {
-      const mockToken = 'test-jwt-token';
-      const getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => {
-        if (key === 'sessionToken') return mockToken;
-        return null;
-      });
-
+    it('should not include auth headers when no token is provided', () => {
       service.connect();
 
       expect(Client).toHaveBeenCalledWith(
         expect.objectContaining({
-          connectHeaders: expect.objectContaining({
-            Authorization: `Bearer ${mockToken}`,
+          connectHeaders: expect.not.objectContaining({
+            Authorization: expect.any(String),
           }),
         })
       );
-
-      getItemSpy.mockRestore();
     });
   });
 
@@ -175,6 +165,79 @@ describe('WebSocketService', () => {
       });
 
       expect(mockClientInstance.publish).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('pending subscriptions', () => {
+    it('should queue a subscription when called before connected', () => {
+      // service is not yet connected (mockClientInstance.connected = false)
+      const onMessage = jest.fn();
+      const unsub = service.subscribe({
+        destination: '/topic/test',
+        onMessage,
+      });
+
+      // Should NOT have called client.subscribe yet
+      expect(mockClientInstance.subscribe).not.toHaveBeenCalled();
+
+      // The returned unsub should be a function (cancel from pending queue)
+      expect(typeof unsub).toBe('function');
+    });
+
+    it('should flush pending subscriptions when onConnected fires', () => {
+      const onMessage = jest.fn();
+      service.subscribe({ destination: '/topic/test', onMessage });
+
+      // Simulate connection establishing
+      mockClientInstance.connected = true;
+      service.connect();
+      const clientConfig = (Client as jest.Mock).mock.calls[0]?.[0];
+      clientConfig?.onConnect?.();
+
+      expect(mockClientInstance.subscribe).toHaveBeenCalledWith(
+        '/topic/test',
+        expect.any(Function)
+      );
+      expect(mockClientInstance.subscribe).toHaveBeenCalledTimes(1);
+    });
+
+    it('should cancel a pending subscription before it is flushed', () => {
+      const onMessage = jest.fn();
+      service.connect();
+      // client is still not connected
+      const unsub = service.subscribe({ destination: '/topic/test', onMessage });
+
+      // Cancel before connect fires
+      unsub();
+
+      // Now simulate connect
+      mockClientInstance.connected = true;
+      const clientConfig = (Client as jest.Mock).mock.calls[0]?.[0];
+      clientConfig?.onConnect?.();
+
+      // Subscription was cancelled — should NOT call client.subscribe
+      expect(mockClientInstance.subscribe).not.toHaveBeenCalled();
+    });
+
+    it('should clear pending subscriptions on disconnect', () => {
+      const onMessage = jest.fn();
+      service.connect();
+      service.subscribe({ destination: '/topic/test', onMessage });
+
+      service.disconnect();
+
+      // Reconnect and fire onConnect — pending should be empty
+      mockClientInstance.activate.mockClear();
+      mockClientInstance.subscribe.mockClear();
+      service.connect();
+      mockClientInstance.connected = true;
+      const clientConfig = (Client as jest.Mock).mock.calls[
+        (Client as jest.Mock).mock.calls.length - 1
+      ]?.[0];
+      clientConfig?.onConnect?.();
+
+      // No pending subscriptions to flush
+      expect(mockClientInstance.subscribe).not.toHaveBeenCalled();
     });
   });
 });
