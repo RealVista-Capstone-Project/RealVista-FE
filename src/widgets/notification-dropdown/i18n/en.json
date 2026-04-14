@@ -5,6 +5,12 @@
     "markAsRead": "Mark all as read",
     "noNotifications": "No notifications yet",
     "viewAll": "View all notifications",
-    "toastView": "View"
+    "toastView": "View",
+    "loading": "Loading notifications\u2026",
+    "error": "Failed to load notifications.",
+    "noNotificationsPage": "No notifications yet.",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {totalPages}"
   }
 }

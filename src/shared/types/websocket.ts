@@ -11,16 +11,10 @@ export type WebSocketState =
 export interface WebSocketOptions {
   // WebSocket endpoint URL (e.g., 'http://localhost:8080/ws')
   endpoint: string;
-  // Whether to use STOMP protocol (default: true for Spring Boot)
-  useSTOMP?: boolean;
   // Connection timeout in milliseconds (default: 5000)
   connectionTimeout?: number;
-  // Whether to automatically reconnect on disconnect (default: true)
-  autoReconnect?: boolean;
   // Delay between reconnection attempts in milliseconds (default: 3000)
   reconnectDelay?: number;
-  // Maximum number of reconnection attempts (default: 5)
-  maxReconnectAttempts?: number;
   // Additional headers to send during connection
   headers?: { [key: string]: string };
   // Enable debug logging

@@ -2,19 +2,21 @@ import { PropertyDetailScreen } from '@/screens/property-detail/ui/property-deta
 import { Metadata } from 'next';
 
 interface PropertyPageProps {
-  params: {
+  params: Promise<{
     id: string;
     locale: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: PropertyPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
   return {
     title: `Property Detail | RealVista`,
-    description: `View details for property ${params.id}`,
+    description: `View details for property ${resolvedParams.id}`,
   };
 }
 
-export default function PropertyPage({ params }: PropertyPageProps) {
-  return <PropertyDetailScreen propertyId={params.id} />;
+export default async function PropertyPage({ params }: PropertyPageProps) {
+  const resolvedParams = await params;
+  return <PropertyDetailScreen propertyId={resolvedParams.id} />;
 }

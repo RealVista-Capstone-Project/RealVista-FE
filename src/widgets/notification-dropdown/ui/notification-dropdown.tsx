@@ -12,6 +12,7 @@ interface NotificationDropdownProps {
   notifications: Notification[];
   unreadCount?: number;
   onNotificationClick?: (notification: Notification) => void;
+  onDelete?: (id: string) => void;
   onViewAll?: () => void;
   onMarkAllRead?: () => void;
   align?: 'start' | 'center' | 'end';
@@ -22,6 +23,7 @@ export function NotificationDropdown({
   notifications,
   unreadCount = 0,
   onNotificationClick,
+  onDelete,
   onViewAll,
   onMarkAllRead,
   align = 'end',
@@ -100,7 +102,7 @@ export function NotificationDropdown({
             {displayed.length > 0 ? (
               <div className='flex flex-col divide-y divide-border'>
                 {displayed.map((n) => (
-                  <NotificationItem key={n.id} notification={n} onClick={handleClick} />
+                  <NotificationItem key={n.id} notification={n} onClick={handleClick} onDelete={onDelete} />
                 ))}
               </div>
             ) : (
