@@ -17,13 +17,13 @@ export interface ChatWebSocketMessage {
 
 /**
  * Incoming WebSocket message envelope (e.g. for typing indicators)
- * Matches WebSocketMessage.java (camelCase)
+ * Matches WebSocketMessage.java (snake_case)
  */
 export interface WebSocketMessage {
   type: string;
   payload: any;
-  senderId?: number;
-  senderName?: string;
+  sender_id?: number;
+  sender_name?: string;
   timestamp?: string; // ISO 8601
   metadata?: any;
 }
