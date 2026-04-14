@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/shared/lib/websocket';
-import { mapWsPayloadToNotification, type Notification, type NotificationWsPayload } from '@/entities/notification';
+import { mapWsPayloadToNotification, type Notification, type NotificationWsPayload, NotificationEventType } from '@/entities/notification';
 import { billingKeys } from '@/entities/billing';
 
 const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_ENDPOINT ?? 'http://localhost:8080/ws';
@@ -46,14 +46,12 @@ export function useNotificationWebSocket({
   const onNotificationActionRef = useRef(onNotificationAction);
   onNotificationActionRef.current = onNotificationAction;
 
-  const { isConnected, subscribe } = useWebSocket({
+  const { subscribe, isConnected } = useWebSocket({
     endpoint: WS_ENDPOINT,
     token,
   });
 
   useEffect(() => {
-    if (!isConnected) return;
-
     const unsubscribe = subscribe({
       destination: NOTIFICATION_DESTINATION,
       onMessage: (frame) => {
@@ -61,7 +59,7 @@ export function useNotificationWebSocket({
           const raw = JSON.parse(frame.body) as NotificationWsPayload;
 
           // Deduplicate — backend may fire over both WS and FCM
-          const id = raw.notificationId ?? raw.notification_id ?? '';
+          const id = raw.notification_id;
           if (!id || seenIds.current.has(id)) return;
           seenIds.current.add(id);
 
@@ -69,8 +67,8 @@ export function useNotificationWebSocket({
           onNewNotificationRef.current(notification);
 
           const is3dEvent =
-            notification.eventType === 'PROPERTY_3D_GENERATED' ||
-            notification.eventType === 'PROPERTY_3D_FAILED';
+            notification.eventType === NotificationEventType.PROPERTY_3D_GENERATED ||
+            notification.eventType === NotificationEventType.PROPERTY_3D_FAILED;
 
           toast.info(notification.title, {
             description: notification.message,
@@ -88,8 +86,10 @@ export function useNotificationWebSocket({
           if (is3dEvent) {
             queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
           }
-        } catch {
-          // Silently ignore malformed frames
+        } catch (err) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('[NotificationWS] Failed to parse frame body:', err);
+          }
         }
       },
     });
@@ -97,5 +97,5 @@ export function useNotificationWebSocket({
     return () => {
       unsubscribe();
     };
-  }, [isConnected, subscribe, queryClient]);
+  }, [subscribe, isConnected, queryClient, toastViewLabel]);
 }

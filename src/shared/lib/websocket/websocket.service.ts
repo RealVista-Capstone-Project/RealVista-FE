@@ -45,6 +45,7 @@ export class WebSocketService {
   };
   private callbacks: WebSocketCallbacks;
   private subscriptions: Map<string, StoredSubscription> = new Map();
+  private pendingSubscriptions: SubscriptionOptions[] = [];
   private connectionTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
@@ -55,11 +56,8 @@ export class WebSocketService {
     this.options = {
       endpoint: options.endpoint,
       token: (options as WebSocketServiceOptions).token,
-      useSTOMP: options.useSTOMP ?? true,
       connectionTimeout: options.connectionTimeout ?? 5000,
-      autoReconnect: options.autoReconnect ?? true,
       reconnectDelay: options.reconnectDelay ?? 3000,
-      maxReconnectAttempts: options.maxReconnectAttempts ?? 5,
       headers: options.headers ?? {},
       debug: options.debug ?? false,
     };
@@ -146,6 +144,7 @@ export class WebSocketService {
     }
 
     // Unsubscribe from all subscriptions
+    this.pendingSubscriptions = [];
     this.unsubscribeAll();
 
     // Deactivate STOMP client
@@ -166,8 +165,12 @@ export class WebSocketService {
    */
   subscribe(options: SubscriptionOptions): () => void {
     if (!this.client || !this.client.connected) {
-      // Return a no-op unsubscribe function
-      return () => {};
+      // Queue the subscription — will be flushed in onConnected()
+      this.pendingSubscriptions.push(options);
+      return () => {
+        const idx = this.pendingSubscriptions.indexOf(options);
+        if (idx !== -1) this.pendingSubscriptions.splice(idx, 1);
+      };
     }
 
     const { destination, onMessage, id } = options;
@@ -296,6 +299,10 @@ export class WebSocketService {
     // Resubscribe to all destinations
     this.resubscribeAll();
 
+    // Flush pending subscriptions (registered before connection was established)
+    const pending = this.pendingSubscriptions.splice(0);
+    pending.forEach((opts) => this.subscribe(opts));
+
     this.callbacks.onConnect();
   }
 
@@ -342,20 +349,10 @@ export class WebSocketService {
 
   /**
    * Get authentication headers
-   * Prioritizes token from options, then localStorage
    */
   private getAuthHeaders(): { [key: string]: string } {
-    // 1. Use token from options if provided
     if (this.options.token) {
       return { Authorization: `Bearer ${this.options.token}` };
-    }
-
-    // 2. Fallback to localStorage (for backward compatibility)
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sessionToken');
-      if (token) {
-        return { Authorization: `Bearer ${token}` };
-      }
     }
     return {};
   }

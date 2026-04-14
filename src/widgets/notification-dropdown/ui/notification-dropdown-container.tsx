@@ -6,20 +6,23 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
+  notificationApi,
   notificationQueries,
   notificationKeys,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   mapToNotification,
+  NotificationEventType,
   type Notification,
   type NotificationResponse,
+  type NotificationPageResponse,
 } from '@/entities/notification';
 import { useNotificationWebSocket } from '../hooks/use-notification-websocket';
 import { NotificationDropdown } from './notification-dropdown';
 
 export function NotificationDropdownContainer() {
   const { data: session } = useSession();
-  const token = session?.user?.accessToken as string | undefined;
+  const token = session?.user?.accessToken;
 
   const t = useTranslations('Notifications');
 
@@ -45,9 +48,7 @@ export function NotificationDropdownContainer() {
   // Backend returns paginated: { success, data: { content: NotificationResponse[], ... } }
   const rawItems: NotificationResponse[] = useMemo(() => {
     if (!data) return [];
-    // data.data is the paginated page object; content holds the actual array
-    const page = (data as { data?: { content?: NotificationResponse[] } })?.data;
-    const arr = page?.content;
+    const arr = (data as NotificationPageResponse).data?.content;
     return Array.isArray(arr) ? arr : [];
   }, [data]);
 
@@ -92,14 +93,14 @@ export function NotificationDropdownContainer() {
       );
     }
 
-    if (n.eventType === 'PROPERTY_3D_GENERATED' || n.eventType === 'PROPERTY_3D_FAILED') {
+    if (n.eventType === NotificationEventType.PROPERTY_3D_GENERATED || n.eventType === NotificationEventType.PROPERTY_3D_FAILED) {
       if (n.entityId) {
         navigateTo3d(n.entityId, n.metadata);
       }
     } else if (n.eventType.includes('TOUR')) {
       router.push(`/${locale}/appointments`);
-    } else if (n.metadata?.listingId) {
-      router.push(`/${locale}/property/${n.metadata.listingId}`);
+    } else if (n.metadata?.listing_id) {
+      router.push(`/${locale}/property/${n.metadata.listing_id}`);
     }
   };
 
@@ -114,6 +115,22 @@ export function NotificationDropdownContainer() {
     [queryClient]
   );
 
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (!token) return;
+      try {
+        await notificationApi.deleteNotification(id, token);
+        // Remove from local WS state
+        setWsNotifications((prev) => prev.filter((n) => n.id !== id));
+        // Invalidate the HTTP cache so the list refetches without the deleted item
+        queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
+      } catch (err) {
+        console.error('[NotificationDropdown] Failed to delete notification:', err);
+      }
+    },
+    [token, queryClient]
+  );
+
   // ── WebSocket real-time channel ──────────────────────────────────────────
   useNotificationWebSocket({
     token,
@@ -121,8 +138,8 @@ export function NotificationDropdownContainer() {
     onNewNotification,
     onNotificationAction: (incoming) => {
       if (
-        (incoming.eventType === 'PROPERTY_3D_GENERATED' ||
-          incoming.eventType === 'PROPERTY_3D_FAILED') &&
+        (incoming.eventType === NotificationEventType.PROPERTY_3D_GENERATED ||
+          incoming.eventType === NotificationEventType.PROPERTY_3D_FAILED) &&
         incoming.entityId
       ) {
         navigateTo3d(incoming.entityId, incoming.metadata);
@@ -149,6 +166,7 @@ export function NotificationDropdownContainer() {
       unreadCount={unreadCount}
       onMarkAllRead={handleMarkAllRead}
       onNotificationClick={handleNotificationClick}
+      onDelete={handleDelete}
       onViewAll={() => router.push(`/${locale}/notifications`)}
     />
   );

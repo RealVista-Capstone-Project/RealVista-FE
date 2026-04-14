@@ -85,8 +85,8 @@ export function useChatWebSocket() {
           if (event.type === 'TYPING' && event.payload) {
             // payload is conversationId
             const conversationId = String(event.payload);
-            const userId = String(event.senderId || 'unknown');
-            const userName = event.senderName || 'Someone';
+            const userId = String(event.sender_id || 'unknown');
+            const userName = event.sender_name || 'Someone';
 
             // Update typing state
             setTypingState((prev) => ({
