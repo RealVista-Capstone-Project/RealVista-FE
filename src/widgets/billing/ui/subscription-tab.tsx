@@ -898,6 +898,23 @@ function Step2Content({
     featureTypes[0] ?? ''
   );
 
+  // When plan data loads after a page reload, selectedFeatureType may still be ''
+  // because featureTypes was empty at mount time. Sync it to the correct tab.
+  React.useEffect(() => {
+    if (featureTypes.length === 0 || featureTypes.includes(selectedFeatureType)) return;
+    // Prefer the tab that contains the currently selected plan
+    if (selectedPlanId && plansByFeatureType) {
+      for (const ft of featureTypes) {
+        if ((plansByFeatureType[ft] ?? []).some((p) => p.id === selectedPlanId)) {
+          setSelectedFeatureType(ft);
+          return;
+        }
+      }
+    }
+    setSelectedFeatureType(featureTypes[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [featureTypes.join(',')]);
+
   // Get plans for active feature type
   const plansForFeatureType = React.useMemo(() => {
     return type === 'subscription' && plansByFeatureType
@@ -1772,36 +1789,39 @@ function PurchaseWizard() {
 
   const selectedPlan = rawPlans.find((p) => p.id === selectedPlanId) ?? null;
 
-  // Load state from localStorage on mount
+  // Restore state from localStorage after hydration (runs client-side only)
   React.useEffect(() => {
     const saved = localStorage.getItem('subscription-wizard-state');
-    if (saved) {
-      try {
-        const state = JSON.parse(saved) as {
-          step: WizardStep;
-          selectedType: PackageType | null;
-          selectedPlanId: string | null;
-          selectedPayment: PaymentMethod | null;
-        };
-        setStep(state.step);
-        setSelectedType(state.selectedType);
-        setSelectedPlanId(state.selectedPlanId);
-        setSelectedPayment(state.selectedPayment);
-      } catch {
-        // ignore
-      }
+    if (!saved) return;
+    try {
+      const state = JSON.parse(saved) as {
+        step: WizardStep;
+        selectedType: PackageType | null;
+        selectedPlanId: string | null;
+        selectedPayment: PaymentMethod | null;
+      };
+      setStep(state.step);
+      setSelectedType(state.selectedType);
+      setSelectedPlanId(state.selectedPlanId);
+      setSelectedPayment(state.selectedPayment);
+    } catch {
+      // ignore
     }
   }, []);
 
   // Save state to localStorage (but not checkoutData to force fresh state after redirect)
+  // Skip the very first run so we don't overwrite localStorage with default values
+  // before the restore effect above has had a chance to apply its state updates.
+  const firstSaveDone = React.useRef(false);
   React.useEffect(() => {
-    const wizardState = {
-      step,
-      selectedType,
-      selectedPlanId,
-      selectedPayment,
-    };
-    localStorage.setItem('subscription-wizard-state', JSON.stringify(wizardState));
+    if (!firstSaveDone.current) {
+      firstSaveDone.current = true;
+      return;
+    }
+    localStorage.setItem(
+      'subscription-wizard-state',
+      JSON.stringify({ step, selectedType, selectedPlanId, selectedPayment })
+    );
   }, [step, selectedType, selectedPlanId, selectedPayment]);
 
   const handleTypeNext = () => { if (selectedType) { setSelectedPlanId(null); setStep(2); } };
