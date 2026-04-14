@@ -12,6 +12,7 @@ import { Label } from '@/shared/ui/label';
 import { getRedirectPathByRole } from '@/shared/lib/auth/rbac';
 import type { UserRole } from '@/shared/lib/auth/rbac';
 import { Eye, EyeOff } from 'lucide-react';
+import { Link } from '@/shared/config/i18n/navigation';
 
 /**
  * LoginFormNextAuth Component
@@ -116,32 +117,38 @@ export function LoginFormNextAuth() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-      <div className='space-y-2'>
-        <Label htmlFor='email'>{t('email')}</Label>
+      <div className='space-y-1.5'>
+        <Label htmlFor='email' className='text-sm font-medium text-main-black'>
+          {t('email')}
+        </Label>
         <Input
           id='email'
           type='email'
-          placeholder='john@example.com'
+          placeholder='hi@example.com'
           disabled={isLoading}
+          className='h-11 rounded-lg border-purple-92 bg-purple-98 px-4 text-main-black placeholder:text-grey-400 focus:border-main-primary focus:bg-white focus:ring-main-primary'
           {...register('email', { required: 'Email is required' })}
         />
         {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
       </div>
 
-      <div className='space-y-2'>
-        <Label htmlFor='password'>{t('password')}</Label>
+      <div className='space-y-1.5'>
+        <Label htmlFor='password' className='text-sm font-medium text-main-black'>
+          {t('password')}
+        </Label>
         <div className='relative'>
           <Input
             id='password'
             type={showPassword ? 'text' : 'password'}
+            placeholder='Enter password'
             disabled={isLoading}
-            className='pr-10'
+            className='h-11 rounded-lg border-purple-92 bg-purple-98 px-4 pr-10 text-main-black placeholder:text-grey-400 focus:border-main-primary focus:bg-white focus:ring-main-primary'
             {...register('password', { required: 'Password is required' })}
           />
           <button
             type='button'
             onClick={() => setShowPassword((prev) => !prev)}
-            className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none'
+            className='absolute right-3 top-1/2 -translate-y-1/2 text-grey-400 hover:text-grey-600 focus:outline-none'
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -149,9 +156,24 @@ export function LoginFormNextAuth() {
         {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
       </div>
 
-      {error && <p className='text-sm text-red-500'>{error}</p>}
+      {/* Forgot Password Link */}
+      <div className='flex justify-end'>
+        <Link href='/forgot-password' className='text-sm font-semibold text-main-primary hover:text-main-primary-hover transition-colors'>
+          {t('forgotPassword')}
+        </Link>
+      </div>
 
-      <Button type='submit' className='w-full' disabled={isLoading}>
+      {error && (
+        <div className='rounded-lg bg-red-50 p-3'>
+          <p className='text-sm text-red-600'>{error}</p>
+        </div>
+      )}
+
+      <Button
+        type='submit'
+        className='h-11 w-full rounded-lg bg-main-primary text-base font-semibold text-white hover:bg-main-primary-hover focus:ring-4 focus:ring-purple-92'
+        disabled={isLoading}
+      >
         {isLoading ? t('loggingIn') : t('login')}
       </Button>
     </form>
