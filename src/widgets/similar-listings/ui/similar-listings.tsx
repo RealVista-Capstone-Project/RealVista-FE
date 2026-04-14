@@ -3,7 +3,8 @@
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { bookmarkApi } from '@/entities/bookmark';
 import {
   listingQueries,
   mapSimilarListingsToCardProps,
@@ -27,9 +28,10 @@ export interface SimilarListingsProps {
  */
 export function SimilarListings({ propertyId, onPropertyClick }: SimilarListingsProps) {
   const t = useTranslations('PropertyDetail');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
   const router = useRouter();
   const locale = useLocale();
+  const queryClient = useQueryClient();
 
   // Fetch similar listings from API
   const { data, isLoading, isError } = useQuery({
@@ -38,16 +40,26 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
     select: (response) => response.payload.data.listings,
   });
 
-  const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(id)) {
-        newFavorites.delete(id);
-      } else {
-        newFavorites.add(id);
-      }
-      return newFavorites;
-    });
+  const handleToggleFavorite = async (id: string) => {
+    // Determine current favorite status
+    const listing = listings.find((l) => l.id === id);
+    const isCurrentlyFavorite = favoriteOverrides[id] ?? listing?.isFavorite ?? false;
+    const nextFavorite = !isCurrentlyFavorite;
+
+    // Optimistic update
+    setFavoriteOverrides((prev) => ({ ...prev, [id]: nextFavorite }));
+
+    try {
+      await bookmarkApi.toggleBookmark(id);
+      // Synchronize other components (like heart icon in header or search results)
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+      // Track behavior
+      behaviorTracker.trackBookmark(id, nextFavorite ? 'add' : 'remove');
+    } catch (error) {
+      console.error('[SimilarListings] Failed to toggle favorite:', error);
+      // Revert on failure
+      setFavoriteOverrides((prev) => ({ ...prev, [id]: isCurrentlyFavorite }));
+    }
   };
 
   const handlePropertyClick = (slug: string, listingId: string) => {
@@ -115,7 +127,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
                 >
                   <RealVistaListingCard
                     {...property}
-                    isFavorite={favorites.has(property.id)}
+                    isFavorite={favoriteOverrides[property.id] ?? property.isFavorite}
                     onToggleFavorite={handleToggleFavorite}
                     onClick={() => handlePropertyClick(property.slug, property.id)}
                   />

@@ -18,6 +18,7 @@ import {
 } from '@/shared/ui/carousel';
 import { recommendationQueries, recommendationApi, recommendationKeys } from '@/entities/recommendation';
 import type { RecommendedListingDTO } from '@/entities/recommendation';
+import { bookmarkApi } from '@/entities/bookmark';
 import { buildListingDetailUrl } from '@/shared/lib/utils';
 import { behaviorTracker } from '@/shared/lib/analytics';
 
@@ -114,11 +115,8 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   // ── Favorite overrides (optimistic local state) ───────────────
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
 
-  const handleToggleFavorite = (id: string) => {
-    setFavoriteOverrides((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const listingType = sourcePage === 'buy' ? 'BUY' : 'RENT';
+  // Must match backend ListingType enum: SALE | RENT
+  const listingType = sourcePage === 'buy' ? 'SALE' : 'RENT';
 
   const {
     data: response,
@@ -151,6 +149,28 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   }, [statusResponse?.payload?.data?.threshold_met, refreshMutation, autoReload]);
 
   const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
+
+  const handleToggleFavorite = async (id: string) => {
+    // Find current status from overrides or response data
+    const listing = recommendations.find((r) => r.listing_id === id);
+    const currentFavorite = favoriteOverrides[id] ?? listing?.is_favorite ?? false;
+    const nextFavorite = !currentFavorite;
+
+    // Optimistic update for immediate feedback
+    setFavoriteOverrides((prev) => ({ ...prev, [id]: nextFavorite }));
+
+    try {
+      await bookmarkApi.toggleBookmark(id);
+      // Invalidate bookmark queries to keep global state in sync
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+      // Track the action for AI feedback loop
+      behaviorTracker.trackBookmark(id, nextFavorite ? 'add' : 'remove');
+    } catch (error) {
+      console.error('[RecommendedListings] Failed to toggle favorite:', error);
+      // Revert optimistic update on failure
+      setFavoriteOverrides((prev) => ({ ...prev, [id]: currentFavorite }));
+    }
+  };
 
   const handleListingClick = (listing: RecommendedListingDTO) => {
     behaviorTracker.trackClick(listing.listing_id, {
