@@ -273,7 +273,7 @@ function QuotaUsageBar({
 // Section 1 — Current active plans
 // ---------------------------------------------------------------------------
 
-function CurrentPlansSection() {
+function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => void }) {
   const queryClient = useQueryClient();
   const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
   const { data: boosts, isLoading: boostsLoading } = useQuery(billingQueries.myBoosts());
@@ -412,9 +412,7 @@ function CurrentPlansSection() {
                         <RealVistaButton
                           size='small'
                           className='w-full sm:w-auto bg-primary text-white hover:bg-primary-dark'
-                          onClick={() => {
-                            document.getElementById('mua-goi-dich-vu')?.scrollIntoView({ behavior: 'smooth' });
-                          }}
+                          onClick={() => onUpgrade(nextPkg.code)}
                         >
                           Nâng cấp
                         </RealVistaButton>
@@ -900,22 +898,25 @@ function Step2Content({
     featureTypes[0] ?? ''
   );
 
-  // When plan data loads after a page reload, selectedFeatureType may still be ''
-  // because featureTypes was empty at mount time. Sync it to the correct tab.
+  // Sync selectedFeatureType to match the selected plan's feature type.
+  // Runs when featureTypes data loads OR when selectedPlanId changes (e.g. upgrade navigation).
   React.useEffect(() => {
-    if (featureTypes.length === 0 || featureTypes.includes(selectedFeatureType)) return;
-    // Prefer the tab that contains the currently selected plan
+    if (featureTypes.length === 0) return;
+    // If a plan is selected, navigate to its tab
     if (selectedPlanId && plansByFeatureType) {
       for (const ft of featureTypes) {
         if ((plansByFeatureType[ft] ?? []).some((p) => p.id === selectedPlanId)) {
-          setSelectedFeatureType(ft);
+          if (ft !== selectedFeatureType) setSelectedFeatureType(ft);
           return;
         }
       }
     }
-    setSelectedFeatureType(featureTypes[0]);
+    // No plan selected or plan not found — fall back to first valid tab
+    if (!featureTypes.includes(selectedFeatureType)) {
+      setSelectedFeatureType(featureTypes[0]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [featureTypes.join(',')]);
+  }, [featureTypes.join(','), selectedPlanId]);
 
   // Get plans for active feature type
   const plansForFeatureType = React.useMemo(() => {
@@ -2267,6 +2268,14 @@ function TransactionsSection() {
 export function SubscriptionTab() {
   const [mainTab, setMainTab] = React.useState<'buy' | 'manage'>('buy');
 
+  const handleUpgrade = React.useCallback((planId: string) => {
+    localStorage.setItem(
+      'subscription-wizard-state',
+      JSON.stringify({ step: 2, selectedType: 'subscription', selectedPlanId: planId, selectedPayment: null })
+    );
+    setMainTab('buy');
+  }, []);
+
   return (
     <div className='space-y-6'>
       {/* Top-level tab switcher */}
@@ -2301,7 +2310,7 @@ export function SubscriptionTab() {
 
       {mainTab === 'manage' && (
         <div className='space-y-6'>
-          <CurrentPlansSection />
+          <CurrentPlansSection onUpgrade={handleUpgrade} />
           <TransactionsSection />
         </div>
       )}
