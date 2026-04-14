@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/shared/ui/button';
 
 /**
@@ -35,37 +35,20 @@ import { Button } from '@/shared/ui/button';
  */
 export function LogoutButtonNextAuth({ children }: { children?: React.ReactNode }) {
   const t = useTranslations('Auth');
-  const router = useRouter();
-  const locale = useLocale();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     setIsLoading(true);
 
     try {
-      // Sign out from NextAuth
-      // redirect: false allows us to handle the redirect manually
-      const result = await signOut({ redirect: false });
-
-      // Check if signOut was successful
-      if (result) {
-        // Show success message
-        toast.success(t('logoutSuccess'));
-
-        // Redirect to login page with current locale
-        router.push(`/${locale}/login`);
-      } else {
-        // If signOut returns undefined/null, treat as error
-        throw new Error('Logout returned undefined result');
-      }
+      await signOut({ redirect: false });
+      localStorage.removeItem('subscription-wizard-state');
+      queryClient.clear();
+      toast.success(t('logoutSuccess'));
     } catch (error) {
-      // Handle any errors during logout
       console.error('Logout error:', error);
       toast.error(t('logoutFailed'));
-
-      // Still redirect to login page even on error for UX
-      // This ensures users aren't stuck in a broken state
-      router.push(`/${locale}/login`);
     } finally {
       setIsLoading(false);
     }

@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { User, HelpCircle, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn } from '@/shared/lib/utils';
 import { ROUTES } from '@/shared/config/routes';
@@ -38,12 +38,12 @@ export function ProfileDropdown({
 }: ProfileDropdownProps) {
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('Profile');
+  const queryClient = useQueryClient();
 
   const resolvedMenuItems = menuItems ?? [
-    { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}`, onClick: undefined },
+    { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}` },
     { id: 'help', label: 'help', icon: HelpCircle, onClick: undefined },
     { id: 'logout', label: 'logout', icon: LogOut, onClick: undefined },
   ];
@@ -52,12 +52,11 @@ export function ProfileDropdown({
     setIsLoggingOut(true);
 
     try {
-      // Sign out from NextAuth (returns void when redirect: false)
       await signOut({ redirect: false });
-
+      localStorage.removeItem('subscription-wizard-state');
+      queryClient.clear();
       toast.success(t('logoutSuccess'));
       setOpen(false);
-      router.push(`/${locale}/login`);
     } catch (error) {
       console.error('Logout error:', error);
       toast.error(t('logoutFailed'));
