@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -35,10 +36,16 @@ const BACKEND_OAUTH_URL = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login-google`;
 export function GoogleLoginButton() {
   const t = useTranslations('Auth');
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
     setIsLoading(true);
+
+    const rawRedirectTo = searchParams.get('redirectTo');
+    if (rawRedirectTo?.startsWith('/') && !rawRedirectTo.startsWith('//')) {
+      document.cookie = `auth-redirect-to=${encodeURIComponent(rawRedirectTo)}; path=/; max-age=300; SameSite=Lax`;
+    }
 
     // Construct the callback URL with current locale
     const callbackUrl = `${window.location.origin}/${locale}/auth/callback`;

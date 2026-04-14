@@ -6,6 +6,7 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PropertyCardFeatured } from '@/shared/ui/property-card-featured';
 import RealVistaLogo from '@/shared/assets/logo/logo';
+import { Suspense } from 'react';
 
 /**
  * Login Page
@@ -55,20 +56,22 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
             {/* Email/Password Form */}
             <div className='space-y-5'>
-              <LoginFormNextAuth />
+              <Suspense>
+                <LoginFormNextAuth />
 
-              {/* Visual Separator */}
-              <div className='relative'>
-                <div className='absolute inset-0 flex items-center'>
-                  <span className='w-full border-t border-grey-200' />
+                {/* Visual Separator */}
+                <div className='relative'>
+                  <div className='absolute inset-0 flex items-center'>
+                    <span className='w-full border-t border-grey-200' />
+                  </div>
+                  <div className='relative flex justify-center text-sm'>
+                    <span className='bg-white px-4 text-grey-500'>{t('continueWith')}</span>
+                  </div>
                 </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='bg-white px-4 text-grey-500'>{t('continueWith')}</span>
-                </div>
-              </div>
 
-              {/* Google OAuth Button */}
-              <GoogleLoginButton />
+                {/* Google OAuth Button */}
+                <GoogleLoginButton />
+              </Suspense>
             </div>
 
             {/* Footer Links */}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn, getSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -42,6 +42,7 @@ export function LoginFormNextAuth() {
   const t = useTranslations('Auth');
   const router = useRouter();
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>('');
@@ -78,9 +79,14 @@ export function LoginFormNextAuth() {
         // Fetch the session to get the user's role for redirect
         const session = await getSession();
         const role = session?.user?.role as UserRole | undefined;
-        const redirectPath = getRedirectPathByRole(role);
 
-        router.push(`/${locale}${redirectPath}`);
+        const rawRedirectTo = searchParams.get('redirectTo');
+        const redirectPath =
+          rawRedirectTo?.startsWith('/') && !rawRedirectTo.startsWith('//')
+            ? `/${locale}${rawRedirectTo}`
+            : `/${locale}${getRedirectPathByRole(role)}`;
+
+        router.push(redirectPath);
       }
     } catch {
       // Unexpected error
