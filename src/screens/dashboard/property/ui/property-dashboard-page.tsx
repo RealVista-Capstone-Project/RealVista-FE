@@ -2,7 +2,20 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, Edit, Eye, Home, ShieldCheck, Box } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  Edit,
+  Home,
+  ShieldCheck,
+  Box,
+  MapPin,
+  Ruler,
+  BedDouble,
+  Building,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 
@@ -10,7 +23,7 @@ import { Button } from '@/shared/ui/button';
 import { Link } from '@/shared/config/i18n/navigation';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui/tooltip';
+import { Tooltip, TooltipTrigger } from '@/shared/ui/tooltip';
 import {
   Select,
   SelectTrigger,
@@ -18,249 +31,440 @@ import {
   SelectItem,
   SelectValue,
 } from '@/shared/ui/select';
-import { DataTable } from '@/shared/ui/data-table';
 import { useQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property/api/property.queries';
+import { listingQueries } from '@/entities/listing/api';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { AgentVerificationModal } from '@/features/property-management/ui/components/agent-verification-modal';
+import { CreateListingModal } from '@/features/create-listing-modal';
 import { ThreeDPromoBanner } from '@/widgets/billing';
+import { formatVND } from '@/shared/lib/utils/format-currency';
+import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { cn } from '@/shared/lib/utils';
 import type {
   PropertySummaryResponse,
   PropertyMediaItem,
+  PropertyAttributeItem,
 } from '@/entities/property/api/property-api.types';
-import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 
 const PROPERTY_STATUSES = [
-  'DRAFT', 'PENDING', 'VERIFIED', 'REJECTED', 'AVAILABLE', 'RESERVED', 'SOLD', 'RENTED',
+  'DRAFT',
+  'PENDING',
+  'VERIFIED',
+  'REJECTED',
+  'AVAILABLE',
+  'RESERVED',
+  'SOLD',
+  'RENTED',
 ] as const;
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'AVAILABLE':
-      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400';
-    case 'DRAFT':
-      return 'bg-slate-100 text-slate-700 dark:bg-slate-500/20 dark:text-slate-400';
-    case 'SOLD':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400';
-    case 'RESERVED':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400';
-    case 'PENDING':
-      return 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400';
-    case 'VERIFIED':
-      return 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400';
-    default:
-      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
-  }
+const STATUS_STYLES: Record<string, string> = {
+  AVAILABLE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DRAFT: 'bg-slate-50 text-slate-600 border-slate-200',
+  SOLD: 'bg-blue-50 text-blue-700 border-blue-200',
+  RESERVED: 'bg-amber-50 text-amber-700 border-amber-200',
+  PENDING: 'bg-rose-50 text-rose-700 border-rose-200',
+  VERIFIED: 'bg-green-50 text-green-700 border-green-200',
+  REJECTED: 'bg-red-50 text-red-700 border-red-200',
+  RENTED: 'bg-purple-50 text-purple-700 border-purple-200',
 };
 
-function usePropertyColumns(
-  t: ReturnType<typeof useTranslations<'PropertyDashboard'>>,
-  handleVerifyClick: (property: PropertySummaryResponse) => void,
-): ColumnDef<PropertySummaryResponse, unknown>[] {
-  return React.useMemo(
-    () => [
-      {
-        id: 'image',
-        header: () => t('colImage'),
-        cell: ({ row }) => {
-          const property = row.original;
-          return (
-            <div className='w-24 h-16 rounded-lg overflow-hidden relative bg-slate-100 dark:bg-slate-800'>
-              {property.media && property.media.length > 0 ? (
-                <Image
-                  src={
-                    property.media.find((m: PropertyMediaItem) => m.is_primary)
-                      ?.media_url || property.media[0].media_url
-                  }
-                  alt={property.street_address}
-                  fill
-                  className='object-cover'
-                />
-              ) : (
-                <div className='w-full h-full flex items-center justify-center'>
-                  <Home className='w-6 h-6 text-slate-400' />
-                </div>
-              )}
-            </div>
-          );
-        },
-      },
-      {
-        id: 'address',
-        header: () => t('colAddress'),
-        cell: ({ row }) => {
-          const property = row.original;
-          return (
-            <div>
-              <div className='font-medium text-slate-900 dark:text-white max-w-xs truncate'>
-                {property.street_address}
+function getStatusStyle(status: string): string {
+  return STATUS_STYLES[status] ?? 'bg-slate-50 text-slate-600 border-slate-200';
+}
+
+function PropertyListCard({
+  property,
+  isSelected,
+  onClick,
+}: {
+  property: PropertySummaryResponse;
+  isSelected: boolean;
+  onClick: (p: PropertySummaryResponse) => void;
+}) {
+  const thumbnailUrl =
+    property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
+    property.media?.[0]?.media_url;
+
+  const location = [property.location_info?.district_name, property.location_info?.city_name]
+    .filter(Boolean)
+    .join(', ');
+
+  const bedroomsAttr = property.attributes?.find(
+    (a: PropertyAttributeItem) => a.attribute_code === 'BEDROOMS'
+  );
+
+  return (
+    <button
+      type='button'
+      onClick={() => onClick(property)}
+      className={cn(
+        'group w-full text-left flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 transition-all duration-200',
+        isSelected ? 'bg-purple-96' : 'bg-white hover:bg-purple-98'
+      )}
+    >
+      {/* Thumbnail */}
+      <div className='relative w-40 h-32 flex-shrink-0 bg-gray-100 overflow-hidden rounded-lg'>
+        {thumbnailUrl ? (
+          <Image
+            src={thumbnailUrl}
+            alt={property.street_address}
+            fill
+            className='object-cover transition-transform duration-300 group-hover:scale-105'
+          />
+        ) : (
+          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
+            <Home className='h-8 w-8 text-indigo-300' />
+          </div>
+        )}
+        <div className='absolute top-2 left-2'>
+          <Badge
+            variant='outline'
+            className={cn(
+              'text-[10px] font-bold px-2 py-0.5 rounded-full border bg-white/90 backdrop-blur-sm',
+              getStatusStyle(property.status)
+            )}
+          >
+            {property.status}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className='flex-1 min-w-0 flex flex-col justify-between px-4 py-2 gap-2'>
+        {/* Row 1: address + type */}
+        <div className='flex items-start justify-between gap-2'>
+          <div className='min-w-0 flex-1'>
+            <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-main-primary transition-colors'>
+              {property.street_address}
+            </h3>
+            {location && (
+              <div className='flex items-center gap-1 mt-0.5'>
+                <MapPin className='h-3 w-3 text-gray-400 flex-shrink-0' />
+                <span className='text-xs text-gray-500 truncate'>{location}</span>
               </div>
-              <div className='text-xs text-muted-foreground mt-1'>
-                ID: {property.property_id.substring(0, 8)}...
-              </div>
+            )}
+          </div>
+          {property.property_type_info?.property_type_name && (
+            <span className='flex-shrink-0 text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
+              {property.property_type_info.property_type_name}
+            </span>
+          )}
+        </div>
+
+        {/* Row 2: description */}
+        {property.description && (
+          <p className='text-xs text-gray-500 leading-relaxed line-clamp-2'>
+            {property.description}
+          </p>
+        )}
+
+        {/* Row 3: stats */}
+        <div className='flex items-center gap-3 text-xs text-gray-500 pt-1.5 border-t border-gray-100'>
+          {property.land_size_m2 != null && (
+            <div className='flex items-center gap-1'>
+              <Ruler className='h-3.5 w-3.5 text-gray-400' />
+              <span className='font-medium'>{property.land_size_m2} m²</span>
             </div>
-          );
-        },
-      },
-      {
-        id: 'type',
-        header: () => t('colType'),
-        cell: ({ row }) => {
-          const property = row.original;
-          const typeName = property.property_type_info?.property_type_name ?? '\u2014';
-          return (
-            <span className='inline-flex items-center rounded-md bg-indigo-100 dark:bg-indigo-900/40 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 ring-1 ring-inset ring-indigo-300 dark:ring-indigo-700'>
-              {typeName}
-            </span>
-          );
-        },
-      },
-      {
-        id: 'location',
-        header: () => t('colLocation'),
-        cell: ({ row }) => {
-          const property = row.original;
-          const { location_info } = property;
-          if (!location_info?.district_name && !location_info?.city_name) {
-            return <span className='text-sm text-muted-foreground'>{'\u2014'}</span>;
-          }
-          const parts = [location_info.district_name, location_info.city_name].filter(Boolean);
-          return (
-            <span className='text-sm text-slate-700 dark:text-slate-300'>
-              {parts.join(', ')}
-            </span>
-          );
-        },
-      },
-      {
-        id: 'size',
-        header: () => t('colSize'),
-        cell: ({ row }) => {
-          const property = row.original;
-          if (property.land_size_m2 == null) {
-            return <span className='text-sm text-muted-foreground'>{'\u2014'}</span>;
-          }
-          return (
-            <span className='text-sm font-medium text-slate-700 dark:text-slate-300'>
-              {property.land_size_m2} m&sup2;
-            </span>
-          );
-        },
-      },
-      {
-        id: 'status',
-        header: () => t('colStatus'),
-        cell: ({ row }) => {
-          const property = row.original;
-          return (
-            <Badge
-              variant='secondary'
-              className={`border-none ${getStatusColor(property.status)}`}
-            >
-              {t(`status${property.status}` as Parameters<typeof t>[0])}
-            </Badge>
-          );
-        },
-      },
-      {
-        id: 'actions',
-        header: () => (
-          <span className='text-right block'>{t('colActions')}</span>
-        ),
-        cell: ({ row }) => {
-          const property = row.original;
-          return (
-            <div className='flex items-center justify-end gap-2'>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8 text-slate-500 hover:text-primary hover:bg-primary/10'
-                asChild
+          )}
+          {bedroomsAttr?.value_number != null && (
+            <div className='flex items-center gap-1'>
+              <BedDouble className='h-3.5 w-3.5 text-gray-400' />
+              <span className='font-medium'>{bedroomsAttr.value_number} PN</span>
+            </div>
+          )}
+          {/* 3D indicator — green badge if has tour, amber pulse if missing */}
+          <div className='ml-auto relative inline-flex items-center'>
+            {property.has_3d ? (
+              <span className='text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1'>
+                <Box className='h-3 w-3' />
+                3D
+              </span>
+            ) : (
+              <div className='relative flex items-center justify-center'>
+                <Box className='h-4 w-4 text-gray-400' />
+                <span className='absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5 pointer-events-none'>
+                  <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75' />
+                  <span className='relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500' />
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function ListingsSection({ propertyId }: { propertyId: string }) {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { data: listingsPage, isLoading } = useQuery(listingQueries.byProperty(propertyId));
+  const listings = listingsPage?.content ?? [];
+
+  return (
+    <div>
+      {/* Section header */}
+      <div className='flex items-center justify-between mb-3'>
+        <h3 className='text-sm font-bold text-slate-800'>Listing</h3>
+        <Button
+          type='button'
+          size='sm'
+          className='rounded-lg gap-1.5 h-8 text-xs'
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus className='h-3.5 w-3.5' />
+          Thêm mới
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className='flex justify-center py-6'>
+          <div className='h-5 w-5 animate-spin rounded-full border-2 border-purple-92 border-t-main-primary' />
+        </div>
+      ) : listings.length === 0 ? (
+        <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 flex flex-col items-center gap-2 text-center'>
+          <Home className='h-6 w-6 text-slate-300' />
+          <p className='text-xs text-slate-400'>Chưa có listing nào cho bất động sản này</p>
+        </div>
+      ) : (
+        <div className='space-y-2'>
+          {listings.map((listing) => {
+            const typeLabel = listing.listing_type === 'RENT' ? 'Thuê' : 'Mua';
+            const typeCls =
+              listing.listing_type === 'RENT'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-blue-50 text-blue-700 border-blue-200';
+            const statusCls: Record<string, string> = {
+              DRAFT: 'bg-slate-100 text-slate-600',
+              PENDING: 'bg-yellow-50 text-yellow-600',
+              PUBLISHED: 'bg-purple-98 text-main-primary',
+              SOLD: 'bg-green-50 text-green-600',
+              RENTED: 'bg-green-50 text-green-600',
+              ARCHIVED: 'bg-slate-100 text-slate-500',
+            };
+            const priceDisplay = listing.is_negotiable
+              ? 'Thương lượng'
+              : listing.min_price && listing.max_price
+                ? `${formatVND(listing.min_price)} – ${formatVND(listing.max_price)}`
+                : formatVND(listing.price);
+
+            return (
+              <Link
+                key={listing.listing_id}
+                href={`/dashboard/listings?listingId=${listing.listing_id}`}
+                className='flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:border-main-primary/40 hover:bg-purple-98/50 transition-all group'
               >
+                {/* Thumbnail */}
+                <div className='relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100'>
+                  {listing.primary_media_thumbnail_url ?? listing.thumbnail ? (
+                    <Image
+                      src={(listing.primary_media_thumbnail_url ?? listing.thumbnail)!}
+                      alt={listing.name}
+                      fill
+                      className='object-cover'
+                    />
+                  ) : (
+                    <div className='h-full w-full flex items-center justify-center'>
+                      <Home className='h-4 w-4 text-slate-300' />
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className='flex-1 min-w-0'>
+                  <p className='text-xs font-semibold text-slate-800 line-clamp-1 group-hover:text-main-primary transition-colors'>
+                    {listing.name}
+                  </p>
+                  <div className='flex items-center gap-1.5 mt-1'>
+                    <span
+                      className={cn(
+                        'text-[10px] font-bold px-1.5 py-0.5 rounded-md border',
+                        typeCls
+                      )}
+                    >
+                      {typeLabel}
+                    </span>
+                    <span
+                      className={cn(
+                        'text-[10px] font-semibold px-1.5 py-0.5 rounded-md',
+                        statusCls[listing.status] ?? 'bg-slate-100 text-slate-600'
+                      )}
+                    >
+                      {listing.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <p className='text-xs font-bold text-main-primary whitespace-nowrap flex-shrink-0'>
+                  {priceDisplay}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      <CreateListingModal open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen} preselectedPropertyId={propertyId} />
+    </div>
+  );
+}
+
+function PropertyDetailPanel({
+  property,
+  onVerifyClick,
+  onBack,
+}: {
+  property: PropertySummaryResponse;
+  onVerifyClick: (p: PropertySummaryResponse) => void;
+  onBack?: () => void;
+}) {
+  const t = useTranslations('PropertyDashboard');
+
+  const thumbnailUrl =
+    property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
+    property.media?.[0]?.media_url;
+
+  const location = [property.location_info?.district_name, property.location_info?.city_name]
+    .filter(Boolean)
+    .join(', ');
+
+  return (
+    <div className='h-full overflow-y-auto'>
+      {/* Mobile back button */}
+      {onBack && (
+        <button
+          type='button'
+          onClick={onBack}
+          className='flex items-center gap-2 px-6 py-4 text-sm font-medium text-main-primary hover:underline'
+        >
+          <ChevronLeft className='h-4 w-4' />
+          {t('backToList')}
+        </button>
+      )}
+
+      {/* Hero image */}
+      <div className='relative w-full h-64 bg-slate-100'>
+        {thumbnailUrl ? (
+          <Image
+            src={thumbnailUrl}
+            alt={property.street_address}
+            fill
+            className='object-cover'
+          />
+        ) : (
+          <div className='h-full w-full flex items-center justify-center'>
+            <Home className='h-16 w-16 text-slate-300' />
+          </div>
+        )}
+        <div className='absolute top-4 left-4'>
+          <Badge
+            variant='outline'
+            className={cn(
+              'text-xs font-bold px-3 py-1 rounded-full border bg-white/90 backdrop-blur-sm',
+              getStatusStyle(property.status)
+            )}
+          >
+            {t(`status${property.status}` as Parameters<typeof t>[0])}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className='p-6 space-y-6'>
+        {/* Header */}
+        <div>
+          <h2 className='text-xl font-bold text-slate-900'>{property.street_address}</h2>
+          {location && (
+            <div className='flex items-center gap-1.5 mt-1.5'>
+              <MapPin className='h-4 w-4 text-slate-400' />
+              <span className='text-sm text-slate-500'>{location}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Info grid */}
+        <div className='grid grid-cols-2 gap-4'>
+          {property.property_type_info?.property_type_name && (
+            <div className='rounded-xl border border-slate-200 bg-slate-50 p-4'>
+              <p className='text-xs text-slate-500 font-medium uppercase tracking-wide mb-1'>
+                {t('labelType')}
+              </p>
+              <p className='text-sm font-semibold text-slate-800'>
+                {property.property_type_info.property_type_name}
+              </p>
+            </div>
+          )}
+          {property.land_size_m2 != null && (
+            <div className='rounded-xl border border-slate-200 bg-slate-50 p-4'>
+              <p className='text-xs text-slate-500 font-medium uppercase tracking-wide mb-1'>
+                {t('labelSize')}
+              </p>
+              <p className='text-sm font-semibold text-slate-800'>{property.land_size_m2} m²</p>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        {property.description && (
+          <div>
+            <h3 className='text-sm font-bold text-slate-700 mb-2'>{t('labelDescription')}</h3>
+            <p className='text-sm text-slate-600 leading-relaxed'>{property.description}</p>
+          </div>
+        )}
+
+        {/* Listings section */}
+        <ListingsSection propertyId={property.property_id} />
+
+        {/* Action buttons */}
+        <div className='flex flex-wrap gap-3'>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button asChild variant='outline' className='rounded-lg gap-2'>
                 <Link href={`/dashboard/property/${property.property_id}/edit`}>
                   <Edit className='w-4 h-4' />
-                  <span className='sr-only'>
-                    {t('editAction')}
-                  </span>
+                  {t('editAction')}
                 </Link>
               </Button>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className='relative inline-flex'>
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='h-8 w-8 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-                      asChild
-                    >
-                      <Link href={`/dashboard/property/${property.property_id}/3d`}>
-                        <Box className='w-4 h-4' />
-                        <span className='sr-only'>
-                          {t('3dAction')}
-                        </span>
-                      </Link>
-                    </Button>
-                    {!property.has_3d && (
-                      <span className='absolute -top-0.5 -right-0.5 flex h-3 w-3 pointer-events-none'>
-                        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75' />
-                        <span className='relative inline-flex rounded-full h-3 w-3 bg-amber-500' />
-                      </span>
-                    )}
-                  </div>
-                </TooltipTrigger>
-                {!property.has_3d && (
-                  <TooltipContent side='top'>
-                    {t('threeDDotTooltip')}
-                  </TooltipContent>
-                )}
-              </Tooltip>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8 text-slate-500 hover:text-slate-900 dark:hover:text-white'
-              >
-                <Eye className='w-4 h-4' />
-                <span className='sr-only'>{t('viewAction')}</span>
-              </Button>
-              {property.status === 'PENDING' && (
-                <Button
-                  variant='default'
-                  size='sm'
-                  className='rounded-full h-8 px-3 text-xs gap-1 bg-primary'
-                  onClick={() => handleVerifyClick(property)}
-                >
-                  <ShieldCheck className='w-3 h-3' />
-                  {t('verifyAction')}
-                </Button>
-              )}
-            </div>
-          );
-        },
-      },
-    ],
-    [t, handleVerifyClick],
+            </TooltipTrigger>
+          </Tooltip>
+
+          {property.status === 'PENDING' && (
+            <Button
+              className='rounded-lg gap-2 bg-main-primary'
+              onClick={() => onVerifyClick(property)}
+            >
+              <ShieldCheck className='w-4 h-4' />
+              {t('verifyAction')}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function PropertyDashboardPage() {
   const t = useTranslations('PropertyDashboard');
+  const isMobile = useIsMobile();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const [page, setPage] = useState(0);
   const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const {
-    data: propertiesResponse,
-    isLoading,
-  } = useQuery(
+  const [selectedProperty, setSelectedProperty] = useState<PropertySummaryResponse | null>(null);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+  const [verifyTarget, setVerifyTarget] = useState<PropertySummaryResponse | null>(null);
+
+  const PAGE_SIZE = 10;
+
+  const { data: propertiesResponse, isLoading } = useQuery(
     propertyQueries.myProperties({
       keyword: debouncedSearch,
       status: statusFilter === 'ALL' ? undefined : statusFilter,
-      page: pagination.pageIndex,
-      size: pagination.pageSize,
+      page,
+      size: PAGE_SIZE,
     })
   );
 
@@ -269,114 +473,205 @@ export default function PropertyDashboardPage() {
     propertiesResponse?.payload.data.total_pages ??
     propertiesResponse?.payload.data.totalPages ??
     0;
+  const totalElements =
+    propertiesResponse?.payload.data.total_elements ??
+    propertiesResponse?.payload.data.totalElements ??
+    0;
 
-  const [selectedProperty, setSelectedProperty] = useState<PropertySummaryResponse | null>(null);
-  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+  // Auto-select first property on desktop when list loads
+  React.useEffect(() => {
+    if (!isMobile && !selectedProperty && properties.length > 0) {
+      setSelectedProperty(properties[0]);
+    }
+  }, [isMobile, properties, selectedProperty]);
 
-  const handleVerifyClick = React.useCallback((property: PropertySummaryResponse) => {
-    setSelectedProperty(property);
+  // Reset selection when filter/search changes
+  React.useEffect(() => {
+    setSelectedProperty(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, statusFilter, page]);
+
+  const handleVerifyClick = (property: PropertySummaryResponse) => {
+    setVerifyTarget(property);
     setIsVerifyModalOpen(true);
-  }, []);
-
-  const columns = usePropertyColumns(t, handleVerifyClick);
+  };
 
   return (
-    <div className='h-full flex-1'>
-      <div className='h-full flex-1 mx-auto px-6 py-6'>
-        {/* Header */}
-        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-          <div>
-            <h1 className='text-3xl font-bold tracking-tight text-slate-900 dark:text-white'>
-              {t('pageTitle')}
-            </h1>
-            <p className='text-muted-foreground mt-2'>
-              {t('pageDesc')}
+    <div className='flex h-full flex-col overflow-hidden sm:flex-row'>
+      {/* ── Left Panel ── */}
+      <aside
+        className={cn(
+          'flex-col border-r border-purple-92/50 bg-white transition-all duration-300',
+          isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[42%]'
+        )}
+      >
+        <div className='flex h-full flex-col'>
+          {/* Header */}
+          <div className='border-b border-purple-92/40 p-4 sm:p-6 bg-white'>
+            <div className='flex items-center justify-between gap-3'>
+              <div className='flex items-center gap-3'>
+                <h2 className='text-xl font-extrabold text-main-black tracking-tight'>
+                  {t('pageTitle')}
+                </h2>
+                <div className='flex items-center justify-center rounded-full bg-main-primary/10 px-3 py-0.5 border border-main-primary/20 shadow-sm'>
+                  <span className='text-sm font-bold text-main-primary'>{totalElements}</span>
+                </div>
+              </div>
+              <Button asChild size='sm' className='rounded-full gap-1.5 shrink-0'>
+                <Link href='/dashboard/property/create'>
+                  <Plus className='w-4 h-4' />
+                  {t('createNew')}
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* 3D promo banner — pinned above search */}
+          <div className='border-b border-purple-92/40 px-4 sm:px-6 py-4 bg-white'>
+            <ThreeDPromoBanner />
+          </div>
+
+          {/* Search + Status Filter — same row */}
+          <div className='border-b border-purple-92/40 px-4 sm:px-6 py-4 bg-purple-98/30'>
+            <div className='flex items-center gap-2'>
+              {/* Search */}
+              <div className='relative group flex-1'>
+                <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
+                  <Search className='h-[18px] w-[18px] text-main-secondary/50 group-focus-within:text-main-primary transition-colors' />
+                </div>
+                <Input
+                  type='text'
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(0);
+                  }}
+                  placeholder={t('searchPlaceholder')}
+                  className='h-10 w-full rounded-xl border border-purple-92 bg-white pl-11 pr-4 text-sm font-medium text-main-black shadow-sm placeholder:text-main-secondary/50 hover:border-main-primary/50 focus:border-main-primary focus:ring-4 focus:ring-main-primary/10 transition-all duration-300'
+                />
+              </div>
+              {/* Status filter */}
+              <Select
+                value={statusFilter}
+                onValueChange={(v) => {
+                  setStatusFilter(v);
+                  setPage(0);
+                }}
+              >
+                <SelectTrigger className='w-[160px] rounded-xl border-purple-92 h-10 shrink-0'>
+                  <SelectValue placeholder={t('filterStatus')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='ALL'>{t('allStatuses')}</SelectItem>
+                  {PROPERTY_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {t(`status${s}` as Parameters<typeof t>[0])}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Scrollable list */}
+          <div className='flex-1 overflow-y-auto bg-gray-50/20'>
+            {isLoading ? (
+              <div className='flex h-full items-center justify-center'>
+                <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-92 border-t-main-primary' />
+              </div>
+            ) : properties.length === 0 ? (
+              <div className='flex flex-col items-center justify-center gap-4 p-12 text-center animate-in fade-in duration-500'>
+                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-purple-98 border border-purple-92/50 shadow-sm'>
+                  <Home className='h-8 w-8 text-main-primary/60' strokeWidth={1.5} />
+                </div>
+                <div className='max-w-[280px]'>
+                  <p className='text-base font-bold text-main-black'>{t('noProperties')}</p>
+                  <p className='mt-1.5 text-sm text-main-secondary/70'>{t('noPropertiesDesc')}</p>
+                </div>
+              </div>
+            ) : (
+              <div className='divide-y divide-purple-92/40'>
+                {properties.map((property) => (
+                  <div key={property.property_id} className='transition-colors'>
+                    <PropertyListCard
+                      property={property}
+                      isSelected={selectedProperty?.property_id === property.property_id}
+                      onClick={setSelectedProperty}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className='border-t border-purple-92/40 flex items-center justify-between px-4 py-3 bg-white'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className='rounded-lg'
+              >
+                <ChevronLeft className='h-4 w-4' />
+              </Button>
+              <span className='text-sm text-slate-500'>
+                {t('pageInfo', { current: page + 1, total: totalPages })}
+              </span>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className='rounded-lg'
+              >
+                <ChevronRight className='h-4 w-4' />
+              </Button>
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* ── Right Detail Panel ── */}
+      <main
+        className={cn(
+          'flex-1 overflow-y-auto bg-purple-98/40',
+          isMobile ? (selectedProperty ? 'block' : 'hidden') : 'block'
+        )}
+      >
+        {selectedProperty ? (
+          <PropertyDetailPanel
+            key={selectedProperty.property_id}
+            property={selectedProperty}
+            onVerifyClick={handleVerifyClick}
+            onBack={isMobile ? () => setSelectedProperty(null) : undefined}
+          />
+        ) : (
+          <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>
+            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-purple-92/50'>
+              <Building className='h-10 w-10 text-main-primary/30' strokeWidth={1.5} />
+            </div>
+            <p className='text-base font-medium text-main-secondary/80 max-w-[250px]'>
+              {t('selectHint')}
             </p>
           </div>
-          <Link href='/dashboard/property/create'>
-            <Button size='lg' className='rounded-full shadow-md font-semibold gap-2'>
-              <Plus className='w-5 h-5' />
-              {t('createNew')}
-            </Button>
-          </Link>
-        </div>
-
-        {/* 3D Tour promo banner */}
-        <div className='mt-3'>
-          <ThreeDPromoBanner />
-        </div>
-
-        {/* Data Table */}
-        <div className='mt-3'>
-          <DataTable
-            columns={columns}
-            data={properties}
-            pageCount={totalPages}
-            pagination={pagination}
-            onPaginationChange={setPagination}
-            isLoading={isLoading}
-            pageInfoText={(current, total) => t('pageInfo', { current, total })}
-            toolbar={
-              <div className='flex flex-col sm:flex-row gap-4 items-center justify-between'>
-                <div className='relative w-full sm:max-w-md'>
-                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-                  <Input
-                    placeholder={t('searchPlaceholder')}
-                    className='pl-10 bg-white dark:bg-slate-900/50'
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                    }}
-                  />
-                </div>
-                <div className='flex items-center gap-2'>
-                  <Select
-                    value={statusFilter}
-                    onValueChange={(value) => {
-                      setStatusFilter(value);
-                      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                    }}
-                  >
-                    <SelectTrigger className='w-[180px] rounded-lg border-grey-200'>
-                      <SelectValue placeholder={t('filterStatus')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='ALL'>{t('allStatuses')}</SelectItem>
-                      {PROPERTY_STATUSES.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {t(`status${status}` as Parameters<typeof t>[0])}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            }
-            emptyIcon={
-              <div className='w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4'>
-                <Home className='w-10 h-10 text-slate-400' />
-              </div>
-            }
-            emptyTitle={t('noProperties')}
-            emptyDescription={t('noPropertiesDesc')}
-          />
-        </div>
-
-        {/* Agent Verification Modal */}
-        {selectedProperty && (
-          <AgentVerificationModal
-            isOpen={isVerifyModalOpen}
-            onClose={() => {
-              setIsVerifyModalOpen(false);
-              setSelectedProperty(null);
-            }}
-            propertyId={selectedProperty.property_id}
-            ownerName={selectedProperty.owner_name || ''}
-            ownerPhone={selectedProperty.owner_phone || ''}
-          />
         )}
-      </div>
+      </main>
+
+      {/* Verify Modal */}
+      {verifyTarget && (
+        <AgentVerificationModal
+          isOpen={isVerifyModalOpen}
+          onClose={() => {
+            setIsVerifyModalOpen(false);
+            setVerifyTarget(null);
+          }}
+          propertyId={verifyTarget.property_id}
+          ownerName={verifyTarget.owner_name || ''}
+          ownerPhone={verifyTarget.owner_phone || ''}
+        />
+      )}
     </div>
   );
 }

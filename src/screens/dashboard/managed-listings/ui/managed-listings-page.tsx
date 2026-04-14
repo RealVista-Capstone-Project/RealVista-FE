@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Search, Filter, X, ChevronDown, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
@@ -30,9 +31,12 @@ type StatusFilter = ListingStatus | 'ALL';
  * - Detailed property view
  */
 export function ManagedListingsPage() {
+  const searchParams = useSearchParams();
+  const initialListingId = searchParams.get('listingId');
+
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [selectedListingId, setSelectedListingId] = React.useState<string | null>(null);
+  const [selectedListingId, setSelectedListingId] = React.useState<string | null>(initialListingId);
   const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('ALL');
   const [sortBy, setSortBy] = React.useState<SortOption>('newest');

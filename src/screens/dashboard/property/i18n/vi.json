@@ -28,6 +28,11 @@
     "viewAction": "Xem",
     "verifyAction": "Xác minh",
     "threeDDotTooltip": "Tạo tour 3D cho căn hộ này",
-    "pageInfo": "Trang {current} / {total}"
+    "pageInfo": "Trang {current} / {total}",
+    "selectHint": "Chọn một bất động sản để xem chi tiết",
+    "backToList": "Quay lại",
+    "labelType": "Loại hình",
+    "labelSize": "Diện tích",
+    "labelDescription": "Mô tả"
   }
 }

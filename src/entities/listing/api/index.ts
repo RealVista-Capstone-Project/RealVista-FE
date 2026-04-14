@@ -45,6 +45,7 @@ export const listingApi = {
     listingType?: string;
     status?: string;
     sortBy?: string;
+    propertyId?: string;
   }) => {
     const query = new URLSearchParams();
     if (params?.page !== undefined) query.append('page', params.page.toString());
@@ -53,6 +54,7 @@ export const listingApi = {
     if (params?.listingType) query.append('listingType', params.listingType);
     if (params?.status) query.append('status', params.status);
     if (params?.sortBy) query.append('sortBy', params.sortBy);
+    if (params?.propertyId) query.append('propertyId', params.propertyId);
 
     const queryString = query.toString();
     return http.get<ApiResponse<PageResponse<ManagedListing>>>(

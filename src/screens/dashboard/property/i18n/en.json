@@ -28,6 +28,11 @@
     "viewAction": "View",
     "verifyAction": "Verify",
     "threeDDotTooltip": "Create a 3D tour for this property",
-    "pageInfo": "Page {current} of {total}"
+    "pageInfo": "Page {current} of {total}",
+    "selectHint": "Select a property to view details",
+    "backToList": "Back",
+    "labelType": "Type",
+    "labelSize": "Area",
+    "labelDescription": "Description"
   }
 }

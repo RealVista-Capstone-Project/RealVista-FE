@@ -18,6 +18,7 @@ import { propertyQueries } from '@/entities/property';
 export interface CreateListingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  preselectedPropertyId?: string;
 }
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
@@ -212,16 +213,16 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 
 const ITEMS_PER_PAGE = 4;
 
-export function CreateListingModal({ open, onOpenChange }: CreateListingModalProps) {
+export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }: CreateListingModalProps) {
   const t = useTranslations('CreateListingModal');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const { data, isLoading } = useQuery(
     propertyQueries.myProperties({
-      page: currentPage - 1,
-      size: ITEMS_PER_PAGE,
-      status: 'AVAILABLE',
+      page: preselectedPropertyId ? 0 : currentPage - 1,
+      size: preselectedPropertyId ? 50 : ITEMS_PER_PAGE,
+      ...(preselectedPropertyId ? {} : { status: 'AVAILABLE' }),
     })
   );
 
@@ -299,6 +300,17 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
       })),
     };
   });
+
+  // Auto-select pre-specified property and skip to step 2
+  React.useEffect(() => {
+    if (!open || !preselectedPropertyId || selectedProperty || currentStep !== 1) return;
+    if (properties.length === 0) return;
+    const match = properties.find((p) => p.propertyId === preselectedPropertyId);
+    if (match) {
+      setSelectedProperty(match);
+      setCurrentStep(2);
+    }
+  }, [open, preselectedPropertyId, properties, selectedProperty, currentStep]);
 
   const handleNextStep = () => {
     if (selectedProperty) {
