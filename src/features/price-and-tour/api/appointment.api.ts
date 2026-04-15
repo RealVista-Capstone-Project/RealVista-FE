@@ -1,5 +1,10 @@
 import http from '@/shared/lib/http';
 import { ApiResponse } from '@/shared/types';
+import type {
+  AppointmentWithListing,
+  FetchAppointmentsParams,
+  UpdateAppointmentStatusRequest,
+} from '@/features/appointments/types';
 
 export interface BookTourRequest {
   listing_id: string;
@@ -18,5 +23,25 @@ export const appointmentApi = {
 
   bookTour: async (data: BookTourRequest): Promise<void> => {
     await http.post('/appointments', data);
+  },
+
+  fetchAppointments: async (params: FetchAppointmentsParams) => {
+    const searchParams = new URLSearchParams({
+      start_date: params.startDate,
+      end_date: params.endDate,
+    });
+    if (params.filter) searchParams.set('filter', params.filter);
+
+    const response = await http.get<ApiResponse<AppointmentWithListing[]>>(
+      `/appointments?${searchParams.toString()}`
+    );
+    return response.data;
+  },
+
+  updateAppointmentStatus: async (
+    appointmentId: string,
+    data: UpdateAppointmentStatusRequest
+  ): Promise<void> => {
+    await http.patch(`/appointments/${appointmentId}`, data);
   },
 };
