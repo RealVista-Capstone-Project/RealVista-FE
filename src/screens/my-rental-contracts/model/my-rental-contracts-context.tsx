@@ -13,7 +13,7 @@ import {
   RentalContractStatus,
   type RentalContract,
 } from '@/entities/rental-contract';
-import { useRenterContractsQuery } from '@/features/rental-contract/hooks/use-rental-contracts';
+import { useRenterContractsQuery, useAgentContractsQuery } from '@/features/rental-contract/hooks/use-rental-contracts';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -44,21 +44,32 @@ export function MyRentalContractsProvider({ children }: { children: ReactNode })
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedContract, setSelectedContract] = useState<RentalContract | null>(null);
 
+  const userId = session?.user?.id ?? '';
+  const backendRoles: string[] = (session?.user as { backendRoles?: string[] })?.backendRoles ?? [];
+  const isAgent = session?.user?.role === 'AGENT' || backendRoles.includes('AGENT');
+
   const queryParams = useMemo(
     () => ({
-      renterId: session?.user?.id ?? '',
       page: currentPage - 1,
       size: ITEMS_PER_PAGE,
       status:
         statusFilter !== 'all' ? (statusFilter as RentalContractStatus) : undefined,
       search: searchQuery || undefined,
     }),
-    [currentPage, searchQuery, session?.user?.id, statusFilter]
+    [currentPage, searchQuery, statusFilter]
   );
 
-  const { data, isLoading, isError } = useRenterContractsQuery(queryParams, {
-    enabled: Boolean(session?.user?.id),
-  });
+  const renterResult = useRenterContractsQuery(
+    { renterId: userId, ...queryParams },
+    { enabled: Boolean(userId) && !isAgent }
+  );
+
+  const agentResult = useAgentContractsQuery(
+    { agentId: userId, ...queryParams },
+    { enabled: Boolean(userId) && isAgent }
+  );
+
+  const { data, isLoading, isError } = isAgent ? agentResult : renterResult;
 
   const pageData = data?.payload.data;
   const contracts = useMemo(() => pageData?.content ?? [], [pageData?.content]);

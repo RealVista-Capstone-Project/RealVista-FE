@@ -99,9 +99,7 @@ export function LeaseSigningCompletePage() {
         <div key={i} className='flex items-center gap-3'>
           <div
             className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-              step.done
-                ? 'bg-emerald-500 text-white'
-                : 'bg-[#EDE8FF] text-main-secondary/50'
+              step.done ? 'bg-emerald-500 text-white' : 'bg-[#EDE8FF] text-main-secondary/50'
             }`}
           >
             {step.done ? '✓' : i + 1}
@@ -131,9 +129,7 @@ export function LeaseSigningCompletePage() {
               <h1 className='mt-5 text-2xl font-semibold tracking-[-0.02em] text-white'>
                 {t('title')}
               </h1>
-              <p className='mt-2 text-sm leading-6 text-white/75'>
-                {t('landlord.confirming')}
-              </p>
+              <p className='mt-2 text-sm leading-6 text-white/75'>{t('landlord.confirming')}</p>
             </div>
           </div>
         </div>
@@ -154,9 +150,7 @@ export function LeaseSigningCompletePage() {
               <h1 className='mt-5 text-2xl font-semibold tracking-[-0.02em] text-white'>
                 {t('error.title')}
               </h1>
-              <p className='mt-2 text-sm leading-6 text-white/75'>
-                {t('landlord.confirmError')}
-              </p>
+              <p className='mt-2 text-sm leading-6 text-white/75'>{t('landlord.confirmError')}</p>
             </div>
             <div className='space-y-3 px-8 py-7'>
               <Button
@@ -226,11 +220,6 @@ export function LeaseSigningCompletePage() {
                             ? t('landlord.sendToRenterBody')
                             : t('infoBody')}
                       </p>
-                      {leaseId && (
-                        <p className='mt-2 text-xs font-mono text-main-secondary/45'>
-                          {t('contractIdLabel')} {leaseId}
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -238,7 +227,7 @@ export function LeaseSigningCompletePage() {
                 {renderSteps()}
 
                 {/* Landlord: Send to Renter CTA */}
-                {isLandlord && confirmState === 'confirmed' && (
+                {/* {isLandlord && confirmState === 'confirmed' && (
                   <div className='space-y-2'>
                     {sendError && (
                       <p className='text-center text-xs text-red-500'>{t('landlord.sendError')}</p>
@@ -262,7 +251,7 @@ export function LeaseSigningCompletePage() {
                       )}
                     </Button>
                   </div>
-                )}
+                )} */}
 
                 <Button
                   asChild
@@ -275,9 +264,7 @@ export function LeaseSigningCompletePage() {
                 >
                   <Link
                     href={
-                      isRenter
-                        ? ROUTES.dashboard.myContracts
-                        : ROUTES.dashboard.rentalContracts
+                      isRenter ? ROUTES.dashboard.myContracts : ROUTES.dashboard.rentalContracts
                     }
                   >
                     <ArrowLeft className='h-4 w-4' />

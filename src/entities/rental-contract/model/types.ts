@@ -32,6 +32,8 @@ export interface RentalContract {
   listing_id: string;
   owner_id: string;
   agent_id?: string | null;
+  landlordName?: string;
+  landlordEmail?: string;
   tenant: RentalContractTenant;
   property: RentalContractProperty;
   monthlyRent: number;
@@ -140,8 +142,12 @@ export interface CreateRentalContractPayload {
   listing_id: string;
   property: RentalContractProperty;
   tenant: RentalContractTenant;
+  /** ID of the tenant/renter user */
   tenantUserId: string;
+  /** ID of the property owner (from property.owner_id) — never the agent */
   landlordId: string;
+  /** ID of the agent who initiated the contract on behalf of the owner (optional) */
+  agentId?: string | null;
   monthlyRent: number;
   securityAmount?: number;
   startDate: string;
@@ -158,6 +164,14 @@ export interface GetRentalContractsParams {
 
 export interface GetRenterContractsParams {
   renterId: string;
+  page?: number;
+  size?: number;
+  status?: RentalContractStatus;
+  search?: string;
+}
+
+export interface GetAgentContractsParams {
+  agentId: string;
   page?: number;
   size?: number;
   status?: RentalContractStatus;

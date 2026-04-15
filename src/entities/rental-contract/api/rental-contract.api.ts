@@ -5,6 +5,7 @@ import {
   type CreateRentalContractPayload,
   type DocuSignApiResponse,
   type DocuSignSigningResponse,
+  type GetAgentContractsParams,
   type GetRentalContractsParams,
   type GetRenterContractsParams,
   type LeaseApiResponse,
@@ -24,6 +25,8 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     listing_id: lease.property_id,
     owner_id: lease.landlord_id,
     agent_id: lease.agent_id,
+    landlordName: lease.landlord_full_name,
+    landlordEmail: lease.landlord_email,
     tenant: {
       id: lease.renter_id,
       fullName: lease.renter_full_name,
@@ -107,7 +110,7 @@ export const rentalContractApi = {
       property_id: payload.listing_id,
       renter_id: payload.tenantUserId,
       landlord_id: payload.landlordId,
-      agent_id: null,
+      agent_id: payload.agentId ?? null,
       lease_start_date: payload.startDate,
       lease_end_date: payload.endDate,
       lease_duration_months: calcDurationMonths(payload.startDate, payload.endDate),
@@ -157,6 +160,37 @@ export const rentalContractApi = {
 
     const result = await http.get<LeasesApiResponse>(
       `/leases/renter/${renterId}?${query.toString()}`
+    );
+
+    const apiData = result.payload.data;
+    const mapped = apiData.content.map(mapLeaseToContract);
+
+    return {
+      payload: {
+        data: {
+          content: mapped,
+          page: apiData.page,
+          size: apiData.size,
+          total_elements: apiData.total_elements,
+          total_pages: apiData.total_pages,
+          first: apiData.first,
+          last: apiData.last,
+        },
+      },
+    };
+  },
+
+  // ── List (agent side) ────────────────────────────────────────────────────
+  async getAgentContracts(
+    params: GetAgentContractsParams
+  ): Promise<{ payload: { data: RentalContractPageResponse } }> {
+    const { agentId, page = 0, size = 10, status } = params;
+
+    const query = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) query.set('status', status);
+
+    const result = await http.get<LeasesApiResponse>(
+      `/leases/agent/${agentId}?${query.toString()}`
     );
 
     const apiData = result.payload.data;

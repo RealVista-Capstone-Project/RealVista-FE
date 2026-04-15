@@ -21,5 +21,8 @@ export function mapListingToChatData(listing: Listing): ChatListingData {
     currency: 'VND',
     address: addressParts.join(', '),
     area: listing.property.usable_size_m2,
+    ownerId: listing.user_id,
+    agentId: listing.agent?.user_id,
+    listingStatus: listing.status,
   };
 }

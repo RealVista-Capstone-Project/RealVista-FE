@@ -114,7 +114,8 @@ export interface ListingData {
   location: Location;
   property_type: PropertyType;
   media: MediaItem[];
-  agent: Agent;
+  agent?: Agent;
+  property_owner?: Agent; // present when an agent manages the listing
   attributes: Attribute[];
   amenities: Amenity[];
   listing_id: string;

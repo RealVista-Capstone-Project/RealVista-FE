@@ -1,0 +1,46 @@
+{
+  "Messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Search Messages",
+    "pinnedMessages": "Pinned Messages",
+    "allMessages": "All Messages",
+    "typing": "Typing...",
+    "today": "Today",
+    "typeYourMessage": "Type your message",
+    "createContract": "Create contract",
+    "viewContract": "View contract",
+    "activityTimeline": "Activity timeline",
+    "endContract": "End contract",
+    "noMessages": "No messages yet. Say hello!",
+    "connected": "Connected",
+    "connecting": "Connecting...",
+    "listingPreview": {
+      "label": "Send as listing card",
+      "dismiss": "Dismiss",
+      "fetching": "Loading listing...",
+      "error": "Could not load listing — will send as plain text",
+      "unrelatedWarning": "This listing isn't associated with this conversation.",
+      "sendAnyway": "Send anyway"
+    },
+    "contractModal": {
+      "title": "Create Rental Contract",
+      "description": "Review the details below before proceeding to the contract wizard.",
+      "listingLabel": "Property",
+      "tenantLabel": "Tenant",
+      "noListing": "No listing selected from this conversation",
+      "noTenant": "No tenant identified",
+      "existingWarningTitle": "Existing contract found",
+      "existingWarningBody": "There is already a {status} contract for this property and tenant. You can still create a new one.",
+      "listingPickerLabel": "Select a property",
+      "proceed": "Proceed to wizard",
+      "cancel": "Cancel",
+      "statusDraft": "draft",
+      "statusPendingRenter": "pending tenant signature",
+      "statusPendingLandlord": "pending landlord signature",
+      "statusActive": "active",
+      "statusExpired": "expired",
+      "statusTerminated": "terminated",
+      "statusRejected": "rejected"
+    }
+  }
+}

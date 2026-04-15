@@ -20,7 +20,7 @@
       "terms": "Điều khoản",
       "review": "Rà soát",
       "titles": {
-        "1": "Xác nhận bối cảnh bất động sản",
+        "1": "Chọn bất động sản",
         "2": "Xác định người thuê ký hợp đồng",
         "3": "Thiết lập điều khoản thuê",
         "4": "Rà soát gói DocuSign"
@@ -57,7 +57,17 @@
       "selected": "Đã chọn",
       "selectAction": "Dùng bất động sản này",
       "emptyTitle": "Không có bất động sản phù hợp",
-      "emptyDescription": "Hãy thử từ khóa địa chỉ khác hoặc kiểm tra danh sách bất động sản của bạn."
+      "emptyDescription": "Hãy thử từ khóa địa chỉ khác hoặc kiểm tra danh sách bất động sản của bạn.",
+      "status": {
+        "DRAFT": "Bản nháp",
+        "PENDING": "Chờ duyệt",
+        "VERIFIED": "Đã xác minh",
+        "REJECTED": "Bị từ chối",
+        "AVAILABLE": "Còn trống",
+        "RESERVED": "Đã đặt cọc",
+        "SOLD": "Đã bán",
+        "RENTED": "Đã cho thuê"
+      }
     },
     "tenantLookup": {
       "eyebrow": "Xác định người thuê",
@@ -84,7 +94,7 @@
       "propertyBanner": "Bất động sản",
       "partiesTitle": "Các bên",
       "ownerLabel": "Chủ nhà",
-      "ownerYou": "Bạn (người tạo hợp đồng)",
+      "ownerFallback": "Đang tải thông tin chủ nhà...",
       "tenantLabel": "Người thuê",
       "financialsTitle": "Điều khoản tài chính",
       "monthlyRentLabel": "Tiền thuê hàng tháng",
