@@ -88,7 +88,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
     try {
       // Use the new create or get conversation API
       const response = await queryClient.fetchQuery(
-        conversationQueries.detailOrCreate(listing.agent.user_id)
+        conversationQueries.detailOrCreate(listing.agent!.user_id)
       );
 
       const convData = (
@@ -108,9 +108,9 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {
-            id: listing.agent.user_id,
-            name: listing.agent.full_name,
-            avatar: listing.agent.avatar_url,
+            id: listing.agent!.user_id,
+            name: listing.agent!.full_name,
+            avatar: listing.agent!.avatar_url,
           });
         }
       }
@@ -273,10 +273,10 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                 <div className='flex items-start gap-4 rounded-lg border border-purple-92 bg-white p-4'>
                   {/* Avatar */}
                   <div className='relative shrink-0'>
-                    {listing.agent.avatar_url ? (
+                    {listing.agent!.avatar_url ? (
                       <Image
-                        src={listing.agent.avatar_url}
-                        alt={listing.agent.full_name}
+                        src={listing.agent!.avatar_url}
+                        alt={listing.agent!.full_name}
                         width={56}
                         height={56}
                         className='h-14 w-14 rounded-full object-cover'
@@ -284,12 +284,12 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     ) : (
                       <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-main-primary to-purple-600'>
                         <span className='text-lg font-bold text-white'>
-                          {listing.agent.first_name?.[0]}
-                          {listing.agent.last_name?.[0]}
+                          {listing.agent!.first_name?.[0]}
+                          {listing.agent!.last_name?.[0]}
                         </span>
                       </div>
                     )}
-                    {listing.agent.is_verified && (
+                    {listing.agent!.is_verified && (
                       <div className='absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white'>
                         <BadgeCheck className='h-4 w-4 fill-blue-500 text-white' strokeWidth={2} />
                       </div>
@@ -301,12 +301,12 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     {/* Name and verification */}
                     <div>
                       <h4 className='text-lg font-bold text-main-black'>
-                        {listing.agent.business_name || listing.agent.full_name}
+                        {listing.agent!.business_name || listing.agent!.full_name}
                       </h4>
-                      {listing.agent.business_name && listing.agent.full_name && (
-                        <p className='text-sm text-main-secondary/70'>{listing.agent.full_name}</p>
+                      {listing.agent!.business_name && listing.agent!.full_name && (
+                        <p className='text-sm text-main-secondary/70'>{listing.agent!.full_name}</p>
                       )}
-                      {listing.agent.is_verified && (
+                      {listing.agent!.is_verified && (
                         <div className='mt-1 flex items-center gap-1.5'>
                           <BadgeCheck className='h-3.5 w-3.5 text-blue-500' strokeWidth={2} />
                           <span className='text-xs font-medium text-blue-600'>
@@ -318,22 +318,22 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
                     {/* Contact Info */}
                     <div className='space-y-2 text-sm'>
-                      {listing.agent.phone && (
+                      {listing.agent!.phone && (
                         <div className='flex items-center gap-2 text-main-secondary/70'>
                           <Phone className='h-4 w-4' strokeWidth={2} />
-                          <span>{listing.agent.phone}</span>
+                          <span>{listing.agent!.phone}</span>
                         </div>
                       )}
-                      {listing.agent.email && (
+                      {listing.agent!.email && (
                         <div className='flex items-center gap-2 text-main-secondary/70'>
                           <Mail className='h-4 w-4' strokeWidth={2} />
-                          <span>{listing.agent.email}</span>
+                          <span>{listing.agent!.email}</span>
                         </div>
                       )}
-                      {listing.agent.company && (
+                      {listing.agent!.company && (
                         <div className='flex items-center gap-2 text-main-secondary/70'>
                           <Building2 className='h-4 w-4' strokeWidth={2} />
-                          <span>{listing.agent.company}</span>
+                          <span>{listing.agent!.company}</span>
                         </div>
                       )}
                     </div>

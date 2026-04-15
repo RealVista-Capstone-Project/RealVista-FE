@@ -28,6 +28,12 @@ export interface ChatListingData {
   beds?: number;
   bathrooms?: number;
   area?: number;
+  /** user_id of the owner who created the listing */
+  ownerId?: string;
+  /** user_id of the agent managing the listing */
+  agentId?: string;
+  /** listing status — e.g. PUBLISHED, DRAFT, RENTED, SOLD */
+  listingStatus?: string;
 }
 
 /**

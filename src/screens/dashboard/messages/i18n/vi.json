@@ -1,0 +1,46 @@
+{
+  "Messages": {
+    "title": "Tin nhắn",
+    "searchPlaceholder": "Tìm kiếm tin nhắn",
+    "pinnedMessages": "Tin nhắn đã ghim",
+    "allMessages": "Tất cả tin nhắn",
+    "typing": "đang nhập...",
+    "today": "Hôm nay",
+    "typeYourMessage": "Nhập tin nhắn của bạn",
+    "createContract": "Tạo hợp đồng",
+    "viewContract": "Xem hợp đồng",
+    "activityTimeline": "Lịch sử hoạt động",
+    "endContract": "Kết thúc hợp đồng",
+    "noMessages": "Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!",
+    "connected": "Đã kết nối",
+    "connecting": "Đang kết nối...",
+    "listingPreview": {
+      "label": "Gửi dưới dạng thẻ bất động sản",
+      "dismiss": "Bỏ qua",
+      "fetching": "Đang tải thông tin...",
+      "error": "Không thể tải thông tin — sẽ gửi dưới dạng văn bản thường",
+      "unrelatedWarning": "Tin đăng này không liên quan đến cuộc trò chuyện.",
+      "sendAnyway": "Vẫn gửi"
+    },
+    "contractModal": {
+      "title": "Tạo hợp đồng thuê",
+      "description": "Xem lại thông tin bên dưới trước khi tiếp tục đến trình hướng dẫn tạo hợp đồng.",
+      "listingLabel": "Bất động sản",
+      "tenantLabel": "Người thuê",
+      "noListing": "Không có tin đăng nào được chọn từ cuộc trò chuyện này",
+      "noTenant": "Không xác định được người thuê",
+      "existingWarningTitle": "Đã tìm thấy hợp đồng",
+      "existingWarningBody": "Đã có hợp đồng {status} cho bất động sản và người thuê này. Bạn vẫn có thể tạo hợp đồng mới.",
+      "listingPickerLabel": "Chọn bất động sản",
+      "proceed": "Tiếp tục đến trình hướng dẫn",
+      "cancel": "Hủy",
+      "statusDraft": "nháp",
+      "statusPendingRenter": "chờ người thuê ký",
+      "statusPendingLandlord": "chờ chủ nhà ký",
+      "statusActive": "đang hoạt động",
+      "statusExpired": "đã hết hạn",
+      "statusTerminated": "đã chấm dứt",
+      "statusRejected": "đã từ chối"
+    }
+  }
+}

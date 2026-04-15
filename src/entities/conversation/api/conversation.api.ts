@@ -15,7 +15,8 @@ export const conversationApi = {
   /**
    * List all conversations for the current user
    */
-  listConversations: () => http.get<ConversationListItemResponse[]>('/conversations'),
+  listConversations: () =>
+    http.get<ApiResponse<ConversationListItemResponse[]>>('/conversations'),
 
   /**
    * Create or get conversation between current user and another user

@@ -122,7 +122,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   const handleSendContact = async (data: ContactFormData) => {
     const response = await sendMessage.mutateAsync({
-      recipient_user_id: listing.agent.user_id,
+      recipient_user_id: listing.agent!.user_id,
       message_type: 'LISTING_CARD',
       content: data.message,
       metadata: JSON.stringify(chatListingData),
@@ -138,9 +138,9 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
           router.push(`/${locale}/messages/${conversationId}`);
         } else {
           openWindow(conversationId, {
-            id: listing.agent.user_id,
-            name: listing.agent.full_name,
-            avatar: listing.agent.avatar_url,
+            id: listing.agent!.user_id,
+            name: listing.agent!.full_name,
+            avatar: listing.agent!.avatar_url,
           });
         }
       }
@@ -188,7 +188,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <PriceAndTour
                 price={property.price}
                 listingType={listing.listing_type}
-                phone={listing.agent.phone}
+                phone={listing.agent!.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
                 isAgent={isAgent}
@@ -212,7 +212,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <PriceAndTour
                 price={property.price}
                 listingType={listing.listing_type}
-                phone={listing.agent.phone}
+                phone={listing.agent!.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
                 isAgent={isAgent}
@@ -232,7 +232,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         open={isContactModalOpen}
         onOpenChange={setIsContactModalOpen}
         listing={chatListingData}
-        agentName={listing.agent.full_name}
+        agentName={listing.agent!.full_name}
         onSend={handleSendContact}
         userInfo={
           session?.user

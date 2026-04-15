@@ -26,7 +26,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
 
   // Type guard to check if property has Listing-specific agent fields
   const hasListingAgent = (prop: Property | Listing): prop is Listing => {
-    return 'avatar_url' in prop.agent || 'full_name' in prop.agent;
+    return !!(prop.agent && ('avatar_url' in prop.agent || 'full_name' in prop.agent));
   };
 
   // Type guard to check if property has Listing-specific location fields
