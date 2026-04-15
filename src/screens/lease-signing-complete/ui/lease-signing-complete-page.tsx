@@ -227,7 +227,7 @@ export function LeaseSigningCompletePage() {
                 {renderSteps()}
 
                 {/* Landlord: Send to Renter CTA */}
-                {isLandlord && confirmState === 'confirmed' && (
+                {/* {isLandlord && confirmState === 'confirmed' && (
                   <div className='space-y-2'>
                     {sendError && (
                       <p className='text-center text-xs text-red-500'>{t('landlord.sendError')}</p>
@@ -251,7 +251,7 @@ export function LeaseSigningCompletePage() {
                       )}
                     </Button>
                   </div>
-                )}
+                )} */}
 
                 <Button
                   asChild
