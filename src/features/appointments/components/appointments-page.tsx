@@ -6,6 +6,7 @@ import { format, addDays, startOfWeek } from 'date-fns';
 import { useAppointments } from '../api/appointment.queries';
 import { AvailabilityCalendar } from './availability-calendar';
 import { SlotModal } from './slot-modal';
+import type { AppointmentWithListing } from '../types/appointment';
 
 type FilterType = 'all' | 'sent' | 'received';
 
@@ -36,10 +37,10 @@ export function AppointmentsPage() {
     endTime: string;
   } | null>(null);
 
-  const slotAppointments = useMemo(() => {
+  const slotAppointments = useMemo((): AppointmentWithListing[] => {
     if (!selectedSlot) return [];
     return filteredAppointments.filter(
-      (apt) =>
+      (apt: AppointmentWithListing): boolean =>
         apt.startTime.startsWith(selectedSlot.date) &&
         apt.startTime.slice(11, 16) === selectedSlot.startTime
     );

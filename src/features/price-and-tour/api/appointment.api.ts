@@ -35,7 +35,7 @@ export const appointmentApi = {
     const response = await http.get<ApiResponse<AppointmentWithListing[]>>(
       `/appointments?${searchParams.toString()}`
     );
-    return response.data;
+    return response.payload.data;
   },
 
   updateAppointmentStatus: async (

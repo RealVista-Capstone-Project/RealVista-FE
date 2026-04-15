@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/di
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Textarea } from '@/shared/ui/textarea';
-import { useCurrentUser } from '@/features/auth/hooks/use-current-user';
+import { useCurrentUser } from '@/features/auth/api/use-current-user';
 import { useUpdateAppointmentStatus } from '../api/appointment.queries';
 import type { AppointmentWithListing, AppointmentStatus } from '../types/appointment';
 
@@ -76,10 +76,10 @@ export function SlotModal({
   };
 
   const canAccept = (apt: AppointmentWithListing) =>
-    currentUser?.userId === apt.receiverId && apt.status === 'PENDING';
+    currentUser?.user_id === apt.receiverId && apt.status === 'PENDING';
 
   const canCancel = (apt: AppointmentWithListing) =>
-    currentUser?.userId === apt.senderId && apt.status === 'PENDING';
+    currentUser?.user_id === apt.senderId && apt.status === 'PENDING';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -94,9 +94,8 @@ export function SlotModal({
           {appointments.map((apt) => (
             <div
               key={apt.appointmentId}
-              className={`rounded-lg border p-4 ${
-                selectedAptId === apt.appointmentId ? 'border-primary' : ''
-              }`}
+              className={`rounded-lg border p-4 ${selectedAptId === apt.appointmentId ? 'border-primary' : ''
+                }`}
             >
               <button
                 className="w-full text-left"
@@ -153,7 +152,7 @@ export function SlotModal({
         {showReason && (
           <div className="mt-4 space-y-2">
             <label>
-              {selectedApt?.senderId === currentUser?.userId
+              {selectedApt?.senderId === currentUser?.user_id
                 ? t('cancelReason')
                 : t('rejectReason')}
             </label>
@@ -161,7 +160,7 @@ export function SlotModal({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder={
-                selectedApt?.senderId === currentUser?.userId
+                selectedApt?.senderId === currentUser?.user_id
                   ? t('enterCancelReason')
                   : t('enterRejectReason')
               }
@@ -169,7 +168,7 @@ export function SlotModal({
             <div className="flex gap-2">
               <Button
                 onClick={
-                  selectedApt?.senderId === currentUser?.userId
+                  selectedApt?.senderId === currentUser?.user_id
                     ? handleCancel
                     : handleReject
                 }
