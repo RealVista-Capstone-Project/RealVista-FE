@@ -2,17 +2,10 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import {
-  RentalContractStatus,
-  type RentalContract,
-} from '@/entities/rental-contract';
+import { RentalContractStatus, type RentalContract } from '@/entities/rental-contract';
 import { useGetRenterSigningUrlMutation } from '@/features/rental-contract/hooks/use-rental-contracts';
 import { DocuSignSigningModal } from '@/features/rental-contract/ui/docusign-signing-modal';
-import {
-  Badge,
-  Button,
-  CardContent,
-} from '@/shared/ui';
+import { Badge, Button, CardContent } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { FileText, Loader2, Pen, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -139,7 +132,6 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
                     <p className='text-xs uppercase tracking-[0.16em] text-main-secondary/50'>
                       {t('detailPanel.contractMeta')}
                     </p>
-                    <p className='mt-1 text-sm font-semibold text-main-black'>{contract.id}</p>
                     <p className='mt-1 text-sm leading-6 text-main-secondary/70'>
                       {contract.property.address} ·{' '}
                       {formatContractCurrency(
@@ -147,11 +139,6 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
                         locale === 'vi' ? 'vi-VN' : 'en-US'
                       )}
                     </p>
-                    {contract.docusignEnvelopeId && (
-                      <p className='mt-1 text-xs text-main-secondary/60'>
-                        {tContract('detailPanel.envelopeId', { envelopeId: contract.docusignEnvelopeId })}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -192,7 +179,9 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
                   <div className='h-px bg-[#F0E8FF]' />
                   <div>
                     <p className='text-xs text-main-secondary/50'>{t('detailPanel.tenantLabel')}</p>
-                    <p className='mt-0.5 text-sm font-medium text-main-black'>{contract.tenant.fullName}</p>
+                    <p className='mt-0.5 text-sm font-medium text-main-black'>
+                      {contract.tenant.fullName}
+                    </p>
                     <p className='text-xs text-main-secondary/50'>{contract.tenant.email}</p>
                   </div>
                 </div>
