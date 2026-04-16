@@ -11,7 +11,7 @@ import { Availability } from '@/shared/ui/availability';
 import type { AppointmentWithListing } from '../types/appointment';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
 import { Check, X, Clock, Settings2, Save, RepeatIcon } from 'lucide-react';
-import { canCancelAppointment } from '../utils/appointment';
+import { canCancelAppointment, isValidUUID, toLocalIso } from '../utils/appointment';
 import { toast } from 'sonner';
 import { TimeSpan } from '@/shared/ui/availability';
 import {
@@ -180,14 +180,6 @@ export function AppointmentsPage() {
   const handleSaveBlocks = async (shouldRepeat: boolean, repeatCount: number) => {
     setShowSaveDialog(false);
 
-    // Helper: format a date+time to ISO string without timezone offset
-    const toIso = (date: Date, timeStr: string) => {
-      const [h, m] = timeStr.split(':').map(Number);
-      const d = new Date(date);
-      d.setHours(h, m, 0, 0);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
-    };
-
     // All weeks to sync: current week + optional future weeks
     const weeksToSync = [0, ...(shouldRepeat ? Array.from({ length: repeatCount }, (_, i) => i + 1) : [])];
 
@@ -210,8 +202,8 @@ export function AppointmentsPage() {
 
         for (const block of editableBlocks) {
           const blockDate = addDays(weekStart, block.week_day);
-          const blockStartIso = toIso(blockDate, block.start_time);
-          const blockEndIso = toIso(blockDate, block.end_time);
+          const blockStartIso = toLocalIso(blockDate, block.start_time);
+          const blockEndIso = toLocalIso(blockDate, block.end_time);
           const blockStartMs = new Date(blockStartIso).getTime();
           const blockEndMs = new Date(blockEndIso).getTime();
 
@@ -234,7 +226,7 @@ export function AppointmentsPage() {
             start_time: blockStartIso,
             end_time: blockEndIso,
             // Only pass appointment_id for existing DB records (real UUID), not newly drawn blocks
-            appointment_id: weekOffset === 0 && originalBlockIds.has(block.id) && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(block.id) ? block.id : undefined,
+            appointment_id: weekOffset === 0 && originalBlockIds.has(block.id) && isValidUUID(block.id) ? block.id : undefined,
           });
         }
 

@@ -9,7 +9,7 @@ import { Textarea } from '@/shared/ui/textarea';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
 import { useUpdateAppointmentStatus } from '../api/appointment.queries';
 import type { AppointmentWithListing } from '../types/appointment';
-import { canCancelAppointment, getStatusColorClasses } from '../utils/appointment';
+import { canCancelAppointment, canAcceptAppointment, getStatusColorClasses } from '../utils/appointment';
 
 interface SlotModalProps {
   open: boolean;
@@ -70,8 +70,7 @@ export function SlotModal({
     onOpenChange(false);
   };
 
-  const canAccept = (apt: AppointmentWithListing) =>
-    currentUser?.user_id === apt.receiver_id && apt.status === 'PENDING';
+  const canAccept = (apt: AppointmentWithListing) => canAcceptAppointment(apt, currentUser?.user_id);
 
   const canCancel = (apt: AppointmentWithListing) => canCancelAppointment(apt, currentUser?.user_id);
 

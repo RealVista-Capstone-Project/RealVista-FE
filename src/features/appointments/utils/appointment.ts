@@ -1,14 +1,47 @@
 import { Appointment, AppointmentStatus } from '../types/appointment';
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
- * Robust date parsing: Replace space with 'T' for ISO compliance
- * Some backends return "YYYY-MM-DD HH:mm:ss" which is not valid ISO 8601
+ * Returns true if the given string is a valid UUID v4.
+ * Used to distinguish persisted DB records from locally-drawn blocks (nanoid).
+ */
+export const isValidUUID = (id: string): boolean => UUID_REGEX.test(id);
+
+/**
+ * Robust date parsing: Replace space with 'T' for ISO compliance.
+ * Some backends return "YYYY-MM-DD HH:mm:ss" which is not valid ISO 8601.
  */
 export const parseAppointmentDate = (dateStr: string): Date => {
   const normalized = dateStr.includes(' ') && !dateStr.includes('T')
     ? dateStr.replace(' ', 'T')
     : dateStr;
   return new Date(normalized);
+};
+
+/**
+ * Formats a Date + "HH:mm" time string to a local ISO datetime string
+ * (no timezone offset), e.g. "2024-06-15T09:30:00".
+ */
+export const toLocalIso = (date: Date, timeStr: string): string => {
+  const [h, m] = timeStr.split(':').map(Number);
+  const d = new Date(date);
+  d.setHours(h, m, 0, 0);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+};
+
+/**
+ * Checks if an appointment can be accepted by the current user.
+ * Rules:
+ * - Must be the receiver
+ * - Status must be PENDING
+ */
+export const canAcceptAppointment = (
+  appointment: Appointment,
+  currentUserId?: string
+): boolean => {
+  if (!currentUserId) return false;
+  return appointment.receiver_id === currentUserId && appointment.status === 'PENDING';
 };
 
 /**
@@ -44,7 +77,7 @@ export const canCancelAppointment = (
 };
 
 /**
- * Gets the color classes for a status badge
+ * Gets the color classes for a status badge.
  */
 export const getStatusColorClasses = (status: AppointmentStatus): string => {
   const configs: Record<AppointmentStatus, string> = {
