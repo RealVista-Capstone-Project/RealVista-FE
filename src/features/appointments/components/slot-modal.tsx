@@ -8,31 +8,26 @@ import { Badge } from '@/shared/ui/badge';
 import { Textarea } from '@/shared/ui/textarea';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
 import { useUpdateAppointmentStatus } from '../api/appointment.queries';
-import type { AppointmentWithListing, AppointmentStatus } from '../types/appointment';
+import type { AppointmentWithListing } from '../types/appointment';
+import { canCancelAppointment, getStatusColorClasses } from '../utils/appointment';
 
 interface SlotModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   date: string;
-  startTime: string;
-  endTime: string;
+  start_time: string;
+  end_time: string;
   appointments: AppointmentWithListing[];
 }
 
-const statusConfig: Record<AppointmentStatus, string> = {
-  PENDING: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300',
-  ACCEPTED: 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300',
-  REJECTED: 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300',
-  CANCELED: 'bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-300',
-  COMPLETED: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
-};
+
 
 export function SlotModal({
   open,
   onOpenChange,
   date,
-  startTime,
-  endTime,
+  start_time,
+  end_time,
   appointments,
 }: SlotModalProps) {
   const t = useTranslations('appointments');
@@ -43,7 +38,7 @@ export function SlotModal({
   const [showReason, setShowReason] = useState(false);
   const [reason, setReason] = useState('');
 
-  const selectedApt = appointments.find((a) => a.appointmentId === selectedAptId);
+  const selectedApt = appointments.find((a) => a.appointment_id === selectedAptId);
 
   const handleAccept = async (appointmentId: string) => {
     await updateStatus.mutateAsync({
@@ -76,51 +71,50 @@ export function SlotModal({
   };
 
   const canAccept = (apt: AppointmentWithListing) =>
-    currentUser?.user_id === apt.receiverId && apt.status === 'PENDING';
+    currentUser?.user_id === apt.receiver_id && apt.status === 'PENDING';
 
-  const canCancel = (apt: AppointmentWithListing) =>
-    currentUser?.user_id === apt.senderId && apt.status === 'PENDING';
+  const canCancel = (apt: AppointmentWithListing) => canCancelAppointment(apt, currentUser?.user_id);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {t('appointmentFor')} {date} {startTime} - {endTime}
+            {t('appointmentFor')} {date} {start_time} - {end_time}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {appointments.map((apt) => (
             <div
-              key={apt.appointmentId}
-              className={`rounded-lg border p-4 ${selectedAptId === apt.appointmentId ? 'border-primary' : ''
+              key={apt.appointment_id}
+              className={`rounded-lg border p-4 ${selectedAptId === apt.appointment_id ? 'border-primary' : ''
                 }`}
             >
               <button
-                className="w-full text-left"
-                onClick={() => setSelectedAptId(apt.appointmentId)}
+                className="w-full text-left focus:outline-none"
+                onClick={() => setSelectedAptId(apt.appointment_id)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">{apt.senderName}</span>
-                  <Badge className={statusConfig[apt.status]}>
+                  <span className="font-medium">{apt.sender_name}</span>
+                  <Badge className={getStatusColorClasses(apt.status)}>
                     {t(apt.status.toLowerCase())}
                   </Badge>
                 </div>
-                <div className="mt-1 text-sm text-gray-500">{apt.listingName}</div>
-                <div className="text-sm text-gray-500">{apt.listingAddress}</div>
-                {apt.senderNotes && (
-                  <div className="mt-2 text-sm">{apt.senderNotes}</div>
+                <div className="mt-1 text-sm text-gray-500">{apt.listing_name}</div>
+                <div className="text-sm text-gray-500">{apt.listing_address}</div>
+                {apt.sender_notes && (
+                  <div className="mt-2 text-sm">{apt.sender_notes}</div>
                 )}
               </button>
 
-              {selectedAptId === apt.appointmentId && (
-                <div className="mt-3 flex gap-2">
+              {selectedAptId === apt.appointment_id && (canAccept(apt) || canCancel(apt)) && (
+                <div className="mt-4 flex justify-end gap-2">
                   {canAccept(apt) && (
                     <>
                       <Button
                         size="sm"
-                        onClick={() => handleAccept(apt.appointmentId)}
+                        onClick={() => handleAccept(apt.appointment_id)}
                         disabled={updateStatus.isPending}
                       >
                         {t('accept')}
@@ -134,7 +128,7 @@ export function SlotModal({
                       </Button>
                     </>
                   )}
-                  {canCancel(apt) && (
+                  {canCancel(apt) && !canAccept(apt) && (
                     <Button
                       size="sm"
                       variant="destructive"
@@ -152,7 +146,7 @@ export function SlotModal({
         {showReason && (
           <div className="mt-4 space-y-2">
             <label>
-              {selectedApt?.senderId === currentUser?.user_id
+              {selectedApt?.sender_id === currentUser?.user_id
                 ? t('cancelReason')
                 : t('rejectReason')}
             </label>
@@ -160,18 +154,22 @@ export function SlotModal({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder={
-                selectedApt?.senderId === currentUser?.user_id
+                selectedApt?.sender_id === currentUser?.user_id
                   ? t('enterCancelReason')
                   : t('enterRejectReason')
               }
             />
             <div className="flex gap-2">
               <Button
-                onClick={
-                  selectedApt?.senderId === currentUser?.user_id
-                    ? handleCancel
-                    : handleReject
-                }
+                onClick={() => {
+                  if (selectedApt?.status === 'ACCEPTED') {
+                    handleCancel();
+                  } else if (selectedApt?.sender_id === currentUser?.user_id) {
+                    handleCancel();
+                  } else {
+                    handleReject();
+                  }
+                }}
                 disabled={!reason.trim() || updateStatus.isPending}
               >
                 {t('submit')}

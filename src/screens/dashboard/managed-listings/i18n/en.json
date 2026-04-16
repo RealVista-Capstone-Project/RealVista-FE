@@ -52,6 +52,7 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
+    "viewAppointments": "View Appointments",
     "preview": "Preview",
     "actions": "Actions",
     "editListing": "Edit Listing",

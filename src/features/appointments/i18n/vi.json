@@ -28,7 +28,27 @@
     "submit": "Xác nhận",
     "cancelReason": "Lý do hủy",
     "rejectReason": "Lý do từ chối",
+    "cancelRuleViolation": "Không thể hủy lịch hẹn trước giờ bắt đầu dưới 4 tiếng",
     "enterCancelReason": "Nhập lý do hủy...",
-    "enterRejectReason": "Nhập lý do từ chối..."
+    "enterRejectReason": "Nhập lý do từ chối...",
+    "manageBlocks": "Quản lý lịch bận",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "confirm": "Xác nhận",
+    "blocksSavedSuccess": "Lưu lịch bận thành công",
+    "blocksSkippedWarning": "{count} khung giờ bị bỏ qua do trùng với lịch tham quan.",
+    "blocksSkippedDetails": "Bị bỏ qua: {details}",
+    "block": "Lịch bận",
+    "tour": "Lịch tham quan",
+    "saveBlocks": "Lưu Lịch Bận",
+    "saveBlocksDesc": "Lưu các khung giờ bận cho tuần này.",
+    "repeatToNextWeeks": "Lặp lại các tuần sau",
+    "repeatDesc": "Sao chép các khung bận sang các tuần tới. Xung đột với lịch tham quan sẽ được bỏ qua.",
+    "repeatFor": "Lặp trong",
+    "week": "tuần",
+    "weeks": "tuần",
+    "afterThisWeek": "sau tuần này",
+    "listing": "Tin đăng",
+    "allListings": "Tất cả tin đăng"
   }
 }

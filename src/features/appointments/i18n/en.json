@@ -28,7 +28,27 @@
     "submit": "Submit",
     "cancelReason": "Cancel reason",
     "rejectReason": "Reject reason",
+    "cancelRuleViolation": "Cannot cancel appointment less than 4 hours before start time",
     "enterCancelReason": "Enter cancel reason...",
-    "enterRejectReason": "Enter reject reason..."
+    "enterRejectReason": "Enter reject reason...",
+    "manageBlocks": "Manage Blocks",
+    "save": "Save",
+    "saving": "Saving...",
+    "confirm": "Confirm",
+    "blocksSavedSuccess": "Busy blocks saved successfully",
+    "blocksSkippedWarning": "{count} block(s) skipped due to conflicts with existing tours.",
+    "blocksSkippedDetails": "Skipped: {details}",
+    "block": "Busy block",
+    "tour": "Tour",
+    "saveBlocks": "Save Busy Blocks",
+    "saveBlocksDesc": "Save the current busy blocks for this week.",
+    "repeatToNextWeeks": "Repeat to next weeks",
+    "repeatDesc": "Copy these blocks to future weeks. Conflicts with tours are skipped.",
+    "repeatFor": "Repeat for",
+    "week": "week",
+    "weeks": "weeks",
+    "afterThisWeek": "after this week",
+    "listing": "Listing",
+    "allListings": "All listings"
   }
 }

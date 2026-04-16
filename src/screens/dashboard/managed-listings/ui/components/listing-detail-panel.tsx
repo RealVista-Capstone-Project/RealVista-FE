@@ -31,13 +31,13 @@ import {
   ArrowLeft,
   BadgeCheck,
   Building2,
-  Calendar,
   Eye,
   Mail,
   Phone,
   ChevronDown,
   Pencil,
   Trash2,
+  CalendarDays,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -213,14 +213,14 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                       <Eye className='h-4 w-4' strokeWidth={2} />
                       <span>{t('preview')}</span>
                     </Link>
-                    <button
-                      type='button'
+                    <Link
+                      href={`/dashboard/appointments?listing=${listing.listing_id}`}
                       onClick={() => setIsActionsOpen(false)}
                       className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
                     >
-                      <Calendar className='h-4 w-4' strokeWidth={2} />
-                      <span>{t('showCalendar')}</span>
-                    </button>
+                      <CalendarDays className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('viewAppointments')}</span>
+                    </Link>
                     <div className='my-1 h-px bg-purple-92/50' />
                     <button
                       type='button'
