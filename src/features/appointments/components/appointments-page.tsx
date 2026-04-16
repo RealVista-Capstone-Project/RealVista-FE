@@ -23,6 +23,7 @@ import {
   DialogClose,
 } from '@/shared/ui/dialog';
 import { Switch } from '@/shared/ui/switch/switch';
+import { Textarea } from '@/shared/ui/textarea';
 
 import {
   Select,
@@ -58,6 +59,13 @@ export function AppointmentsPage() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [repeatWeeks, setRepeatWeeks] = useState(false);
   const [repeatCount, setRepeatCount] = useState<number>(1);
+
+  // Quick reject/cancel reason dialog
+  const [pendingAction, setPendingAction] = useState<{
+    appointmentId: string;
+    action: 'REJECT' | 'CANCEL';
+  } | null>(null);
+  const [actionReason, setActionReason] = useState('');
 
   // Per-week block cache: saves drawn blocks when navigating between weeks in edit-blocks mode.
   // Key = week start timestamp (ms), Value = blocks array for that week.
@@ -270,6 +278,23 @@ export function AppointmentsPage() {
     });
   };
 
+  const handleOpenReasonDialog = (e: React.MouseEvent, appointmentId: string, action: 'REJECT' | 'CANCEL') => {
+    e.stopPropagation();
+    setActionReason('');
+    setPendingAction({ appointmentId, action });
+  };
+
+  const handleSubmitReason = async () => {
+    if (!pendingAction || !actionReason.trim()) return;
+    const status = pendingAction.action === 'REJECT' ? 'REJECTED' : 'CANCELED';
+    await updateStatus.mutateAsync({
+      id: pendingAction.appointmentId,
+      data: { status, reason: actionReason.trim() },
+    });
+    setPendingAction(null);
+    setActionReason('');
+  };
+
   const handleDeleteBlock = async (e: React.MouseEvent, appointmentId: string) => {
     e.stopPropagation();
     if (originalBlockIds.has(appointmentId)) {
@@ -343,7 +368,7 @@ export function AppointmentsPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleAppointmentClick(apt, dateString, startTime, endTime); // open modal to enter reject reason
+                    handleOpenReasonDialog(e, apt.appointment_id, 'REJECT');
                   }}
                   className="rounded bg-red-500/20 p-1 text-red-700 hover:bg-red-500/30 dark:text-red-300"
                   title={t('reject')}
@@ -354,10 +379,7 @@ export function AppointmentsPage() {
             )}
             {canCancel && !(isReceiver && isPending) && (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAppointmentClick(apt, dateString, startTime, endTime); // open modal to enter cancel reason
-                }}
+                onClick={(e) => handleOpenReasonDialog(e, apt.appointment_id, 'CANCEL')}
                 className="rounded bg-gray-500/20 p-1 text-gray-700 hover:bg-gray-500/30 dark:text-gray-300"
                 title={t('cancel')}
               >
@@ -463,6 +485,43 @@ export function AppointmentsPage() {
         end_time={selectedSlot?.end_time || ''}
         appointments={selectedSlot?.appointments || []}
       />
+
+      {/* Quick reject/cancel reason dialog */}
+      <Dialog open={!!pendingAction} onOpenChange={(open) => !open && setPendingAction(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingAction?.action === 'REJECT' ? t('rejectReason') : t('cancelReason')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <Textarea
+              value={actionReason}
+              onChange={(e) => setActionReason(e.target.value)}
+              placeholder={
+                pendingAction?.action === 'REJECT'
+                  ? t('enterRejectReason')
+                  : t('enterCancelReason')
+              }
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline" size="sm">{t('cancel')}</Button>
+            </DialogClose>
+            <Button
+              size="sm"
+              onClick={handleSubmitReason}
+              disabled={!actionReason.trim() || updateStatus.isPending}
+              className="bg-main-primary text-white border-0 hover:bg-main-primary-hover shadow-sm"
+            >
+              {updateStatus.isPending ? t('saving') || 'Saving...' : t('submit')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Save blocks dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
