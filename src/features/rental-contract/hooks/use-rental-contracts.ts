@@ -6,6 +6,7 @@ import {
   rentalContractKeys,
   rentalContractQueries,
   type CreateRentalContractPayload,
+  type GetAgentContractsParams,
   type GetRentalContractsParams,
   type GetRenterContractsParams,
   type UpdateRentalContractStatusPayload,
@@ -28,6 +29,17 @@ export function useRenterContractsQuery(
   return useQuery({
     queryKey: [...rentalContractKeys.all, 'renter', params.renterId, params],
     queryFn: () => rentalContractApi.getRenterContracts(params),
+    enabled: options?.enabled ?? true,
+  });
+}
+
+export function useAgentContractsQuery(
+  params: GetAgentContractsParams,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: [...rentalContractKeys.all, 'agent', params.agentId, params],
+    queryFn: () => rentalContractApi.getAgentContracts(params),
     enabled: options?.enabled ?? true,
   });
 }

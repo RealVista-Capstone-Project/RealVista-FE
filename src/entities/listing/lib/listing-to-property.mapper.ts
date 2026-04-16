@@ -80,13 +80,21 @@ export function mapListingToProperty(listing: Listing): Property {
       lat: listing.location.latitude,
       lng: listing.location.longitude,
     },
-    agent: {
-      id: listing.agent.user_id,
-      name: listing.agent.full_name,
-      avatar: listing.agent.avatar_url,
-      phone: listing.agent.phone ?? '',
-      email: listing.agent.email ?? '',
-    },
+    agent: listing.agent
+      ? {
+          id: listing.agent.user_id,
+          name: listing.agent.full_name,
+          avatar: listing.agent.avatar_url,
+          phone: listing.agent.phone ?? '',
+          email: listing.agent.email ?? '',
+        }
+      : {
+          id: '',
+          name: 'Unknown Agent',
+          avatar: '',
+          phone: '',
+          email: '',
+        },
     createdAt: listing.created_at,
     updatedAt: listing.updated_at,
   };
