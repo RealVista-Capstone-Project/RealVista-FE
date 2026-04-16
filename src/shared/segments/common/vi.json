@@ -309,6 +309,11 @@
       "hideEmail": "Ẩn Email",
       "hideEmailDesc": "Ẩn địa chỉ email với người dùng khác"
     },
+    "personalization": {
+      "title": "Cá nhân hóa",
+      "autoRefresh": "Tự động cập nhật tìm kiếm thông minh",
+      "autoRefreshDesc": "Tự động cập nhật các gợi ý bất động sản dựa trên hành vi của bạn."
+    },
     "saveChanges": "Lưu thay đổi",
     "saving": "Đang lưu...",
     "subscription": {

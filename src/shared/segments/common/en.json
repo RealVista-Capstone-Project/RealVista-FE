@@ -309,6 +309,11 @@
       "hideEmail": "Hide Email",
       "hideEmailDesc": "Hide your email address from other users"
     },
+    "personalization": {
+      "title": "Personalization",
+      "autoRefresh": "Smart Search Auto-Refresh",
+      "autoRefreshDesc": "Automatically refresh recommendations based on your behavior."
+    },
     "saveChanges": "Save changes",
     "saving": "Saving...",
     "subscription": {

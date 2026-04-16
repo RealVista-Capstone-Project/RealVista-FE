@@ -216,6 +216,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     contactViaPhone: false,
     hidePhoneNumber: true,
     hideEmail: true,
+    autoRefreshEnabled: true,
   });
 
   const [agentProfessionalForm, setAgentProfessionalForm] = useState({
@@ -250,6 +251,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
         contactViaPhone: settings.contact_via_phone,
         hidePhoneNumber: settings.hide_phone_number,
         hideEmail: settings.hide_email,
+        autoRefreshEnabled: settings.auto_refresh_enabled,
       });
     }
   }, [settings]);
@@ -750,6 +752,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       contact_via_phone: updated.contactViaPhone,
       hide_phone_number: updated.hidePhoneNumber,
       hide_email: updated.hideEmail,
+      auto_refresh_enabled: updated.autoRefreshEnabled,
     });
   };
 
@@ -1599,6 +1602,23 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                     />
                   </div>
                 ))}
+              </div>
+            </section>
+
+            <section className='bg-white rounded-xl border border-border p-6'>
+              <h2 className='text-base font-semibold text-main-black mb-6'>{t('personalization.title') || 'Personalization'}</h2>
+              <div className='space-y-5'>
+                <div className='flex items-center justify-between py-3 border-b border-border last:border-0'>
+                  <div>
+                    <p className='text-sm font-medium text-main-black'>{t('personalization.autoRefresh') || 'Smart Search Auto-Refresh'}</p>
+                    <p className='text-xs text-grey-500'>{t('personalization.autoRefreshDesc') || 'Automatically refresh recommendations based on your behavior.'}</p>
+                  </div>
+                  <Switch
+                    checked={notifForm.autoRefreshEnabled}
+                    disabled={updateSettingsMutation.isPending}
+                    onCheckedChange={(checked) => handleToggleSetting('autoRefreshEnabled', checked)}
+                  />
+                </div>
               </div>
             </section>
 

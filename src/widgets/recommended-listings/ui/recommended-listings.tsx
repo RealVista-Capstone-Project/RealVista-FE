@@ -19,6 +19,7 @@ import {
 import { recommendationQueries, recommendationApi, recommendationKeys } from '@/entities/recommendation';
 import type { RecommendedListingDTO } from '@/entities/recommendation';
 import { bookmarkApi } from '@/entities/bookmark';
+import { settingPreferenceApi } from '@/entities/setting-preference';
 import { buildListingDetailUrl } from '@/shared/lib/utils';
 import { behaviorTracker } from '@/shared/lib/analytics';
 
@@ -101,16 +102,13 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const t = useTranslations('RecommendedListings');
   const queryClient = useQueryClient();
 
-  // ── Auto-reload toggle (persisted to localStorage) ───────────
-  const [autoReload, setAutoReload] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    const stored = localStorage.getItem('recommendation_auto_reload');
-    return stored === null ? true : stored === 'true';
+  const { data: preferenceResponse } = useQuery({
+    queryKey: ['setting-preference'],
+    queryFn: () => settingPreferenceApi.get(),
+    enabled: authStatus === 'authenticated',
   });
 
-  useEffect(() => {
-    localStorage.setItem('recommendation_auto_reload', String(autoReload));
-  }, [autoReload]);
+  const autoReload = preferenceResponse?.payload?.data?.auto_refresh_enabled ?? true;
 
   // ── Favorite overrides (optimistic local state) ───────────────
   const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
@@ -219,24 +217,6 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
               </h2>
             </div>
             <div className='flex items-center gap-2'>
-              {/* Auto-reload pill toggle */}
-              <button
-                type='button'
-                onClick={() => setAutoReload((v) => !v)}
-                className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-                  autoReload
-                    ? 'bg-main-primary/10 border-main-primary text-main-primary'
-                    : 'bg-white border-purple-90 text-grey-400'
-                }`}
-                aria-label='Toggle auto-reload'
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                    autoReload ? 'bg-main-primary animate-pulse' : 'bg-grey-300'
-                  }`}
-                />
-                Auto
-              </button>
               <CarouselNavButtons />
               <Button
                 variant='outline'

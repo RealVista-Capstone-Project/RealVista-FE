@@ -6,15 +6,20 @@
     "placeholder": "Hỏi tôi bất cứ điều gì...",
     "send": "Gửi",
     "close": "Đóng",
-    "chipFindProperties": "Tìm bất động sản gần tôi",
-    "chipAverageRent": "Giá thuê trung bình Quận 1?",
-    "chipCompareListings": "So sánh tin đăng",
+    "chipFindProperties": "Tìm nhà phố Q.7 giá tốt",
+    "chipAverageRent": "Giá thuê căn hộ Q.2 hiện nay?",
+    "chipCompareListings": "So sánh các tin đăng hot",
+    "chipMarketTrend": "Phân tích thị trường Quận 9",
+    "chipInvestment": "Căn hộ tiềm năng đầu tư?",
     "thinking": "Đang suy nghĩ...",
     "newChat": "Cuộc trò chuyện mới",
     "retry": "Thử lại",
     "errorGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
     "errorUnauthorized": "Phiên đã hết hạn. Vui lòng đăng nhập lại.",
     "errorNetwork": "Mất kết nối. Kiểm tra mạng và thử lại.",
-    "loadingHistory": "Đang tải tin nhắn..."
+    "loadingHistory": "Đang tải tin nhắn...",
+    "quotaExceeded": "Bạn đã hết lượt sử dụng AI hôm nay!",
+    "quotaExceededDesc": "Nâng cấp gói cước để tiếp tục trải nghiệm không giới hạn.",
+    "buyMore": "Mua thêm lượt ngay ⭐"
   }
 }
