@@ -31,11 +31,11 @@ interface ListingInformationStepProps {
 function ReadOnlyField({ label, value, badge }: { label: string; value: string; badge?: string }) {
   return (
     <div className='flex flex-col gap-2'>
-      <span className='text-sm font-medium text-main-black'>{label}</span>
-      <div className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/50 px-4 py-3'>
+      <span className='text-sm font-medium text-foreground'>{label}</span>
+      <div className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5/50 px-4 py-3'>
         <span className='flex-1 text-sm text-secondary/60'>{value}</span>
         {badge && (
-          <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-primary'>
+          <span className='rounded-full bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
             {badge}
           </span>
         )}
@@ -303,7 +303,7 @@ export function ListingInformationStep({
               <Home className='h-6 w-6 text-primary' />
             </div>
             <div className='flex min-w-0 flex-col gap-1'>
-              <span className='text-lg font-bold tracking-tight text-main-black'>
+              <span className='text-lg font-bold tracking-tight text-foreground'>
                 {t('propertyAddress')}
               </span>
               <span className='flex items-center gap-1 text-sm text-secondary/50'>
@@ -315,8 +315,8 @@ export function ListingInformationStep({
         </div>
 
         {/* Listing Information Form */}
-        <div className='mt-5 rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
-          <h3 className='mb-6 text-lg font-bold tracking-tight text-main-black'>
+        <div className='mt-5 rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
+          <h3 className='mb-6 text-lg font-bold tracking-tight text-foreground'>
             {t('listingInformation')}
           </h3>
 
@@ -351,7 +351,7 @@ export function ListingInformationStep({
 
             {/* Listing Type */}
             <div className='flex flex-col gap-2'>
-              <span className='text-sm font-medium text-main-black'>
+              <span className='text-sm font-medium text-foreground'>
                 {t('listingTypeLabel')}
                 <span className='text-primary'>*</span>
               </span>
@@ -429,19 +429,19 @@ export function ListingInformationStep({
             {selectedProperty.amenities.length > 0 && (
               <div className='flex flex-col gap-3'>
                 <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-main-black'>
+                  <span className='text-sm font-medium text-foreground'>
                     {t('selectAmenities')}
                   </span>
-                  <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-primary'>
+                  <span className='rounded-full bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
                     {t('readOnly')}
                   </span>
                 </div>
-                <div className='rounded-lg border border-purple-92 p-4'>
+                <div className='rounded-lg border border-primary/20 p-4'>
                   <div className='flex flex-wrap gap-2'>
                     {selectedProperty.amenities.map((amenity) => (
                       <div
                         key={amenity.amenityId}
-                        className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/30 px-3 py-1.5 text-sm font-medium text-main-black/80'
+                        className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5/30 px-3 py-1.5 text-sm font-medium text-foreground/80'
                       >
                         <Check className='h-3.5 w-3.5 text-primary' strokeWidth={2.5} />
                         {amenity.amenityName}
@@ -467,7 +467,7 @@ export function ListingInformationStep({
             {/* Media Section */}
             <div className='flex flex-col gap-3'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-main-black'>{t('mediaUpload')}</span>
+                <span className='text-sm font-medium text-foreground'>{t('mediaUpload')}</span>
                 {selectedProperty.media.filter((m) => m.isPropertyStandard).length > 0 && (
                   <span className='text-xs text-secondary/50'>
                     {selectedMediaIds.size} /{' '}
@@ -522,12 +522,12 @@ export function ListingInformationStep({
       </div>
 
       {/* Footer — Previous / Save as Draft / Submit */}
-      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-primary/20/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
         <button
           type='button'
           onClick={onPrevious}
           disabled={isSubmitting}
-          className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-purple-98 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-primary transition-colors hover:bg-purple-96 disabled:opacity-50'
+          className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-primary/5 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-primary transition-colors hover:bg-primary/5 disabled:opacity-50'
         >
           {t('previous')}
         </button>

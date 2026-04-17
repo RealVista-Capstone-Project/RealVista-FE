@@ -115,8 +115,8 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
           <div className='flex-1 min-w-0'>
             {/* Mobile: Apply Sidebar (inline) only for agents */}
             {isAgent && (
-              <div className='md:hidden mb-6 bg-white border border-purple-92 rounded-lg p-6'>
-                <p className='text-grey-600 mb-4'>{t('agentApplyDescription') || 'Are you an agent looking to manage this property?'}</p>
+              <div className='md:hidden mb-6 bg-white border border-primary/20 rounded-lg p-6'>
+                <p className='text-muted-foreground mb-4'>{t('agentApplyDescription') || 'Are you an agent looking to manage this property?'}</p>
                 <RealVistaButton
                   variant='primary'
                   size='medium'
@@ -136,7 +136,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
             </div>
 
             {/* Active Listings Section (Market context for Agents) */}
-            <div className='mb-10 pt-8 border-t border-grey-100'>
+            <div className='mb-10 pt-8 border-t border-border/50'>
               <PropertyActiveListings
                 listings={response.active_listings || []}
                 locale={(params?.locale as string) || 'vi'}
@@ -147,9 +147,9 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
           {/* Desktop: Apply Sidebar only for agents */}
           {isAgent && (
             <div className='hidden md:block mt-6 md:mt-0 w-full max-w-[380px] shrink-0'>
-              <div className='md:sticky md:top-8 bg-white border border-purple-92 rounded-lg p-6'>
+              <div className='md:sticky md:top-8 bg-white border border-primary/20 rounded-lg p-6'>
                 <h3 className='text-lg font-bold mb-2'>{t('agentApplyTitle') || 'Manage this property'}</h3>
-                <p className='text-grey-500 text-sm mb-6'>
+                <p className='text-muted-foreground text-sm mb-6'>
                   {t('agentApplyDescription') || 'Submit your proposal to the owner to manage this real estate asset.'}
                 </p>
                 <RealVistaButton

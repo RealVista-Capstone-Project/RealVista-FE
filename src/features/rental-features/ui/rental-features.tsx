@@ -29,7 +29,7 @@ export function RentalFeatures({ property }: RentalFeaturesProps) {
   return (
     <div className='flex flex-col gap-6'>
       {/* Title */}
-      <h2 className='text-main-black text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
+      <h2 className='text-foreground text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
         {t('title')}
       </h2>
 
@@ -53,16 +53,16 @@ function AmenitySection({ title, amenities }: { title: string; amenities: Amenit
   return (
     <div className='flex flex-col gap-3'>
       {/* Section Title */}
-      <h3 className='text-main-black text-base sm:text-lg font-bold'>{title}</h3>
+      <h3 className='text-foreground text-base sm:text-lg font-bold'>{title}</h3>
 
       {/* Amenity List Card */}
-      <div className='bg-purple-98/84 rounded-lg p-4 sm:p-6'>
+      <div className='bg-primary/5/84 rounded-lg p-4 sm:p-6'>
         {/* Mobile: Single column bullet list */}
         <ul className='sm:hidden flex flex-col gap-2'>
           {amenities.map((amenity) => (
             <li key={amenity.amenity_id} className='flex items-center gap-2'>
-              <span className='text-grey-600'>•</span>
-              <span className='text-grey-600 text-base font-medium'>
+              <span className='text-muted-foreground'>•</span>
+              <span className='text-muted-foreground text-base font-medium'>
                 {amenity.amenity_name}
               </span>
             </li>
@@ -73,8 +73,8 @@ function AmenitySection({ title, amenities }: { title: string; amenities: Amenit
         <ul className='hidden sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-2'>
           {amenities.map((amenity) => (
             <li key={amenity.amenity_id} className='flex items-center gap-2'>
-              <span className='text-grey-600'>•</span>
-              <span className='text-grey-600 text-base font-medium'>
+              <span className='text-muted-foreground'>•</span>
+              <span className='text-muted-foreground text-base font-medium'>
                 {amenity.amenity_name}
               </span>
             </li>

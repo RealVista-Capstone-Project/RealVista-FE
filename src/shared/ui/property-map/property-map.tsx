@@ -129,7 +129,7 @@ export function PropertyMap({
               'rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-md transition-all',
               mapType === 'roadmap'
                 ? 'bg-primary text-white'
-                : 'text-main-black hover:bg-purple-98'
+                : 'text-foreground hover:bg-primary/5'
             )}
           >
             Map
@@ -141,7 +141,7 @@ export function PropertyMap({
               'rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-md transition-all',
               mapType === 'satellite'
                 ? 'bg-primary text-white'
-                : 'text-main-black hover:bg-purple-98'
+                : 'text-foreground hover:bg-primary/5'
             )}
           >
             Satellite

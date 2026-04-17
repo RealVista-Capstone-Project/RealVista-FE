@@ -45,7 +45,7 @@ export function DashboardPage() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-semibold tracking-tight text-main-black sm:text-3xl'>
+          <h1 className='text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'>
             Dashboard
           </h1>
           <p className='mt-1 text-sm text-secondary/60'>
@@ -67,9 +67,9 @@ export function DashboardPage() {
       {/* Main Content */}
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
         {/* Activity Card */}
-        <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
+        <div className='group relative overflow-hidden rounded-xl border border-primary/20/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
           <div className='mb-4 flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-main-black'>Recent Activity</h2>
+            <h2 className='text-lg font-semibold text-foreground'>Recent Activity</h2>
             <span className='h-2 w-2 rounded-full bg-emerald-500' />
           </div>
 
@@ -94,9 +94,9 @@ export function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
+        <div className='group relative overflow-hidden rounded-xl border border-primary/20/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
           <div className='mb-4 flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-main-black'>Quick Actions</h2>
+            <h2 className='text-lg font-semibold text-foreground'>Quick Actions</h2>
             <span className='h-2 w-2 rounded-full bg-primary' />
           </div>
 
@@ -104,7 +104,7 @@ export function DashboardPage() {
             {['Profile Settings', 'Security', 'Billing'].map((label) => (
               <button
                 key={label}
-                className='rounded-lg bg-purple-98 px-3 py-1.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-96'
+                className='rounded-lg bg-primary/5 px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/5'
               >
                 {label}
               </button>

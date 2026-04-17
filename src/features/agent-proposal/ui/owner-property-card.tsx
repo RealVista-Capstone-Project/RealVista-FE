@@ -108,8 +108,8 @@ export function OwnerPropertyCard({
             className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
           />
         ) : (
-          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
-            <Home className='h-8 w-8 text-indigo-300' />
+          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
+            <Home className='h-8 w-8 text-primary300' />
           </div>
         )}
         {/* Status badge */}
@@ -144,7 +144,7 @@ export function OwnerPropertyCard({
           </div>
           <div className='flex items-center gap-1.5 flex-shrink-0'>
             {property.property_type_info?.property_type_name && (
-              <span className='text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
+              <span className='text-[11px] font-semibold bg-primary/5 text-primary700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
                 {property.property_type_info.property_type_name}
               </span>
             )}

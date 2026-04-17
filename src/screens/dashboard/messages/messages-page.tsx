@@ -242,14 +242,14 @@ export function MessagesPage() {
 
   if (isLoading) {
     return (
-      <div className='flex h-[calc(100vh-6rem)] items-center justify-center rounded-2xl border border-purple-92/50 bg-white shadow-sm'>
+      <div className='flex h-[calc(100vh-6rem)] items-center justify-center rounded-2xl border border-primary/20/50 bg-white shadow-sm'>
         <Loader2 className='h-6 w-6 animate-spin text-primary/60' />
       </div>
     );
   }
 
   return (
-    <div className='flex h-[calc(100vh-6rem)] overflow-hidden rounded-2xl border border-purple-92/50 bg-white shadow-sm'>
+    <div className='flex h-[calc(100vh-6rem)] overflow-hidden rounded-2xl border border-primary/20/50 bg-white shadow-sm'>
       {/* ── Left Sidebar ─────────────────────────────────────────────────── */}
       <ConversationSidebar
         conversations={conversations}
@@ -260,7 +260,7 @@ export function MessagesPage() {
       />
 
       {/* ── Chat Panel ───────────────────────────────────────────────────── */}
-      <div className='flex flex-1 flex-col bg-purple-98/40'>
+      <div className='flex flex-1 flex-col bg-primary/5/40'>
         {activeConv && (
           <>
             <ChatHeader

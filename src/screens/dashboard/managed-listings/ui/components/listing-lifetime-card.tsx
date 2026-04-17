@@ -78,7 +78,7 @@ export function ListingLifetimeCard({ listing }: ListingLifetimeCardProps) {
       </div>
       <div className='flex-1'>
         <div className='mb-1 flex items-center gap-2'>
-          <span className='text-sm font-semibold text-main-black'>{t('lifetime.title')}</span>
+          <span className='text-sm font-semibold text-foreground'>{t('lifetime.title')}</span>
           <Tooltip>
             <TooltipTrigger asChild>
               <button type='button' className='flex items-center text-secondary/40 hover:text-secondary/70 transition-colors' aria-label={t('lifetime.tooltip')}>

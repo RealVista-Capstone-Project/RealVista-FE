@@ -401,7 +401,7 @@ export function MessageInput({
       )}
 
       {/* ── Input row ────────────────────────────────────────────────────── */}
-      <div className='flex items-center gap-3 rounded-2xl border border-purple-92 bg-white px-4 py-3 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10'>
+      <div className='flex items-center gap-3 rounded-2xl border border-primary/20 bg-white px-4 py-3 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10'>
         {/* Plus button with popover — only rendered for owner / AGENT */}
         {canCreateContract && (
           <div className='relative shrink-0'>
@@ -420,7 +420,7 @@ export function MessageInput({
             {popoverOpen && (
               <div
                 ref={popoverRef}
-                className='absolute bottom-full left-0 mb-2 w-52 overflow-hidden rounded-xl border border-purple-92 bg-white shadow-lg'
+                className='absolute bottom-full left-0 mb-2 w-52 overflow-hidden rounded-xl border border-primary/20 bg-white shadow-lg'
               >
                 <button
                   onClick={() => {

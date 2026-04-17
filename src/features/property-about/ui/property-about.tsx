@@ -38,22 +38,22 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
   return (
     <div className='flex flex-col gap-12 w-full max-w-[782px]'>
       {/* Specifications */}
-      <div className='bg-white border border-purple-96 rounded-lg p-6'>
+      <div className='bg-white border border-primary/10 rounded-lg p-6'>
         {attributes.length > 0 ? (
           // Dynamic attributes from server - max 4 items per row
           <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6'>
             {attributes.map((attribute) => (
               <div key={attribute.attribute_id} className='flex flex-col gap-4'>
-                <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+                <p className='text-foreground/50 text-[16px] font-medium leading-[1.5]'>
                   {attribute.attribute_name}
                 </p>
                 <div className='flex items-center gap-2'>
                   <AttributeIcon
                     iconName={attribute.icon}
-                    className='size-6 text-main-black/50'
+                    className='size-6 text-foreground/50'
                     strokeWidth={2}
                   />
-                  <p className='text-main-black font-bold leading-[1.45] tracking-[-0.09px]'>
+                  <p className='text-foreground font-bold leading-[1.45] tracking-[-0.09px]'>
                     {attribute.display_value}
                   </p>
                 </div>
@@ -65,16 +65,16 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
           <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6'>
             {/* Status */}
             <div className='flex flex-col gap-4'>
-              <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+              <p className='text-foreground/50 text-[16px] font-medium leading-[1.5]'>
                 {t('status')}
               </p>
               <div className='flex items-center gap-2'>
                 <AttributeIcon
                   iconName='CheckCircle'
-                  className='size-6 text-main-black/50'
+                  className='size-6 text-foreground/50'
                   strokeWidth={2}
                 />
-                <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
+                <p className='text-foreground text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                   {t('active')}
                 </p>
               </div>
@@ -82,16 +82,16 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
 
             {/* Repair Quality */}
             <div className='flex flex-col gap-4'>
-              <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+              <p className='text-foreground/50 text-[16px] font-medium leading-[1.5]'>
                 {t('repairQuality')}
               </p>
               <div className='flex items-center gap-2'>
                 <AttributeIcon
                   iconName='Wrench'
-                  className='size-6 text-main-black/50'
+                  className='size-6 text-foreground/50'
                   strokeWidth={2}
                 />
-                <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
+                <p className='text-foreground text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
                   {t('modernLoft')}
                 </p>
               </div>
@@ -102,23 +102,23 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
 
       {/* About this home */}
       <div className='flex flex-col gap-8'>
-        <h2 className='text-main-black text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
+        <h2 className='text-foreground text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
           {t('aboutThisHome')}
         </h2>
-        <p className='text-main-black/70 text-[16px] font-medium leading-[1.6]'>
+        <p className='text-foreground/70 text-[16px] font-medium leading-[1.6]'>
           {property.description}
         </p>
       </div>
 
       {/* Owner */}
-      <div className='bg-purple-98 border border-purple-92 rounded-lg p-6'>
+      <div className='bg-primary/5 border border-primary/20 rounded-lg p-6'>
         <div className='flex flex-col gap-6'>
-          <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
+          <p className='text-foreground/50 text-[16px] font-medium leading-[1.5]'>
             {isPostedByAgent ? 'Được đăng bởi môi giới' : t('listedByPropertyOwner')}
           </p>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
             <div className='flex items-center gap-4'>
-              <div className='size-[64px] rounded-full overflow-hidden bg-grey-200 flex items-center justify-center'>
+              <div className='size-[64px] rounded-full overflow-hidden bg-muted flex items-center justify-center'>
                 {hasListingAgent(property) && property.agent.avatar_url ? (
                   <Image
                     src={property.agent.avatar_url}
@@ -162,7 +162,7 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
                     }}
                   />
                 ) : (
-                  <span className='text-main-black/50 text-lg font-semibold'>
+                  <span className='text-foreground/50 text-lg font-semibold'>
                     {hasListingAgent(property)
                       ? property.agent.full_name
                         .split(' ')
@@ -180,10 +180,10 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
                 )}
               </div>
               <div className='flex flex-col gap-[2px]'>
-                <p className='text-main-black text-[16px] font-bold leading-[1.5]'>
+                <p className='text-foreground text-[16px] font-bold leading-[1.5]'>
                   {hasListingAgent(property) ? property.agent.full_name : property.agent.name}
                 </p>
-                <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>
+                <p className='text-foreground/50 text-[14px] font-medium leading-[1.4]'>
                   {hasListingAgent(property)
                     ? property.agent.business_name || t('realEstateAgency')
                     : t('realEstateAgency')}
@@ -214,12 +214,12 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
         </div>
       </div>
 
-      <div className='h-px w-full bg-purple-92' />
+      <div className='h-px w-full bg-primary/15' />
 
       {/* Rental Features */}
       <RentalFeatures property={property} />
 
-      <div className='h-px w-full bg-purple-92' />
+      <div className='h-px w-full bg-primary/15' />
 
       {/* Map Section */}
       <PropertyMapSection
@@ -231,7 +231,7 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
       />
 
       {/* Legal Disclaimer */}
-      <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>
+      <p className='text-foreground/50 text-[14px] font-medium leading-[1.4]'>
         {t('legalDisclaimer')}
       </p>
     </div>

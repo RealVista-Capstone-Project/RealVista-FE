@@ -14,10 +14,10 @@ export function RegisterPageClient() {
     <>
       {/* Header */}
       <div>
-        <h1 className='text-3xl font-bold tracking-tight text-main-black'>
+        <h1 className='text-3xl font-bold tracking-tight text-foreground'>
           {t('createAccount')}
         </h1>
-        <p className='mt-1.5 text-sm text-grey-500'>{t('registerSubtitle')}</p>
+        <p className='mt-1.5 text-sm text-muted-foreground'>{t('registerSubtitle')}</p>
       </div>
 
       {/* Register Form */}

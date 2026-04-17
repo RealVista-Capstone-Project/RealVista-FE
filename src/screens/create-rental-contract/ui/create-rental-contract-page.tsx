@@ -383,7 +383,7 @@ export function CreateRentalContractPage() {
                   <p className='text-xs font-semibold uppercase tracking-[0.22em] text-secondary/50'>
                     {t('steps.eyebrow')}
                   </p>
-                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-main-black'>
+                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-foreground'>
                     {t(`steps.titles.${currentStep}` as never)}
                   </h2>
                   <p className='mt-1 max-w-xl text-sm leading-6 text-secondary/60'>

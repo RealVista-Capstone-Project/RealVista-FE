@@ -148,7 +148,7 @@ export function ListingStatusActions({
                 !isDisabled &&
                 (variant === 'primary'
                   ? 'bg-primary text-white hover:bg-primary/90'
-                  : 'border border-purple-92 bg-white text-main-black hover:bg-purple-98')
+                  : 'border border-primary/20 bg-white text-foreground hover:bg-primary/5')
               )}
             >
               {icon}
@@ -180,7 +180,7 @@ export function ListingStatusActions({
             <button
               type='button'
               onClick={() => setConfirmingAction(null)}
-              className='flex h-11 items-center justify-center rounded-lg border border-purple-92 bg-white px-6 text-sm font-bold text-main-black transition-colors hover:bg-purple-98'
+              className='flex h-11 items-center justify-center rounded-lg border border-primary/20 bg-white px-6 text-sm font-bold text-foreground transition-colors hover:bg-primary/5'
               disabled={isPending}
             >
               {t('confirm.cancel')}

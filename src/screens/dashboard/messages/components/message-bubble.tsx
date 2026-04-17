@@ -49,7 +49,7 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
       )}
 
       <div className={cn('flex max-w-[65%] flex-col gap-1', isMe && 'items-end')}>
-        {!isMe && <span className='text-xs font-semibold text-main-black'>{msg.sender.name}</span>}
+        {!isMe && <span className='text-xs font-semibold text-foreground'>{msg.sender.name}</span>}
 
         {msg.text && (
           <div
@@ -57,7 +57,7 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
               'rounded-2xl px-4 py-3 text-sm leading-relaxed',
               isMe
                 ? 'rounded-tr-sm bg-primary text-white'
-                : 'rounded-tl-sm bg-white text-main-black shadow-sm',
+                : 'rounded-tl-sm bg-white text-foreground shadow-sm',
               msg.isLink && 'break-all'
             )}
           >
@@ -93,11 +93,11 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
         )}
 
         <div className={cn('flex items-center gap-2', isMe && 'flex-row-reverse')}>
-          <span className='text-xs text-grey-400'>{msg.time}</span>
+          <span className='text-xs text-muted-foreground/60'>{msg.time}</span>
           {msg.reactions?.map((r) => (
             <span
               key={r.emoji}
-              className='flex items-center gap-1 rounded-full bg-purple-96 px-2 py-0.5 text-xs'
+              className='flex items-center gap-1 rounded-full bg-primary/5 px-2 py-0.5 text-xs'
             >
               {r.emoji} {r.count}
             </span>

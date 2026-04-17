@@ -62,7 +62,7 @@ export function UpdateContractStatusDialog({
       <DialogContent className='max-w-md rounded-2xl border-0 p-0 shadow-2xl'>
         <div className='rounded-2xl bg-white p-6'>
           <DialogHeader className='text-left'>
-            <DialogTitle className='text-xl font-semibold text-main-black'>
+            <DialogTitle className='text-xl font-semibold text-foreground'>
               {config.title}
             </DialogTitle>
             <DialogDescription className='mt-2 text-sm leading-6 text-secondary/70'>
@@ -72,7 +72,7 @@ export function UpdateContractStatusDialog({
 
           {requiresReason && (
             <div className='mt-5 space-y-2'>
-              <label className='text-sm font-medium text-main-black' htmlFor='contract-status-reason'>
+              <label className='text-sm font-medium text-foreground' htmlFor='contract-status-reason'>
                 {t('statusDialog.reasonLabel')}
               </label>
               <Textarea

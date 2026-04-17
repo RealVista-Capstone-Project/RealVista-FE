@@ -13,13 +13,13 @@ function FooterLinkGroup({
 }) {
   return (
     <div className='flex flex-col gap-3'>
-      <h3 className='text-xs font-semibold uppercase tracking-wider text-main-black'>{title}</h3>
+      <h3 className='text-xs font-semibold uppercase tracking-wider text-foreground'>{title}</h3>
       <ul className='flex flex-col gap-2'>
         {links.map((link) => (
           <li key={link.label}>
             <Link
               href={link.href}
-              className='text-sm text-grey-500 transition-colors hover:text-primary'
+              className='text-sm text-muted-foreground transition-colors hover:text-primary'
             >
               {link.label}
             </Link>
@@ -44,7 +44,7 @@ export function HomeFooter() {
               <div className='flex h-8 w-8 items-center justify-center rounded-md bg-primary'>
                 <Home className='h-4 w-4 text-white' />
               </div>
-              <span className='text-xl font-bold text-main-black'>RealVista</span>
+              <span className='text-xl font-bold text-foreground'>RealVista</span>
             </Link>
           </div>
 
@@ -113,44 +113,44 @@ export function HomeFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className='border-t border-grey-200 bg-grey-50'>
+      <div className='border-t border-border bg-muted/50'>
         <div className='mx-auto flex flex-col md:flex-row max-w-7xl items-center justify-between px-6 py-4 lg:px-8 gap-4'>
-          <p className='text-sm text-grey-500 whitespace-nowrap'>{t('copyright')}</p>
+          <p className='text-sm text-muted-foreground whitespace-nowrap'>{t('copyright')}</p>
           <div className='flex flex-wrap items-center justify-center gap-x-4 gap-y-2'>
-            <Link href='/policies/terms-of-service' className='text-xs text-grey-500 transition-colors hover:text-primary'>Điều khoản sử dụng</Link>
-            <Link href='/policies/privacy-policy' className='text-xs text-grey-500 transition-colors hover:text-primary'>Chính sách bảo mật</Link>
-            <Link href='/policies/posting-regulations' className='text-xs text-grey-500 transition-colors hover:text-primary'>Quy định đăng tin</Link>
-            <Link href='/policies/fees-and-payments' className='text-xs text-grey-500 transition-colors hover:text-primary'>Chính sách phí</Link>
-            <Link href='/policies/transaction-safety' className='text-xs text-grey-500 transition-colors hover:text-primary'>An toàn giao dịch</Link>
-            <Link href='/policies/e-commerce-regulations' className='text-xs text-grey-500 transition-colors hover:text-primary'>Quy chế TMĐT</Link>
-            <Link href='/policies/cookie-policy' className='text-xs text-grey-500 transition-colors hover:text-primary'>Chính sách Cookie</Link>
+            <Link href='/policies/terms-of-service' className='text-xs text-muted-foreground transition-colors hover:text-primary'>Điều khoản sử dụng</Link>
+            <Link href='/policies/privacy-policy' className='text-xs text-muted-foreground transition-colors hover:text-primary'>Chính sách bảo mật</Link>
+            <Link href='/policies/posting-regulations' className='text-xs text-muted-foreground transition-colors hover:text-primary'>Quy định đăng tin</Link>
+            <Link href='/policies/fees-and-payments' className='text-xs text-muted-foreground transition-colors hover:text-primary'>Chính sách phí</Link>
+            <Link href='/policies/transaction-safety' className='text-xs text-muted-foreground transition-colors hover:text-primary'>An toàn giao dịch</Link>
+            <Link href='/policies/e-commerce-regulations' className='text-xs text-muted-foreground transition-colors hover:text-primary'>Quy chế TMĐT</Link>
+            <Link href='/policies/cookie-policy' className='text-xs text-muted-foreground transition-colors hover:text-primary'>Chính sách Cookie</Link>
           </div>
           <div className='flex items-center gap-4 whitespace-nowrap'>
             <Link
               href='#'
               aria-label='Facebook'
-              className='text-grey-400 transition-colors hover:text-primary'
+              className='text-muted-foreground/60 transition-colors hover:text-primary'
             >
               <Facebook className='h-5 w-5' />
             </Link>
             <Link
               href='#'
               aria-label='Instagram'
-              className='text-grey-400 transition-colors hover:text-primary'
+              className='text-muted-foreground/60 transition-colors hover:text-primary'
             >
               <Instagram className='h-5 w-5' />
             </Link>
             <Link
               href='#'
               aria-label='Twitter'
-              className='text-grey-400 transition-colors hover:text-primary'
+              className='text-muted-foreground/60 transition-colors hover:text-primary'
             >
               <Twitter className='h-5 w-5' />
             </Link>
             <Link
               href='#'
               aria-label='LinkedIn'
-              className='text-grey-400 transition-colors hover:text-primary'
+              className='text-muted-foreground/60 transition-colors hover:text-primary'
             >
               <Linkedin className='h-5 w-5' />
             </Link>

@@ -107,7 +107,7 @@ export function FavoritedPage() {
   };
 
   return (
-    <div className='min-h-screen bg-purple-98'>
+    <div className='min-h-screen bg-primary/5'>
       {/* Filter Section */}
       <BookmarksFilter
         sortOrder={sortOrder}
@@ -127,10 +127,10 @@ export function FavoritedPage() {
             </div>
           ) : items.length === 0 ? (
             // Empty State
-            <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-white py-16 px-6'>
-              <Heart className='mb-4 h-12 w-12 text-grey-400' strokeWidth={1.5} />
-              <h2 className='mb-2 text-lg font-bold text-main-black'>{t('emptyTitle')}</h2>
-              <p className='mb-6 max-w-md text-center text-sm text-grey-600'>
+            <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-white py-16 px-6'>
+              <Heart className='mb-4 h-12 w-12 text-muted-foreground/60' strokeWidth={1.5} />
+              <h2 className='mb-2 text-lg font-bold text-foreground'>{t('emptyTitle')}</h2>
+              <p className='mb-6 max-w-md text-center text-sm text-muted-foreground'>
                 {t('emptyDescription')}
               </p>
               <Link

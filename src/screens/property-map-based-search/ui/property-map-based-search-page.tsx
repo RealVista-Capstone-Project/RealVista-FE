@@ -252,7 +252,7 @@ export function PropertyMapBasedSearchPage({
       </div>
 
       {/* Right Side - Property Listings */}
-      <div className='w-full lg:w-1/2 overflow-y-auto bg-purple-98 h-full'>
+      <div className='w-full lg:w-1/2 overflow-y-auto bg-primary/5 h-full'>
         <div className='mx-auto max-w-4xl p-6'>
           <PropertySearchHeader
             title={initialListingType === 'SALE' ? t('searchTitleSale') : t('searchTitleRent')}
@@ -285,7 +285,7 @@ export function PropertyMapBasedSearchPage({
                   <span>Quay lại</span>
                   <div className='relative flex h-5 w-5 items-center justify-center'>
                     {/* Background circle */}
-                    <div className='absolute inset-0 rounded-full bg-purple-96'></div>
+                    <div className='absolute inset-0 rounded-full bg-primary/5'></div>
                     {/* Icon */}
                     <ChevronLeft className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
                   </div>
@@ -295,7 +295,7 @@ export function PropertyMapBasedSearchPage({
           />
 
           {/* Filters Container */}
-          <div className='mt-6 sticky top-0 z-10 bg-purple-98/80 backdrop-blur-md py-2 px-1'>
+          <div className='mt-6 sticky top-0 z-10 bg-primary/5/80 backdrop-blur-md py-2 px-1'>
             <PropertyFilters
               priceRange={{
                 min: filters.priceRange.min,
@@ -337,7 +337,7 @@ export function PropertyMapBasedSearchPage({
             {isLoading ? (
               <div className='col-span-full grid grid-cols-1 md:grid-cols-2 gap-6'>
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className='flex flex-col gap-3 rounded-2xl border border-purple-92 bg-white p-3'>
+                  <div key={i} className='flex flex-col gap-3 rounded-2xl border border-primary/20 bg-white p-3'>
                     <Skeleton className='aspect-[4/3] w-full rounded-xl' />
                     <div className='space-y-2 px-1'>
                       <Skeleton className='h-6 w-3/4' />
@@ -352,11 +352,11 @@ export function PropertyMapBasedSearchPage({
               </div>
             ) : properties.length === 0 ? (
               <div className='col-span-full flex flex-col items-center justify-center py-20 text-center opacity-60'>
-                <div className='mb-4 rounded-full bg-purple-96 p-6'>
+                <div className='mb-4 rounded-full bg-primary/5 p-6'>
                   <Search className='h-10 w-10 text-primary' />
                 </div>
-                <h3 className='text-xl font-bold text-main-black'>Không tìm thấy kết quả</h3>
-                <p className='text-grey-500'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
+                <h3 className='text-xl font-bold text-foreground'>Không tìm thấy kết quả</h3>
+                <p className='text-muted-foreground'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
                 <Button variant='link' onClick={handleResetFilters} className='mt-2 text-primary font-bold'>Xóa tất cả bộ lọc</Button>
               </div>
             ) : (

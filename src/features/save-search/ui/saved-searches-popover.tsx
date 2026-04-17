@@ -163,7 +163,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant='outline' className='flex items-center gap-2 border-primary text-primary hover:bg-purple-96'>
+        <Button variant='outline' className='flex items-center gap-2 border-primary text-primary hover:bg-primary/5'>
           <Bookmark className='w-4 h-4' />
           <span className='hidden sm:inline'>
             {searchType === 'RENT' ? 'Tìm kiếm thuê' : searchType === 'BUY' ? 'Tìm kiếm mua' : 'Tìm kiếm'} đã lưu ({savedSearches.length || 0})
@@ -172,7 +172,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
       </PopoverTrigger>
       <PopoverContent className='w-80 p-0' align='end'>
         <div className='p-4 border-b border-gray-100 flex items-center justify-between'>
-          <h3 className='font-semibold text-main-black'>Tìm kiếm đã lưu</h3>
+          <h3 className='font-semibold text-foreground'>Tìm kiếm đã lưu</h3>
         </div>
         <div className='max-h-80 overflow-y-auto p-2'>
           {isLoading ? (
@@ -191,11 +191,11 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
                 className='flex items-start justify-between p-3 hover:bg-gray-50 rounded-md cursor-pointer group transition-colors'
               >
                 <div>
-                  <p className='text-sm font-medium text-main-black line-clamp-2 leading-snug'>
+                  <p className='text-sm font-medium text-foreground line-clamp-2 leading-snug'>
                     {generateSearchSummary(search)}
                   </p>
                   <div className='flex items-center gap-2 mt-1'>
-                    <span className='inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10'>
+                    <span className='inline-flex items-center rounded-md bg-primary/5 px-2 py-0.5 text-[10px] font-medium text-primary ring-1 ring-inset ring-primary/10'>
                       {search.board_id || 'Mặc định'}
                     </span>
                     <p className='text-[10px] text-gray-400 uppercase tracking-wider font-semibold'>

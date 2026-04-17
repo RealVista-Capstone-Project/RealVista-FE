@@ -13,7 +13,7 @@ interface ChatHeaderProps {
 export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHeaderProps) {
   const t = useTranslations('Messages');
   return (
-    <div className='flex items-center justify-between border-b border-purple-92/50 bg-white px-6 py-3'>
+    <div className='flex items-center justify-between border-b border-primary/20/50 bg-white px-6 py-3'>
       {/* Left: Avatar + Name */}
       <div className='flex items-center gap-3'>
         <AvatarCircle
@@ -23,7 +23,7 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
           size='md'
         />
         <div>
-          <p className='text-sm font-bold text-main-black'>{conversation.name}</p>
+          <p className='text-sm font-bold text-foreground'>{conversation.name}</p>
           {conversation.isTyping && (
             <p className='text-xs font-medium text-primary'>{t('typing')}</p>
           )}
@@ -40,7 +40,7 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
                 key={p.id}
                 className={cn(
                   'flex size-8 items-center justify-center rounded-full border-2 border-white text-xs font-semibold text-white',
-                  p.avatarBg ?? 'bg-grey-400'
+                  p.avatarBg ?? 'bg-muted-foreground/60'
                 )}
                 style={{ marginLeft: i === 0 ? 0 : -8 }}
               >
@@ -60,10 +60,10 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
 
         {/* Action buttons */}
         <div className='flex items-center gap-1'>
-          <button className='flex size-9 items-center justify-center rounded-xl text-grey-500 transition-colors hover:bg-purple-96 hover:text-primary'>
+          <button className='flex size-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary'>
             <Phone className='size-4' />
           </button>
-          <button className='flex size-9 items-center justify-center rounded-xl text-grey-500 transition-colors hover:bg-purple-96 hover:text-primary'>
+          <button className='flex size-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary'>
             <Video className='size-4' />
           </button>
           <button
@@ -72,7 +72,7 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
               'flex size-9 items-center justify-center rounded-xl transition-colors',
               showDetail
                 ? 'bg-primary text-white'
-                : 'text-grey-500 hover:bg-purple-96 hover:text-primary'
+                : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
             )}
           >
             <MoreHorizontal className='size-4' />

@@ -50,18 +50,18 @@ export function PriceAndTour({
   const contactLabel = isAgent ? 'môi giới' : 'chủ nhà';
 
   return (
-    <div className='bg-white border border-purple-92 rounded-lg p-6 w-full'>
+    <div className='bg-white border border-primary/20 rounded-lg p-6 w-full'>
       <div className='flex flex-col gap-6'>
         {/* Price Section */}
         <div className='flex flex-col gap-1'>
-          <p className='text-main-black/50 text-[14px] font-medium leading-[1.4]'>{priceLabel}</p>
+          <p className='text-foreground/50 text-[14px] font-medium leading-[1.4]'>{priceLabel}</p>
           <div className='flex items-baseline gap-0.5'>
             <p className='text-primary text-[24px] font-extrabold leading-[1.5] tracking-[-1px]'>
               {formatVND(price)}
             </p>
-            <span className='text-sm font-semibold text-grey-500'>₫</span>
+            <span className='text-sm font-semibold text-muted-foreground'>₫</span>
             {priceSuffix && (
-              <span className='text-main-black/50 text-[14px] font-medium h-8 flex items-center'>
+              <span className='text-foreground/50 text-[14px] font-medium h-8 flex items-center'>
                 {priceSuffix}
               </span>
             )}
@@ -95,11 +95,11 @@ export function PriceAndTour({
         </div>
 
         {/* Divider */}
-        <div className='h-px w-full bg-purple-92' />
+        <div className='h-px w-full bg-primary/15' />
 
         {/* Request a Home Tour Section */}
         <div className='flex flex-col gap-6'>
-          <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
+          <p className='text-foreground text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
             {t('requestHomeTour')}
           </p>
 
@@ -126,7 +126,7 @@ export function PriceAndTour({
             </RealVistaButton>
 
             {/* Disclaimer */}
-            <p className='text-grey-500 text-[12px] font-normal leading-[1.35]'>
+            <p className='text-muted-foreground text-[12px] font-normal leading-[1.35]'>
               {t('disclaimer')}
             </p>
           </div>

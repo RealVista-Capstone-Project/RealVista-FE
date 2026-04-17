@@ -30,7 +30,7 @@ function CheckboxIcon({ checked, indeterminate }: { checked: boolean; indetermin
         'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
         checked || indeterminate
           ? 'border-primary bg-primary'
-          : 'border-grey-400 bg-white'
+          : 'border-border bg-white'
       )}
     >
       {indeterminate ? (
@@ -114,7 +114,7 @@ export function BookmarksFilter({
     sortOrder === 'newest' ? t('newest') : t('oldest');
 
   const dropdownButtonClass =
-    'flex items-center gap-2 rounded-lg border border-grey-96 bg-white px-3 py-2 text-sm font-medium text-main-black transition-colors hover:bg-grey-98';
+    'flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/5';
 
   return (
     <section className='pt-10 px-6 sm:px-6 lg:px-8'>
@@ -131,7 +131,7 @@ export function BookmarksFilter({
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   listingType === 'rent'
                     ? 'bg-primary text-white'
-                    : 'text-grey-600 hover:bg-grey-98'
+                    : 'text-muted-foreground hover:bg-primary/5'
                 )}
               >
                 {t('rent')}
@@ -143,7 +143,7 @@ export function BookmarksFilter({
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   listingType === 'buy'
                     ? 'bg-primary text-white'
-                    : 'text-grey-600 hover:bg-grey-98'
+                    : 'text-muted-foreground hover:bg-primary/5'
                 )}
               >
                 {t('buy')}
@@ -152,7 +152,7 @@ export function BookmarksFilter({
 
             {/* Sort By Dropdown */}
             <div className='flex items-center gap-2'>
-              <span className='text-sm font-medium text-grey-600'>{t('sortBy')}</span>
+              <span className='text-sm font-medium text-muted-foreground'>{t('sortBy')}</span>
               <PopoverPrimitive.Root open={sortOpen} onOpenChange={setSortOpen}>
                 <PopoverPrimitive.Trigger asChild>
                   <button type='button' className={dropdownButtonClass} aria-label='Sort filter'>
@@ -167,7 +167,7 @@ export function BookmarksFilter({
                   <PopoverPrimitive.Content
                     align='start'
                     sideOffset={8}
-                    className='z-50 w-[200px] overflow-hidden rounded-lg border border-purple-92 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
+                    className='z-50 w-[200px] overflow-hidden rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
                   >
                     <div className='flex flex-col'>
                       {[
@@ -184,7 +184,7 @@ export function BookmarksFilter({
                             'px-4 py-2.5 text-left text-sm font-medium transition-colors',
                             sortOrder === option.value
                               ? 'bg-primary text-white'
-                              : 'text-main-black hover:bg-purple-98'
+                              : 'text-foreground hover:bg-primary/5'
                           )}
                         >
                           {option.label}
@@ -198,7 +198,7 @@ export function BookmarksFilter({
 
             {/* Property Dropdown */}
             <div className='flex items-center gap-2'>
-              <span className='text-sm font-medium text-grey-600'>{t('property')}</span>
+              <span className='text-sm font-medium text-muted-foreground'>{t('property')}</span>
               <PopoverPrimitive.Root open={categoryOpen} onOpenChange={setCategoryOpen}>
                 <PopoverPrimitive.Trigger asChild>
                   <button type='button' className={dropdownButtonClass} aria-label='Category filter'>
@@ -213,14 +213,14 @@ export function BookmarksFilter({
                   <PopoverPrimitive.Content
                     align='start'
                     sideOffset={8}
-                    className='z-50 w-[260px] overflow-hidden rounded-lg border border-purple-92 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
+                    className='z-50 w-[260px] overflow-hidden rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
                   >
                     <div className='flex flex-col max-h-[400px] overflow-y-auto'>
                       {/* Tất cả */}
                       <button
                         type='button'
                         onClick={toggleAll}
-                        className='flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-main-black hover:bg-purple-98 transition-colors'
+                        className='flex items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-foreground hover:bg-primary/5 transition-colors'
                         aria-label={t('allTypes')}
                       >
                         <CheckboxIcon checked={isAllSelected} />
@@ -234,7 +234,7 @@ export function BookmarksFilter({
                           <button
                             type='button'
                             onClick={() => toggleCategory(cat.code)}
-                            className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-semibold text-main-black hover:bg-purple-98 transition-colors'
+                            className='flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-semibold text-foreground hover:bg-primary/5 transition-colors'
                             aria-label={cat.label}
                           >
                             <CheckboxIcon
@@ -250,7 +250,7 @@ export function BookmarksFilter({
                               key={type.code}
                               type='button'
                               onClick={() => toggleType(type.code)}
-                              className='flex w-full items-center gap-3 py-2 pl-10 pr-4 text-left text-sm font-medium text-grey-600 hover:bg-purple-98 transition-colors'
+                              className='flex w-full items-center gap-3 py-2 pl-10 pr-4 text-left text-sm font-medium text-muted-foreground hover:bg-primary/5 transition-colors'
                               aria-label={type.label}
                             >
                               <CheckboxIcon checked={propertyType.includes(type.code)} />

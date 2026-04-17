@@ -183,7 +183,7 @@ function ManageRentalContractContent() {
                       <FileSearch className='h-8 w-8 text-primary/70' />
                     </div>
                     <div>
-                      <p className='font-semibold text-main-black'>{t('empty.title')}</p>
+                      <p className='font-semibold text-foreground'>{t('empty.title')}</p>
                       <p className='mt-1 text-sm text-secondary/60'>{t('empty.subtitle')}</p>
                     </div>
                   </div>
@@ -222,7 +222,7 @@ function ManageRentalContractContent() {
                   >
                     <ChevronLeft className='h-4 w-4' />
                   </Button>
-                  <span className='px-3 text-sm font-semibold tabular-nums text-main-black'>
+                  <span className='px-3 text-sm font-semibold tabular-nums text-foreground'>
                     {currentPage}
                     <span className='mx-1.5 font-normal text-secondary/35'>/</span>
                     {totalPages}

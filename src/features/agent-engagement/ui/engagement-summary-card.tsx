@@ -46,18 +46,18 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
   return (
     <Card className='border border-gray-100 shadow-sm rounded-2xl overflow-hidden'>
       {/* Property Image Banner */}
-      <div className='relative h-40 bg-gradient-to-br from-indigo-50 via-purple-50/50 to-blue-50/30 flex items-center justify-center overflow-hidden'>
+      <div className='relative h-40 bg-gradient-to-br from-primary/5 via-primary/5 to-blue-50/30 flex items-center justify-center overflow-hidden'>
         {/* Decorative blobs */}
         <div className='absolute top-3 left-6 h-28 w-28 rounded-full bg-indigo-200/20' />
-        <div className='absolute bottom-2 right-8 h-20 w-20 rounded-full bg-purple-200/20' />
+        <div className='absolute bottom-2 right-8 h-20 w-20 rounded-full bg-primary/10' />
         <div className='absolute top-8 right-16 h-12 w-12 rounded-full bg-blue-200/20' />
         {/* Icon */}
         <div className='relative flex flex-col items-center gap-2'>
           <div className='h-14 w-14 rounded-2xl bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm border border-white/80'>
-            <Home className='h-7 w-7 text-indigo-400' />
+            <Home className='h-7 w-7 text-primary400' />
           </div>
           {agent.property_type_name && (
-            <span className='text-xs font-semibold bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-indigo-600 border border-white/80 shadow-sm'>
+            <span className='text-xs font-semibold bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-primary600 border border-white/80 shadow-sm'>
               {agent.property_type_name}
             </span>
           )}
@@ -93,8 +93,8 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
         <div className='space-y-3 mb-4'>
           {agent.property_address && (
             <div className='flex items-start gap-3'>
-              <div className='h-8 w-8 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-0.5'>
-                <MapPin className='h-3.5 w-3.5 text-indigo-500' />
+              <div className='h-8 w-8 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0 mt-0.5'>
+                <MapPin className='h-3.5 w-3.5 text-primary500' />
               </div>
               <div>
                 <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-0.5'>
@@ -124,7 +124,7 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
         <div className='grid grid-cols-2 gap-3'>
           <div className='bg-gray-50 rounded-xl p-3.5 border border-gray-100'>
             <div className='flex items-center gap-1.5 mb-1.5'>
-              <Award className='h-3.5 w-3.5 text-purple-400' />
+              <Award className='h-3.5 w-3.5 text-primary/60' />
               <span className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
                 {t('detailPage.engagementType')}
               </span>

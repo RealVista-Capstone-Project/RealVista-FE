@@ -272,7 +272,7 @@ function BuyPageContent() {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                    className='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10'
+                    className='w-full px-4 h-11 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10'
                     maxLength={100}
                   />
                   {location && (
@@ -298,7 +298,7 @@ function BuyPageContent() {
                   onChange={(val) => setMinPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   hidePreview
-                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+                  inputClassName='w-full px-4 h-11 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
                 />
               </div>
 
@@ -314,7 +314,7 @@ function BuyPageContent() {
                   onChange={(val) => setMaxPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   hidePreview
-                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+                  inputClassName='w-full px-4 h-11 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
                 />
               </div>
 

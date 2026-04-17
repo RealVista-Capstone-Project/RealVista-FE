@@ -168,7 +168,7 @@ export function DataTable<TData>({
               pageNum === '...' ? (
                 <span
                   key={`ellipsis-${idx}`}
-                  className='px-1 text-grey-400'
+                  className='px-1 text-muted-foreground/60'
                 >
                   ...
                 </span>

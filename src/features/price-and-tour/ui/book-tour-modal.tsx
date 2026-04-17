@@ -222,7 +222,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                       type='button'
                       disabled={!date}
                       className={cn(
-                        'flex w-full items-center justify-between rounded-lg border border-purple-92 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-purple-92-hover transition-colors',
+                        'flex w-full items-center justify-between rounded-lg border border-primary/20 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-primary/20-hover transition-colors',
                         !selectedStartTime && 'text-muted-foreground'
                       )}
                     >
@@ -282,7 +282,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                       type='button'
                       disabled={!selectedStartTime}
                       className={cn(
-                        'flex w-full items-center justify-between rounded-lg border border-purple-92 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-purple-92-hover transition-colors',
+                        'flex w-full items-center justify-between rounded-lg border border-primary/20 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-primary/20-hover transition-colors',
                         !selectedDuration && 'text-muted-foreground'
                       )}
                     >

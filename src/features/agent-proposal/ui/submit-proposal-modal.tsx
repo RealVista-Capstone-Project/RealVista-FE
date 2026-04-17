@@ -87,7 +87,7 @@ export function SubmitProposalModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[480px] p-0 overflow-hidden'>
         {/* Gradient header */}
-        <div className='bg-gradient-to-br from-purple-98 to-purple-96 px-6 pt-6 pb-5 border-b border-purple-94'>
+        <div className='bg-gradient-to-br from-primary/5 to-primary/5 px-6 pt-6 pb-5 border-b border-primary/15'>
           <DialogHeader className='gap-0'>
             <DialogTitle className='sr-only'>{t('proposalModal.title')}</DialogTitle>
             <DialogDescription className='sr-only'>
@@ -98,7 +98,7 @@ export function SubmitProposalModal({
           {/* Property summary */}
           <div className='flex items-start gap-4'>
             <div className='h-14 w-14 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0'>
-              <Home className='h-7 w-7 text-indigo-500' />
+              <Home className='h-7 w-7 text-primary500' />
             </div>
             <div className='min-w-0'>
               <h3 className='font-bold text-gray-900 text-base leading-tight truncate'>
@@ -106,12 +106,12 @@ export function SubmitProposalModal({
               </h3>
               {location && (
                 <div className='flex items-center gap-1 mt-1'>
-                  <MapPin className='h-3.5 w-3.5 text-indigo-400 flex-shrink-0' />
+                  <MapPin className='h-3.5 w-3.5 text-primary400 flex-shrink-0' />
                   <span className='text-sm text-gray-500 truncate'>{location}</span>
                 </div>
               )}
               {property.property_type_info?.property_type_name && (
-                <span className='inline-block mt-1.5 text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-lg font-semibold'>
+                <span className='inline-block mt-1.5 text-xs bg-indigo-100 text-primary700 px-2.5 py-0.5 rounded-lg font-semibold'>
                   {property.property_type_info.property_type_name}
                 </span>
               )}

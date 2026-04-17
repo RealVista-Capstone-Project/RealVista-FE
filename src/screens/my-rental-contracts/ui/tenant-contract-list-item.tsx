@@ -52,7 +52,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
         </div>
 
         <div className='min-w-0'>
-          <div className='truncate text-sm font-semibold text-main-black'>
+          <div className='truncate text-sm font-semibold text-foreground'>
             {contract.property.title}
           </div>
           <div className='mt-0.5 truncate text-xs text-secondary/60'>
@@ -62,7 +62,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
       </div>
 
       <div className='col-span-3'>
-        <div className='text-sm font-semibold text-main-black'>
+        <div className='text-sm font-semibold text-foreground'>
           {formatContractCurrency(contract.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
         </div>
         <div className='mt-0.5 text-xs text-secondary/60'>{t('table.perMonth')}</div>
@@ -70,7 +70,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
 
       <div className='col-span-2 flex items-center justify-between gap-2'>
         <div>
-          <div className='text-sm font-semibold text-main-black tabular-nums'>
+          <div className='text-sm font-semibold text-foreground tabular-nums'>
             {formatContractDate(contract.leaseStartDate, locale, 'dd MMM')}
           </div>
           <div className='mt-0.5 text-xs text-secondary/60 tabular-nums'>

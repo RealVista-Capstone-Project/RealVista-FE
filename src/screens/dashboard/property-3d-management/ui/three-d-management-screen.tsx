@@ -298,16 +298,16 @@ export function ThreeDManagementScreen({
         <div className='container max-w-7xl mx-auto px-4 sm:px-6 mt-6'>
           <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
             <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
-            <h3 className='text-sm font-semibold text-main-black mb-1'>
+            <h3 className='text-sm font-semibold text-foreground mb-1'>
               {remaining != null ? t('lockedTitle') : t('noSubscriptionTitle')}
             </h3>
-            <p className='text-xs text-grey-500 mb-4'>
+            <p className='text-xs text-muted-foreground mb-4'>
               {remaining != null ? t('lockedDescription') : t('noSubscriptionDescription')}
             </p>
             <button
               type='button'
               onClick={() => router.push(`/${locale}/subscribe`)}
-              className='inline-flex items-center justify-center rounded-lg bg-main-black text-white text-xs font-semibold px-6 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
+              className='inline-flex items-center justify-center rounded-lg bg-foreground text-white text-xs font-semibold px-6 py-2 hover:bg-foreground/80 transition-colors cursor-pointer'
             >
               {remaining != null ? t('lockedCta') : t('noSubscriptionCta')}
             </button>

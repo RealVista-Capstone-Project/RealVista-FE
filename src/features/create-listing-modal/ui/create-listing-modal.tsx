@@ -28,7 +28,7 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] | stri
   const statusConfig: Record<string, { label: string; className: string }> = {
     DRAFT: {
       label: t('propertyStatus.draft'),
-      className: 'bg-grey-100 text-grey-600',
+      className: 'bg-muted text-muted-foreground',
     },
     PENDING: {
       label: t('propertyStatus.pending'),
@@ -62,7 +62,7 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] | stri
 
   const config = statusConfig[status] || {
     label: status,
-    className: 'bg-grey-100 text-grey-600',
+    className: 'bg-muted text-muted-foreground',
   };
 
   return (
@@ -104,7 +104,7 @@ function PropertyCard({
         'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
         isSelected
           ? 'border-primary bg-primary/5 shadow-primary/15'
-          : 'border-purple-92 bg-white hover:border-primary/40 hover:bg-purple-98/50'
+          : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5/50'
       )}
     >
       {/* Thumbnail */}
@@ -118,7 +118,7 @@ function PropertyCard({
             sizes='112px'
           />
         ) : (
-          <div className='flex h-full w-full items-center justify-center bg-purple-96'>
+          <div className='flex h-full w-full items-center justify-center bg-primary/5'>
             <Home className='h-6 w-6 text-secondary/40' />
           </div>
         )}
@@ -164,7 +164,7 @@ function PropertyCard({
           'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
           isSelected
             ? 'border-primary bg-primary'
-            : 'border-purple-92 bg-white group-hover:border-primary/40'
+            : 'border-primary/20 bg-white group-hover:border-primary/40'
         )}
       >
         {isSelected && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
@@ -191,7 +191,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
                 step.number <= currentStep
                   ? 'bg-primary text-white'
-                  : 'bg-purple-96 text-foreground'
+                  : 'bg-primary/5 text-foreground'
               )}
             >
               {step.number}
@@ -426,7 +426,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
           </DialogHeader>
 
           {/* Step indicator */}
-          <div className='flex justify-center border-b border-purple-92/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
+          <div className='flex justify-center border-b border-primary/20/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
             <StepIndicator currentStep={currentStep} />
           </div>
         </div>
@@ -437,7 +437,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
             {/* Scrollable content - Flex 1 */}
             <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
               {/* Property Selection */}
-              <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
+              <div className='rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
                 <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-foreground'>
                   {t('selectProperty')}
                 </h3>
@@ -479,7 +479,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
             </div>
 
             {/* Footer — Next button - Fixed */}
-            <div className='shrink-0 flex justify-end border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+            <div className='shrink-0 flex justify-end border-t border-primary/20/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
               <button
                 type='button'
                 disabled={!selectedProperty}

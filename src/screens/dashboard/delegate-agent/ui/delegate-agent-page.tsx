@@ -98,7 +98,7 @@ function AgentCard({
       className={cn(
         'relative flex flex-col items-center text-center rounded-2xl border transition-all duration-200 p-4 gap-2.5 w-full',
         isSelected
-          ? 'border-primary shadow-md bg-purple-50/60 ring-1 ring-primary/20'
+          ? 'border-primary shadow-md bg-primary/5/60 ring-1 ring-primary/20'
           : 'border-slate-200 bg-white hover:border-primary/50 hover:shadow-md',
         isAccepted && 'cursor-not-allowed opacity-80'
       )}
@@ -126,8 +126,8 @@ function AgentCard({
             className='object-cover w-full h-full'
           />
         ) : (
-          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-100'>
-            <User className='h-6 w-6 text-indigo-300' />
+          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10'>
+            <User className='h-6 w-6 text-primary300' />
           </div>
         )}
       </div>
@@ -162,7 +162,7 @@ function AgentCard({
           {specialtyChips.map((chip) => (
             <span
               key={chip}
-              className='text-[10px] bg-purple-50 text-primary border border-purple-100 rounded-md px-1.5 py-0.5 font-medium'
+              className='text-[10px] bg-primary/5 text-primary border border-primary/30 rounded-md px-1.5 py-0.5 font-medium'
             >
               {chip}
             </span>
@@ -265,8 +265,8 @@ function AgentDetailPanel({
               className='object-cover w-full h-full'
             />
           ) : (
-            <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
-              <User className='h-7 w-7 text-indigo-300' />
+            <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
+              <User className='h-7 w-7 text-primary300' />
             </div>
           )}
         </div>
@@ -609,7 +609,7 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
             />
           ) : (
             <div className='h-full flex flex-col items-center justify-center p-6 text-center'>
-              <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-50 border border-purple-100'>
+              <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 border border-primary/30'>
                 <User className='h-7 w-7 text-primary/40' strokeWidth={1.5} />
               </div>
               <p className='text-sm text-slate-400 max-w-[200px]'>{t('selectAgentHint')}</p>

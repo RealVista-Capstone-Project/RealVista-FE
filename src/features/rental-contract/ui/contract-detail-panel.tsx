@@ -192,13 +192,13 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-secondary/60'>
               {t('detailPanel.title')}
             </h2>
-            <p className='mt-1 text-lg font-semibold text-main-black'>{contract.property.title}</p>
+            <p className='mt-1 text-lg font-semibold text-foreground'>{contract.property.title}</p>
           </div>
           <Button
             type='button'
             variant='ghost'
             size='icon'
-            className='rounded-xl text-secondary/60 hover:bg-[#F6F4FF] hover:text-main-black'
+            className='rounded-xl text-secondary/60 hover:bg-[#F6F4FF] hover:text-foreground'
             onClick={onClose}
           >
             <X className='h-4 w-4' />
@@ -247,7 +247,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     <p className='text-xs uppercase tracking-[0.16em] text-secondary/50'>
                       {t('detailPanel.contractMeta')}
                     </p>
-                    <p className='mt-1 text-sm font-semibold text-main-black'>{contract.id}</p>
+                    <p className='mt-1 text-sm font-semibold text-foreground'>{contract.id}</p>
                     <p className='mt-1 text-sm leading-6 text-secondary/70'>
                       {contract.tenant.fullName} ·{' '}
                       {formatContractCurrency(
@@ -269,7 +269,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.leaseStart')}
                   </p>
-                  <p className='mt-1 text-sm font-semibold text-main-black'>
+                  <p className='mt-1 text-sm font-semibold text-foreground'>
                     {formatContractDate(contract.leaseStartDate, locale)}
                   </p>
                 </div>
@@ -277,7 +277,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.leaseEnd')}
                   </p>
-                  <p className='mt-1 text-sm font-semibold text-main-black'>
+                  <p className='mt-1 text-sm font-semibold text-foreground'>
                     {formatContractDate(contract.leaseEndDate, locale)}
                   </p>
                 </div>
@@ -291,7 +291,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   {signingProgress.map((item) => (
                     <div key={item.label} className='flex items-center justify-between gap-4'>
                       <span className='text-sm text-secondary/70'>{item.label}</span>
-                      <span className='text-sm font-semibold text-main-black'>{item.value}</span>
+                      <span className='text-sm font-semibold text-foreground'>{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -384,7 +384,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                         onClick={() => handleAction(action)}
                       >
                         <div className='flex-1'>
-                          <p className='flex items-center gap-1.5 text-sm font-semibold text-main-black'>
+                          <p className='flex items-center gap-1.5 text-sm font-semibold text-foreground'>
                             {getActionLabel(action)}
                             {isSigning && <ExternalLink className='h-3 w-3 text-primary' />}
                           </p>

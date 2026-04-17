@@ -23,7 +23,7 @@ export const LISTING_STATUS_CONFIG: Record<ListingStatus, { labelKey: string; cl
   },
   [ListingStatus.PUBLISHED]: {
     labelKey: 'status.published',
-    className: 'bg-purple-94 text-primary',
+    className: 'bg-primary/10 text-primary',
   },
   [ListingStatus.SOLD]: {
     labelKey: 'status.sold',

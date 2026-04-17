@@ -5,8 +5,8 @@ import { cn } from '@/shared/lib/utils';
 const COLORS = [
   'bg-cyan-500',
   'bg-blue-500',
-  'bg-indigo-500',
-  'bg-purple-500',
+  'bg-primary/50',
+  'bg-primary/50',
   'bg-pink-500',
   'bg-rose-500',
   'bg-amber-500',

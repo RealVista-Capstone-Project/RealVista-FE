@@ -313,19 +313,19 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className='fixed inset-0 z-50 bg-main-black/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0' />
-        <Dialog.Content className='fixed left-[50%] top-[50%] z-50 flex h-[90vh] w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden border border-purple-92 bg-purple-98 shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-2xl'>
+        <Dialog.Overlay className='fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0' />
+        <Dialog.Content className='fixed left-[50%] top-[50%] z-50 flex h-[90vh] w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden border border-primary/20 bg-primary/5 shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-2xl'>
           {/* Header */}
-          <div className='flex items-center justify-between border-b border-purple-92 bg-white px-6 py-4'>
+          <div className='flex items-center justify-between border-b border-primary/20 bg-white px-6 py-4'>
             <div>
-              <Dialog.Title className='text-xl font-bold text-main-black'>
+              <Dialog.Title className='text-xl font-bold text-foreground'>
                 {t('editTitle')}
               </Dialog.Title>
               <Dialog.Description className='text-sm text-secondary/70 mt-1'>
                 {t('editSubtitle')}
               </Dialog.Description>
             </div>
-            <Dialog.Close className='rounded-full p-2 transition-colors hover:bg-purple-98'>
+            <Dialog.Close className='rounded-full p-2 transition-colors hover:bg-primary/5'>
               <X className='h-5 w-5 text-secondary' />
               <span className='sr-only'>Close</span>
             </Dialog.Close>
@@ -336,12 +336,12 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
             <div className='mx-auto max-w-3xl space-y-10'>
               {/* Type, Name & Content */}
               <div className='space-y-6'>
-                <h3 className='text-lg font-bold text-main-black border-b border-purple-92 pb-2'>
+                <h3 className='text-lg font-bold text-foreground border-b border-primary/20 pb-2'>
                   {t('listingInformation')}
                 </h3>
 
                 <div className='flex flex-col gap-2'>
-                  <span className='text-sm font-medium text-main-black'>
+                  <span className='text-sm font-medium text-foreground'>
                     {t('listingTypeLabel')}
                     <span className='text-primary'>*</span>
                   </span>
@@ -383,7 +383,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
 
               {/* Pricing */}
               <div className='space-y-6'>
-                <h3 className='text-lg font-bold text-main-black border-b border-purple-92 pb-2'>
+                <h3 className='text-lg font-bold text-foreground border-b border-primary/20 pb-2'>
                   {t('price')}
                 </h3>
 
@@ -414,7 +414,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
               {/* Media Selection */}
               <div className='flex flex-col gap-3'>
                 <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-main-black'>{t('mediaUpload')}</span>
+                  <span className='text-sm font-medium text-foreground'>{t('mediaUpload')}</span>
                   {(listing.media || []).length > 0 && (
                     <span className='text-xs text-secondary/50'>
                       {selectedMediaIds.size + selectedNewFileIndices.size} / 10{' '}
@@ -452,7 +452,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                     }}
                   />
                 ) : (
-                  <div className='rounded-xl border border-dashed border-purple-92 bg-purple-98/50 p-8 text-center'>
+                  <div className='rounded-xl border border-dashed border-primary/20 bg-primary/5/50 p-8 text-center'>
                     <p className='text-sm font-medium text-secondary/80'>
                       No media available from the property.
                     </p>
@@ -483,11 +483,11 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
           </div>
 
           {/* Footer Actions */}
-          <div className='flex items-center justify-end gap-3 border-t border-purple-92 bg-white px-6 py-4'>
+          <div className='flex items-center justify-end gap-3 border-t border-primary/20 bg-white px-6 py-4'>
             <button
               type='button'
               onClick={() => onOpenChange(false)}
-              className='rounded-xl px-5 py-2.5 text-sm font-bold text-main-black transition-colors hover:bg-purple-98'
+              className='rounded-xl px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-primary/5'
             >
               {t('cancel')}
             </button>

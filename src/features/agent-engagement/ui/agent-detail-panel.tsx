@@ -200,7 +200,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
         {/* Scrollable Content */}
         <CardContent className='p-0 flex-1 overflow-y-auto min-h-0'>
           {/* Profile Banner */}
-          <div className='relative bg-gradient-to-br from-indigo-50 via-purple-50/40 to-white px-6 pt-6 pb-5 border-b border-gray-100'>
+          <div className='relative bg-gradient-to-br from-primary/5 via-primary/5 to-white px-6 pt-6 pb-5 border-b border-gray-100'>
             <div className='flex flex-col items-center'>
               <div className='relative mb-3'>
                 <Avatar className='h-20 w-20 ring-4 ring-white shadow-md'>
@@ -208,7 +208,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                     src={agent.agent_avatar_url ?? undefined}
                     alt={agent.agent_full_name}
                   />
-                  <AvatarFallback className='bg-indigo-100 text-indigo-700 text-xl font-bold'>
+                  <AvatarFallback className='bg-indigo-100 text-primary700 text-xl font-bold'>
                     {getInitials(agent.agent_full_name)}
                   </AvatarFallback>
                 </Avatar>
@@ -270,8 +270,8 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
               </h4>
               {agent.agent_email && (
                 <div className='flex items-center gap-3'>
-                  <div className='h-8 w-8 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0'>
-                    <Mail className='h-3.5 w-3.5 text-indigo-500' />
+                  <div className='h-8 w-8 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0'>
+                    <Mail className='h-3.5 w-3.5 text-primary500' />
                   </div>
                   <div className='min-w-0'>
                     <div className='text-[10px] text-gray-400 font-medium'>
@@ -385,7 +385,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                     <Badge
                       key={specialty}
                       variant='outline'
-                      className='text-xs font-semibold bg-indigo-50/60 text-indigo-600 border-indigo-100 rounded-lg px-2.5 py-0.5'
+                      className='text-xs font-semibold bg-primary/5/60 text-primary600 border-indigo-100 rounded-lg px-2.5 py-0.5'
                     >
                       {specialty}
                     </Badge>
@@ -411,10 +411,10 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
               <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5'>
                 {t('detailPanel.assignedProperty')}
               </h4>
-              <div className='bg-indigo-50/40 border border-indigo-100/70 p-4 rounded-xl space-y-2'>
+              <div className='bg-primary/5/40 border border-indigo-100/70 p-4 rounded-xl space-y-2'>
                 {agent.property_address && (
                   <div className='flex items-start gap-2'>
-                    <MapPin className='h-3.5 w-3.5 text-indigo-400 mt-0.5 flex-shrink-0' />
+                    <MapPin className='h-3.5 w-3.5 text-primary400 mt-0.5 flex-shrink-0' />
                     <span className='text-sm text-gray-700 font-medium leading-snug'>
                       {agent.property_address}
                     </span>
@@ -422,7 +422,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                 )}
                 <div className='flex items-center gap-2 flex-wrap'>
                   {agent.property_type_name && (
-                    <span className='text-xs bg-white text-indigo-600 border border-indigo-100 px-2.5 py-1 rounded-lg font-semibold'>
+                    <span className='text-xs bg-white text-primary600 border border-indigo-100 px-2.5 py-1 rounded-lg font-semibold'>
                       {agent.property_type_name}
                     </span>
                   )}
@@ -442,7 +442,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
           {renderActionButtons()}
           <Link
             href={`/${locale}${ROUTES.dashboard.agentDetail(agent.engagement_id)}`}
-            className='flex items-center justify-center gap-1.5 w-full text-xs text-primary hover:text-primary-hover font-semibold py-2 rounded-xl hover:bg-indigo-50 transition-colors'
+            className='flex items-center justify-center gap-1.5 w-full text-xs text-primary hover:text-primary-hover font-semibold py-2 rounded-xl hover:bg-primary/5 transition-colors'
           >
             <ExternalLink className='h-3 w-3' />
             {t('detailPage.viewFullDetails')}

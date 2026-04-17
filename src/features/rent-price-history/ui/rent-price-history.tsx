@@ -30,34 +30,34 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
 
   return (
     <div className='flex flex-col gap-8'>
-      <h2 className='text-main-black text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
+      <h2 className='text-foreground text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
         {t('title', { title: property.title })}
       </h2>
-      <div className='bg-purple-98/84 rounded-lg p-4'>
+      <div className='bg-primary/5/84 rounded-lg p-4'>
         {/* Desktop Table */}
         <div className='hidden md:block'>
           {/* Table Header */}
           <div className='grid grid-cols-[220px_1fr_1fr_1fr] gap-4 mb-4'>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('date')}</p>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('price')}</p>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('event')}</p>
-            <p className='text-main-black text-[16px] font-bold leading-[1.5]'>{t('source')}</p>
+            <p className='text-foreground text-[16px] font-bold leading-[1.5]'>{t('date')}</p>
+            <p className='text-foreground text-[16px] font-bold leading-[1.5]'>{t('price')}</p>
+            <p className='text-foreground text-[16px] font-bold leading-[1.5]'>{t('event')}</p>
+            <p className='text-foreground text-[16px] font-bold leading-[1.5]'>{t('source')}</p>
           </div>
           {/* Table Body */}
           {priceHistory.map((item, index) => (
             <div
               key={index}
-              className='grid grid-cols-[220px_1fr_1fr_1fr] gap-4 py-4 border-t border-purple-92'
+              className='grid grid-cols-[220px_1fr_1fr_1fr] gap-4 py-4 border-t border-primary/20'
             >
-              <p className='text-grey-500 text-[16px] font-medium leading-[1.5]'>{item.date}</p>
-              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+              <p className='text-muted-foreground text-[16px] font-medium leading-[1.5]'>{item.date}</p>
+              <p className='text-foreground text-[16px] font-medium leading-[1.5]'>
                 ${item.price.toLocaleString()}
                 {t('perMonth')}
               </p>
-              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+              <p className='text-foreground text-[16px] font-medium leading-[1.5]'>
                 {t(`events.${item.event}` as any)}
               </p>
-              <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+              <p className='text-foreground text-[16px] font-medium leading-[1.5]'>
                 {t(`sources.${item.source}` as any)}
               </p>
             </div>
@@ -69,19 +69,19 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
           {priceHistory.map((item, index) => (
             <div
               key={index}
-              className='flex flex-col gap-2 py-4 border-t border-purple-92 first:border-t-0'
+              className='flex flex-col gap-2 py-4 border-t border-primary/20 first:border-t-0'
             >
-              <p className='text-grey-500 text-xs font-medium leading-[1.4]'>{item.date}</p>
+              <p className='text-muted-foreground text-xs font-medium leading-[1.4]'>{item.date}</p>
               <div className='flex items-center justify-between gap-2'>
-                <p className='text-main-black text-[16px] font-medium leading-[1.5]'>
+                <p className='text-foreground text-[16px] font-medium leading-[1.5]'>
                   {t(`events.${item.event}` as any)}
                 </p>
-                <p className='text-main-black text-[16px] font-bold leading-[1.5]'>
+                <p className='text-foreground text-[16px] font-bold leading-[1.5]'>
                   ${item.price.toLocaleString()}
                   {t('perMonth')}
                 </p>
               </div>
-              <p className='text-grey-500 text-xs font-medium leading-[1.4]'>
+              <p className='text-muted-foreground text-xs font-medium leading-[1.4]'>
                 {t(`sources.${item.source}` as any)}
               </p>
             </div>

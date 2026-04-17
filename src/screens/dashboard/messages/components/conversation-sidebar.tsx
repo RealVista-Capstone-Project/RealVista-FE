@@ -30,25 +30,25 @@ export function ConversationSidebar({
   );
 
   return (
-    <aside className='flex w-80 shrink-0 flex-col border-r border-purple-92/50'>
+    <aside className='flex w-80 shrink-0 flex-col border-r border-primary/20/50'>
       {/* Header */}
       <div className='flex items-center justify-between px-5 py-4'>
-        <h1 className='text-xl font-bold text-main-black'>{t('title')}</h1>
-        <button className='flex size-8 items-center justify-center rounded-lg text-grey-500 transition-colors hover:bg-purple-96 hover:text-primary'>
+        <h1 className='text-xl font-bold text-foreground'>{t('title')}</h1>
+        <button className='flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary'>
           <Plus className='size-5' />
         </button>
       </div>
 
       {/* Search */}
       <div className='px-4 pb-3'>
-        <div className='flex items-center gap-2 rounded-xl bg-purple-98 px-3 py-2'>
-          <Search className='size-4 shrink-0 text-grey-400' />
+        <div className='flex items-center gap-2 rounded-xl bg-primary/5 px-3 py-2'>
+          <Search className='size-4 shrink-0 text-muted-foreground/60' />
           <input
             type='text'
             placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className='w-full bg-transparent text-sm text-main-black placeholder:text-grey-400 focus:outline-none'
+            className='w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none'
           />
         </div>
       </div>
@@ -59,8 +59,8 @@ export function ConversationSidebar({
         {filteredPinned.length > 0 && (
           <div className='mb-3'>
             <div className='mb-2 flex items-center gap-1.5 px-2'>
-              <Pin className='size-3 text-grey-400' />
-              <span className='text-xs font-semibold uppercase tracking-wider text-grey-400'>
+              <Pin className='size-3 text-muted-foreground/60' />
+              <span className='text-xs font-semibold uppercase tracking-wider text-muted-foreground/60'>
                 {t('pinnedMessages')}
               </span>
             </div>
@@ -81,8 +81,8 @@ export function ConversationSidebar({
         {filteredAll.length > 0 && (
           <div>
             <div className='mb-2 flex items-center gap-1.5 px-2'>
-              <Pin className='size-3 text-grey-400' />
-              <span className='text-xs font-semibold uppercase tracking-wider text-grey-400'>
+              <Pin className='size-3 text-muted-foreground/60' />
+              <span className='text-xs font-semibold uppercase tracking-wider text-muted-foreground/60'>
                 {t('allMessages')}
               </span>
             </div>

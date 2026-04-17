@@ -24,8 +24,8 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
 
   if (isLoading) {
     return (
-      <div className='rounded-lg border border-purple-92 p-6'>
-        <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
+      <div className='rounded-lg border border-primary/20 p-6'>
+        <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-foreground'>
           {t('title')}
         </h2>
         <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
@@ -44,8 +44,8 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
   }
 
   return (
-    <div className='rounded-lg border border-purple-92 p-6'>
-      <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-main-black'>
+    <div className='rounded-lg border border-primary/20 p-6'>
+      <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-foreground'>
         {t('title')}
       </h2>
 
@@ -87,11 +87,11 @@ function MetricItem({ icon, label, value, tooltip }: MetricItemProps) {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex items-center gap-1.5'>
-        <p className='text-base font-medium leading-[1.5] text-grey-500'>{label}</p>
+        <p className='text-base font-medium leading-[1.5] text-muted-foreground'>{label}</p>
         {tooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleHelp className='h-4 w-4 cursor-help text-grey-500/60 transition-colors hover:text-grey-500' />
+              <CircleHelp className='h-4 w-4 cursor-help text-muted-foreground/60 transition-colors hover:text-muted-foreground' />
             </TooltipTrigger>
             <TooltipContent side='top' align='start'>
               {tooltip}
@@ -100,8 +100,8 @@ function MetricItem({ icon, label, value, tooltip }: MetricItemProps) {
         )}
       </div>
       <div className='flex items-center gap-2'>
-        <div className='text-main-black/50'>{icon}</div>
-        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
+        <div className='text-foreground/50'>{icon}</div>
+        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-foreground'>
           {value}
         </p>
       </div>
@@ -112,10 +112,10 @@ function MetricItem({ icon, label, value, tooltip }: MetricItemProps) {
 function MetricSkeleton() {
   return (
     <div className='flex flex-col gap-4'>
-      <div className='h-6 w-24 animate-pulse rounded bg-purple-92' />
+      <div className='h-6 w-24 animate-pulse rounded bg-primary/15' />
       <div className='flex items-center gap-2'>
-        <div className='h-6 w-6 animate-pulse rounded bg-purple-92' />
-        <div className='h-7 w-16 animate-pulse rounded bg-purple-92' />
+        <div className='h-6 w-6 animate-pulse rounded bg-primary/15' />
+        <div className='h-7 w-16 animate-pulse rounded bg-primary/15' />
       </div>
     </div>
   );
