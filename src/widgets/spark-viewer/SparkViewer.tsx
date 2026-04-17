@@ -41,7 +41,8 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     const urls: Record<string, string> = {};
     const seen = new Set();
 
-    const extract = (obj: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extract = (obj: any) => {
       if (!obj) return;
 
       // If metadata is a string, try to parse it first

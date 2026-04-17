@@ -120,7 +120,7 @@ export function useAiChat() {
     } finally {
       setIsLoadingHistory(false);
     }
-  }, []);
+  }, [loadQuota]);
 
   /**
    * Send a user message and stream the AI response.
@@ -176,7 +176,7 @@ export function useAiChat() {
         }
         setIsStreaming(false);
         abortRef.current = null;
-        
+
         // Refresh quota even on error (it might have been consumed before the error)
         loadQuota();
 
@@ -190,7 +190,7 @@ export function useAiChat() {
         });
       },
     });
-  }, []);
+  }, [isStreaming, loadQuota]);
 
   /**
    * Clear chat — resets local state immediately and calls DELETE on the backend.

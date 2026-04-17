@@ -66,11 +66,11 @@ export function AiChatWindow({
     e?.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isTyping || isSubmittingRef.current) return;
-    
+
     isSubmittingRef.current = true;
     onSendMessage(trimmed);
     setInput('');
-    
+
     // Reset submission lock after a short delay or when message area updates
     setTimeout(() => { isSubmittingRef.current = false; }, 500);
   };
