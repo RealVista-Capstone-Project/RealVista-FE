@@ -104,7 +104,7 @@ export function InlineAdvancedFilters({
             value={currentValue || ''}
             onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
-            className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+            className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
             maxLength={10}
           />
         </div>
@@ -122,7 +122,7 @@ export function InlineAdvancedFilters({
           placeholder='Nhập giá trị'
           value={currentValue || ''}
           onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
-          className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+          className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
           maxLength={100}
         />
       </div>
@@ -138,9 +138,9 @@ export function InlineAdvancedFilters({
       >
         <span className='text-base font-medium text-main-black'>Advanced Filters</span>
         {isExpanded ? (
-          <ChevronUp className='h-5 w-5 text-main-secondary' />
+          <ChevronUp className='h-5 w-5 text-secondary' />
         ) : (
-          <ChevronDown className='h-5 w-5 text-main-secondary' />
+          <ChevronDown className='h-5 w-5 text-secondary' />
         )}
       </button>
 
@@ -151,7 +151,7 @@ export function InlineAdvancedFilters({
           {/* Property Type Selector */}
           <div className='mb-6'>
             <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-              <Home className='w-4 h-4 text-main-primary' />
+              <Home className='w-4 h-4 text-primary' />
               Loại bất động sản
             </label>
             <Select
@@ -181,7 +181,7 @@ export function InlineAdvancedFilters({
               {/* Area Range Slider */}
               <div className='md:col-span-2'>
                 <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-                  <Maximize2 className='w-4 h-4 text-main-primary' />
+                  <Maximize2 className='w-4 h-4 text-primary' />
                   Diện tích: {filters.area?.[0] || 0}m² - {filters.area?.[1] || 500}m²
                 </label>
                 <Slider
@@ -210,30 +210,30 @@ export function InlineAdvancedFilters({
               {activeAttributes
                 .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
                 .length > 0 && (
-                <div className='grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-4'>
-                  {activeAttributes
-                    .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
-                    .map((attr) => renderDynamicField(attr))}
-                </div>
-              )}
+                  <div className='grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-4'>
+                    {activeAttributes
+                      .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
+                      .map((attr) => renderDynamicField(attr))}
+                  </div>
+                )}
 
               {/* Boolean Switches */}
               {activeAttributes
                 .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
                 .length > 0 && (
-                <div className='grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4'>
-                  {activeAttributes
-                    .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
-                    .map((attr) => renderDynamicField(attr))}
-                </div>
-              )}
+                  <div className='grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4'>
+                    {activeAttributes
+                      .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
+                      .map((attr) => renderDynamicField(attr))}
+                  </div>
+                )}
             </div>
           )}
 
           {/* Media Filters */}
           <div className='mb-4'>
             <h4 className='flex items-center gap-2 text-sm font-semibold text-main-black mb-4'>
-              <Video className='w-4 h-4 text-main-primary' />
+              <Video className='w-4 h-4 text-primary' />
               Phương tiện
             </h4>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -265,7 +265,7 @@ export function InlineAdvancedFilters({
                   sortBy: e.target.value as AdvancedSearchRequest['sortBy'],
                 })
               }
-              className='w-full md:w-64 px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+              className='w-full md:w-64 px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
             >
               <option value='PRIORITY'>Priority (Featured First)</option>
               <option value='DATE_DESC'>Newest First</option>
@@ -282,7 +282,7 @@ export function InlineAdvancedFilters({
             <Button
               type='button'
               onClick={handleApply}
-              className='px-6 bg-main-primary hover:bg-main-primary/90'
+              className='px-6 bg-primary hover:bg-primary/90'
             >
               Apply Filters
             </Button>

@@ -176,7 +176,7 @@ export function PublicAppointmentsPage() {
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <h1 className='text-2xl font-bold text-main-black'>{t('title')}</h1>
-            <p className='text-sm text-main-secondary/60'>{t('publicSubtitle') || 'View and manage your tour requests'}</p>
+            <p className='text-sm text-secondary/60'>{t('publicSubtitle') || 'View and manage your tour requests'}</p>
           </div>
 
           <div className='flex items-center gap-2'>

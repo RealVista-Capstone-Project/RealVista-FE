@@ -39,7 +39,7 @@ export function StepReview({ form, t }: StepReviewProps) {
   return (
     <div className='space-y-4'>
       {/* Property banner */}
-      <div className='flex items-center gap-4 rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
+      <div className='flex items-center gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-4'>
         {form.thumbnailUrl ? (
           <Image
             src={form.thumbnailUrl}
@@ -49,35 +49,35 @@ export function StepReview({ form, t }: StepReviewProps) {
             className='h-20 w-20 shrink-0 rounded-xl object-cover'
           />
         ) : (
-          <div className='flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-[#F3EEFF]'>
-            <Building2 className='h-6 w-6 text-main-primary/50' />
+          <div className='flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-primary/10'>
+            <Building2 className='h-6 w-6 text-primary/50' />
           </div>
         )}
         <div className='min-w-0'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
             {t('review.propertyBanner')}
           </p>
-          <p className='mt-1 text-lg font-semibold tracking-[-0.02em] text-main-black'>
+          <p className='mt-1 text-lg font-semibold tracking-[-0.02em] text-foreground'>
             {form.propertyTitle}
           </p>
           <div className='mt-1.5 flex flex-wrap items-center gap-2'>
-            <span className='flex items-center gap-1 text-xs text-main-secondary/60'>
+            <span className='flex items-center gap-1 text-xs text-secondary/60'>
               <MapPin className='h-3 w-3' />
               {form.propertyAddress}
             </span>
             <Badge
               variant='secondary'
-              className='rounded-full bg-[#F3EEFF] px-2.5 py-0.5 text-[11px] font-medium text-main-primary/80'
+              className='rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary/80'
             >
               {form.propertyType}
             </Badge>
             {form.bedrooms && (
-              <span className='flex items-center gap-1 text-xs text-main-secondary/60'>
+              <span className='flex items-center gap-1 text-xs text-secondary/60'>
                 <BedDouble className='h-3 w-3' /> {form.bedrooms}
               </span>
             )}
             {form.bathrooms && (
-              <span className='flex items-center gap-1 text-xs text-main-secondary/60'>
+              <span className='flex items-center gap-1 text-xs text-secondary/60'>
                 <Bath className='h-3 w-3' /> {form.bathrooms}
               </span>
             )}
@@ -87,44 +87,44 @@ export function StepReview({ form, t }: StepReviewProps) {
 
       {/* Parties + Financials */}
       <div className='grid gap-4 sm:grid-cols-2'>
-        <div className='rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+        <div className='rounded-2xl border border-primary/20 bg-primary/5 p-4'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
             {t('review.partiesTitle')}
           </p>
           <div className='mt-3 space-y-3'>
             <div>
-              <p className='text-xs text-main-secondary/50'>{t('review.ownerLabel')}</p>
-              <p className='mt-0.5 text-sm font-medium text-main-black'>
+              <p className='text-xs text-secondary/50'>{t('review.ownerLabel')}</p>
+              <p className='mt-0.5 text-sm font-medium text-foreground'>
                 {form.landlordName || t('review.ownerFallback')}
               </p>
               {form.landlordEmail && (
-                <p className='text-xs text-main-secondary/50'>{form.landlordEmail}</p>
+                <p className='text-xs text-secondary/50'>{form.landlordEmail}</p>
               )}
             </div>
-            <div className='h-px bg-[#F0E8FF]' />
+            <div className='h-px bg-primary/15' />
             <div>
-              <p className='text-xs text-main-secondary/50'>{t('review.tenantLabel')}</p>
-              <p className='mt-0.5 text-sm font-medium text-main-black'>{form.tenantName}</p>
-              <p className='text-xs text-main-secondary/50'>{form.tenantEmail}</p>
+              <p className='text-xs text-secondary/50'>{t('review.tenantLabel')}</p>
+              <p className='mt-0.5 text-sm font-medium text-foreground'>{form.tenantName}</p>
+              <p className='text-xs text-secondary/50'>{form.tenantEmail}</p>
             </div>
           </div>
         </div>
 
-        <div className='rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+        <div className='rounded-2xl border border-primary/20 bg-primary/5 p-4'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
             {t('review.financialsTitle')}
           </p>
           <div className='mt-3 space-y-3'>
             <div>
-              <p className='text-xs text-main-secondary/50'>{t('review.monthlyRentLabel')}</p>
-              <p className='mt-0.5 text-lg font-semibold text-main-black'>
+              <p className='text-xs text-secondary/50'>{t('review.monthlyRentLabel')}</p>
+              <p className='mt-0.5 text-lg font-semibold text-foreground'>
                 {formatCurrencyValue(form.monthlyRent)}
               </p>
             </div>
-            <div className='h-px bg-[#F0E8FF]' />
+            <div className='h-px bg-primary/15' />
             <div>
-              <p className='text-xs text-main-secondary/50'>{t('review.depositLabel')}</p>
-              <p className='mt-0.5 text-sm font-medium text-main-black'>
+              <p className='text-xs text-secondary/50'>{t('review.depositLabel')}</p>
+              <p className='mt-0.5 text-sm font-medium text-foreground'>
                 {form.securityDeposit
                   ? formatCurrencyValue(form.securityDeposit)
                   : t('review.noDeposit')}
@@ -135,41 +135,41 @@ export function StepReview({ form, t }: StepReviewProps) {
       </div>
 
       {/* Lease timeline */}
-      <div className='rounded-2xl border border-[#E7E0FF] bg-[#FDFBFF] p-4'>
-        <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+      <div className='rounded-2xl border border-primary/20 bg-primary/5 p-4'>
+        <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
           {t('review.timelineTitle')}
         </p>
         <div className='mt-3 flex items-center gap-3'>
-          <div className='rounded-xl bg-[#F3EEFF] px-3 py-2 text-center'>
-            <p className='text-[10px] font-medium uppercase text-main-secondary/50'>
+          <div className='rounded-xl bg-primary/10 px-3 py-2 text-center'>
+            <p className='text-[10px] font-medium uppercase text-secondary/50'>
               {t('review.timelineFrom')}
             </p>
-            <p className='mt-0.5 text-sm font-semibold text-main-black'>{form.leaseStartDate}</p>
+            <p className='mt-0.5 text-sm font-semibold text-foreground'>{form.leaseStartDate}</p>
           </div>
           <div className='flex flex-1 items-center gap-2'>
-            <div className='h-px flex-1 bg-[#E7E0FF]' />
+            <div className='h-px flex-1 bg-primary/20' />
             {leaseDurationMonths > 0 && (
-              <span className='shrink-0 rounded-full bg-main-primary/10 px-3 py-1 text-xs font-semibold text-main-primary'>
+              <span className='shrink-0 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary'>
                 {t('review.timelineDuration', { months: leaseDurationMonths })}
               </span>
             )}
-            <div className='h-px flex-1 bg-[#E7E0FF]' />
+            <div className='h-px flex-1 bg-primary/20' />
           </div>
-          <div className='rounded-xl bg-[#F3EEFF] px-3 py-2 text-center'>
-            <p className='text-[10px] font-medium uppercase text-main-secondary/50'>
+          <div className='rounded-xl bg-primary/10 px-3 py-2 text-center'>
+            <p className='text-[10px] font-medium uppercase text-secondary/50'>
               {t('review.timelineTo')}
             </p>
-            <p className='mt-0.5 text-sm font-semibold text-main-black'>{form.leaseEndDate}</p>
+            <p className='mt-0.5 text-sm font-semibold text-foreground'>{form.leaseEndDate}</p>
           </div>
         </div>
       </div>
 
       {/* DocuSign notice */}
-      <div className='flex items-center gap-3 rounded-2xl border border-dashed border-[#D7CFFF] bg-[#FAF8FF] px-4 py-3'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-main-primary/10'>
-          <SendHorizontal className='h-4 w-4 text-main-primary' />
+      <div className='flex items-center gap-3 rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-4 py-3'>
+        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10'>
+          <SendHorizontal className='h-4 w-4 text-primary' />
         </div>
-        <p className='text-sm leading-relaxed text-main-secondary/70'>{t('review.docusignNotice')}</p>
+        <p className='text-sm leading-relaxed text-secondary/70'>{t('review.docusignNotice')}</p>
       </div>
     </div>
   );

@@ -108,7 +108,7 @@ export function PropertyCardFeatured({
         {/* Badge */}
         {badge && (
           <div className='absolute left-4 top-4'>
-            <div className='flex items-center gap-1.5 rounded-lg bg-main-primary px-3 py-1.5 shadow-sm'>
+            <div className='flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 shadow-sm'>
               <svg
                 width='12'
                 height='12'
@@ -147,7 +147,7 @@ export function PropertyCardFeatured({
             <Heart
               className={cn(
                 'h-5 w-5',
-                isFavorite ? 'fill-red-500 text-red-500' : 'text-main-primary'
+                isFavorite ? 'fill-red-500 text-red-500' : 'text-primary'
               )}
               strokeWidth={2.3}
             />
@@ -160,13 +160,13 @@ export function PropertyCardFeatured({
         {/* Features */}
         <div className='mb-4 flex items-center justify-center gap-4'>
           <div className='flex items-center gap-1.5'>
-            <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+            <BedSingle className='h-5 w-5 text-primary' strokeWidth={2.3} />
             <span className='text-sm font-normal leading-[1.4] text-grey-500'>
               {beds} {bedsLabel}
             </span>
           </div>
           <div className='flex items-center gap-1.5'>
-            <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+            <Bath className='h-5 w-5 text-primary' strokeWidth={2.3} />
             <span className='text-sm font-normal leading-[1.4] text-grey-500'>
               {bathrooms} {bathroomsLabel}
             </span>
@@ -185,7 +185,7 @@ export function PropertyCardFeatured({
           <div>
             <p className='text-xs font-medium uppercase tracking-wide text-grey-500'>{rentSaleLabel}</p>
             <p className='flex items-baseline gap-1'>
-              <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
+              <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-primary'>
                 {!currencyAfter && currency}
                 {formattedPrice}
                 {currencyAfter && currency}

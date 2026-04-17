@@ -186,13 +186,13 @@ export function PropertyMapBasedSearchPage({
   const handleApplyFilters = (newFilters: PropertyFilterValues, newPropertyType?: string) => {
     setFilters(newFilters);
     if (newPropertyType !== propertyType) {
-        const params = new URLSearchParams(searchParams?.toString());
-        if (newPropertyType) {
-            params.set('propertyType', newPropertyType);
-        } else {
-            params.delete('propertyType');
-        }
-        router.push(`?${params.toString()}`);
+      const params = new URLSearchParams(searchParams?.toString());
+      if (newPropertyType) {
+        params.set('propertyType', newPropertyType);
+      } else {
+        params.delete('propertyType');
+      }
+      router.push(`?${params.toString()}`);
     }
     setCurrentPage(1);
   };
@@ -265,7 +265,7 @@ export function PropertyMapBasedSearchPage({
             searchPlaceholder='Tìm theo phố, phường, quận hoặc tên dự án...'
             searchValue={searchValue}
             onSearchChange={(val) => {
-                setSearchValue(val);
+              setSearchValue(val);
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -280,14 +280,14 @@ export function PropertyMapBasedSearchPage({
                   type='button'
                   onClick={onBack}
                   variant='secondary'
-                  className='w-full justify-between gap-3 border-[1.5px] bg-white px-4 py-3 h-auto text-base font-medium text-main-secondary opacity-70 hover:bg-white hover:opacity-100 sm:w-auto cursor-pointer'
+                  className='w-full justify-between gap-3 border-[1.5px] bg-white px-4 py-3 h-auto text-base font-medium text-secondary opacity-70 hover:bg-white hover:opacity-100 sm:w-auto cursor-pointer'
                 >
                   <span>Quay lại</span>
                   <div className='relative flex h-5 w-5 items-center justify-center'>
                     {/* Background circle */}
                     <div className='absolute inset-0 rounded-full bg-purple-96'></div>
                     {/* Icon */}
-                    <ChevronLeft className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+                    <ChevronLeft className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
                   </div>
                 </RealVistaButton>
               )
@@ -352,12 +352,12 @@ export function PropertyMapBasedSearchPage({
               </div>
             ) : properties.length === 0 ? (
               <div className='col-span-full flex flex-col items-center justify-center py-20 text-center opacity-60'>
-                 <div className='mb-4 rounded-full bg-purple-96 p-6'>
-                    <Search className='h-10 w-10 text-main-primary' />
-                 </div>
-                 <h3 className='text-xl font-bold text-main-black'>Không tìm thấy kết quả</h3>
-                 <p className='text-grey-500'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
-                 <Button variant='link' onClick={handleResetFilters} className='mt-2 text-main-primary font-bold'>Xóa tất cả bộ lọc</Button>
+                <div className='mb-4 rounded-full bg-purple-96 p-6'>
+                  <Search className='h-10 w-10 text-primary' />
+                </div>
+                <h3 className='text-xl font-bold text-main-black'>Không tìm thấy kết quả</h3>
+                <p className='text-grey-500'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
+                <Button variant='link' onClick={handleResetFilters} className='mt-2 text-primary font-bold'>Xóa tất cả bộ lọc</Button>
               </div>
             ) : (
               properties.map((property: PropertyListingDto) => (
@@ -387,7 +387,7 @@ export function PropertyMapBasedSearchPage({
                     }
                     className={
                       selectedPropertyIds.includes(property.listing_id)
-                        ? 'ring-2 ring-main-primary'
+                        ? 'ring-2 ring-primary'
                         : ''
                     }
                   />

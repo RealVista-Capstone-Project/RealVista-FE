@@ -230,8 +230,8 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
   const buyMax = useWatch({ control, name: 'info.priceRange.buy.max' });
 
   const usableSizeError = usableSize != null && landSize != null && usableSize > landSize;
-  const rentMaxError   = rentMin != null && rentMax != null && rentMax <= rentMin;
-  const buyMaxError    = buyMin != null && buyMax != null && buyMax <= buyMin;
+  const rentMaxError = rentMin != null && rentMax != null && rentMax <= rentMin;
+  const buyMaxError = buyMin != null && buyMax != null && buyMax <= buyMin;
 
   useEffect(() => {
     if (usableSizeError) {
@@ -345,7 +345,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
     const IconComponent = iconMap[attrCode];
     if (!IconComponent) return null;
 
-    return <IconComponent className='w-4 h-4 text-main-primary/70' />;
+    return <IconComponent className='w-4 h-4 text-primary/70' />;
   };
 
   const renderField = (attr: PropertyAttributeDefinition) => {
@@ -398,7 +398,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   placeholder='0'
-                  className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+                  className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
                 />
               </FormControl>
               <FormMessage className='text-xs' />
@@ -430,7 +430,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 value={attr.ranges?.find((r) => r.label === field.value)?.range_id || ''}
               >
                 <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-main-primary focus:ring-1 focus:ring-main-primary'>
+                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'>
                     <SelectValue
                       placeholder={t('selectOption', { default: 'Select {label}', label })}
                     />
@@ -449,7 +449,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 <Input
                   type='text'
                   placeholder={label}
-                  className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+                  className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
                   {...field}
                   value={field.value || ''}
                   onChange={(e) => field.onChange(e.target.value)}

@@ -257,7 +257,7 @@ function QuotaUsageBar({
       <div className='flex items-center gap-3'>
         <div className='h-2 flex-1 overflow-hidden rounded-full bg-purple-92'>
           <div
-            className={cn('h-full rounded-full transition-all', isHigh ? 'bg-orange-400' : 'bg-main-primary')}
+            className={cn('h-full rounded-full transition-all', isHigh ? 'bg-orange-400' : 'bg-primary')}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -481,15 +481,15 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 <p className='mt-1 text-sm text-grey-500'>{boost.description}</p>
                 <ul className='mt-3 space-y-1.5'>
                   <li className='flex items-start gap-2 text-sm text-grey-700'>
-                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     {boost.featured_quota} lượt đẩy nổi bật
                   </li>
                   <li className='flex items-start gap-2 text-sm text-grey-700'>
-                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     {boost.hot_badge_quota} huy hiệu HOT
                   </li>
                   <li className='flex items-start gap-2 text-sm text-grey-700'>
-                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     Hiển thị ưu tiên {boost.duration_days} ngày
                   </li>
                 </ul>
@@ -591,10 +591,10 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
 // ---------------------------------------------------------------------------
 
 const WIZARD_STEP_DEFS: { num: WizardStep; label: string; icon: React.ReactNode }[] = [
-  { num: 1, label: 'Loại gói',   icon: <LayoutGrid   className='size-4' /> },
-  { num: 2, label: 'Chọn gói',   icon: <PackageSearch className='size-4' /> },
-  { num: 3, label: 'Thanh toán', icon: <CreditCard    className='size-4' /> },
-  { num: 4, label: 'Kết quả',    icon: <CheckCircle2  className='size-4' /> },
+  { num: 1, label: 'Loại gói', icon: <LayoutGrid className='size-4' /> },
+  { num: 2, label: 'Chọn gói', icon: <PackageSearch className='size-4' /> },
+  { num: 3, label: 'Thanh toán', icon: <CreditCard className='size-4' /> },
+  { num: 4, label: 'Kết quả', icon: <CheckCircle2 className='size-4' /> },
 ];
 
 function StepIconCircle({
@@ -613,11 +613,11 @@ function StepIconCircle({
       className={cn(
         'flex size-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
         active
-          ? 'border-main-primary bg-main-primary text-white ring-4 ring-purple-94'
+          ? 'border-primary bg-primary text-white ring-4 ring-purple-94'
           : done
-            ? 'border-main-primary bg-main-primary text-white'
+            ? 'border-primary bg-primary text-white'
             : reachable
-              ? 'border-main-primary bg-white text-main-primary'
+              ? 'border-primary bg-white text-primary'
               : 'border-grey-200 bg-white text-grey-400'
       )}
     >
@@ -651,7 +651,7 @@ function StepLabel({
         {label}
       </span>
       {active && (
-        <span className='mt-0.5 inline-flex items-center rounded-full bg-purple-94 px-2 py-0.5 text-[9px] font-bold text-main-primary'>
+        <span className='mt-0.5 inline-flex items-center rounded-full bg-purple-94 px-2 py-0.5 text-[9px] font-bold text-primary'>
           Đang thực hiện
         </span>
       )}
@@ -683,10 +683,10 @@ function HorizontalWizardSteps({
     <div className='mb-6 w-full overflow-x-auto pb-1'>
       <div className='flex min-w-0 items-start pl-1'>
         {WIZARD_STEP_DEFS.map((item, index) => {
-          const done      = activeStep > item.num;
-          const active    = activeStep === item.num;
+          const done = activeStep > item.num;
+          const active = activeStep === item.num;
           const reachable = activeStep >= item.num;
-          const isLast    = index === WIZARD_STEP_DEFS.length - 1;
+          const isLast = index === WIZARD_STEP_DEFS.length - 1;
 
           return (
             /* Each step slot is relative so the connector line can be absolutely positioned.
@@ -704,7 +704,7 @@ function HorizontalWizardSteps({
                   aria-hidden
                   className={cn(
                     'absolute left-8 right-0 top-4 h-0.5 translate-y-px transition-colors',
-                    done ? 'bg-main-primary' : 'bg-grey-200'
+                    done ? 'bg-primary' : 'bg-grey-200'
                   )}
                 />
               )}
@@ -759,13 +759,13 @@ function Step1Content({
             <div
               className={cn(
                 'flex size-10 shrink-0 items-center justify-center rounded-lg',
-                selected === 'subscription' ? 'bg-main-primary text-white' : 'bg-purple-96 text-main-primary'
+                selected === 'subscription' ? 'bg-primary text-white' : 'bg-purple-96 text-primary'
               )}
             >
               <CreditCard className='size-5' />
             </div>
             <p className='font-semibold text-sm text-main-black flex-1'>Gói tính năng</p>
-            {selected === 'subscription' && <Check className='size-5 shrink-0 text-main-primary' />}
+            {selected === 'subscription' && <Check className='size-5 shrink-0 text-primary' />}
           </div>
           <ul className='w-full space-y-2'>
             <li className='flex items-start gap-2 text-sm text-grey-700'>
@@ -797,13 +797,13 @@ function Step1Content({
             <div
               className={cn(
                 'flex size-10 shrink-0 items-center justify-center rounded-lg',
-                selected === 'boost' ? 'bg-main-primary text-white' : 'bg-purple-96 text-main-primary'
+                selected === 'boost' ? 'bg-primary text-white' : 'bg-purple-96 text-primary'
               )}
             >
               <Rocket className='size-5' />
             </div>
             <p className='font-semibold text-sm text-main-black flex-1'>Gói đẩy tin</p>
-            {selected === 'boost' && <Check className='size-5 shrink-0 text-main-primary' />}
+            {selected === 'boost' && <Check className='size-5 shrink-0 text-primary' />}
           </div>
           <ul className='w-full space-y-2'>
             <li className='flex items-start gap-2 text-sm text-grey-700'>
@@ -988,7 +988,7 @@ function Step2Content({
     return (
       <p className='py-4 text-sm text-grey-600'>
         Bạn đang dùng gói cao nhất cho {featureTypeLabelVi(selectedFeatureType)}. Để đổi gói, hãy{' '}
-        <span className='font-medium text-main-primary'>huỷ gói hiện tại</span> ở phần trên rồi chọn gói thấp hơn (nếu
+        <span className='font-medium text-primary'>huỷ gói hiện tại</span> ở phần trên rồi chọn gói thấp hơn (nếu
         phù hợp), hoặc chờ hết hạn.
       </p>
     );
@@ -1019,7 +1019,7 @@ function Step2Content({
                   'relative flex shrink-0 items-center justify-center px-2 py-2 text-xs font-semibold transition-all whitespace-nowrap',
                   'rounded-t-lg border-2 border-b-0',
                   selectedFeatureType === featureType
-                    ? 'bg-main-primary text-white border-main-primary'
+                    ? 'bg-primary text-white border-primary'
                     : 'bg-white border-grey-300 text-grey-600 hover:bg-grey-50'
                 )}
               >
@@ -1030,16 +1030,16 @@ function Step2Content({
 
           {/* Content section - no border container */}
           <div className='flex flex-col gap-4 lg:flex-row'>
-              <div className='flex flex-col gap-4 lg:w-2/5'>
-                {plansForFeatureType.map((plan) => {
-                  const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
-                  let isCurrentActive = false;
-                  if (type === 'subscription') {
-                    isCurrentActive = isCurrentActivePlan(plan.id, mySubs);
-                  } else if (type === 'boost') {
-                    isCurrentActive = isCurrentActiveBoost(plan.id, myBoosts);
-                  }
-                  return (
+            <div className='flex flex-col gap-4 lg:w-2/5'>
+              {plansForFeatureType.map((plan) => {
+                const blocked = type === 'subscription' && isSubscriptionPlanBlocked(plan, mySubs);
+                let isCurrentActive = false;
+                if (type === 'subscription') {
+                  isCurrentActive = isCurrentActivePlan(plan.id, mySubs);
+                } else if (type === 'boost') {
+                  isCurrentActive = isCurrentActiveBoost(plan.id, myBoosts);
+                }
+                return (
                   <button
                     key={plan.id}
                     type='button'
@@ -1049,13 +1049,13 @@ function Step2Content({
                       'relative flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-all',
                       (blocked || isCurrentActive) && 'cursor-not-allowed',
                       activePlanId === plan.id && !blocked && !isCurrentActive
-                        ? 'border-2 border-main-primary bg-white shadow-md'
+                        ? 'border-2 border-primary bg-white shadow-md'
                         : !blocked && !isCurrentActive && 'border border-grey-200 bg-white hover:border-purple-90 hover:bg-purple-98',
                       (blocked || isCurrentActive) && 'border border-grey-200 bg-grey-50'
                     )}
                   >
                     {(plan.isPopular || isCurrentActive) && (
-                      <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-main-primary')}>
+                      <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-primary')}>
                         {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                       </span>
                     )}
@@ -1069,59 +1069,59 @@ function Step2Content({
                     </div>
                   </button>
                 );
-                })}
+              })}
+            </div>
+
+            {/* Plan details - simplified border */}
+            <div className='rounded-xl border border-grey-200 bg-white p-5 lg:flex-1 shadow-sm'>
+              <div className='mb-4 flex items-start justify-between gap-2'>
+                <div>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
+                    {selectedPlan.isPopular && (
+                      <span className='rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
+                        Phổ biến nhất
+                      </span>
+                    )}
+                  </div>
+                  <p className='text-xs text-grey-500'>
+                    {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
+                  </p>
+                </div>
+                <div className='shrink-0 text-right'>
+                  <p className='text-2xl font-bold text-main-black'>
+                    {selectedPlan.priceLabel}
+                  </p>
+                  <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
+                </div>
               </div>
 
-              {/* Plan details - simplified border */}
-              <div className='rounded-xl border border-grey-200 bg-white p-5 lg:flex-1 shadow-sm'>
-                <div className='mb-4 flex items-start justify-between gap-2'>
-                  <div>
-                    <div className='flex flex-wrap items-center gap-2'>
-                      <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
-                      {selectedPlan.isPopular && (
-                        <span className='rounded-full bg-main-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
-                          Phổ biến nhất
-                        </span>
-                      )}
-                    </div>
-                    <p className='text-xs text-grey-500'>
-                      {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
-                    </p>
-                  </div>
-                  <div className='shrink-0 text-right'>
-                    <p className='text-2xl font-bold text-main-black'>
-                      {selectedPlan.priceLabel}
-                    </p>
-                    <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
-                  </div>
-                </div>
+              <div className='mb-4'>
+                <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+                <ul className='space-y-1.5'>
+                  {selectedPlan.benefits.map((b) => (
+                    <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                      <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
+                      {b.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-                <div className='mb-4'>
-                  <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
-                  <ul className='space-y-1.5'>
-                    {selectedPlan.benefits.map((b) => (
-                      <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
-                        <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
-                        {b.label}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className='mb-5'>
-                  <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
-                  <ul className='space-y-1.5'>
-                    {selectedPlan.features.map((f) => (
-                      <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
-                        <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
-                        {f.label}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <div className='mb-5'>
+                <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
+                <ul className='space-y-1.5'>
+                  {selectedPlan.features.map((f) => (
+                    <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
+                      <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
+                      {f.label}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
+        </div>
       )}
 
       {/* For boost packages or single feature type subscriptions - original layout */}
@@ -1137,40 +1137,40 @@ function Step2Content({
                 isCurrentActive = isCurrentActiveBoost(plan.id, myBoosts);
               }
               return (
-              <button
-                key={plan.id}
-                type='button'
-                disabled={blocked || isCurrentActive}
-                onClick={() => !blocked && !isCurrentActive && onSelectPlan(plan.id)}
-                className={cn(
-                  'relative flex w-full items-center justify-between rounded-lg border-2 px-4 py-3 text-left transition-all',
-                  (blocked || isCurrentActive) && 'cursor-not-allowed',
-                  activePlanId === plan.id && !blocked && !isCurrentActive
-                    ? 'border-main-primary bg-purple-98'
-                    : !blocked && !isCurrentActive && 'border-border bg-white hover:border-purple-90 hover:bg-purple-98',
-                  (blocked || isCurrentActive) && 'border-grey-200 bg-grey-100'
-                )}
-              >
-                {(plan.isPopular || isCurrentActive) && (
-                  <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-main-primary')}>
-                    {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
-                  </span>
-                )}
-                <div className='min-w-0'>
-                  <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
-                  <p className='text-xs text-grey-500'>{plan.description}</p>
-                </div>
-                <div className='ml-3 shrink-0 text-right'>
-                  <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
-                  <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
-                </div>
-                {blocked && !isCurrentActive && (
-                  <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>
-                    Đang dùng gói cao hơn
-                  </span>
-                )}
-              </button>
-            );
+                <button
+                  key={plan.id}
+                  type='button'
+                  disabled={blocked || isCurrentActive}
+                  onClick={() => !blocked && !isCurrentActive && onSelectPlan(plan.id)}
+                  className={cn(
+                    'relative flex w-full items-center justify-between rounded-lg border-2 px-4 py-3 text-left transition-all',
+                    (blocked || isCurrentActive) && 'cursor-not-allowed',
+                    activePlanId === plan.id && !blocked && !isCurrentActive
+                      ? 'border-primary bg-purple-98'
+                      : !blocked && !isCurrentActive && 'border-border bg-white hover:border-purple-90 hover:bg-purple-98',
+                    (blocked || isCurrentActive) && 'border-grey-200 bg-grey-100'
+                  )}
+                >
+                  {(plan.isPopular || isCurrentActive) && (
+                    <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-primary')}>
+                      {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
+                    </span>
+                  )}
+                  <div className='min-w-0'>
+                    <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
+                    <p className='text-xs text-grey-500'>{plan.description}</p>
+                  </div>
+                  <div className='ml-3 shrink-0 text-right'>
+                    <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
+                    <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
+                  </div>
+                  {blocked && !isCurrentActive && (
+                    <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>
+                      Đang dùng gói cao hơn
+                    </span>
+                  )}
+                </button>
+              );
             })}
           </div>
 
@@ -1180,7 +1180,7 @@ function Step2Content({
                 <div className='flex flex-wrap items-center gap-2'>
                   <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
                   {selectedPlan.isPopular && (
-                    <span className='rounded-full bg-main-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
+                    <span className='rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
                       Phổ biến nhất
                     </span>
                   )}
@@ -1202,7 +1202,7 @@ function Step2Content({
               <ul className='space-y-1.5'>
                 {selectedPlan.benefits.map((b) => (
                   <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
-                    <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                    <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     {b.label}
                   </li>
                 ))}
@@ -1458,7 +1458,7 @@ function Step3Content({
           >
             <div className='flex size-5 items-center justify-center rounded-full border-2 border-grey-300 shrink-0'>
               {selectedPayment === 'vnpay' && (
-                <div className='size-2.5 rounded-full bg-main-primary' />
+                <div className='size-2.5 rounded-full bg-primary' />
               )}
             </div>
             <Image
@@ -1486,7 +1486,7 @@ function Step3Content({
           >
             <div className='flex size-5 items-center justify-center rounded-full border-2 border-grey-300 shrink-0'>
               {selectedPayment === 'payos' && (
-                <div className='size-2.5 rounded-full bg-main-primary' />
+                <div className='size-2.5 rounded-full bg-primary' />
               )}
             </div>
             <Image
@@ -1527,7 +1527,7 @@ function Step3Content({
             <ul className='space-y-1.5'>
               {selectedPlan?.benefits.map((b) => (
                 <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
-                  <Check className='mt-0.5 size-3.5 shrink-0 text-main-primary' />
+                  <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                   {b.label}
                 </li>
               ))}
@@ -1577,7 +1577,7 @@ function Step3Content({
                   type='button'
                   onClick={() => { isManualSyncRef.current = true; syncPayOsMutation.mutate(); }}
                   disabled={syncPayOsMutation.isPending}
-                  className='inline-flex items-center gap-1.5 rounded-lg border border-main-primary px-4 py-2 text-sm font-semibold text-main-primary hover:bg-purple-98 disabled:opacity-50 transition-colors'
+                  className='inline-flex items-center gap-1.5 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-purple-98 disabled:opacity-50 transition-colors'
                 >
                   {syncPayOsMutation.isPending
                     ? <Loader2 className='size-3.5 animate-spin' />
@@ -1588,7 +1588,7 @@ function Step3Content({
                   type='button'
                   onClick={() => { setCheckout(null); requestCheckout('PAYOS'); }}
                   disabled={isLoading}
-                  className='inline-flex items-center gap-1.5 rounded-lg bg-main-primary px-4 py-2 text-sm font-semibold text-white hover:bg-main-primary-hover disabled:opacity-50 transition-colors'
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors'
                 >
                   <RefreshCw className='size-3.5' />
                   Tạo mã QR mới
@@ -1633,8 +1633,8 @@ function Step3Content({
                 'flex items-center gap-1 text-xs',
                 secondsLeft === null ? 'text-grey-500'
                   : secondsLeft > 300 ? 'text-grey-500'
-                  : secondsLeft > 60 ? 'text-yellow-600'
-                  : 'text-red-500'
+                    : secondsLeft > 60 ? 'text-yellow-600'
+                      : 'text-red-500'
               )}>
                 <Clock className='size-3' />
                 {secondsLeft !== null
@@ -1751,7 +1751,7 @@ function Step4Content({
   if (isPending) {
     return (
       <div className='flex flex-col items-center gap-4 py-12 text-center'>
-        <Loader2 className='size-16 animate-spin text-main-primary' />
+        <Loader2 className='size-16 animate-spin text-primary' />
         <div>
           <h3 className='text-lg font-bold text-main-black'>Đang xử lý thanh toán...</h3>
           <p className='mt-2 text-sm text-grey-500'>
@@ -1766,7 +1766,7 @@ function Step4Content({
     <div className='space-y-5'>
       <div className='flex flex-col items-center gap-4 py-8 text-center'>
         {isSuccess ? (
-          <CheckCircle2 className='size-16 text-main-primary' />
+          <CheckCircle2 className='size-16 text-primary' />
         ) : (
           <XCircle className='size-16 text-red-400' />
         )}
@@ -1783,7 +1783,7 @@ function Step4Content({
 
         {isSuccess && plan && (
           <div className='w-full max-w-xs rounded-xl border border-purple-90 bg-purple-98 p-4 text-left'>
-            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-main-primary'>Chi tiết đơn hàng</p>
+            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-primary'>Chi tiết đơn hàng</p>
             <div className='space-y-1.5 text-sm'>
               <div className='flex justify-between'>
                 <span className='text-grey-600'>Gói</span>
@@ -1795,7 +1795,7 @@ function Step4Content({
               </div>
               <div className='flex justify-between border-t border-purple-90 pt-1.5'>
                 <span className='text-grey-600'>Tổng tiền</span>
-                <span className='font-bold text-main-primary'>{plan.priceLabel}</span>
+                <span className='font-bold text-primary'>{plan.priceLabel}</span>
               </div>
             </div>
           </div>
@@ -2060,7 +2060,7 @@ function PurchaseWizard() {
             </p>
             <div className='mt-6 flex flex-col gap-3'>
               <RealVistaButton
-                className='w-full bg-main-primary text-white hover:bg-main-primary-hover'
+                className='w-full bg-primary text-white hover:bg-primary-hover'
                 onClick={() => {
                   setShowLoginDialog(false);
                   router.push(`/${locale}${ROUTES.login}?redirectTo=${ROUTES.subscribe}`);
@@ -2108,7 +2108,7 @@ function PurchaseWizard() {
             </p>
             <div className='mt-6 flex flex-col gap-3'>
               <RealVistaButton
-                className='w-full bg-main-primary text-white hover:bg-main-primary-hover'
+                className='w-full bg-primary text-white hover:bg-primary-hover'
                 onClick={handleConfirmPlanSwap}
               >
                 Đồng ý, hủy và mua gói mới
@@ -2184,7 +2184,7 @@ function TransactionsSection() {
       <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
         <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
         <div className='flex justify-center py-8'>
-          <Loader2 className='size-6 animate-spin text-main-primary' />
+          <Loader2 className='size-6 animate-spin text-primary' />
         </div>
       </div>
     );
@@ -2286,7 +2286,7 @@ export function SubscriptionTab() {
           className={cn(
             'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
             mainTab === 'buy'
-              ? 'bg-white text-main-primary shadow-sm'
+              ? 'bg-white text-primary shadow-sm'
               : 'text-grey-600 hover:text-main-black'
           )}
         >
@@ -2298,7 +2298,7 @@ export function SubscriptionTab() {
           className={cn(
             'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
             mainTab === 'manage'
-              ? 'bg-white text-main-primary shadow-sm'
+              ? 'bg-white text-primary shadow-sm'
               : 'text-grey-600 hover:text-main-black'
           )}
         >

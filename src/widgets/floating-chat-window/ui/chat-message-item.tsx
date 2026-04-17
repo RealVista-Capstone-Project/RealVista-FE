@@ -49,7 +49,7 @@ export function ChatMessageItem({ message, onListingClick, className }: ChatMess
         className={cn(
           'max-w-[85%] rounded-2xl px-4 py-2',
           isOwn
-            ? 'rounded-br-md bg-main-primary text-white'
+            ? 'rounded-br-md bg-primary text-white'
             : 'rounded-bl-md bg-grey-100 text-main-black'
         )}
       >

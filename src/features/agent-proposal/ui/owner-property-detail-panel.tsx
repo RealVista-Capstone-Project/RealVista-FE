@@ -379,7 +379,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
               </div>
             ) : (
               <Button
-                className='h-11 w-full gap-2 rounded-xl bg-main-primary text-sm font-semibold text-white shadow-sm shadow-indigo-200/60 hover:bg-main-primary/90'
+                className='h-11 w-full gap-2 rounded-xl bg-primary text-sm font-semibold text-white shadow-sm shadow-indigo-200/60 hover:bg-primary/90'
                 onClick={openApplyModal}
               >
                 <SendHorizonal className='h-4 w-4' />

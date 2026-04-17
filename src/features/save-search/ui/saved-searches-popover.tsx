@@ -163,7 +163,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant='outline' className='flex items-center gap-2 border-main-primary text-main-primary hover:bg-purple-96'>
+        <Button variant='outline' className='flex items-center gap-2 border-primary text-primary hover:bg-purple-96'>
           <Bookmark className='w-4 h-4' />
           <span className='hidden sm:inline'>
             {searchType === 'RENT' ? 'Tìm kiếm thuê' : searchType === 'BUY' ? 'Tìm kiếm mua' : 'Tìm kiếm'} đã lưu ({savedSearches.length || 0})
@@ -177,7 +177,7 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
         <div className='max-h-80 overflow-y-auto p-2'>
           {isLoading ? (
             <div className='flex justify-center p-4'>
-              <Loader2 className='w-5 h-5 animate-spin text-main-primary' />
+              <Loader2 className='w-5 h-5 animate-spin text-primary' />
             </div>
           ) : savedSearches.length === 0 ? (
             <p className='text-sm text-gray-500 text-center p-4'>

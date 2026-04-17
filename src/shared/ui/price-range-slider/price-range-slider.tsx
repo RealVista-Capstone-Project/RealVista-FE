@@ -72,9 +72,8 @@ export function PriceRangeSlider({
             return (
               <div
                 key={index}
-                className={`flex-1 rounded-t-sm transition-colors duration-300 ${
-                  isActive ? 'bg-main-primary opacity-80' : 'bg-[#E5E7EB]'
-                }`}
+                className={`flex-1 rounded-t-sm transition-colors duration-300 ${isActive ? 'bg-primary opacity-80' : 'bg-[#E5E7EB]'
+                  }`}
                 style={{ height: `${height}px` }}
               />
             );
@@ -85,7 +84,7 @@ export function PriceRangeSlider({
         <div className='relative px-2 h-6'>
           <div className='absolute left-2 right-2 top-2.5 h-1.5 bg-[#E0DEF7] rounded-full'>
             <div
-              className='absolute h-full bg-main-primary rounded-full shadow-[0_0_10px_rgba(112,101,240,0.3)]'
+              className='absolute h-full bg-primary rounded-full shadow-[0_0_10px_rgba(112,101,240,0.3)]'
               style={{
                 left: `${((internalLow - minValue) / (maxValue - minValue)) * 100}%`,
                 right: `${100 - ((internalHigh - minValue) / (maxValue - minValue)) * 100}%`,
@@ -101,7 +100,7 @@ export function PriceRangeSlider({
             onChange={(e) => handleMinChange(Number(e.target.value))}
             onMouseUp={handleMinDragEnd}
             onTouchEnd={handleMinDragEnd}
-            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-main-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
+            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
             style={{ zIndex: internalLow > maxValue / 2 ? 11 : 10 }}
           />
           <input
@@ -113,7 +112,7 @@ export function PriceRangeSlider({
             onChange={(e) => handleMaxChange(Number(e.target.value))}
             onMouseUp={handleMaxDragEnd}
             onTouchEnd={handleMaxDragEnd}
-            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-main-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
+            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
             style={{ zIndex: internalHigh < maxValue / 2 ? 11 : 10 }}
           />
         </div>

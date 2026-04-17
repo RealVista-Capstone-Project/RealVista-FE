@@ -51,7 +51,7 @@ function ManageAgentContent() {
     return (
       <div className='h-full bg-[#F7F7FD] flex items-center justify-center'>
         <div className='flex flex-col items-center gap-4'>
-          <div className='h-10 w-10 rounded-full border-[3px] border-main-primary border-t-transparent animate-spin' />
+          <div className='h-10 w-10 rounded-full border-[3px] border-primary border-t-transparent animate-spin' />
           <p className='text-sm text-gray-500 font-medium tracking-wide'>
             {t('loading')}
           </p>
@@ -181,7 +181,7 @@ function ManageAgentContent() {
                   <Button
                     variant='outline'
                     size='icon'
-                    className='h-8 w-8 rounded-lg border-gray-200 hover:border-main-primary hover:text-main-primary hover:bg-indigo-50 transition-colors'
+                    className='h-8 w-8 rounded-lg border-gray-200 hover:border-primary hover:text-primary hover:bg-indigo-50 transition-colors'
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                   >
@@ -195,7 +195,7 @@ function ManageAgentContent() {
                   <Button
                     variant='outline'
                     size='icon'
-                    className='h-8 w-8 rounded-lg border-gray-200 hover:border-main-primary hover:text-main-primary hover:bg-indigo-50 transition-colors'
+                    className='h-8 w-8 rounded-lg border-gray-200 hover:border-primary hover:text-primary hover:bg-indigo-50 transition-colors'
                     onClick={() =>
                       setCurrentPage((p) => Math.min(totalPages, p + 1))
                     }

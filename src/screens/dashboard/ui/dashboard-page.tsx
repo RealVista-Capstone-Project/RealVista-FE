@@ -48,7 +48,7 @@ export function DashboardPage() {
           <h1 className='text-2xl font-semibold tracking-tight text-main-black sm:text-3xl'>
             Dashboard
           </h1>
-          <p className='mt-1 text-sm text-main-secondary/60'>
+          <p className='mt-1 text-sm text-secondary/60'>
             Welcome back, {user?.name || user?.email?.split('@')[0]}
           </p>
         </div>
@@ -73,7 +73,7 @@ export function DashboardPage() {
             <span className='h-2 w-2 rounded-full bg-emerald-500' />
           </div>
 
-          <p className='mb-4 text-sm text-main-secondary/60'>
+          <p className='mb-4 text-sm text-secondary/60'>
             Your recent account activity and updates will appear here.
           </p>
 
@@ -97,7 +97,7 @@ export function DashboardPage() {
         <div className='group relative overflow-hidden rounded-xl border border-purple-92/50 bg-white p-6 shadow-sm transition-all hover:shadow-md'>
           <div className='mb-4 flex items-center justify-between'>
             <h2 className='text-lg font-semibold text-main-black'>Quick Actions</h2>
-            <span className='h-2 w-2 rounded-full bg-main-primary' />
+            <span className='h-2 w-2 rounded-full bg-primary' />
           </div>
 
           <div className='flex flex-wrap gap-2'>

@@ -46,7 +46,7 @@ export function HomeHero() {
           />
         </div>
         <Button
-          className='w-full md:w-auto h-12 px-8 rounded-md bg-main-primary hover:bg-main-primary/90 text-white font-medium'
+          className='w-full md:w-auto h-12 px-8 rounded-md bg-primary hover:bg-primary/90 text-white font-medium'
           onClick={handleSearch}
         >
           Search

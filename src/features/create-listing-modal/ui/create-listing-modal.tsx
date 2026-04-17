@@ -103,8 +103,8 @@ function PropertyCard({
       className={cn(
         'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
         isSelected
-          ? 'border-main-primary bg-purple-98 shadow-[0px_0px_20px_0px_rgba(112,101,240,0.15)]'
-          : 'border-purple-92 bg-white hover:border-main-primary/40 hover:bg-purple-98/50'
+          ? 'border-primary bg-primary/5 shadow-primary/15'
+          : 'border-purple-92 bg-white hover:border-primary/40 hover:bg-purple-98/50'
       )}
     >
       {/* Thumbnail */}
@@ -119,7 +119,7 @@ function PropertyCard({
           />
         ) : (
           <div className='flex h-full w-full items-center justify-center bg-purple-96'>
-            <Home className='h-6 w-6 text-main-secondary/40' />
+            <Home className='h-6 w-6 text-secondary/40' />
           </div>
         )}
       </div>
@@ -127,18 +127,18 @@ function PropertyCard({
       {/* Info */}
       <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
         <div className='flex items-center gap-2'>
-          <span className='truncate text-sm font-bold leading-tight text-main-black'>
+          <span className='truncate text-sm font-bold leading-tight text-foreground'>
             {property.streetAddress}
           </span>
           <PropertyStatusBadge status={property.status} />
         </div>
 
-        <div className='flex items-center gap-1 text-xs text-main-secondary/60'>
+        <div className='flex items-center gap-1 text-xs text-secondary/60'>
           <MapPin className='h-3 w-3 shrink-0' />
           <span className='truncate'>{fullAddress}</span>
         </div>
 
-        <div className='flex flex-wrap items-center gap-3 text-xs text-main-secondary/60'>
+        <div className='flex flex-wrap items-center gap-3 text-xs text-secondary/60'>
           <span className='flex items-center gap-1'>
             <Home className='h-3 w-3' />
             {property.propertyType.propertyTypeName}
@@ -163,8 +163,8 @@ function PropertyCard({
         className={cn(
           'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
           isSelected
-            ? 'border-main-primary bg-main-primary'
-            : 'border-purple-92 bg-white group-hover:border-main-primary/40'
+            ? 'border-primary bg-primary'
+            : 'border-purple-92 bg-white group-hover:border-primary/40'
         )}
       >
         {isSelected && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
@@ -190,8 +190,8 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
               className={cn(
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
                 step.number <= currentStep
-                  ? 'bg-main-primary text-white'
-                  : 'bg-purple-96 text-main-black'
+                  ? 'bg-primary text-white'
+                  : 'bg-purple-96 text-foreground'
               )}
             >
               {step.number}
@@ -199,13 +199,13 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep ? 'text-main-black' : 'text-main-secondary/50'
+                step.number <= currentStep ? 'text-foreground' : 'text-secondary/50'
               )}
             >
               {step.label}
             </span>
           </div>
-          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-main-secondary/50' />}
+          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-secondary/50' />}
         </React.Fragment>
       ))}
     </div>
@@ -413,14 +413,14 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='flex flex-col max-h-[95vh] sm:max-h-[90vh] sm:max-w-5xl !max-w-[95vw] sm:!max-w-5xl overflow-hidden p-0'>
+      <DialogContent className='flex flex-col max-h-[95vh] sm:max-h-[90vh] sm:max-w-5xl !max-w-[95vw] overflow-hidden p-0'>
         {/* Header - Fixed */}
         <div className='shrink-0'>
           <DialogHeader className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
-            <DialogTitle className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
+            <DialogTitle className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-foreground'>
               {t('title')}
             </DialogTitle>
-            <DialogDescription className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-main-secondary/50'>
+            <DialogDescription className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-secondary/50'>
               {t('subtitle')}
             </DialogDescription>
           </DialogHeader>
@@ -438,18 +438,18 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
             <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
               {/* Property Selection */}
               <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
-                <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-main-black'>
+                <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-foreground'>
                   {t('selectProperty')}
                 </h3>
 
                 <div className='flex flex-col gap-3'>
                   {isLoading ? (
                     <div className='flex justify-center py-8'>
-                      <div className='h-8 w-8 animate-spin rounded-full border-4 border-main-primary border-t-transparent' />
+                      <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
                     </div>
                   ) : properties.length === 0 ? (
                     <div className='flex justify-center py-8'>
-                      <span className='text-main-secondary/50'>
+                      <span className='text-secondary/50'>
                         {t('noProperties', { fallback: 'No properties found' })}
                       </span>
                     </div>
@@ -487,8 +487,8 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
                 className={cn(
                   'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
                   selectedProperty
-                    ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
-                    : 'bg-main-primary/30 cursor-not-allowed'
+                    ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
+                    : 'bg-primary/30 cursor-not-allowed'
                 )}
               >
                 {t('next')}

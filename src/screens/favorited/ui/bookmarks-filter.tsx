@@ -29,7 +29,7 @@ function CheckboxIcon({ checked, indeterminate }: { checked: boolean; indetermin
       className={cn(
         'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
         checked || indeterminate
-          ? 'border-main-primary bg-main-primary'
+          ? 'border-primary bg-primary'
           : 'border-grey-400 bg-white'
       )}
     >
@@ -130,7 +130,7 @@ export function BookmarksFilter({
                 className={cn(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   listingType === 'rent'
-                    ? 'bg-main-primary text-white'
+                    ? 'bg-primary text-white'
                     : 'text-grey-600 hover:bg-grey-98'
                 )}
               >
@@ -142,7 +142,7 @@ export function BookmarksFilter({
                 className={cn(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   listingType === 'buy'
-                    ? 'bg-main-primary text-white'
+                    ? 'bg-primary text-white'
                     : 'text-grey-600 hover:bg-grey-98'
                 )}
               >
@@ -183,7 +183,7 @@ export function BookmarksFilter({
                           className={cn(
                             'px-4 py-2.5 text-left text-sm font-medium transition-colors',
                             sortOrder === option.value
-                              ? 'bg-main-primary text-white'
+                              ? 'bg-primary text-white'
                               : 'text-main-black hover:bg-purple-98'
                           )}
                         >
@@ -269,7 +269,7 @@ export function BookmarksFilter({
           {/* Right: Compare Button */}
           <button
             type='button'
-            className='rounded-lg bg-main-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-main-primary/90'
+            className='rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90'
           >
             {t('compare')} (3)
           </button>

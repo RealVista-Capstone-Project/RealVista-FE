@@ -21,7 +21,7 @@ export function ListingDateField({ value, onChange, label, error }: ListingDateF
         type='date'
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className='w-full rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black transition-colors focus:border-main-primary focus:outline-none'
+        className='w-full rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black transition-colors focus:border-primary focus:outline-none'
       />
       {error && <span className='text-xs text-red-500'>{error}</span>}
     </div>

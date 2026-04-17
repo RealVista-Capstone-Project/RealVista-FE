@@ -56,7 +56,7 @@ export function PublicActions({
           className={cn(
             'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
             isRouteActive('/favorited')
-              ? 'bg-main-primary text-white'
+              ? 'bg-primary text-white'
               : 'bg-purple-98 text-main-black hover:bg-purple-92'
           )}
           aria-label='Bookmarks'
@@ -76,7 +76,7 @@ export function PublicActions({
         className={cn(
           'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
           isRouteActive('/subscribe')
-            ? 'bg-main-primary text-white'
+            ? 'bg-primary text-white'
             : 'bg-purple-98 text-main-black hover:bg-purple-92'
         )}
         aria-label={t('subscribe')}
@@ -123,13 +123,13 @@ export function PublicActions({
         <div className='hidden lg:flex items-center gap-3'>
           <Link
             href={`/${locale}${ROUTES.login}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg border border-purple-92 bg-white font-medium text-main-primary transition-colors hover:bg-purple-98'
+            className='flex h-12 items-center justify-center px-6 rounded-lg border border-purple-92 bg-white font-medium text-primary transition-colors hover:bg-purple-98'
           >
             {t('login')}
           </Link>
           <Link
             href={`/${locale}${ROUTES.register}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg bg-main-primary text-white font-medium transition-colors hover:bg-main-primary-hover'
+            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-white font-medium transition-colors hover:bg-primary-hover'
           >
             {t('signup')}
           </Link>

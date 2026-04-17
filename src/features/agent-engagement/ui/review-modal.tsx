@@ -93,12 +93,12 @@ export function ReviewModal({
 
           {/* Agent profile summary */}
           <div className='flex flex-col items-center gap-3'>
-            <Avatar className='h-16 w-16 border-2 border-white shadow-md ring-2 ring-main-primary/20'>
+            <Avatar className='h-16 w-16 border-2 border-white shadow-md ring-2 ring-primary/20'>
               <AvatarImage
                 src={agent.agent_avatar_url ?? undefined}
                 alt={agent.agent_full_name}
               />
-              <AvatarFallback className='bg-purple-92 text-main-primary font-bold text-lg'>
+              <AvatarFallback className='bg-purple-92 text-primary font-bold text-lg'>
                 {getInitials(agent.agent_full_name)}
               </AvatarFallback>
             </Avatar>
@@ -191,7 +191,7 @@ export function ReviewModal({
             type='submit'
             form='review-form'
             disabled={isLoading || rating === 0}
-            className='bg-main-primary hover:bg-main-primary-hover text-white gap-2 flex-1'
+            className='bg-primary hover:bg-primary-hover text-white gap-2 flex-1'
           >
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />

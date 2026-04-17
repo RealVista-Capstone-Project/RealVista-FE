@@ -120,7 +120,7 @@ function SegmentedSelector({
             {opt === 0 ? 'Bất kỳ' : `${opt}${opt === maxItems - 1 ? '+' : ''}`}
             {isActive && (
               <div
-                className='absolute inset-0 -z-10 rounded-lg bg-main-primary shadow-md animate-in fade-in zoom-in-95 duration-200'
+                className='absolute inset-0 -z-10 rounded-lg bg-primary shadow-md animate-in fade-in zoom-in-95 duration-200'
               />
             )}
           </button>
@@ -157,7 +157,7 @@ function AttributeSlider({
           {Icon && <Icon className='h-4 w-4 text-grey-400' />}
           <span className='text-[13px] font-bold text-main-black'>{label}</span>
         </div>
-        <span className='text-sm font-black text-main-primary'>
+        <span className='text-sm font-black text-primary'>
           {value === 0 ? 'Bất kỳ' : `Từ ${value}${unit}+`}
         </span>
       </div>
@@ -241,7 +241,7 @@ export function PropertyFiltersModal({
               <div className='flex items-center justify-between'>
                 <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.category}</h3>
                 {selectedType && (
-                  <button className='text-xs font-bold text-main-primary hover:underline' onClick={() => setSelectedType(undefined)}>Xóa bộ lọc</button>
+                  <button className='text-xs font-bold text-primary hover:underline' onClick={() => setSelectedType(undefined)}>Xóa bộ lọc</button>
                 )}
               </div>
               <div className='grid grid-cols-4 gap-3'>
@@ -262,11 +262,11 @@ export function PropertyFiltersModal({
                     >
                       <div className={cn(
                         'flex h-12 w-12 items-center justify-center rounded-2xl border-1.5 transition-all duration-300',
-                        isSelected ? 'border-main-primary bg-main-primary/5 text-main-primary shadow-sm' : 'border-purple-92 bg-white text-grey-500 group-hover:border-main-primary/50'
+                        isSelected ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-purple-92 bg-white text-grey-500 group-hover:border-primary/50'
                       )}>
                         <Icon className='h-6 w-6' strokeWidth={isSelected ? 2.5 : 2} />
                       </div>
-                      <span className={cn('text-[10px] font-bold uppercase tracking-tight', isSelected ? 'text-main-primary' : 'text-grey-500')}>
+                      <span className={cn('text-[10px] font-bold uppercase tracking-tight', isSelected ? 'text-primary' : 'text-grey-500')}>
                         {capitalizedLabel}
                       </span>
                     </button>
@@ -283,8 +283,8 @@ export function PropertyFiltersModal({
                       className={cn(
                         'px-3.5 py-1.5 rounded-lg text-xs font-bold border-1.5 transition-all',
                         selectedType === t.code
-                          ? 'bg-main-primary text-white border-main-primary shadow-sm'
-                          : 'bg-white text-grey-500 border-purple-92 hover:border-main-primary/30'
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-white text-grey-500 border-purple-92 hover:border-primary/30'
                       )}
                     >
                       {t.label}
@@ -360,11 +360,11 @@ export function PropertyFiltersModal({
                       key={attrKey}
                       className={cn(
                         'flex items-center justify-between rounded-xl px-4 py-2.5 transition-colors',
-                        isChecked ? 'bg-main-primary/[0.03]' : 'hover:bg-grey-50'
+                        isChecked ? 'bg-primary/[0.03]' : 'hover:bg-grey-50'
                       )}
                     >
                       <div className='flex items-center gap-3'>
-                        {Icon && <Icon className={cn('h-4.5 w-4.5', isChecked ? 'text-main-primary' : 'text-grey-400')} />}
+                        {Icon && <Icon className={cn('h-4.5 w-4.5', isChecked ? 'text-primary' : 'text-grey-400')} />}
                         <span className={cn('text-sm font-medium', isChecked ? 'text-main-black font-semibold' : 'text-grey-600')}>{label}</span>
                       </div>
                       <Switch
@@ -392,8 +392,8 @@ export function PropertyFiltersModal({
                       className={cn(
                         'flex h-11 items-center justify-center rounded-xl border-1.5 text-sm font-bold transition-all',
                         localFilters.rentalPeriod === period
-                          ? 'bg-main-primary text-white border-main-primary shadow-sm'
-                          : 'bg-white text-grey-500 border-purple-92 hover:border-main-primary/30'
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-white text-grey-500 border-purple-92 hover:border-primary/30'
                       )}
                     >
                       {period === 'any' ? translations.rentalPeriod.any : translations.rentalPeriod[period as '1-12']}
@@ -409,7 +409,7 @@ export function PropertyFiltersModal({
           <Button
             type='button'
             onClick={handleApply}
-            className='w-full h-12 rounded-xl bg-main-primary text-sm font-bold text-white shadow-lg shadow-main-primary/20 hover:bg-main-primary/90 transition-all active:scale-95'
+            className='w-full h-12 rounded-xl bg-primary text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95'
           >
             {translations.apply}
           </Button>

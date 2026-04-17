@@ -260,12 +260,12 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               <div className='p-6'>
                 {/* Header */}
                 <div className='mb-4 flex items-center gap-2'>
-                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-main-primary/10'>
-                    <Building2 className='h-4 w-4 text-main-primary' strokeWidth={2} />
+                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10'>
+                    <Building2 className='h-4 w-4 text-primary' strokeWidth={2} />
                   </div>
                   <div>
                     <h3 className='text-sm font-semibold text-main-black'>{t('agent.title')}</h3>
-                    <p className='text-xs text-main-secondary/60'>{t('agent.subtitle')}</p>
+                    <p className='text-xs text-secondary/60'>{t('agent.subtitle')}</p>
                   </div>
                 </div>
 
@@ -282,7 +282,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                         className='h-14 w-14 rounded-full object-cover'
                       />
                     ) : (
-                      <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-main-primary to-purple-600'>
+                      <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600'>
                         <span className='text-lg font-bold text-white'>
                           {listing.agent!.first_name?.[0]}
                           {listing.agent!.last_name?.[0]}
@@ -304,7 +304,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                         {listing.agent!.business_name || listing.agent!.full_name}
                       </h4>
                       {listing.agent!.business_name && listing.agent!.full_name && (
-                        <p className='text-sm text-main-secondary/70'>{listing.agent!.full_name}</p>
+                        <p className='text-sm text-secondary/70'>{listing.agent!.full_name}</p>
                       )}
                       {listing.agent!.is_verified && (
                         <div className='mt-1 flex items-center gap-1.5'>
@@ -319,19 +319,19 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     {/* Contact Info */}
                     <div className='space-y-2 text-sm'>
                       {listing.agent!.phone && (
-                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                        <div className='flex items-center gap-2 text-secondary/70'>
                           <Phone className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.phone}</span>
                         </div>
                       )}
                       {listing.agent!.email && (
-                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                        <div className='flex items-center gap-2 text-secondary/70'>
                           <Mail className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.email}</span>
                         </div>
                       )}
                       {listing.agent!.company && (
-                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                        <div className='flex items-center gap-2 text-secondary/70'>
                           <Building2 className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.company}</span>
                         </div>
@@ -342,7 +342,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     <button
                       type='button'
                       onClick={handleContact}
-                      className='mt-2 w-full rounded-lg bg-main-primary py-2.5 text-sm font-semibold text-white transition-all hover:bg-main-primary/90 hover:shadow-md'
+                      className='mt-2 w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-md'
                     >
                       {t('agent.contact')}
                     </button>

@@ -61,7 +61,7 @@ export function GlobalProfileSwitcher() {
   return (
     <>
       <div className='flex items-center gap-1 rounded-lg border border-purple-92 px-2 hover:bg-purple-98 transition-colors group'>
-        <Sparkles className='h-4 w-4 text-main-primary animate-pulse group-hover:scale-110 transition-transform' />
+        <Sparkles className='h-4 w-4 text-primary animate-pulse group-hover:scale-110 transition-transform' />
         <Select
           value={activeProfile?.customer_profile_id || ''}
           onValueChange={(val) => {
@@ -84,7 +84,7 @@ export function GlobalProfileSwitcher() {
               </SelectItem>
             ))}
             <div className='border-t border-purple-92 my-1' />
-            <SelectItem value='CREATE_NEW' className='text-main-primary font-bold focus:bg-purple-98 focus:text-main-primary'>
+            <SelectItem value='CREATE_NEW' className='text-primary font-bold focus:bg-purple-98 focus:text-primary'>
               <div className='flex items-center gap-2'>
                 <PlusCircle className='h-4 w-4' />
                 <span>Thêm Profile</span>

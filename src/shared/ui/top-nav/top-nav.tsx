@@ -126,8 +126,8 @@ export function TopNav({
                     key={item.id}
                     href={`/${locale}${item.href}`}
                     className={cn(
-                      'text-base leading-[1.5] transition-colors hover:text-main-primary',
-                      isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+                      'text-base leading-[1.5] transition-colors hover:text-primary',
+                      isActive ? 'font-bold text-primary' : 'font-medium text-main-black'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -200,8 +200,8 @@ export function TopNav({
                       className={cn(
                         'py-3 text-base leading-[1.5] transition-colors',
                         isActive
-                          ? 'font-bold text-main-primary'
-                          : 'font-medium text-main-black hover:text-main-primary'
+                          ? 'font-bold text-primary'
+                          : 'font-medium text-main-black hover:text-primary'
                       )}
                       aria-current={isActive ? 'page' : undefined}
                     >
@@ -215,7 +215,7 @@ export function TopNav({
             {/* Profile Section */}
             <div className='border-t border-border px-6 py-4'>
               <div className='flex items-center gap-3'>
-                <div className='flex size-10 items-center justify-center rounded-full bg-main-primary text-white'>
+                <div className='flex size-10 items-center justify-center rounded-full bg-primary text-white'>
                   <span className='text-sm font-bold leading-[1.5]'>{user.initials}</span>
                 </div>
                 <div className='flex flex-col'>
@@ -253,8 +253,8 @@ function NavItemDropdown({
       <Link
         href={`/${locale}${item.href}`}
         className={cn(
-          'text-base leading-[1.5] transition-colors hover:text-main-primary',
-          isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+          'text-base leading-[1.5] transition-colors hover:text-primary',
+          isActive ? 'font-bold text-primary' : 'font-medium text-main-black'
         )}
         aria-current={isActive ? 'page' : undefined}
       >
@@ -273,9 +273,9 @@ function NavItemDropdown({
         <Link
           href={`/${locale}${item.href}`}
           className={cn(
-            'flex items-center gap-1 text-base leading-[1.5] transition-colors hover:text-main-primary outline-none',
-            isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black',
-            open && 'text-main-primary'
+            'flex items-center gap-1 text-base leading-[1.5] transition-colors hover:text-primary outline-none',
+            isActive ? 'font-bold text-primary' : 'font-medium text-main-black',
+            open && 'text-primary'
           )}
         >
           {t(item.translationKey)}
@@ -305,10 +305,10 @@ function NavItemDropdown({
               <div key={category.code} className='space-y-4'>
                 <Link
                   href={`/${locale}${item.href}?propertyCategory=${category.code}`}
-                  className='flex items-center gap-2 pb-2 border-b border-purple-92 hover:border-main-primary transition-colors group'
+                  className='flex items-center gap-2 pb-2 border-b border-purple-92 hover:border-primary transition-colors group'
                   onClick={() => setOpen(false)}
                 >
-                  <span className='text-sm font-bold uppercase tracking-wider text-main-primary/80 group-hover:text-main-primary transition-colors'>
+                  <span className='text-sm font-bold uppercase tracking-wider text-primary/80 group-hover:text-primary transition-colors'>
                     {category.label}
                   </span>
                 </Link>
@@ -317,7 +317,7 @@ function NavItemDropdown({
                     <Link
                       key={type.code}
                       href={`/${locale}${item.href}?propertyType=${type.code}`}
-                      className='text-sm text-grey-600 hover:text-main-primary hover:bg-purple-98 px-3 py-2 rounded-lg transition-colors capitalize'
+                      className='text-sm text-grey-600 hover:text-primary hover:bg-purple-98 px-3 py-2 rounded-lg transition-colors capitalize'
                       onClick={() => setOpen(false)}
                     >
                       {type.label}

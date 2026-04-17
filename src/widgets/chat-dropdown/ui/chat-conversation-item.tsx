@@ -54,7 +54,7 @@ export function ChatConversationItem({
             />
           </div>
         ) : (
-          <div className='flex h-10 w-10 items-center justify-center rounded-full bg-main-primary text-white'>
+          <div className='flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white'>
             <span className='text-sm font-bold'>{participant.name.charAt(0).toUpperCase()}</span>
           </div>
         )}

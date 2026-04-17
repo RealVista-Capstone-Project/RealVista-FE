@@ -63,7 +63,7 @@ export function ChatListingCard({ listing, onClick, onCreateContract, className 
         <div className='flex min-w-0 flex-1 flex-col justify-between gap-1'>
           <p className='line-clamp-1 text-sm font-medium text-main-black'>{title}</p>
 
-          <p className='text-base font-bold text-main-primary'>
+          <p className='text-base font-bold text-primary'>
             {currency ?? '$'}
             {price !== undefined && price !== null ? price.toLocaleString() : '0'}
           </p>
@@ -103,7 +103,7 @@ export function ChatListingCard({ listing, onClick, onCreateContract, className 
           <button
             type='button'
             onClick={() => onCreateContract(listing)}
-            className='flex w-full items-center justify-center gap-1.5 rounded-md bg-main-primary/8 py-1.5 text-xs font-medium text-main-primary transition-colors hover:bg-main-primary/15'
+            className='flex w-full items-center justify-center gap-1.5 rounded-md bg-primary/8 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/15'
           >
             <FileText className='h-3.5 w-3.5' />
             {t('createContract')}

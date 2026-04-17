@@ -95,7 +95,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}
-          onFavorite={() => {}} // Properties themselves might not be favoritable yet?
+          onFavorite={() => { }} // Properties themselves might not be favoritable yet?
           isFavorite={false}
         />
 
@@ -103,8 +103,8 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
         <div className='mt-4 sm:mt-8'>
           <PropertyGallery
             images={property.images}
-            onViewAllPhotos={() => {}}
-            onFavorite={() => {}}
+            onViewAllPhotos={() => { }}
+            onFavorite={() => { }}
             isFavorite={false}
           />
         </div>
@@ -119,8 +119,8 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
                 <p className='text-grey-600 mb-4'>{t('agentApplyDescription') || 'Are you an agent looking to manage this property?'}</p>
                 <RealVistaButton
                   variant='primary'
-                   size='medium'
-                  className='w-full bg-main-secondary flex items-center justify-center gap-2'
+                  size='medium'
+                  className='w-full bg-secondary flex items-center justify-center gap-2'
                   onClick={handleApplyProposal}
                   disabled={isApplyProposalDisabled}
                 >
@@ -155,7 +155,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
                 <RealVistaButton
                   variant='primary'
                   size='medium'
-                  className='w-full bg-main-secondary flex items-center justify-center gap-2'
+                  className='w-full bg-secondary flex items-center justify-center gap-2'
                   onClick={handleApplyProposal}
                   disabled={isApplyProposalDisabled}
                 >

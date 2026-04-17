@@ -151,7 +151,7 @@ export function RealVistaListingCard({
               {attr.icon && (
                 <AttributeIcon
                   iconName={attr.icon}
-                  className='h-5 w-5 text-main-primary'
+                  className='h-5 w-5 text-primary'
                   strokeWidth={2.3}
                 />
               )}
@@ -173,13 +173,13 @@ export function RealVistaListingCard({
     return (
       <div className='flex items-center gap-4'>
         <div className='flex items-center gap-1.5'>
-          <BedSingle className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+          <BedSingle className='h-5 w-5 text-primary' strokeWidth={2.3} />
           <span className='text-sm font-normal leading-[1.4] text-grey-500'>
             {beds} {t('beds')}
           </span>
         </div>
         <div className='flex items-center gap-1.5'>
-          <Bath className='h-5 w-5 text-main-primary' strokeWidth={2.3} />
+          <Bath className='h-5 w-5 text-primary' strokeWidth={2.3} />
           <span className='text-sm font-normal leading-[1.4] text-grey-500'>
             {bathrooms} {t('bathrooms')}
           </span>
@@ -205,7 +205,7 @@ export function RealVistaListingCard({
       size='icon'
     >
       <Heart
-        className={cn('h-5 w-5', isFavorite ? 'fill-red-500 text-red-500' : 'text-main-primary')}
+        className={cn('h-5 w-5', isFavorite ? 'fill-red-500 text-red-500' : 'text-primary')}
         strokeWidth={2.3}
       />
     </Button>
@@ -291,7 +291,7 @@ export function RealVistaListingCard({
       <DialogContent className='max-w-sm p-8' onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Heart className='h-5 w-5 fill-purple-100 text-main-primary' strokeWidth={2} />
+            <Heart className='h-5 w-5 fill-purple-100 text-primary' strokeWidth={2} />
             {t('confirmUnfavoriteTitle')}
           </DialogTitle>
           <DialogDescription>{t('confirmUnfavoriteMessage')}</DialogDescription>
@@ -304,7 +304,7 @@ export function RealVistaListingCard({
           </DialogClose>
           <Button
             onClick={handleConfirmUnfavorite}
-            className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white border-0'
+            className='flex-1 bg-primary hover:bg-primary/90 text-white border-0'
           >
             {t('unfavorite')}
           </Button>
@@ -355,7 +355,7 @@ export function RealVistaListingCard({
                   <StatusTag marginClass='-ml-5' paddingClass='pl-6' />
                 ) : (
                   <div className='flex items-baseline gap-1'>
-                    <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
+                    <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-primary'>
                       {formatVND(price)}
                     </span>
                     <span className='text-xs font-semibold text-grey-500'>₫</span>
@@ -434,7 +434,7 @@ export function RealVistaListingCard({
               <StatusTag marginClass='-ml-8' paddingClass='pl-9' />
             ) : (
               <div className='flex items-baseline gap-1'>
-                <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
+                <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-primary'>
                   {formatVND(price)}
                 </span>
                 <span className='text-sm font-semibold text-grey-500'>₫</span>

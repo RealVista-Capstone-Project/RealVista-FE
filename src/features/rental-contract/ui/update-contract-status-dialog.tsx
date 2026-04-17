@@ -65,7 +65,7 @@ export function UpdateContractStatusDialog({
             <DialogTitle className='text-xl font-semibold text-main-black'>
               {config.title}
             </DialogTitle>
-            <DialogDescription className='mt-2 text-sm leading-6 text-main-secondary/70'>
+            <DialogDescription className='mt-2 text-sm leading-6 text-secondary/70'>
               {config.description}
             </DialogDescription>
           </DialogHeader>
@@ -80,9 +80,9 @@ export function UpdateContractStatusDialog({
                 value={reason}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setReason(event.target.value)}
                 placeholder={t('statusDialog.reasonPlaceholder')}
-                className='min-h-28 rounded-xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-main-primary/30'
+                className='min-h-28 rounded-xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-primary/30'
               />
-              <p className='text-xs text-main-secondary/60'>
+              <p className='text-xs text-secondary/60'>
                 {t('statusDialog.reasonHint')}
               </p>
             </div>
@@ -101,7 +101,7 @@ export function UpdateContractStatusDialog({
               type='button'
               onClick={handleConfirm}
               disabled={disableConfirm}
-              className='rounded-xl bg-main-primary text-white hover:bg-main-primary-hover'
+              className='rounded-xl bg-primary text-white hover:bg-primary-hover'
             >
               {isPending ? t('statusDialog.updating') : config.confirmLabel}
             </Button>

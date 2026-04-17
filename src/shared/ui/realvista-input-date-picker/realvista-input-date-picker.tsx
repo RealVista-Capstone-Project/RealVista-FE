@@ -113,7 +113,7 @@ export function DatePickerInput({
               'bg-white border border-purple-92 rounded-lg px-4 py-3.5',
               'flex items-center justify-between w-full',
               'hover:border-purple-92-hover transition-colors cursor-pointer',
-              'focus:outline-none focus:ring-2 focus:ring-main-primary/50',
+              'focus:outline-none focus:ring-2 focus:ring-primary/50',
               className
             )}
           >

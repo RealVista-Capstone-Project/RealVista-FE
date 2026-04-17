@@ -68,7 +68,7 @@ export function SharePopover({ url, title }: SharePopoverProps) {
             onClick={handleCopyLink}
             className={cn(
               'w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-grey-100 transition-colors text-left',
-              copied && 'text-main-primary'
+              copied && 'text-primary'
             )}
           >
             <LinkIcon className='size-5' />

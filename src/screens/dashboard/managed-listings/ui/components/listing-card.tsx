@@ -54,7 +54,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
             if (listing.total_videos && listing.total_videos > 0) {
               return (
                 <div className='flex h-full w-full flex-col items-center justify-center'>
-                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-main-primary/10 text-main-primary'>
+                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary'>
                     <svg
                       width='16'
                       height='16'
@@ -65,14 +65,14 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
                       <path d='M8 5V19L19 12L8 5Z' />
                     </svg>
                   </div>
-                  <span className='mt-1 text-[10px] font-medium text-main-primary'>Video</span>
+                  <span className='mt-1 text-[10px] font-medium text-primary'>Video</span>
                 </div>
               );
             }
 
             return (
               <div className='flex h-full w-full items-center justify-center'>
-                <span className='text-xs text-main-secondary/60'>{t('noImage')}</span>
+                <span className='text-xs text-secondary/60'>{t('noImage')}</span>
               </div>
             );
           })()}
@@ -104,7 +104,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
 
           {/* Price, Status & Area */}
           <div className='flex items-center gap-2 text-sm'>
-            <span className='font-semibold text-main-primary'>{formattedPrice}</span>
+            <span className='font-semibold text-primary'>{formattedPrice}</span>
             <span className='text-main-black/50'>•</span>
             <div className='flex items-center gap-1.5'>
               <div className={cn('rounded-full px-2 py-0.5', status.className)}>
@@ -113,7 +113,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
               {(listing.status === ListingStatus.DRAFT || listing.status === ListingStatus.ARCHIVED) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button type='button' className='text-main-primary hover:text-main-primary/80 transition-colors' onClick={(e) => e.stopPropagation()}>
+                    <button type='button' className='text-primary hover:text-primary/80 transition-colors' onClick={(e) => e.stopPropagation()}>
                       <Info className='h-3.5 w-3.5' />
                     </button>
                   </TooltipTrigger>

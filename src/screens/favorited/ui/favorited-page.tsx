@@ -123,7 +123,7 @@ export function FavoritedPage() {
         <div className='mx-auto max-w-7xl'>
           {isLoading ? (
             <div className='flex justify-center py-16'>
-              <div className='h-8 w-8 animate-spin rounded-full border-4 border-main-primary border-t-transparent' />
+              <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
             </div>
           ) : items.length === 0 ? (
             // Empty State
@@ -135,7 +135,7 @@ export function FavoritedPage() {
               </p>
               <Link
                 href={`/${locale}/`}
-                className='inline-block rounded-lg bg-main-primary px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-main-primary/90'
+                className='inline-block rounded-lg bg-primary px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-primary/90'
               >
                 {t('browseListing')}
               </Link>

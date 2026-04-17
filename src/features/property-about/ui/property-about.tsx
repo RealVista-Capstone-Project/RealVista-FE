@@ -165,17 +165,17 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
                   <span className='text-main-black/50 text-lg font-semibold'>
                     {hasListingAgent(property)
                       ? property.agent.full_name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .slice(0, 2)
-                          .join('')
-                          .toUpperCase()
+                        .split(' ')
+                        .map((n) => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase()
                       : property.agent.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .slice(0, 2)
-                          .join('')
-                          .toUpperCase()}
+                        .split(' ')
+                        .map((n) => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase()}
                   </span>
                 )}
               </div>
@@ -195,7 +195,7 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
                 <RealVistaButton
                   variant='secondary'
                   size='small'
-                  className='border-main-primary text-main-primary hover:bg-main-primary/5'
+                  className='border-primary text-primary hover:bg-primary/5'
                   onClick={() => window.open(`tel:${property.agent.phone.replace(/\s+/g, '')}`, '_self')}
                 >
                   <Phone className='size-4' />

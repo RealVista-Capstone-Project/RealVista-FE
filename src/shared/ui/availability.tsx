@@ -877,11 +877,11 @@ export function Availability<T extends AppointmentData = AppointmentData>({
                           todayCol && "bg-purple-96 dark:bg-purple-96/10",
                         )}
                       >
-                        <div className={cn(todayCol && "text-main-primary font-semibold")}>
+                        <div className={cn(todayCol && "text-primary font-semibold")}>
                           {(readOnly || isEditBlocks) && isDate ? dayNames[day.getDay()] : dayNames[(dayIndex + 1) % 7]}
                         </div>
                         {(readOnly || isEditBlocks) && isDate && (
-                          <div className={cn("text-xs", todayCol ? "text-main-primary/70 font-medium" : "text-muted-foreground")}>
+                          <div className={cn("text-xs", todayCol ? "text-primary/70 font-medium" : "text-muted-foreground")}>
                             {String(day.getDate()).padStart(2, '0')}/{String(day.getMonth() + 1).padStart(2, '0')}
                           </div>
                         )}

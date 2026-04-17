@@ -82,7 +82,7 @@ export function CompleteConfirmDialog({
           <Button
             onClick={onConfirm}
             disabled={isLoading}
-            className='bg-main-primary hover:bg-main-primary-hover text-white gap-2'
+            className='bg-primary hover:bg-primary-hover text-white gap-2'
           >
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />

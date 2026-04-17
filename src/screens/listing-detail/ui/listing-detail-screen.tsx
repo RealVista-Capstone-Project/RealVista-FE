@@ -234,10 +234,10 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         userInfo={
           session?.user
             ? {
-                fullName: session.user.name || '',
-                email: session.user.email,
-                phone: '',
-              }
+              fullName: session.user.name || '',
+              email: session.user.email,
+              phone: '',
+            }
             : undefined
         }
       />
@@ -250,7 +250,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               {listing.listing_type === 'RENT' ? 'Rent price' : 'Sale price'}
             </p>
             <div className='flex items-baseline gap-1'>
-              <p className='text-main-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
+              <p className='text-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
               <span className='text-xs font-semibold text-grey-500'>₫</span>
@@ -280,7 +280,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         <DialogContent className='max-w-sm p-8'>
           <DialogHeader>
             <DialogTitle className='flex items-center gap-2'>
-              <Heart className='h-5 w-5 fill-purple-100 text-main-primary' strokeWidth={2} />
+              <Heart className='h-5 w-5 fill-purple-100 text-primary' strokeWidth={2} />
               {t('confirmUnfavoriteTitle')}
             </DialogTitle>
             <DialogDescription>{t('confirmUnfavoriteMessage')}</DialogDescription>
@@ -293,7 +293,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             </DialogClose>
             <Button
               onClick={handleConfirmUnfavorite}
-              className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white border-0'
+              className='flex-1 bg-primary hover:bg-primary/90 text-white border-0'
             >
               {t('unfavorite')}
             </Button>

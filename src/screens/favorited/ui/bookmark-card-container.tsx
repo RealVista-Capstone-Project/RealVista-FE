@@ -38,11 +38,10 @@ export function BookmarkCardContainer({
       {isSelectionMode && (
         <button
           onClick={handleCheckboxChange}
-          className={`absolute top-4 left-4 flex h-6 w-6 items-center justify-center rounded border-2 transition-colors ${
-            isSelected
-              ? 'border-main-primary bg-main-primary'
+          className={`absolute top-4 left-4 flex h-6 w-6 items-center justify-center rounded border-2 transition-colors ${isSelected
+              ? 'border-primary bg-primary'
               : 'border-white bg-white/80 hover:bg-white'
-          }`}
+            }`}
           aria-label={isSelected ? 'Unselect' : 'Select'}
         >
           {isSelected && <Check className='h-4 w-4 text-white' strokeWidth={3} />}

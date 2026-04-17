@@ -31,7 +31,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
       className={cn(
         'grid cursor-pointer grid-cols-12 items-center gap-4 border-l-[3px] px-5 py-4 transition-all duration-150 group',
         isSelected
-          ? 'border-l-main-primary bg-[#F2F0FF]'
+          ? 'border-l-primary bg-[#F2F0FF]'
           : 'border-l-transparent bg-white hover:border-l-[#D7D1F8] hover:bg-[#FBFAFF]'
       )}
       onClick={() => onClick(contract)}
@@ -52,7 +52,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
         <Avatar
           className={cn(
             'h-10 w-10 ring-2 ring-offset-1 transition-all duration-150',
-            isSelected ? 'ring-main-primary/30' : 'ring-gray-100'
+            isSelected ? 'ring-primary/30' : 'ring-gray-100'
           )}
         >
           <AvatarImage src={contract.tenant.avatarUrl ?? undefined} alt={contract.tenant.fullName} />
@@ -65,7 +65,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
           <div className='truncate text-sm font-semibold text-main-black'>
             {contract.tenant.fullName}
           </div>
-          <div className='mt-0.5 truncate text-xs text-main-secondary/60'>
+          <div className='mt-0.5 truncate text-xs text-secondary/60'>
             {contract.tenant.email}
           </div>
         </div>
@@ -75,7 +75,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
         <div className='text-sm font-semibold text-main-black'>
           {formatContractCurrency(contract.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
         </div>
-        <div className='mt-0.5 text-xs text-main-secondary/60'>{t('table.perMonth')}</div>
+        <div className='mt-0.5 text-xs text-secondary/60'>{t('table.perMonth')}</div>
       </div>
 
       <div className='col-span-2 flex items-center justify-between gap-2'>
@@ -83,7 +83,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
           <div className='text-sm font-semibold text-main-black tabular-nums'>
             {formatContractDate(contract.createdAt, locale, 'dd MMM')}
           </div>
-          <div className='mt-0.5 text-xs text-main-secondary/60 tabular-nums'>
+          <div className='mt-0.5 text-xs text-secondary/60 tabular-nums'>
             {formatContractDate(contract.createdAt, locale, 'yyyy')}
           </div>
         </div>
@@ -91,7 +91,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
         <ChevronRight
           className={cn(
             'h-4 w-4 flex-shrink-0 transition-all duration-150',
-            isSelected ? 'text-main-primary' : 'text-gray-200 group-hover:text-gray-400'
+            isSelected ? 'text-primary' : 'text-gray-200 group-hover:text-gray-400'
           )}
         />
       </div>

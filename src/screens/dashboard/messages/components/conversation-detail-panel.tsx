@@ -57,7 +57,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
         </div>
 
         {/* View contract */}
-        <button className='flex items-center gap-2 rounded-xl border border-main-primary/30 px-5 py-2 text-sm font-semibold text-main-primary transition-colors hover:bg-purple-98'>
+        <button className='flex items-center gap-2 rounded-xl border border-primary/30 px-5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-purple-98'>
           <Eye className='size-4' />
           {t('viewContract')}
         </button>
@@ -117,7 +117,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
                     <div className='flex items-center gap-2'>
                       <span className='text-sm font-bold text-main-black'>{event.amount}</span>
                       {event.badge && (
-                        <span className='rounded-full bg-main-primary px-2.5 py-0.5 text-xs font-semibold text-white'>
+                        <span className='rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-white'>
                           {event.badge}
                         </span>
                       )}
@@ -130,7 +130,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
                   {event.link && (
                     <a
                       href={event.link.href}
-                      className='mt-1 text-sm font-semibold text-main-primary underline underline-offset-2 hover:text-main-primary-hover'
+                      className='mt-1 text-sm font-semibold text-primary underline underline-offset-2 hover:text-primary-hover'
                     >
                       {event.link.label}
                     </a>
@@ -144,7 +144,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
 
       {/* End contract button */}
       <div className='px-4 pb-6 pt-2'>
-        <button className='w-full rounded-xl bg-main-primary py-3 text-sm font-bold text-white transition-colors hover:bg-main-primary-hover active:bg-main-primary-active'>
+        <button className='w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary-hover active:bg-primary-active'>
           {t('endContract')}
         </button>
       </div>

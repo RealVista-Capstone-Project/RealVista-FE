@@ -201,11 +201,10 @@ export function RegisterForm({ role, onRoleChange }: { role: Role; onRoleChange:
               onChange={(e) => onRoleChange(e.target.checked ? 'AGENT' : 'CUSTOMER')}
             />
             <div
-              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-colors duration-150 ${
-                role === 'AGENT'
-                  ? 'border-main-primary bg-main-primary'
-                  : 'border-purple-92 bg-purple-98 group-hover:border-main-primary'
-              }`}
+              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-colors duration-150 ${role === 'AGENT'
+                  ? 'border-primary bg-primary'
+                  : 'border-purple-92 bg-purple-98 group-hover:border-primary'
+                }`}
             >
               {role === 'AGENT' && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
             </div>

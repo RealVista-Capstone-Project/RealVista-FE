@@ -56,7 +56,7 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
             className={cn(
               'rounded-2xl px-4 py-3 text-sm leading-relaxed',
               isMe
-                ? 'rounded-tr-sm bg-main-primary text-white'
+                ? 'rounded-tr-sm bg-primary text-white'
                 : 'rounded-tl-sm bg-white text-main-black shadow-sm',
               msg.isLink && 'break-all'
             )}
@@ -68,7 +68,7 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
                   href={`https://${msg.text.split('https://')[1]}`}
                   target='_blank'
                   rel='noreferrer'
-                  className='text-main-primary underline'
+                  className='text-primary underline'
                 >
                   https://{msg.text.split('https://')[1]}
                 </a>

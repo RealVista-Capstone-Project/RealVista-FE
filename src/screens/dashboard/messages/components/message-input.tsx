@@ -330,10 +330,10 @@ export function MessageInput({
 
       {/* ── Listing URL preview banner ────────────────────────────────────── */}
       {showPreview && (
-        <div className='mb-3 overflow-hidden rounded-xl border border-[#EAE1FF] bg-[#FBF9FF]'>
+        <div className='mb-3 overflow-hidden rounded-xl border border-primary/25 bg-primary/5'>
           {/* Header row */}
           <div className='flex items-center justify-between px-3 py-2'>
-            <span className='text-xs font-semibold text-main-primary'>
+            <span className='text-xs font-semibold text-primary'>
               {t('listingPreview.label')}
             </span>
             <button
@@ -348,8 +348,8 @@ export function MessageInput({
 
           {/* Content */}
           {isFetchingCard && (
-            <div className='flex items-center gap-2 border-t border-[#EAE1FF] px-3 py-2'>
-              <Loader2 className='size-3.5 animate-spin text-main-primary/60' />
+            <div className='flex items-center gap-2 border-t border-primary/25 px-3 py-2'>
+              <Loader2 className='size-3.5 animate-spin text-primary/60' />
               <span className='text-xs text-grey-400'>{t('listingPreview.fetching')}</span>
             </div>
           )}
@@ -362,7 +362,7 @@ export function MessageInput({
           )}
 
           {!isFetchingCard && resolvedCard && (
-            <div className='flex items-center gap-3 border-t border-[#EAE1FF] px-3 py-2'>
+            <div className='flex items-center gap-3 border-t border-primary/25 px-3 py-2'>
               {resolvedCard.image && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -375,7 +375,7 @@ export function MessageInput({
                 <p className='truncate text-xs font-semibold text-main-black'>{resolvedCard.title}</p>
                 <p className='truncate text-xs text-grey-400'>{resolvedCard.address}</p>
               </div>
-              <span className='shrink-0 text-xs font-bold text-main-primary'>
+              <span className='shrink-0 text-xs font-bold text-primary'>
                 {resolvedCard.price?.toLocaleString()}
               </span>
             </div>
@@ -401,7 +401,7 @@ export function MessageInput({
       )}
 
       {/* ── Input row ────────────────────────────────────────────────────── */}
-      <div className='flex items-center gap-3 rounded-2xl border border-purple-92 bg-white px-4 py-3 shadow-sm focus-within:border-main-primary/50 focus-within:ring-2 focus-within:ring-main-primary/10'>
+      <div className='flex items-center gap-3 rounded-2xl border border-purple-92 bg-white px-4 py-3 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10'>
         {/* Plus button with popover — only rendered for owner / AGENT */}
         {canCreateContract && (
           <div className='relative shrink-0'>
@@ -410,7 +410,7 @@ export function MessageInput({
               onClick={() => setPopoverOpen((v) => !v)}
               className={cn(
                 'flex size-5 items-center justify-center rounded-full transition-colors',
-                popoverOpen ? 'bg-main-primary text-white' : 'text-grey-400 hover:text-main-primary'
+                popoverOpen ? 'bg-primary text-white' : 'text-grey-400 hover:text-primary'
               )}
               aria-label='More actions'
             >
@@ -430,7 +430,7 @@ export function MessageInput({
                   }}
                   className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
                 >
-                  <FileText className='size-4 shrink-0 text-main-primary' />
+                  <FileText className='size-4 shrink-0 text-primary' />
                   {t('createContract')}
                 </button>
               </div>
@@ -460,13 +460,13 @@ export function MessageInput({
           <button
             onClick={handleSend}
             disabled={isSending}
-            className='shrink-0 text-main-primary transition-colors hover:text-main-primary/70 disabled:opacity-50'
+            className='shrink-0 text-primary transition-colors hover:text-primary/70 disabled:opacity-50'
             aria-label='Send message'
           >
             {isSending ? <Loader2 className='size-5 animate-spin' /> : <Send className='size-5' />}
           </button>
         ) : (
-          <button className='shrink-0 text-grey-400 transition-colors hover:text-main-primary'>
+          <button className='shrink-0 text-grey-400 transition-colors hover:text-primary'>
             <Mic className='size-5' />
           </button>
         )}
@@ -477,10 +477,10 @@ export function MessageInput({
         <DialogContent className='max-w-md' showCloseButton>
           <DialogHeader>
             <DialogTitle className='flex items-center gap-2 text-main-black'>
-              <FileText className='size-5 text-main-primary' />
+              <FileText className='size-5 text-primary' />
               {t('contractModal.title')}
             </DialogTitle>
-            <DialogDescription className='text-sm text-main-secondary/65'>
+            <DialogDescription className='text-sm text-secondary/65'>
               {t('contractModal.description')}
             </DialogDescription>
           </DialogHeader>
@@ -489,7 +489,7 @@ export function MessageInput({
             {/* Listing picker — shown when conversation has multiple listings */}
             {listings.length > 1 && (
               <div className='space-y-2'>
-                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
                   {t('contractModal.listingPickerLabel')}
                 </p>
                 <div className='max-h-52 space-y-1.5 overflow-y-auto pr-0.5'>
@@ -503,14 +503,14 @@ export function MessageInput({
                         className={cn(
                           'flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-all',
                           isSelected
-                            ? 'border-main-primary bg-[#FBF9FF] ring-1 ring-main-primary/30'
-                            : 'border-[#EAE1FF] bg-white hover:border-main-primary/40 hover:bg-[#FBF9FF]/60'
+                            ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                            : 'border-primary/25 bg-white hover:border-primary/40 hover:bg-primary/5'
                         )}
                       >
                         <Building2
                           className={cn(
                             'size-4 shrink-0',
-                            isSelected ? 'text-main-primary' : 'text-main-secondary/40'
+                            isSelected ? 'text-primary' : 'text-secondary/40'
                           )}
                         />
                         <div className='min-w-0 flex-1'>
@@ -519,7 +519,7 @@ export function MessageInput({
                           </p>
                           <p className='truncate text-xs text-grey-400'>{listing.address}</p>
                         </div>
-                        {isSelected && <Check className='size-4 shrink-0 text-main-primary' />}
+                        {isSelected && <Check className='size-4 shrink-0 text-primary' />}
                       </button>
                     );
                   })}
@@ -529,10 +529,10 @@ export function MessageInput({
 
             {/* Single listing row */}
             {listings.length <= 1 && (
-              <div className='flex items-start gap-3 rounded-2xl border border-[#EAE1FF] bg-[#FBF9FF] px-4 py-3'>
-                <Building2 className='mt-0.5 size-4 shrink-0 text-main-primary/70' />
+              <div className='flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3'>
+                <Building2 className='mt-0.5 size-4 shrink-0 text-primary/70' />
                 <div className='min-w-0 flex-1'>
-                  <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+                  <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
                     {t('contractModal.listingLabel')}
                   </p>
                   <p className='mt-0.5 truncate text-sm font-medium text-main-black'>
@@ -543,10 +543,10 @@ export function MessageInput({
             )}
 
             {/* Tenant row */}
-            <div className='flex items-start gap-3 rounded-2xl border border-[#EAE1FF] bg-[#FBF9FF] px-4 py-3'>
-              <User className='mt-0.5 size-4 shrink-0 text-main-primary/70' />
+            <div className='flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3'>
+              <User className='mt-0.5 size-4 shrink-0 text-primary/70' />
               <div className='min-w-0 flex-1'>
-                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-main-secondary/50'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
                   {t('contractModal.tenantLabel')}
                 </p>
                 <p className='mt-0.5 truncate text-sm font-medium text-main-black'>
@@ -558,7 +558,7 @@ export function MessageInput({
             {/* Existing contract warning */}
             {contractsLoading && (
               <div className='flex items-center justify-center py-2'>
-                <Loader2 className='size-4 animate-spin text-main-primary/60' />
+                <Loader2 className='size-4 animate-spin text-primary/60' />
               </div>
             )}
 
@@ -584,14 +584,14 @@ export function MessageInput({
             <Button
               variant='outline'
               onClick={() => setModalOpen(false)}
-              className='rounded-xl border-[#DDD2FF]'
+              className='rounded-xl border-primary/30'
             >
               {t('contractModal.cancel')}
             </Button>
             <Button
               onClick={navigateToWizard}
               disabled={contractsLoading || !selectedListing}
-              className='rounded-xl bg-main-primary text-white hover:bg-main-primary/90'
+              className='rounded-xl bg-primary text-white hover:bg-primary/90'
             >
               {t('contractModal.proceed')}
             </Button>

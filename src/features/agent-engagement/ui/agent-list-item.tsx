@@ -26,7 +26,7 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
       className={cn(
         'grid grid-cols-12 gap-4 px-5 py-3.5 items-center cursor-pointer transition-all duration-150 group relative border-l-[3px]',
         isSelected
-          ? 'bg-indigo-50/70 border-l-main-primary'
+          ? 'bg-indigo-50/70 border-l-primary'
           : 'bg-white border-l-transparent hover:bg-gray-50/80 hover:border-l-gray-200'
       )}
       onClick={() => onClick(agent)}
@@ -46,7 +46,7 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
         <Avatar
           className={cn(
             'h-9 w-9 flex-shrink-0 ring-2 ring-offset-1 transition-all duration-150',
-            isSelected ? 'ring-main-primary/30' : 'ring-gray-100'
+            isSelected ? 'ring-primary/30' : 'ring-gray-100'
           )}
         >
           <AvatarImage
@@ -110,7 +110,7 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
           className={cn(
             'h-4 w-4 flex-shrink-0 transition-all duration-150',
             isSelected
-              ? 'text-main-primary'
+              ? 'text-primary'
               : 'text-gray-200 group-hover:text-gray-400'
           )}
         />

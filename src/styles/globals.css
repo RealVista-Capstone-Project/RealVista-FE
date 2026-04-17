@@ -1,8 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@import 'tw-animate-css';
-
 @import "tw-animate-css";
 
 @import "shadcn/tailwind.css";
@@ -48,10 +46,9 @@
   /* Main Colors */
   --color-main-black: var(--main-black);
   --color-main-white: var(--main-white);
-  --color-main-primary: var(--main-primary);
-  --color-main-primary-hover: var(--main-primary-hover);
-  --color-main-primary-active: var(--main-primary-active);
-  --color-main-secondary: var(--main-secondary);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
 
   /* Greyscale */
   --color-grey-50: var(--grey-50);
@@ -87,35 +84,11 @@
 }
 
 :root {
-  /* Main Colors */
-  --main-black: #000929;
-  --main-white: #ffffff;
-  --main-primary: #7065f0;
-  --main-primary-hover: #5b52d1;
-  --main-primary-active: #4a42a8;
-  --main-secondary: #100a55;
-
-  /* Greyscale */
-  --grey-50: #f9fafb;
-  --grey-100: #f4f4f6;
-  --grey-150: #f3f4f6;
-  --grey-200: #e5e6eb;
-  --grey-300: #d3d5da;
-  --grey-400: #9ea3ae;
-  --grey-500: #6c727f;
-  --grey-600: #4d5461;
-  --grey-700: #394150;
-  --grey-800: #212936;
-  --grey-900: #0b0a0f;
-
-  /* Shades of Purple */
-  --purple-90: #d8d6f5;
-  --purple-92: #e0def7;
-  --purple-92-hover: #f8f7ff;
-  --purple-92-active: #f0eeff;
-  --purple-94: #e8e6f9;
-  --purple-96: #f0effb;
-  --purple-98: #f7f7fd;
+  /* Brand Colors (Mapped to standard variables) */
+  --primary: #7065f0;
+  --primary-hover: #5b52d1;
+  --primary-active: #4a42a8;
+  --primary-foreground: #ffffff;
 
   /* Semantic Colors */
   --radius: 0.625rem;
@@ -131,8 +104,10 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #7065f0;
+  --primary-hover: #5b52d1;
+  --primary-active: #4a42a8;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -168,8 +143,10 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #8a81f5; /* Slightly lighter for dark mode */
+  --primary-hover: #7b72e5;
+  --primary-active: #6c63d6;
+  --primary-foreground: #000000;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

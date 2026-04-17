@@ -480,7 +480,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                   type='button'
                   onClick={handleBack}
                   disabled={isPending}
-                  className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
+                  className='w-[160px] h-12 rounded-lg bg-muted/50 text-primary font-bold hover:bg-primary/10 border-none shadow-none'
                 >
                   {t('back')}
                 </Button>
@@ -501,7 +501,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                   type='button'
                   onClick={handleNext}
                   disabled={isNextDisabled}
-                  className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none disabled:opacity-50'
+                  className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary-hover border-none shadow-none disabled:opacity-50'
                 >
                   {t('continue')}
                 </Button>
@@ -514,7 +514,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                       !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
                     }
                     onClick={() => setSubmissionStatus('DRAFT')}
-                    className='w-[160px] h-12 rounded-lg bg-[#F7F7FD] text-[#7065F0] font-bold hover:bg-[#E8E6F9] border-none shadow-none'
+                    className='w-[160px] h-12 rounded-lg bg-muted/50 text-primary font-bold hover:bg-primary/10 border-none shadow-none'
                   >
                     {t('saveDraft')}
                   </Button>
@@ -525,7 +525,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                       !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
                     }
                     onClick={() => setSubmissionStatus('AVAILABLE')}
-                    className='w-[160px] h-12 rounded-lg bg-[#7065F0] text-white font-bold hover:bg-[#5B51D9] border-none shadow-none'
+                    className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary-hover border-none shadow-none'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}
                   </Button>

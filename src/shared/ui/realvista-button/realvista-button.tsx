@@ -16,7 +16,7 @@ import { cn } from '@/shared/lib/utils';
  * - Icon variants: Includes arrow icon
  */
 const realVistaButtonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-bold transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-main-primary/50 focus-visible:ring-offset-2",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-bold transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
   {
     variants: {
       /**
@@ -26,8 +26,8 @@ const realVistaButtonVariants = cva(
        * - google: White background with gray border for OAuth
        */
       variant: {
-        primary: 'bg-main-primary text-main-white hover:bg-main-primary-hover active:bg-main-primary-active',
-        secondary: 'bg-main-white border-2 border-purple-92 text-main-primary hover:bg-purple-92-hover active:bg-purple-92-active',
+        primary: 'bg-primary text-main-white hover:bg-primary-hover active:bg-primary-active',
+        secondary: 'bg-main-white border-2 border-purple-92 text-primary hover:bg-purple-92-hover active:bg-purple-92-active',
         google: 'bg-main-white border border-grey-200 text-main-black hover:bg-grey-150',
       },
       /**
@@ -51,7 +51,7 @@ const realVistaButtonVariants = cva(
 
 export interface RealVistaButtonProps
   extends React.ComponentProps<'button'>,
-    VariantProps<typeof realVistaButtonVariants> {
+  VariantProps<typeof realVistaButtonVariants> {
   /** Render as child component (e.g., Link) */
   asChild?: boolean;
   /** Show icon after text (arrow for primary/secondary variants) */

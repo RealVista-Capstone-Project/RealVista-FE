@@ -64,7 +64,7 @@ function CarouselNavButtons() {
         type='button'
         onClick={scrollPrev}
         disabled={!canScrollPrev}
-        className='hidden sm:flex items-center justify-center h-8 w-8 rounded-full border border-purple-90 bg-white text-main-primary transition-all duration-200 hover:bg-purple-96 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100'
+        className='hidden sm:flex items-center justify-center h-8 w-8 rounded-full border border-purple-90 bg-white text-primary transition-all duration-200 hover:bg-purple-96 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100'
         aria-label='Previous recommendations'
       >
         <ChevronLeft className='h-4 w-4' />
@@ -73,7 +73,7 @@ function CarouselNavButtons() {
         type='button'
         onClick={scrollNext}
         disabled={!canScrollNext}
-        className='hidden sm:flex items-center justify-center h-8 w-8 rounded-full border border-purple-90 bg-white text-main-primary transition-all duration-200 hover:bg-purple-96 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100'
+        className='hidden sm:flex items-center justify-center h-8 w-8 rounded-full border border-purple-90 bg-white text-primary transition-all duration-200 hover:bg-purple-96 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100'
         aria-label='Next recommendations'
       >
         <ChevronRight className='h-4 w-4' />
@@ -211,7 +211,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
           {/* Section Header */}
           <div className='flex items-center justify-between mb-6 sm:mb-8'>
             <div className='flex items-center gap-2'>
-              <Sparkles className='h-5 w-5 text-main-primary' />
+              <Sparkles className='h-5 w-5 text-primary' />
               <h2 className='text-main-black text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
                 {t('recommendedForYou')}
               </h2>
@@ -223,7 +223,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
                 size='sm'
                 onClick={() => refreshMutation.mutate()}
                 disabled={refreshMutation.isPending}
-                className='flex items-center gap-2 text-main-primary border-main-primary hover:bg-purple-96'
+                className='flex items-center gap-2 text-primary border-primary hover:bg-purple-96'
               >
                 <RefreshCw
                   className={`h-4 w-4 ${refreshMutation.isPending ? 'animate-spin' : ''}`}

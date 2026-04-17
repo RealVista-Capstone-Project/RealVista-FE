@@ -148,7 +148,7 @@ export function FloatingChatWindow({
               />
             </div>
           ) : (
-            <div className='flex h-7 w-7 items-center justify-center rounded-full bg-main-primary text-white'>
+            <div className='flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white'>
               <span className='text-xs font-bold'>{participant.name.charAt(0).toUpperCase()}</span>
             </div>
           )}
@@ -216,13 +216,13 @@ export function FloatingChatWindow({
                 onKeyDown={handleKeyDown}
                 placeholder={t('typeMessage')}
                 disabled={isSending}
-                className='flex-1 rounded-full border border-border bg-grey-50 px-4 py-2 text-sm placeholder:text-grey-400 focus:border-main-primary focus:outline-none focus:ring-1 focus:ring-main-primary disabled:opacity-50'
+                className='flex-1 rounded-full border border-border bg-grey-50 px-4 py-2 text-sm placeholder:text-grey-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50'
               />
               <button
                 type='button'
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isSending}
-                className='flex h-9 w-9 items-center justify-center rounded-full bg-main-primary text-white transition-colors hover:bg-main-primary/90 disabled:bg-grey-200 disabled:text-grey-400'
+                className='flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary/90 disabled:bg-grey-200 disabled:text-grey-400'
                 aria-label={t('send')}
               >
                 {isSending ? (

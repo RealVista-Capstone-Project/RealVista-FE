@@ -17,7 +17,7 @@ function getNotificationIcon(eventType: Notification['eventType']): { Icon: Luci
   if (eventType.includes('TOUR')) return { Icon: Calendar, bg: 'bg-emerald-500' };
   if (eventType.includes('APPLICATION')) return { Icon: UserCheck, bg: 'bg-orange-400' };
   if (eventType.includes('DRAFT') || eventType.includes('LISTING')) {
-    return { Icon: Home, bg: 'bg-main-primary' };
+    return { Icon: Home, bg: 'bg-primary' };
   }
   return DEFAULT_ICON_ENTRY;
 }
@@ -41,7 +41,7 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
       className={cn(
         'w-full flex items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-purple-98 group border-l-4',
         !notification.isRead
-          ? 'bg-purple-98/40 border-main-primary'
+          ? 'bg-purple-98/40 border-primary'
           : 'border-transparent'
       )}
     >

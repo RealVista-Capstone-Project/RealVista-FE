@@ -34,7 +34,7 @@ export function ConversationSidebar({
       {/* Header */}
       <div className='flex items-center justify-between px-5 py-4'>
         <h1 className='text-xl font-bold text-main-black'>{t('title')}</h1>
-        <button className='flex size-8 items-center justify-center rounded-lg text-grey-500 transition-colors hover:bg-purple-96 hover:text-main-primary'>
+        <button className='flex size-8 items-center justify-center rounded-lg text-grey-500 transition-colors hover:bg-purple-96 hover:text-primary'>
           <Plus className='size-5' />
         </button>
       </div>

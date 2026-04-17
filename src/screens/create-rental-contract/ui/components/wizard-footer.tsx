@@ -27,13 +27,13 @@ export function WizardFooter({
   t,
 }: WizardFooterProps) {
   return (
-    <div className='mt-8 flex flex-col gap-3 border-t border-[#F0E8FF] pt-6 sm:flex-row sm:items-center sm:justify-between'>
+    <div className='mt-8 flex flex-col gap-3 border-t border-primary/10 pt-6 sm:flex-row sm:items-center sm:justify-between'>
       {/* Left: Save draft + Back */}
       <div className='flex flex-wrap gap-3'>
         <Button
           type='button'
           variant='outline'
-          className='h-11 rounded-xl border-[#DED1FF] bg-white px-4 hover:bg-[#F8F4FF]'
+          className='h-11 rounded-xl border-primary/30 bg-white px-4 hover:bg-primary/5'
           onClick={onSaveDraft}
           disabled={isMutating}
         >
@@ -45,7 +45,7 @@ export function WizardFooter({
           <Button
             type='button'
             variant='ghost'
-            className='h-11 rounded-xl px-4 text-main-secondary/70 hover:bg-[#F8F4FF] hover:text-main-black'
+            className='h-11 rounded-xl px-4 text-secondary/70 hover:bg-primary/5 hover:text-foreground'
             onClick={onBack}
           >
             <ArrowLeft className='h-4 w-4' />
@@ -59,7 +59,7 @@ export function WizardFooter({
         {currentStep < totalSteps ? (
           <Button
             type='button'
-            className='h-11 rounded-xl bg-main-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-main-primary-hover'
+            className='h-11 rounded-xl bg-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary-hover'
             onClick={onNext}
             disabled={!isStepValid || isMutating}
           >
@@ -69,7 +69,7 @@ export function WizardFooter({
         ) : (
           <Button
             type='button'
-            className='h-11 rounded-xl bg-main-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-main-primary-hover'
+            className='h-11 rounded-xl bg-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary-hover'
             onClick={onSendForSigning}
             disabled={isMutating}
           >

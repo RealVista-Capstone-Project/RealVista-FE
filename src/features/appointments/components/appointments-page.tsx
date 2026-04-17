@@ -430,108 +430,108 @@ export function AppointmentsPage() {
     );
   };
 
-   return (
+  return (
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
 
-        <Availability
-          mode={isEditingBlocks ? 'edit-blocks' : 'view'}
-          value={isEditingBlocks ? editableBlocks : undefined}
-          onValueChange={isEditingBlocks ? setEditableBlocks : undefined}
-          appointments={filteredAppointments as AppointmentWithListing[]}
-          onAppointmentClick={isEditingBlocks ? undefined : handleAppointmentClick}
-          renderAppointmentCard={renderAppointmentCard as any}
-          currentWeekStart={currentWeekStart}
-          onWeekChange={setCurrentWeekStart}
-          locale={locale as 'vi' | 'en'}
-          isLoading={isLoading}
-          filters={
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Status Filter */}
-              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-                <SelectTrigger className="h-8 w-[130px] text-xs">
-                  <SelectValue placeholder={t('statusLabel')} />
+      <Availability
+        mode={isEditingBlocks ? 'edit-blocks' : 'view'}
+        value={isEditingBlocks ? editableBlocks : undefined}
+        onValueChange={isEditingBlocks ? setEditableBlocks : undefined}
+        appointments={filteredAppointments as AppointmentWithListing[]}
+        onAppointmentClick={isEditingBlocks ? undefined : handleAppointmentClick}
+        renderAppointmentCard={renderAppointmentCard as any}
+        currentWeekStart={currentWeekStart}
+        onWeekChange={setCurrentWeekStart}
+        locale={locale as 'vi' | 'en'}
+        isLoading={isLoading}
+        filters={
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Status Filter */}
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+              <SelectTrigger className="h-8 w-[130px] text-xs">
+                <SelectValue placeholder={t('statusLabel')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">{t('all')}</SelectItem>
+                <SelectItem value="PENDING">{t('pending')}</SelectItem>
+                <SelectItem value="ACCEPTED">{t('accepted')}</SelectItem>
+                <SelectItem value="REJECTED">{t('rejected')}</SelectItem>
+                <SelectItem value="CANCELED">{t('canceled')}</SelectItem>
+                <SelectItem value="COMPLETED">{t('completed')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Listing Filter */}
+            {managedListings.length > 0 && (
+              <Select value={listingFilter} onValueChange={setListingFilter}>
+                <SelectTrigger className="h-8 w-[160px] text-xs">
+                  <SelectValue placeholder={t('listing')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALL">{t('all')}</SelectItem>
-                  <SelectItem value="PENDING">{t('pending')}</SelectItem>
-                  <SelectItem value="ACCEPTED">{t('accepted')}</SelectItem>
-                  <SelectItem value="REJECTED">{t('rejected')}</SelectItem>
-                  <SelectItem value="CANCELED">{t('canceled')}</SelectItem>
-                  <SelectItem value="COMPLETED">{t('completed')}</SelectItem>
+                  <SelectItem value="ALL">{t('allListings')}</SelectItem>
+                  {managedListings.map((l) => (
+                    <SelectItem key={l.listing_id} value={l.listing_id}>
+                      {l.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+            )}
 
-              {/* Listing Filter */}
-              {managedListings.length > 0 && (
-                <Select value={listingFilter} onValueChange={setListingFilter}>
-                  <SelectTrigger className="h-8 w-[160px] text-xs">
-                    <SelectValue placeholder={t('listing')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ALL">{t('allListings')}</SelectItem>
-                    {managedListings.map((l) => (
-                      <SelectItem key={l.listing_id} value={l.listing_id}>
-                        {l.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
-              {/* Reload Button */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => refetch()}
-                    disabled={isLoading}
-                  >
-                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  {t('reload')}
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          }
-          actions={
-            !isEditingBlocks ? (
+            {/* Reload Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => refetch()}
+                  disabled={isLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {t('reload')}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        }
+        actions={
+          !isEditingBlocks ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleStartEditingBlocks}
+              className="h-8 gap-1.5 text-xs"
+            >
+              <Settings2 className="h-3.5 w-3.5" />
+              {t('manageBlocks') || 'Manage Blocks'}
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleStartEditingBlocks}
-                className="h-8 gap-1.5 text-xs"
+                className="h-8 text-xs"
+                onClick={() => stopEditingBlocks()}
               >
-                <Settings2 className="h-3.5 w-3.5" />
-                {t('manageBlocks') || 'Manage Blocks'}
+                {t('cancel') || 'Cancel'}
               </Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={() => stopEditingBlocks()}
-                >
-                  {t('cancel') || 'Cancel'}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setShowSaveDialog(true)}
-                  disabled={syncBlocks.isPending}
-                  className="h-8 gap-1.5 text-xs bg-main-primary text-white border-0 hover:bg-main-primary-hover shadow-sm"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  {t('save') || 'Save'}
-                </Button>
-              </div>
-            )
-          }
-        />
+              <Button
+                size="sm"
+                onClick={() => setShowSaveDialog(true)}
+                disabled={syncBlocks.isPending}
+                className="h-8 gap-1.5 text-xs bg-primary text-white border-0 hover:bg-primary-hover shadow-sm"
+              >
+                <Save className="h-3.5 w-3.5" />
+                {t('save') || 'Save'}
+              </Button>
+            </div>
+          )
+        }
+      />
 
       <SlotModal
         open={!!selectedSlot}
@@ -571,7 +571,7 @@ export function AppointmentsPage() {
               size="sm"
               onClick={handleSubmitReason}
               disabled={!actionReason.trim() || updateStatus.isPending}
-              className="bg-main-primary text-white border-0 hover:bg-main-primary-hover shadow-sm"
+              className="bg-primary text-white border-0 hover:bg-primary-hover shadow-sm"
             >
               {updateStatus.isPending ? t('saving') || 'Saving...' : t('submit')}
             </Button>
@@ -641,7 +641,7 @@ export function AppointmentsPage() {
               size="sm"
               onClick={() => handleSaveBlocks(repeatWeeks, repeatCount)}
               disabled={syncBlocks.isPending}
-              className="gap-2 bg-main-primary text-white border-0 hover:bg-main-primary-hover shadow-sm"
+              className="gap-2 bg-primary text-white border-0 hover:bg-primary-hover shadow-sm"
             >
               <Save className="h-4 w-4" />
               {syncBlocks.isPending ? (t('saving') || 'Saving...') : (t('confirm') || 'Confirm')}

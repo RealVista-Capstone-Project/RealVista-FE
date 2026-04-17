@@ -145,7 +145,7 @@ export function MediaViewer({
                     >
                       {tab.label}
                       {activeTab === tab.id && (
-                        <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-main-primary rounded-full' />
+                        <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-primary rounded-full' />
                       )}
                     </button>
                   )
@@ -158,7 +158,7 @@ export function MediaViewer({
                 variant='secondary'
                 size='small'
                 onClick={onRequestTour}
-                className='!bg-main-primary !border-main-primary !text-white hover:!bg-main-primary-hover'
+                className='!bg-primary !border-primary !text-white hover:!bg-primary-hover'
               >
                 {t('requestTour')}
               </RealVistaButton>

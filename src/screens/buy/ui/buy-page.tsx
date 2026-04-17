@@ -89,9 +89,9 @@ function BuyPageContent() {
       price:
         searchParams?.get('minPrice') || searchParams?.get('maxPrice')
           ? [
-              searchParams?.get('minPrice') ? Number(searchParams?.get('minPrice')) : null,
-              searchParams?.get('maxPrice') ? Number(searchParams?.get('maxPrice')) : null,
-            ]
+            searchParams?.get('minPrice') ? Number(searchParams?.get('minPrice')) : null,
+            searchParams?.get('maxPrice') ? Number(searchParams?.get('maxPrice')) : null,
+          ]
           : undefined,
       propertyType: searchParams?.get('propertyType') || undefined,
       propertyCategory: searchParams?.get('propertyCategory') || undefined,
@@ -99,9 +99,9 @@ function BuyPageContent() {
       area:
         searchParams?.get('minArea') || searchParams?.get('maxArea')
           ? [
-              searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
-              searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null,
-            ]
+            searchParams?.get('minArea') ? Number(searchParams?.get('minArea')) : null,
+            searchParams?.get('maxArea') ? Number(searchParams?.get('maxArea')) : null,
+          ]
           : undefined,
       hasVideo: searchParams?.get('hasVideo') === 'true',
       has3D: searchParams?.get('has3D') === 'true',
@@ -244,13 +244,13 @@ function BuyPageContent() {
               <Button
                 type='button'
                 onClick={() => setIsMapView(!isMapView)}
-                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-main-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
+                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
                 variant='outline'
               >
                 <span>{isMapView ? t('searchWithSearchBar') : t('searchWithMap')}</span>
                 <div className='relative flex h-5 w-5 items-center justify-center'>
                   <div className='absolute inset-0 rounded-full bg-purple-96'></div>
-                  <MapPin className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+                  <MapPin className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
                 </div>
               </Button>
             </div>
@@ -262,34 +262,34 @@ function BuyPageContent() {
               {/* Location */}
               <div>
                 <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-                  <MapPin className='w-4 h-4 text-main-primary' />
+                  <MapPin className='w-4 h-4 text-primary' />
                   Địa điểm
                 </label>
-                  <div className='relative'>
-                    <input
-                      type='text'
-                      placeholder='Hà Nội, Việt Nam'
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                      className='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary pr-10'
-                      maxLength={100}
-                    />
-                    {location && (
-                      <button
-                        onClick={() => setLocation('')}
-                        className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-main-black transition-colors'
-                      >
-                        <X className='h-4 w-4' />
-                      </button>
-                    )}
-                  </div>
+                <div className='relative'>
+                  <input
+                    type='text'
+                    placeholder='Hà Nội, Việt Nam'
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
+                    className='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10'
+                    maxLength={100}
+                  />
+                  {location && (
+                    <button
+                      onClick={() => setLocation('')}
+                      className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-main-black transition-colors'
+                    >
+                      <X className='h-4 w-4' />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Min Price */}
               <div>
                 <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-                  <Banknote className='w-4 h-4 text-main-primary' />
+                  <Banknote className='w-4 h-4 text-primary' />
                   Giá tối thiểu
                 </label>
                 <VndAmountInput
@@ -298,14 +298,14 @@ function BuyPageContent() {
                   onChange={(val) => setMinPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   hidePreview
-                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
                 />
               </div>
 
               {/* Max Price */}
               <div>
                 <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-                  <Banknote className='w-4 h-4 text-main-primary' />
+                  <Banknote className='w-4 h-4 text-primary' />
                   Giá tối đa
                 </label>
                 <VndAmountInput
@@ -314,7 +314,7 @@ function BuyPageContent() {
                   onChange={(val) => setMaxPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
                   hidePreview
-                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
+                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
                 />
               </div>
 
@@ -324,7 +324,7 @@ function BuyPageContent() {
                   type='button'
                   variant='outline'
                   onClick={() => setIsFiltersOpen(true)}
-                  className='border-main-primary text-main-primary hover:bg-purple-96 px-4 py-2 flex items-center justify-center gap-2'
+                  className='border-primary text-primary hover:bg-purple-96 px-4 py-2 flex items-center justify-center gap-2'
                   title='Bộ lọc nâng cao'
                 >
                   <SlidersHorizontal className='w-4 h-4' />
@@ -332,7 +332,7 @@ function BuyPageContent() {
                 <Button
                   type='button'
                   onClick={handleBasicSearch}
-                  className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white px-6 py-2 flex items-center justify-center gap-2'
+                  className='flex-1 bg-primary hover:bg-primary/90 text-white px-6 py-2 flex items-center justify-center gap-2'
                 >
                   <Search className='w-4 h-4' />
                   Tìm kiếm
@@ -430,7 +430,7 @@ function BuyPageContent() {
                   <p className='text-lg font-medium text-main-black mb-2'>
                     {t('noResults')}
                   </p>
-                  <p className='text-sm text-main-secondary'>
+                  <p className='text-sm text-secondary'>
                     {t('noResultsHint')}
                   </p>
                 </div>

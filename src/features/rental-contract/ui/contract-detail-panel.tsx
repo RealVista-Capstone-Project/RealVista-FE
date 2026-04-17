@@ -189,7 +189,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
       <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-[#E9E7F5] bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:basis-[40%] lg:max-w-[40%]'>
         <div className='flex items-center justify-between border-b border-[#F0EEF7] px-5 py-4'>
           <div>
-            <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-main-secondary/60'>
+            <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-secondary/60'>
               {t('detailPanel.title')}
             </h2>
             <p className='mt-1 text-lg font-semibold text-main-black'>{contract.property.title}</p>
@@ -198,7 +198,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             type='button'
             variant='ghost'
             size='icon'
-            className='rounded-xl text-main-secondary/60 hover:bg-[#F6F4FF] hover:text-main-black'
+            className='rounded-xl text-secondary/60 hover:bg-[#F6F4FF] hover:text-main-black'
             onClick={onClose}
           >
             <X className='h-4 w-4' />
@@ -215,7 +215,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   className='h-full w-full object-cover'
                 />
               ) : (
-                <div className='flex h-full w-full items-center justify-center text-main-secondary/30'>
+                <div className='flex h-full w-full items-center justify-center text-secondary/30'>
                   <FileText className='h-16 w-16' />
                 </div>
               )}
@@ -240,15 +240,15 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             <div className='space-y-4 px-4 py-4'>
               <div className='rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_rgba(234,230,249,0.9)]'>
                 <div className='flex items-start gap-3'>
-                  <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-[#F1ECFF] text-main-primary'>
+                  <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-[#F1ECFF] text-primary'>
                     <FileText className='h-5 w-5' />
                   </div>
                   <div className='min-w-0 flex-1'>
-                    <p className='text-xs uppercase tracking-[0.16em] text-main-secondary/50'>
+                    <p className='text-xs uppercase tracking-[0.16em] text-secondary/50'>
                       {t('detailPanel.contractMeta')}
                     </p>
                     <p className='mt-1 text-sm font-semibold text-main-black'>{contract.id}</p>
-                    <p className='mt-1 text-sm leading-6 text-main-secondary/70'>
+                    <p className='mt-1 text-sm leading-6 text-secondary/70'>
                       {contract.tenant.fullName} ·{' '}
                       {formatContractCurrency(
                         contract.monthlyRent,
@@ -256,7 +256,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                       )}
                     </p>
                     {contract.docusignEnvelopeId && (
-                      <p className='mt-1 text-xs text-main-secondary/60'>
+                      <p className='mt-1 text-xs text-secondary/60'>
                         {t('detailPanel.envelopeId', { envelopeId: contract.docusignEnvelopeId })}
                       </p>
                     )}
@@ -266,7 +266,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
               <div className='grid grid-cols-2 gap-3'>
                 <div className='rounded-xl bg-[#F8F7FD] p-3'>
-                  <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.leaseStart')}
                   </p>
                   <p className='mt-1 text-sm font-semibold text-main-black'>
@@ -274,7 +274,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   </p>
                 </div>
                 <div className='rounded-xl bg-[#F8F7FD] p-3'>
-                  <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.leaseEnd')}
                   </p>
                   <p className='mt-1 text-sm font-semibold text-main-black'>
@@ -284,13 +284,13 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </div>
 
               <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
-                <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
+                <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                   {t('detailPanel.signingProgress.title')}
                 </p>
                 <div className='mt-3 space-y-3'>
                   {signingProgress.map((item) => (
                     <div key={item.label} className='flex items-center justify-between gap-4'>
-                      <span className='text-sm text-main-secondary/70'>{item.label}</span>
+                      <span className='text-sm text-secondary/70'>{item.label}</span>
                       <span className='text-sm font-semibold text-main-black'>{item.value}</span>
                     </div>
                   ))}
@@ -299,10 +299,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
               {contract.terminationReason && (
                 <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
-                  <p className='text-[11px] uppercase tracking-[0.14em] text-main-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.terminationReason')}
                   </p>
-                  <p className='mt-2 text-sm leading-6 text-main-secondary/80'>
+                  <p className='mt-2 text-sm leading-6 text-secondary/80'>
                     {contract.terminationReason}
                   </p>
                 </div>
@@ -313,10 +313,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
           <div className='rounded-2xl border border-[#ECE9FB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F7F5FF_100%)] p-4'>
             <div className='mb-3 flex items-center justify-between'>
               <div>
-                <p className='text-xs uppercase tracking-[0.18em] text-main-secondary/50'>
+                <p className='text-xs uppercase tracking-[0.18em] text-secondary/50'>
                   {t('detailPanel.actionCardEyebrow')}
                 </p>
-                <p className='mt-1 text-sm leading-6 text-main-secondary/80'>
+                <p className='mt-1 text-sm leading-6 text-secondary/80'>
                   {t('detailPanel.actionCardDescription')}
                 </p>
               </div>
@@ -348,7 +348,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                 <Button
                   type='button'
                   disabled={availableActions.length === 0 || isPending}
-                  className='h-11 w-full rounded-xl bg-main-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-main-primary-hover'
+                  className='h-11 w-full rounded-xl bg-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-primary-hover'
                 >
                   {availableActions.length === 0
                     ? t('statusActions.noAvailableAction')
@@ -386,9 +386,9 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                         <div className='flex-1'>
                           <p className='flex items-center gap-1.5 text-sm font-semibold text-main-black'>
                             {getActionLabel(action)}
-                            {isSigning && <ExternalLink className='h-3 w-3 text-main-primary' />}
+                            {isSigning && <ExternalLink className='h-3 w-3 text-primary' />}
                           </p>
-                          <p className='mt-0.5 text-xs leading-5 text-main-secondary/60'>
+                          <p className='mt-0.5 text-xs leading-5 text-secondary/60'>
                             {getActionHint(action)}
                           </p>
                         </div>

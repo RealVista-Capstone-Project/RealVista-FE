@@ -194,7 +194,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     #loading.hidden { opacity: 0; pointer-events: none; }
     .spinner {
       width: 40px; height: 40px;
-      border: 3px solid #1F2937; border-top-color: #3B82F6;
+      border: 3px solid #1F2937; border-top-color: #7065f0;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -320,7 +320,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     >
       {loading && (
         <div className='absolute inset-0 z-10 flex flex-col items-center justify-center  text-white'>
-          <Loader2 className='w-8 h-8 animate-spin text-main-primary mb-4' />
+          <Loader2 className='w-8 h-8 animate-spin text-primary mb-4' />
           <p className='text-sm font-medium text-slate-400'>{t('loading')}</p>
         </div>
       )}
@@ -351,7 +351,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
               onClick={handleToggleRotate}
               className={cn(
                 '!bg-transparent !border-transparent !p-2 hover:!bg-white/10 !rounded-full transition-colors',
-                isRotating && '!text-main-primary'
+                isRotating && '!text-primary'
               )}
             >
               {isRotating ? (
@@ -403,7 +403,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
                     className={cn(
                       'w-full px-3 py-2 rounded-lg text-xs font-medium text-left transition-colors',
                       quality === q
-                        ? 'bg-main-primary text-white'
+                        ? 'bg-primary text-white'
                         : 'text-slate-300 hover:bg-white/10 hover:text-white'
                     )}
                   >
@@ -444,19 +444,19 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
           </div>
           <div className='space-y-4 text-[10px] text-slate-300 font-mono'>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-main-primary mb-1'>{t('debugMetadata')}</p>
+              <p className='text-primary mb-1'>{t('debugMetadata')}</p>
               <pre className='whitespace-pre-wrap break-all'>
                 {JSON.stringify(metadata, null, 2) || 'undefined'}
               </pre>
             </div>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-main-primary mb-1'>{t('debugUrls')}</p>
+              <p className='text-primary mb-1'>{t('debugUrls')}</p>
               <pre className='whitespace-pre-wrap break-all'>
                 {JSON.stringify(spzUrls, null, 2)}
               </pre>
             </div>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-main-primary mb-1'>{t('debugPropTypes')}</p>
+              <p className='text-primary mb-1'>{t('debugPropTypes')}</p>
               <p>metadata: {typeof metadata}</p>
               <p>spzUrl: {typeof spzUrl}</p>
             </div>

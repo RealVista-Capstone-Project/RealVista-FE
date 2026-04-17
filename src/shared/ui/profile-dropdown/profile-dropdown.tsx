@@ -87,7 +87,7 @@ export function ProfileDropdown({
               priority
             />
           ) : (
-            <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
+            <div className='flex size-8 items-center justify-center rounded-full bg-primary'>
               <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
             </div>
           )}

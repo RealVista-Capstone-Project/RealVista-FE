@@ -186,7 +186,7 @@ export function PropertySearchStep() {
           <MapAutocomplete
             value={address}
             onChange={handleAddressChange}
-            className='pl-10 h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+            className='pl-10 h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
             placeholder={t('searchAddress')}
           />
           <MapPin

@@ -79,7 +79,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
               {t('noAccount')}{' '}
               <Link
                 href='/register'
-                className='font-semibold text-main-black hover:text-main-primary transition-colors'
+                className='font-semibold text-main-black hover:text-primary transition-colors'
               >
                 {t('signUpForFree')}
               </Link>
@@ -92,7 +92,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
       <div className='hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-purple-98 lg:via-purple-96 lg:to-purple-92 lg:p-8 overflow-y-auto'>
         <div className='relative mx-auto w-full max-w-sm'>
           {/* Decorative Shape */}
-          <div className='absolute -right-8 -top-8 h-48 w-48 rounded-full bg-main-primary opacity-10' />
+          <div className='absolute -right-8 -top-8 h-48 w-48 rounded-full bg-primary opacity-10' />
 
           {/* Property Card */}
           <PropertyCardFeatured

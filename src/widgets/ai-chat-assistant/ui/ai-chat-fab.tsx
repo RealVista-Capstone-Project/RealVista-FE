@@ -24,7 +24,7 @@ export function AiChatFab({ isOpen, onClick, className }: AiChatFabProps) {
         'transition-all duration-200 ease-out',
         'hover:shadow-xl active:scale-95',
         isOpen
-          ? 'bg-main-primary text-white hover:bg-main-primary-hover active:bg-main-primary-active'
+          ? 'bg-primary text-white hover:bg-primary-hover active:bg-primary-active'
           : 'overflow-hidden bg-transparent p-0',
         // Mobile: slightly smaller
         'max-md:h-12 max-md:w-12',

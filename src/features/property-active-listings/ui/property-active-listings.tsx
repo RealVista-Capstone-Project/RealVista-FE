@@ -60,7 +60,7 @@ export const PropertyActiveListings: React.FC<PropertyActiveListingsProps> = ({ 
                 {listing.name}
               </h4>
               <div className='flex items-center gap-4 text-sm text-grey-500'>
-                <span className='font-bold text-main-primary'>
+                <span className='font-bold text-primary'>
                   {formatVND(listing.price)}
                   {listing.listing_type === 'RENT' && <span className='font-normal'> / month</span>}
                 </span>

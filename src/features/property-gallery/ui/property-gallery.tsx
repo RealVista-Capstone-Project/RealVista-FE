@@ -117,7 +117,7 @@ export function PropertyGallery({
                   group flex items-center gap-2 px-3 py-2
                   bg-white/95 backdrop-blur-sm rounded-lg
                   border-2 border-transparent
-                  hover:border-main-primary hover:p-1.5
+                  hover:border-primary hover:p-1.5
                   transition-all duration-200 ease-out
                   shadow-sm hover:shadow-md
                 '
@@ -136,7 +136,7 @@ export function PropertyGallery({
                   group flex items-center gap-2 px-3 py-2
                   bg-white/95 backdrop-blur-sm rounded-lg
                   border-2 border-transparent
-                  hover:border-main-primary hover:p-1.5
+                  hover:border-primary hover:p-1.5
                   transition-all duration-200 ease-out
                   shadow-sm hover:shadow-md
                 '
@@ -163,8 +163,8 @@ export function PropertyGallery({
               className={cn(
                 'group relative rounded-xl overflow-hidden w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 border-2 border-transparent transition-all duration-200 ease-out',
                 mainImage.id === image.id
-                  ? 'border-main-primary p-1'
-                  : 'hover:border-main-primary hover:p-1'
+                  ? 'border-primary p-1'
+                  : 'hover:border-primary hover:p-1'
               )}
             >
               <div className='relative w-full h-full rounded-lg overflow-hidden bg-purple-98'>
@@ -178,14 +178,14 @@ export function PropertyGallery({
                   />
                 ) : (
                   <div className='flex h-full w-full items-center justify-center'>
-                    <span className='text-[10px] sm:text-xs text-main-secondary/60'>
+                    <span className='text-[10px] sm:text-xs text-secondary/60'>
                       {isVideo ? t('video') : t('noImage')}
                     </span>
                   </div>
                 )}
                 {isVideo && (
                   <div className='absolute inset-0 flex items-center justify-center bg-black/20'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-main-primary shadow-sm'>
+                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm'>
                       <svg
                         width='16'
                         height='16'
@@ -208,7 +208,7 @@ export function PropertyGallery({
           Array.from({ length: 2 - thumbnailImages.length }).map((_, index) => (
             <div
               key={`placeholder-${index}`}
-              className='w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 rounded-xl border-2 border-dashed border-grey-300 bg-grey-100 flex items-center justify-center hover:border-main-primary hover:p-1 transition-all duration-200'
+              className='w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 rounded-xl border-2 border-dashed border-grey-300 bg-grey-100 flex items-center justify-center hover:border-primary hover:p-1 transition-all duration-200'
             >
               <span className='text-sm text-grey-500'>{t('noImage')}</span>
             </div>

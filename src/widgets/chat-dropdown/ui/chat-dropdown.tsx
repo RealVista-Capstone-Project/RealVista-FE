@@ -101,7 +101,7 @@ export function ChatDropdown({
             <div className='flex items-center gap-2'>
               <h3 className='text-base font-semibold text-main-black'>{t('messages')}</h3>
               {unreadCount > 0 && (
-                <span className='flex h-5 min-w-5 items-center justify-center rounded-full bg-main-primary px-1.5 text-xs font-medium text-white'>
+                <span className='flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-white'>
                   {unreadCount} {t('new')}
                 </span>
               )}
@@ -110,7 +110,7 @@ export function ChatDropdown({
               <button
                 type='button'
                 onClick={onMarkAllRead}
-                className='flex items-center gap-1 text-sm font-medium text-main-primary transition-colors hover:text-main-primary/80'
+                className='flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80'
               >
                 <CheckCheck className='h-4 w-4' />
                 {t('markAsRead')}
@@ -147,7 +147,7 @@ export function ChatDropdown({
                   onViewAll?.();
                   setOpen(false);
                 }}
-                className='text-sm font-medium text-main-primary transition-colors hover:text-main-primary/80'
+                className='text-sm font-medium text-primary transition-colors hover:text-primary/80'
               >
                 {t('viewAllMessages')}
               </button>

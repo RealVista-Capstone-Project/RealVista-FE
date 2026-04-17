@@ -164,7 +164,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
   if (messagesLoading) {
     return (
       <div className='flex flex-1 items-center justify-center'>
-        <Loader2 className='size-5 animate-spin text-main-primary/50' />
+        <Loader2 className='size-5 animate-spin text-primary/50' />
       </div>
     );
   }

@@ -88,7 +88,7 @@ export function SearchIntegrationExample() {
             >
               <h3 className='font-bold text-lg'>{listing.name}</h3>
               <p className='text-grey-600'>{listing.full_address}</p>
-              <p className='text-main-primary font-bold mt-2'>
+              <p className='text-primary font-bold mt-2'>
                 ${listing.price.toLocaleString()}
               </p>
               {listing.is_boosted && (

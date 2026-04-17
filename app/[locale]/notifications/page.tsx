@@ -102,7 +102,7 @@ export default function NotificationsPage() {
             <button
               type='button'
               onClick={handleMarkAllRead}
-              className='text-sm text-main-primary hover:underline'
+              className='text-sm text-primary hover:underline'
             >
               {t('markAsRead')}
             </button>

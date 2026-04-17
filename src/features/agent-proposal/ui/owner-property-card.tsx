@@ -88,15 +88,15 @@ export function OwnerPropertyCard({
         'group w-full text-left transition-all duration-200',
         variant === 'sidebar'
           ? cn(
-              'flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 hover:bg-purple-98',
-              isSelected ? 'bg-purple-96' : 'bg-white'
-            )
+            'flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 hover:bg-purple-98',
+            isSelected ? 'bg-purple-96' : 'bg-white'
+          )
           : cn(
-              'flex flex-row items-stretch gap-0 rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5',
-              isSelected
-                ? 'border-main-primary shadow-md ring-2 ring-main-primary/20'
-                : 'border-gray-200 shadow-sm hover:border-main-primary/40'
-            )
+            'flex flex-row items-stretch gap-0 rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5',
+            isSelected
+              ? 'border-primary shadow-md ring-2 ring-primary/20'
+              : 'border-gray-200 shadow-sm hover:border-primary/40'
+          )
       )}
     >
       {/* Thumbnail */}
@@ -132,7 +132,7 @@ export function OwnerPropertyCard({
         {/* Row 1: address + type badge + proposed chip */}
         <div className='flex items-start justify-between gap-2'>
           <div className='min-w-0 flex-1'>
-            <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-main-primary transition-colors'>
+            <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors'>
               {property.street_address}
             </h3>
             {location && (

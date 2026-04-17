@@ -114,8 +114,8 @@ export function ListingBoostSection({ listing }: ListingBoostSectionProps) {
         {/* Boost Card */}
         <div className='flex flex-col rounded-lg border border-purple-92 bg-purple-98/50 p-4 w-full'>
           <div className='mb-3 flex items-center gap-2'>
-            <div className='flex h-7 w-7 items-center justify-center rounded-md bg-main-primary/10'>
-              <Zap className='h-3.5 w-3.5 text-main-primary' strokeWidth={2.5} />
+            <div className='flex h-7 w-7 items-center justify-center rounded-md bg-primary/10'>
+              <Zap className='h-3.5 w-3.5 text-primary' strokeWidth={2.5} />
             </div>
             <h3 className='text-sm font-semibold text-main-black'>{t('boost.title')}</h3>
           </div>
@@ -128,8 +128,8 @@ export function ListingBoostSection({ listing }: ListingBoostSectionProps) {
           ) : !activePackage ? (
             <div className='rounded-md border border-purple-92 bg-white p-3 text-center'>
               <p className='text-sm font-semibold text-main-black'>{t('boost.noPackage')}</p>
-              <p className='mt-1 text-xs text-main-secondary/60'>{t('boost.noPackageDescription')}</p>
-              <Link href='/subscribe' className='mt-2 inline-flex items-center justify-center rounded-md bg-main-primary px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-main-primary/90'>
+              <p className='mt-1 text-xs text-secondary/60'>{t('boost.noPackageDescription')}</p>
+              <Link href='/subscribe' className='mt-2 inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-primary/90'>
                 {t('boost.buyPackage')}
               </Link>
             </div>
@@ -203,7 +203,7 @@ function BoostRow({
     <div className='flex items-center justify-between rounded-md border border-purple-92 bg-white px-3 py-2'>
       <div className='flex items-center gap-2'>
         <span className='text-sm font-medium text-main-black'>{label}</span>
-        <span className='text-xs text-main-secondary/60'>{t('boost.remaining', { count: remaining })}</span>
+        <span className='text-xs text-secondary/60'>{t('boost.remaining', { count: remaining })}</span>
         {isActive && (
           <span className='inline-flex items-center rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700'>
             {t('boost.active')}
@@ -216,7 +216,7 @@ function BoostRow({
             {isPendingRemove ? t('boost.removing') : t('boost.remove')}
           </button>
         ) : (
-          <button type='button' onClick={onApply} disabled={remaining <= 0 || isPendingApply} className='rounded-md bg-main-primary px-2 py-1 text-xs font-medium text-white transition-all hover:bg-main-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'>
+          <button type='button' onClick={onApply} disabled={remaining <= 0 || isPendingApply} className='rounded-md bg-primary px-2 py-1 text-xs font-medium text-white transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'>
             {isPendingApply ? t('boost.applying') : t('boost.apply')}
           </button>
         )}

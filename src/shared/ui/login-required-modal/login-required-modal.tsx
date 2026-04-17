@@ -34,7 +34,7 @@ export function LoginRequiredModal({ open, onClose }: LoginRequiredModalProps) {
       <DialogContent className='max-w-sm'>
         <DialogHeader className='items-center text-center'>
           <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-purple-96 mx-auto'>
-            <LogIn className='h-7 w-7 text-main-primary' />
+            <LogIn className='h-7 w-7 text-primary' />
           </div>
           <DialogTitle className='text-center text-[18px]'>{t('title')}</DialogTitle>
           <DialogDescription className='text-center'>

@@ -3,7 +3,7 @@ import type { Conversation, ConversationDetail, Message, Participant } from './t
 export const MOCK_CONVERSATION_DETAIL: ConversationDetail = {
   name: 'Matriks Studio',
   initials: 'M',
-  avatarBg: 'bg-main-primary',
+  avatarBg: 'bg-primary',
   company: 'Matriks Studio',
   timezone: '11:36 PM WIB (same timezone)',
   isOnline: true,
@@ -45,7 +45,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     otherUserId: '',
     name: 'Matriks Studio',
     initials: 'M',
-    avatarBg: 'bg-main-primary',
+    avatarBg: 'bg-primary',
     lastMessage: 'Dimas Eza Typing...',
     time: '4.30 PM',
     unread: 2,
@@ -145,7 +145,7 @@ export const MOCK_MESSAGES: Message[] = [
   },
   {
     id: 'm3',
-    sender: { id: 'me', name: 'Me', initials: 'ME', avatarBg: 'bg-main-primary' },
+    sender: { id: 'me', name: 'Me', initials: 'ME', avatarBg: 'bg-primary' },
     text: 'Wahhh boleh tuh dashboard design 👍',
     time: '4.30 PM',
   },

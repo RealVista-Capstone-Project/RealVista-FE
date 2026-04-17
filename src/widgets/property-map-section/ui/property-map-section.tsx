@@ -60,7 +60,7 @@ export function PropertyMapSection({
           {/* Open Google Maps Button */}
           <button
             onClick={handleOpenGoogleMaps}
-            className='flex items-center gap-2 bg-main-secondary hover:bg-main-secondary/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors shadow-md text-xs sm:text-sm font-bold leading-[1.5]'
+            className='flex items-center gap-2 bg-secondary hover:bg-secondary/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors shadow-md text-xs sm:text-sm font-bold leading-[1.5]'
           >
             <MapPin className='size-4' strokeWidth={2.5} />
             <span className='hidden sm:inline'>{t('openGoogleMaps')}</span>
@@ -99,7 +99,7 @@ export function PropertyMapSection({
       {/* See More Listings Link */}
       <a
         href='#'
-        className='text-main-primary text-sm sm:text-base font-medium leading-[1.5] hover:underline inline-flex items-center gap-1'
+        className='text-primary text-sm sm:text-base font-medium leading-[1.5] hover:underline inline-flex items-center gap-1'
       >
         {t('seeMoreListings')}
         <svg

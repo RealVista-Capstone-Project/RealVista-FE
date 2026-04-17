@@ -25,8 +25,8 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
         <div>
           <p className='text-sm font-bold text-main-black'>{conversation.name}</p>
           {conversation.isTyping && (
-              <p className='text-xs font-medium text-main-primary'>{t('typing')}</p>
-            )}
+            <p className='text-xs font-medium text-primary'>{t('typing')}</p>
+          )}
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
             ))}
             {conversation.participants.length > 3 && (
               <div
-                className='flex size-8 items-center justify-center rounded-full border-2 border-white bg-main-primary text-xs font-bold text-white'
+                className='flex size-8 items-center justify-center rounded-full border-2 border-white bg-primary text-xs font-bold text-white'
                 style={{ marginLeft: -8 }}
               >
                 +{conversation.participants.length - 3}
@@ -60,10 +60,10 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
 
         {/* Action buttons */}
         <div className='flex items-center gap-1'>
-          <button className='flex size-9 items-center justify-center rounded-xl text-grey-500 transition-colors hover:bg-purple-96 hover:text-main-primary'>
+          <button className='flex size-9 items-center justify-center rounded-xl text-grey-500 transition-colors hover:bg-purple-96 hover:text-primary'>
             <Phone className='size-4' />
           </button>
-          <button className='flex size-9 items-center justify-center rounded-xl text-grey-500 transition-colors hover:bg-purple-96 hover:text-main-primary'>
+          <button className='flex size-9 items-center justify-center rounded-xl text-grey-500 transition-colors hover:bg-purple-96 hover:text-primary'>
             <Video className='size-4' />
           </button>
           <button
@@ -71,8 +71,8 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
             className={cn(
               'flex size-9 items-center justify-center rounded-xl transition-colors',
               showDetail
-                ? 'bg-main-primary text-white'
-                : 'text-grey-500 hover:bg-purple-96 hover:text-main-primary'
+                ? 'bg-primary text-white'
+                : 'text-grey-500 hover:bg-purple-96 hover:text-primary'
             )}
           >
             <MoreHorizontal className='size-4' />

@@ -26,14 +26,14 @@ export function ConversationItem({ conv, isActive, onClick }: ConversationItemPr
         <p
           className={cn(
             'truncate text-xs',
-            conv.isTyping ? 'font-medium text-main-primary' : 'text-grey-500'
+            conv.isTyping ? 'font-medium text-primary' : 'text-grey-500'
           )}
         >
           {conv.lastMessage}
         </p>
       </div>
       {!!conv.unread && (
-        <span className='flex size-5 shrink-0 items-center justify-center rounded-full bg-main-primary text-xs font-bold text-white'>
+        <span className='flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white'>
           {conv.unread}
         </span>
       )}

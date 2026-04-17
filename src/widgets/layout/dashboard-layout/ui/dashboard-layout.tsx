@@ -223,7 +223,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={() => setIsCollapsed(false)}
-              className='flex size-8 items-center justify-center rounded-xl bg-main-primary transition-opacity hover:opacity-90 shadow-sm shadow-indigo-100'
+              className='flex size-8 items-center justify-center rounded-xl bg-primary transition-opacity hover:opacity-90 shadow-sm shadow-indigo-100'
               aria-label='Expand sidebar'
             >
               <Image
@@ -237,7 +237,7 @@ export function DashboardLayout({
           ) : (
             <>
               <Link href={logoHref} className='flex items-center gap-3 group'>
-                <div className='flex items-center justify-center rounded-xl bg-main-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-indigo-100'>
+                <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-indigo-100'>
                   <Image
                     src='/logo.png'
                     alt='RealVista Logo'
@@ -250,7 +250,7 @@ export function DashboardLayout({
                   <span className='text-base font-bold leading-tight text-main-black'>
                     Estatery
                   </span>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-main-secondary/40'>
+                  <span className='text-[10px] uppercase font-bold tracking-wider text-secondary/40'>
                     Property Manager
                   </span>
                 </div>
@@ -258,7 +258,7 @@ export function DashboardLayout({
               <button
                 type='button'
                 onClick={() => setIsCollapsed(true)}
-                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-main-secondary/40 transition-all hover:bg-slate-50 hover:text-main-secondary hover:border-slate-300 hover:shadow-sm'
+                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-secondary/40 transition-all hover:bg-slate-50 hover:text-secondary hover:border-slate-300 hover:shadow-sm'
                 aria-label='Collapse sidebar'
               >
                 <Columns className='h-4 w-4' strokeWidth={2} />
@@ -278,8 +278,8 @@ export function DashboardLayout({
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200',
                   isActive
-                    ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
-                    : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                    ? 'bg-purple-96 text-primary font-semibold ring-1 ring-purple-92/50'
+                    : 'text-secondary/60 hover:bg-purple-98 hover:text-secondary',
                   isCollapsed ? 'justify-center' : 'justify-start'
                 )}
                 title={isCollapsed ? item.label : undefined}
@@ -301,8 +301,8 @@ export function DashboardLayout({
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
               isSettingsFooterActive
-                ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
-                : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                ? 'bg-purple-96 text-primary font-semibold ring-1 ring-purple-92/50'
+                : 'text-secondary/60 hover:bg-purple-98 hover:text-secondary',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
