@@ -9,6 +9,10 @@
     "rejected": "Rejected",
     "canceled": "Canceled",
     "completed": "Completed",
+    "complete": "Complete",
+    "completeDescription": "Mark this tour as completed.",
+    "completeSuccess": "Tour marked as completed!",
+    "details": "Details",
     "accept": "Accept",
     "reject": "Reject",
     "cancel": "Cancel",
@@ -23,7 +27,8 @@
     "property": "Property",
     "time": "Time",
     "notes": "Notes",
-    "status": "Status",
+    "reload": "Reload",
+    "statusLabel": "Filter Status",
     "reason": "Reason",
     "submit": "Submit",
     "cancelReason": "Cancel reason",
@@ -50,6 +55,11 @@
     "weeks": "weeks",
     "afterThisWeek": "after this week",
     "listing": "Listing",
-    "allListings": "All listings"
+    "allListings": "All listings",
+    "acceptedSuccess": "Appointment accepted successfully",
+    "rejectedSuccess": "Appointment rejected successfully",
+    "genericError": "An error occurred. Please try again.",
+    "publicSubtitle": "View and manage your tour requests",
+    "statusFilter": "Filter status"
   }
 }

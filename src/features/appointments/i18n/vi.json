@@ -9,6 +9,10 @@
     "rejected": "Đã từ chối",
     "canceled": "Đã hủy",
     "completed": "Hoàn thành",
+    "complete": "Hoàn thành",
+    "completeDescription": "Đánh dấu lịch tham quan này là đã hoàn thành.",
+    "completeSuccess": "Lịch tham quan đã được hoàn thành!",
+    "details": "Chi tiết",
     "accept": "Chấp nhận",
     "reject": "Từ chối",
     "cancel": "Hủy",
@@ -23,7 +27,8 @@
     "property": "Bất động sản",
     "time": "Thời gian",
     "notes": "Ghi chú",
-    "status": "Trạng thái",
+    "reload": "Làm mới",
+    "statusLabel": "Lọc trạng thái",
     "reason": "Lý do",
     "submit": "Xác nhận",
     "cancelReason": "Lý do hủy",
@@ -50,6 +55,11 @@
     "weeks": "tuần",
     "afterThisWeek": "sau tuần này",
     "listing": "Tin đăng",
-    "allListings": "Tất cả tin đăng"
+    "allListings": "Tất cả tin đăng",
+    "acceptedSuccess": "Đã chấp nhận yêu cầu tham quan",
+    "rejectedSuccess": "Đã từ chối yêu cầu tham quan",
+    "genericError": "Có lỗi xảy ra. Vui lòng thử lại sau.",
+    "publicSubtitle": "Xem và quản lý các yêu cầu tham quan của bạn",
+    "statusFilter": "Lọc trạng thái"
   }
 }
