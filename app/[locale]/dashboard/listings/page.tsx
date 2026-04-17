@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { ManagedListingsPage } from '@/screens/dashboard/managed-listings';
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function QuanLyBaiDangPage() {
-  return <ManagedListingsPage />;
+  return (
+    <Suspense>
+      <ManagedListingsPage />
+    </Suspense>
+  );
 }

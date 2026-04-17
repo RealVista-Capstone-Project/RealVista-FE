@@ -10,4 +10,25 @@ export const agentProfileQueries = {
       staleTime: 2 * 60 * 1000,
       retry: 1,
     }),
+
+  listForProperty: (params?: { propertyId?: string; search?: string; minRating?: number }) =>
+    queryOptions({
+      queryKey: agentProfileKeys.list(params),
+      queryFn: async () => {
+        const res = await agentProfileApi.listAgents(params);
+        return res.payload.data;
+      },
+      staleTime: 2 * 60 * 1000,
+    }),
+
+  reviewsForAgent: (agentId: string) =>
+    queryOptions({
+      queryKey: agentProfileKeys.reviews(agentId),
+      queryFn: async () => {
+        const res = await agentProfileApi.getAgentReviews(agentId);
+        return res.payload.data;
+      },
+      staleTime: 2 * 60 * 1000,
+      enabled: !!agentId,
+    }),
 } as const;

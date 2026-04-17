@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Heart, Search } from 'lucide-react';
+import { ArrowLeft, Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Property } from '@/entities/property';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
@@ -12,14 +12,12 @@ export interface PropertyHeaderProps {
   property: Property;
   onFavorite?: () => void;
   isFavorite?: boolean;
-  onBrowseNearby?: () => void;
 }
 
 export function PropertyHeader({
   property,
   onFavorite,
   isFavorite = false,
-  onBrowseNearby,
 }: PropertyHeaderProps) {
   const t = useTranslations('PropertyHeader');
   const router = useRouter();
@@ -66,19 +64,6 @@ export function PropertyHeader({
           <Heart className={`size-4 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
           <span>{isFavorite ? t('saved') : t('save')}</span>
         </RealVistaButton>
-
-        {/* Browse Button nearby on sm and up */}
-        <div className='hidden sm:block'>
-          <RealVistaButton
-            variant='secondary'
-            size='medium'
-            onClick={onBrowseNearby}
-            className='gap-2 w-full sm:w-auto'
-          >
-            <Search className='size-4' />
-            <span className='truncate'>{t('browseNearbyListings')}</span>
-          </RealVistaButton>
-        </div>
       </div>
     </div>
   );

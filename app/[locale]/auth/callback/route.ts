@@ -75,9 +75,17 @@ export async function GET(request: NextRequest) {
     // Determine redirect path based on role
     const backendRoles = roles ? roles.split(',').map((r) => r.trim()) : undefined;
     const userRole = determineUserRole(backendRoles);
-    const redirectPath = getRedirectPathByRole(userRole);
+    const rolePath = getRedirectPathByRole(userRole);
 
-    return NextResponse.redirect(new URL(`/${locale}${redirectPath}`, request.url));
+    const rawRedirectTo = request.cookies.get('auth-redirect-to')?.value;
+    const finalPath =
+      rawRedirectTo && rawRedirectTo.startsWith('/') && !rawRedirectTo.startsWith('//')
+        ? rawRedirectTo
+        : rolePath;
+
+    const response = NextResponse.redirect(new URL(`/${locale}${finalPath}`, request.url));
+    response.cookies.delete('auth-redirect-to');
+    return response;
   } catch (error) {
     console.error('[OAuth Callback] Unexpected error:', error);
     return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url));

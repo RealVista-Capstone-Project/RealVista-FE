@@ -116,6 +116,11 @@ export const userApi = {
    */
   searchByEmail: (email: string) =>
     http.get<ApiResponse<UserSearchResponse>>(`/users/search?email=${email}`),
+
+  /**
+   * Add OWNER role to current user (idempotent)
+   */
+  addOwnerRole: () => http.post<ApiResponse<UserProfile>>('/me/add-role', {}),
 } as const;
 
 // Re-export query keys and queries

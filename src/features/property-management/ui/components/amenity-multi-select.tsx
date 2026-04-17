@@ -60,7 +60,7 @@ export function AmenityMultiSelect({
                 key={amenity.amenity_id}
                 type='button'
                 onClick={() => removeAmenity(amenity.amenity_id)}
-                className='flex items-center gap-1.5 rounded-lg border-[1.5px] border-[#7065F0] bg-[#E8E6F9] px-4 py-2 text-base font-medium text-[#7065F0] transition-colors hover:bg-[#E0DEF7] cursor-pointer'
+                className='flex items-center gap-1 rounded-md border-[1.5px] border-[#7065F0] bg-[#E8E6F9] px-2.5 py-1 text-sm font-medium text-[#7065F0] transition-colors hover:bg-[#E0DEF7] cursor-pointer'
               >
                 <span className='truncate max-w-[150px]'>{amenity.amenity_name}</span>
                 <X className='size-3.5 shrink-0' />

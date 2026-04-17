@@ -74,4 +74,18 @@ export const listingQueries = {
       },
       staleTime: 5 * 60 * 1000,
     }),
+
+  /**
+   * Get listings by property ID
+   */
+  byProperty: (propertyId: string) =>
+    queryOptions({
+      queryKey: [...listingKeys.all, 'by-property', propertyId] as const,
+      queryFn: async () => {
+        const response = await listingApi.getManagedListings({ propertyId, size: 50 });
+        return response.payload.data;
+      },
+      staleTime: 2 * 60 * 1000,
+      enabled: !!propertyId,
+    }),
 };

@@ -52,6 +52,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/screens/owner-properties/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/managed-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/messages/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/dashboard/delegate-agent/i18n/${locale}.json`)).default,
       ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing-analytics/i18n/${locale}.json`)).default,
@@ -59,6 +60,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/engagement/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/buy/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/rent/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/sell/i18n/${locale}.json`)).default,
       // Widget segments
       ...(await import(`@/widgets/recommended-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/ai-chat-assistant/i18n/${locale}.json`)).default,

@@ -65,6 +65,8 @@
     "proposalModal": {
       "title": "Submit Proposal",
       "description": "Submit a proposal to handle this property for the owner.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. I have 5 years of experience in this area...",
       "commissionLabel": "Offered Commission",
       "commissionPlaceholder": "e.g. 2% or 5,000,000 VND",
       "messageLabel": "Your Message",

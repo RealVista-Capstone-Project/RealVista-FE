@@ -83,8 +83,11 @@ export const propertyApi = {
     });
   },
 
-  getAttributes: () => {
-    return http.get<ApiResponse<PropertyAttributeDefinition[]>>('properties/attributes', {
+  getAttributes: (propertyTypeId?: string) => {
+    const url = propertyTypeId
+      ? `properties/attributes?property_type_id=${propertyTypeId}`
+      : 'properties/attributes';
+    return http.get<ApiResponse<PropertyAttributeDefinition[]>>(url, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
@@ -137,6 +140,26 @@ export const propertyApi = {
   },
   deleteMedia: (mediaId: string) => {
     return http.delete<ApiResponse<void>>(`media/${mediaId}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  updatePropertyStatus: ({
+    propertyId,
+    status,
+  }: {
+    propertyId: string;
+    status: string;
+  }) => {
+    return http.patch<ApiResponse<PropertyDetailResponse>>(
+      `properties/${propertyId}/status?status=${encodeURIComponent(status)}`,
+      {},
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  deleteProperty: (propertyId: string) => {
+    return http.delete<ApiResponse<void>>(`properties/${propertyId}`, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },

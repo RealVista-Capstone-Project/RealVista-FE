@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ClipboardEdit, Phone } from 'lucide-react';
+import { MessageCircle, Phone } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
 import { formatVND } from '@/shared/lib/utils';
@@ -47,6 +47,8 @@ export function PriceAndTour({
     }
   };
 
+  const contactLabel = isAgent ? 'môi giới' : 'chủ nhà';
+
   return (
     <div className='bg-white border border-purple-92 rounded-lg p-6 w-full'>
       <div className='flex flex-col gap-6'>
@@ -57,6 +59,7 @@ export function PriceAndTour({
             <p className='text-main-primary text-[24px] font-extrabold leading-[1.5] tracking-[-1px]'>
               {formatVND(price)}
             </p>
+            <span className='text-sm font-semibold text-grey-500'>₫</span>
             {priceSuffix && (
               <span className='text-main-black/50 text-[14px] font-medium h-8 flex items-center'>
                 {priceSuffix}
@@ -66,28 +69,29 @@ export function PriceAndTour({
         </div>
 
         {/* Contact Button */}
-        <div className='flex gap-2 w-full'>
-          <RealVistaButton
-            variant='primary'
-            size='medium'
-            className={phone ? 'flex-1' : 'w-full'}
-            onClick={onContact}
-          >
-            {t('contactAgent')}
-          </RealVistaButton>
-
+        <div className='flex flex-col gap-2 w-full'>
           {phone && (
             <RealVistaButton
-              variant='secondary'
+              variant='primary'
               size='medium'
-              className='flex-1 border-main-primary text-main-primary hover:bg-main-primary/5 px-2'
+              className='w-full'
               onClick={handleCall}
               title={`${t('callAgent')}: ${phone}`}
             >
-              <Phone className='h-5 w-5' strokeWidth={2.5} />
-              <span className='text-[14px] truncate'>{phone}</span>
+              <Phone className='h-4 w-4' strokeWidth={2.5} />
+              <span>Liên hệ {contactLabel}</span>
             </RealVistaButton>
           )}
+
+          <RealVistaButton
+            variant='secondary'
+            size='medium'
+            className={`${phone ? '' : 'w-full'} border-main-primary text-main-primary hover:bg-main-primary/5`}
+            onClick={onContact}
+          >
+            <MessageCircle className='h-4 w-4' strokeWidth={2.5} />
+            <span>Nhắn tin với {contactLabel}</span>
+          </RealVistaButton>
         </div>
 
         {/* Divider */}
