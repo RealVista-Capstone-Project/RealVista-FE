@@ -269,7 +269,7 @@ export interface PropertyDetailResponse {
     attribute_id: string;
     attribute_code: string;
     attribute_name: string;
-    dataType: string;
+    data_type: string;
     icon: string | null;
     unit: string | null;
     value_number: number | null;

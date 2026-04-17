@@ -17,6 +17,9 @@ import {
   ChevronRight,
   Eye,
   User,
+  Trash2,
+  AlertTriangle,
+  UserCheck,
 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -33,8 +36,17 @@ import {
   SelectItem,
   SelectValue,
 } from '@/shared/ui/select';
-import { useQuery } from '@tanstack/react-query';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/shared/ui/dialog';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property/api/property.queries';
+import { propertyApi } from '@/entities/property/api/property.api';
 import { listingQueries } from '@/entities/listing/api';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { AgentVerificationModal } from '@/features/property-management/ui/components/agent-verification-modal';
@@ -59,6 +71,9 @@ const PROPERTY_STATUSES = [
   'SOLD',
   'RENTED',
 ] as const;
+
+// Statuses controlled by the system — owner cannot manually set these
+const SYSTEM_STATUSES = new Set(['PENDING', 'VERIFIED', 'REJECTED']);
 
 const STATUS_STYLES: Record<string, string> = {
   AVAILABLE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -124,7 +139,7 @@ function PropertyListCard({
               getStatusStyle(property.status)
             )}
           >
-            {property.status}
+            {t(`status${property.status}` as Parameters<typeof t>[0])}
           </Badge>
         </div>
       </div>
@@ -214,7 +229,14 @@ function PropertyListCard({
   );
 }
 
-function ListingsSection({ propertyId }: { propertyId: string }) {
+function ListingsSection({
+  propertyId,
+  currentUserId,
+}: {
+  propertyId: string;
+  currentUserId?: string;
+}) {
+  const t = useTranslations('PropertyDashboard');
   const { data: listingsPage, isLoading } = useQuery(listingQueries.byProperty(propertyId));
   const listings = listingsPage?.content ?? [];
 
@@ -222,11 +244,18 @@ function ListingsSection({ propertyId }: { propertyId: string }) {
     <div>
       {/* Section header */}
       <div className='flex items-center justify-between mb-3'>
-        <h3 className='text-sm font-bold text-slate-800'>Listing</h3>
+        <div className='flex items-center gap-2'>
+          <h3 className='text-sm font-bold text-slate-800'>{t('labelListings')}</h3>
+          {listings.length > 0 && (
+            <span className='inline-flex items-center justify-center rounded-full bg-main-primary/10 w-5 h-5 text-[11px] font-bold text-main-primary'>
+              {listings.length}
+            </span>
+          )}
+        </div>
         <Button asChild size='sm' className='rounded-lg gap-1.5 h-8 text-xs'>
-          <Link href={`/dashboard/listings?propertyId=${propertyId}&action=create`}>
+          <Link href={`/dashboard/listing/create?propertyId=${propertyId}`}>
             <Plus className='h-3.5 w-3.5' />
-            Thêm mới
+            {t('addListing')}
           </Link>
         </Button>
       </div>
@@ -238,26 +267,24 @@ function ListingsSection({ propertyId }: { propertyId: string }) {
       ) : listings.length === 0 ? (
         <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 flex flex-col items-center gap-2 text-center'>
           <Home className='h-6 w-6 text-slate-300' />
-          <p className='text-xs text-slate-400'>Chưa có listing nào cho bất động sản này</p>
+          <p className='text-xs text-slate-400'>{t('noListings')}</p>
         </div>
       ) : (
-        <div className='space-y-2'>
+        <div className='space-y-2.5'>
           {listings.map((listing) => {
-            const typeLabel = listing.listing_type === 'RENT' ? 'Thuê' : 'Mua';
-            const typeCls =
-              listing.listing_type === 'RENT'
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-blue-50 text-blue-700 border-blue-200';
-            const statusCls: Record<string, string> = {
-              DRAFT: 'bg-slate-100 text-slate-600',
-              PENDING: 'bg-yellow-50 text-yellow-600',
-              PUBLISHED: 'bg-purple-98 text-main-primary',
-              SOLD: 'bg-green-50 text-green-600',
-              RENTED: 'bg-green-50 text-green-600',
-              ARCHIVED: 'bg-slate-100 text-slate-500',
+            const typeLabel = listing.listing_type === 'RENT' ? t('listingTypeRent') : t('listingTypeSale');
+            const isRent = listing.listing_type === 'RENT';
+            const statusConfig: Record<string, { cls: string; label: string }> = {
+              DRAFT: { cls: 'bg-slate-100 text-slate-500', label: t('listingStatusDRAFT') },
+              PENDING: { cls: 'bg-amber-50 text-amber-600', label: t('listingStatusPENDING') },
+              PUBLISHED: { cls: 'bg-emerald-50 text-emerald-700', label: t('listingStatusPUBLISHED') },
+              SOLD: { cls: 'bg-blue-50 text-blue-700', label: t('listingStatusSOLD') },
+              RENTED: { cls: 'bg-purple-50 text-purple-700', label: t('listingStatusRENTED') },
+              ARCHIVED: { cls: 'bg-slate-100 text-slate-400', label: t('listingStatusARCHIVED') },
             };
+            const sc = statusConfig[listing.status] ?? { cls: 'bg-slate-100 text-slate-500', label: listing.status };
             const priceDisplay = listing.is_negotiable
-              ? 'Thương lượng'
+              ? t('negotiable')
               : listing.min_price && listing.max_price
                 ? `${formatVND(listing.min_price)} – ${formatVND(listing.max_price)}`
                 : formatVND(listing.price);
@@ -266,53 +293,62 @@ function ListingsSection({ propertyId }: { propertyId: string }) {
               <Link
                 key={listing.listing_id}
                 href={`/dashboard/listings?listingId=${listing.listing_id}`}
-                className='flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 hover:border-main-primary/40 hover:bg-purple-98/50 transition-all group'
+                className='flex gap-0 rounded-xl border border-slate-200 bg-white overflow-hidden hover:border-main-primary/40 hover:shadow-sm transition-all group'
               >
-                {/* Thumbnail */}
-                <div className='relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100'>
+                {/* Thumbnail — left column, fixed width */}
+                <div className='relative w-24 flex-shrink-0 bg-slate-100'>
                   {listing.primary_media_thumbnail_url ?? listing.thumbnail ? (
                     <Image
                       src={(listing.primary_media_thumbnail_url ?? listing.thumbnail)!}
                       alt={listing.name}
                       fill
-                      className='object-cover'
+                      className='object-cover transition-transform duration-300 group-hover:scale-105'
                     />
                   ) : (
                     <div className='h-full w-full flex items-center justify-center'>
-                      <Home className='h-4 w-4 text-slate-300' />
+                      <Home className='h-5 w-5 text-slate-300' />
                     </div>
                   )}
                 </div>
 
-                {/* Info */}
-                <div className='flex-1 min-w-0'>
-                  <p className='text-xs font-semibold text-slate-800 line-clamp-1 group-hover:text-main-primary transition-colors'>
+                {/* Info — right column */}
+                <div className='flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-between gap-1.5'>
+                  {/* Name */}
+                  <p className='text-xs font-semibold text-slate-800 line-clamp-2 leading-snug group-hover:text-main-primary transition-colors'>
                     {listing.name}
                   </p>
-                  <div className='flex items-center gap-1.5 mt-1'>
+
+                  {/* Type + owner row */}
+                  <div className='flex items-center justify-between gap-2'>
                     <span
                       className={cn(
-                        'text-[10px] font-bold px-1.5 py-0.5 rounded-md border',
-                        typeCls
+                        'text-[10px] font-bold px-1.5 py-0.5 rounded-md',
+                        isRent
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-blue-50 text-blue-700'
                       )}
                     >
                       {typeLabel}
                     </span>
-                    <span
-                      className={cn(
-                        'text-[10px] font-semibold px-1.5 py-0.5 rounded-md',
-                        statusCls[listing.status] ?? 'bg-slate-100 text-slate-600'
-                      )}
-                    >
-                      {listing.status}
+                    {listing.user_id && (
+                      <span className='text-[10px] text-slate-400 font-medium truncate max-w-[80px]'>
+                        {currentUserId && listing.user_id === currentUserId
+                          ? t('selfPosted')
+                          : t('agentPosted')}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Bottom row: status + price */}
+                  <div className='flex items-center justify-between gap-2'>
+                    <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-md', sc.cls)}>
+                      {sc.label}
                     </span>
+                    <p className='text-xs font-bold text-main-primary whitespace-nowrap'>
+                      {priceDisplay}
+                    </p>
                   </div>
                 </div>
-
-                {/* Price */}
-                <p className='text-xs font-bold text-main-primary whitespace-nowrap flex-shrink-0'>
-                  {priceDisplay}
-                </p>
               </Link>
             );
           })}
@@ -324,6 +360,7 @@ function ListingsSection({ propertyId }: { propertyId: string }) {
 
 const ENGAGEMENT_STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   SUBMITTED: { bg: 'bg-amber-50 border-amber-200', text: 'text-amber-700', label: 'Chờ duyệt' },
+  SUBMITTED_BY_OWNER: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-700', label: 'Chờ môi giới duyệt' },
   ACCEPTED: { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-700', label: 'Đã chấp nhận' },
   REJECTED: { bg: 'bg-red-50 border-red-200', text: 'text-red-600', label: 'Từ chối' },
   CANCELLED: { bg: 'bg-slate-100 border-slate-200', text: 'text-slate-500', label: 'Đã hủy' },
@@ -339,7 +376,20 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
   return (
     <div>
       <div className='flex items-center justify-between mb-3'>
-        <h3 className='text-sm font-bold text-slate-800'>{t('labelEngagements')}</h3>
+        <div className='flex items-center gap-2'>
+          <h3 className='text-sm font-bold text-slate-800'>{t('labelEngagements')}</h3>
+          {engagements.length > 0 && (
+            <span className='inline-flex items-center justify-center rounded-full bg-amber-100 w-5 h-5 text-[11px] font-bold text-amber-700'>
+              {engagements.length}
+            </span>
+          )}
+        </div>
+        <Button asChild size='sm' variant='outline' className='rounded-lg gap-1.5 h-8 text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50'>
+          <Link href={`/dashboard/property/${propertyId}/delegate`}>
+            <UserCheck className='h-3.5 w-3.5' />
+            {t('hireAgent')}
+          </Link>
+        </Button>
       </div>
 
       {isLoading ? (
@@ -354,13 +404,18 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
       ) : (
         <div className='space-y-3'>
           {engagements.map((e) => {
-            const statusStyle = ENGAGEMENT_STATUS_STYLES[e.status] ?? {
+            const isOwnerInvitation = e.engagementType === 'OWNER_INVITATION';
+            const statusKey =
+              e.status === 'SUBMITTED' && isOwnerInvitation ? 'SUBMITTED_BY_OWNER' : e.status;
+            const statusStyle = ENGAGEMENT_STATUS_STYLES[statusKey] ?? {
               bg: 'bg-slate-100 border-slate-200',
               text: 'text-slate-600',
               label: e.status,
             };
             const commission = e.content?.commissionRate ?? e.content?.offeredCommission;
             const experience = e.content?.experienceYears;
+            const canDelegate =
+              !isOwnerInvitation && (e.status === 'SUBMITTED' || e.status === 'ACCEPTED');
 
             return (
               <div
@@ -377,7 +432,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                     className={cn('flex items-center gap-1 text-[11px] font-semibold hover:underline', statusStyle.text)}
                   >
                     <Eye className='h-3.5 w-3.5' />
-                    Xem
+                    {t('viewAction')}
                   </Link>
                 </div>
 
@@ -421,16 +476,33 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                       )}
                       {commission != null && (
                         <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full'>
-                          Hoa hồng: {commission}%
+                          {t('commissionLabel')}: {commission}%
                         </span>
                       )}
                       {experience != null && (
                         <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-100 px-2.5 py-1 rounded-full'>
-                          {experience} năm kinh nghiệm
+                          {experience} {t('yearsExperience')}
                         </span>
                       )}
                     </div>
                   </div>
+
+                  {/* Delegate agent button */}
+                  {canDelegate && (
+                    <div className='mt-3 pt-3 border-t border-slate-100'>
+                      <Button
+                        asChild
+                        size='sm'
+                        variant='outline'
+                        className='w-full rounded-lg gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800'
+                      >
+                        <Link href={`/dashboard/my-engagements?engagementId=${e.engagementId}&action=delegate`}>
+                          <UserCheck className='h-3.5 w-3.5' />
+                          {t('delegateAgent')}
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -445,16 +517,48 @@ function PropertyDetailPanel({
   property,
   onVerifyClick,
   onBack,
+  onDeleted,
 }: {
   property: PropertySummaryResponse;
   onVerifyClick: (p: PropertySummaryResponse) => void;
   onBack?: () => void;
+  onDeleted?: () => void;
 }) {
   const t = useTranslations('PropertyDashboard');
   const { data: session } = useSession();
   const [imgIndex, setImgIndex] = useState(0);
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [statusSelectKey, setStatusSelectKey] = useState(0);
+  const queryClient = useQueryClient();
 
   const isOwner = !!(session?.user?.id && property.owner_id && session.user.id === property.owner_id);
+
+  const { mutate: changeStatus, isPending: isStatusChanging } = useMutation({
+    mutationFn: (status: string) =>
+      propertyApi.updatePropertyStatus({ propertyId: property.property_id, status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties', 'me'] });
+      setStatusConfirmOpen(false);
+      setPendingStatus(null);
+      setStatusSelectKey((k) => k + 1);
+    },
+    onError: () => {
+      setStatusConfirmOpen(false);
+      setPendingStatus(null);
+      setStatusSelectKey((k) => k + 1);
+    },
+  });
+
+  const { mutate: softDelete, isPending: isDeleting } = useMutation({
+    mutationFn: () => propertyApi.deleteProperty(property.property_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties', 'me'] });
+      setDeleteConfirmOpen(false);
+      onDeleted?.();
+    },
+  });
 
   const images = (property.media ?? []).filter((m) => m.media_type === 'IMAGE');
 
@@ -521,15 +625,45 @@ function PropertyDetailPanel({
         )}
 
         <div className='absolute top-4 left-4'>
-          <Badge
-            variant='outline'
-            className={cn(
-              'text-xs font-bold px-3 py-1 rounded-full border bg-white/90 backdrop-blur-sm',
-              getStatusStyle(property.status)
-            )}
-          >
-            {t(`status${property.status}` as Parameters<typeof t>[0])}
-          </Badge>
+          {isOwner && !SYSTEM_STATUSES.has(property.status) ? (
+            <Select
+              key={statusSelectKey}
+              onValueChange={(val) => {
+                setPendingStatus(val);
+                setStatusConfirmOpen(true);
+              }}
+            >
+              <SelectTrigger
+                className={cn(
+                  'h-auto text-xs font-bold px-3 py-1 rounded-full border bg-white/90 backdrop-blur-sm shadow-sm gap-1.5 [&>svg]:h-3 [&>svg]:w-3',
+                  getStatusStyle(property.status)
+                )}
+              >
+                <SelectValue
+                  placeholder={t(`status${property.status}` as Parameters<typeof t>[0])}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {PROPERTY_STATUSES.filter(
+                  (s) => s !== property.status && !SYSTEM_STATUSES.has(s)
+                ).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {t(`status${s}` as Parameters<typeof t>[0])}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Badge
+              variant='outline'
+              className={cn(
+                'text-xs font-bold px-3 py-1 rounded-full border bg-white/90 backdrop-blur-sm',
+                getStatusStyle(property.status)
+              )}
+            >
+              {t(`status${property.status}` as Parameters<typeof t>[0])}
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -739,11 +873,113 @@ function PropertyDetailPanel({
         )}
 
         {/* Listings section */}
-        <ListingsSection propertyId={property.property_id} />
+        <ListingsSection propertyId={property.property_id} currentUserId={session?.user?.id ?? undefined} />
 
         {/* Engagements section — owner only */}
         {isOwner && <EngagementsSection propertyId={property.property_id} />}
+
+        {/* Soft delete — owner only */}
+        {isOwner && (
+          <div className='pt-6 border-t border-slate-100'>
+            <Button
+              variant='ghost'
+              className='w-full py-5 rounded-xl gap-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 border border-dashed border-slate-200 hover:border-slate-300 transition-all'
+              onClick={() => setDeleteConfirmOpen(true)}
+            >
+              <Trash2 className='h-4 w-4' />
+              <span className='text-sm font-medium'>{t('deleteProperty')}</span>
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* Confirm: change status */}
+      <Dialog
+        open={statusConfirmOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setStatusConfirmOpen(false);
+            setPendingStatus(null);
+            setStatusSelectKey((k) => k + 1);
+          }
+        }}
+      >
+        <DialogContent className='max-w-sm'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2'>
+              <AlertTriangle className='h-5 w-5 text-amber-500' />
+              {t('confirmStatusTitle')}
+            </DialogTitle>
+          </DialogHeader>
+          <p className='text-sm text-slate-600'>
+            {t('confirmStatusDesc', {
+              status: pendingStatus
+                ? t(`status${pendingStatus}` as Parameters<typeof t>[0])
+                : '',
+            })}
+          </p>
+          <DialogFooter className='gap-2'>
+            <DialogClose asChild>
+              <Button variant='outline' size='sm' className='rounded-lg'>
+                {t('cancelAction')}
+              </Button>
+            </DialogClose>
+            <Button
+              size='sm'
+              className='rounded-lg bg-main-primary'
+              disabled={isStatusChanging}
+              onClick={() => {
+                if (pendingStatus) changeStatus(pendingStatus);
+              }}
+            >
+              {isStatusChanging ? (
+                <span className='flex items-center gap-2'>
+                  <span className='h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white' />
+                  {t('saving')}
+                </span>
+              ) : (
+                t('confirmAction')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm: soft delete */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className='max-w-sm'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2 text-red-600'>
+              <Trash2 className='h-5 w-5' />
+              {t('confirmDeleteTitle')}
+            </DialogTitle>
+          </DialogHeader>
+          <p className='text-sm text-slate-600'>{t('confirmDeleteDesc')}</p>
+          <DialogFooter className='gap-2'>
+            <DialogClose asChild>
+              <Button variant='outline' size='sm' className='rounded-lg'>
+                {t('cancelAction')}
+              </Button>
+            </DialogClose>
+            <Button
+              size='sm'
+              variant='destructive'
+              className='rounded-lg'
+              disabled={isDeleting}
+              onClick={() => softDelete()}
+            >
+              {isDeleting ? (
+                <span className='flex items-center gap-2'>
+                  <span className='h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white' />
+                  {t('deleting')}
+                </span>
+              ) : (
+                t('deleteAction')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -959,6 +1195,7 @@ export default function PropertyDashboardPage() {
             property={selectedProperty}
             onVerifyClick={handleVerifyClick}
             onBack={isMobile ? () => setSelectedProperty(null) : undefined}
+            onDeleted={() => setSelectedProperty(null)}
           />
         ) : (
           <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>

@@ -288,7 +288,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         return {
           attribute_code: code,
           value_number: type === 'number' ? Number(value) : undefined,
-          value_boolean: type === 'boolean' ? Boolean(value) : undefined,
+          value_boolean: type === 'boolean' ? Boolean(value ?? false) : undefined,
           value_text: type === 'text' ? String(value) : undefined,
         } as PropertyAttributeRequest;
       }),

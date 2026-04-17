@@ -144,6 +144,26 @@ export const propertyApi = {
     });
   },
 
+  updatePropertyStatus: ({
+    propertyId,
+    status,
+  }: {
+    propertyId: string;
+    status: string;
+  }) => {
+    return http.patch<ApiResponse<PropertyDetailResponse>>(
+      `properties/${propertyId}/status?status=${encodeURIComponent(status)}`,
+      {},
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  deleteProperty: (propertyId: string) => {
+    return http.delete<ApiResponse<void>>(`properties/${propertyId}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
   getOwnerAvailableProperties: (criteria: OwnerAvailablePropertiesCriteria) => {
     const queryParams = new URLSearchParams();
     if (criteria.keyword) queryParams.append('keyword', criteria.keyword);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Map as GoogleMap, Marker } from '@vis.gl/react-google-maps';
@@ -94,6 +94,13 @@ function PositiveNumberInput({
   placeholder?: string;
 }) {
   const [display, setDisplay] = useState(() => (value != null ? String(value) : ''));
+  const isEditing = useRef(false);
+
+  useEffect(() => {
+    if (!isEditing.current) {
+      setDisplay(value != null ? String(value) : '');
+    }
+  }, [value]);
 
   return (
     <Input
@@ -102,7 +109,8 @@ function PositiveNumberInput({
       placeholder={placeholder}
       className={className}
       value={display}
-      onBlur={onBlur}
+      onFocus={() => { isEditing.current = true; }}
+      onBlur={() => { isEditing.current = false; onBlur?.(); }}
       onChange={(e) => {
         let raw = e.target.value;
         raw = raw.replace(/[^\d.]/g, '');
@@ -174,6 +182,13 @@ function PriceInput({
     n != null ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
 
   const [display, setDisplay] = useState(() => fmt(value));
+  const isEditing = useRef(false);
+
+  useEffect(() => {
+    if (!isEditing.current) {
+      setDisplay(fmt(value));
+    }
+  }, [value]);
 
   const rawNum = Number(display.replace(/\./g, ''));
   const words = display && !isNaN(rawNum) && rawNum > 0 ? toVietnameseWords(rawNum) : '';
@@ -186,7 +201,8 @@ function PriceInput({
         placeholder={placeholder}
         className={className}
         value={display}
-        onBlur={onBlur}
+        onFocus={() => { isEditing.current = true; }}
+        onBlur={() => { isEditing.current = false; onBlur?.(); }}
         onChange={(e) => {
           let raw = e.target.value.replace(/\D/g, '');
           raw = raw.replace(/^0+(\d)/, '$1');
