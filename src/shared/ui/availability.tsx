@@ -740,7 +740,7 @@ export function Availability<T extends AppointmentData = AppointmentData>({
         <div
           suppressHydrationWarning
           className={cn(
-            "flex h-[600px] w-full flex-col overflow-hidden rounded-md border bg-background select-none touch-none",
+            "flex w-full flex-col overflow-hidden rounded-md border bg-background select-none touch-none min-h-[500px] h-[calc(100vh-220px)]",
             className,
           )}
         >
