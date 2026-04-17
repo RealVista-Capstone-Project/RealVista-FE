@@ -68,10 +68,10 @@ export function mapBackendRole(backendRole: string | undefined): UserRole | unde
  * Determine primary user role from multiple backend roles
  *
  * Priority logic:
- * 1. If user has OWNER → 'owner' (manage-agent layout)
- * 2. If user has ANY of [BUYER, TENANT] → 'user' (public layout)
- * 3. Else if user has ADMIN → 'admin' (dashboard layout)
- * 4. Else if user has [AGENT, VERIFIER] → 'moderator' (dashboard layout)
+ * 1. If user has ADMIN → 'admin' (highest privilege)
+ * 2. If user has AGENT or VERIFIER → 'moderator' (dashboard layout)
+ * 3. If user has OWNER → 'owner' (manage-agent layout)
+ * 4. If user has ANY of [BUYER, TENANT] → 'user' (public layout)
  * 5. Else → 'user' (fallback)
  *
  * @param backendRoles - Array of roles from authentication response
@@ -83,6 +83,7 @@ export function mapBackendRole(backendRole: string | undefined): UserRole | unde
  * determineUserRole(['OWNER']) // 'owner'
  * determineUserRole(['ADMIN']) // 'admin'
  * determineUserRole(['AGENT']) // 'moderator'
+ * determineUserRole(['AGENT', 'OWNER']) // 'moderator' (AGENT wins)
  * determineUserRole([]) // 'user'
  * ```
  */
@@ -91,27 +92,25 @@ export function determineUserRole(backendRoles: string[] | undefined): UserRole 
     return 'user'; // Default fallback
   }
 
+  // Admin has highest priority
+  if (backendRoles.includes('ADMIN')) {
+    return 'admin';
+  }
+
+  // Agent/Verifier - dashboard layout (moderator > owner in hierarchy)
+  if (backendRoles.includes('AGENT') || backendRoles.includes('VERIFIER')) {
+    return 'moderator';
+  }
+
   // Owner role - gets dedicated manage-agent layout
   if (backendRoles.includes('OWNER')) {
     return 'owner';
   }
 
-  // Public roles - if user has ANY of these, they use public layout
+  // Public roles
   const publicRoles: BackendRole[] = ['BUYER', 'TENANT'];
-  const hasPublicRole = backendRoles.some((role) => publicRoles.includes(role as BackendRole));
-
-  if (hasPublicRole) {
+  if (backendRoles.some((role) => publicRoles.includes(role as BackendRole))) {
     return 'user';
-  }
-
-  // Dashboard roles - admin has highest priority
-  if (backendRoles.includes('ADMIN')) {
-    return 'admin';
-  }
-
-  // Dashboard roles - moderator level
-  if (backendRoles.includes('AGENT') || backendRoles.includes('VERIFIER')) {
-    return 'moderator';
   }
 
   // Default fallback
@@ -176,11 +175,10 @@ export function canAccessRoute(
 // TODO: Handle only BackendRole
 export function getRedirectPathByRole(role: UserRole | undefined): string {
   switch (role) {
-    case 'owner':
-      return '/manage-agent';
     case 'admin':
     case 'moderator':
-      return '/dashboard/owner-properties';
+      return '/dashboard';
+    case 'owner':
     case 'user':
     default:
       return '/buy';

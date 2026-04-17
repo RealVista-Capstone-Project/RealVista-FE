@@ -77,6 +77,7 @@
     "bedrooms": "Phòng ngủ",
     "baths": "Phòng tắm",
     "squareFeet": "Diện tích (m²)",
+    "dimensions": "Kích thước",
     "price": "Giá",
     "priceRent": "Giá thuê / tháng",
     "priceSale": "Giá bán",
@@ -311,6 +312,11 @@
       "hideEmail": "Ẩn Email",
       "hideEmailDesc": "Ẩn địa chỉ email với người dùng khác"
     },
+    "personalization": {
+      "title": "Tìm kiếm thông minh",
+      "autoRefresh": "Tự động cập nhật tìm kiếm thông minh",
+      "autoRefreshDesc": "Tự động cập nhật các gợi ý bất động sản dựa trên hành vi của bạn."
+    },
     "saveChanges": "Lưu thay đổi",
     "saving": "Đang lưu...",
     "subscription": {
@@ -379,7 +385,8 @@
     "appointments": "Lịch hẹn",
     "myEngagements": "Engagement của tôi",
     "login": "Đăng nhập",
-    "signup": "Đăng ký"
+    "signup": "Đăng ký",
+    "switchPersona": "Chuyển Profile"
   },
   "PropertyCard": {
     "beds": "Phòng ngủ",
@@ -525,6 +532,7 @@
     "length": "Chiều dài (m)",
     "propertyType": "Loại Bất động sản",
     "selectType": "Chọn loại hình",
+    "propertyCharacteristics": "Đặc trưng của bất động sản",
     "selectOption": "Chọn {label}",
     "additionalDetails": "Thông tin bổ sung",
     "additionalDetailsDesc": "Chi tiết kỹ thuật và tính năng bổ sung của bất động sản.",
@@ -535,6 +543,11 @@
     "selectedAmenities": "Đã chọn {count} tiện ích",
     "noAmenitiesFound": "Không tìm thấy tiện ích",
     "selectAmenities": "Chọn tiện ích",
+    "priceRange": "Khoảng giá",
+    "priceRangeRent": "Giá thuê (đ/tháng)",
+    "priceRangeBuy": "Giá bán (đ)",
+    "priceMin": "Giá tối thiểu",
+    "priceMax": "Giá tối đa",
     "step2Title": "Tải Hình ảnh / Video",
     "step2Desc": "Thêm hình ảnh chất lượng cao, video hoặc tour 3D để làm nổi bật bất động sản của bạn. (Tùy chọn)",
     "propertyMedia": "Hình ảnh & Video",
@@ -596,6 +609,8 @@
       "streetRequired": "Vui lòng nhập địa chỉ cụ thể",
       "landSizeMin": "Diện tích đất phải lớn hơn 0",
       "usableSizeMin": "Diện tích sử dụng phải lớn hơn 0",
+      "usableSizeLtLandSize": "Diện tích sử dụng phải nhỏ hơn hoặc bằng diện tích đất",
+      "priceMaxGtMin": "Giá tối đa phải lớn hơn giá tối thiểu",
       "widthMin": "Mặt tiền không được âm",
       "lengthMin": "Chiều dài không được âm",
       "propertyTypeRequired": "Vui lòng chọn loại bất động sản",
@@ -734,5 +749,11 @@
     "personalMessageLabel": "Lời nhắn cá nhân",
     "messagePlaceholder": "Giới thiệu bản thân và giải thích lý do tại sao bạn phù hợp với bất động sản này...",
     "messageHint": "Lời nhắn này sẽ được gửi kèm với mẫu đề xuất mà bạn đã chọn."
+  },
+  "SavedSearch": {
+    "duplicateAlert": "Tìm kiếm này đã được lưu trước đó trong nhóm này",
+    "success": "Đã lưu tìm kiếm thành công",
+    "error": "Lưu tìm kiếm thất bại. Vui lòng thử lại sau.",
+    "buttonLabel": "Lưu tìm kiếm"
   }
 }

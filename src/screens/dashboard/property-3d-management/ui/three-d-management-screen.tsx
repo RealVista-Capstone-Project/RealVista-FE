@@ -144,7 +144,7 @@ export function ThreeDManagementScreen({
     );
     return {
       url: matching?.media_url || null,
-      metadata: matching?.metadata || null
+      metadata: matching?.metadata || undefined
     };
   }, [selectedRoom, threeDMediaItems]);
 

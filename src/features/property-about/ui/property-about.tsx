@@ -12,13 +12,14 @@ import { AttributeIcon } from '@/shared/ui/attribute-icon';
 
 export interface PropertyAboutProps {
   property: Property;
+  isPostedByAgent?: boolean;
 }
 
 /**
  * PropertyAbout component displays detailed property information
  * including specifications, description, owner info, features, and price history
  */
-export function PropertyAbout({ property }: PropertyAboutProps) {
+export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps) {
   const t = useTranslations('PropertyAbout');
 
   // Get attributes from property (optional field, may be undefined)
@@ -113,7 +114,7 @@ export function PropertyAbout({ property }: PropertyAboutProps) {
       <div className='bg-purple-98 border border-purple-92 rounded-lg p-6'>
         <div className='flex flex-col gap-6'>
           <p className='text-main-black/50 text-[16px] font-medium leading-[1.5]'>
-            {t('listedByPropertyOwner')}
+            {isPostedByAgent ? 'Được đăng bởi môi giới' : t('listedByPropertyOwner')}
           </p>
           <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
             <div className='flex items-center gap-4'>

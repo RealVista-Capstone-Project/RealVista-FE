@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -35,10 +36,16 @@ const BACKEND_OAUTH_URL = `${env.NEXT_PUBLIC_API_ENDPOINT}/auth/login-google`;
 export function GoogleLoginButton() {
   const t = useTranslations('Auth');
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
     setIsLoading(true);
+
+    const rawRedirectTo = searchParams?.get?.('redirectTo') ?? null;
+    if (rawRedirectTo?.startsWith('/') && !rawRedirectTo.startsWith('//')) {
+      document.cookie = `auth-redirect-to=${encodeURIComponent(rawRedirectTo)}; path=/; max-age=300; SameSite=Lax`;
+    }
 
     // Construct the callback URL with current locale
     const callbackUrl = `${window.location.origin}/${locale}/auth/callback`;
@@ -52,10 +59,15 @@ export function GoogleLoginButton() {
   };
 
   return (
-    <Button variant='outline' className='w-full' onClick={handleClick} disabled={isLoading}>
+    <Button
+      variant='outline'
+      className='h-11 w-full rounded-lg border-[1.5px] border-grey-200 bg-white text-base font-semibold text-main-black hover:bg-grey-50 focus:ring-4 focus:ring-purple-92'
+      onClick={handleClick}
+      disabled={isLoading}
+    >
       {isLoading ? (
         <>
-          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+          <Loader2 className='mr-2 h-5 w-5 animate-spin' />
           {t('continueWithGoogle')}
         </>
       ) : (
@@ -63,7 +75,7 @@ export function GoogleLoginButton() {
           <svg
             xmlns='http://www.w3.org/2000/svg'
             viewBox='0 0 24 24'
-            className='mr-2 h-4 w-4'
+            className='mr-2 h-5 w-5'
             aria-hidden='true'
           >
             <path

@@ -28,6 +28,10 @@ import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
 const proposalSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(200, 'Title cannot exceed 200 characters'),
   message: z
     .string()
     .min(10, 'Message must be at least 10 characters')
@@ -59,14 +63,14 @@ export function SubmitProposalModal({
 
   const form = useForm<ProposalFormValues>({
     resolver: zodResolver(proposalSchema),
-    defaultValues: { message: '', offered_commission: '' },
+    defaultValues: { title: '', message: '', offered_commission: '' },
   });
 
   const message = form.watch('message') ?? '';
 
   useEffect(() => {
     if (!open) {
-      form.reset({ message: '', offered_commission: '' });
+      form.reset({ title: '', message: '', offered_commission: '' });
     }
   }, [open, form]);
 
@@ -119,6 +123,28 @@ export function SubmitProposalModal({
         <div className='px-6 py-5'>
           <Form {...form}>
             <form onSubmit={handleSubmit} id='proposal-form' className='space-y-4'>
+              {/* Title */}
+              <FormField
+                control={form.control}
+                name='title'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium text-gray-700'>
+                      {t('proposalModal.titleLabel')}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t('proposalModal.titlePlaceholder')}
+                        className='rounded-xl'
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Commission */}
               <FormField
                 control={form.control}

@@ -6,25 +6,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
 import { useRegister } from '@/features/auth/api/use-register';
 
 import { registerSchema, type RegisterFormValues } from './register-form.schema';
 import { PASSWORD_RULES, getStrength } from './register-form.constants';
 import { getErrorMessage } from './register-form.utils';
-import { EyeIcon, RuleIcon, CheckIcon, CrossIcon } from './register-form.icons';
+import { EyeIcon, CheckIcon, CrossIcon } from './register-form.icons';
 
 type Role = 'CUSTOMER' | 'AGENT';
 
-export function RegisterForm() {
+export function RegisterForm({ role, onRoleChange }: { role: Role; onRoleChange: (role: Role) => void }) {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('Auth');
-  const [role, setRole] = useState<Role>('CUSTOMER');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -89,68 +87,44 @@ export function RegisterForm() {
   const passwordsMatch = passwordValue === confirmValue;
 
   return (
-    <div className='space-y-6'>
-      {/* ── Role selector ──────────────────────────────────────────── */}
-      <div className='space-y-2 text-center'>
-        <p className='text-sm font-medium text-muted-foreground'>{t('roleSelector')}</p>
-        <div className='mx-auto flex max-w-xs rounded-xl border bg-muted p-1' role='group' aria-label='Chọn vai trò'>
-          {(['CUSTOMER', 'AGENT'] as Role[]).map((r) => (
-            <button
-              key={r}
-              type='button'
-              onClick={() => setRole(r)}
-              aria-pressed={role === r}
-              className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all duration-200 ${
-                role === r ? 'bg-white shadow-sm text-primary dark:bg-background' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {r === 'CUSTOMER' ? t('customerRole') : t('agentRole')}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-4' noValidate>
+    <div className='space-y-4'>
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-2.5' noValidate>
         {/* ── Name ────────────────────────────────────────────────── */}
-        <div className='grid grid-cols-2 gap-3'>
-          <div className='space-y-1.5'>
-            <Label htmlFor='firstName'>{t('firstName')}</Label>
-            <Input id='firstName' placeholder={t('firstNamePlaceholder')} disabled={isLoading} aria-invalid={!!errors.firstName} {...register('firstName')} />
-            {errors.firstName && <p role='alert' className='text-xs text-red-500'>{errors.firstName.message}</p>}
+        <div className='grid grid-cols-2 gap-2.5'>
+          <div>
+            <Input id='firstName' placeholder={t('firstNamePlaceholder')} disabled={isLoading} aria-label={t('firstName')} aria-invalid={!!errors.firstName} className='h-9 border-purple-92 bg-purple-98' {...register('firstName')} />
+            {errors.firstName && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.firstName.message}</p>}
           </div>
-          <div className='space-y-1.5'>
-            <Label htmlFor='lastName'>{t('lastName')}</Label>
-            <Input id='lastName' placeholder={t('lastNamePlaceholder')} disabled={isLoading} aria-invalid={!!errors.lastName} {...register('lastName')} />
-            {errors.lastName && <p role='alert' className='text-xs text-red-500'>{errors.lastName.message}</p>}
+          <div>
+            <Input id='lastName' placeholder={t('lastNamePlaceholder')} disabled={isLoading} aria-label={t('lastName')} aria-invalid={!!errors.lastName} className='h-9 border-purple-92 bg-purple-98' {...register('lastName')} />
+            {errors.lastName && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.lastName.message}</p>}
           </div>
         </div>
 
         {/* ── Email ───────────────────────────────────────────────── */}
-        <div className='space-y-1.5'>
-          <Label htmlFor='email'>{t('email')}</Label>
-          <Input id='email' type='email' placeholder={t('emailPlaceholder')} disabled={isLoading} aria-invalid={!!errors.email} autoComplete='email' {...register('email')} />
-          {errors.email && <p role='alert' className='text-xs text-red-500'>{errors.email.message}</p>}
+        <div>
+          <Input id='email' type='email' placeholder={t('emailPlaceholder')} disabled={isLoading} aria-label={t('email')} aria-invalid={!!errors.email} autoComplete='email' className='h-9 border-purple-92 bg-purple-98' {...register('email')} />
+          {errors.email && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.email.message}</p>}
         </div>
 
         {/* ── Phone ───────────────────────────────────────────────── */}
-        <div className='space-y-1.5'>
-          <Label htmlFor='phoneNumber'>{t('phoneNumber')}</Label>
-          <Input id='phoneNumber' placeholder={t('phonePlaceholder')} inputMode='tel' disabled={isLoading} aria-invalid={!!errors.phoneNumber} autoComplete='tel' {...register('phoneNumber')} />
-          {errors.phoneNumber && <p role='alert' className='text-xs text-red-500'>{errors.phoneNumber.message}</p>}
+        <div>
+          <Input id='phoneNumber' placeholder={t('phonePlaceholder')} inputMode='tel' disabled={isLoading} aria-label={t('phoneNumber')} aria-invalid={!!errors.phoneNumber} autoComplete='tel' className='h-9 border-purple-92 bg-purple-98' {...register('phoneNumber')} />
+          {errors.phoneNumber && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.phoneNumber.message}</p>}
         </div>
 
         {/* ── Password ────────────────────────────────────────────── */}
-        <div className='space-y-1.5'>
-          <Label htmlFor='password'>{t('password')}</Label>
+        <div>
           <div className='relative'>
             <Input
               id='password'
               type={showPassword ? 'text' : 'password'}
               placeholder={t('passwordPlaceholder')}
               disabled={isLoading}
+              aria-label={t('password')}
               aria-invalid={!!errors.password}
               autoComplete='new-password'
-              className='pr-10'
+              className='h-9 pr-10 border-purple-92 bg-purple-98'
               {...register('password')}
             />
             <button
@@ -162,9 +136,8 @@ export function RegisterForm() {
               <EyeIcon open={showPassword} />
             </button>
           </div>
-
           {passwordValue.length > 0 && (
-            <div className='space-y-2 pt-1'>
+            <div className='mt-1.5 space-y-1'>
               <div
                 className='flex gap-1'
                 role='meter'
@@ -180,35 +153,23 @@ export function RegisterForm() {
               <p className={`text-xs font-medium ${strength.level <= 1 ? 'text-red-500' : strength.level === 2 ? 'text-yellow-600' : 'text-green-600'}`}>
                 {t('strengthLabel', { label: translatedStrengthLabel })}
               </p>
-              <ul className='space-y-1'>
-                {ruleResults.map((rule) => {
-                  const ruleKey = `rule${rule.id.charAt(0).toUpperCase() + rule.id.slice(1)}` as any;
-                  return (
-                    <li key={rule.id} className='flex items-center gap-2'>
-                      <RuleIcon passed={rule.passed} />
-                      <span className={`text-xs ${rule.passed ? 'text-green-600' : 'text-muted-foreground'}`}>{t(ruleKey)}</span>
-                    </li>
-                  );
-                })}
-              </ul>
             </div>
           )}
-
-          {errors.password && <p role='alert' className='text-xs text-red-500'>{errors.password.message}</p>}
+          {errors.password && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.password.message}</p>}
         </div>
 
         {/* ── Confirm Password ─────────────────────────────────────── */}
-        <div className='space-y-1.5'>
-          <Label htmlFor='confirmPassword'>{t('confirmPassword')}</Label>
+        <div>
           <div className='relative'>
             <Input
               id='confirmPassword'
               type={showConfirm ? 'text' : 'password'}
               placeholder={t('confirmPlaceholder')}
               disabled={isLoading}
+              aria-label={t('confirmPassword')}
               aria-invalid={!!errors.confirmPassword}
               autoComplete='new-password'
-              className='pr-10'
+              className='h-9 pr-10 border-purple-92 bg-purple-98'
               {...register('confirmPassword')}
             />
             <button
@@ -220,29 +181,48 @@ export function RegisterForm() {
               <EyeIcon open={showConfirm} />
             </button>
           </div>
-
           {confirmValue.length > 0 && passwordValue.length > 0 && (
-            <p className={`flex items-center gap-1.5 text-xs ${passwordsMatch ? 'text-green-600' : 'text-red-500'}`} role='status'>
+            <p className={`mt-1 flex items-center gap-1.5 text-xs ${passwordsMatch ? 'text-green-600' : 'text-red-500'}`} role='status'>
               {passwordsMatch ? <><CheckIcon /> {t('passwordsMatch')}</> : <><CrossIcon /> {t('passwordsDoNotMatch')}</>}
             </p>
           )}
-
           {errors.confirmPassword && confirmValue.length === 0 && (
-            <p role='alert' className='text-xs text-red-500'>{errors.confirmPassword.message}</p>
+            <p role='alert' className='mt-1 text-xs text-red-500'>{errors.confirmPassword.message}</p>
           )}
         </div>
 
-        {/* ── Submit ──────────────────────────────────────────────── */}
-        <Button type='submit' className='w-full' disabled={isLoading}>
-          {isLoading ? (
-            <span className='flex items-center gap-2'>
-              <Loader2 className='h-4 w-4 animate-spin' />
-              {t('signingUp')}
-            </span>
-          ) : (
-            t('createAccount')
-          )}
-        </Button>
+        {/* ── Agent Checkbox + Submit ─────────────────────────────── */}
+        <div className='space-y-3'>
+          <label className='group flex cursor-pointer items-center gap-3 pt-1'>
+            <input
+              type='checkbox'
+              className='sr-only'
+              checked={role === 'AGENT'}
+              onChange={(e) => onRoleChange(e.target.checked ? 'AGENT' : 'CUSTOMER')}
+            />
+            <div
+              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-colors duration-150 ${
+                role === 'AGENT'
+                  ? 'border-main-primary bg-main-primary'
+                  : 'border-purple-92 bg-purple-98 group-hover:border-main-primary'
+              }`}
+            >
+              {role === 'AGENT' && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
+            </div>
+            <span className='text-sm font-normal text-main-black'>{t('agentCheckboxLabel')}</span>
+          </label>
+
+          <Button type='submit' className='w-full' disabled={isLoading}>
+            {isLoading ? (
+              <span className='flex items-center gap-2'>
+                <Loader2 className='h-4 w-4 animate-spin' />
+                {t('signingUp')}
+              </span>
+            ) : (
+              t('createAccount')
+            )}
+          </Button>
+        </div>
       </form>
     </div>
   );

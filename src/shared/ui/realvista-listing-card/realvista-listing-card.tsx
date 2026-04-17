@@ -255,7 +255,7 @@ export function RealVistaListingCard({
     if (!isHot || isUnavailable) return null;
 
     return (
-      <div className='absolute -bottom-3.75 -left-2 z-10'>
+      <div className='absolute -bottom-2 -left-2 z-10'>
         <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
           <div className='flex items-center gap-1.5'>
             <Flame className='h-4 w-4 fill-white text-white' strokeWidth={2.5} />
@@ -319,7 +319,7 @@ export function RealVistaListingCard({
       <>
         <div
           className={cn(
-            'relative flex rounded-xl border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md overflow-hidden',
+            'relative flex rounded-xl border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md',
             !isUnavailable && onClick && 'cursor-pointer',
             isUnavailable && 'cursor-default',
             className
@@ -358,6 +358,7 @@ export function RealVistaListingCard({
                     <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
                       {formatVND(price)}
                     </span>
+                    <span className='text-xs font-semibold text-grey-500'>₫</span>
                     {listingType === 'RENT' && (
                       <span className='text-sm font-normal leading-[1.5] text-grey-500'>
                         {t('perMonth')}
@@ -436,6 +437,7 @@ export function RealVistaListingCard({
                 <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
                   {formatVND(price)}
                 </span>
+                <span className='text-sm font-semibold text-grey-500'>₫</span>
                 {listingType === 'RENT' && (
                   <span className='text-base font-normal leading-[1.5] text-grey-500'>
                     {t('perMonth')}

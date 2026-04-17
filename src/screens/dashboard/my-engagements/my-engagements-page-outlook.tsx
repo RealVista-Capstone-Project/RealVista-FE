@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { MyEngagementsProvider, useMyEngagementsContext } from '@/features/engagement/model/my-engagements-context';
 import { EngagementListView } from '@/features/engagement/ui/engagement-list-view';
 
@@ -47,8 +48,10 @@ const MyEngagementsOutlookContent = () => {
 
 export const MyEngagementsPageOutlook = () => {
   return (
-    <MyEngagementsProvider>
-      <MyEngagementsOutlookContent />
-    </MyEngagementsProvider>
+    <Suspense>
+      <MyEngagementsProvider>
+        <MyEngagementsOutlookContent />
+      </MyEngagementsProvider>
+    </Suspense>
   );
 };

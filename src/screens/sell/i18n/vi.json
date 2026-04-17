@@ -1,0 +1,32 @@
+{
+  "Sell": {
+    "sectionTitle": "Bất động sản của tôi",
+    "sectionSubtitle": "Quản lý và đăng bán bất động sản của bạn một cách dễ dàng. Tạo mới hoặc tiếp tục quản lý danh sách hiện có của bạn ngay trên nền tảng RealVista.",
+    "card1Title": "Tạo mới bất động sản",
+    "card1Desc": "Thêm bất động sản mới và bắt đầu đăng bán trên hệ thống.",
+    "card1Button": "Thêm mới",
+    "card2Title": "Đã có bất động sản",
+    "card2Desc": "Truy cập dashboard để quản lý các bất động sản hiện có của bạn.",
+    "card2Button": "Đến Dashboard",
+    "card2Disabled": "Chỉ dành cho chủ bất động sản (Owner)",
+    "confirmTitle": "Chuyển sang Dashboard",
+    "confirmDesc": "Bạn sẽ được chuyển đến trang Dashboard để tạo bất động sản mới. Tiếp tục?",
+    "confirmYes": "Có, tiếp tục",
+    "confirmNo": "Không, quay lại",
+    "addingRole": "Đang xử lý...",
+    "roleAddSuccess": "Đã cấp quyền Owner thành công!",
+    "typesTitle": "Dành cho tất cả các loại bất động sản",
+    "typesSubtitle": "Dù bạn sở hữu loại hình nào, RealVista đều hỗ trợ bạn đăng bán nhanh chóng và hiệu quả.",
+    "types": [
+      { "label": "Nhà phố", "desc": "Nhà riêng, nhà liền kề, nhà mặt tiền đường" },
+      { "label": "Căn hộ chung cư", "desc": "Căn hộ studio, 1–4 phòng ngủ, penthouse" },
+      { "label": "Đất nền", "desc": "Đất thổ cư, đất nền dự án, đất nông nghiệp" },
+      { "label": "Biệt thự", "desc": "Biệt thự đơn lập, song lập, liền kề cao cấp" },
+      { "label": "Nhà trọ & phòng cho thuê", "desc": "Phòng trọ, nhà nguyên căn cho thuê" },
+      { "label": "Tòa nhà & văn phòng", "desc": "Shophouse, văn phòng, mặt bằng thương mại" }
+    ],
+    "ctaTitle": "Chần chờ gì nữa?",
+    "ctaSubtitle": "Hàng nghìn người mua đang tìm kiếm bất động sản mỗi ngày. Hãy đăng tin ngay hôm nay để tiếp cận khách hàng tiềm năng nhanh nhất.",
+    "ctaButton": "Tạo bất động sản ngay"
+  }
+}

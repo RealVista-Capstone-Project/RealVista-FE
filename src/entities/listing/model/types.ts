@@ -121,7 +121,7 @@ export interface ListingData {
   listing_id: string;
   property_id: string;
   user_id: string;
-  listing_type: ListingType;
+  user_type?: 'AGENT' | 'OWNER';
   min_price?: number;
   max_price?: number;
   cost_breakdown?: CostBreakdownAPI;
@@ -135,6 +135,7 @@ export interface ListingData {
   total_3d_tours: number;
   is_favorite?: boolean;
   is_created_by_owner?: boolean;
+  listing_type: ListingType;
 }
 
 // ============ Cost Breakdown (API format - snake_case) ============
@@ -185,12 +186,14 @@ export interface SimilarListing {
   price: number;
   area: number;
   location_name: string;
+  full_address?: string;
   thumbnail_url: string;
   similarity_score: number;
   published_at: string;
   attributes: Attribute[];
   display_price: string;
   display_area: string;
+  is_favorite?: boolean;
 }
 
 export interface SimilarListingsResponse {

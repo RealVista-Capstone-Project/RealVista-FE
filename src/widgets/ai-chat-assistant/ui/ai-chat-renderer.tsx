@@ -23,6 +23,7 @@ export function AiChatRenderer() {
     isLoadingHistory,
     isClearing,
     error,
+    quota,
     sendMessage,
     clearChat,
     loadHistory,
@@ -65,6 +66,7 @@ export function AiChatRenderer() {
           isLoadingHistory={isLoadingHistory}
           isClearing={isClearing}
           error={error}
+          quota={quota}
           onSendMessage={sendMessage}
           onClose={handleClose}
           onQuickAction={sendMessage}

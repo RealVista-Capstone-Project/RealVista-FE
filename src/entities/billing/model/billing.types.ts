@@ -59,6 +59,8 @@ export interface CheckoutResponse {
   payment_method: PaymentMethodType;
   plan_name: string;
   amount: number;
+  /** Unix timestamp (seconds) when the PayOS link expires. Only present for PayOS. */
+  expired_at?: number;
 }
 
 export interface TransactionStatusResponse {

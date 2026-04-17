@@ -17,6 +17,7 @@ interface ListingCardProps {
 export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) {
   const t = useTranslations('ListingCard');
   const tStatus = useTranslations('ListingStatus');
+  const tManagedListings = useTranslations('ManagedListings');
   const status =
     LISTING_STATUS_CONFIG[listing.status as ListingStatus] ??
     LISTING_STATUS_CONFIG[ListingStatus.DRAFT];
@@ -117,7 +118,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side='top' className='max-w-[180px]'>
-                    {useTranslations('ManagedListings')('draftRuleTooltip')}
+                    {tManagedListings('draftRuleTooltip')}
                   </TooltipContent>
                 </Tooltip>
               )}

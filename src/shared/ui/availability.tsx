@@ -467,7 +467,7 @@ export function Availability<T extends AppointmentData = AppointmentData>({
     if (appointments.length === 0) return []
     const normalizedStart = new Date(weekStart)
     normalizedStart.setHours(0, 0, 0, 0)
-    
+
     const weekEnd = new Date(normalizedStart)
     weekEnd.setDate(weekEnd.getDate() + 6)
     weekEnd.setHours(23, 59, 59, 999)
@@ -856,115 +856,115 @@ export function Availability<T extends AppointmentData = AppointmentData>({
             </div>
           ) : (
             <>
-          {/* Header */}
-          <div className="flex w-full border-b bg-muted/40">
-            <div className="w-16 flex-shrink-0 border-r p-2 text-xs font-medium text-muted-foreground" />
-            <div className="flex flex-1">
-              {(readOnly || isEditBlocks ? weekDays : renderedDays).map((day, idx) => {
-                const isDate = day instanceof Date
-                const dayIndex = isDate
-                  ? (day.getDay() === 0 ? 6 : day.getDay() - 1)
-                  : (day as number)
-                const todayCol = isDate && isToday(day)
-                return (
-                  <div
-                    key={idx}
-                    className={cn(
-                      "flex-1 border-r px-2 py-3 text-center text-sm font-medium last:border-r-0",
-                      !readOnly && !isEditBlocks && !days.includes(dayIndex) && "bg-muted/30 text-muted-foreground",
-                      todayCol && "bg-purple-96 dark:bg-purple-96/10",
-                    )}
-                  >
-                    <div className={cn(todayCol && "text-main-primary font-semibold")}>
-                      {(readOnly || isEditBlocks) && isDate ? dayNames[day.getDay()] : dayNames[(dayIndex + 1) % 7]}
-                    </div>
-                    {(readOnly || isEditBlocks) && isDate && (
-                      <div className={cn("text-xs", todayCol ? "text-main-primary/70 font-medium" : "text-muted-foreground")}>
-                        {String(day.getDate()).padStart(2, '0')}/{String(day.getMonth() + 1).padStart(2, '0')}
+              {/* Header */}
+              <div className="flex w-full border-b bg-muted/40">
+                <div className="w-16 flex-shrink-0 border-r p-2 text-xs font-medium text-muted-foreground" />
+                <div className="flex flex-1">
+                  {(readOnly || isEditBlocks ? weekDays : renderedDays).map((day, idx) => {
+                    const isDate = day instanceof Date
+                    const dayIndex = isDate
+                      ? (day.getDay() === 0 ? 6 : day.getDay() - 1)
+                      : (day as number)
+                    const todayCol = isDate && isToday(day)
+                    return (
+                      <div
+                        key={idx}
+                        className={cn(
+                          "flex-1 border-r px-2 py-3 text-center text-sm font-medium last:border-r-0",
+                          !readOnly && !isEditBlocks && !days.includes(dayIndex) && "bg-muted/30 text-muted-foreground",
+                          todayCol && "bg-purple-96 dark:bg-purple-96/10",
+                        )}
+                      >
+                        <div className={cn(todayCol && "text-main-primary font-semibold")}>
+                          {(readOnly || isEditBlocks) && isDate ? dayNames[day.getDay()] : dayNames[(dayIndex + 1) % 7]}
+                        </div>
+                        {(readOnly || isEditBlocks) && isDate && (
+                          <div className={cn("text-xs", todayCol ? "text-main-primary/70 font-medium" : "text-muted-foreground")}>
+                            {String(day.getDate()).padStart(2, '0')}/{String(day.getMonth() + 1).padStart(2, '0')}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Body */}
-          <div className="flex flex-1 overflow-y-auto relative" ref={mainContainerRef}>
-            <div className="flex w-full relative" style={{ minHeight: `${(endTime - startTime) * 120}px` }}>
-              {/* Time Labels */}
-              <div className="w-16 flex-shrink-0 border-r bg-muted/10 flex flex-col">
-                {Array.from({ length: endTime - startTime }).map((_, i) => {
-                  const hour = startTime + i
-                  return (
-                    <div
-                      key={hour}
-                      className="flex-1 border-b border-dashed border-muted-foreground/20 relative flex items-center justify-start pl-3"
-                    >
-                      <span className="text-xs text-muted-foreground">{formatDisplayTime(`${hour}:00`, useAmPm)}</span>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Days Grid */}
-              <div className="flex flex-1 relative">
-                <div className="absolute inset-0 pointer-events-none flex flex-col">
-                  {Array.from({ length: endTime - startTime }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 border-b border-dashed border-foreground/10 dark:border-muted/60 w-full relative"
-                    />
-                  ))}
+                    )
+                  })}
                 </div>
-
-                {Array.from({ length: (readOnly || isEditBlocks) ? 7 : renderedDays.length }).map((_, i) => {
-                  const dayIndex = (readOnly || isEditBlocks) ? i : renderedDays[i]
-                  const dayAppointments = readOnly
-                    ? appointmentSpans.filter((e) => e.week_day === i)
-                    : internalValue.filter((e) => e.week_day === dayIndex)
-                  const colDay = (readOnly || isEditBlocks) ? weekDays[i] : null
-                  const todayCol = colDay instanceof Date && isToday(colDay)
-
-                  return (
-                    <DayColumn<T>
-                      key={i}
-                      dayIndex={i}
-                      colIndex={i}
-                      startTime={startTime}
-                      endTime={endTime}
-                      timeIncrements={timeIncrements}
-                      events={isEditBlocks ? internalValue.filter((e) => e.week_day === dayIndex) : dayAppointments}
-                      disabledEvents={readOnly ? [] : [
-                        ...disabled.filter((e) => e.week_day === dayIndex),
-                        ...(isEditBlocks ? tourDisabledSpans.filter((e) => e.week_day === dayIndex) : [])
-                      ]}
-                      onCreate={readOnly ? () => { } : handleCreate}
-                      onResize={readOnly ? () => { } : handleResize}
-                      onDelete={readOnly ? () => { } : handleDelete}
-                      useAmPm={useAmPm}
-                      isDayDisabled={readOnly ? false : (!isEditBlocks && !days.includes(dayIndex))}
-                      readOnly={readOnly}
-                      isEditBlocks={isEditBlocks}
-                      onAppointmentClick={onAppointmentClick}
-                      renderAppointmentCard={renderAppointmentCard}
-                      weekStart={weekStart}
-                      isTodayCol={todayCol}
-                    />
-                  )
-                })}
               </div>
-            </div>
-          </div>
 
-          {/* Drag Overlay */}
-          <DragOverlay>
-            {activeSpan && (
-              <div className="w-full h-full cursor-grabbing relative opacity-80">
-                <dragPreviewTunnel.Out />
+              {/* Body */}
+              <div className="flex flex-1 overflow-y-auto relative" ref={mainContainerRef}>
+                <div className="flex w-full relative" style={{ minHeight: `${(endTime - startTime) * 120}px` }}>
+                  {/* Time Labels */}
+                  <div className="w-16 flex-shrink-0 border-r bg-muted/10 flex flex-col">
+                    {Array.from({ length: endTime - startTime }).map((_, i) => {
+                      const hour = startTime + i
+                      return (
+                        <div
+                          key={hour}
+                          className="flex-1 border-b border-dashed border-muted-foreground/20 relative flex items-center justify-start pl-3"
+                        >
+                          <span className="text-xs text-muted-foreground">{formatDisplayTime(`${hour}:00`, useAmPm)}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Days Grid */}
+                  <div className="flex flex-1 relative">
+                    <div className="absolute inset-0 pointer-events-none flex flex-col">
+                      {Array.from({ length: endTime - startTime }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 border-b border-dashed border-foreground/10 dark:border-muted/60 w-full relative"
+                        />
+                      ))}
+                    </div>
+
+                    {Array.from({ length: (readOnly || isEditBlocks) ? 7 : renderedDays.length }).map((_, i) => {
+                      const dayIndex = (readOnly || isEditBlocks) ? i : renderedDays[i]
+                      const dayAppointments = readOnly
+                        ? appointmentSpans.filter((e) => e.week_day === i)
+                        : internalValue.filter((e) => e.week_day === dayIndex)
+                      const colDay = (readOnly || isEditBlocks) ? weekDays[i] : null
+                      const todayCol = colDay instanceof Date && isToday(colDay)
+
+                      return (
+                        <DayColumn<T>
+                          key={i}
+                          dayIndex={i}
+                          colIndex={i}
+                          startTime={startTime}
+                          endTime={endTime}
+                          timeIncrements={timeIncrements}
+                          events={isEditBlocks ? internalValue.filter((e) => e.week_day === dayIndex) : dayAppointments}
+                          disabledEvents={readOnly ? [] : [
+                            ...disabled.filter((e) => e.week_day === dayIndex),
+                            ...(isEditBlocks ? tourDisabledSpans.filter((e) => e.week_day === dayIndex) : [])
+                          ]}
+                          onCreate={readOnly ? () => { } : handleCreate}
+                          onResize={readOnly ? () => { } : handleResize}
+                          onDelete={readOnly ? () => { } : handleDelete}
+                          useAmPm={useAmPm}
+                          isDayDisabled={readOnly ? false : (!isEditBlocks && !days.includes(dayIndex))}
+                          readOnly={readOnly}
+                          isEditBlocks={isEditBlocks}
+                          onAppointmentClick={onAppointmentClick}
+                          renderAppointmentCard={renderAppointmentCard}
+                          weekStart={weekStart}
+                          isTodayCol={todayCol}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
-            )}
-          </DragOverlay>
+
+              {/* Drag Overlay */}
+              <DragOverlay>
+                {activeSpan && (
+                  <div className="w-full h-full cursor-grabbing relative opacity-80">
+                    <dragPreviewTunnel.Out />
+                  </div>
+                )}
+              </DragOverlay>
             </>
           )}
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { Check, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
-import { Separator } from '@/shared/ui/separator';
 import {
   createPropertyFormSchema,
   PropertyFormValues,
@@ -39,12 +38,41 @@ interface PropertyFormProps {
   isEditMode?: boolean;
 }
 
+const DRAFT_KEY = 'property-form-draft';
+
+function readDraft(): { step: number; values: PropertyFormValues } | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const saved = sessionStorage.getItem(DRAFT_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+function hasErrors(obj: unknown): boolean {
+  if (!obj || typeof obj !== 'object') return false;
+  const o = obj as Record<string, unknown>;
+  if (typeof o.message === 'string' && typeof o.type === 'string') return true;
+  return Object.values(o).some(hasErrors);
+}
+
 export function PropertyForm({ initialData, propertyId, isEditMode = false }: PropertyFormProps) {
   const t = useTranslations('PropertyManagement');
   const router = useRouter();
   const queryClient = useQueryClient();
   const { data: session } = useAuthSession();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (isEditMode || typeof window === 'undefined') return 0;
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      if (!saved) return 0;
+      const parsed = JSON.parse(saved);
+      return typeof parsed.step === 'number' ? parsed.step : 0;
+    } catch {
+      return 0;
+    }
+  });
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<'DRAFT' | 'AVAILABLE'>('AVAILABLE');
@@ -57,6 +85,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   });
 
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [infoHasError, setInfoHasError] = useState(false);
   const isPending =
     createProperty.isPending ||
     updateProperty.isPending ||
@@ -67,7 +96,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
   const methods = useForm<PropertyFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: initialData || {
+    defaultValues: {
       role: {
         role: 'OWNER',
         ownerEmail: '',
@@ -81,10 +110,10 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         ward: '',
         streetAddress: '',
         location: { lat: 0, lng: 0 },
-        landSize: 0,
-        usableSize: 0,
-        width: 0,
-        length: 0,
+        landSize: undefined,
+        usableSize: undefined,
+        width: undefined,
+        length: undefined,
         propertyType: '',
         dynamicAttributes: {},
       },
@@ -95,16 +124,69 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       },
       isExistingProperty: false,
       selectedPropertyId: null,
+      ...initialData,
     },
     mode: 'onTouched',
   });
 
-  const { handleSubmit, trigger } = methods;
+  const { handleSubmit, trigger, formState: { errors } } = methods;
+
+  const clearDraft = useCallback(() => sessionStorage.removeItem(DRAFT_KEY), [DRAFT_KEY]);
+
+  // Restore form values from sessionStorage on mount (create mode only)
+  useEffect(() => {
+    if (isEditMode) return;
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as { step: number; values: PropertyFormValues };
+      if (parsed.values) {
+        methods.reset(parsed.values);
+        // Re-persist immediately so the restored values are saved under the current key
+        const { newFiles: _nf, ...media } = (parsed.values.media ?? {}) as Record<string, unknown>;
+        sessionStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({ ...parsed, values: { ...parsed.values, media } })
+        );
+      }
+    } catch {
+      // corrupt data, ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist step whenever it changes
+  useEffect(() => {
+    if (isEditMode) return;
+    try {
+      const saved = sessionStorage.getItem(DRAFT_KEY);
+      const existing = saved ? JSON.parse(saved) : {};
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...existing, step: currentStep }));
+    } catch { /* ignore quota errors */ }
+  }, [currentStep, isEditMode, DRAFT_KEY]);
+
+  // Persist form values on every change (skip File objects which can't be serialized)
+  useEffect(() => {
+    if (isEditMode) return;
+    const { unsubscribe } = methods.watch(() => {
+      try {
+        const currentValues = methods.getValues();
+        const { newFiles: _newFiles, ...media } = (currentValues.media ?? {}) as Record<string, unknown>;
+        const saved = sessionStorage.getItem(DRAFT_KEY);
+        const existing = saved ? JSON.parse(saved) : {};
+        sessionStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({ ...existing, values: { ...currentValues, media } })
+        );
+      } catch { /* ignore quota errors */ }
+    });
+    return unsubscribe;
+  }, [methods, isEditMode, DRAFT_KEY]);
 
   const ALL_STEPS = useMemo(
     () => [
       { id: 'role', component: <PropertySearchStep />, label: t('tabRole') },
-      { id: 'info', component: <PropertyInfoStep />, label: t('tabInfo') },
+      { id: 'info', component: <PropertyInfoStep onErrorChange={setInfoHasError} />, label: t('tabInfo') },
       { id: 'media', component: <PropertyMediaStep />, label: t('tabMedia') },
     ],
     [t]
@@ -129,13 +211,16 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
 
   const isNextDisabled = useMemo(() => {
     if (isPending) return true;
-    if (STEPS[currentStep].id === 'role') {
-      // Step 0: Ensure a property is selected (Existing or NEW)
-      // AND a valid address exists (lat/lng and street address string)
+    const stepId = STEPS[currentStep]?.id;
+    if (stepId === 'role') {
       if (watchIsExisting) return !watchSelectedId;
-
-      // For NEW properties, both coordinates and the street address must be provided
       return !watchLocation?.lat || watchLocation?.lat === 0 || !watchStreetAddress?.trim();
+    }
+    if (stepId === 'info') {
+      return infoHasError;
+    }
+    if (stepId === 'media') {
+      return hasErrors(errors.media);
     }
     return false;
   }, [
@@ -146,6 +231,8 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     watchStreetAddress,
     watchIsExisting,
     watchSelectedId,
+    infoHasError,
+    errors,
   ]);
 
   const transformToRequest = (data: PropertyFormValues, status: string): CreatePropertyRequest => {
@@ -180,17 +267,28 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       street_address: data.info.streetAddress || '',
       latitude: data.info.location!.lat,
       longitude: data.info.location!.lng,
-      land_size_m2: data.info.landSize || undefined,
-      usable_size_m2: data.info.usableSize || undefined,
-      length_m: data.info.length || undefined,
+      land_size_m2: data.info.landSize != null ? data.info.landSize : undefined,
+      usable_size_m2: data.info.usableSize != null ? data.info.usableSize : undefined,
+      width_m: data.info.width != null ? data.info.width : undefined,
+      length_m: data.info.length != null ? data.info.length : undefined,
       amenity_ids: data.info.amenityIds || [],
       status,
+      price_range: data.info.priceRange
+        ? {
+            rent: data.info.priceRange.rent?.min != null || data.info.priceRange.rent?.max != null
+              ? { min: data.info.priceRange.rent?.min ?? undefined, max: data.info.priceRange.rent?.max ?? undefined }
+              : undefined,
+            buy: data.info.priceRange.buy?.min != null || data.info.priceRange.buy?.max != null
+              ? { min: data.info.priceRange.buy?.min ?? undefined, max: data.info.priceRange.buy?.max ?? undefined }
+              : undefined,
+          }
+        : undefined,
       attributes: Object.entries(data.info.dynamicAttributes || {}).map(([code, value]) => {
         const type = ATTRIBUTE_TYPES[code as PropertyAttribute];
         return {
           attribute_code: code,
           value_number: type === 'number' ? Number(value) : undefined,
-          value_boolean: type === 'boolean' ? Boolean(value) : undefined,
+          value_boolean: type === 'boolean' ? Boolean(value ?? false) : undefined,
           value_text: type === 'text' ? String(value) : undefined,
         } as PropertyAttributeRequest;
       }),
@@ -204,7 +302,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     const isStepValid = await trigger(stepId);
 
     if (isStepValid) {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentStep((prev: number) => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       toast.error(t('fillRequired'));
@@ -212,7 +310,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   };
 
   const handleBack = () => {
-    setCurrentStep((prev) => prev - 1);
+    setCurrentStep((prev: number) => prev - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -247,23 +345,27 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       };
 
       if (isEditMode && propertyId) {
-        console.log(`property create request is: ${JSON.stringify(finalData)}`);
         const request = transformToRequest(finalData, submissionStatus);
+        console.log('[PropertyForm] update request:', JSON.stringify(request, null, 2));
         updateProperty.mutate(
           { propertyId, request },
           {
             onSuccess: () => {
+              clearDraft();
               toast.success(t('updateSuccess'));
               router.push('/dashboard/property');
             },
-            onError: () => {
-              toast.error(t('submitError'));
+            onError: (error) => {
+              console.error('[PropertyForm] update error:', error);
+              const message = (error as { payload?: { message?: string } })?.payload?.message;
+              toast.error(message || t('submitError'));
             },
           }
         );
       } else if (finalData.isExistingProperty && finalData.selectedPropertyId) {
         assignAgent.mutate(finalData.selectedPropertyId, {
           onSuccess: () => {
+            clearDraft();
             toast.success(t('createSuccess'));
             queryClient.invalidateQueries({ queryKey: ['my-properties'] });
             const currentUserId = session?.user?.id;
@@ -285,6 +387,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         const request = transformToRequest(finalData, submissionStatus);
         createProperty.mutate(request, {
           onSuccess: (response: { payload: { data: { property_id: string } } }) => {
+            clearDraft();
             toast.success(t('createSuccess'));
             queryClient.invalidateQueries({ queryKey: ['my-properties'] });
 
@@ -361,8 +464,6 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         ))}
       </div>
 
-      <Separator className='mb-8 bg-[#E0DEF7]' />
-
       {/* Form Card */}
       <div className='rounded-lg border-[1.5px] border-[#E0DEF7] bg-white p-6 sm:p-8 shadow-sm'>
         <FormProvider {...methods}>
@@ -387,7 +488,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 <Button
                   type='button'
                   variant='ghost'
-                  onClick={() => router.push('/dashboard/property')}
+                  onClick={() => { clearDraft(); router.push('/dashboard/property'); }}
                   disabled={isPending}
                   className='h-12 rounded-lg text-muted-foreground hover:text-foreground'
                 >

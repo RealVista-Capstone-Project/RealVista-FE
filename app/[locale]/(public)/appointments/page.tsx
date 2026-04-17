@@ -21,7 +21,7 @@ export default function PublicAppointmentsRoute() {
     }
 
     const { role } = session.user;
-    
+
     if (role === 'user') {
       return; // Allow access
     }

@@ -42,6 +42,16 @@ export default function PropertyEditPage({ id }: Props) {
             },
             {} as Record<string, any>
           ) || {},
+        priceRange: property.price_range
+          ? {
+              rent: property.price_range.rent
+                ? { min: property.price_range.rent.min ?? undefined, max: property.price_range.rent.max ?? undefined }
+                : undefined,
+              buy: property.price_range.buy
+                ? { min: property.price_range.buy.min ?? undefined, max: property.price_range.buy.max ?? undefined }
+                : undefined,
+            }
+          : undefined,
       },
       media: {
         images:

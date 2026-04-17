@@ -32,14 +32,14 @@ export function mapSimilarListingToCardProps(listing: SimilarListing): SimilarLi
     slug: listing.slug || listing.listing_id,
     image: listing.thumbnail_url,
     title: listing.name,
-    address: listing.location_name,
+    address: listing.full_address || listing.location_name,
     price: listing.price,
     currency: '',
     attributes,
     area: listing.area,
     areaUnit: 'm²',
     listingType: listing.listing_type,
-    isFavorite: false,
+    isFavorite: listing.is_favorite ?? false,
   };
 }
 

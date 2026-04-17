@@ -3,7 +3,8 @@
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { bookmarkApi } from '@/entities/bookmark';
 import {
   listingQueries,
   mapSimilarListingsToCardProps,
@@ -15,6 +16,13 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { buildListingDetailUrl } from '@/shared/lib/utils';
 import { behaviorTracker } from '@/shared/lib/analytics';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/shared/ui/carousel';
 
 export interface SimilarListingsProps {
   propertyId?: string;
@@ -27,9 +35,10 @@ export interface SimilarListingsProps {
  */
 export function SimilarListings({ propertyId, onPropertyClick }: SimilarListingsProps) {
   const t = useTranslations('PropertyDetail');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
   const router = useRouter();
   const locale = useLocale();
+  const queryClient = useQueryClient();
 
   // Fetch similar listings from API
   const { data, isLoading, isError } = useQuery({
@@ -38,16 +47,26 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
     select: (response) => response.payload.data.listings,
   });
 
-  const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(id)) {
-        newFavorites.delete(id);
-      } else {
-        newFavorites.add(id);
-      }
-      return newFavorites;
-    });
+  const handleToggleFavorite = async (id: string) => {
+    // Determine current favorite status
+    const listing = listings.find((l) => l.id === id);
+    const isCurrentlyFavorite = favoriteOverrides[id] ?? listing?.isFavorite ?? false;
+    const nextFavorite = !isCurrentlyFavorite;
+
+    // Optimistic update
+    setFavoriteOverrides((prev) => ({ ...prev, [id]: nextFavorite }));
+
+    try {
+      await bookmarkApi.toggleBookmark(id);
+      // Synchronize other components (like heart icon in header or search results)
+      void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+      // Track behavior
+      behaviorTracker.trackBookmark(id, nextFavorite ? 'add' : 'remove');
+    } catch (error) {
+      console.error('[SimilarListings] Failed to toggle favorite:', error);
+      // Revert on failure
+      setFavoriteOverrides((prev) => ({ ...prev, [id]: isCurrentlyFavorite }));
+    }
   };
 
   const handlePropertyClick = (slug: string, listingId: string) => {
@@ -69,7 +88,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
 
   return (
     <div className='bg-purple-98 w-full py-12 sm:py-16'>
-      <div className='max-w-[1200px] mx-auto px-4 sm:px-6'>
+      <div className='max-w-[1200px] mx-auto px-10 sm:px-14'>
         {/* Section Title */}
         <h2 className='text-main-black text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px] mb-6 sm:mb-8'>
           {t('similarListings')}
@@ -77,23 +96,25 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
 
         {/* Loading State */}
         {isLoading && (
-          <div className='flex gap-6 sm:gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3'>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'>
-                <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6 h-full'>
-                  <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
-                  <Skeleton className='h-8 w-3/4 mb-3' />
-                  <Skeleton className='h-6 w-1/2 mb-4' />
-                  <Skeleton className='h-px w-full mb-4' />
-                  <div className='flex gap-4 justify-center'>
-                    <Skeleton className='h-5 w-12' />
-                    <Skeleton className='h-5 w-12' />
-                    <Skeleton className='h-5 w-12' />
+          <Carousel opts={{ align: 'start' }}>
+            <CarouselContent>
+              {[1, 2, 3].map((i) => (
+                <CarouselItem key={i} className='basis-full sm:basis-1/2 lg:basis-1/3'>
+                  <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6 h-full'>
+                    <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
+                    <Skeleton className='h-8 w-3/4 mb-3' />
+                    <Skeleton className='h-6 w-1/2 mb-4' />
+                    <Skeleton className='h-px w-full mb-4' />
+                    <div className='flex gap-4 justify-center'>
+                      <Skeleton className='h-5 w-12' />
+                      <Skeleton className='h-5 w-12' />
+                      <Skeleton className='h-5 w-12' />
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         )}
 
         {/* Error State */}
@@ -104,25 +125,24 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
           </div>
         )}
 
-        {/* Listings Grid - Mobile: Horizontal scroll, Desktop: 3 column grid */}
+        {/* Listings Slider */}
         {!isLoading && !isError && listings.length > 0 && (
-          <div className='overflow-x-auto sm:overflow-x-visible -mx-4 px-4 sm:mx-0 sm:px-0'>
-            <div className='flex gap-6 sm:gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-3 min-w-min sm:min-w-0'>
+          <Carousel opts={{ align: 'start' }} className='relative'>
+            <CarouselContent>
               {listings.map((property) => (
-                <div
-                  key={property.id}
-                  className='w-[280px] sm:w-auto flex-shrink-0 sm:flex-shrink h-full'
-                >
+                <CarouselItem key={property.id} className='basis-full sm:basis-1/2 lg:basis-1/3'>
                   <RealVistaListingCard
                     {...property}
-                    isFavorite={favorites.has(property.id)}
+                    isFavorite={favoriteOverrides[property.id] ?? property.isFavorite}
                     onToggleFavorite={handleToggleFavorite}
                     onClick={() => handlePropertyClick(property.slug, property.id)}
                   />
-                </div>
+                </CarouselItem>
               ))}
-            </div>
-          </div>
+            </CarouselContent>
+            <CarouselPrevious className='-left-6 sm:-left-8' />
+            <CarouselNext className='-right-6 sm:-right-8' />
+          </Carousel>
         )}
 
         {/* Empty State */}

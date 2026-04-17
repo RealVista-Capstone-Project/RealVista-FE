@@ -77,6 +77,7 @@
     "bedrooms": "Bedrooms",
     "baths": "Baths",
     "squareFeet": "Area (m²)",
+    "dimensions": "Dimensions",
     "price": "Price",
     "priceRent": "Rent Price / Month",
     "priceSale": "Sale Price",
@@ -311,6 +312,11 @@
       "hideEmail": "Hide Email",
       "hideEmailDesc": "Hide your email address from other users"
     },
+    "personalization": {
+      "title": "Personalization",
+      "autoRefresh": "Smart Search Auto-Refresh",
+      "autoRefreshDesc": "Automatically refresh recommendations based on your behavior."
+    },
     "saveChanges": "Save changes",
     "saving": "Saving...",
     "subscription": {
@@ -379,7 +385,8 @@
     "appointments": "Appointments",
     "myEngagements": "My Engagements",
     "login": "Login",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "switchPersona": "Switch Profile"
   },
   "PropertyCard": {
     "beds": "Beds",
@@ -525,6 +532,7 @@
     "length": "Length (m)",
     "propertyType": "Property Type",
     "selectType": "Select property type",
+    "propertyCharacteristics": "Property characteristics",
     "selectOption": "Select {label}",
     "additionalDetails": "Additional Details",
     "additionalDetailsDesc": "Specify technical details and additional features of the property.",
@@ -535,6 +543,11 @@
     "selectedAmenities": "{count} amenities selected",
     "noAmenitiesFound": "No amenities found",
     "selectAmenities": "Select amenities",
+    "priceRange": "Price Range",
+    "priceRangeRent": "Rental Price (VND/month)",
+    "priceRangeBuy": "Sale Price (VND)",
+    "priceMin": "Min Price",
+    "priceMax": "Max Price",
     "step2Title": "Media Upload",
     "step2Desc": "Add high-quality photos, videos, or 3D tours to make your property stand out. (Optional)",
     "propertyMedia": "Images & Videos",
@@ -734,5 +747,11 @@
     "personalMessageLabel": "Personal Message",
     "messagePlaceholder": "Introduce yourself and explain why you're a great fit for this property...",
     "messageHint": "This message will be sent along with your selected proposal template."
+  },
+  "SavedSearch": {
+    "duplicateAlert": "This search has already been saved in this board",
+    "success": "Saved search successfully",
+    "error": "Failed to save search. Please try again later.",
+    "buttonLabel": "Save search"
   }
 }

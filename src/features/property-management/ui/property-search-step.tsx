@@ -23,7 +23,8 @@ export function PropertySearchStep() {
   const t = useTranslations('PropertyManagement');
   const { control, setValue, clearErrors } = useFormContext();
   const { data: session } = useAuthSession();
-  const currentUserRole = session?.user?.role;
+  const backendRoles: string[] = (session?.user as any)?.backendRoles ?? [];
+  const isCurrentUserAgent = backendRoles.includes('AGENT') || backendRoles.includes('ADMIN');
 
   const [address, setAddress] = useState('');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -233,7 +234,7 @@ export function PropertySearchStep() {
                             />
                           </div>
                           <div>
-                            <h4 className='font-semibold text-foreground'>{p.street_address || p.full_address}</h4>
+                            <h4 className='text-sm font-semibold text-foreground'>{p.street_address || p.full_address}</h4>
                             <p className='text-sm text-muted-foreground'>
                               {/* TODO: Add owner info if available in PropertyListingDto */}
                             </p>
@@ -279,8 +280,8 @@ export function PropertySearchStep() {
         )}
       </div>
 
-      {/* Role Selection - only visible if user is not just an owner */}
-      {selection && currentUserRole !== 'owner' && (
+      {/* Role Selection - only visible for agents */}
+      {selection && isCurrentUserAgent && (
         <div className='flex flex-col gap-6 pt-8 border-t border-[#E0DEF7] animate-in fade-in slide-in-from-top-4 duration-500'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             {/* Owner Card */}
@@ -307,7 +308,7 @@ export function PropertySearchStep() {
                 >
                   <User size={32} />
                 </div>
-                <h3 className='font-semibold text-lg text-foreground'>{t('iAmOwner')}</h3>
+                <h3 className='text-base font-semibold text-foreground'>{t('iAmOwner')}</h3>
               </CardContent>
             </Card>
 

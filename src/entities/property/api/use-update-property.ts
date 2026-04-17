@@ -10,11 +10,12 @@ export const useUpdateProperty = () => {
   return useMutation({
     mutationFn: (data: { propertyId: string; request: UpdatePropertyRequest }) =>
       propertyApi.updateProperty(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [MY_PROPERTIES_QUERY_KEY] });
-      queryClient.invalidateQueries({
-        queryKey: [PROPERTY_DETAIL_QUERY_KEY, variables.propertyId],
-      });
+    onSuccess: async (_, variables) => {
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: [MY_PROPERTIES_QUERY_KEY] }),
+        queryClient.refetchQueries({ queryKey: ['properties', 'me'] }),
+        queryClient.refetchQueries({ queryKey: [PROPERTY_DETAIL_QUERY_KEY, variables.propertyId] }),
+      ]);
     },
   });
 };

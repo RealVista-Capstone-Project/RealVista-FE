@@ -14,10 +14,12 @@ import type { UserProperty, CreateListingFormData, CreateListingPayload } from '
 import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
 import { propertyQueries } from '@/entities/property';
+import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
 
 export interface CreateListingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  preselectedPropertyId?: string;
 }
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
@@ -212,29 +214,31 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 
 const ITEMS_PER_PAGE = 4;
 
-export function CreateListingModal({ open, onOpenChange }: CreateListingModalProps) {
+export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }: CreateListingModalProps) {
   const t = useTranslations('CreateListingModal');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
-
-  const { data, isLoading } = useQuery(
-    propertyQueries.myProperties({
-      page: currentPage - 1,
-      size: ITEMS_PER_PAGE,
-      status: 'AVAILABLE',
-    })
-  );
-
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
 
-  // Reset state when modal closes
+  // Set step immediately when modal opens/closes
   React.useEffect(() => {
     if (!open) {
       setSelectedProperty(null);
       setCurrentPage(1);
       setCurrentStep(1);
+    } else if (preselectedPropertyId) {
+      setCurrentStep(2);
     }
-  }, [open]);
+  }, [open, preselectedPropertyId]);
+
+  const { data, isLoading } = useQuery({
+    ...propertyQueries.myProperties({
+      page: preselectedPropertyId ? 0 : currentPage - 1,
+      size: preselectedPropertyId ? 50 : ITEMS_PER_PAGE,
+      ...(preselectedPropertyId ? {} : { status: 'AVAILABLE' }),
+    }),
+    enabled: currentStep === 1 || (!!preselectedPropertyId && !selectedProperty),
+  });
 
   const propertiesResponse = data?.payload?.data;
   const rawProperties = propertiesResponse?.content || [];
@@ -300,6 +304,17 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
     };
   });
 
+  // Auto-select pre-specified property and skip to step 2
+  React.useEffect(() => {
+    if (!open || !preselectedPropertyId || selectedProperty || currentStep !== 1) return;
+    if (properties.length === 0) return;
+    const match = properties.find((p) => p.propertyId === preselectedPropertyId);
+    if (match) {
+      setSelectedProperty(match);
+      setCurrentStep(2);
+    }
+  }, [open, preselectedPropertyId, properties, selectedProperty, currentStep]);
+
   const handleNextStep = () => {
     if (selectedProperty) {
       setCurrentStep(2);
@@ -311,6 +326,31 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
   };
 
   const createListingMutation = useCreateListing();
+
+  // Fetch full property detail when at step 2 to get all attributes (list endpoint returns fewer)
+  const { data: propertyDetail } = usePropertyDetail(
+    currentStep === 2 ? selectedProperty?.propertyId : undefined
+  );
+
+  const enrichedProperty: UserProperty | null = React.useMemo(() => {
+    if (!selectedProperty) return null;
+    if (!propertyDetail?.attributes) return selectedProperty;
+    return {
+      ...selectedProperty,
+      attributes: propertyDetail.attributes.map((attr) => ({
+        attributeId: attr.attribute_id,
+        attributeCode: attr.attribute_code,
+        attributeName: attr.attribute_name,
+        dataType: attr.data_type,
+        icon: attr.icon,
+        unit: attr.unit,
+        valueNumber: attr.value_number,
+        valueText: attr.value_text,
+        valueBoolean: attr.value_boolean,
+        displayValue: null,
+      })),
+    };
+  }, [selectedProperty, propertyDetail]);
 
   const handleSubmit = async (data: CreateListingFormData) => {
     // Backend uses snake_case JSON naming (Jackson PropertyNamingStrategies.SNAKE_CASE)
@@ -458,9 +498,9 @@ export function CreateListingModal({ open, onOpenChange }: CreateListingModalPro
         )}
 
         {/* Step 2: Listing Information */}
-        {currentStep === 2 && selectedProperty && (
+        {currentStep === 2 && enrichedProperty && (
           <ListingInformationStep
-            selectedProperty={selectedProperty}
+            selectedProperty={enrichedProperty}
             onPrevious={handlePreviousStep}
             onSubmit={handleSubmit}
             isSubmitting={createListingMutation.isPending}
