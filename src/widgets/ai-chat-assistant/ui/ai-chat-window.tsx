@@ -149,9 +149,9 @@ export function AiChatWindow({
             ))}
             {isTyping && <TypingIndicator />}
             {error && (
-              <ErrorBanner 
-                message={error} 
-                isQuota={error === 'QUOTA_EXCEEDED'} 
+              <ErrorBanner
+                message={error}
+                isQuota={error === 'QUOTA_EXCEEDED'}
                 subscribeUrl={`/${locale}/subscribe`}
                 t={t}
               />
@@ -207,16 +207,16 @@ function LoadingState({ message }: { message: string }) {
 
 /* ---------- Error banner sub-component ---------- */
 
-function ErrorBanner({ 
-  message, 
-  isQuota, 
+function ErrorBanner({
+  message,
+  isQuota,
   subscribeUrl,
-  t 
-}: { 
-  message: string; 
+  t
+}: {
+  message: string;
   isQuota?: boolean;
   subscribeUrl?: string;
-  t: any;
+  t: (key: string) => string;
 }) {
   if (isQuota) {
     return (
@@ -232,8 +232,7 @@ function ErrorBanner({
             </p>
           </div>
         </div>
-        
-        <Link 
+        <Link
           href={subscribeUrl || '/subscribe'}
           className='group relative flex items-center justify-center gap-2 overflow-hidden rounded-lg bg-main-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-main-primary-hover hover:shadow-lg active:scale-95'
         >
