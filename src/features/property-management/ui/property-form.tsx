@@ -302,7 +302,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     const isStepValid = await trigger(stepId);
 
     if (isStepValid) {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentStep((prev: number) => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       toast.error(t('fillRequired'));
@@ -310,7 +310,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   };
 
   const handleBack = () => {
-    setCurrentStep((prev) => prev - 1);
+    setCurrentStep((prev: number) => prev - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

@@ -341,7 +341,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
         attributeId: attr.attribute_id,
         attributeCode: attr.attribute_code,
         attributeName: attr.attribute_name,
-        dataType: attr.dataType,
+        dataType: attr.data_type,
         icon: attr.icon,
         unit: attr.unit,
         valueNumber: attr.value_number,
