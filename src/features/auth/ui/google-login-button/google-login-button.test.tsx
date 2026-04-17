@@ -41,7 +41,7 @@ describe('GoogleLoginButton', () => {
   it('renders with outline variant', () => {
     render(<GoogleLoginButton />);
     const button = screen.getByRole('button', { name: /continue with google/i });
-    expect(button).toHaveClass('border');
+    expect(button).toHaveClass('border-[1.5px]');
   });
 
   it('renders with full width', () => {

@@ -42,7 +42,7 @@ export function GoogleLoginButton() {
   const handleClick = () => {
     setIsLoading(true);
 
-    const rawRedirectTo = searchParams.get('redirectTo');
+    const rawRedirectTo = searchParams?.get?.('redirectTo') ?? null;
     if (rawRedirectTo?.startsWith('/') && !rawRedirectTo.startsWith('//')) {
       document.cookie = `auth-redirect-to=${encodeURIComponent(rawRedirectTo)}; path=/; max-age=300; SameSite=Lax`;
     }
