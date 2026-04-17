@@ -367,7 +367,7 @@ export function AppointmentsPage() {
           </div>
         )}
 
-        {apt.appointment_type !== 'BLOCK' && (isPending || (isAccepted && canCancel)) && (
+        {apt.appointment_type !== 'BLOCK' && (isPending || isAccepted) && (
           <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm pl-1 rounded-sm">
             {isReceiver && isPending && (
               <>
