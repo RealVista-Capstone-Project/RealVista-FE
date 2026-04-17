@@ -10,7 +10,7 @@ import { SlotModal } from './slot-modal';
 import { Availability } from '@/shared/ui/availability';
 import type { AppointmentWithListing } from '../types/appointment';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
-import { Check, X, Clock, Settings2, Save, RepeatIcon } from 'lucide-react';
+import { Check, X, Clock, Settings2, Save, RepeatIcon, CheckCircle2, RefreshCw } from 'lucide-react';
 import { canCancelAppointment, isValidUUID, toLocalIso } from '../utils/appointment';
 import { toast } from 'sonner';
 import { TimeSpan } from '@/shared/ui/availability';
@@ -79,7 +79,7 @@ export function AppointmentsPage() {
   const start_date = format(currentWeekStart, 'yyyy-MM-dd');
   const end_date = format(addDays(currentWeekStart, 29), 'yyyy-MM-dd');
 
-  const { data: appointments = [], isLoading } = useAppointments({
+  const { data: appointments = [], isLoading, refetch } = useAppointments({
     start_date,
     end_date,
   });
@@ -264,7 +264,8 @@ export function AppointmentsPage() {
       }
       stopEditingBlocks();
     } catch (error) {
-      // Error handled by mutation's onError
+      console.error('Failed to sync blocks:', error);
+      toast.error(t('genericError') || 'An error occurred. Please try again.');
     }
   };
 
@@ -273,10 +274,16 @@ export function AppointmentsPage() {
 
   const handleQuickAccept = async (e: React.MouseEvent, appointmentId: string) => {
     e.stopPropagation();
-    await updateStatus.mutateAsync({
-      id: appointmentId,
-      data: { status: 'ACCEPTED' },
-    });
+    try {
+      await updateStatus.mutateAsync({
+        id: appointmentId,
+        data: { status: 'ACCEPTED' },
+      });
+      toast.success(t('acceptedSuccess') || 'Appointment accepted');
+    } catch (error) {
+      console.error('Failed to accept appointment:', error);
+      toast.error(t('genericError') || 'Failed to accept appointment');
+    }
   };
 
   const handleOpenReasonDialog = (e: React.MouseEvent, appointmentId: string, action: 'REJECT' | 'CANCEL') => {
@@ -288,12 +295,18 @@ export function AppointmentsPage() {
   const handleSubmitReason = async () => {
     if (!pendingAction || !actionReason.trim()) return;
     const status = pendingAction.action === 'REJECT' ? 'REJECTED' : 'CANCELED';
-    await updateStatus.mutateAsync({
-      id: pendingAction.appointmentId,
-      data: { status, reason: actionReason.trim() },
-    });
-    setPendingAction(null);
-    setActionReason('');
+    try {
+      await updateStatus.mutateAsync({
+        id: pendingAction.appointmentId,
+        data: { status, reason: actionReason.trim() },
+      });
+      toast.success(status === 'REJECTED' ? t('rejectedSuccess') : t('canceled'));
+      setPendingAction(null);
+      setActionReason('');
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      toast.error(t('genericError'));
+    }
   };
 
   const handleDeleteBlock = async (e: React.MouseEvent, appointmentId: string) => {
@@ -307,6 +320,7 @@ export function AppointmentsPage() {
           return next;
         });
       } catch (error) {
+        console.error('Failed to delete block from server:', error);
         toast.error("Failed to delete block from server");
         return;
       }
@@ -316,7 +330,6 @@ export function AppointmentsPage() {
 
   const renderAppointmentCard = (apt: AppointmentWithListing, dateString: string, startTime: string, endTime: string) => {
     const isReceiver = currentUser?.user_id === apt.receiver_id;
-    const isSender = currentUser?.user_id === apt.sender_id;
     const isPending = apt.status === 'PENDING';
     const isAccepted = apt.status === 'ACCEPTED';
 
@@ -342,7 +355,7 @@ export function AppointmentsPage() {
         )}
 
         {apt.appointment_type === 'BLOCK' && isEditingBlocks && (
-          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-slate-50 dark:bg-slate-900 pl-1 rounded">
+          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm pl-1 rounded-sm">
             <Button
               variant="ghost"
               size="icon"
@@ -355,7 +368,7 @@ export function AppointmentsPage() {
         )}
 
         {apt.appointment_type !== 'BLOCK' && (isPending || (isAccepted && canCancel)) && (
-          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-yellow-50 dark:bg-yellow-950 pl-1 rounded">
+          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm pl-1 rounded-sm">
             {isReceiver && isPending && (
               <>
                 <button
@@ -377,6 +390,24 @@ export function AppointmentsPage() {
                   <X className="h-3 w-3" />
                 </button>
               </>
+            )}
+            {isReceiver && isAccepted && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateStatus.mutate({
+                    id: apt.appointment_id,
+                    data: { status: 'COMPLETED' }
+                  }, {
+                    onSuccess: () => toast.success(t('completeSuccess'))
+                  });
+                }}
+                disabled={updateStatus.isPending}
+                className="rounded bg-blue-500/20 p-1 text-blue-700 hover:bg-blue-500/30 dark:text-blue-300"
+                title={t('complete')}
+              >
+                <CheckCircle2 className="h-3 w-3" />
+              </button>
             )}
             {canCancel && !(isReceiver && isPending) && (
               <Tooltip>
@@ -419,7 +450,7 @@ export function AppointmentsPage() {
               {/* Status Filter */}
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
                 <SelectTrigger className="h-8 w-[130px] text-xs">
-                  <SelectValue placeholder={t('status')} />
+                  <SelectValue placeholder={t('statusLabel')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">{t('all')}</SelectItem>
@@ -447,6 +478,24 @@ export function AppointmentsPage() {
                   </SelectContent>
                 </Select>
               )}
+
+              {/* Reload Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => refetch()}
+                    disabled={isLoading}
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {t('reload')}
+                </TooltipContent>
+              </Tooltip>
             </div>
           }
           actions={
