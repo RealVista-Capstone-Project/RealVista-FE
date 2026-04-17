@@ -13,29 +13,12 @@ import { getRedirectPathByRole } from '@/shared/lib/auth/rbac';
 import type { UserRole } from '@/shared/lib/auth/rbac';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link } from '@/shared/config/i18n/navigation';
+import { cn } from '@/shared/lib/utils';
 
-/**
- * LoginFormNextAuth Component
- *
- * NextAuth-powered login form that uses the Credentials provider.
- * Integrates with the backend API at /api/auth/signin/credentials.
- *
- * Features:
- * - Email/password validation
- * - NextAuth error handling with user-friendly messages
- * - Toast notifications for success/error
- * - Loading state during authentication
- * - Redirect to dashboard on success
- *
- * Usage:
- * ```tsx
- * import { LoginFormNextAuth } from '@/features/auth/ui';
- *
- * export default function LoginPage() {
- *   return <LoginFormNextAuth />;
- * }
- * ```
- */
+type LoginFormData = {
+  identifier: string;
+  password: string;
+};
 
 // TODO: Handle only BackendRole
 export function LoginFormNextAuth() {
@@ -51,32 +34,28 @@ export function LoginFormNextAuth() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ email: string; password: string }>();
+  } = useForm<LoginFormData>();
 
-  const onSubmit = async (data: { email: string; password: string }) => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError('');
 
+    const isEmail = data.identifier.includes('@');
+    const credentials = isEmail
+      ? { email: data.identifier, password: data.password }
+      : { phone: data.identifier, password: data.password };
+
     try {
-      // Call NextAuth signIn with Credentials provider
-      const result = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: false, // Handle redirect manually
-      });
+      const result = await signIn('credentials', { ...credentials, redirect: false });
 
       if (result?.error) {
-        // Map NextAuth error codes to user-friendly messages
-        // result.error can be string | undefined, validate it first
         const errorCode = typeof result.error === 'string' ? result.error : 'Default';
         const errorMessage = mapAuthError(errorCode);
         setError(errorMessage);
         toast.error(errorMessage);
       } else if (result?.ok) {
-        // Success! Show toast and redirect based on role
         toast.success(t('loginSuccess'));
 
-        // Fetch the session to get the user's role for redirect
         const session = await getSession();
         const role = session?.user?.role as UserRole | undefined;
 
@@ -89,7 +68,6 @@ export function LoginFormNextAuth() {
         router.push(redirectPath);
       }
     } catch {
-      // Unexpected error
       const errorMessage = t('loginFailed');
       setError(errorMessage);
       toast.error(errorMessage);
@@ -98,21 +76,10 @@ export function LoginFormNextAuth() {
     }
   };
 
-  /**
-   * Maps NextAuth error codes to user-friendly messages
-   *
-   * NextAuth error codes:
-   * - CredentialsSignin: Invalid credentials
-   * - InvalidCredentials: Invalid credentials
-   * - Default: Generic error
-   *
-   * @param error - Error code from NextAuth
-   * @returns User-friendly error message
-   */
   function mapAuthError(error: string): string {
     const errorMap: Record<string, string> = {
-      CredentialsSignin: 'Invalid email or password',
-      InvalidCredentials: 'Invalid email or password',
+      CredentialsSignin: 'Invalid email/phone or password',
+      InvalidCredentials: 'Invalid email/phone or password',
       AccessDenied: 'Access denied',
       Configuration: 'Server configuration error',
       Default: 'An error occurred. Please try again.',
@@ -121,21 +88,24 @@ export function LoginFormNextAuth() {
     return errorMap[error] || errorMap.Default;
   }
 
+  const inputClass =
+    'h-11 rounded-lg border-purple-92 bg-purple-98 px-4 text-main-black placeholder:text-grey-400 focus:border-main-primary focus:bg-white focus:ring-main-primary';
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <div className='space-y-1.5'>
-        <Label htmlFor='email' className='text-sm font-medium text-main-black'>
-          {t('email')}
+        <Label htmlFor='identifier' className='text-sm font-medium text-main-black'>
+          {t('emailOrPhone')}
         </Label>
         <Input
-          id='email'
-          type='email'
-          placeholder='hi@example.com'
+          id='identifier'
+          type='text'
+          placeholder={t('emailOrPhonePlaceholder')}
           disabled={isLoading}
-          className='h-11 rounded-lg border-purple-92 bg-purple-98 px-4 text-main-black placeholder:text-grey-400 focus:border-main-primary focus:bg-white focus:ring-main-primary'
-          {...register('email', { required: 'Email is required' })}
+          className={inputClass}
+          {...register('identifier', { required: t('emailOrPhoneRequired') })}
         />
-        {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
+        {errors.identifier && <p className='text-sm text-red-500'>{errors.identifier.message}</p>}
       </div>
 
       <div className='space-y-1.5'>
@@ -148,7 +118,7 @@ export function LoginFormNextAuth() {
             type={showPassword ? 'text' : 'password'}
             placeholder='Enter password'
             disabled={isLoading}
-            className='h-11 rounded-lg border-purple-92 bg-purple-98 px-4 pr-10 text-main-black placeholder:text-grey-400 focus:border-main-primary focus:bg-white focus:ring-main-primary'
+            className={cn(inputClass, 'pr-10')}
             {...register('password', { required: 'Password is required' })}
           />
           <button
@@ -162,9 +132,11 @@ export function LoginFormNextAuth() {
         {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
       </div>
 
-      {/* Forgot Password Link */}
       <div className='flex justify-end'>
-        <Link href='/forgot-password' className='text-sm font-semibold text-main-primary hover:text-main-primary-hover transition-colors'>
+        <Link
+          href='/forgot-password'
+          className='text-sm font-semibold text-main-primary hover:text-main-primary-hover transition-colors'
+        >
           {t('forgotPassword')}
         </Link>
       </div>

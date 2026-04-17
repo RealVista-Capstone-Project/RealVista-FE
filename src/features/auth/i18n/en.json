@@ -66,6 +66,11 @@
     "loginSuccess": "Login successful!",
     "loginFailed": "Login failed",
     "invalidCredentials": "Invalid email or password",
+    "emailRequired": "Email is required",
+    "phoneRequired": "Phone number is required",
+    "emailOrPhone": "Email or Phone number",
+    "emailOrPhonePlaceholder": "Email or phone number",
+    "emailOrPhoneRequired": "Email or phone number is required",
     "signUp": "Sign up",
     "cardPropertyTitle": "Beverly Springfield",
     "cardPropertyAddress": "2821 Sevilla, Palm Harbor, TX"

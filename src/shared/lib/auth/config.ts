@@ -41,17 +41,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
+        phone: { label: 'Phone', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // Validate credentials presence
-        if (!credentials?.email || !credentials?.password) {
-          console.error('[NextAuth] Email and password required');
+        const hasEmail = !!credentials?.email;
+        const hasPhone = !!credentials?.phone;
+
+        if ((!hasEmail && !hasPhone) || !credentials?.password) {
+          console.error('[NextAuth] Email or phone and password required');
           return null;
         }
 
-        const email = credentials.email as string;
         const password = credentials.password as string;
+        const loginBody = hasEmail
+          ? { email: credentials.email as string, password }
+          : { phone: credentials.phone as string, password };
 
         try {
           console.log('[NextAuth] Attempting login');
@@ -59,7 +64,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Call backend API using centralized http client
           const result = await http.post<BackendLoginResponse>(
             '/auth/login',
-            { email, password },
+            loginBody,
             { baseUrl: env.NEXT_PUBLIC_API_ENDPOINT }
           );
 
