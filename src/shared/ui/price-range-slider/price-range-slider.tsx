@@ -62,7 +62,7 @@ export function PriceRangeSlider({
 
   return (
     <div className='space-y-3'>
-      {title && <h3 className='text-sm font-semibold text-[#4D5461]'>{title}</h3>}
+      {title && <h3 className='text-sm font-semibold text-muted-foreground'>{title}</h3>}
       <div className='space-y-4'>
         {/* Price Histogram */}
         <div className='flex items-end justify-between gap-1 h-16 px-1'>
@@ -72,8 +72,9 @@ export function PriceRangeSlider({
             return (
               <div
                 key={index}
-                className={`flex-1 rounded-t-sm transition-colors duration-300 ${isActive ? 'bg-primary opacity-80' : 'bg-[#E5E7EB]'
-                  }`}
+                className={`flex-1 rounded-t-sm transition-colors duration-300 ${
+                  isActive ? 'bg-primary opacity-80' : 'bg-muted'
+                }`}
                 style={{ height: `${height}px` }}
               />
             );
@@ -82,9 +83,9 @@ export function PriceRangeSlider({
 
         {/* Dual Range Slider */}
         <div className='relative px-2 h-6'>
-          <div className='absolute left-2 right-2 top-2.5 h-1.5 bg-[#E0DEF7] rounded-full'>
+          <div className='absolute left-2 right-2 top-2.5 h-1.5 bg-primary/20 rounded-full'>
             <div
-              className='absolute h-full bg-primary rounded-full shadow-[0_0_10px_rgba(112,101,240,0.3)]'
+              className='absolute h-full bg-primary rounded-full shadow-primary/30'
               style={{
                 left: `${((internalLow - minValue) / (maxValue - minValue)) * 100}%`,
                 right: `${100 - ((internalHigh - minValue) / (maxValue - minValue)) * 100}%`,
@@ -119,8 +120,8 @@ export function PriceRangeSlider({
 
         {/* Price Labels */}
         <div className='flex justify-between px-2'>
-          <span className='text-lg font-bold text-main-black'>{formatVND(internalLow)}</span>
-          <span className='text-lg font-bold text-main-black'>{formatVND(internalHigh)}</span>
+          <span className='text-lg font-bold text-foreground'>{formatVND(internalLow)}</span>
+          <span className='text-lg font-bold text-foreground'>{formatVND(internalHigh)}</span>
         </div>
       </div>
     </div>

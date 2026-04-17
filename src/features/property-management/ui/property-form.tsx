@@ -444,28 +444,28 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                 className={cn(
                   'flex size-7 items-center justify-center rounded-full text-xs font-bold transition-all',
                   currentStep > index
-                    ? 'bg-[#7065F0] text-white'
+                    ? 'bg-primary text-white'
                     : currentStep === index
-                      ? 'bg-[#7065F0] text-white'
-                      : 'bg-[#E8E6F9] text-[#100A55]'
+                      ? 'bg-primary text-white'
+                      : 'bg-secondary text-foreground'
                 )}
               >
                 {currentStep > index ? <Check className='size-4' /> : index + 1}
               </div>
               {/* Step label */}
-              <span className='text-base font-medium text-[#100A55]'>{step.label}</span>
+              <span className='text-base font-medium text-foreground'>{step.label}</span>
             </div>
 
             {/* Step separator arrow */}
             {index < STEPS.length - 1 && (
-              <ChevronRight className='size-5 text-[#100A55] opacity-50' />
+              <ChevronRight className='size-5 text-foreground opacity-50' />
             )}
           </div>
         ))}
       </div>
 
       {/* Form Card */}
-      <div className='rounded-lg border-[1.5px] border-[#E0DEF7] bg-white p-6 sm:p-8 shadow-sm'>
+      <div className='rounded-lg border-[1.5px] border-primary/20 bg-white p-6 sm:p-8 shadow-sm'>
         <FormProvider {...methods}>
           <form
             onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation Errors:', errors))}
@@ -474,7 +474,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
             {STEPS[currentStep].component}
 
             {/* Navigation Buttons */}
-            <div className='flex items-center justify-end gap-4 pt-6 mt-4 border-t border-[#E0DEF7]'>
+            <div className='flex items-center justify-end gap-4 pt-6 mt-4 border-t border-primary/20'>
               {currentStep > 0 ? (
                 <Button
                   type='button'

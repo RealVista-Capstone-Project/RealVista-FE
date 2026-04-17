@@ -59,7 +59,7 @@ export function WizardFooter({
         {currentStep < totalSteps ? (
           <Button
             type='button'
-            className='h-11 rounded-xl bg-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary-hover'
+            className='h-11 rounded-xl bg-primary px-5 text-white shadow-primary/30 hover:bg-primary/90'
             onClick={onNext}
             disabled={!isStepValid || isMutating}
           >
@@ -69,7 +69,7 @@ export function WizardFooter({
         ) : (
           <Button
             type='button'
-            className='h-11 rounded-xl bg-primary px-5 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary-hover'
+            className='h-11 rounded-xl bg-primary px-5 text-white shadow-primary/30 hover:bg-primary/90'
             onClick={onSendForSigning}
             disabled={isMutating}
           >

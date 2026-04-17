@@ -208,14 +208,14 @@ export function DashboardLayout({
       {/* Sidebar - Now part of the flex flow on desktop */}
       <aside
         className={cn(
-          'relative z-20 flex h-screen flex-col border-r border-purple-92/50 bg-white transition-all duration-300 ease-in-out shrink-0',
+          'relative z-20 flex h-screen flex-col border-primary/20 bg-white transition-all duration-300 ease-in-out shrink-0',
           isCollapsed ? 'w-20' : 'w-[280px]'
         )}
       >
         {/* Logo */}
         <div
           className={cn(
-            'flex h-16 items-center border-purple-92/50 p-5',
+            'flex h-16 items-center border-primary/20 p-5',
             isCollapsed ? 'justify-center' : 'justify-between'
           )}
         >
@@ -223,7 +223,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={() => setIsCollapsed(false)}
-              className='flex size-8 items-center justify-center rounded-xl bg-primary transition-opacity hover:opacity-90 shadow-sm shadow-indigo-100'
+              className='flex size-8 items-center justify-center rounded-xl bg-primary transition-opacity hover:opacity-90 shadow-sm shadow-primary/10'
               aria-label='Expand sidebar'
             >
               <Image
@@ -237,7 +237,7 @@ export function DashboardLayout({
           ) : (
             <>
               <Link href={logoHref} className='flex items-center gap-3 group'>
-                <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-indigo-100'>
+                <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-primary/10'>
                   <Image
                     src='/logo.png'
                     alt='RealVista Logo'
@@ -247,7 +247,7 @@ export function DashboardLayout({
                   />
                 </div>
                 <div className='flex flex-col'>
-                  <span className='text-base font-bold leading-tight text-main-black'>
+                  <span className='text-base font-bold leading-tight text-foreground'>
                     Estatery
                   </span>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-secondary/40'>
@@ -258,7 +258,7 @@ export function DashboardLayout({
               <button
                 type='button'
                 onClick={() => setIsCollapsed(true)}
-                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-secondary/40 transition-all hover:bg-slate-50 hover:text-secondary hover:border-slate-300 hover:shadow-sm'
+                className='flex size-8 items-center justify-center rounded-lg border-primary/20 bg-white text-secondary/40 transition-all hover:bg-slate-50 hover:text-secondary hover:border-border hover:shadow-sm'
                 aria-label='Collapse sidebar'
               >
                 <Columns className='h-4 w-4' strokeWidth={2} />
@@ -278,8 +278,8 @@ export function DashboardLayout({
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200',
                   isActive
-                    ? 'bg-purple-96 text-primary font-semibold ring-1 ring-purple-92/50'
-                    : 'text-secondary/60 hover:bg-purple-98 hover:text-secondary',
+                    ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
+                    : 'text-secondary/60 hover:bg-primary/10 hover:text-secondary',
                   isCollapsed ? 'justify-center' : 'justify-start'
                 )}
                 title={isCollapsed ? item.label : undefined}
@@ -295,14 +295,14 @@ export function DashboardLayout({
         </nav>
 
         {/* Footer */}
-        <div className='border-t border-purple-92/50 p-3'>
+        <div className='border-t border-primary/20 p-3'>
           <Link
             href={settingsHref}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
               isSettingsFooterActive
-                ? 'bg-purple-96 text-primary font-semibold ring-1 ring-purple-92/50'
-                : 'text-secondary/60 hover:bg-purple-98 hover:text-secondary',
+                ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
+                : 'text-secondary/60 hover:bg-primary/10 hover:text-secondary',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
@@ -331,7 +331,7 @@ export function DashboardLayout({
         />
 
         {/* Page Content - fills remaining height, scrollable */}
-        <main className='flex-1 overflow-y-auto bg-slate-50/50 p-0'>{children}</main>
+        <main className='flex-1 overflow-y-auto bg-secondary/30 p-0'>{children}</main>
       </div>
     </div>
   );

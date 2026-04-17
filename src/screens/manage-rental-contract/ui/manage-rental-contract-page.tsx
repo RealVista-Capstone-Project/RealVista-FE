@@ -69,7 +69,7 @@ function ManageRentalContractContent() {
           <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm'>
             <FileSearch className='h-8 w-8 text-primary' />
           </div>
-          <p className='font-semibold text-main-black'>{t('error')}</p>
+          <p className='font-semibold text-foreground'>{t('error')}</p>
         </div>
       </div>
     );
@@ -84,7 +84,7 @@ function ManageRentalContractContent() {
               <p className='text-xs font-semibold uppercase tracking-[0.24em] text-primary/70'>
                 {t('hero.eyebrow')}
               </p>
-              <h1 className='mt-3 text-3xl font-semibold tracking-[-0.03em] text-main-black'>
+              <h1 className='mt-3 text-3xl font-semibold tracking-[-0.03em] text-foreground'>
                 {t('hero.title')}
               </h1>
               <p className='mt-3 max-w-xl text-sm leading-7 text-secondary/70'>
@@ -109,13 +109,13 @@ function ManageRentalContractContent() {
                   <p className='text-[11px] uppercase tracking-[0.16em] text-secondary/50'>
                     {t('hero.stats.totalContracts')}
                   </p>
-                  <p className='mt-2 text-2xl font-semibold text-main-black'>{totalElements}</p>
+                  <p className='mt-2 text-2xl font-semibold text-foreground'>{totalElements}</p>
                 </div>
                 <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
                   <p className='text-[11px] uppercase tracking-[0.16em] text-secondary/50'>
                     {t('hero.stats.activeSelection')}
                   </p>
-                  <p className='mt-2 text-sm font-semibold text-main-black'>
+                  <p className='mt-2 text-sm font-semibold text-foreground'>
                     {selectedContract?.tenant.fullName ?? t('hero.noSelection')}
                   </p>
                 </div>
@@ -161,7 +161,7 @@ function ManageRentalContractContent() {
             </div>
 
             <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_rgba(96,72,179,0.10)]'>
-              <div className='grid grid-cols-12 gap-4 border-b border-[#F0EEF7] bg-[#FAF8FF] px-5 py-4'>
+              <div className='grid grid-cols-12 gap-4 border-b border-primary/20 bg-secondary px-5 py-4'>
                 <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/45'>
                   {t('table.status')}
                 </div>
@@ -179,7 +179,7 @@ function ManageRentalContractContent() {
               <div className='min-h-[420px]'>
                 {contracts.length === 0 ? (
                   <div className='flex h-[420px] flex-col items-center justify-center gap-4 px-6 text-center'>
-                    <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F1ECFF]'>
+                    <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10'>
                       <FileSearch className='h-8 w-8 text-primary/70' />
                     </div>
                     <div>
@@ -188,7 +188,7 @@ function ManageRentalContractContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className='divide-y divide-[#F3F1FA]'>
+                  <div className='divide-y divide-primary/10'>
                     {contracts.map((contract) => (
                       <ContractListItem
                         key={contract.id}
@@ -216,7 +216,7 @@ function ManageRentalContractContent() {
                   <Button
                     variant='outline'
                     size='icon'
-                    className='h-9 w-9 rounded-xl border-[#E1DCF4] bg-white hover:border-primary hover:bg-[#F4F1FF] hover:text-primary'
+                    className='h-9 w-9 rounded-xl border-primary/20 bg-white hover:border-primary hover:bg-primary/5 hover:text-primary'
                     onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
                     disabled={currentPage === 1}
                   >
@@ -230,7 +230,7 @@ function ManageRentalContractContent() {
                   <Button
                     variant='outline'
                     size='icon'
-                    className='h-9 w-9 rounded-xl border-[#E1DCF4] bg-white hover:border-primary hover:bg-[#F4F1FF] hover:text-primary'
+                    className='h-9 w-9 rounded-xl border-primary/20 bg-white hover:border-primary hover:bg-primary/5 hover:text-primary'
                     onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
                     disabled={currentPage === totalPages || totalPages === 0}
                   >

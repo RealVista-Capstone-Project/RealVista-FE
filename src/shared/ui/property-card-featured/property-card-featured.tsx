@@ -58,21 +58,21 @@ export function PropertyCardFeatured({
       <g clipPath='url(#clip0_272_7379)'>
         <path
           d='M8.83149 15.5437L3.45631 10.1685C2.8479 9.56011 2.8479 8.43989 3.45631 7.83148L8.83149 2.45631C9.43989 1.8479 10.5601 1.8479 11.1685 2.45631L16.5437 7.83148C17.1521 8.43989 17.1521 9.56011 16.5437 10.1685L11.1685 15.5437C10.5601 16.1521 9.43989 16.1521 8.83149 15.5437V15.5437Z'
-          stroke='#7065F0'
+          stroke='var(--primary)'
           strokeWidth='2.1'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
         <path
           d='M2 13.1719L6.36371 17.5356'
-          stroke='#7065F0'
+          stroke='var(--primary)'
           strokeWidth='2.1'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
         <path
           d='M13.6362 17.5356L17.9999 13.1719'
-          stroke='#7065F0'
+          stroke='var(--primary)'
           strokeWidth='2.1'
           strokeLinecap='round'
           strokeLinejoin='round'
@@ -89,7 +89,7 @@ export function PropertyCardFeatured({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border-[1.5px] border-purple-96 bg-white transition-shadow hover:shadow-md',
+        'relative overflow-hidden rounded-xl border-[1.5px] border-primary/10 bg-white transition-shadow hover:shadow-md',
         className
       )}
     >
@@ -132,16 +132,16 @@ export function PropertyCardFeatured({
         {/* Title & Favorite */}
         <div className='mb-3 flex items-start justify-between gap-3'>
           <div className='flex-1'>
-            <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-black truncate'>
+            <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-foreground truncate'>
               {title}
             </h3>
-            <p className='text-base font-normal leading-[1.5] text-grey-500 line-clamp-2'>
+            <p className='text-base font-normal leading-[1.5] text-muted-foreground line-clamp-2'>
               {address}
             </p>
           </div>
           <button
             onClick={onFavorite}
-            className='flex size-10 shrink-0 items-center justify-center rounded-full border-[1.5px] border-purple-92 bg-white transition-colors hover:bg-purple-98'
+            className='flex size-10 shrink-0 items-center justify-center rounded-full border-[1.5px] border-primary/20 bg-white transition-colors hover:bg-primary/5'
             aria-label='Add to favorites'
           >
             <Heart
@@ -155,25 +155,25 @@ export function PropertyCardFeatured({
         </div>
 
         {/* Divider */}
-        <div className='mb-4 h-[1px] bg-purple-92' />
+        <div className='mb-4 h-[1px] bg-primary/10' />
 
         {/* Features */}
         <div className='mb-4 flex items-center justify-center gap-4'>
           <div className='flex items-center gap-1.5'>
             <BedSingle className='h-5 w-5 text-primary' strokeWidth={2.3} />
-            <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
               {beds} {bedsLabel}
             </span>
           </div>
           <div className='flex items-center gap-1.5'>
             <Bath className='h-5 w-5 text-primary' strokeWidth={2.3} />
-            <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
               {bathrooms} {bathroomsLabel}
             </span>
           </div>
           <div className='flex items-center gap-1.5'>
             <AreaIcon />
-            <span className='text-sm font-normal leading-[1.4] text-grey-500'>
+            <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
               {area}
               {areaUnit}
             </span>
@@ -183,19 +183,19 @@ export function PropertyCardFeatured({
         {/* Price & Apply Button */}
         <div className='flex items-center justify-between gap-4'>
           <div>
-            <p className='text-xs font-medium uppercase tracking-wide text-grey-500'>{rentSaleLabel}</p>
+            <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>{rentSaleLabel}</p>
             <p className='flex items-baseline gap-1'>
               <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-primary'>
                 {!currencyAfter && currency}
                 {formattedPrice}
                 {currencyAfter && currency}
               </span>
-              <span className='text-base font-normal leading-[1.5] text-grey-500'>{period}</span>
+              <span className='text-base font-normal leading-[1.5] text-muted-foreground'>{period}</span>
             </p>
           </div>
           <Button
             onClick={onApply}
-            className='h-11 rounded-lg bg-main-black px-5 text-sm font-semibold text-white hover:bg-main-black/90 transition-colors'
+            className='h-11 rounded-lg bg-foreground px-5 text-sm font-semibold text-white hover:bg-foreground/90 transition-colors'
           >
             {applyLabel}
             <svg

@@ -110,16 +110,16 @@ export function DatePickerInput({
             type='button'
             id={id}
             className={cn(
-              'bg-white border border-purple-92 rounded-lg px-4 py-3.5',
+              'bg-white border border-primary/20 rounded-lg px-4 py-3.5',
               'flex items-center justify-between w-full',
-              'hover:border-purple-92-hover transition-colors cursor-pointer',
+              'hover:border-primary transition-colors cursor-pointer',
               'focus:outline-none focus:ring-2 focus:ring-primary/50',
               className
             )}
           >
             <div className='flex items-center gap-2 opacity-50'>
               <CalendarIcon className='size-6' />
-              <span className='text-main-black text-[14px] font-medium leading-[1.4]'>
+              <span className='text-foreground text-[14px] font-medium leading-[1.4]'>
                 {inputValue || placeholder}
               </span>
             </div>
@@ -131,8 +131,8 @@ export function DatePickerInput({
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
               >
-                <circle cx='10' cy='10' r='10' fill='#7065F0' fillOpacity='0.1' />
-                <path d='M10 6V14M6 10H14' stroke='#7065F0' strokeWidth='2' strokeLinecap='round' />
+                <circle cx='10' cy='10' r='10' fill='currentColor' fillOpacity='0.1' />
+                <path d='M10 6V14M6 10H14' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
               </svg>
             </div>
           </button>

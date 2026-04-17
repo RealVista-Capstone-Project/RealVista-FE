@@ -55,7 +55,7 @@ function FilterChip({
       )}
     >
       <span>{label}</span>
-      <Icon className={cn('h-4 w-4 transition-transform duration-200', active ? 'text-primary' : 'text-grey-500')} strokeWidth={2} />
+      <Icon className={cn('h-4 w-4 transition-transform duration-200', active ? 'text-primary' : 'text-muted-foreground')} strokeWidth={2} />
     </button>
   );
 }

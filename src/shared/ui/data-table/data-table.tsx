@@ -65,11 +65,11 @@ export function DataTable<TData>({
   })
 
   return (
-    <div className={cn('px-2 py-2 space-y-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800', className)}>
+    <div className={cn('px-2 py-2 space-y-2 bg-white dark:bg-background rounded-2xl shadow-sm border border-border', className)}>
       {/* Toolbar */}
       {toolbar && toolbar}
       {/* Table */}
-      <div className='rounded-b-2xl overflow-hidden rounded-md border border-slate-200 dark:border-slate-800'>
+      <div className='rounded-b-2xl overflow-hidden rounded-md border border-border'>
         <Table>
           <TableHeader >
             {table.getHeaderGroups().map((headerGroup) => (
@@ -95,7 +95,7 @@ export function DataTable<TData>({
                   <TableRow key={`skeleton-${i}`}>
                     {columns.map((_, j) => (
                       <TableCell key={`skeleton-${i}-${j}`}>
-                        <div className='h-4 w-full animate-pulse rounded bg-grey-200' />
+                        <div className='h-4 w-full animate-pulse rounded bg-muted' />
                       </TableCell>
                     ))}
                   </TableRow>
@@ -123,13 +123,13 @@ export function DataTable<TData>({
                 >
                   <div className='flex flex-col items-center justify-center text-center'>
                     {emptyIcon ?? (
-                      <Inbox className='h-10 w-10 text-grey-400 mb-2' />
+                      <Inbox className='h-10 w-10 text-muted-foreground mb-2' />
                     )}
-                    <p className='text-sm font-medium text-grey-600'>
+                    <p className='text-sm font-medium text-muted-foreground'>
                       {emptyTitle}
                     </p>
                     {emptyDescription && (
-                      <p className='text-xs text-grey-400 mt-1'>
+                      <p className='text-xs text-muted-foreground mt-1'>
                         {emptyDescription}
                       </p>
                     )}
@@ -144,7 +144,7 @@ export function DataTable<TData>({
       {/* Pagination */}
       {pageCount != null && pageCount >= 1 && (
         <div className='flex items-center justify-between px-6'>
-          <p className='text-sm text-grey-500'>
+          <p className='text-sm text-muted-foreground'>
             {pageInfoText
               ? pageInfoText((pagination?.pageIndex ?? 0) + 1, pageCount!)
               : `Page ${(pagination?.pageIndex ?? 0) + 1} of ${pageCount}`}
@@ -177,7 +177,7 @@ export function DataTable<TData>({
                   key={pageNum}
                   variant={pageNum === (pagination?.pageIndex ?? 0) + 1 ? 'default' : 'outline'}
                   size='icon'
-                  className={pageNum === (pagination?.pageIndex ?? 0) + 1 ? 'bg-[#100A55] text-white hover:bg-[#100A55]/90' : ''}
+                  className={pageNum === (pagination?.pageIndex ?? 0) + 1 ? 'bg-primary text-white hover:bg-primary/90' : ''}
                   onClick={() =>
                     table.setPageIndex((pageNum as number) - 1)
                   }

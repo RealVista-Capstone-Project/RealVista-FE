@@ -52,7 +52,7 @@ export function PropertyMapMarker({
       <span
         className={cn(
           'text-sm font-bold leading-tight',
-          isSelected || isHovered ? 'text-white' : 'text-main-black'
+          isSelected || isHovered ? 'text-white' : 'text-foreground'
         )}
       >
         {label || formatVND(price ?? 0)}

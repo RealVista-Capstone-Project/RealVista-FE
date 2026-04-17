@@ -44,33 +44,9 @@
   --color-card: var(--card);
 
   /* Main Colors */
-  --color-main-black: var(--main-black);
-  --color-main-white: var(--main-white);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
-
-  /* Greyscale */
-  --color-grey-50: var(--grey-50);
-  --color-grey-100: var(--grey-100);
-  --color-grey-150: var(--grey-150);
-  --color-grey-200: var(--grey-200);
-  --color-grey-300: var(--grey-300);
-  --color-grey-400: var(--grey-400);
-  --color-grey-500: var(--grey-500);
-  --color-grey-600: var(--grey-600);
-  --color-grey-700: var(--grey-700);
-  --color-grey-800: var(--grey-800);
-  --color-grey-900: var(--grey-900);
-
-  /* Shades of Purple */
-  --color-purple-90: var(--purple-90);
-  --color-purple-92: var(--purple-92);
-  --color-purple-92-hover: var(--purple-92-hover);
-  --color-purple-92-active: var(--purple-92-active);
-  --color-purple-94: var(--purple-94);
-  --color-purple-96: var(--purple-96);
-  --color-purple-98: var(--purple-98);
 
   /* Border Radius */
   --radius-sm: var(--radius-sm);
@@ -97,17 +73,10 @@
   --radius-lg: 0.625rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
-
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #7065f0;
-  --primary-hover: #5b52d1;
-  --primary-active: #4a42a8;
-  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -134,6 +103,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
 }
 
 .dark {
@@ -189,29 +160,6 @@
   }
 }
 
-@layer base {
-  :root {
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-  }
-
-  .dark {
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.439 0 0);
-  }
-}
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {

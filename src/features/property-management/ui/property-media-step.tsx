@@ -129,7 +129,7 @@ export function PropertyMediaStep() {
           render={() => (
             <FormItem>
               <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
-                <ImageIcon className='size-4 text-[#7065F0]' />
+                <ImageIcon className='size-4 text-primary' />
                 {t('propertyMedia')}
               </FormLabel>
               <FormControl>
@@ -140,7 +140,7 @@ export function PropertyMediaStep() {
                       {uploadedMedia.map((item, index) => (
                         <div
                           key={`${item.url}-${index}`}
-                          className='relative group rounded-lg overflow-hidden border border-[#E0DEF7] aspect-square'
+                          className='relative group rounded-lg overflow-hidden border border-primary/20 aspect-square'
                         >
                           {item.type === 'VIDEO' ? (
                             <div className='size-full bg-[#100A55] flex items-center justify-center'>

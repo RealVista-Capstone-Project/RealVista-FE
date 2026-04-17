@@ -322,15 +322,15 @@ export function MessageInput({
     : '';
 
   return (
-    <div className='border-t border-purple-92/50 bg-white px-6 py-4'>
+    <div className='border-primary/20 bg-white px-6 py-4'>
       {/* Offline banner */}
       {!isConnected && (
-        <p className='mb-2 text-center text-xs text-grey-400'>{t('connecting')}</p>
+        <p className='mb-2 text-center text-xs text-muted-foreground'>{t('connecting')}</p>
       )}
 
       {/* ── Listing URL preview banner ────────────────────────────────────── */}
       {showPreview && (
-        <div className='mb-3 overflow-hidden rounded-xl border border-primary/25 bg-primary/5'>
+        <div className='mb-3 overflow-hidden rounded-xl border border-primary/20 bg-primary/5'>
           {/* Header row */}
           <div className='flex items-center justify-between px-3 py-2'>
             <span className='text-xs font-semibold text-primary'>
@@ -339,7 +339,7 @@ export function MessageInput({
             <button
               type='button'
               onClick={() => setPreviewDismissed(true)}
-              className='text-grey-400 transition-colors hover:text-main-black'
+              className='text-muted-foreground transition-colors hover:text-foreground'
               aria-label={t('listingPreview.dismiss')}
             >
               <X className='size-3.5' />
@@ -348,9 +348,9 @@ export function MessageInput({
 
           {/* Content */}
           {isFetchingCard && (
-            <div className='flex items-center gap-2 border-t border-primary/25 px-3 py-2'>
+            <div className='flex items-center gap-2 border-t border-primary/20 px-3 py-2'>
               <Loader2 className='size-3.5 animate-spin text-primary/60' />
-              <span className='text-xs text-grey-400'>{t('listingPreview.fetching')}</span>
+              <span className='text-xs text-muted-foreground'>{t('listingPreview.fetching')}</span>
             </div>
           )}
 
@@ -362,7 +362,7 @@ export function MessageInput({
           )}
 
           {!isFetchingCard && resolvedCard && (
-            <div className='flex items-center gap-3 border-t border-primary/25 px-3 py-2'>
+            <div className='flex items-center gap-3 border-t border-primary/20 px-3 py-2'>
               {resolvedCard.image && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -372,8 +372,8 @@ export function MessageInput({
                 />
               )}
               <div className='min-w-0 flex-1'>
-                <p className='truncate text-xs font-semibold text-main-black'>{resolvedCard.title}</p>
-                <p className='truncate text-xs text-grey-400'>{resolvedCard.address}</p>
+                <p className='truncate text-xs font-semibold text-foreground'>{resolvedCard.title}</p>
+                <p className='truncate text-xs text-muted-foreground'>{resolvedCard.address}</p>
               </div>
               <span className='shrink-0 text-xs font-bold text-primary'>
                 {resolvedCard.price?.toLocaleString()}
@@ -410,7 +410,7 @@ export function MessageInput({
               onClick={() => setPopoverOpen((v) => !v)}
               className={cn(
                 'flex size-5 items-center justify-center rounded-full transition-colors',
-                popoverOpen ? 'bg-primary text-white' : 'text-grey-400 hover:text-primary'
+                popoverOpen ? 'bg-primary text-white' : 'text-muted-foreground hover:text-primary'
               )}
               aria-label='More actions'
             >
@@ -428,7 +428,7 @@ export function MessageInput({
                     setSelectedListing(listings[0] ?? null);
                     setModalOpen(true);
                   }}
-                  className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-main-black transition-colors hover:bg-purple-98'
+                  className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-primary/5'
                 >
                   <FileText className='size-4 shrink-0 text-primary' />
                   {t('createContract')}
@@ -452,7 +452,7 @@ export function MessageInput({
               handleSend();
             }
           }}
-          className='flex-1 bg-transparent text-sm text-main-black placeholder:text-grey-400 focus:outline-none disabled:opacity-50'
+          className='flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50'
         />
 
         {/* Send / Mic button */}
@@ -466,7 +466,7 @@ export function MessageInput({
             {isSending ? <Loader2 className='size-5 animate-spin' /> : <Send className='size-5' />}
           </button>
         ) : (
-          <button className='shrink-0 text-grey-400 transition-colors hover:text-primary'>
+          <button className='shrink-0 text-muted-foreground transition-colors hover:text-primary'>
             <Mic className='size-5' />
           </button>
         )}
@@ -476,7 +476,7 @@ export function MessageInput({
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className='max-w-md' showCloseButton>
           <DialogHeader>
-            <DialogTitle className='flex items-center gap-2 text-main-black'>
+            <DialogTitle className='flex items-center gap-2 text-foreground'>
               <FileText className='size-5 text-primary' />
               {t('contractModal.title')}
             </DialogTitle>
@@ -504,7 +504,7 @@ export function MessageInput({
                           'flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-all',
                           isSelected
                             ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
-                            : 'border-primary/25 bg-white hover:border-primary/40 hover:bg-primary/5'
+                            : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
                         )}
                       >
                         <Building2
@@ -514,10 +514,10 @@ export function MessageInput({
                           )}
                         />
                         <div className='min-w-0 flex-1'>
-                          <p className='truncate text-sm font-medium text-main-black'>
+                          <p className='truncate text-sm font-medium text-foreground'>
                             {listing.title}
                           </p>
-                          <p className='truncate text-xs text-grey-400'>{listing.address}</p>
+                          <p className='truncate text-xs text-muted-foreground'>{listing.address}</p>
                         </div>
                         {isSelected && <Check className='size-4 shrink-0 text-primary' />}
                       </button>
@@ -529,13 +529,13 @@ export function MessageInput({
 
             {/* Single listing row */}
             {listings.length <= 1 && (
-              <div className='flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3'>
+              <div className='flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3'>
                 <Building2 className='mt-0.5 size-4 shrink-0 text-primary/70' />
                 <div className='min-w-0 flex-1'>
                   <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
                     {t('contractModal.listingLabel')}
                   </p>
-                  <p className='mt-0.5 truncate text-sm font-medium text-main-black'>
+                  <p className='mt-0.5 truncate text-sm font-medium text-foreground'>
                     {selectedListing?.title ?? selectedListing?.id ?? t('contractModal.noListing')}
                   </p>
                 </div>
@@ -543,13 +543,13 @@ export function MessageInput({
             )}
 
             {/* Tenant row */}
-            <div className='flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3'>
+            <div className='flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3'>
               <User className='mt-0.5 size-4 shrink-0 text-primary/70' />
               <div className='min-w-0 flex-1'>
                 <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
                   {t('contractModal.tenantLabel')}
                 </p>
-                <p className='mt-0.5 truncate text-sm font-medium text-main-black'>
+                <p className='mt-0.5 truncate text-sm font-medium text-foreground'>
                   {otherUserName ?? t('contractModal.noTenant')}
                 </p>
               </div>

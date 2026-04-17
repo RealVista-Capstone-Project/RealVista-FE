@@ -198,7 +198,7 @@ export function PropertySearchStep() {
         {/* Search Loading */}
         {isSearching && (
           <div className='flex items-center justify-center p-8'>
-            <Loader2 className='animate-spin text-[#7065F0]' size={32} />
+            <Loader2 className='animate-spin text-primary' size={32} />
           </div>
         )}
 
@@ -218,8 +218,8 @@ export function PropertySearchStep() {
                       className={cn(
                         'cursor-pointer transition-all hover:shadow-md border-[1.5px]',
                         selection === p.listing_id
-                          ? 'border-[#7065F0] bg-[#F7F7FD]'
-                          : 'border-[#E0DEF7] hover:border-[#7065F0]'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-primary/20 hover:border-primary'
                       )}
                       onClick={() => handleSelect(p.listing_id)}
                     >
@@ -241,7 +241,7 @@ export function PropertySearchStep() {
                           </div>
                         </div>
                         {selection === p.listing_id && (
-                          <div className='size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
+                          <div className='size-8 rounded-full bg-[primary] flex items-center justify-center text-white'>
                             <Check size={20} />
                           </div>
                         )}
@@ -251,13 +251,13 @@ export function PropertySearchStep() {
 
                   <Card
                     className={cn(
-                      'cursor-pointer border-[1.5px] border-dashed transition-all hover:bg-[#F7F7FD]',
-                      selection === 'NEW' ? 'border-[#7065F0] bg-[#F7F7FD]' : 'border-[#E0DEF7]'
+                      'cursor-pointer border-[1.5px] border-dashed transition-all hover:bg-primary/5',
+                      selection === 'NEW' ? 'border-primary bg-primary/5' : 'border-primary/20'
                     )}
                     onClick={() => handleSelect('NEW')}
                   >
                     <CardContent className='p-4 flex items-center gap-4'>
-                      <div className='size-16 rounded-lg bg-[#F0EFFB] flex items-center justify-center text-[#7065F0]'>
+                      <div className='size-16 rounded-lg bg-[#F0EFFB] flex items-center justify-center text-primary'>
                         <Plus size={32} />
                       </div>
                       <div>
@@ -267,7 +267,7 @@ export function PropertySearchStep() {
                         <p className='text-sm text-muted-foreground'>{t('step0Desc')}</p>
                       </div>
                       {selection === 'NEW' && (
-                        <div className='ml-auto size-8 rounded-full bg-[#7065F0] flex items-center justify-center text-white'>
+                        <div className='ml-auto size-8 rounded-full bg-[primary] flex items-center justify-center text-white'>
                           <Check size={20} />
                         </div>
                       )}
@@ -282,15 +282,15 @@ export function PropertySearchStep() {
 
       {/* Role Selection - only visible for agents */}
       {selection && isCurrentUserAgent && (
-        <div className='flex flex-col gap-6 pt-8 border-t border-[#E0DEF7] animate-in fade-in slide-in-from-top-4 duration-500'>
+        <div className='flex flex-col gap-6 pt-8 border-t border-primary/20 animate-in fade-in slide-in-from-top-4 duration-500'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             {/* Owner Card */}
             <Card
               className={cn(
                 'cursor-pointer transition-all border-[1.5px]',
                 selectedRole === 'OWNER'
-                  ? 'border-[#7065F0] bg-[#F7F7FD] shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'
-                  : 'border-[#E0DEF7] hover:border-[#7065F0]'
+                  ? 'border-primary bg-primary/5 shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'
+                  : 'border-primary/20 hover:border-primary'
               )}
               onClick={() => {
                 setValue('role.role', 'OWNER', { shouldValidate: true });
@@ -302,8 +302,8 @@ export function PropertySearchStep() {
                   className={cn(
                     'p-4 rounded-full transition-colors',
                     selectedRole === 'OWNER'
-                      ? 'bg-[#7065F0] text-white'
-                      : 'bg-[#F0EFFB] text-[#7065F0]'
+                      ? 'bg-primary text-white'
+                      : 'bg-primary/10 text-primary'
                   )}
                 >
                   <User size={32} />
@@ -317,8 +317,8 @@ export function PropertySearchStep() {
               className={cn(
                 'cursor-pointer transition-all border-[1.5px]',
                 selectedRole === 'AGENT'
-                  ? 'border-[#7065F0] bg-[#F7F7FD] shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'
-                  : 'border-[#E0DEF7] hover:border-[#7065F0]'
+                  ? 'border-[primary] bg-primary/5 shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'
+                  : 'border-primary/20 hover:border-[primary]'
               )}
               onClick={() => setValue('role.role', 'AGENT', { shouldValidate: true })}
             >
@@ -327,8 +327,8 @@ export function PropertySearchStep() {
                   className={cn(
                     'p-4 rounded-full transition-colors',
                     selectedRole === 'AGENT'
-                      ? 'bg-[#7065F0] text-white'
-                      : 'bg-[#F0EFFB] text-[#7065F0]'
+                      ? 'bg-primary text-white'
+                      : 'bg-primary/10 text-primary'
                   )}
                 >
                   <Users size={32} />
@@ -340,7 +340,7 @@ export function PropertySearchStep() {
 
           {/* Agent Owner Search */}
           {selectedRole === 'AGENT' && (
-            <div className='flex flex-col gap-6 pt-4 border-t border-[#E0DEF7] animate-in fade-in slide-in-from-top-2 duration-300'>
+            <div className='flex flex-col gap-6 pt-4 border-t border-primary/20 animate-in fade-in slide-in-from-top-2 duration-300'>
               {!ownerId ? (
                 <FormField
                   control={control}
@@ -354,7 +354,7 @@ export function PropertySearchStep() {
                         <FormControl>
                           <Input
                             placeholder={t('ownerEmailPlaceholder')}
-                            className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                            className='h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
                             {...field}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
@@ -368,7 +368,7 @@ export function PropertySearchStep() {
                           type='button'
                           onClick={handleUserSearch}
                           disabled={isUserFetching || !field.value?.includes('@')}
-                          className='h-12 rounded-lg bg-[#7065F0] hover:bg-[#5B51D9]'
+                          className='h-12 rounded-lg bg-primary hover:bg-primary-hover'
                         >
                           {isUserFetching ? (
                             <Loader2 className='size-4 animate-spin' />
@@ -383,10 +383,10 @@ export function PropertySearchStep() {
                   )}
                 />
               ) : (
-                <Card className='border-[1.5px] border-[#7065F0] bg-[#F7F7FD]'>
+                <Card className='border-[1.5px] border-[primary] bg-primary/5'>
                   <CardContent className='p-4 flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
-                      <div className='size-12 rounded-full bg-[#E8E6F9] flex items-center justify-center text-[#7065F0]'>
+                      <div className='size-12 rounded-full bg-[#E8E6F9] flex items-center justify-center text-[primary]'>
                         <Check size={24} />
                       </div>
                       <div>

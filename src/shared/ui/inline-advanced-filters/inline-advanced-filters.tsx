@@ -80,8 +80,8 @@ export function InlineAdvancedFilters({
 
     if (type === 'boolean') {
       return (
-        <div key={attrCode} className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
-          <span className='text-sm text-main-black'>{label}</span>
+        <div key={attrCode} className='flex items-center justify-between p-3 border border-primary/20 rounded-lg'>
+          <span className='text-sm text-foreground'>{label}</span>
           <Switch
             checked={currentValue === 'true'}
             onCheckedChange={(checked) => setDynamicAttr(attrCode, checked ? 'true' : undefined)}
@@ -93,7 +93,7 @@ export function InlineAdvancedFilters({
     if (type === 'number') {
       return (
         <div key={attrCode}>
-          <label className='block text-sm font-medium text-main-black mb-2'>
+          <label className='block text-sm font-medium text-foreground mb-2'>
             {label}
           </label>
           <input
@@ -104,7 +104,7 @@ export function InlineAdvancedFilters({
             value={currentValue || ''}
             onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
-            className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+            className='w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
             maxLength={10}
           />
         </div>
@@ -114,7 +114,7 @@ export function InlineAdvancedFilters({
     // Text / Select
     return (
       <div key={attrCode}>
-        <label className='block text-sm font-medium text-main-black mb-2'>
+        <label className='block text-sm font-medium text-foreground mb-2'>
           {label}
         </label>
         <input
@@ -122,7 +122,7 @@ export function InlineAdvancedFilters({
           placeholder='Nhập giá trị'
           value={currentValue || ''}
           onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
-          className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+          className='w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
           maxLength={100}
         />
       </div>
@@ -130,13 +130,13 @@ export function InlineAdvancedFilters({
   };
 
   return (
-    <div className='w-full bg-white rounded-lg border border-purple-92'>
+    <div className='w-full bg-white rounded-lg border border-primary/20'>
       {/* Toggle Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className='w-full flex items-center justify-between px-6 py-4 hover:bg-purple-98 transition-colors'
+        className='w-full flex items-center justify-between px-6 py-4 hover:bg-primary/5 transition-colors'
       >
-        <span className='text-base font-medium text-main-black'>Advanced Filters</span>
+        <span className='text-base font-medium text-foreground'>Advanced Filters</span>
         {isExpanded ? (
           <ChevronUp className='h-5 w-5 text-secondary' />
         ) : (
@@ -146,11 +146,11 @@ export function InlineAdvancedFilters({
 
       {/* Filters Content */}
       {isExpanded && (
-        <div className='px-6 pb-6 pt-2 border-t border-purple-92'>
+        <div className='px-6 pb-6 pt-2 border-t border-primary/20'>
 
           {/* Property Type Selector */}
           <div className='mb-6'>
-            <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
+            <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
               <Home className='w-4 h-4 text-primary' />
               Loại bất động sản
             </label>
@@ -176,11 +176,11 @@ export function InlineAdvancedFilters({
 
           {/* Basic Filters Section */}
           <div className='mb-6'>
-            <h4 className='text-sm font-semibold text-main-black mb-4'>Thông tin cơ bản</h4>
+            <h4 className='text-sm font-semibold text-foreground mb-4'>Thông tin cơ bản</h4>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {/* Area Range Slider */}
               <div className='md:col-span-2'>
-                <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
+                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
                   <Maximize2 className='w-4 h-4 text-primary' />
                   Diện tích: {filters.area?.[0] || 0}m² - {filters.area?.[1] || 500}m²
                 </label>
@@ -204,7 +204,7 @@ export function InlineAdvancedFilters({
           {/* Dynamic Attributes Section — BEDROOMS/BATHROOMS appear here automatically if the type supports them */}
           {activeAttributes.length > 0 && (
             <div className='mb-6'>
-              <h4 className='text-sm font-semibold text-main-black mb-4'>Đặc điểm bổ sung</h4>
+              <h4 className='text-sm font-semibold text-foreground mb-4'>Đặc điểm bổ sung</h4>
 
               {/* Number and Text Inputs */}
               {activeAttributes
@@ -232,20 +232,20 @@ export function InlineAdvancedFilters({
 
           {/* Media Filters */}
           <div className='mb-4'>
-            <h4 className='flex items-center gap-2 text-sm font-semibold text-main-black mb-4'>
+            <h4 className='flex items-center gap-2 text-sm font-semibold text-foreground mb-4'>
               <Video className='w-4 h-4 text-primary' />
               Phương tiện
             </h4>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
-                <span className='text-sm text-main-black'>Có Video</span>
+              <div className='flex items-center justify-between p-3 border border-primary/20 rounded-lg'>
+                <span className='text-sm text-foreground'>Có Video</span>
                 <Switch
                   checked={filters.hasVideo || false}
                   onCheckedChange={(checked) => setFilters({ ...filters, hasVideo: checked })}
                 />
               </div>
-              <div className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
-                <span className='text-sm text-main-black'>Có 3D Tour</span>
+              <div className='flex items-center justify-between p-3 border border-primary/20 rounded-lg'>
+                <span className='text-sm text-foreground'>Có 3D Tour</span>
                 <Switch
                   checked={filters.has3D || false}
                   onCheckedChange={(checked) => setFilters({ ...filters, has3D: checked })}
@@ -256,7 +256,7 @@ export function InlineAdvancedFilters({
 
           {/* Sort By */}
           <div className='mb-4'>
-            <label className='block text-sm font-medium text-main-black mb-2'>Sort By</label>
+            <label className='block text-sm font-medium text-foreground mb-2'>Sort By</label>
             <select
               value={filters.sortBy || 'PRIORITY'}
               onChange={(e) =>
@@ -265,7 +265,7 @@ export function InlineAdvancedFilters({
                   sortBy: e.target.value as AdvancedSearchRequest['sortBy'],
                 })
               }
-              className='w-full md:w-64 px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
+              className='w-full md:w-64 px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
             >
               <option value='PRIORITY'>Priority (Featured First)</option>
               <option value='DATE_DESC'>Newest First</option>

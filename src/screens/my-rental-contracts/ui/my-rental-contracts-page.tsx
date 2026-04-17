@@ -43,7 +43,7 @@ function MyRentalContractsContent() {
 
   if (isLoading) {
     return (
-      <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
+      <div className='flex h-full items-center justify-center bg-secondary/50'>
         <div className='flex flex-col items-center gap-4'>
           <div className='h-10 w-10 animate-spin rounded-full border-[3px] border-primary border-t-transparent' />
           <p className='text-sm font-medium tracking-wide text-secondary/70'>{t('loading')}</p>
@@ -54,12 +54,12 @@ function MyRentalContractsContent() {
 
   if (isError) {
     return (
-      <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
+      <div className='flex h-full items-center justify-center bg-secondary/50'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm'>
             <FileSearch className='h-8 w-8 text-primary' />
           </div>
-          <p className='font-semibold text-main-black'>{t('error')}</p>
+          <p className='font-semibold text-foreground'>{t('error')}</p>
         </div>
       </div>
     );
@@ -75,7 +75,7 @@ function MyRentalContractsContent() {
               <p className='text-xs font-semibold uppercase tracking-[0.24em] text-primary/70'>
                 {t('hero.eyebrow')}
               </p>
-              <h1 className='mt-3 text-3xl font-semibold tracking-[-0.03em] text-main-black'>
+              <h1 className='mt-3 text-3xl font-semibold tracking-[-0.03em] text-foreground'>
                 {t('hero.title')}
               </h1>
               <p className='mt-3 max-w-xl text-sm leading-7 text-secondary/70'>
@@ -88,13 +88,13 @@ function MyRentalContractsContent() {
                 <p className='text-[11px] uppercase tracking-[0.16em] text-secondary/50'>
                   {t('hero.stats.totalContracts')}
                 </p>
-                <p className='mt-2 text-2xl font-semibold text-main-black'>{totalElements}</p>
+                <p className='mt-2 text-2xl font-semibold text-foreground'>{totalElements}</p>
               </div>
               <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
                 <p className='text-[11px] uppercase tracking-[0.16em] text-secondary/50'>
                   {t('hero.stats.activeSelection')}
                 </p>
-                <p className='mt-2 text-sm font-semibold text-main-black'>
+                <p className='mt-2 text-sm font-semibold text-foreground'>
                   {selectedContract?.property.title ?? t('hero.noSelection')}
                 </p>
               </div>
@@ -114,7 +114,7 @@ function MyRentalContractsContent() {
               <div className='flex w-full flex-shrink-0 items-center gap-2 sm:w-auto'>
                 <SlidersHorizontal className='h-4 w-4 flex-shrink-0 text-secondary/50' />
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className='h-10 w-full rounded-xl border-transparent bg-[#F5F3FF] text-sm font-medium focus:ring-primary/20 sm:w-48'>
+                  <SelectTrigger className='h-10 w-full rounded-xl border-transparent bg-primary/5 text-sm font-medium focus:ring-primary/20 sm:w-48'>
                     <SelectValue placeholder={t('filter.allStatuses')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -133,7 +133,7 @@ function MyRentalContractsContent() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('filter.searchPlaceholder')}
-                  className='h-10 rounded-xl border-transparent bg-[#F5F3FF] pl-9 text-sm focus-visible:ring-primary/20'
+                  className='h-10 rounded-xl border-transparent bg-primary/5 pl-9 text-sm focus-visible:ring-primary/20'
                   aria-label={t('filter.searchAria')}
                 />
               </div>
@@ -151,7 +151,7 @@ function MyRentalContractsContent() {
                       'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
                       statusFilter === tab
                         ? 'bg-primary text-white'
-                        : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                        : 'bg-transparent text-foreground/70 hover:bg-primary/5'
                     )}
                   >
                     {t(
@@ -180,11 +180,11 @@ function MyRentalContractsContent() {
               <div className='min-h-[420px]'>
                 {contracts.length === 0 ? (
                   <div className='flex h-[420px] flex-col items-center justify-center gap-4 px-6 text-center'>
-                    <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F1ECFF]'>
+                    <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10'>
                       <FileSearch className='h-8 w-8 text-primary/70' />
                     </div>
                     <div>
-                      <p className='font-semibold text-main-black'>{t('empty.title')}</p>
+                      <p className='font-semibold text-foreground'>{t('empty.title')}</p>
                       <p className='mt-1 text-sm text-secondary/60'>{t('empty.subtitle')}</p>
                     </div>
                   </div>
@@ -217,14 +217,14 @@ function MyRentalContractsContent() {
                   <Button
                     variant='outline'
                     size='icon'
-                    className='h-9 w-9 rounded-xl border-[#E1DCF4] bg-white hover:border-primary hover:bg-[#F4F1FF] hover:text-primary'
+                    className='h-9 w-9 rounded-xl border-border bg-white hover:border-primary hover:bg-primary/5 hover:text-primary'
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                     aria-label={t('pagination.prevAria')}
                   >
                     <ChevronLeft className='h-4 w-4' />
                   </Button>
-                  <span className='px-3 text-sm font-semibold tabular-nums text-main-black'>
+                  <span className='px-3 text-sm font-semibold tabular-nums text-foreground'>
                     {currentPage}
                     <span className='mx-1.5 font-normal text-secondary/35'>/</span>
                     {totalPages}
@@ -232,7 +232,7 @@ function MyRentalContractsContent() {
                   <Button
                     variant='outline'
                     size='icon'
-                    className='h-9 w-9 rounded-xl border-[#E1DCF4] bg-white hover:border-primary hover:bg-[#F4F1FF] hover:text-primary'
+                    className='h-9 w-9 rounded-xl border-border bg-white hover:border-primary hover:bg-primary/5 hover:text-primary'
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages || totalPages === 0}
                     aria-label={t('pagination.nextAria')}

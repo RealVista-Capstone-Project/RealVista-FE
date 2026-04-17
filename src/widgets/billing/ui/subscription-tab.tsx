@@ -252,7 +252,7 @@ function QuotaUsageBar({
     <div className='space-y-1'>
       <div className='flex items-center justify-between text-xs text-grey-500'>
         <span>Đã dùng</span>
-        <span className='font-semibold text-main-black'>{pct}%</span>
+        <span className='font-semibold text-foreground'>{pct}%</span>
       </div>
       <div className='flex items-center gap-3'>
         <div className='h-2 flex-1 overflow-hidden rounded-full bg-purple-92'>
@@ -320,7 +320,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
   if (isLoading || boostsLoading) {
     return (
       <div>
-        <h2 className='mb-4 text-base font-semibold text-main-black'>Gói đang hoạt động</h2>
+        <h2 className='mb-4 text-base font-semibold text-foreground'>Gói đang hoạt động</h2>
         <div className='flex items-center gap-2 text-sm text-grey-500'>
           <Loader2 className='size-4 animate-spin' /> Đang tải...
         </div>
@@ -334,7 +334,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
 
   return (
     <div>
-      <h2 className='mb-4 text-base font-semibold text-main-black'>Gói đang hoạt động</h2>
+      <h2 className='mb-4 text-base font-semibold text-foreground'>Gói đang hoạt động</h2>
 
       {/* Display subscriptions */}
       {active.length === 0 && activeBoosts.length === 0 ? (
@@ -362,15 +362,15 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   <div className='flex flex-row items-center justify-between'>
                     <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói hiện tại</p>
                     <div className='flex flex-wrap items-center gap-2'>
-                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
+                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-grey-200'>
                         {featureTypeLabelVi(sub.feature_type)}
                       </span>
-                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
+                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-grey-200'>
                         {tierLabelVi(tier)}
                       </span>
                     </div>
                   </div>
-                  <h3 className='mt-2 text-lg font-bold text-main-black'>{sub.package_name}</h3>
+                  <h3 className='mt-2 text-lg font-bold text-foreground'>{sub.package_name}</h3>
                   <div className='mt-1 flex items-center gap-1.5 text-xs text-grey-500'>
                     <CalendarDays className='size-3.5 shrink-0' />
                     <span>
@@ -399,9 +399,9 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Nâng cấp</p>
                   {nextPkg ? (
                     <>
-                      <h3 className='mt-2 text-lg font-bold text-main-black'>{nextPkg.name}</h3>
+                      <h3 className='mt-2 text-lg font-bold text-foreground'>{nextPkg.name}</h3>
                       <p className='mt-1 text-sm text-grey-500'>{nextPkg.description}</p>
-                      <p className='mt-1 text-2xl font-bold text-main-black'>
+                      <p className='mt-1 text-2xl font-bold text-foreground'>
                         {(nextPkg.price).toLocaleString('vi-VN')} đ
                         <span className='text-xs font-normal text-grey-500'>
                           /
@@ -438,12 +438,12 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 <div className='flex flex-row items-center justify-between'>
                   <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói đẩy tin</p>
                   <div className='flex flex-wrap items-center gap-2'>
-                    <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-main-black ring-1 ring-grey-200'>
+                    <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-grey-200'>
                       {boost.code}
                     </span>
                   </div>
                 </div>
-                <h3 className='mt-2 text-lg font-bold text-main-black'>{boost.name}</h3>
+                <h3 className='mt-2 text-lg font-bold text-foreground'>{boost.name}</h3>
                 <div className='mt-1 flex items-center gap-1.5 text-xs text-grey-500'>
                   <CalendarDays className='size-3.5 shrink-0' />
                   <span>
@@ -452,12 +452,12 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 </div>
                 <div className='mt-2 space-y-2 text-sm'>
                   <div className='flex justify-between'>
-                    <span className='text-grey-600'>Lượt đẩy nổi bật:</span>
-                    <span className='font-semibold text-main-black'>{boost.remaining_featured_quota}/{boost.featured_quota}</span>
+                    <span className='text-muted-foreground'>Lượt đẩy nổi bật:</span>
+                    <span className='font-semibold text-foreground'>{boost.remaining_featured_quota}/{boost.featured_quota}</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span className='text-grey-600'>Huy hiệu HOT:</span>
-                    <span className='font-semibold text-main-black'>{boost.remaining_hot_badge_quota}/{boost.hot_badge_quota}</span>
+                    <span className='text-muted-foreground'>Huy hiệu HOT:</span>
+                    <span className='font-semibold text-foreground'>{boost.remaining_hot_badge_quota}/{boost.hot_badge_quota}</span>
                   </div>
                 </div>
                 <div className='mt-3 flex flex-wrap gap-2 pt-0'>
@@ -477,7 +477,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
 
               <div className='flex flex-col rounded-xl border border-main-black/10 bg-white p-5 shadow-sm ring-1 ring-grey-100'>
                 <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Chi tiết gói</p>
-                <h3 className='mt-2 text-lg font-bold text-main-black'>{boost.name}</h3>
+                <h3 className='mt-2 text-lg font-bold text-foreground'>{boost.name}</h3>
                 <p className='mt-1 text-sm text-grey-500'>{boost.description}</p>
                 <ul className='mt-3 space-y-1.5'>
                   <li className='flex items-start gap-2 text-sm text-grey-700'>
@@ -515,8 +515,8 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
       {showCancelConfirm && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
-            <h3 className='text-lg font-bold text-main-black'>Xác nhận huỷ gói</h3>
-            <p className='mt-3 text-sm text-grey-600'>
+            <h3 className='text-lg font-bold text-foreground'>Xác nhận huỷ gói</h3>
+            <p className='mt-3 text-sm text-muted-foreground'>
               Huỷ gói này? Bạn sẽ mất quyền lợi ngay sau khi huỷ (theo chính sách hiện tại).
             </p>
             <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end'>
@@ -551,8 +551,8 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
       {showCancelBoostConfirm && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
-            <h3 className='text-lg font-bold text-main-black'>Xác nhận huỷ gói đẩy tin</h3>
-            <p className='mt-3 text-sm text-grey-600'>
+            <h3 className='text-lg font-bold text-foreground'>Xác nhận huỷ gói đẩy tin</h3>
+            <p className='mt-3 text-sm text-muted-foreground'>
               Huỷ gói này? Bạn sẽ mất lượt đẩy tin còn lại ngay sau khi huỷ.
             </p>
             <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end'>
@@ -645,7 +645,7 @@ function StepLabel({
       <span
         className={cn(
           'text-start text-xs font-semibold leading-tight sm:text-sm',
-          active || done ? 'text-main-black' : 'text-grey-400'
+          active || done ? 'text-foreground' : 'text-grey-400'
         )}
       >
         {label}
@@ -764,7 +764,7 @@ function Step1Content({
             >
               <CreditCard className='size-5' />
             </div>
-            <p className='font-semibold text-sm text-main-black flex-1'>Gói tính năng</p>
+            <p className='font-semibold text-sm text-foreground flex-1'>Gói tính năng</p>
             {selected === 'subscription' && <Check className='size-5 shrink-0 text-primary' />}
           </div>
           <ul className='w-full space-y-2'>
@@ -802,7 +802,7 @@ function Step1Content({
             >
               <Rocket className='size-5' />
             </div>
-            <p className='font-semibold text-sm text-main-black flex-1'>Gói đẩy tin</p>
+            <p className='font-semibold text-sm text-foreground flex-1'>Gói đẩy tin</p>
             {selected === 'boost' && <Check className='size-5 shrink-0 text-primary' />}
           </div>
           <ul className='w-full space-y-2'>
@@ -986,7 +986,7 @@ function Step2Content({
 
   if (type === 'subscription' && selectableCount === 0 && plansForFeatureType.length > 0) {
     return (
-      <p className='py-4 text-sm text-grey-600'>
+      <p className='py-4 text-sm text-muted-foreground'>
         Bạn đang dùng gói cao nhất cho {featureTypeLabelVi(selectedFeatureType)}. Để đổi gói, hãy{' '}
         <span className='font-medium text-primary'>huỷ gói hiện tại</span> ở phần trên rồi chọn gói thấp hơn (nếu
         phù hợp), hoặc chờ hết hạn.
@@ -1020,7 +1020,7 @@ function Step2Content({
                   'rounded-t-lg border-2 border-b-0',
                   selectedFeatureType === featureType
                     ? 'bg-primary text-white border-primary'
-                    : 'bg-white border-grey-300 text-grey-600 hover:bg-grey-50'
+                    : 'bg-white border-grey-300 text-muted-foreground hover:bg-grey-50'
                 )}
               >
                 {featureTypeLabelVi(featureType)}
@@ -1060,11 +1060,11 @@ function Step2Content({
                       </span>
                     )}
                     <div className='min-w-0'>
-                      <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
+                      <p className='font-semibold text-sm text-foreground'>{plan.name}</p>
                       <p className='text-xs text-grey-500'>{plan.description}</p>
                     </div>
                     <div className='ml-3 shrink-0 text-right'>
-                      <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
+                      <span className='text-lg font-bold text-foreground'>{plan.priceLabel}</span>
                       <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
                     </div>
                   </button>
@@ -1077,7 +1077,7 @@ function Step2Content({
               <div className='mb-4 flex items-start justify-between gap-2'>
                 <div>
                   <div className='flex flex-wrap items-center gap-2'>
-                    <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
+                    <h3 className='text-lg font-bold text-foreground'>{selectedPlan.name}</h3>
                     {selectedPlan.isPopular && (
                       <span className='rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
                         Phổ biến nhất
@@ -1089,7 +1089,7 @@ function Step2Content({
                   </p>
                 </div>
                 <div className='shrink-0 text-right'>
-                  <p className='text-2xl font-bold text-main-black'>
+                  <p className='text-2xl font-bold text-foreground'>
                     {selectedPlan.priceLabel}
                   </p>
                   <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
@@ -1157,11 +1157,11 @@ function Step2Content({
                     </span>
                   )}
                   <div className='min-w-0'>
-                    <p className='font-semibold text-sm text-main-black'>{plan.name}</p>
+                    <p className='font-semibold text-sm text-foreground'>{plan.name}</p>
                     <p className='text-xs text-grey-500'>{plan.description}</p>
                   </div>
                   <div className='ml-3 shrink-0 text-right'>
-                    <span className='text-lg font-bold text-main-black'>{plan.priceLabel}</span>
+                    <span className='text-lg font-bold text-foreground'>{plan.priceLabel}</span>
                     <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
                   </div>
                   {blocked && !isCurrentActive && (
@@ -1178,7 +1178,7 @@ function Step2Content({
             <div className='mb-4 flex items-start justify-between gap-2'>
               <div>
                 <div className='flex flex-wrap items-center gap-2'>
-                  <h3 className='text-lg font-bold text-main-black'>{selectedPlan.name}</h3>
+                  <h3 className='text-lg font-bold text-foreground'>{selectedPlan.name}</h3>
                   {selectedPlan.isPopular && (
                     <span className='rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-white'>
                       Phổ biến nhất
@@ -1190,7 +1190,7 @@ function Step2Content({
                 </p>
               </div>
               <div className='shrink-0 text-right'>
-                <p className='text-2xl font-bold text-main-black'>
+                <p className='text-2xl font-bold text-foreground'>
                   {selectedPlan.priceLabel}
                 </p>
                 <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
@@ -1469,7 +1469,7 @@ function Step3Content({
               className='h-10 w-auto shrink-0 object-contain rounded-lg'
             />
             <div className='flex-1'>
-              <p className='font-semibold text-sm text-main-black'>VNPay</p>
+              <p className='font-semibold text-sm text-foreground'>VNPay</p>
               <p className='text-xs text-grey-500'>Ví điện tử & ngân hàng</p>
             </div>
           </button>
@@ -1497,7 +1497,7 @@ function Step3Content({
               className='h-10 w-auto shrink-0 object-contain rounded-lg'
             />
             <div className='flex-1'>
-              <p className='font-semibold text-sm text-main-black'>PayOS</p>
+              <p className='font-semibold text-sm text-foreground'>PayOS</p>
               <p className='text-xs text-grey-500'>Chuyển khoản ngân hàng</p>
             </div>
           </button>
@@ -1508,14 +1508,14 @@ function Step3Content({
           <div className='mb-4 flex items-start justify-between gap-2'>
             <div>
               <div className='flex flex-wrap items-center gap-2'>
-                <h3 className='text-lg font-bold text-main-black'>{selectedPlan?.name || 'Gói dịch vụ'}</h3>
+                <h3 className='text-lg font-bold text-foreground'>{selectedPlan?.name || 'Gói dịch vụ'}</h3>
               </div>
               <p className='text-xs text-grey-500'>
                 {selectedType === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan?.durationLabel}`}
               </p>
             </div>
             <div className='shrink-0 text-right'>
-              <p className='text-2xl font-bold text-main-black'>
+              <p className='text-2xl font-bold text-foreground'>
                 {selectedPlan?.priceLabel}
               </p>
               <p className='text-xs text-grey-500'>/{selectedPlan?.durationLabel}</p>
@@ -1552,7 +1552,7 @@ function Step3Content({
 
       {/* PayOS loading */}
       {selectedPayment === 'payos' && isLoading && (
-        <div className='flex items-center justify-center gap-2 py-2 text-sm text-grey-600'>
+        <div className='flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground'>
           <Loader2 className='size-4 animate-spin' />
           Đang tạo mã QR PayOS…
         </div>
@@ -1753,7 +1753,7 @@ function Step4Content({
       <div className='flex flex-col items-center gap-4 py-12 text-center'>
         <Loader2 className='size-16 animate-spin text-primary' />
         <div>
-          <h3 className='text-lg font-bold text-main-black'>Đang xử lý thanh toán...</h3>
+          <h3 className='text-lg font-bold text-foreground'>Đang xử lý thanh toán...</h3>
           <p className='mt-2 text-sm text-grey-500'>
             Trang đang chờ kết quả từ hệ thống.
           </p>
@@ -1771,7 +1771,7 @@ function Step4Content({
           <XCircle className='size-16 text-red-400' />
         )}
         <div>
-          <h3 className={cn('text-xl font-bold', isSuccess ? 'text-main-black' : 'text-red-500')}>
+          <h3 className={cn('text-xl font-bold', isSuccess ? 'text-foreground' : 'text-red-500')}>
             {isSuccess ? 'Thanh toán thành công!' : 'Thanh toán thất bại'}
           </h3>
           <p className='mt-2 text-sm text-grey-500'>
@@ -1786,15 +1786,15 @@ function Step4Content({
             <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-primary'>Chi tiết đơn hàng</p>
             <div className='space-y-1.5 text-sm'>
               <div className='flex justify-between'>
-                <span className='text-grey-600'>Gói</span>
-                <span className='font-semibold text-main-black'>{plan.name}</span>
+                <span className='text-muted-foreground'>Gói</span>
+                <span className='font-semibold text-foreground'>{plan.name}</span>
               </div>
               <div className='flex justify-between'>
-                <span className='text-grey-600'>Thời hạn</span>
-                <span className='font-semibold text-main-black'>{startDate} - {endDate}</span>
+                <span className='text-muted-foreground'>Thời hạn</span>
+                <span className='font-semibold text-foreground'>{startDate} - {endDate}</span>
               </div>
               <div className='flex justify-between border-t border-purple-90 pt-1.5'>
-                <span className='text-grey-600'>Tổng tiền</span>
+                <span className='text-muted-foreground'>Tổng tiền</span>
                 <span className='font-bold text-primary'>{plan.priceLabel}</span>
               </div>
             </div>
@@ -1804,8 +1804,8 @@ function Step4Content({
         {isSuccess && statusData && plan && (
           <div className='w-full rounded-xl border border-border bg-white p-6'>
             <div className='mb-6 flex items-center justify-between'>
-              <p className='text-base font-semibold text-main-black'>Chi tiết thanh toán</p>
-              <span className='text-sm text-grey-600'>
+              <p className='text-base font-semibold text-foreground'>Chi tiết thanh toán</p>
+              <span className='text-sm text-muted-foreground'>
                 {new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' }).replace('/', ' năm ')}
               </span>
             </div>
@@ -1814,10 +1814,10 @@ function Step4Content({
               <table className='w-full'>
                 <thead>
                   <tr className='border-b border-grey-200'>
-                    <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Ngày</th>
-                    <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Sự miêu tả</th>
-                    <th className='pb-4 text-left text-xs font-semibold text-grey-600'>Trạng thái</th>
-                    <th className='pb-4 text-right text-xs font-semibold text-grey-600'>Số tiền</th>
+                    <th className='pb-4 text-left text-xs font-semibold text-muted-foreground'>Ngày</th>
+                    <th className='pb-4 text-left text-xs font-semibold text-muted-foreground'>Sự miêu tả</th>
+                    <th className='pb-4 text-left text-xs font-semibold text-muted-foreground'>Trạng thái</th>
+                    <th className='pb-4 text-right text-xs font-semibold text-muted-foreground'>Số tiền</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1827,7 +1827,7 @@ function Step4Content({
                     <td className='py-4'>
                       <span className='text-sm text-grey-700'>Đã thanh toán</span>
                     </td>
-                    <td className='py-4 text-right text-sm font-semibold text-main-black'>{plan.priceLabel}</td>
+                    <td className='py-4 text-right text-sm font-semibold text-foreground'>{plan.priceLabel}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1999,7 +1999,7 @@ function PurchaseWizard() {
 
   return (
     <div id='mua-goi-dich-vu'>
-      <h2 className='mb-5 text-base font-semibold text-main-black'>Chọn gói trải nghiệm</h2>
+      <h2 className='mb-5 text-base font-semibold text-foreground'>Chọn gói trải nghiệm</h2>
 
       <HorizontalWizardSteps
         activeStep={step}
@@ -2054,7 +2054,7 @@ function PurchaseWizard() {
       {showLoginDialog && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
-            <h3 className='text-lg font-bold text-main-black'>Yêu cầu đăng nhập</h3>
+            <h3 className='text-lg font-bold text-foreground'>Yêu cầu đăng nhập</h3>
             <p className='mt-2 text-sm text-grey-500'>
               Bạn cần đăng nhập để tiếp tục mua gói dịch vụ.
             </p>
@@ -2081,7 +2081,7 @@ function PurchaseWizard() {
               <button
                 type='button'
                 onClick={() => setShowLoginDialog(false)}
-                className='text-sm font-medium text-grey-500 hover:text-main-black transition-colors'
+                className='text-sm font-medium text-grey-500 hover:text-foreground transition-colors'
               >
                 Tiếp tục mua sắm
               </button>
@@ -2094,16 +2094,16 @@ function PurchaseWizard() {
       {showConflictDialog && conflictingPlan && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
-            <h3 className='text-lg font-bold text-main-black'>Nâng cấp gói dịch vụ</h3>
-            <p className='mt-3 text-sm text-grey-600'>
+            <h3 className='text-lg font-bold text-foreground'>Nâng cấp gói dịch vụ</h3>
+            <p className='mt-3 text-sm text-muted-foreground'>
               Bạn đã có gói{' '}
-              <span className='font-semibold text-main-black'>
+              <span className='font-semibold text-foreground'>
                 {('package_name' in conflictingPlan ? conflictingPlan.package_name : null) ||
                   ('name' in conflictingPlan ? conflictingPlan.name : 'hiện tại')}
               </span>{' '}
               đang hoạt động.
             </p>
-            <p className='mt-2 text-sm text-grey-600'>
+            <p className='mt-2 text-sm text-muted-foreground'>
               Hủy gói hiện tại để mua gói mới?
             </p>
             <div className='mt-6 flex flex-col gap-3'>
@@ -2120,7 +2120,7 @@ function PurchaseWizard() {
                   setPendingPlanId(null);
                   setConflictingPlan(null);
                 }}
-                className='text-sm font-medium text-grey-500 hover:text-main-black transition-colors'
+                className='text-sm font-medium text-grey-500 hover:text-foreground transition-colors'
               >
                 Hủy bỏ
               </button>
@@ -2182,7 +2182,7 @@ function TransactionsSection() {
   if (isLoading) {
     return (
       <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
-        <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <h2 className='mb-4 text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
         <div className='flex justify-center py-8'>
           <Loader2 className='size-6 animate-spin text-primary' />
         </div>
@@ -2193,7 +2193,7 @@ function TransactionsSection() {
   if (error) {
     return (
       <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
-        <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <h2 className='mb-4 text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
         <div className='text-center py-8 text-grey-500'>
           Không thể tải lịch sử giao dịch
         </div>
@@ -2204,7 +2204,7 @@ function TransactionsSection() {
   if (!transactions || transactions.length === 0) {
     return (
       <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
-        <h2 className='mb-4 text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <h2 className='mb-4 text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
         <div className='text-center py-8 text-grey-500'>
           Chưa có giao dịch nào
         </div>
@@ -2215,22 +2215,22 @@ function TransactionsSection() {
   return (
     <div className='rounded-xl border border-grey-200 bg-white shadow-sm overflow-hidden'>
       <div className='border-b border-grey-200 px-5 py-4'>
-        <h2 className='text-lg font-bold text-main-black'>Lịch sử giao dịch</h2>
+        <h2 className='text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
       </div>
       <div className='overflow-x-auto'>
         <table className='w-full'>
           <thead>
             <tr className='border-b border-grey-200 bg-grey-50'>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
                 Ngày
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
                 Mô tả
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
                 Trạng thái
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-grey-600 uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
                 Số tiền
               </th>
             </tr>
@@ -2238,10 +2238,10 @@ function TransactionsSection() {
           <tbody>
             {transactions.map((transaction) => (
               <tr key={transaction.transaction_id} className='border-b border-grey-100 hover:bg-grey-50 transition-colors'>
-                <td className='px-5 py-3 text-sm text-grey-600'>
+                <td className='px-5 py-3 text-sm text-muted-foreground'>
                   {formatDate(transaction.created_at)}
                 </td>
-                <td className='px-5 py-3 text-sm text-main-black'>
+                <td className='px-5 py-3 text-sm text-foreground'>
                   {transaction.description}
                 </td>
                 <td className='px-5 py-3 text-sm'>
@@ -2249,7 +2249,7 @@ function TransactionsSection() {
                     {formatStatus(transaction.status)}
                   </span>
                 </td>
-                <td className='px-5 py-3 text-sm font-semibold text-main-black'>
+                <td className='px-5 py-3 text-sm font-semibold text-foreground'>
                   {formatCurrency(transaction.amount)}
                 </td>
               </tr>
@@ -2287,7 +2287,7 @@ export function SubscriptionTab() {
             'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
             mainTab === 'buy'
               ? 'bg-white text-primary shadow-sm'
-              : 'text-grey-600 hover:text-main-black'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           Mua gói
@@ -2299,7 +2299,7 @@ export function SubscriptionTab() {
             'flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all',
             mainTab === 'manage'
               ? 'bg-white text-primary shadow-sm'
-              : 'text-grey-600 hover:text-main-black'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           Gói hiện tại

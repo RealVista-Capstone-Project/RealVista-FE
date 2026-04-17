@@ -206,7 +206,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
         </div>
 
         <CardContent className='min-h-0 flex-1 space-y-5 overflow-y-auto p-5'>
-          <div className='overflow-hidden rounded-2xl border border-[#ECE9FB] bg-[#FBFAFF]'>
+          <div className='overflow-hidden rounded-2xl border border-primary/10 bg-[#FBFAFF]'>
             <div className='relative aspect-[3/4] overflow-hidden bg-[#F3F0FF]'>
               {contract.contractDocumentUrl ? (
                 <img
@@ -219,7 +219,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   <FileText className='h-16 w-16' />
                 </div>
               )}
-              <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-[#120F25]/40 via-transparent to-white/10' />
+              <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-white/10' />
               <div className='absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3'>
                 <Badge
                   variant='secondary'
@@ -240,7 +240,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             <div className='space-y-4 px-4 py-4'>
               <div className='rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_rgba(234,230,249,0.9)]'>
                 <div className='flex items-start gap-3'>
-                  <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-[#F1ECFF] text-primary'>
+                  <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary'>
                     <FileText className='h-5 w-5' />
                   </div>
                   <div className='min-w-0 flex-1'>
@@ -265,7 +265,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </div>
 
               <div className='grid grid-cols-2 gap-3'>
-                <div className='rounded-xl bg-[#F8F7FD] p-3'>
+                <div className='rounded-xl bg-secondary p-3'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.leaseStart')}
                   </p>
@@ -273,7 +273,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     {formatContractDate(contract.leaseStartDate, locale)}
                   </p>
                 </div>
-                <div className='rounded-xl bg-[#F8F7FD] p-3'>
+                <div className='rounded-xl bg-secondary p-3'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.leaseEnd')}
                   </p>
@@ -283,7 +283,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                 </div>
               </div>
 
-              <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
+              <div className='rounded-xl border border-dashed border-primary/20 bg-secondary p-4'>
                 <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                   {t('detailPanel.signingProgress.title')}
                 </p>
@@ -298,7 +298,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </div>
 
               {contract.terminationReason && (
-                <div className='rounded-xl border border-dashed border-[#D7D1F8] bg-[#FAF8FF] p-4'>
+                <div className='rounded-xl border border-dashed border-primary/20 bg-secondary p-4'>
                   <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
                     {t('detailPanel.terminationReason')}
                   </p>
@@ -310,7 +310,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             </div>
           </div>
 
-          <div className='rounded-2xl border border-[#ECE9FB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F7F5FF_100%)] p-4'>
+          <div className='rounded-2xl border border-primary/10 bg-[linear-gradient(180deg,white_0%,var(--primary-light,#F7F5FF)_100%)] p-4'>
             <div className='mb-3 flex items-center justify-between'>
               <div>
                 <p className='text-xs uppercase tracking-[0.18em] text-secondary/50'>
@@ -369,7 +369,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </PopoverTrigger>
               <PopoverContent
                 align='end'
-                className='w-64 rounded-xl border-[#ECE9FB] p-2 shadow-xl'
+                className='w-64 rounded-xl border-primary/10 p-2 shadow-xl'
               >
                 <div className='space-y-1'>
                   {availableActions.map((action) => {
@@ -380,7 +380,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                       <button
                         key={action}
                         type='button'
-                        className='flex w-full items-start rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#F5F1FF]'
+                        className='flex w-full items-start rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-primary/5'
                         onClick={() => handleAction(action)}
                       >
                         <div className='flex-1'>

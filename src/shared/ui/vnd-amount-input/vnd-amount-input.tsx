@@ -88,11 +88,11 @@ export function VndAmountInput({
         )}
         {...props}
       />
-      <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-[10px] font-bold text-slate-400'>
+      <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-[10px] font-bold text-muted-foreground/60'>
         VNĐ
       </span>
       {!hidePreview && preview ? (
-        <p className='mt-1 text-[10px] text-slate-500 leading-tight'>{preview}</p>
+        <p className='mt-1 text-[10px] text-muted-foreground leading-tight'>{preview}</p>
       ) : null}
     </div>
   );

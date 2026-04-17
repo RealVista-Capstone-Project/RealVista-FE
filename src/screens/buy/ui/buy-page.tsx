@@ -227,13 +227,13 @@ function BuyPageContent() {
   }
 
   return (
-    <div className='min-h-screen bg-purple-98'>
+    <div className='min-h-screen bg-secondary'>
       {/* Hero Section with Search */}
       <section className='px-6 pb-6 pt-8 sm:px-6 sm:pb-8 sm:pt-16 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
           {/* Header */}
           <div className='mb-6 flex flex-col items-start justify-between gap-4 sm:mb-8 sm:flex-row sm:items-center sm:gap-6'>
-            <h1 className='text-2xl font-bold leading-[1.2] tracking-[-0.4px] text-main-black sm:text-3xl lg:text-[40px] sm:leading-[1.4]'>
+            <h1 className='text-2xl font-bold leading-[1.2] tracking-[-0.4px] text-foreground sm:text-3xl lg:text-[40px] sm:leading-[1.4]'>
               {t('searchTitle')}
             </h1>
 
@@ -244,12 +244,12 @@ function BuyPageContent() {
               <Button
                 type='button'
                 onClick={() => setIsMapView(!isMapView)}
-                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-purple-92 bg-white px-4 py-3 text-base font-medium text-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
+                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-primary/20 bg-white px-4 py-3 text-base font-medium text-muted-foreground opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
                 variant='outline'
               >
                 <span>{isMapView ? t('searchWithSearchBar') : t('searchWithMap')}</span>
                 <div className='relative flex h-5 w-5 items-center justify-center'>
-                  <div className='absolute inset-0 rounded-full bg-purple-96'></div>
+                  <div className='absolute inset-0 rounded-full bg-primary/5'></div>
                   <MapPin className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
                 </div>
               </Button>
@@ -257,11 +257,11 @@ function BuyPageContent() {
           </div>
 
           {/* Simple Search Bar */}
-          <div className='bg-white rounded-lg border border-purple-92 p-6 mb-6'>
+          <div className='bg-white rounded-lg border border-primary/20 p-6 mb-6'>
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               {/* Location */}
               <div>
-                <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
+                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
                   <MapPin className='w-4 h-4 text-primary' />
                   Địa điểm
                 </label>
@@ -278,7 +278,7 @@ function BuyPageContent() {
                   {location && (
                     <button
                       onClick={() => setLocation('')}
-                      className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-main-black transition-colors'
+                      className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors'
                     >
                       <X className='h-4 w-4' />
                     </button>
@@ -288,7 +288,7 @@ function BuyPageContent() {
 
               {/* Min Price */}
               <div>
-                <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
+                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
                   <Banknote className='w-4 h-4 text-primary' />
                   Giá tối thiểu
                 </label>
@@ -304,7 +304,7 @@ function BuyPageContent() {
 
               {/* Max Price */}
               <div>
-                <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
+                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
                   <Banknote className='w-4 h-4 text-primary' />
                   Giá tối đa
                 </label>
@@ -324,7 +324,7 @@ function BuyPageContent() {
                   type='button'
                   variant='outline'
                   onClick={() => setIsFiltersOpen(true)}
-                  className='border-primary text-primary hover:bg-purple-96 px-4 py-2 flex items-center justify-center gap-2'
+                  className='border-primary text-primary hover:bg-primary/5 px-4 py-2 flex items-center justify-center gap-2'
                   title='Bộ lọc nâng cao'
                 >
                   <SlidersHorizontal className='w-4 h-4' />
@@ -367,7 +367,7 @@ function BuyPageContent() {
         <div className='mx-auto max-w-7xl'>
           {/* Results Header */}
           <div className='mb-6 flex items-center justify-between'>
-            <h2 className='text-xl font-bold text-main-black sm:text-2xl'>
+            <h2 className='text-xl font-bold text-foreground sm:text-2xl'>
               {t('resultsHeader')}
             </h2>
           </div>
@@ -375,7 +375,7 @@ function BuyPageContent() {
           {isLoading ? (
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
               {Array.from({ length: itemsPerPage }).map((_, i) => (
-                <div key={i} className='rounded-lg border-[1.5px] border-purple-96 bg-white p-4'>
+                <div key={i} className='rounded-lg border-[1.5px] border-primary/5 bg-white p-4'>
                   <Skeleton className='aspect-[16/10] w-full rounded-lg mb-4' />
                   <Skeleton className='h-6 w-3/4 mb-2' />
                   <Skeleton className='h-5 w-1/2 mb-3' />
@@ -426,11 +426,11 @@ function BuyPageContent() {
               {/* No Results */}
               {listings.length === 0 && (
                 <div className='py-16 text-center'>
-                  <Search className='mx-auto h-12 w-12 text-purple-80 mb-4' />
-                  <p className='text-lg font-medium text-main-black mb-2'>
+                  <Search className='mx-auto h-12 w-12 text-primary/60 mb-4' />
+                  <p className='text-lg font-medium text-foreground mb-2'>
                     {t('noResults')}
                   </p>
-                  <p className='text-sm text-secondary'>
+                  <p className='text-sm text-muted-foreground'>
                     {t('noResultsHint')}
                   </p>
                 </div>

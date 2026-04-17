@@ -16,7 +16,7 @@ export function Field({
 }) {
   return (
     <div className={className}>
-      <Label className='mb-2 block text-sm font-medium text-main-black'>{label}</Label>
+      <Label className='mb-2 block text-sm font-medium text-foreground'>{label}</Label>
       {children}
     </div>
   );
@@ -68,7 +68,7 @@ export function ListingMetaChip({
   value: string;
 }) {
   return (
-    <div className='inline-flex items-center gap-2 rounded-full bg-[#F6F2FF] px-3 py-1.5 text-xs font-semibold text-secondary/80'>
+    <div className='inline-flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 text-xs font-semibold text-secondary/80'>
       <Icon className='h-3.5 w-3.5 text-primary' />
       <span>{value}</span>
     </div>

@@ -194,7 +194,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     #loading.hidden { opacity: 0; pointer-events: none; }
     .spinner {
       width: 40px; height: 40px;
-      border: 3px solid #1F2937; border-top-color: #7065f0;
+      border: 3px solid #1F2937; border-top-color: var(--primary, #7065f0);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -321,7 +321,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       {loading && (
         <div className='absolute inset-0 z-10 flex flex-col items-center justify-center  text-white'>
           <Loader2 className='w-8 h-8 animate-spin text-primary mb-4' />
-          <p className='text-sm font-medium text-slate-400'>{t('loading')}</p>
+          <p className='text-sm font-medium text-muted-foreground'>{t('loading')}</p>
         </div>
       )}
 
@@ -329,7 +329,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       <div
         className={cn(
           'absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-4 py-2 rounded-full',
-          'bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-2xl',
+          'bg-background/40 backdrop-blur-xl border border-white/10 shadow-2xl',
           'opacity-0 group-hover/viewer:opacity-100 transition-all duration-300 transform translate-y-2 group-hover/viewer:translate-y-0'
         )}
       >
@@ -391,7 +391,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
           </RealVistaButton>
 
           {showQualityMenu && (
-            <div className='absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md rounded-xl border border-white/10 p-1.5 shadow-2xl min-w-[140px] animate-in fade-in slide-in-from-bottom-2'>
+            <div className='absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-md rounded-xl border border-white/10 p-1.5 shadow-2xl min-w-[140px] animate-in fade-in slide-in-from-bottom-2'>
               {(availableQualities.length > 0 ? availableQualities : ['default']).map((q) => {
                 return (
                   <button
@@ -404,7 +404,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
                       'w-full px-3 py-2 rounded-lg text-xs font-medium text-left transition-colors',
                       quality === q
                         ? 'bg-primary text-white'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                        : 'text-muted-foreground hover:bg-white/10 hover:text-white'
                     )}
                   >
                     {q.toLowerCase() === 'full_res' || q.toLowerCase() === 'full'
@@ -442,7 +442,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
               <X className='size-4' />
             </button>
           </div>
-          <div className='space-y-4 text-[10px] text-slate-300 font-mono'>
+          <div className='space-y-4 text-[10px] text-muted-foreground font-mono'>
             <div className='p-2 bg-black/40 rounded border border-white/5'>
               <p className='text-primary mb-1'>{t('debugMetadata')}</p>
               <pre className='whitespace-pre-wrap break-all'>

@@ -188,7 +188,7 @@ export function AiChatWindow({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t('placeholder')}
-          className='flex-1 max-h-32 min-h-[40px] resize-y overflow-y-auto bg-transparent py-2 text-sm text-main-black outline-none placeholder:text-grey-400 scrollbar-thin'
+          className='flex-1 max-h-32 min-h-[40px] resize-y overflow-y-auto bg-transparent py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground scrollbar-thin'
           disabled={isTyping || isClearing}
         />
         <button
@@ -198,7 +198,7 @@ export function AiChatWindow({
             'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200',
             input.trim() && !isTyping
               ? 'bg-primary text-white shadow-md hover:bg-primary-hover hover:scale-105 active:scale-95'
-              : 'bg-grey-100 text-grey-400'
+              : 'bg-secondary text-muted-foreground'
           )}
           aria-label={t('send')}
         >
@@ -215,7 +215,7 @@ function LoadingState({ message }: { message: string }) {
   return (
     <div className='flex h-full flex-col items-center justify-center gap-3'>
       <Loader2 className='h-6 w-6 animate-spin text-primary' />
-      <p className='text-sm text-grey-500'>{message}</p>
+      <p className='text-sm text-muted-foreground'>{message}</p>
     </div>
   );
 }
@@ -235,14 +235,14 @@ function ErrorBanner({
 }) {
   if (isQuota) {
     return (
-      <div className='flex flex-col gap-3 rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-4 shadow-sm animate-in fade-in slide-in-from-bottom-2'>
+      <div className='flex flex-col gap-3 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-white p-4 shadow-sm animate-in fade-in slide-in-from-bottom-2'>
         <div className='flex items-start gap-3'>
-          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600'>
+          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
             <Sparkles className='h-5 w-5' />
           </div>
           <div className='flex-1'>
             <h4 className='text-sm font-bold text-primary'>{t('quotaExceeded')}</h4>
-            <p className='mt-1 text-xs text-grey-600 leading-relaxed'>
+            <p className='mt-1 text-xs text-muted-foreground leading-relaxed'>
               {t('quotaExceededDesc')}
             </p>
           </div>
@@ -286,7 +286,7 @@ function WelcomeState({ welcomeMessage, quickActions, onQuickAction }: WelcomeSt
         className='h-14 w-14 rounded-full object-cover'
       />
 
-      <p className='text-center text-sm leading-relaxed text-grey-600'>{welcomeMessage}</p>
+      <p className='text-center text-sm leading-relaxed text-muted-foreground'>{welcomeMessage}</p>
 
       {/* Quick-action chips */}
       <div className='flex flex-col gap-2 self-stretch'>
@@ -294,7 +294,7 @@ function WelcomeState({ welcomeMessage, quickActions, onQuickAction }: WelcomeSt
           <button
             key={action.key}
             onClick={() => onQuickAction(action.text)}
-            className='cursor-pointer rounded-xl border border-border px-4 py-2.5 text-left text-sm text-main-black transition-colors duration-150 hover:border-primary hover:bg-purple-98 hover:text-primary'
+            className='cursor-pointer rounded-xl border border-border px-4 py-2.5 text-left text-sm text-foreground transition-colors duration-150 hover:border-primary hover:bg-primary/5 hover:text-primary'
           >
             {action.text}
           </button>
