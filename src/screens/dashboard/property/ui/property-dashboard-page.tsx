@@ -1050,7 +1050,7 @@ export default function PropertyDashboardPage() {
       {/* ── Left Panel ── */}
       <aside
         className={cn(
-          'flex-col border-r border-primary/20/50 bg-white transition-all duration-300',
+          'flex-col border-r border-primary/20 bg-white transition-all duration-300',
           isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[42%]'
         )}
       >
@@ -1076,17 +1076,17 @@ export default function PropertyDashboardPage() {
           </div>
 
           {/* 3D promo banner — pinned above search */}
-          <div className='border-b border-primary/20/40 px-4 sm:px-6 py-4 bg-white'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-white'>
             <ThreeDPromoBanner />
           </div>
 
           {/* Search + Status Filter — same row */}
-          <div className='border-b border-primary/20/40 px-4 sm:px-6 py-4 bg-primary/5/30'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-primary/5/30'>
             <div className='flex items-center gap-2'>
               {/* Search */}
               <div className='relative group flex-1'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-                  <Search className='h-[18px] w-[18px] text-secondary/50 group-focus-within:text-primary transition-colors' />
+                  <Search className='h-[18px] w-[18px] text-muted-foreground/70 group-focus-within:text-primary transition-colors' />
                 </div>
                 <Input
                   type='text'
@@ -1096,7 +1096,7 @@ export default function PropertyDashboardPage() {
                     setPage(0);
                   }}
                   placeholder={t('searchPlaceholder')}
-                  className='h-10 w-full rounded-xl border border-primary/20 bg-white pl-11 pr-4 text-sm font-medium text-foreground shadow-sm placeholder:text-secondary/50 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300'
+                  className='h-10 w-full rounded-xl border border-primary/20 bg-white pl-11 pr-4 text-sm font-medium text-foreground shadow-sm placeholder:text-muted-foreground/70 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300'
                 />
               </div>
               {/* Status filter */}
@@ -1130,12 +1130,12 @@ export default function PropertyDashboardPage() {
               </div>
             ) : properties.length === 0 ? (
               <div className='flex flex-col items-center justify-center gap-4 p-12 text-center animate-in fade-in duration-500'>
-                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 border border-primary/20/50 shadow-sm'>
+                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 border border-primary/20 shadow-sm'>
                   <Home className='h-8 w-8 text-primary/60' strokeWidth={1.5} />
                 </div>
                 <div className='max-w-[280px]'>
                   <p className='text-base font-bold text-foreground'>{t('noProperties')}</p>
-                  <p className='mt-1.5 text-sm text-secondary/70'>{t('noPropertiesDesc')}</p>
+                  <p className='mt-1.5 text-sm text-muted-foreground'>{t('noPropertiesDesc')}</p>
                 </div>
               </div>
             ) : (
@@ -1155,7 +1155,7 @@ export default function PropertyDashboardPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className='border-t border-primary/20/40 flex items-center justify-between px-4 py-3 bg-white'>
+            <div className='border-t border-primary/20 flex items-center justify-between px-4 py-3 bg-white'>
               <Button
                 variant='outline'
                 size='sm'
@@ -1199,10 +1199,10 @@ export default function PropertyDashboardPage() {
           />
         ) : (
           <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>
-            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20/50'>
+            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20'>
               <Building className='h-10 w-10 text-primary/30' strokeWidth={1.5} />
             </div>
-            <p className='text-base font-medium text-secondary/80 max-w-[250px]'>
+            <p className='text-base font-medium text-muted-foreground max-w-[250px]'>
               {t('selectHint')}
             </p>
           </div>

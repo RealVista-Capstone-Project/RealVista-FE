@@ -30,7 +30,7 @@ export function ConversationSidebar({
   );
 
   return (
-    <aside className='flex w-80 shrink-0 flex-col border-r border-primary/20/50'>
+    <aside className='flex w-80 shrink-0 flex-col border-r border-primary/20'>
       {/* Header */}
       <div className='flex items-center justify-between px-5 py-4'>
         <h1 className='text-xl font-bold text-foreground'>{t('title')}</h1>

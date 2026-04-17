@@ -257,7 +257,7 @@ export function NewFilesGrid({
                 )}
               >
                 <Play className='h-6 w-6 text-primary/60' />
-                <span className='truncate text-[10px] text-secondary/60 w-full text-center'>
+                <span className='truncate text-[10px] text-muted-foreground w-full text-center'>
                   {file.name}
                 </span>
               </div>
@@ -420,8 +420,8 @@ export function MediaUploadZone({
         className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-primary/10 cursor-pointer w-full'
       >
         <Upload className='mb-2 h-7 w-7 text-primary/50' />
-        <p className='text-sm font-medium text-secondary/60'>{labels.dragAndDrop}</p>
-        <p className='mt-0.5 text-xs text-secondary/40'>{labels.uploadHint}</p>
+        <p className='text-sm font-medium text-muted-foreground'>{labels.dragAndDrop}</p>
+        <p className='mt-0.5 text-xs text-muted-foreground/60'>{labels.uploadHint}</p>
       </button>
     </>
   );

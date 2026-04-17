@@ -32,8 +32,8 @@ function ReadOnlyField({ label, value, badge }: { label: string; value: string; 
   return (
     <div className='flex flex-col gap-2'>
       <span className='text-sm font-medium text-foreground'>{label}</span>
-      <div className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5/50 px-4 py-3'>
-        <span className='flex-1 text-sm text-secondary/60'>{value}</span>
+      <div className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3'>
+        <span className='flex-1 text-sm text-muted-foreground'>{value}</span>
         {badge && (
           <span className='rounded-full bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
             {badge}
@@ -306,7 +306,7 @@ export function ListingInformationStep({
               <span className='text-lg font-bold tracking-tight text-foreground'>
                 {t('propertyAddress')}
               </span>
-              <span className='flex items-center gap-1 text-sm text-secondary/50'>
+              <span className='flex items-center gap-1 text-sm text-muted-foreground/70'>
                 <MapPin className='h-3 w-3 shrink-0' />
                 <span className='truncate'>{fullAddress}</span>
               </span>
@@ -469,14 +469,14 @@ export function ListingInformationStep({
               <div className='flex items-center justify-between'>
                 <span className='text-sm font-medium text-foreground'>{t('mediaUpload')}</span>
                 {selectedProperty.media.filter((m) => m.isPropertyStandard).length > 0 && (
-                  <span className='text-xs text-secondary/50'>
+                  <span className='text-xs text-muted-foreground/70'>
                     {selectedMediaIds.size} /{' '}
                     {selectedProperty.media.filter((m) => m.isPropertyStandard).length}{' '}
                     {t('selected', { fallback: 'selected' })}
                   </span>
                 )}
               </div>
-              <p className='text-xs text-secondary/50'>{t('mediaUploadHint')}</p>
+              <p className='text-xs text-muted-foreground/70'>{t('mediaUploadHint')}</p>
 
               {selectedMediaIds.size === 0 && newFiles.length === 0 && (
                 <div className='mt-1 flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-[11px] font-medium text-red-600'>
@@ -522,7 +522,7 @@ export function ListingInformationStep({
       </div>
 
       {/* Footer — Previous / Save as Draft / Submit */}
-      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-primary/20/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
         <button
           type='button'
           onClick={onPrevious}

@@ -45,7 +45,7 @@ export function WizardFooter({
           <Button
             type='button'
             variant='ghost'
-            className='h-11 rounded-xl px-4 text-secondary/70 hover:bg-primary/5 hover:text-foreground'
+            className='h-11 rounded-xl px-4 text-muted-foreground hover:bg-primary/5 hover:text-foreground'
             onClick={onBack}
           >
             <ArrowLeft className='h-4 w-4' />

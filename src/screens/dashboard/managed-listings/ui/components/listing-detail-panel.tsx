@@ -171,7 +171,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               <h1 className='text-2xl sm:text-[32px] font-bold leading-tight sm:leading-[1.25] tracking-tight sm:tracking-[-0.32px] text-foreground'>
                 {property.title}
               </h1>
-              <p className='text-sm sm:text-base font-medium leading-relaxed sm:leading-[1.6] text-foreground/50'>
+              <p className='text-sm sm:text-base font-medium leading-relaxed sm:leading-[1.6] text-muted-foreground'>
                 {property.address || t('addressNotAvailable')}
               </p>
             </div>
@@ -221,7 +221,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                       <CalendarDays className='h-4 w-4' strokeWidth={2} />
                       <span>{t('viewAppointments')}</span>
                     </Link>
-                    <div className='my-1 h-px bg-primary/15/50' />
+                    <div className='my-1 h-px bg-border' />
                     <button
                       type='button'
                       onClick={() => {
@@ -265,7 +265,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                   </div>
                   <div>
                     <h3 className='text-sm font-semibold text-foreground'>{t('agent.title')}</h3>
-                    <p className='text-xs text-secondary/60'>{t('agent.subtitle')}</p>
+                    <p className='text-xs text-muted-foreground'>{t('agent.subtitle')}</p>
                   </div>
                 </div>
 
@@ -304,7 +304,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                         {listing.agent!.business_name || listing.agent!.full_name}
                       </h4>
                       {listing.agent!.business_name && listing.agent!.full_name && (
-                        <p className='text-sm text-secondary/70'>{listing.agent!.full_name}</p>
+                        <p className='text-sm text-muted-foreground'>{listing.agent!.full_name}</p>
                       )}
                       {listing.agent!.is_verified && (
                         <div className='mt-1 flex items-center gap-1.5'>
@@ -319,19 +319,19 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     {/* Contact Info */}
                     <div className='space-y-2 text-sm'>
                       {listing.agent!.phone && (
-                        <div className='flex items-center gap-2 text-secondary/70'>
+                        <div className='flex items-center gap-2 text-muted-foreground'>
                           <Phone className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.phone}</span>
                         </div>
                       )}
                       {listing.agent!.email && (
-                        <div className='flex items-center gap-2 text-secondary/70'>
+                        <div className='flex items-center gap-2 text-muted-foreground'>
                           <Mail className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.email}</span>
                         </div>
                       )}
                       {listing.agent!.company && (
-                        <div className='flex items-center gap-2 text-secondary/70'>
+                        <div className='flex items-center gap-2 text-muted-foreground'>
                           <Building2 className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.company}</span>
                         </div>
@@ -356,7 +356,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           {listing.status === 'PUBLISHED' && listing.published_at && (
             <div className='flex flex-1 flex-col gap-4'>
               {/* Listing Lifetime - Above Metrics */}
-              <div className='rounded-lg border border-primary/20 bg-primary/5/50 p-4'>
+              <div className='rounded-lg border border-primary/20 bg-primary/5 p-4'>
                 <ListingLifetimeCard listing={listing} />
               </div>
               <ListingBoostSection listing={listing} />
@@ -434,7 +434,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           <h2 className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-foreground'>
             {t('aboutThisListing', { fallback: 'About this listing' })}
           </h2>
-          <p className='text-base font-medium leading-[1.6] text-foreground/70 whitespace-pre-wrap font-sans'>
+          <p className='text-base font-medium leading-[1.6] text-muted-foreground whitespace-pre-wrap font-sans'>
             {listing.content || property.description}
           </p>
         </div>

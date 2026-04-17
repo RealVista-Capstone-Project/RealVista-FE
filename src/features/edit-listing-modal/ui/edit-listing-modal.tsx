@@ -321,7 +321,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
               <Dialog.Title className='text-xl font-bold text-foreground'>
                 {t('editTitle')}
               </Dialog.Title>
-              <Dialog.Description className='text-sm text-secondary/70 mt-1'>
+              <Dialog.Description className='text-sm text-muted-foreground mt-1'>
                 {t('editSubtitle')}
               </Dialog.Description>
             </div>
@@ -416,13 +416,13 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                 <div className='flex items-center justify-between'>
                   <span className='text-sm font-medium text-foreground'>{t('mediaUpload')}</span>
                   {(listing.media || []).length > 0 && (
-                    <span className='text-xs text-secondary/50'>
+                    <span className='text-xs text-muted-foreground/70'>
                       {selectedMediaIds.size + selectedNewFileIndices.size} / 10{' '}
                       {t('selected', { fallback: 'selected' })}
                     </span>
                   )}
                 </div>
-                <p className='text-xs text-secondary/50'>
+                <p className='text-xs text-muted-foreground/70'>
                   {t('mediaUploadHint', {
                     fallback: 'Select existing media or upload new ones (max 10)',
                   })}
@@ -452,8 +452,8 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                     }}
                   />
                 ) : (
-                  <div className='rounded-xl border border-dashed border-primary/20 bg-primary/5/50 p-8 text-center'>
-                    <p className='text-sm font-medium text-secondary/80'>
+                  <div className='rounded-xl border border-dashed border-primary/20 bg-primary/5 p-8 text-center'>
+                    <p className='text-sm font-medium text-muted-foreground'>
                       No media available from the property.
                     </p>
                   </div>

@@ -98,13 +98,13 @@ export function LeaseSigningCompletePage() {
       {steps.map((step, i) => (
         <div key={i} className='flex items-center gap-3'>
           <div
-            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${step.done ? 'bg-emerald-500 text-white' : 'bg-primary/10 text-secondary/50'
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${step.done ? 'bg-emerald-500 text-white' : 'bg-primary/10 text-muted-foreground/70'
               }`}
           >
             {step.done ? '✓' : i + 1}
           </div>
           <span
-            className={`text-sm ${step.done ? 'font-semibold text-foreground' : 'text-secondary/55'
+            className={`text-sm ${step.done ? 'font-semibold text-foreground' : 'text-muted-foreground'
               }`}
           >
             {step.label}
@@ -162,7 +162,7 @@ export function LeaseSigningCompletePage() {
               <Button
                 asChild
                 variant='outline'
-                className='h-11 w-full rounded-xl border-primary/30 text-secondary/70 hover:bg-primary/5'
+                className='h-11 w-full rounded-xl border-primary/30 text-muted-foreground hover:bg-primary/5'
               >
                 <Link href={ROUTES.dashboard.rentalContracts}>
                   <ArrowLeft className='h-4 w-4' />
@@ -211,7 +211,7 @@ export function LeaseSigningCompletePage() {
                             ? t('landlord.sendToRenterTitle')
                             : t('infoTitle')}
                       </p>
-                      <p className='mt-1 text-sm leading-6 text-secondary/70'>
+                      <p className='mt-1 text-sm leading-6 text-muted-foreground'>
                         {isRenter
                           ? t('renter.infoBody')
                           : isLandlord
@@ -256,7 +256,7 @@ export function LeaseSigningCompletePage() {
                   variant={isLandlord && confirmState === 'confirmed' ? 'outline' : 'default'}
                   className={
                     isLandlord && confirmState === 'confirmed'
-                      ? 'h-11 w-full rounded-xl border-primary/30 text-secondary/70 hover:bg-primary/5'
+                      ? 'h-11 w-full rounded-xl border-primary/30 text-muted-foreground hover:bg-primary/5'
                       : 'mt-2 h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary-hover'
                   }
                 >

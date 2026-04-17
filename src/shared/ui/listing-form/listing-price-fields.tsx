@@ -31,7 +31,7 @@ export function CurrencyInput({
         {required && <span className='text-primary'>*</span>}
       </label>
       <div className='flex items-center rounded-lg border border-primary/20 bg-white overflow-hidden transition-colors focus-within:border-primary'>
-        <span className='flex h-full items-center border-r border-primary/20 bg-primary/5/50 px-3 text-sm text-secondary/50'>
+        <span className='flex h-full items-center border-r border-primary/20 bg-primary/5 px-3 text-sm text-muted-foreground/70'>
           {currency}
         </span>
         <input
@@ -41,7 +41,7 @@ export function CurrencyInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className={cn(
-            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-secondary/50 focus:outline-none',
+            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none',
             error && 'text-red-500'
           )}
         />

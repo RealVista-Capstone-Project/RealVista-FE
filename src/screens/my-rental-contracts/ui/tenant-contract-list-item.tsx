@@ -55,7 +55,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
           <div className='truncate text-sm font-semibold text-foreground'>
             {contract.property.title}
           </div>
-          <div className='mt-0.5 truncate text-xs text-secondary/60'>
+          <div className='mt-0.5 truncate text-xs text-muted-foreground'>
             {contract.property.address}
           </div>
         </div>
@@ -65,7 +65,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
         <div className='text-sm font-semibold text-foreground'>
           {formatContractCurrency(contract.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
         </div>
-        <div className='mt-0.5 text-xs text-secondary/60'>{t('table.perMonth')}</div>
+        <div className='mt-0.5 text-xs text-muted-foreground'>{t('table.perMonth')}</div>
       </div>
 
       <div className='col-span-2 flex items-center justify-between gap-2'>
@@ -73,7 +73,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
           <div className='text-sm font-semibold text-foreground tabular-nums'>
             {formatContractDate(contract.leaseStartDate, locale, 'dd MMM')}
           </div>
-          <div className='mt-0.5 text-xs text-secondary/60 tabular-nums'>
+          <div className='mt-0.5 text-xs text-muted-foreground tabular-nums'>
             {formatContractDate(contract.leaseStartDate, locale, 'yyyy')}
           </div>
         </div>

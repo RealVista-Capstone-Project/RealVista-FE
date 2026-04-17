@@ -65,7 +65,7 @@ export function UpdateContractStatusDialog({
             <DialogTitle className='text-xl font-semibold text-foreground'>
               {config.title}
             </DialogTitle>
-            <DialogDescription className='mt-2 text-sm leading-6 text-secondary/70'>
+            <DialogDescription className='mt-2 text-sm leading-6 text-muted-foreground'>
               {config.description}
             </DialogDescription>
           </DialogHeader>
@@ -82,7 +82,7 @@ export function UpdateContractStatusDialog({
                 placeholder={t('statusDialog.reasonPlaceholder')}
                 className='min-h-28 rounded-xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-primary/30'
               />
-              <p className='text-xs text-secondary/60'>
+              <p className='text-xs text-muted-foreground'>
                 {t('statusDialog.reasonHint')}
               </p>
             </div>

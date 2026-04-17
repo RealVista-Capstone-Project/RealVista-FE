@@ -98,7 +98,7 @@ function PropertyCard({
         'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
         isSelected
           ? 'border-primary bg-primary/5 shadow-[0px_0px_20px_0px_rgba(112,101,240,0.15)]'
-          : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5/50'
+          : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
       )}
     >
       {/* Thumbnail */}
@@ -113,7 +113,7 @@ function PropertyCard({
           />
         ) : (
           <div className='flex h-full w-full items-center justify-center bg-primary/5'>
-            <Home className='h-6 w-6 text-secondary/40' />
+            <Home className='h-6 w-6 text-muted-foreground/60' />
           </div>
         )}
       </div>
@@ -127,12 +127,12 @@ function PropertyCard({
           <PropertyStatusBadge status={property.status} />
         </div>
 
-        <div className='flex items-center gap-1 text-xs text-secondary/60'>
+        <div className='flex items-center gap-1 text-xs text-muted-foreground'>
           <MapPin className='h-3 w-3 shrink-0' />
           <span className='truncate'>{fullAddress}</span>
         </div>
 
-        <div className='flex flex-wrap items-center gap-3 text-xs text-secondary/60'>
+        <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
           <span className='flex items-center gap-1'>
             <Home className='h-3 w-3' />
             {property.propertyType.propertyTypeName}
@@ -193,13 +193,13 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep ? 'text-foreground' : 'text-secondary/50'
+                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground/70'
               )}
             >
               {step.label}
             </span>
           </div>
-          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-secondary/50' />}
+          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-muted-foreground/70' />}
         </React.Fragment>
       ))}
     </div>
@@ -393,13 +393,13 @@ export function CreateListingPage() {
             <h1 className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-foreground'>
               {t('title')}
             </h1>
-            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-secondary/50'>
+            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-muted-foreground/70'>
               {t('subtitle')}
             </p>
           </div>
 
           {/* Step indicator */}
-          <div className='flex justify-center border-b border-primary/20/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
+          <div className='flex justify-center border-b border-primary/20 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
             <StepIndicator currentStep={currentStep} />
           </div>
         </div>
@@ -422,7 +422,7 @@ export function CreateListingPage() {
                     </div>
                   ) : properties.length === 0 ? (
                     <div className='flex justify-center py-8'>
-                      <span className='text-secondary/50'>
+                      <span className='text-muted-foreground/70'>
                         {t('noProperties', { fallback: 'No properties found' })}
                       </span>
                     </div>
@@ -452,7 +452,7 @@ export function CreateListingPage() {
             </div>
 
             {/* Footer — Next button - Fixed */}
-            <div className='shrink-0 flex justify-end border-t border-primary/20/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+            <div className='shrink-0 flex justify-end border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
               <button
                 type='button'
                 disabled={!selectedProperty}

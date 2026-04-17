@@ -30,7 +30,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       type='button'
       onClick={onClick}
       className={cn(
-        'w-full border-b border-primary/20/50 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5',
+        'w-full border-b border-primary/20 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5',
         isSelected && 'bg-primary/5'
       )}
     >
@@ -72,7 +72,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
 
             return (
               <div className='flex h-full w-full items-center justify-center'>
-                <span className='text-xs text-secondary/60'>{t('noImage')}</span>
+                <span className='text-xs text-muted-foreground'>{t('noImage')}</span>
               </div>
             );
           })()}

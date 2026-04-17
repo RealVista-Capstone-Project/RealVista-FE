@@ -105,12 +105,12 @@ export function StepListingPicker({
             <h3 className='mt-2 text-lg font-semibold text-foreground'>
               {t('listingPicker.title')}
             </h3>
-            <p className='mt-1 text-sm leading-6 text-secondary/65'>
+            <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>
               {t('listingPicker.description')}
             </p>
           </div>
           <div className='relative w-full md:max-w-xs'>
-            <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary/45' />
+            <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70' />
             <Input
               value={searchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
@@ -185,7 +185,7 @@ export function StepListingPicker({
                           </div>
                         </div>
 
-                        <div className='mt-4 flex items-start gap-2 text-sm text-secondary/72'>
+                        <div className='mt-4 flex items-start gap-2 text-sm text-muted-foreground'>
                           <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-primary/70' />
                           <span>{address}</span>
                         </div>
@@ -231,11 +231,11 @@ export function StepListingPicker({
             {/* Empty state */}
             {properties.length === 0 && (
               <div className='rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-5 py-10 text-center'>
-                <Building2 className='mx-auto mb-3 h-10 w-10 text-secondary/25' />
+                <Building2 className='mx-auto mb-3 h-10 w-10 text-muted-foreground/40' />
                 <p className='text-sm font-semibold text-foreground'>
                   {t('listingPicker.emptyTitle')}
                 </p>
-                <p className='mt-2 text-sm leading-6 text-secondary/65'>
+                <p className='mt-2 text-sm leading-6 text-muted-foreground/80'>
                   {t('listingPicker.emptyDescription')}
                 </p>
               </div>
@@ -254,7 +254,7 @@ export function StepListingPicker({
               >
                 <ChevronLeft className='h-4 w-4' />
               </Button>
-              <span className='text-sm text-secondary/70'>
+              <span className='text-sm text-muted-foreground'>
                 {page} / {totalPages}
               </span>
               <Button

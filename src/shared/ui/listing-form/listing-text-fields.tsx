@@ -35,7 +35,7 @@ export function ListingNameInput({
         maxLength={maxLength}
         placeholder={placeholder}
         className={cn(
-          'rounded-lg border bg-background px-4 py-3 text-sm text-foreground placeholder:text-secondary/50 transition-colors focus:outline-none',
+          'rounded-lg border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:outline-none',
           error
             ? 'border-red-400 focus:border-red-500'
             : 'border-primary/20 focus:border-primary'
@@ -71,7 +71,7 @@ export function ListingContentTextarea({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className='rounded-lg border border-primary/20 bg-background px-4 py-3 text-sm text-foreground placeholder:text-secondary/50 transition-colors focus:border-primary focus:outline-none resize-none'
+        className='rounded-lg border border-primary/20 bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-primary focus:outline-none resize-none'
       />
     </div>
   );

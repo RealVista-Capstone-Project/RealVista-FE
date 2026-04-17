@@ -178,7 +178,7 @@ export function PropertyGallery({
                   />
                 ) : (
                   <div className='flex h-full w-full items-center justify-center'>
-                    <span className='text-[10px] sm:text-xs text-secondary/60'>
+                    <span className='text-[10px] sm:text-xs text-muted-foreground'>
                       {isVideo ? t('video') : t('noImage')}
                     </span>
                   </div>

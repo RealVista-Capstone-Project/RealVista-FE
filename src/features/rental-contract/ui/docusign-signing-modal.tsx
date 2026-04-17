@@ -92,11 +92,11 @@ export function DocuSignSigningModal({
           <div className='space-y-4 px-6 py-5'>
             {/* URL display */}
             <div className='space-y-1.5'>
-              <p className='text-xs font-semibold uppercase tracking-[0.16em] text-secondary/50'>
+              <p className='text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground/70'>
                 Đường dẫn ký
               </p>
               <div className='flex items-center gap-2 overflow-hidden rounded-xl border border-primary/25 bg-primary/5 px-3 py-2.5'>
-                <span className='flex-1 truncate text-xs text-secondary/70 font-mono'>
+                <span className='flex-1 truncate text-xs text-muted-foreground font-mono'>
                   {signingUrl}
                 </span>
                 <button
@@ -117,7 +117,7 @@ export function DocuSignSigningModal({
                   )}
                 </button>
               </div>
-              <p className='text-[11px] text-secondary/45'>
+              <p className='text-[11px] text-muted-foreground/70'>
                 Lưu ý: Đường dẫn này có hiệu lực trong khoảng 5 phút.
               </p>
             </div>
@@ -125,7 +125,7 @@ export function DocuSignSigningModal({
             {/* Divider */}
             <div className='flex items-center gap-3'>
               <div className='h-px flex-1 bg-primary/15' />
-              <span className='text-xs text-secondary/40'>hoặc</span>
+              <span className='text-xs text-muted-foreground/60'>hoặc</span>
               <div className='h-px flex-1 bg-primary/15' />
             </div>
 
@@ -143,7 +143,7 @@ export function DocuSignSigningModal({
               <Button
                 type='button'
                 variant='outline'
-                className='h-11 w-full rounded-xl border-primary/30 bg-white text-secondary/70 hover:bg-primary/5'
+                className='h-11 w-full rounded-xl border-primary/30 bg-white text-muted-foreground hover:bg-primary/5'
                 onClick={onClose}
               >
                 Ký sau

@@ -56,7 +56,7 @@ function ManageRentalContractContent() {
       <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
         <div className='flex flex-col items-center gap-4'>
           <div className='h-10 w-10 animate-spin rounded-full border-[3px] border-primary border-t-transparent' />
-          <p className='text-sm font-medium tracking-wide text-secondary/70'>{t('loading')}</p>
+          <p className='text-sm font-medium tracking-wide text-muted-foreground'>{t('loading')}</p>
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ function ManageRentalContractContent() {
               <h1 className='mt-3 text-3xl font-semibold tracking-[-0.03em] text-foreground'>
                 {t('hero.title')}
               </h1>
-              <p className='mt-3 max-w-xl text-sm leading-7 text-secondary/70'>
+              <p className='mt-3 max-w-xl text-sm leading-7 text-muted-foreground'>
                 {t('hero.subtitle')}
               </p>
             </div>
@@ -106,13 +106,13 @@ function ManageRentalContractContent() {
 
               <div className='grid gap-3 sm:grid-cols-2'>
                 <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
-                  <p className='text-[11px] uppercase tracking-[0.16em] text-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70'>
                     {t('hero.stats.totalContracts')}
                   </p>
                   <p className='mt-2 text-2xl font-semibold text-foreground'>{totalElements}</p>
                 </div>
                 <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
-                  <p className='text-[11px] uppercase tracking-[0.16em] text-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70'>
                     {t('hero.stats.activeSelection')}
                   </p>
                   <p className='mt-2 text-sm font-semibold text-foreground'>
@@ -133,7 +133,7 @@ function ManageRentalContractContent() {
           >
             <div className='mb-5 flex flex-col gap-3 rounded-3xl border border-white/60 bg-white/90 p-4 shadow-[0_12px_36px_rgba(94,74,175,0.08)] sm:flex-row sm:items-center'>
               <div className='flex w-full flex-shrink-0 items-center gap-2 sm:w-auto'>
-                <SlidersHorizontal className='h-4 w-4 flex-shrink-0 text-secondary/50' />
+                <SlidersHorizontal className='h-4 w-4 flex-shrink-0 text-muted-foreground/70' />
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className='h-10 w-full rounded-xl border-transparent bg-[#F5F3FF] text-sm font-medium focus:ring-primary/20 sm:w-48'>
                     <SelectValue placeholder={t('filter.allStatuses')} />
@@ -150,7 +150,7 @@ function ManageRentalContractContent() {
               </div>
 
               <div className='relative w-full flex-1'>
-                <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary/40' />
+                <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60' />
                 <Input
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
@@ -162,16 +162,16 @@ function ManageRentalContractContent() {
 
             <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_rgba(96,72,179,0.10)]'>
               <div className='grid grid-cols-12 gap-4 border-b border-primary/20 bg-secondary px-5 py-4'>
-                <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/45'>
+                <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('table.status')}
                 </div>
-                <div className='col-span-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/45'>
+                <div className='col-span-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('table.tenant')}
                 </div>
-                <div className='col-span-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/45'>
+                <div className='col-span-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('table.monthlyRent')}
                 </div>
-                <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/45'>
+                <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('table.createdDate')}
                 </div>
               </div>
@@ -184,7 +184,7 @@ function ManageRentalContractContent() {
                     </div>
                     <div>
                       <p className='font-semibold text-foreground'>{t('empty.title')}</p>
-                      <p className='mt-1 text-sm text-secondary/60'>{t('empty.subtitle')}</p>
+                      <p className='mt-1 text-sm text-muted-foreground'>{t('empty.subtitle')}</p>
                     </div>
                   </div>
                 ) : (
@@ -204,7 +204,7 @@ function ManageRentalContractContent() {
 
             {totalElements > 0 && (
               <div className='mt-4 flex items-center justify-between px-1'>
-                <p className='text-xs font-medium text-secondary/55'>
+                <p className='text-xs font-medium text-muted-foreground'>
                   {t('pagination.showing', {
                     from: Math.min((currentPage - 1) * itemsPerPage + 1, totalElements),
                     to: Math.min(currentPage * itemsPerPage, totalElements),

@@ -92,7 +92,7 @@ export function WizardStepsCard({
                   'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors',
                   isActive && 'bg-white/20 text-white ring-1 ring-white/30',
                   isComplete && 'bg-primary text-white',
-                  !isActive && !isComplete && 'bg-white/70 text-secondary/50 shadow-sm',
+                  !isActive && !isComplete && 'bg-white/70 text-muted-foreground/70 shadow-sm',
                 )}
               >
                 {isComplete ? <Check className='h-3.5 w-3.5' strokeWidth={3} /> : step.id}
@@ -105,7 +105,7 @@ export function WizardStepsCard({
                     'truncate text-[11px] font-extrabold uppercase tracking-widest leading-none',
                     isActive && 'text-white',
                     isComplete && 'text-primary',
-                    !isActive && !isComplete && 'text-secondary/50',
+                    !isActive && !isComplete && 'text-muted-foreground/70',
                   )}
                 >
                   {step.label}

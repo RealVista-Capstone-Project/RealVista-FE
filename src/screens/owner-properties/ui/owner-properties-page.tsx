@@ -406,7 +406,7 @@ function OwnerPropertiesContent() {
       >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-primary/20/40 p-4 sm:p-6 bg-white'>
+          <div className='border-b border-primary/20 p-4 sm:p-6 bg-white'>
             <div className='flex items-center gap-3'>
               <h2 className='text-2xl font-extrabold text-foreground tracking-tight'>
                 {t('pageTitle')}
@@ -535,7 +535,7 @@ function OwnerPropertiesContent() {
           />
         ) : (
           <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>
-            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20/50'>
+            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20'>
               <Building className='h-10 w-10 text-primary/30' strokeWidth={1.5} />
             </div>
             <p className='text-base font-medium text-muted-foreground max-w-[250px]'>

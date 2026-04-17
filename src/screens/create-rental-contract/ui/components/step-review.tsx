@@ -54,14 +54,14 @@ export function StepReview({ form, t }: StepReviewProps) {
           </div>
         )}
         <div className='min-w-0'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
             {t('review.propertyBanner')}
           </p>
           <p className='mt-1 text-lg font-semibold tracking-[-0.02em] text-foreground'>
             {form.propertyTitle}
           </p>
           <div className='mt-1.5 flex flex-wrap items-center gap-2'>
-            <span className='flex items-center gap-1 text-xs text-secondary/60'>
+            <span className='flex items-center gap-1 text-xs text-muted-foreground'>
               <MapPin className='h-3 w-3' />
               {form.propertyAddress}
             </span>
@@ -72,12 +72,12 @@ export function StepReview({ form, t }: StepReviewProps) {
               {form.propertyType}
             </Badge>
             {form.bedrooms && (
-              <span className='flex items-center gap-1 text-xs text-secondary/60'>
+              <span className='flex items-center gap-1 text-xs text-muted-foreground'>
                 <BedDouble className='h-3 w-3' /> {form.bedrooms}
               </span>
             )}
             {form.bathrooms && (
-              <span className='flex items-center gap-1 text-xs text-secondary/60'>
+              <span className='flex items-center gap-1 text-xs text-muted-foreground'>
                 <Bath className='h-3 w-3' /> {form.bathrooms}
               </span>
             )}
@@ -88,42 +88,42 @@ export function StepReview({ form, t }: StepReviewProps) {
       {/* Parties + Financials */}
       <div className='grid gap-4 sm:grid-cols-2'>
         <div className='rounded-2xl border border-primary/20 bg-primary/5 p-4'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
             {t('review.partiesTitle')}
           </p>
           <div className='mt-3 space-y-3'>
             <div>
-              <p className='text-xs text-secondary/50'>{t('review.ownerLabel')}</p>
+              <p className='text-xs text-muted-foreground/70'>{t('review.ownerLabel')}</p>
               <p className='mt-0.5 text-sm font-medium text-foreground'>
                 {form.landlordName || t('review.ownerFallback')}
               </p>
               {form.landlordEmail && (
-                <p className='text-xs text-secondary/50'>{form.landlordEmail}</p>
+                <p className='text-xs text-muted-foreground/70'>{form.landlordEmail}</p>
               )}
             </div>
             <div className='h-px bg-primary/15' />
             <div>
-              <p className='text-xs text-secondary/50'>{t('review.tenantLabel')}</p>
+              <p className='text-xs text-muted-foreground/70'>{t('review.tenantLabel')}</p>
               <p className='mt-0.5 text-sm font-medium text-foreground'>{form.tenantName}</p>
-              <p className='text-xs text-secondary/50'>{form.tenantEmail}</p>
+              <p className='text-xs text-muted-foreground/70'>{form.tenantEmail}</p>
             </div>
           </div>
         </div>
 
         <div className='rounded-2xl border border-primary/20 bg-primary/5 p-4'>
-          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+          <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
             {t('review.financialsTitle')}
           </p>
           <div className='mt-3 space-y-3'>
             <div>
-              <p className='text-xs text-secondary/50'>{t('review.monthlyRentLabel')}</p>
+              <p className='text-xs text-muted-foreground/70'>{t('review.monthlyRentLabel')}</p>
               <p className='mt-0.5 text-lg font-semibold text-foreground'>
                 {formatCurrencyValue(form.monthlyRent)}
               </p>
             </div>
             <div className='h-px bg-primary/15' />
             <div>
-              <p className='text-xs text-secondary/50'>{t('review.depositLabel')}</p>
+              <p className='text-xs text-muted-foreground/70'>{t('review.depositLabel')}</p>
               <p className='mt-0.5 text-sm font-medium text-foreground'>
                 {form.securityDeposit
                   ? formatCurrencyValue(form.securityDeposit)
@@ -136,12 +136,12 @@ export function StepReview({ form, t }: StepReviewProps) {
 
       {/* Lease timeline */}
       <div className='rounded-2xl border border-primary/20 bg-primary/5 p-4'>
-        <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+        <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
           {t('review.timelineTitle')}
         </p>
         <div className='mt-3 flex items-center gap-3'>
           <div className='rounded-xl bg-primary/10 px-3 py-2 text-center'>
-            <p className='text-[10px] font-medium uppercase text-secondary/50'>
+            <p className='text-[10px] font-medium uppercase text-muted-foreground/70'>
               {t('review.timelineFrom')}
             </p>
             <p className='mt-0.5 text-sm font-semibold text-foreground'>{form.leaseStartDate}</p>
@@ -156,7 +156,7 @@ export function StepReview({ form, t }: StepReviewProps) {
             <div className='h-px flex-1 bg-primary/20' />
           </div>
           <div className='rounded-xl bg-primary/10 px-3 py-2 text-center'>
-            <p className='text-[10px] font-medium uppercase text-secondary/50'>
+            <p className='text-[10px] font-medium uppercase text-muted-foreground/70'>
               {t('review.timelineTo')}
             </p>
             <p className='mt-0.5 text-sm font-semibold text-foreground'>{form.leaseEndDate}</p>
@@ -169,7 +169,7 @@ export function StepReview({ form, t }: StepReviewProps) {
         <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10'>
           <SendHorizontal className='h-4 w-4 text-primary' />
         </div>
-        <p className='text-sm leading-relaxed text-secondary/70'>{t('review.docusignNotice')}</p>
+        <p className='text-sm leading-relaxed text-muted-foreground'>{t('review.docusignNotice')}</p>
       </div>
     </div>
   );

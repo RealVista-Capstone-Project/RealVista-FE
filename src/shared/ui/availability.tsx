@@ -874,7 +874,7 @@ export function Availability<T extends AppointmentData = AppointmentData>({
                         className={cn(
                           "flex-1 border-r px-2 py-3 text-center text-sm font-medium last:border-r-0",
                           !readOnly && !isEditBlocks && !days.includes(dayIndex) && "bg-muted/30 text-muted-foreground",
-                          todayCol && "bg-primary/5 dark:bg-primary/5/10",
+                          todayCol && "bg-primary/5 dark:bg-primary/5",
                         )}
                       >
                         <div className={cn(todayCol && "text-primary font-semibold")}>
@@ -1075,7 +1075,7 @@ function DayColumn<T extends AppointmentData = AppointmentData>({
       className={cn(
         "flex-1 relative border-r last:border-r-0 min-w-[100px] touch-none",
         isDayDisabled && "bg-muted/30",
-        isTodayCol && "bg-primary/5 dark:bg-primary/5/10",
+        isTodayCol && "bg-primary/5 dark:bg-primary/5",
         context?.activeId && "z-10",
       )}
       onPointerDown={handlePointerDown}

@@ -480,7 +480,7 @@ export function MessageInput({
               <FileText className='size-5 text-primary' />
               {t('contractModal.title')}
             </DialogTitle>
-            <DialogDescription className='text-sm text-secondary/65'>
+            <DialogDescription className='text-sm text-muted-foreground/80'>
               {t('contractModal.description')}
             </DialogDescription>
           </DialogHeader>
@@ -489,7 +489,7 @@ export function MessageInput({
             {/* Listing picker — shown when conversation has multiple listings */}
             {listings.length > 1 && (
               <div className='space-y-2'>
-                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('contractModal.listingPickerLabel')}
                 </p>
                 <div className='max-h-52 space-y-1.5 overflow-y-auto pr-0.5'>
@@ -510,7 +510,7 @@ export function MessageInput({
                         <Building2
                           className={cn(
                             'size-4 shrink-0',
-                            isSelected ? 'text-primary' : 'text-secondary/40'
+                            isSelected ? 'text-primary' : 'text-muted-foreground/60'
                           )}
                         />
                         <div className='min-w-0 flex-1'>
@@ -532,7 +532,7 @@ export function MessageInput({
               <div className='flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3'>
                 <Building2 className='mt-0.5 size-4 shrink-0 text-primary/70' />
                 <div className='min-w-0 flex-1'>
-                  <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+                  <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                     {t('contractModal.listingLabel')}
                   </p>
                   <p className='mt-0.5 truncate text-sm font-medium text-foreground'>
@@ -546,7 +546,7 @@ export function MessageInput({
             <div className='flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3'>
               <User className='mt-0.5 size-4 shrink-0 text-primary/70' />
               <div className='min-w-0 flex-1'>
-                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary/50'>
+                <p className='text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('contractModal.tenantLabel')}
                 </p>
                 <p className='mt-0.5 truncate text-sm font-medium text-foreground'>

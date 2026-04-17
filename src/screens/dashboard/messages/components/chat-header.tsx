@@ -13,7 +13,7 @@ interface ChatHeaderProps {
 export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHeaderProps) {
   const t = useTranslations('Messages');
   return (
-    <div className='flex items-center justify-between border-b border-primary/20/50 bg-white px-6 py-3'>
+    <div className='flex items-center justify-between border-b border-primary/20 bg-white px-6 py-3'>
       {/* Left: Avatar + Name */}
       <div className='flex items-center gap-3'>
         <AvatarCircle

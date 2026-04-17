@@ -153,7 +153,7 @@ export function ManagedListingsPage() {
       <div className='flex h-full items-center justify-center'>
         <div className='text-center'>
           <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
-          <p className='mt-2 text-sm text-secondary/60'>{error.message}</p>
+          <p className='mt-2 text-sm text-muted-foreground'>{error.message}</p>
         </div>
       </div>
     );
@@ -176,13 +176,13 @@ export function ManagedListingsPage() {
       {/* Left Sidebar - Properties List */}
       <aside
         className={cn(
-          'flex-col border-r border-primary/20/50 bg-white transition-all duration-300',
+          'flex-col border-r border-primary/20 bg-white transition-all duration-300',
           isMobile ? (selectedListingId ? 'hidden' : 'flex w-full') : 'flex w-[460px]'
         )}
       >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-primary/20/50 p-4 sm:p-6'>
+          <div className='border-b border-primary/20 p-4 sm:p-6'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
@@ -205,7 +205,7 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Tabs */}
-          <div className='border-b border-primary/20/50 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
             <div className='flex gap-1 min-w-max'>
               <button
                 type='button'
@@ -275,18 +275,18 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Search bar + Filter */}
-          <div className='border-b border-primary/20/50 p-4 sm:p-6'>
+          <div className='border-b border-primary/20 p-4 sm:p-6'>
             <div className='flex items-center gap-3'>
               <div className='relative flex-1'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-                  <Search className='h-5 w-5 text-secondary/50' strokeWidth={2} />
+                  <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
                 </div>
                 <input
                   type='text'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('search.placeholder')}
-                  className='h-14 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-secondary/50 focus:border-primary focus:outline-none focus:ring-0'
+                  className='h-14 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
                 />
               </div>
 
@@ -318,7 +318,7 @@ export function ManagedListingsPage() {
                 {/* Filter Dropdown Panel */}
                 {isFilterOpen && (
                   <div className='absolute right-0 top-full z-30 mt-2 w-64 rounded-xl border border-primary/20 bg-white shadow-lg'>
-                    <div className='flex items-center justify-between border-b border-primary/20/50 px-4 py-3'>
+                    <div className='flex items-center justify-between border-b border-primary/20 px-4 py-3'>
                       <span className='text-sm font-semibold text-foreground'>{t('filter')}</span>
                       <button
                         type='button'
@@ -332,7 +332,7 @@ export function ManagedListingsPage() {
                     <div className='p-4 space-y-4'>
                       {/* Status Filter */}
                       <div>
-                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-secondary/60'>
+                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                           {t('filterPanel.status')}
                         </p>
                         <div className='flex flex-col gap-1'>
@@ -365,7 +365,7 @@ export function ManagedListingsPage() {
 
                       {/* Sort By */}
                       <div>
-                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-secondary/60'>
+                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                           {t('filterPanel.sortBy')}
                         </p>
                         <div className='flex flex-col gap-1'>
@@ -403,7 +403,7 @@ export function ManagedListingsPage() {
           <div className='flex-1 overflow-y-auto'>
             {listings.length === 0 ? (
               <div className='flex items-center justify-center p-8'>
-                <p className='text-sm text-secondary/60'>{t('empty.noProperties')}</p>
+                <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
               </div>
             ) : (
               <div className='divide-y divide-border'>
@@ -417,7 +417,7 @@ export function ManagedListingsPage() {
                 ))}
                 {/* Pagination Controls */}
                 {listingPage && listingPage.total_pages > 1 && (
-                  <div className='py-6 bg-white border-t border-primary/20/50'>
+                  <div className='py-6 bg-white border-t border-primary/20'>
                     <RealVistaPagination
                       currentPage={page + 1}
                       totalPages={listingPage.total_pages}
@@ -449,7 +449,7 @@ export function ManagedListingsPage() {
             {isDetailLoading ? (
               <div className='h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary' />
             ) : (
-              <p className='text-sm text-secondary/60'>{t('empty.selectProperty')}</p>
+              <p className='text-sm text-muted-foreground'>{t('empty.selectProperty')}</p>
             )}
           </div>
         )}

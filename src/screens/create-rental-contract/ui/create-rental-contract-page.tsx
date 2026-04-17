@@ -380,13 +380,13 @@ export function CreateRentalContractPage() {
               {/* Step title + progress */}
               <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
                 <div>
-                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-secondary/50'>
+                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground/70'>
                     {t('steps.eyebrow')}
                   </p>
                   <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-foreground'>
                     {t(`steps.titles.${currentStep}` as never)}
                   </h2>
-                  <p className='mt-1 max-w-xl text-sm leading-6 text-secondary/60'>
+                  <p className='mt-1 max-w-xl text-sm leading-6 text-muted-foreground'>
                     {t(`steps.descriptions.${currentStep}` as never)}
                   </p>
                 </div>

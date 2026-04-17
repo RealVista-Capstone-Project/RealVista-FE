@@ -51,7 +51,7 @@ export function MoneyInput({
         onChange={(event) => onChange(sanitizeNumericInput(event.target.value))}
         className={cn('pr-14', className)}
       />
-      <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs font-semibold text-secondary/60'>
+      <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs font-semibold text-muted-foreground'>
         VND
       </span>
     </div>
@@ -68,7 +68,7 @@ export function ListingMetaChip({
   value: string;
 }) {
   return (
-    <div className='inline-flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 text-xs font-semibold text-secondary/80'>
+    <div className='inline-flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1.5 text-xs font-semibold text-muted-foreground'>
       <Icon className='h-3.5 w-3.5 text-primary' />
       <span>{value}</span>
     </div>

@@ -26,7 +26,7 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
           {t('tenantLookup.eyebrow')}
         </p>
         <h3 className='mt-2 text-lg font-semibold text-foreground'>{t('tenantLookup.title')}</h3>
-        <p className='mt-1 text-sm leading-6 text-secondary/65'>{t('tenantLookup.description')}</p>
+        <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>{t('tenantLookup.description')}</p>
 
         <div className='mt-4 flex gap-3'>
           <div className='flex-1'>
@@ -63,21 +63,21 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
             <Input
               value={form.tenantName}
               readOnly
-              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-secondary/80'
+              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
             />
           </Field>
           <Field label={t('form.tenantPhone')}>
             <Input
               value={form.tenantPhone}
               readOnly
-              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-secondary/80'
+              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
             />
           </Field>
           <Field label={t('form.tenantEmail')} className='md:col-span-2'>
             <Input
               value={form.tenantEmail}
               readOnly
-              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-secondary/80'
+              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
             />
           </Field>
         </div>

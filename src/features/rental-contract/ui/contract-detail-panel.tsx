@@ -189,7 +189,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
       <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-[#E9E7F5] bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:basis-[40%] lg:max-w-[40%]'>
         <div className='flex items-center justify-between border-b border-[#F0EEF7] px-5 py-4'>
           <div>
-            <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-secondary/60'>
+            <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground'>
               {t('detailPanel.title')}
             </h2>
             <p className='mt-1 text-lg font-semibold text-foreground'>{contract.property.title}</p>
@@ -198,7 +198,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             type='button'
             variant='ghost'
             size='icon'
-            className='rounded-xl text-secondary/60 hover:bg-[#F6F4FF] hover:text-foreground'
+            className='rounded-xl text-muted-foreground hover:bg-[#F6F4FF] hover:text-foreground'
             onClick={onClose}
           >
             <X className='h-4 w-4' />
@@ -244,11 +244,11 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     <FileText className='h-5 w-5' />
                   </div>
                   <div className='min-w-0 flex-1'>
-                    <p className='text-xs uppercase tracking-[0.16em] text-secondary/50'>
+                    <p className='text-xs uppercase tracking-[0.16em] text-muted-foreground/70'>
                       {t('detailPanel.contractMeta')}
                     </p>
                     <p className='mt-1 text-sm font-semibold text-foreground'>{contract.id}</p>
-                    <p className='mt-1 text-sm leading-6 text-secondary/70'>
+                    <p className='mt-1 text-sm leading-6 text-muted-foreground'>
                       {contract.tenant.fullName} ·{' '}
                       {formatContractCurrency(
                         contract.monthlyRent,
@@ -256,7 +256,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                       )}
                     </p>
                     {contract.docusignEnvelopeId && (
-                      <p className='mt-1 text-xs text-secondary/60'>
+                      <p className='mt-1 text-xs text-muted-foreground'>
                         {t('detailPanel.envelopeId', { envelopeId: contract.docusignEnvelopeId })}
                       </p>
                     )}
@@ -266,7 +266,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
               <div className='grid grid-cols-2 gap-3'>
                 <div className='rounded-xl bg-secondary p-3'>
-                  <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70'>
                     {t('detailPanel.leaseStart')}
                   </p>
                   <p className='mt-1 text-sm font-semibold text-foreground'>
@@ -274,7 +274,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   </p>
                 </div>
                 <div className='rounded-xl bg-secondary p-3'>
-                  <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70'>
                     {t('detailPanel.leaseEnd')}
                   </p>
                   <p className='mt-1 text-sm font-semibold text-foreground'>
@@ -284,13 +284,13 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
               </div>
 
               <div className='rounded-xl border border-dashed border-primary/20 bg-secondary p-4'>
-                <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
+                <p className='text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70'>
                   {t('detailPanel.signingProgress.title')}
                 </p>
                 <div className='mt-3 space-y-3'>
                   {signingProgress.map((item) => (
                     <div key={item.label} className='flex items-center justify-between gap-4'>
-                      <span className='text-sm text-secondary/70'>{item.label}</span>
+                      <span className='text-sm text-muted-foreground'>{item.label}</span>
                       <span className='text-sm font-semibold text-foreground'>{item.value}</span>
                     </div>
                   ))}
@@ -299,10 +299,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
               {contract.terminationReason && (
                 <div className='rounded-xl border border-dashed border-primary/20 bg-secondary p-4'>
-                  <p className='text-[11px] uppercase tracking-[0.14em] text-secondary/50'>
+                  <p className='text-[11px] uppercase tracking-[0.14em] text-muted-foreground/70'>
                     {t('detailPanel.terminationReason')}
                   </p>
-                  <p className='mt-2 text-sm leading-6 text-secondary/80'>
+                  <p className='mt-2 text-sm leading-6 text-muted-foreground'>
                     {contract.terminationReason}
                   </p>
                 </div>
@@ -313,10 +313,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
           <div className='rounded-2xl border border-primary/10 bg-[linear-gradient(180deg,white_0%,var(--primary-light,#F7F5FF)_100%)] p-4'>
             <div className='mb-3 flex items-center justify-between'>
               <div>
-                <p className='text-xs uppercase tracking-[0.18em] text-secondary/50'>
+                <p className='text-xs uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('detailPanel.actionCardEyebrow')}
                 </p>
-                <p className='mt-1 text-sm leading-6 text-secondary/80'>
+                <p className='mt-1 text-sm leading-6 text-muted-foreground'>
                   {t('detailPanel.actionCardDescription')}
                 </p>
               </div>
@@ -388,7 +388,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                             {getActionLabel(action)}
                             {isSigning && <ExternalLink className='h-3 w-3 text-primary' />}
                           </p>
-                          <p className='mt-0.5 text-xs leading-5 text-secondary/60'>
+                          <p className='mt-0.5 text-xs leading-5 text-muted-foreground'>
                             {getActionHint(action)}
                           </p>
                         </div>
