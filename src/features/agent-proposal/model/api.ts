@@ -6,6 +6,7 @@ export const agentProposalApi = {
   submitProposal: (payload: SubmitProposalPayload) =>
     http.post<ApiResponse<void>>('/engagements', {
       property_id: payload.property_id,
+      title: payload.title,
       message: payload.message,
       offered_commission: payload.offered_commission,
     }),
