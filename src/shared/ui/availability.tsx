@@ -443,9 +443,11 @@ export function Availability<T extends AppointmentData = AppointmentData>({
 
   const handleToday = () => {
     const now = new Date()
+    now.setHours(0, 0, 0, 0)
     const day = now.getDay()
     const diff = now.getDate() - day + (day === 0 ? -6 : 1)
     const todayStart = new Date(now.setDate(diff))
+    todayStart.setHours(0, 0, 0, 0)
     setWeekStart(todayStart)
     onWeekChange?.(todayStart)
   }
@@ -454,6 +456,7 @@ export function Availability<T extends AppointmentData = AppointmentData>({
   const weekDays = React.useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(weekStart)
+      d.setHours(0, 0, 0, 0) // Normalize to start of day
       d.setDate(d.getDate() + i)
       return d
     })
@@ -462,13 +465,17 @@ export function Availability<T extends AppointmentData = AppointmentData>({
   // Map appointments to time spans — only for the currently visible week
   const appointmentSpans = React.useMemo(() => {
     if (appointments.length === 0) return []
-    const weekEnd = new Date(weekStart)
+    const normalizedStart = new Date(weekStart)
+    normalizedStart.setHours(0, 0, 0, 0)
+    
+    const weekEnd = new Date(normalizedStart)
     weekEnd.setDate(weekEnd.getDate() + 6)
     weekEnd.setHours(23, 59, 59, 999)
+
     return appointments
       .filter((apt) => {
         const aptDate = new Date(apt.start_time)
-        return aptDate >= weekStart && aptDate <= weekEnd
+        return aptDate >= normalizedStart && aptDate <= weekEnd
       })
       .map((apt) => {
         const start = new Date(apt.start_time)
