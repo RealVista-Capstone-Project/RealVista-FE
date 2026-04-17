@@ -672,7 +672,8 @@ export function Availability<T extends AppointmentData = AppointmentData>({
       return
     }
 
-    const result = validatePlacement(span, targetDayIndex, currentDeltaY, mainContainerRef.current.clientHeight)
+    const containerHeight = mainContainerRef.current.scrollHeight
+    const result = validatePlacement(span, targetDayIndex, currentDeltaY, containerHeight)
     setIsDropValid(result.isValid)
   }
 
@@ -697,11 +698,12 @@ export function Availability<T extends AppointmentData = AppointmentData>({
     if (isNaN(targetDayIndex)) return
 
     // Final validation before commit
+    const containerHeight = mainContainerRef.current.scrollHeight
     const { isValid, newStart, duration } = validatePlacement(
       span,
       targetDayIndex,
       delta.y,
-      mainContainerRef.current.clientHeight,
+      containerHeight,
     )
 
     if (!isValid) {
@@ -738,7 +740,7 @@ export function Availability<T extends AppointmentData = AppointmentData>({
         <div
           suppressHydrationWarning
           className={cn(
-            "flex h-full w-full flex-col overflow-hidden rounded-md border bg-background select-none touch-none",
+            "flex h-[600px] w-full flex-col overflow-hidden rounded-md border bg-background select-none touch-none",
             className,
           )}
         >
