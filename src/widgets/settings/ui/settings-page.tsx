@@ -178,7 +178,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const queryClient = useQueryClient();
 
   const { data: session } = useSession();
-  const isAuthenticated = !!(session as any)?.user?.accessToken;
+  const isAuthenticated = !!(session as { user?: { accessToken?: string } })?.user?.accessToken;
   const auth = getAuth(firebaseApp);
 
   // Data queries
@@ -1577,6 +1577,17 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                       />
                     </div>
                   ))}
+                  <div className='flex items-center justify-between py-3 border-t border-border mt-2 pt-5'>
+                    <div>
+                      <p className='text-sm font-medium text-main-black'>{t('personalization.autoRefresh') || 'Smart Search Auto-Refresh'}</p>
+                      <p className='text-xs text-grey-500'>{t('personalization.autoRefreshDesc') || 'Automatically refresh recommendations based on your behavior.'}</p>
+                    </div>
+                    <Switch
+                      checked={notifForm.autoRefreshEnabled}
+                      disabled={updateSettingsMutation.isPending}
+                      onCheckedChange={(checked) => handleToggleSetting('autoRefreshEnabled', checked)}
+                    />
+                  </div>
                 </div>
               )}
             </section>
@@ -1605,22 +1616,6 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
               </div>
             </section>
 
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-6'>{t('personalization.title') || 'Personalization'}</h2>
-              <div className='space-y-5'>
-                <div className='flex items-center justify-between py-3 border-b border-border last:border-0'>
-                  <div>
-                    <p className='text-sm font-medium text-main-black'>{t('personalization.autoRefresh') || 'Smart Search Auto-Refresh'}</p>
-                    <p className='text-xs text-grey-500'>{t('personalization.autoRefreshDesc') || 'Automatically refresh recommendations based on your behavior.'}</p>
-                  </div>
-                  <Switch
-                    checked={notifForm.autoRefreshEnabled}
-                    disabled={updateSettingsMutation.isPending}
-                    onCheckedChange={(checked) => handleToggleSetting('autoRefreshEnabled', checked)}
-                  />
-                </div>
-              </div>
-            </section>
 
           </div>
         )}

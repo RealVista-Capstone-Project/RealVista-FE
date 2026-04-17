@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { AiChatMessageItem, TypingIndicator } from './ai-chat-message-item';
 import type { AiChatMessage } from './ai-chat-message-item';
+import type { AiQuotaStatus } from '../model/use-ai-chat';
 
 interface AiChatWindowProps {
   messages: AiChatMessage[];
@@ -16,6 +17,7 @@ interface AiChatWindowProps {
   isLoadingHistory?: boolean;
   isClearing?: boolean;
   error?: string | null;
+  quota?: AiQuotaStatus | null;
   onSendMessage: (content: string) => void;
   onClose: () => void;
   onQuickAction: (text: string) => void;
@@ -34,6 +36,7 @@ export function AiChatWindow({
   isLoadingHistory,
   isClearing,
   error,
+  quota,
   onSendMessage,
   onClose,
   onQuickAction,
@@ -44,6 +47,7 @@ export function AiChatWindow({
   const [input, setInput] = React.useState('');
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const isSubmittingRef = React.useRef(false);
   const locale = useLocale();
 
   const showWelcome = messages.length === 0;
@@ -61,9 +65,14 @@ export function AiChatWindow({
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     const trimmed = input.trim();
-    if (!trimmed || isTyping) return;
+    if (!trimmed || isTyping || isSubmittingRef.current) return;
+    
+    isSubmittingRef.current = true;
     onSendMessage(trimmed);
     setInput('');
+    
+    // Reset submission lock after a short delay or when message area updates
+    setTimeout(() => { isSubmittingRef.current = false; }, 500);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -102,7 +111,13 @@ export function AiChatWindow({
         />
         <div className='flex-1'>
           <h3 className='text-sm font-semibold text-white'>{t('title')}</h3>
-          <p className='text-xs text-white/70'>{t('subtitle')}</p>
+          <p className='text-xs text-white/70'>
+            {quota && !quota.isUnlimited ? (
+              <span>{t('dailyQuotaRemaining', { count: quota.remaining, total: quota.limit })}</span>
+            ) : (
+              t('subtitle')
+            )}
+          </p>
         </div>
         {/* New chat button */}
         {onNewChat && messages.length > 0 && (
@@ -173,12 +188,12 @@ export function AiChatWindow({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t('placeholder')}
-          className='flex-1 max-h-32 min-h-[40px] resize-none bg-transparent py-2 text-sm text-main-black outline-none placeholder:text-grey-400 scrollbar-thin'
-          disabled={isTyping}
+          className='flex-1 max-h-32 min-h-[40px] resize-y overflow-y-auto bg-transparent py-2 text-sm text-main-black outline-none placeholder:text-grey-400 scrollbar-thin'
+          disabled={isTyping || isClearing}
         />
         <button
           type='submit'
-          disabled={!input.trim() || isTyping}
+          disabled={!input.trim() || isTyping || isClearing}
           className={cn(
             'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200',
             input.trim() && !isTyping

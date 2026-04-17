@@ -18,7 +18,7 @@ import { cn } from '@/shared/lib/utils';
 import { toast } from 'sonner';
 
 interface SparkViewerProps {
-  metadata?: any;
+  metadata?: Record<string, unknown> | string;
   spzUrl?: string; // Fallback for single URL
   className?: string;
 }
@@ -41,7 +41,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     const urls: Record<string, string> = {};
     const seen = new Set();
 
-    const extract = (obj: any) => {
+    const extract = (obj: unknown) => {
       if (!obj) return;
 
       // If metadata is a string, try to parse it first
@@ -49,7 +49,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
         try {
           const parsed = JSON.parse(obj);
           extract(parsed);
-        } catch (_e) {
+        } catch {
           /* ignore */
         }
         return;
@@ -89,7 +89,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
           try {
             const parsed = JSON.parse(val);
             extract(parsed);
-          } catch (e) {
+          } catch {
             /* ignore */
           }
         }
@@ -134,7 +134,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
   }, [quality, spzUrls, spzUrl]);
 
   // Messaging functions
-  const sendCommand = useCallback((type: string, payload?: any) => {
+  const sendCommand = useCallback((type: string, payload?: Record<string, unknown>) => {
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage({ type, ...payload }, '*');
     }

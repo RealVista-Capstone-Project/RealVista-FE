@@ -60,10 +60,8 @@ interface FloatingChatWindowProps {
  * Facebook Messenger-style floating chat window
  */
 export function FloatingChatWindow({
-  id: _id,
   participant,
   messages,
-  listing: _listing,
   isMinimized = false,
   position = 0,
   onClose,

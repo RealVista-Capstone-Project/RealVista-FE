@@ -43,7 +43,6 @@ export function LoginFormNextAuth() {
   const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string>('');
 
   const {
     register,
@@ -53,7 +52,6 @@ export function LoginFormNextAuth() {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     setIsLoading(true);
-    setError('');
 
     try {
       // Call NextAuth signIn with Credentials provider
@@ -68,7 +66,6 @@ export function LoginFormNextAuth() {
         // result.error can be string | undefined, validate it first
         const errorCode = typeof result.error === 'string' ? result.error : 'Default';
         const errorMessage = mapAuthError(errorCode);
-        setError(errorMessage);
         toast.error(errorMessage);
       } else if (result?.ok) {
         // Success! Show toast and redirect based on role
@@ -84,7 +81,6 @@ export function LoginFormNextAuth() {
     } catch {
       // Unexpected error
       const errorMessage = t('loginFailed');
-      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
