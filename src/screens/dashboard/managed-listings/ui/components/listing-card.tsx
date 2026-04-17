@@ -1,10 +1,12 @@
 import * as React from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { Info } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import type { ManagedListing } from '../../types/managed-listing';
 import { LISTING_STATUS_CONFIG, ListingStatus } from '../../types/managed-listing';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui';
 
 interface ListingCardProps {
   listing: ManagedListing;
@@ -15,6 +17,7 @@ interface ListingCardProps {
 export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) {
   const t = useTranslations('ListingCard');
   const tStatus = useTranslations('ListingStatus');
+  const tManagedListings = useTranslations('ManagedListings');
   const status =
     LISTING_STATUS_CONFIG[listing.status as ListingStatus] ??
     LISTING_STATUS_CONFIG[ListingStatus.DRAFT];
@@ -103,8 +106,22 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
           <div className='flex items-center gap-2 text-sm'>
             <span className='font-semibold text-main-primary'>{formattedPrice}</span>
             <span className='text-main-black/50'>•</span>
-            <div className={cn('rounded-full px-2 py-0.5', status.className)}>
-              <span className='text-xs font-bold leading-tight'>{tStatus(status.labelKey)}</span>
+            <div className='flex items-center gap-1.5'>
+              <div className={cn('rounded-full px-2 py-0.5', status.className)}>
+                <span className='text-xs font-bold leading-tight'>{tStatus(status.labelKey)}</span>
+              </div>
+              {(listing.status === ListingStatus.DRAFT || listing.status === ListingStatus.ARCHIVED) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button type='button' className='text-main-primary hover:text-main-primary/80 transition-colors' onClick={(e) => e.stopPropagation()}>
+                      <Info className='h-3.5 w-3.5' />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side='top' className='max-w-[180px]'>
+                    {tManagedListings('draftRuleTooltip')}
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
             {area && (
               <>

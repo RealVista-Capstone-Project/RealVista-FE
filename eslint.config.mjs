@@ -14,7 +14,7 @@ const eslintConfig = [
     extends: ['next/core-web-vitals', 'next/typescript', 'prettier'],
     rules: {
       semi: ['off'],
-      'jsx-quotes': ['error', 'prefer-single'],
+      'jsx-quotes': ['off'],
       'arrow-parens': ['error', 'always'],
       'no-trailing-spaces': 'error',
       '@typescript-eslint/interface-name-prefix': 'off',

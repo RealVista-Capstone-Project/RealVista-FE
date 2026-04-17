@@ -41,7 +41,8 @@ type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
 function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
     { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
     { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
     { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
@@ -53,6 +54,7 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
 
 function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
+    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
     { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
     { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
@@ -63,7 +65,8 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
     { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
     { id: 'owner-properties', label: t('menu.ownerProperties'), href: ROUTES.dashboard.ownerProperties, icon: Search },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     { id: 'proposals', label: t('menu.proposals'), href: ROUTES.dashboard.manageProposals, icon: FileText },
     { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
@@ -102,6 +105,11 @@ export function DashboardLayout({
       return t('pageTitle.managedListings');
     if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight))
       return t('pageTitle.insight');
+    if (
+      pathname === ROUTES.dashboard.appointments ||
+      pathname.startsWith(ROUTES.dashboard.appointments)
+    )
+      return t('pageTitle.appointments');
     if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants))
       return t('pageTitle.tenants');
     if (

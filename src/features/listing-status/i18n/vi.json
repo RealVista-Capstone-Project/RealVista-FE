@@ -30,6 +30,10 @@
         "title": "Đánh dấu đã cho thuê",
         "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã cho thuê? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các đại lý khác."
       },
+      "unpublish": {
+        "title": "Gỡ bài đăng",
+        "description": "Bạn có chắc muốn gỡ bài đăng này? Các lịch hẹn đang hoạt động sẽ bị hủy nếu tin đăng tạm ẩn quá 24h."
+      },
       "cancel": "Hủy",
       "proceed": "Xác nhận"
     },
