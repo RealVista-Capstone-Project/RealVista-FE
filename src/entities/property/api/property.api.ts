@@ -83,8 +83,11 @@ export const propertyApi = {
     });
   },
 
-  getAttributes: () => {
-    return http.get<ApiResponse<PropertyAttributeDefinition[]>>('properties/attributes', {
+  getAttributes: (propertyTypeId?: string) => {
+    const url = propertyTypeId
+      ? `properties/attributes?property_type_id=${propertyTypeId}`
+      : 'properties/attributes';
+    return http.get<ApiResponse<PropertyAttributeDefinition[]>>(url, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },

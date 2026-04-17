@@ -17,15 +17,71 @@ export function createPropertyInfoSchema(t: (key: string) => string) {
         lat: z.number(),
         lng: z.number(),
       }),
-      landSize: z.coerce.number().min(1, t('validation.landSizeMin')),
-      usableSize: z.coerce.number().min(1, t('validation.usableSizeMin')),
-      width: z.coerce.number().min(0, t('validation.widthMin')),
-      length: z.coerce.number().min(0, t('validation.lengthMin')),
+      landSize: z.coerce
+        .number({ invalid_type_error: t('validation.landSizeMin') })
+        .min(1, t('validation.landSizeMin')),
+      usableSize: z.coerce
+        .number({ invalid_type_error: t('validation.usableSizeMin') })
+        .min(1, t('validation.usableSizeMin')),
+      width: z.coerce
+        .number({ invalid_type_error: t('validation.widthMin') })
+        .min(0, t('validation.widthMin')),
+      length: z.coerce
+        .number({ invalid_type_error: t('validation.lengthMin') })
+        .min(0, t('validation.lengthMin')),
       propertyType: z.string().min(1, t('validation.propertyTypeRequired')),
       dynamicAttributes: z.record(z.string(), z.any()).optional().default({}),
       amenityIds: z.array(z.string()).optional().default([]),
+      priceRange: z
+        .object({
+          rent: z
+            .object({
+              min: z.coerce.number().min(0).optional(),
+              max: z.coerce.number().min(0).optional(),
+            })
+            .optional(),
+          buy: z
+            .object({
+              min: z.coerce.number().min(0).optional(),
+              max: z.coerce.number().min(0).optional(),
+            })
+            .optional(),
+        })
+        .optional(),
     })
     .superRefine((data, ctx) => {
+      if (
+        data.usableSize != null &&
+        data.landSize != null &&
+        data.usableSize > data.landSize
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('validation.usableSizeLtLandSize'),
+          path: ['usableSize'],
+        });
+      }
+
+      const rentMin = data.priceRange?.rent?.min;
+      const rentMax = data.priceRange?.rent?.max;
+      if (rentMin != null && rentMax != null && rentMax <= rentMin) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('validation.priceMaxGtMin'),
+          path: ['priceRange', 'rent', 'max'],
+        });
+      }
+
+      const buyMin = data.priceRange?.buy?.min;
+      const buyMax = data.priceRange?.buy?.max;
+      if (buyMin != null && buyMax != null && buyMax <= buyMin) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('validation.priceMaxGtMin'),
+          path: ['priceRange', 'buy', 'max'],
+        });
+      }
+
       if (data.dynamicAttributes) {
         Object.entries(data.dynamicAttributes).forEach(([code, value]) => {
           const type = ATTRIBUTE_TYPES[code as PropertyAttribute];

@@ -26,6 +26,7 @@ export interface PropertySummaryResponse {
   owner_name?: string;
   owner_phone?: string;
   has_3d?: boolean;
+  price_range?: PropertyPriceRange | null;
 }
 export interface PropertySearchRequest {
   north_lat: number;
@@ -223,6 +224,10 @@ export interface CreatePropertyRequest {
   attributes?: PropertyAttributeRequest[];
   media?: PropertyMediaRequest[];
   status?: string;
+  price_range?: {
+    rent?: { min?: number; max?: number };
+    buy?: { min?: number; max?: number };
+  };
 }
 
 export type UpdatePropertyRequest = Partial<CreatePropertyRequest>;
@@ -280,6 +285,7 @@ export interface PropertyDetailResponse {
     metadata?: Record<string, unknown>;
   }>;
   active_listings?: ListingSummaryDTO[];
+  price_range?: PropertyPriceRange | null;
 }
 
 export interface PropertySummary {

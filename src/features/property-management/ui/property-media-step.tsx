@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { ImageIcon, Video, Box, X, Play } from 'lucide-react';
+import { ImageIcon, Video, X, Play } from 'lucide-react';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -201,52 +201,6 @@ export function PropertyMediaStep() {
           )}
         />
 
-        {/* URL Inputs */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#E0DEF7]'>
-          <FormField
-            control={control}
-            name='media.videoUrl'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
-                  <Video className='size-4 text-[#7065F0]' />
-                  {t('videoUrl')}
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type='url'
-                    placeholder={t('videoPlaceholder')}
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={control}
-            name='media.tour3dUrl'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='flex items-center gap-2 text-sm font-medium text-foreground'>
-                  <Box className='size-4 text-[#7065F0]' />
-                  {t('tour3dUrl')}
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type='url'
-                    placeholder={t('tourPlaceholder')}
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
       </div>
     </div>
   );
