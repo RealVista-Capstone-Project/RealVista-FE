@@ -98,8 +98,7 @@ export function PriceAndTour({
         <div className='h-px w-full bg-purple-92' />
 
         {/* Request a Home Tour Section */}
-        {!isAgent && (
-          <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-6'>
             <p className='text-main-black text-[18px] font-bold leading-[1.45] tracking-[-0.09px]'>
               {t('requestHomeTour')}
             </p>
@@ -132,7 +131,6 @@ export function PriceAndTour({
               </p>
             </div>
           </div>
-        )}
       </div>
     </div>
   );
