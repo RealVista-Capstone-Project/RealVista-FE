@@ -151,5 +151,20 @@ export const agentEngagementApi = {
       `/engagements/agent-proposal/apply-state?${params.toString()}`
     );
   },
+
+  sendOwnerInvitation: (payload: {
+    agent_id: string;
+    property_id: string;
+    title?: string;
+    offered_commission?: number;
+    message?: string;
+  }) =>
+    http.post<ApiResponse<{ engagement_id: string }>>('/engagements/owner-invitation', {
+      agent_id: payload.agent_id,
+      property_id: payload.property_id,
+      title: payload.title,
+      offered_commission: payload.offered_commission,
+      message: payload.message,
+    }),
 } as const;
 
