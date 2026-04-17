@@ -17,6 +17,7 @@ export const ROUTES = {
     root: '/dashboard',
     insight: '/dashboard/insight',
     managedListings: '/dashboard/listings',
+    appointments: '/dashboard/appointments',
     myEngagements: '/dashboard/my-engagements',
     tenants: '/dashboard/tenants',
     rentalContracts: '/dashboard/rental-contracts',
