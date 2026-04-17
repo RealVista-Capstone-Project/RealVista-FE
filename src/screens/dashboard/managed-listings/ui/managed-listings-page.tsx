@@ -4,7 +4,8 @@ import * as React from 'react';
 import { Search, Filter, X, ChevronDown, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
@@ -13,7 +14,6 @@ import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
-import { CreateListingModal } from '@/features/create-listing-modal';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
@@ -33,6 +33,8 @@ type StatusFilter = ListingStatus | 'ALL';
 export function ManagedListingsPage() {
   const searchParams = useSearchParams();
   const initialListingId = searchParams.get('listingId');
+  const router = useRouter();
+  const locale = useLocale();
 
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -42,10 +44,13 @@ export function ManagedListingsPage() {
   const [sortBy, setSortBy] = React.useState<SortOption>('newest');
   const [page, setPage] = React.useState(0);
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
-  const [isCreateListingModalOpen, setIsCreateListingModalOpen] = React.useState(false);
   const filterRef = React.useRef<HTMLDivElement>(null);
   const t = useTranslations('ManagedListings');
   const isMobile = useIsMobile();
+
+  const handleCreateListing = () => {
+    router.push(`/${locale}/dashboard/listing/create`);
+  };
 
   // Fetch summary counts for tabs
   const { data: summary } = useQuery(listingQueries.managedSummary());
@@ -189,7 +194,7 @@ export function ManagedListingsPage() {
               {/* Create Button at the end of header */}
               <button
                 type='button'
-                onClick={() => setIsCreateListingModalOpen(true)}
+                onClick={handleCreateListing}
                 className='flex items-center gap-2 rounded-lg bg-main-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-main-primary/90'
                 aria-label={t('createButton')}
               >
@@ -449,10 +454,6 @@ export function ManagedListingsPage() {
           </div>
         )}
       </main>
-      <CreateListingModal
-        open={isCreateListingModalOpen}
-        onOpenChange={setIsCreateListingModalOpen}
-      />
     </div>
   );
 }

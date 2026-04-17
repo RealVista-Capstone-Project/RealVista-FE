@@ -189,7 +189,7 @@ export function ListingInformationStep({
     ) || [];
 
   const booleanFeatures =
-    selectedProperty.attributes?.filter((attr) => attr.valueBoolean === true) || [];
+    selectedProperty.attributes?.filter((attr) => attr.valueBoolean !== null) || [];
 
   const existingMediaItems: ExistingMediaItem[] = selectedProperty.media
     .filter((m) => m.isPropertyStandard)
@@ -468,7 +468,8 @@ export function ListingInformationStep({
                             strokeWidth={2}
                           />
                         )}
-                        {attr.attributeName}
+                        {attr.attributeName}:{' '}
+                        <span className='text-main-black'>{attr.valueBoolean ? 'Có' : 'Không'}</span>
                       </div>
                     ))}
                   </div>

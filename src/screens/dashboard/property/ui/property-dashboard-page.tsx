@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import {
   Plus,
   Search,
@@ -11,10 +12,11 @@ import {
   Box,
   MapPin,
   Ruler,
-  BedDouble,
   Building,
   ChevronLeft,
   ChevronRight,
+  Eye,
+  User,
 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -36,15 +38,15 @@ import { propertyQueries } from '@/entities/property/api/property.queries';
 import { listingQueries } from '@/entities/listing/api';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { AgentVerificationModal } from '@/features/property-management/ui/components/agent-verification-modal';
-import { CreateListingModal } from '@/features/create-listing-modal';
 import { ThreeDPromoBanner } from '@/widgets/billing';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
+import { AttributeIcon } from '@/shared/ui/attribute-icon';
+import { useMyEngagementsQuery } from '@/features/engagement/hooks/use-my-engagements';
 import type {
   PropertySummaryResponse,
   PropertyMediaItem,
-  PropertyAttributeItem,
 } from '@/entities/property/api/property-api.types';
 
 const PROPERTY_STATUSES = [
@@ -82,6 +84,7 @@ function PropertyListCard({
   isSelected: boolean;
   onClick: (p: PropertySummaryResponse) => void;
 }) {
+  const t = useTranslations('PropertyDashboard');
   const thumbnailUrl =
     property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
     property.media?.[0]?.media_url;
@@ -89,10 +92,6 @@ function PropertyListCard({
   const location = [property.location_info?.district_name, property.location_info?.city_name]
     .filter(Boolean)
     .join(', ');
-
-  const bedroomsAttr = property.attributes?.find(
-    (a: PropertyAttributeItem) => a.attribute_code === 'BEDROOMS'
-  );
 
   return (
     <button
@@ -167,27 +166,46 @@ function PropertyListCard({
               <span className='font-medium'>{property.land_size_m2} m²</span>
             </div>
           )}
-          {bedroomsAttr?.value_number != null && (
+          {property.width_m != null && property.length_m != null ? (
             <div className='flex items-center gap-1'>
-              <BedDouble className='h-3.5 w-3.5 text-gray-400' />
-              <span className='font-medium'>{bedroomsAttr.value_number} PN</span>
+              <Ruler className='h-3.5 w-3.5 text-gray-400' />
+              <span className='font-medium'>{property.width_m} × {property.length_m} m</span>
             </div>
-          )}
+          ) : property.width_m != null ? (
+            <div className='flex items-center gap-1'>
+              <Ruler className='h-3.5 w-3.5 text-gray-400' />
+              <span className='font-medium'>Rộng {property.width_m} m</span>
+            </div>
+          ) : property.length_m != null ? (
+            <div className='flex items-center gap-1'>
+              <Ruler className='h-3.5 w-3.5 text-gray-400' />
+              <span className='font-medium'>Dài {property.length_m} m</span>
+            </div>
+          ) : null}
           {/* 3D indicator — green badge if has tour, amber pulse if missing */}
           <div className='ml-auto relative inline-flex items-center'>
             {property.has_3d ? (
-              <span className='text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1'>
+              <Link
+                href={`/dashboard/property/${property.property_id}/3d`}
+                onClick={(e) => e.stopPropagation()}
+                className='text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1 hover:bg-emerald-100 transition-colors'
+              >
                 <Box className='h-3 w-3' />
                 3D
-              </span>
+              </Link>
             ) : (
-              <div className='relative flex items-center justify-center'>
-                <Box className='h-4 w-4 text-gray-400' />
+              <Link
+                href={`/dashboard/property/${property.property_id}/3d`}
+                onClick={(e) => e.stopPropagation()}
+                className='relative flex items-center justify-center'
+                title={t('threeDDotTooltip')}
+              >
+                <Box className='h-4 w-4 text-gray-400 hover:text-amber-500 transition-colors' />
                 <span className='absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5 pointer-events-none'>
                   <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75' />
                   <span className='relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500' />
                 </span>
-              </div>
+              </Link>
             )}
           </div>
         </div>
@@ -197,7 +215,6 @@ function PropertyListCard({
 }
 
 function ListingsSection({ propertyId }: { propertyId: string }) {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { data: listingsPage, isLoading } = useQuery(listingQueries.byProperty(propertyId));
   const listings = listingsPage?.content ?? [];
 
@@ -206,14 +223,11 @@ function ListingsSection({ propertyId }: { propertyId: string }) {
       {/* Section header */}
       <div className='flex items-center justify-between mb-3'>
         <h3 className='text-sm font-bold text-slate-800'>Listing</h3>
-        <Button
-          type='button'
-          size='sm'
-          className='rounded-lg gap-1.5 h-8 text-xs'
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          <Plus className='h-3.5 w-3.5' />
-          Thêm mới
+        <Button asChild size='sm' className='rounded-lg gap-1.5 h-8 text-xs'>
+          <Link href={`/dashboard/listings?propertyId=${propertyId}&action=create`}>
+            <Plus className='h-3.5 w-3.5' />
+            Thêm mới
+          </Link>
         </Button>
       </div>
 
@@ -304,8 +318,125 @@ function ListingsSection({ propertyId }: { propertyId: string }) {
           })}
         </div>
       )}
+    </div>
+  );
+}
 
-      <CreateListingModal open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen} preselectedPropertyId={propertyId} />
+const ENGAGEMENT_STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
+  SUBMITTED: { bg: 'bg-amber-50 border-amber-200', text: 'text-amber-700', label: 'Chờ duyệt' },
+  ACCEPTED: { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-700', label: 'Đã chấp nhận' },
+  REJECTED: { bg: 'bg-red-50 border-red-200', text: 'text-red-600', label: 'Từ chối' },
+  CANCELLED: { bg: 'bg-slate-100 border-slate-200', text: 'text-slate-500', label: 'Đã hủy' },
+  FINISHED: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-700', label: 'Hoàn thành' },
+};
+
+function EngagementsSection({ propertyId }: { propertyId: string }) {
+  const t = useTranslations('PropertyDashboard');
+  const { data: allEngagements, isLoading } = useMyEngagementsQuery();
+
+  const engagements = (allEngagements ?? []).filter((e) => e.propertyId === propertyId);
+
+  return (
+    <div>
+      <div className='flex items-center justify-between mb-3'>
+        <h3 className='text-sm font-bold text-slate-800'>{t('labelEngagements')}</h3>
+      </div>
+
+      {isLoading ? (
+        <div className='flex justify-center py-6'>
+          <div className='h-5 w-5 animate-spin rounded-full border-2 border-purple-92 border-t-main-primary' />
+        </div>
+      ) : engagements.length === 0 ? (
+        <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 flex flex-col items-center gap-2 text-center'>
+          <User className='h-6 w-6 text-slate-300' />
+          <p className='text-xs text-slate-400'>{t('noEngagements')}</p>
+        </div>
+      ) : (
+        <div className='space-y-3'>
+          {engagements.map((e) => {
+            const statusStyle = ENGAGEMENT_STATUS_STYLES[e.status] ?? {
+              bg: 'bg-slate-100 border-slate-200',
+              text: 'text-slate-600',
+              label: e.status,
+            };
+            const commission = e.content?.commissionRate ?? e.content?.offeredCommission;
+            const experience = e.content?.experienceYears;
+
+            return (
+              <div
+                key={e.engagementId}
+                className='rounded-xl border border-slate-200 bg-white overflow-hidden'
+              >
+                {/* Status bar */}
+                <div className={cn('px-4 py-1.5 flex items-center justify-between border-b', statusStyle.bg)}>
+                  <span className={cn('text-[11px] font-bold uppercase tracking-wide', statusStyle.text)}>
+                    {statusStyle.label}
+                  </span>
+                  <Link
+                    href={`/dashboard/my-engagements?engagementId=${e.engagementId}`}
+                    className={cn('flex items-center gap-1 text-[11px] font-semibold hover:underline', statusStyle.text)}
+                  >
+                    <Eye className='h-3.5 w-3.5' />
+                    Xem
+                  </Link>
+                </div>
+
+                {/* Card body */}
+                <div className='p-4'>
+                  <div className='flex items-start gap-3'>
+                    {/* Avatar */}
+                    <div className='h-11 w-11 rounded-full bg-slate-100 overflow-hidden flex-shrink-0 ring-2 ring-white shadow-sm'>
+                      {e.agentAvatarUrl ? (
+                        <Image
+                          src={e.agentAvatarUrl}
+                          alt={e.agentFullName ?? ''}
+                          width={44}
+                          height={44}
+                          className='object-cover w-full h-full'
+                        />
+                      ) : (
+                        <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
+                          <User className='h-5 w-5 text-indigo-300' />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Agent info */}
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-sm font-bold text-slate-800 leading-snug'>
+                        {e.agentFullName ?? e.initiatorName ?? '—'}
+                      </p>
+                      {e.content?.title && (
+                        <p className='text-xs text-slate-500 mt-0.5 line-clamp-1'>{e.content.title}</p>
+                      )}
+                    </div>
+
+                    {/* Meta pills — right side */}
+                    <div className='flex flex-col items-end gap-1.5 flex-shrink-0'>
+                      {e.propertyTypeName && (
+                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full'>
+                          <Building className='h-3 w-3' />
+                          {e.propertyTypeName}
+                        </span>
+                      )}
+                      {commission != null && (
+                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full'>
+                          Hoa hồng: {commission}%
+                        </span>
+                      )}
+                      {experience != null && (
+                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-100 px-2.5 py-1 rounded-full'>
+                          {experience} năm kinh nghiệm
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -320,14 +451,22 @@ function PropertyDetailPanel({
   onBack?: () => void;
 }) {
   const t = useTranslations('PropertyDashboard');
+  const { data: session } = useSession();
+  const [imgIndex, setImgIndex] = useState(0);
 
-  const thumbnailUrl =
-    property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
-    property.media?.[0]?.media_url;
+  const isOwner = !!(session?.user?.id && property.owner_id && session.user.id === property.owner_id);
+
+  const images = (property.media ?? []).filter((m) => m.media_type === 'IMAGE');
+
+  React.useEffect(() => {
+    setImgIndex(0);
+  }, [property.property_id]);
 
   const location = [property.location_info?.district_name, property.location_info?.city_name]
     .filter(Boolean)
     .join(', ');
+
+  const currentImageUrl = images[imgIndex]?.media_url;
 
   return (
     <div className='h-full overflow-y-auto'>
@@ -343,11 +482,11 @@ function PropertyDetailPanel({
         </button>
       )}
 
-      {/* Hero image */}
-      <div className='relative w-full h-64 bg-slate-100'>
-        {thumbnailUrl ? (
+      {/* Hero image / slider */}
+      <div className='relative w-full h-64 bg-slate-100 overflow-hidden'>
+        {currentImageUrl ? (
           <Image
-            src={thumbnailUrl}
+            src={currentImageUrl}
             alt={property.street_address}
             fill
             className='object-cover'
@@ -357,6 +496,30 @@ function PropertyDetailPanel({
             <Home className='h-16 w-16 text-slate-300' />
           </div>
         )}
+
+        {/* Prev / Next arrows — only when multiple images */}
+        {images.length > 1 && (
+          <>
+            <button
+              type='button'
+              onClick={() => setImgIndex((i) => (i > 0 ? i - 1 : images.length - 1))}
+              className='absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 hover:bg-black/60 p-1.5 text-white transition-colors'
+            >
+              <ChevronLeft className='h-4 w-4' />
+            </button>
+            <button
+              type='button'
+              onClick={() => setImgIndex((i) => (i < images.length - 1 ? i + 1 : 0))}
+              className='absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 hover:bg-black/60 p-1.5 text-white transition-colors'
+            >
+              <ChevronRight className='h-4 w-4' />
+            </button>
+            <div className='absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-2.5 py-0.5 text-xs text-white'>
+              {imgIndex + 1} / {images.length}
+            </div>
+          </>
+        )}
+
         <div className='absolute top-4 left-4'>
           <Badge
             variant='outline'
@@ -373,34 +536,132 @@ function PropertyDetailPanel({
       {/* Content */}
       <div className='p-6 space-y-6'>
         {/* Header */}
-        <div>
-          <h2 className='text-xl font-bold text-slate-900'>{property.street_address}</h2>
-          {location && (
-            <div className='flex items-center gap-1.5 mt-1.5'>
-              <MapPin className='h-4 w-4 text-slate-400' />
-              <span className='text-sm text-slate-500'>{location}</span>
-            </div>
-          )}
+        <div className='flex items-start justify-between gap-3'>
+          <div className='min-w-0 flex-1'>
+            <h2 className='text-xl font-bold text-slate-900'>{property.street_address}</h2>
+            {location && (
+              <div className='flex items-center gap-1.5 mt-1.5'>
+                <MapPin className='h-4 w-4 text-slate-400' />
+                <span className='text-sm text-slate-500'>{location}</span>
+              </div>
+            )}
+          </div>
+          <div className='flex items-center gap-2 flex-shrink-0'>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild variant='outline' size='sm' className='rounded-lg gap-2'>
+                  <Link href={`/dashboard/property/${property.property_id}/edit`}>
+                    <Edit className='w-4 h-4' />
+                    {t('editAction')}
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild variant='outline' size='sm' className='rounded-lg gap-2 border-amber-200 text-amber-700 hover:bg-amber-50'>
+                  <Link href={`/dashboard/property/${property.property_id}/3d`}>
+                    <Box className='w-4 h-4' />
+                    {t('3dAction')}
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+            </Tooltip>
+            {property.status === 'PENDING' && (
+              <Button
+                size='sm'
+                className='rounded-lg gap-2 bg-main-primary'
+                onClick={() => onVerifyClick(property)}
+              >
+                <ShieldCheck className='w-4 h-4' />
+                {t('verifyAction')}
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* Info grid */}
-        <div className='grid grid-cols-2 gap-4'>
-          {property.property_type_info?.property_type_name && (
-            <div className='rounded-xl border border-slate-200 bg-slate-50 p-4'>
-              <p className='text-xs text-slate-500 font-medium uppercase tracking-wide mb-1'>
-                {t('labelType')}
-              </p>
-              <p className='text-sm font-semibold text-slate-800'>
-                {property.property_type_info.property_type_name}
-              </p>
-            </div>
-          )}
-          {property.land_size_m2 != null && (
-            <div className='rounded-xl border border-slate-200 bg-slate-50 p-4'>
-              <p className='text-xs text-slate-500 font-medium uppercase tracking-wide mb-1'>
-                {t('labelSize')}
-              </p>
-              <p className='text-sm font-semibold text-slate-800'>{property.land_size_m2} m²</p>
+        {/* Info grid — Type + Price + Dimensions */}
+        <div className='space-y-3'>
+        {/* Type + Price cards — side by side */}
+          <div className='grid grid-cols-2 gap-3'>
+            {/* Left: Property type */}
+            {property.property_type_info?.property_type_name && (
+              <div className='rounded-xl border border-slate-200 bg-slate-50 p-4'>
+                <p className='text-xs text-slate-500 font-medium uppercase tracking-wide mb-1'>
+                  {t('labelType')}
+                </p>
+                <p className='text-sm font-semibold text-slate-800'>
+                  {property.property_type_info.property_type_name}
+                </p>
+              </div>
+            )}
+
+            {/* Right: Prices */}
+            {(property.price_range?.buy || property.price_range?.rent) && (
+              <div className='rounded-xl border border-slate-200 bg-slate-50 p-4 flex flex-col gap-3'>
+                <div className='flex flex-col gap-0.5'>
+                  <span className='text-[10px] font-semibold text-blue-600 uppercase tracking-wide'>Giá bán</span>
+                  <span className='text-xs font-semibold text-slate-700'>
+                    {property.price_range?.buy?.min != null && property.price_range?.buy?.max != null
+                      ? `${formatVND(property.price_range.buy.min)} – ${formatVND(property.price_range.buy.max)} đ`
+                      : property.price_range?.buy?.min != null
+                        ? `Từ ${formatVND(property.price_range.buy.min)} đ`
+                        : property.price_range?.buy?.max != null
+                          ? `Đến ${formatVND(property.price_range.buy.max)} đ`
+                          : <span className='text-slate-400 font-normal'>—</span>}
+                  </span>
+                </div>
+                <div className='flex flex-col gap-0.5'>
+                  <span className='text-[10px] font-semibold text-emerald-600 uppercase tracking-wide'>Giá thuê</span>
+                  <span className='text-xs font-semibold text-slate-700'>
+                    {property.price_range?.rent?.min != null && property.price_range?.rent?.max != null
+                      ? `${formatVND(property.price_range.rent.min)} – ${formatVND(property.price_range.rent.max)} đ`
+                      : property.price_range?.rent?.min != null
+                        ? `Từ ${formatVND(property.price_range.rent.min)} đ`
+                        : property.price_range?.rent?.max != null
+                          ? `Đến ${formatVND(property.price_range.rent.max)} đ`
+                          : <span className='text-slate-400 font-normal'>—</span>}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Dimensions grid */}
+          {(property.land_size_m2 != null || property.usable_size_m2 != null || property.width_m != null || property.length_m != null) && (
+            <div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
+              <div className='rounded-xl border border-slate-200 bg-slate-50 p-3'>
+                <p className='text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-1'>
+                  {t('labelSize')}
+                </p>
+                <p className='text-sm font-semibold text-slate-800'>
+                  {property.land_size_m2 != null ? `${property.land_size_m2} m²` : '—'}
+                </p>
+              </div>
+              <div className='rounded-xl border border-slate-200 bg-slate-50 p-3'>
+                <p className='text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-1'>
+                  Diện tích SD
+                </p>
+                <p className='text-sm font-semibold text-slate-800'>
+                  {property.usable_size_m2 != null ? `${property.usable_size_m2} m²` : '—'}
+                </p>
+              </div>
+              <div className='rounded-xl border border-slate-200 bg-slate-50 p-3'>
+                <p className='text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-1'>
+                  Mặt tiền
+                </p>
+                <p className='text-sm font-semibold text-slate-800'>
+                  {property.width_m != null ? `${property.width_m} m` : '—'}
+                </p>
+              </div>
+              <div className='rounded-xl border border-slate-200 bg-slate-50 p-3'>
+                <p className='text-[10px] text-slate-400 font-medium uppercase tracking-wide mb-1'>
+                  Chiều dài
+                </p>
+                <p className='text-sm font-semibold text-slate-800'>
+                  {property.length_m != null ? `${property.length_m} m` : '—'}
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -413,32 +674,75 @@ function PropertyDetailPanel({
           </div>
         )}
 
+        {/* Attributes */}
+        {property.attributes && property.attributes.length > 0 && (
+          <div>
+            <h3 className='text-sm font-bold text-slate-700 mb-3'>{t('labelAttributes')}</h3>
+            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6'>
+              {property.attributes.map((attr) => {
+                const hasValue =
+                  (attr.display_value != null && attr.display_value !== '' && attr.display_value !== 'undefined') ||
+                  attr.value_number != null ||
+                  attr.value_text != null ||
+                  attr.value_boolean != null;
+                if (!hasValue) return null;
+
+                const displayValue =
+                  attr.display_value != null && attr.display_value !== '' && attr.display_value !== 'undefined'
+                    ? attr.display_value
+                    : attr.value_number != null
+                      ? `${attr.value_number}${attr.unit ? ' ' + attr.unit : ''}`
+                      : attr.value_text != null
+                        ? attr.value_text
+                        : attr.value_boolean != null
+                          ? attr.value_boolean
+                            ? 'Có'
+                            : 'Không'
+                          : '—';
+                return (
+                  <div key={attr.attribute_id} className='flex flex-col gap-4'>
+                    <p className='text-main-black/50 text-[14px] font-medium leading-[1.5]'>
+                      {attr.attribute_name}
+                    </p>
+                    <div className='flex items-center gap-2'>
+                      <AttributeIcon
+                        iconName={attr.icon ?? attr.attribute_code}
+                        className='size-5 text-main-black/50'
+                        strokeWidth={2}
+                      />
+                      <p className='text-main-black font-bold leading-[1.45] tracking-[-0.09px]'>
+                        {displayValue}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Amenities */}
+        {property.amenities && property.amenities.length > 0 && (
+          <div>
+            <h3 className='text-sm font-bold text-slate-700 mb-3'>{t('labelAmenities')}</h3>
+            <div className='flex flex-wrap gap-2'>
+              {property.amenities.map((a) => (
+                <span
+                  key={a.amenity_id}
+                  className='rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-medium px-3 py-1'
+                >
+                  {a.amenity_name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Listings section */}
         <ListingsSection propertyId={property.property_id} />
 
-        {/* Action buttons */}
-        <div className='flex flex-wrap gap-3'>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button asChild variant='outline' className='rounded-lg gap-2'>
-                <Link href={`/dashboard/property/${property.property_id}/edit`}>
-                  <Edit className='w-4 h-4' />
-                  {t('editAction')}
-                </Link>
-              </Button>
-            </TooltipTrigger>
-          </Tooltip>
-
-          {property.status === 'PENDING' && (
-            <Button
-              className='rounded-lg gap-2 bg-main-primary'
-              onClick={() => onVerifyClick(property)}
-            >
-              <ShieldCheck className='w-4 h-4' />
-              {t('verifyAction')}
-            </Button>
-          )}
-        </div>
+        {/* Engagements section — owner only */}
+        {isOwner && <EngagementsSection propertyId={property.property_id} />}
       </div>
     </div>
   );
@@ -485,6 +789,15 @@ export default function PropertyDashboardPage() {
     }
   }, [isMobile, properties, selectedProperty]);
 
+  // Sync selectedProperty with latest query data (e.g. after edit/update)
+  React.useEffect(() => {
+    if (!selectedProperty || properties.length === 0) return;
+    const updated = properties.find((p) => p.property_id === selectedProperty.property_id);
+    if (updated && updated !== selectedProperty) {
+      setSelectedProperty(updated);
+    }
+  }, [properties]);
+
   // Reset selection when filter/search changes
   React.useEffect(() => {
     setSelectedProperty(null);
@@ -507,7 +820,7 @@ export default function PropertyDashboardPage() {
       >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-purple-92/40 p-4 sm:p-6 bg-white'>
+          <div className='p-4 sm:p-6 bg-white'>
             <div className='flex items-center justify-between gap-3'>
               <div className='flex items-center gap-3'>
                 <h2 className='text-xl font-extrabold text-main-black tracking-tight'>

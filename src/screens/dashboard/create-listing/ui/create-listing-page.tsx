@@ -3,24 +3,17 @@
 import * as React from 'react';
 import Image from 'next/image';
 import { ChevronRight, MapPin, Maximize2, Home, Check } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { mediaApi } from '@/entities/media/api/media.api';
-import type { UserProperty, CreateListingFormData, CreateListingPayload } from '../model/types';
-import { useCreateListing } from '../api/use-create-listing';
-import { ListingInformationStep } from './listing-information-step';
+import type { UserProperty, CreateListingFormData, CreateListingPayload } from '@/features/create-listing-modal/model/types';
+import { useCreateListing } from '@/features/create-listing-modal/api/use-create-listing';
+import { ListingInformationStep } from '@/features/create-listing-modal/ui/listing-information-step';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
-
-export interface CreateListingModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  preselectedPropertyId?: string;
-}
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
   const t = useTranslations('CreateListingModal');
@@ -214,30 +207,19 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 
 const ITEMS_PER_PAGE = 4;
 
-export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }: CreateListingModalProps) {
+export function CreateListingPage() {
   const t = useTranslations('CreateListingModal');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
 
-  // Set step immediately when modal opens/closes
-  React.useEffect(() => {
-    if (!open) {
-      setSelectedProperty(null);
-      setCurrentPage(1);
-      setCurrentStep(1);
-    } else if (preselectedPropertyId) {
-      setCurrentStep(2);
-    }
-  }, [open, preselectedPropertyId]);
-
   const { data, isLoading } = useQuery({
     ...propertyQueries.myProperties({
-      page: preselectedPropertyId ? 0 : currentPage - 1,
-      size: preselectedPropertyId ? 50 : ITEMS_PER_PAGE,
-      ...(preselectedPropertyId ? {} : { status: 'AVAILABLE' }),
+      page: currentPage - 1,
+      size: ITEMS_PER_PAGE,
+      status: 'AVAILABLE',
     }),
-    enabled: currentStep === 1 || (!!preselectedPropertyId && !selectedProperty),
+    enabled: currentStep === 1,
   });
 
   const propertiesResponse = data?.payload?.data;
@@ -303,17 +285,6 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
       })),
     };
   });
-
-  // Auto-select pre-specified property and skip to step 2
-  React.useEffect(() => {
-    if (!open || !preselectedPropertyId || selectedProperty || currentStep !== 1) return;
-    if (properties.length === 0) return;
-    const match = properties.find((p) => p.propertyId === preselectedPropertyId);
-    if (match) {
-      setSelectedProperty(match);
-      setCurrentStep(2);
-    }
-  }, [open, preselectedPropertyId, properties, selectedProperty, currentStep]);
 
   const handleNextStep = () => {
     if (selectedProperty) {
@@ -405,25 +376,27 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
 
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
-      onOpenChange(false);
+      // Reset form or redirect
+      setCurrentStep(1);
+      setSelectedProperty(null);
     } catch {
       toast.error(t('createError'));
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='flex flex-col max-h-[95vh] sm:max-h-[90vh] sm:max-w-5xl !max-w-[95vw] sm:!max-w-5xl overflow-hidden p-0'>
+    <div className='container py-8 max-w-5xl mx-auto'>
+      <div className='rounded-2xl border border-purple-92 overflow-hidden bg-white shadow-lg flex flex-col max-h-[85vh]'>
         {/* Header - Fixed */}
         <div className='shrink-0'>
-          <DialogHeader className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
-            <DialogTitle className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
+          <div className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
+            <h1 className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
               {t('title')}
-            </DialogTitle>
-            <DialogDescription className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-main-secondary/50'>
+            </h1>
+            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-main-secondary/50'>
               {t('subtitle')}
-            </DialogDescription>
-          </DialogHeader>
+            </p>
+          </div>
 
           {/* Step indicator */}
           <div className='flex justify-center border-b border-purple-92/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
@@ -506,7 +479,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
             isSubmitting={createListingMutation.isPending}
           />
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

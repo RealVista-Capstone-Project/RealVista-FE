@@ -358,6 +358,7 @@ export function RealVistaListingCard({
                     <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-main-primary'>
                       {formatVND(price)}
                     </span>
+                    <span className='text-xs font-semibold text-grey-500'>₫</span>
                     {listingType === 'RENT' && (
                       <span className='text-sm font-normal leading-[1.5] text-grey-500'>
                         {t('perMonth')}
@@ -436,6 +437,7 @@ export function RealVistaListingCard({
                 <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-main-primary'>
                   {formatVND(price)}
                 </span>
+                <span className='text-sm font-semibold text-grey-500'>₫</span>
                 {listingType === 'RENT' && (
                   <span className='text-base font-normal leading-[1.5] text-grey-500'>
                     {t('perMonth')}

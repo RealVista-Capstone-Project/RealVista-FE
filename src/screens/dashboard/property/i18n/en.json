@@ -33,6 +33,10 @@
     "backToList": "Back",
     "labelType": "Type",
     "labelSize": "Area",
-    "labelDescription": "Description"
+    "labelDescription": "Description",
+    "labelAmenities": "Amenities",
+    "labelAttributes": "Features",
+    "labelEngagements": "Applications",
+    "noEngagements": "No applications for this property yet"
   }
 }

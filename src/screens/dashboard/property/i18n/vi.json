@@ -2,7 +2,7 @@
   "PropertyDashboard": {
     "pageTitle": "Quản lý Bất động sản",
     "pageDesc": "Quản lý các danh sách bất động sản của bạn, thống kê lượt xem và trạng thái hoạt động.",
-    "createNew": "Thêm Bất động sản",
+    "createNew": "Thêm mới",
     "searchPlaceholder": "Tìm kiếm theo tiêu đề, vị trí",
     "noProperties": "Không tìm thấy Bất động sản nào",
     "noPropertiesDesc": "Bạn chưa thêm bất kỳ bất động sản nào.",
@@ -33,6 +33,10 @@
     "backToList": "Quay lại",
     "labelType": "Loại hình",
     "labelSize": "Diện tích",
-    "labelDescription": "Mô tả"
+    "labelDescription": "Mô tả",
+    "labelAmenities": "Tiện ích",
+    "labelAttributes": "Đặc trưng",
+    "labelEngagements": "Ứng tuyển",
+    "noEngagements": "Chưa có ứng tuyển nào cho bất động sản này"
   }
 }

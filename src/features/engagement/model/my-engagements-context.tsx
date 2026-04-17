@@ -1,5 +1,8 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+'use client';
+
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { isSameDay } from 'date-fns';
+import { useSearchParams } from 'next/navigation';
 import { Engagement, EngagementStatus } from '@/entities/engagement/model/types';
 import {
   useMyEngagementsQuery,
@@ -51,10 +54,30 @@ export const MyEngagementsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [tab, setTab] = useState<EngagementTab>('sent');
 
+  const searchParams = useSearchParams();
+  const preselectedId = searchParams.get('engagementId');
+
   const { data: session } = useAuthSession();
   const currentUserId = session?.user?.id;
 
   const { data: engagements, isLoading, isError } = useMyEngagementsQuery();
+
+  // Auto-select engagement from URL param once data is loaded
+  useEffect(() => {
+    if (!preselectedId || !engagements || selectedEngagement) return;
+    const match = engagements.find((e) => e.engagementId === preselectedId);
+    if (match) {
+      setSelectedEngagement(match);
+      // Switch to correct tab based on whether user sent or received it
+      if (currentUserId) {
+        setTab(match.initiatorId === currentUserId ? 'sent' : 'received');
+      }
+      setTimeout(() => {
+        const panel = document.getElementById('engagement-detail-panel');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 200);
+    }
+  }, [preselectedId, engagements, selectedEngagement, currentUserId]);
   const cancelMutation = useCancelEngagementMutation(() => setSelectedEngagement(null));
   const finishMutation = useFinishEngagementMutation(() => setSelectedEngagement(null));
   const acceptMutation = useAcceptEngagementMutation(() => setSelectedEngagement(null));

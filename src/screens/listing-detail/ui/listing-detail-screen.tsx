@@ -57,9 +57,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const params = useParams();
   const { openWindow } = useChatWindowStore();
   const isMobile = useIsMobile();
-  // RBAC maps backend 'AGENT' → frontend 'moderator', so we must check backendRoles
-  const backendRoles: string[] = (session?.user as any)?.backendRoles ?? [];
-  const isAgent = backendRoles.includes('AGENT');
+  const isListingPostedByAgent = listing.user_type === 'AGENT';
 
 
   const { isFavorite, toggleFavorite } = useListingFavorite(
@@ -187,13 +185,13 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 phone={listing.agent!.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
-                isAgent={isAgent}
+                isAgent={isListingPostedByAgent}
               />
             </div>
 
             {/* About Section */}
             <div className='mb-6'>
-              <PropertyAbout property={property} />
+              <PropertyAbout property={property} isPostedByAgent={isListingPostedByAgent} />
             </div>
 
             {/* Monthly Cost Breakdown Section */}
@@ -214,7 +212,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
                 phone={listing.agent!.phone}
                 onContact={handleContact}
                 onRequestTour={handleRequestTour}
-                isAgent={isAgent}
+                isAgent={isListingPostedByAgent}
               />
             </div>
           </div>
@@ -255,6 +253,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <p className='text-main-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
+              <span className='text-xs font-semibold text-grey-500'>₫</span>
               {listing.listing_type === 'RENT' && (
                 <span className='text-main-black/50 text-sm font-medium'>/month</span>
               )}
