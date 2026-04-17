@@ -12,6 +12,7 @@ import { mediaApi } from '@/entities/media/api/media.api';
 import type { UserProperty, CreateListingFormData, CreateListingPayload } from '@/features/create-listing-modal/model/types';
 import { useCreateListing } from '@/features/create-listing-modal/api/use-create-listing';
 import { ListingInformationStep } from '@/features/create-listing-modal/ui/listing-information-step';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
 
@@ -209,6 +210,7 @@ const ITEMS_PER_PAGE = 4;
 
 export function CreateListingPage() {
   const t = useTranslations('CreateListingModal');
+  const router = useRouter();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
@@ -312,7 +314,7 @@ export function CreateListingPage() {
         attributeId: attr.attribute_id,
         attributeCode: attr.attribute_code,
         attributeName: attr.attribute_name,
-        dataType: attr.dataType,
+        dataType: attr.data_type,
         icon: attr.icon,
         unit: attr.unit,
         valueNumber: attr.value_number,
@@ -376,17 +378,15 @@ export function CreateListingPage() {
 
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
-      // Reset form or redirect
-      setCurrentStep(1);
-      setSelectedProperty(null);
+      router.push('/dashboard/listings');
     } catch {
       toast.error(t('createError'));
     }
   };
 
   return (
-    <div className='container py-8 max-w-5xl mx-auto'>
-      <div className='rounded-2xl border border-purple-92 overflow-hidden bg-white shadow-lg flex flex-col max-h-[85vh]'>
+    <div className='h-full overflow-hidden flex flex-col p-4 md:p-6'>
+      <div className='rounded-2xl border border-purple-92 overflow-hidden bg-white shadow-lg flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0'>
         {/* Header - Fixed */}
         <div className='shrink-0'>
           <div className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>

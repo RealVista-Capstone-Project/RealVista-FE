@@ -75,6 +75,7 @@
     "bedrooms": "Bedrooms",
     "baths": "Baths",
     "squareFeet": "Area (m²)",
+    "dimensions": "Dimensions",
     "price": "Price",
     "priceRent": "Rent Price / Month",
     "priceSale": "Sale Price",

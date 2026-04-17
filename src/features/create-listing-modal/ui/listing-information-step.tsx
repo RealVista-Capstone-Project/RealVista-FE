@@ -5,7 +5,6 @@ import { Home, MapPin, AlertCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import type { UserProperty, ListingType, CreateListingFormData } from '../model/types';
-import { AttributeIcon } from '@/shared/ui/attribute-icon/attribute-icon';
 import { Check } from 'lucide-react';
 import { useContentVerification } from '@/shared/lib/hooks/use-content-verification';
 import { useMediaAnalysis } from '@/shared/lib/hooks/use-media-analysis';
@@ -185,11 +184,13 @@ export function ListingInformationStep({
 
   const numericFeatures =
     selectedProperty.attributes?.filter(
-      (attr) => attr.valueNumber !== null || attr.valueText !== null
+      (attr) =>
+        attr.dataType !== 'BOOLEAN' &&
+        (attr.valueNumber !== null || attr.valueText !== null)
     ) || [];
 
   const booleanFeatures =
-    selectedProperty.attributes?.filter((attr) => attr.valueBoolean !== null) || [];
+    selectedProperty.attributes?.filter((attr) => attr.dataType === 'BOOLEAN') || [];
 
   const existingMediaItems: ExistingMediaItem[] = selectedProperty.media
     .filter((m) => m.isPropertyStandard)
@@ -378,6 +379,14 @@ export function ListingInformationStep({
                   badge={t('readOnly')}
                 />
               ))}
+              {booleanFeatures.map((attr) => (
+                <ReadOnlyField
+                  key={attr.attributeId}
+                  label={attr.attributeName}
+                  value={attr.valueBoolean === true ? 'Có' : 'Không'}
+                  badge={t('readOnly')}
+                />
+              ))}
               {selectedProperty.usableSizeM2 && (
                 <ReadOnlyField
                   label={t('squareFeet')}
@@ -442,53 +451,6 @@ export function ListingInformationStep({
                 </div>
               </div>
             )}
-
-            {/* Boolean features from attributes */}
-            {booleanFeatures.length > 0 && (
-              <div className='flex flex-col gap-3'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-main-black'>
-                    {t('features', { fallback: 'Features' })}
-                  </span>
-                  <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
-                    {t('readOnly')}
-                  </span>
-                </div>
-                <div className='rounded-lg border border-purple-92 p-4'>
-                  <div className='flex flex-wrap gap-2'>
-                    {booleanFeatures.map((attr) => (
-                      <div
-                        key={attr.attributeId}
-                        className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/30 px-3 py-1.5 text-sm font-medium text-main-black/80'
-                      >
-                        {attr.icon && (
-                          <AttributeIcon
-                            iconName={attr.icon}
-                            className='h-4 w-4 text-main-primary'
-                            strokeWidth={2}
-                          />
-                        )}
-                        {attr.attributeName}:{' '}
-                        <span className='text-main-black'>{attr.valueBoolean ? 'Có' : 'Không'}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Property Description (read-only) */}
-            <div className='flex flex-col gap-2'>
-              <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-main-black'>{t('description')}</span>
-                <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
-                  {t('readOnly')}
-                </span>
-              </div>
-              <div className='min-h-[100px] whitespace-pre-wrap rounded-lg border border-purple-92 bg-purple-98/50 px-4 py-3 text-sm text-main-secondary/60'>
-                {selectedProperty.description || '—'}
-              </div>
-            </div>
 
             {/* Date Available */}
             {listingType === 'RENT' && (
