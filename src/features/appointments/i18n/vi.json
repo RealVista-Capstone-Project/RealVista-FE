@@ -29,6 +29,7 @@
     "cancelReason": "Lý do hủy",
     "rejectReason": "Lý do từ chối",
     "cancelRuleViolation": "Không thể hủy lịch hẹn trước giờ bắt đầu dưới 4 tiếng",
+    "cancelRuleTooltip": "Lịch hẹn chỉ có thể được hủy ít nhất 4 giờ trước thời gian bắt đầu.",
     "enterCancelReason": "Nhập lý do hủy...",
     "enterRejectReason": "Nhập lý do từ chối...",
     "manageBlocks": "Quản lý lịch bận",

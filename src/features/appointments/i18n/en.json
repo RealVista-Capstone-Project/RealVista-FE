@@ -29,6 +29,7 @@
     "cancelReason": "Cancel reason",
     "rejectReason": "Reject reason",
     "cancelRuleViolation": "Cannot cancel appointment less than 4 hours before start time",
+    "cancelRuleTooltip": "Appointments can only be cancelled at least 4 hours before the scheduled start time.",
     "enterCancelReason": "Enter cancel reason...",
     "enterRejectReason": "Enter reject reason...",
     "manageBlocks": "Manage Blocks",

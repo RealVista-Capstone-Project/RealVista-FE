@@ -24,6 +24,7 @@ import {
 } from '@/shared/ui/dialog';
 import { Switch } from '@/shared/ui/switch/switch';
 import { Textarea } from '@/shared/ui/textarea';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui';
 
 import {
   Select,
@@ -378,13 +379,19 @@ export function AppointmentsPage() {
               </>
             )}
             {canCancel && !(isReceiver && isPending) && (
-              <button
-                onClick={(e) => handleOpenReasonDialog(e, apt.appointment_id, 'CANCEL')}
-                className="rounded bg-gray-500/20 p-1 text-gray-700 hover:bg-gray-500/30 dark:text-gray-300"
-                title={t('cancel')}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => handleOpenReasonDialog(e, apt.appointment_id, 'CANCEL')}
+                    className="rounded bg-gray-500/20 p-1 text-gray-700 hover:bg-gray-500/30 dark:text-gray-300"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  {t('cancelRuleTooltip')}
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         )}

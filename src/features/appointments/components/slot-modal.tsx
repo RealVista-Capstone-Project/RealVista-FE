@@ -128,13 +128,18 @@ export function SlotModal({
                     </>
                   )}
                   {canCancel(apt) && !canAccept(apt) && (
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => setShowReason(true)}
-                    >
-                      {t('cancel')}
-                    </Button>
+                    <div className="flex flex-col items-end gap-2">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => setShowReason(true)}
+                      >
+                        {t('cancel')}
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground italic">
+                        {t('cancelRuleTooltip')}
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
