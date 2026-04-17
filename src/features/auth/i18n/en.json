@@ -51,6 +51,11 @@
     "loginSuccess": "Login successful!",
     "loginFailed": "Login failed",
     "invalidCredentials": "Invalid email or password",
+    "errorAccessDenied": "Access denied",
+    "errorConfiguration": "Server configuration error",
+    "errorDefault": "An error occurred. Please try again.",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
     "signUp": "Sign up"
   },
   "unauthorized": {

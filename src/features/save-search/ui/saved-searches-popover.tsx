@@ -194,9 +194,14 @@ export function SavedSearchesPopover({ searchType }: SavedSearchesPopoverProps) 
                   <p className='text-sm font-medium text-main-black line-clamp-2 leading-snug'>
                     {generateSearchSummary(search)}
                   </p>
-                  <p className='text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold'>
-                    {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: vi })}
-                  </p>
+                  <div className='flex items-center gap-2 mt-1'>
+                    <span className='inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10'>
+                      {search.board_id || 'Mặc định'}
+                    </span>
+                    <p className='text-[10px] text-gray-400 uppercase tracking-wider font-semibold'>
+                      {formatDistanceToNow(new Date(search.created_at), { addSuffix: true, locale: vi })}
+                    </p>
+                  </div>
                 </div>
                 <Button
                   variant='ghost'

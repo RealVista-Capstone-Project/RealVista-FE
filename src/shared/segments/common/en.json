@@ -309,6 +309,11 @@
       "hideEmail": "Hide Email",
       "hideEmailDesc": "Hide your email address from other users"
     },
+    "personalization": {
+      "title": "Personalization",
+      "autoRefresh": "Smart Search Auto-Refresh",
+      "autoRefreshDesc": "Automatically refresh recommendations based on your behavior."
+    },
     "saveChanges": "Save changes",
     "saving": "Saving...",
     "subscription": {
@@ -377,7 +382,8 @@
     "appointments": "Appointments",
     "myEngagements": "My Engagements",
     "login": "Login",
-    "signup": "Sign up"
+    "signup": "Sign up",
+    "switchPersona": "Switch Profile"
   },
   "PropertyCard": {
     "beds": "Beds",
@@ -732,5 +738,11 @@
     "personalMessageLabel": "Personal Message",
     "messagePlaceholder": "Introduce yourself and explain why you're a great fit for this property...",
     "messageHint": "This message will be sent along with your selected proposal template."
+  },
+  "SavedSearch": {
+    "duplicateAlert": "This search has already been saved in this board",
+    "success": "Saved search successfully",
+    "error": "Failed to save search. Please try again later.",
+    "buttonLabel": "Save search"
   }
 }

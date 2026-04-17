@@ -8,6 +8,7 @@ export interface SettingPreference {
   contact_via_phone: boolean
   hide_phone_number: boolean
   hide_email: boolean
+  auto_refresh_enabled: boolean
   created_at: string
   updated_at: string
 }
@@ -20,4 +21,5 @@ export interface UpdateSettingPreferenceData {
   contact_via_phone?: boolean
   hide_phone_number?: boolean
   hide_email?: boolean
+  auto_refresh_enabled?: boolean
 }

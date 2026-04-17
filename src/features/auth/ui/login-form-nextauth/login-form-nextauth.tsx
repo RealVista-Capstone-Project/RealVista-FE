@@ -43,7 +43,6 @@ export function LoginFormNextAuth() {
   const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string>('');
 
   const {
     register,
@@ -53,7 +52,6 @@ export function LoginFormNextAuth() {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     setIsLoading(true);
-    setError('');
 
     try {
       // Call NextAuth signIn with Credentials provider
@@ -68,7 +66,6 @@ export function LoginFormNextAuth() {
         // result.error can be string | undefined, validate it first
         const errorCode = typeof result.error === 'string' ? result.error : 'Default';
         const errorMessage = mapAuthError(errorCode);
-        setError(errorMessage);
         toast.error(errorMessage);
       } else if (result?.ok) {
         // Success! Show toast and redirect based on role
@@ -84,7 +81,6 @@ export function LoginFormNextAuth() {
     } catch {
       // Unexpected error
       const errorMessage = t('loginFailed');
-      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -104,11 +100,11 @@ export function LoginFormNextAuth() {
    */
   function mapAuthError(error: string): string {
     const errorMap: Record<string, string> = {
-      CredentialsSignin: 'Invalid email or password',
-      InvalidCredentials: 'Invalid email or password',
-      AccessDenied: 'Access denied',
-      Configuration: 'Server configuration error',
-      Default: 'An error occurred. Please try again.',
+      CredentialsSignin: t('invalidCredentials'),
+      InvalidCredentials: t('invalidCredentials'),
+      AccessDenied: t('errorAccessDenied'),
+      Configuration: t('errorConfiguration'),
+      Default: t('errorDefault'),
     };
 
     return errorMap[error] || errorMap.Default;
@@ -123,7 +119,7 @@ export function LoginFormNextAuth() {
           type='email'
           placeholder='john@example.com'
           disabled={isLoading}
-          {...register('email', { required: 'Email is required' })}
+          {...register('email', { required: t('emailRequired') })}
         />
         {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
       </div>
@@ -136,7 +132,7 @@ export function LoginFormNextAuth() {
             type={showPassword ? 'text' : 'password'}
             disabled={isLoading}
             className='pr-10'
-            {...register('password', { required: 'Password is required' })}
+            {...register('password', { required: t('passwordRequired') })}
           />
           <button
             type='button'
@@ -149,7 +145,6 @@ export function LoginFormNextAuth() {
         {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
       </div>
 
-      {error && <p className='text-sm text-red-500'>{error}</p>}
 
       <Button type='submit' className='w-full' disabled={isLoading}>
         {isLoading ? t('loggingIn') : t('login')}
