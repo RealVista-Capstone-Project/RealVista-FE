@@ -15,8 +15,10 @@ export const recommendationApi = {
    * Uses cached results when below metrics threshold,
    * or generates fresh ones when threshold is met.
    */
-  getRecommendations(limit: number = 6) {
-    return http.get<RecommendationApiResponse>(`/recommendations?limit=${limit}`);
+  getRecommendations(limit: number = 6, listingType?: string) {
+    const params = new URLSearchParams({ limit: limit.toString() });
+    if (listingType) params.append('listing_type', listingType);
+    return http.get<RecommendationApiResponse>(`/recommendations?${params.toString()}`);
   },
 
   /**
@@ -24,9 +26,11 @@ export const recommendationApi = {
    * Bypasses threshold check and calls AI service directly.
    * Evicts cache for this user.
    */
-  refreshRecommendations(limit: number = 6) {
+  refreshRecommendations(limit: number = 6, listingType?: string) {
+    const params = new URLSearchParams({ limit: limit.toString() });
+    if (listingType) params.append('listing_type', listingType);
     return http.post<RecommendationApiResponse>(
-      `/recommendations/refresh?limit=${limit}`,
+      `/recommendations/refresh?${params.toString()}`,
       {}
     );
   },

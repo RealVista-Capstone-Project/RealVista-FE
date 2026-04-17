@@ -131,9 +131,9 @@ export function CreateRentalContractPage() {
   const sendToLandlordMutation = useSendToLandlordMutation();
 
   // ── Pre-fill context from ?listingId=&tenantUserId=&tenantName= ───────────
-  const prefillListingId  = searchParams.get('listingId')    ?? '';
-  const prefillTenantId   = searchParams.get('tenantUserId') ?? '';
-  const prefillTenantName = searchParams.get('tenantName')   ?? '';
+  const prefillListingId  = searchParams?.get('listingId')    ?? '';
+  const prefillTenantId   = searchParams?.get('tenantUserId') ?? '';
+  const prefillTenantName = searchParams?.get('tenantName')   ?? '';
 
   // Fetch the listing so we can populate Step 1 fields
   const { data: listingResponse } = useQuery({

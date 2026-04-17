@@ -4,9 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, CreditCard, Menu, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
-import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
+import { ProfileDropdown, Separator, useProfileMenuItems, GlobalProfileSwitcher } from '@/shared/ui';
 import { ChatDropdownContainer } from '@/widgets/chat-dropdown';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
@@ -38,6 +39,9 @@ export function PublicActions({
 }: PublicActionsProps) {
   const queryClient = useQueryClient();
   const menuItems = useProfileMenuItems();
+  const { status } = useSession();
+
+  const isLoadingSession = status === 'loading';
 
   return (
     <div className='flex items-center gap-6'>
@@ -95,13 +99,22 @@ export function PublicActions({
         </div>
       )}
 
+      {/* Profile Switcher — logged-in only, hidden on mobile */}
+      {isUserLoggedIn && (
+        <div className='hidden lg:block'>
+          <GlobalProfileSwitcher />
+        </div>
+      )}
+
       {/* Divider — hidden on mobile */}
       <div className='hidden lg:flex h-10 items-center'>
         <Separator orientation='vertical' className='h-6' />
       </div>
 
       {/* Profile / Auth */}
-      {isUserLoggedIn ? (
+      {isLoadingSession ? (
+        <div className='hidden lg:block w-[100px] h-10 bg-purple-98 animate-pulse rounded-lg' />
+      ) : isUserLoggedIn ? (
         <div className='hidden lg:block'>
           <ProfileDropdown user={user} align='end' menuItems={menuItems} />
         </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MapPin, Search, DollarSign, SlidersHorizontal, X } from 'lucide-react';
+import { MapPin, Banknote, X, Search, SlidersHorizontal } from 'lucide-react';
 import {
   RealVistaListingCard,
   type ListingAttribute,
@@ -18,6 +18,7 @@ import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
 import { useHideFooter } from '@/widgets/layout';
+import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { behaviorTracker } from '@/shared/lib/analytics';
@@ -36,7 +37,8 @@ function BuyPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [totalResults, setTotalResults] = useState(0);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();
@@ -103,7 +105,7 @@ function BuyPageContent() {
           : undefined,
       hasVideo: searchParams?.get('hasVideo') === 'true',
       has3D: searchParams?.get('has3D') === 'true',
-      sortBy: (searchParams?.get('sortBy') as any) || 'PRIORITY',
+      sortBy: (searchParams?.get('sortBy') as AdvancedSearchRequest['sortBy']) || 'PRIORITY',
     };
   }, [searchParams]);
 
@@ -203,6 +205,19 @@ function BuyPageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleResetFilters = () => {
+    setLocation('');
+    setMinPrice('');
+    setMaxPrice('');
+
+    const defaultCriteria: AdvancedSearchRequest = {
+      listingType: 'SALE' as const,
+      sortBy: 'PRIORITY',
+    };
+
+    updateUrl(defaultCriteria, 1);
+  };
+
   if (isMapView) {
     return (
       <div className='fixed inset-0 top-[72px] w-full bg-white z-10'>
@@ -257,7 +272,7 @@ function BuyPageContent() {
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                      className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary pr-10'
+                      className='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary pr-10'
                       maxLength={100}
                     />
                     {location && (
@@ -274,34 +289,32 @@ function BuyPageContent() {
               {/* Min Price */}
               <div>
                 <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-                  <DollarSign className='w-4 h-4 text-main-primary' />
+                  <Banknote className='w-4 h-4 text-main-primary' />
                   Giá tối thiểu
                 </label>
-                <input
-                  type='number'
-                  placeholder='5,000,000 VNĐ'
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
+                <VndAmountInput
+                  placeholder='0'
+                  value={Number(minPrice) || 0}
+                  onChange={(val) => setMinPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-                  maxLength={15}
+                  hidePreview
+                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
                 />
               </div>
 
               {/* Max Price */}
               <div>
                 <label className='flex items-center gap-2 text-sm font-medium text-main-black mb-2'>
-                  <DollarSign className='w-4 h-4 text-main-primary' />
+                  <Banknote className='w-4 h-4 text-main-primary' />
                   Giá tối đa
                 </label>
-                <input
-                  type='number'
-                  placeholder='25,000,000 VNĐ'
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
+                <VndAmountInput
+                  placeholder='Bất kỳ'
+                  value={Number(maxPrice) || 0}
+                  onChange={(val) => setMaxPrice(val ? val.toString() : '')}
                   onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  className='w-full px-4 py-2 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
-                  maxLength={15}
+                  hidePreview
+                  inputClassName='w-full px-4 h-11 border border-grey-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-main-primary'
                 />
               </div>
 
@@ -333,7 +346,15 @@ function BuyPageContent() {
             open={isFiltersOpen}
             onOpenChange={setIsFiltersOpen}
             onApplyFilters={handleAdvancedFiltersApply}
-            initialFilters={searchCriteria}
+            initialFilters={{
+              ...searchCriteria,
+              location: location || undefined,
+              price: [
+                minPrice ? Number(minPrice) : null,
+                maxPrice ? Number(maxPrice) : null
+              ]
+            }}
+            onReset={handleResetFilters}
           />
         </div>
       </section>
@@ -387,7 +408,7 @@ function BuyPageContent() {
                       attributes={listing.attributes as ListingAttribute[]}
                       isFavorite={listing.is_favorite ?? false}
                       boostTags={listing.is_boosted ? listing.boost_packages : undefined}
-                      userType={listing.user_type as any}
+                      userType={listing.user_type as 'AGENT' | 'OWNER'}
                       onToggleFavorite={handleToggleFavorite}
                       onClick={() => {
                         behaviorTracker.trackClick(listing.listing_id, {

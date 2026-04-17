@@ -6,15 +6,20 @@
     "placeholder": "Ask me anything...",
     "send": "Send",
     "close": "Close",
-    "chipFindProperties": "Find properties near me",
-    "chipAverageRent": "Average rent in District 1?",
-    "chipCompareListings": "Compare listings",
+    "chipFindProperties": "Townhouses in Dist. 7",
+    "chipAverageRent": "Rent prices in Dist. 2?",
+    "chipCompareListings": "Compare hot listings",
+    "chipMarketTrend": "Dist. 9 market analysis",
+    "chipInvestment": "Investment potential?",
     "thinking": "Thinking...",
     "newChat": "New chat",
     "retry": "Retry",
     "errorGeneric": "Something went wrong. Please try again.",
     "errorUnauthorized": "Session expired. Please sign in again.",
     "errorNetwork": "Connection lost. Check your internet and retry.",
-    "loadingHistory": "Loading messages..."
+    "loadingHistory": "Loading messages...",
+    "quotaExceeded": "You've reached your daily AI limit!",
+    "quotaExceededDesc": "Upgrade your plan to continue with unlimited requests.",
+    "buyMore": "Get more requests ⭐"
   }
 }

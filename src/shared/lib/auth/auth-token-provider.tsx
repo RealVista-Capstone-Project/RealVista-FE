@@ -58,7 +58,7 @@ export function AuthTokenProvider({ children }: { children: React.ReactNode }) {
   // Keep useEffect as well to handle async session updates after render
   useEffect(() => {
     updateAuthTokenCache(token);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [token]);
 
   // Use fragment to avoid unnecessary DOM nodes

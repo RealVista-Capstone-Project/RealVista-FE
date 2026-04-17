@@ -193,6 +193,7 @@ export interface SimilarListing {
   attributes: Attribute[];
   display_price: string;
   display_area: string;
+  is_favorite?: boolean;
 }
 
 export interface SimilarListingsResponse {

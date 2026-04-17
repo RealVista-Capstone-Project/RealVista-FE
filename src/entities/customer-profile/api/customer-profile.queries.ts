@@ -7,7 +7,7 @@ export const customerProfileQueries = {
     queryOptions({
       queryKey: customerProfileKeys.me(),
       queryFn: () => customerProfileApi.getAll(),
-      staleTime: 5 * 60 * 1000,
+      staleTime: 0, // Always fetch fresh profiles when needed to avoid session leakage cache issues
       retry: 1,
     }),
 } as const

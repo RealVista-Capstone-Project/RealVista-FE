@@ -4,9 +4,12 @@ import * as React from 'react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import { X, Send, RotateCcw, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Send, RotateCcw, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { AiChatMessageItem, TypingIndicator } from './ai-chat-message-item';
 import type { AiChatMessage } from './ai-chat-message-item';
+import type { AiQuotaStatus } from '../model/use-ai-chat';
 
 interface AiChatWindowProps {
   messages: AiChatMessage[];
@@ -14,6 +17,7 @@ interface AiChatWindowProps {
   isLoadingHistory?: boolean;
   isClearing?: boolean;
   error?: string | null;
+  quota?: AiQuotaStatus | null;
   onSendMessage: (content: string) => void;
   onClose: () => void;
   onQuickAction: (text: string) => void;
@@ -32,6 +36,7 @@ export function AiChatWindow({
   isLoadingHistory,
   isClearing,
   error,
+  quota,
   onSendMessage,
   onClose,
   onQuickAction,
@@ -41,7 +46,9 @@ export function AiChatWindow({
   const t = useTranslations('AiAssistant');
   const [input, setInput] = React.useState('');
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const isSubmittingRef = React.useRef(false);
+  const locale = useLocale();
 
   const showWelcome = messages.length === 0;
 
@@ -55,18 +62,32 @@ export function AiChatWindow({
     inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || isTyping || isSubmittingRef.current) return;
+
+    isSubmittingRef.current = true;
     onSendMessage(trimmed);
     setInput('');
+
+    // Reset submission lock after a short delay or when message area updates
+    setTimeout(() => { isSubmittingRef.current = false; }, 500);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const quickActions = [
     { key: 'chipFindProperties', text: t('chipFindProperties') },
     { key: 'chipAverageRent', text: t('chipAverageRent') },
     { key: 'chipCompareListings', text: t('chipCompareListings') },
+    { key: 'chipMarketTrend', text: t('chipMarketTrend') },
+    { key: 'chipInvestment', text: t('chipInvestment') },
   ];
 
   return (
@@ -90,7 +111,13 @@ export function AiChatWindow({
         />
         <div className='flex-1'>
           <h3 className='text-sm font-semibold text-white'>{t('title')}</h3>
-          <p className='text-xs text-white/70'>{t('subtitle')}</p>
+          <p className='text-xs text-white/70'>
+            {quota && !quota.isUnlimited ? (
+              <span>{t('dailyQuotaRemaining', { count: quota.remaining, total: quota.limit })}</span>
+            ) : (
+              t('subtitle')
+            )}
+          </p>
         </div>
         {/* New chat button */}
         {onNewChat && messages.length > 0 && (
@@ -136,7 +163,14 @@ export function AiChatWindow({
               <AiChatMessageItem key={msg.id} message={msg} />
             ))}
             {isTyping && <TypingIndicator />}
-            {error && <ErrorBanner message={error} />}
+            {error && (
+              <ErrorBanner
+                message={error}
+                isQuota={error === 'QUOTA_EXCEEDED'}
+                subscribeUrl={`/${locale}/subscribe`}
+                t={t}
+              />
+            )}
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -145,29 +179,30 @@ export function AiChatWindow({
       {/* Input bar */}
       <form
         onSubmit={handleSubmit}
-        className='flex items-center gap-2 border-t border-border px-4 py-3'
+        className='flex items-end gap-2 border-t border-border px-4 py-3 bg-white'
       >
-        <input
+        <textarea
           ref={inputRef}
-          type='text'
+          rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={t('placeholder')}
-          className='flex-1 bg-transparent text-sm text-main-black outline-none placeholder:text-grey-400'
-          disabled={isTyping}
+          className='flex-1 max-h-32 min-h-[40px] resize-y overflow-y-auto bg-transparent py-2 text-sm text-main-black outline-none placeholder:text-grey-400 scrollbar-thin'
+          disabled={isTyping || isClearing}
         />
         <button
           type='submit'
-          disabled={!input.trim() || isTyping}
+          disabled={!input.trim() || isTyping || isClearing}
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-150',
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200',
             input.trim() && !isTyping
-              ? 'bg-main-primary text-white hover:bg-main-primary-hover'
+              ? 'bg-main-primary text-white shadow-md hover:bg-main-primary-hover hover:scale-105 active:scale-95'
               : 'bg-grey-100 text-grey-400'
           )}
           aria-label={t('send')}
         >
-          <Send className='h-4 w-4' />
+          <Send className='h-5 w-5' />
         </button>
       </form>
     </div>
@@ -187,7 +222,42 @@ function LoadingState({ message }: { message: string }) {
 
 /* ---------- Error banner sub-component ---------- */
 
-function ErrorBanner({ message }: { message: string }) {
+function ErrorBanner({
+  message,
+  isQuota,
+  subscribeUrl,
+  t
+}: {
+  message: string;
+  isQuota?: boolean;
+  subscribeUrl?: string;
+  t: (key: string) => string;
+}) {
+  if (isQuota) {
+    return (
+      <div className='flex flex-col gap-3 rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-4 shadow-sm animate-in fade-in slide-in-from-bottom-2'>
+        <div className='flex items-start gap-3'>
+          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600'>
+            <Sparkles className='h-5 w-5' />
+          </div>
+          <div className='flex-1'>
+            <h4 className='text-sm font-bold text-main-primary'>{t('quotaExceeded')}</h4>
+            <p className='mt-1 text-xs text-grey-600 leading-relaxed'>
+              {t('quotaExceededDesc')}
+            </p>
+          </div>
+        </div>
+        <Link
+          href={subscribeUrl || '/subscribe'}
+          className='group relative flex items-center justify-center gap-2 overflow-hidden rounded-lg bg-main-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-main-primary-hover hover:shadow-lg active:scale-95'
+        >
+          <span className='z-10'>{t('buyMore')}</span>
+          <div className='absolute inset-0 z-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer' />
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className='flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2'>
       <AlertCircle className='mt-0.5 h-4 w-4 shrink-0 text-red-500' />

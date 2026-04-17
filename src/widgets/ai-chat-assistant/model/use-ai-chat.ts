@@ -9,6 +9,7 @@ import type { AiChatMessage } from '../ui/ai-chat-message-item';
 const AI_CHAT_ENDPOINT = '/ai/chat';
 const AI_CONVERSATIONS_MESSAGES_ENDPOINT = '/ai/conversations/messages';
 const AI_CONVERSATIONS_ENDPOINT = '/ai/conversations';
+const AI_QUOTA_ENDPOINT = '/ai/quota';
 
 /* ---------- Backend response types ---------- */
 
@@ -25,6 +26,13 @@ interface ConversationMessagesData {
   thread_id: string;
   created_at: string;
   messages: BackendMessage[];
+}
+
+export interface AiQuotaStatus {
+  hasSubscription: boolean;
+  remaining: number;
+  limit: number;
+  isUnlimited: boolean;
 }
 
 /* ---------- Helpers ---------- */
@@ -74,17 +82,31 @@ export function useAiChat() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [quota, setQuota] = useState<AiQuotaStatus | null>(null);
 
   // AbortController ref — lets us cancel the current stream if the user
   // sends a new message or clears the chat while streaming.
   const abortRef = useRef<AbortController | null>(null);
 
+  const loadQuota = useCallback(async () => {
+    try {
+      const res = await http.get<ApiResponse<AiQuotaStatus>>(AI_QUOTA_ENDPOINT);
+      if (res.payload.data) {
+        setQuota(res.payload.data);
+      }
+    } catch {
+      // Ignore quota fetch errors
+    }
+  }, []);
+
   /**
-   * Load conversation history from the backend.
+   * Load conversation history and quota from the backend.
    * Called when the chat window opens.
    */
   const loadHistory = useCallback(async () => {
     setIsLoadingHistory(true);
+    // Load quota in parallel
+    loadQuota();
     try {
       const res = await http.get<ApiResponse<ConversationMessagesData>>(
         AI_CONVERSATIONS_MESSAGES_ENDPOINT
@@ -98,14 +120,14 @@ export function useAiChat() {
     } finally {
       setIsLoadingHistory(false);
     }
-  }, []);
+  }, [loadQuota]);
 
   /**
    * Send a user message and stream the AI response.
    */
   const sendMessage = useCallback((text: string) => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || isStreaming) return;
 
     // Abort any in-flight stream
     abortRef.current?.abort();
@@ -142,11 +164,21 @@ export function useAiChat() {
       onDone: () => {
         setIsStreaming(false);
         abortRef.current = null;
+        // Refresh quota after a successful message
+        loadQuota();
       },
       onError: (message) => {
-        setError(message);
+        // Map specific backend error messages or codes to 'QUOTA_EXCEEDED'
+        if (message.includes('hết lượt sử dụng') || message.includes('QUOTA_EXCEEDED')) {
+          setError('QUOTA_EXCEEDED');
+        } else {
+          setError(message);
+        }
         setIsStreaming(false);
         abortRef.current = null;
+
+        // Refresh quota even on error (it might have been consumed before the error)
+        loadQuota();
 
         // Remove the empty assistant placeholder if no content was streamed
         setMessages((prev) => {
@@ -158,7 +190,7 @@ export function useAiChat() {
         });
       },
     });
-  }, []);
+  }, [isStreaming, loadQuota]);
 
   /**
    * Clear chat — resets local state immediately and calls DELETE on the backend.
@@ -191,8 +223,10 @@ export function useAiChat() {
     isLoadingHistory,
     isClearing,
     error,
+    quota,
     sendMessage,
     clearChat,
     loadHistory,
+    loadQuota,
   };
 }

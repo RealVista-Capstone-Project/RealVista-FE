@@ -11,10 +11,10 @@ export const recommendationQueries = {
    * Get personalized recommendations for the current user.
    * Shorter stale time than listings since recommendations are more dynamic.
    */
-  forUser: (limit: number = 6) =>
+  forUser: (limit: number = 6, listingType?: string) =>
     queryOptions({
-      queryKey: recommendationKeys.forUser(limit),
-      queryFn: () => recommendationApi.getRecommendations(limit),
+      queryKey: recommendationKeys.forUser(limit, listingType),
+      queryFn: () => recommendationApi.getRecommendations(limit, listingType),
       staleTime: 2 * 60 * 1000, // 2 minutes
       retry: 1,
     }),

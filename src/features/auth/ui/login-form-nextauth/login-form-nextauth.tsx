@@ -28,7 +28,6 @@ export function LoginFormNextAuth() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string>('');
 
   const {
     register,
@@ -38,7 +37,6 @@ export function LoginFormNextAuth() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setError('');
 
     const isEmail = data.identifier.includes('@');
     const credentials = isEmail
@@ -51,7 +49,6 @@ export function LoginFormNextAuth() {
       if (result?.error) {
         const errorCode = typeof result.error === 'string' ? result.error : 'Default';
         const errorMessage = mapAuthError(errorCode);
-        setError(errorMessage);
         toast.error(errorMessage);
       } else if (result?.ok) {
         toast.success(t('loginSuccess'));
@@ -69,7 +66,6 @@ export function LoginFormNextAuth() {
       }
     } catch {
       const errorMessage = t('loginFailed');
-      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -78,11 +74,11 @@ export function LoginFormNextAuth() {
 
   function mapAuthError(error: string): string {
     const errorMap: Record<string, string> = {
-      CredentialsSignin: 'Invalid email/phone or password',
-      InvalidCredentials: 'Invalid email/phone or password',
-      AccessDenied: 'Access denied',
-      Configuration: 'Server configuration error',
-      Default: 'An error occurred. Please try again.',
+      CredentialsSignin: t('invalidCredentials'),
+      InvalidCredentials: t('invalidCredentials'),
+      AccessDenied: t('errorAccessDenied'),
+      Configuration: t('errorConfiguration'),
+      Default: t('errorDefault'),
     };
 
     return errorMap[error] || errorMap.Default;
@@ -119,7 +115,7 @@ export function LoginFormNextAuth() {
             placeholder='Enter password'
             disabled={isLoading}
             className={cn(inputClass, 'pr-10')}
-            {...register('password', { required: 'Password is required' })}
+            {...register('password', { required: t('passwordRequired') })}
           />
           <button
             type='button'
@@ -140,12 +136,6 @@ export function LoginFormNextAuth() {
           {t('forgotPassword')}
         </Link>
       </div>
-
-      {error && (
-        <div className='rounded-lg bg-red-50 p-3'>
-          <p className='text-sm text-red-600'>{error}</p>
-        </div>
-      )}
 
       <Button
         type='submit'

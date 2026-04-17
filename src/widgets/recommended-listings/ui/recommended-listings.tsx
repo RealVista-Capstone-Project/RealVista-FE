@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw, Sparkles } from 'lucide-react';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { Skeleton } from '@/shared/ui/skeleton/skeleton';
@@ -17,6 +18,8 @@ import {
 } from '@/shared/ui/carousel';
 import { recommendationQueries, recommendationApi, recommendationKeys } from '@/entities/recommendation';
 import type { RecommendedListingDTO } from '@/entities/recommendation';
+import { bookmarkApi } from '@/entities/bookmark';
+import { settingPreferenceApi } from '@/entities/setting-preference';
 import { buildListingDetailUrl } from '@/shared/lib/utils';
 import { behaviorTracker } from '@/shared/lib/analytics';
 
@@ -99,23 +102,73 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
   const t = useTranslations('RecommendedListings');
   const queryClient = useQueryClient();
 
-  const {
-    data: response,
-    isLoading,
-    isError,
-  } = useQuery({
-    ...recommendationQueries.forUser(6),
+  const { data: preferenceResponse } = useQuery({
+    queryKey: ['setting-preference'],
+    queryFn: () => settingPreferenceApi.get(),
     enabled: authStatus === 'authenticated',
   });
 
-  const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
+  const autoReload = preferenceResponse?.payload?.data?.auto_refresh_enabled ?? true;
+
+  // ── Favorite overrides (optimistic local state) ───────────────
+  const [favoriteOverrides, setFavoriteOverrides] = useState<Record<string, boolean>>({});
+
+  // Must match backend ListingType enum: SALE | RENT
+  const listingType = sourcePage === 'buy' ? 'SALE' : 'RENT';
+
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+    isError,
+  } = useQuery({
+    ...recommendationQueries.forUser(6, listingType),
+    enabled: authStatus === 'authenticated',
+  });
+
+  // Poll status every 10s — only when autoReload is on
+  const { data: statusResponse } = useQuery({
+    ...recommendationQueries.status(),
+    enabled: authStatus === 'authenticated' && autoReload,
+    refetchInterval: autoReload ? 10000 : false,
+  });
 
   const refreshMutation = useMutation({
-    mutationFn: () => recommendationApi.refreshRecommendations(6),
+    mutationFn: () => recommendationApi.refreshRecommendations(6, listingType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: recommendationKeys.all });
     },
   });
+
+  useEffect(() => {
+    if (autoReload && statusResponse?.payload?.data?.threshold_met && !refreshMutation.isPending) {
+      refreshMutation.mutate();
+    }
+  }, [statusResponse?.payload?.data?.threshold_met, refreshMutation, autoReload]);
+
+  const recommendations: RecommendedListingDTO[] = response?.payload?.data?.recommendations ?? [];
+
+  const handleToggleFavorite = async (id: string) => {
+    // Find current status from overrides or response data
+    const listing = recommendations.find((r) => r.listing_id === id);
+    const currentFavorite = favoriteOverrides[id] ?? listing?.is_favorite ?? false;
+    const nextFavorite = !currentFavorite;
+
+    // Optimistic update for immediate feedback
+    setFavoriteOverrides((prev) => ({ ...prev, [id]: nextFavorite }));
+
+    try {
+      await bookmarkApi.toggleBookmark(id);
+      // Invalidate bookmark queries to keep global state in sync
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+      // Track the action for AI feedback loop
+      behaviorTracker.trackBookmark(id, nextFavorite ? 'add' : 'remove');
+    } catch (error) {
+      console.error('[RecommendedListings] Failed to toggle favorite:', error);
+      // Revert optimistic update on failure
+      setFavoriteOverrides((prev) => ({ ...prev, [id]: currentFavorite }));
+    }
+  };
 
   const handleListingClick = (listing: RecommendedListingDTO) => {
     behaviorTracker.trackClick(listing.listing_id, {
@@ -180,23 +233,33 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
           </div>
 
           {/* Loading State - Horizontal skeleton cards */}
-          {isLoading && (
-            <div className='flex gap-4 overflow-hidden'>
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className='w-[300px] flex-shrink-0'>
-                  <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6'>
-                    <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
-                    <Skeleton className='h-8 w-3/4 mb-3' />
-                    <Skeleton className='h-6 w-1/2 mb-4' />
-                    <Skeleton className='h-px w-full mb-4' />
-                    <div className='flex gap-4 justify-center'>
-                      <Skeleton className='h-5 w-12' />
-                      <Skeleton className='h-5 w-12' />
-                      <Skeleton className='h-5 w-12' />
+          {(isLoading || isFetching) && (
+            <div className='flex gap-4 overflow-hidden relative'>
+              {/* Optional slight slide/fade for skeleton */}
+              <AnimatePresence>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0 }}
+                  className='flex gap-4'
+                >
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className='w-[300px] flex-shrink-0'>
+                      <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6'>
+                        <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
+                        <Skeleton className='h-8 w-3/4 mb-3' />
+                        <Skeleton className='h-6 w-1/2 mb-4' />
+                        <Skeleton className='h-px w-full mb-4' />
+                        <div className='flex gap-4 justify-center'>
+                          <Skeleton className='h-5 w-12' />
+                          <Skeleton className='h-5 w-12' />
+                          <Skeleton className='h-5 w-12' />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </div>
           )}
 
@@ -209,7 +272,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
           )}
 
           {/* Recommendations Carousel */}
-          {!isLoading && !isError && recommendations.length > 0 && (
+          {(!isLoading && !isFetching && !isError && recommendations.length > 0) && (
             <CarouselContent className='-ml-4'>
               {recommendations.map((listing, index) => (
                 <CarouselItem
@@ -234,6 +297,8 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
                       attributes={listing.attributes}
                       listingType={listing.listing_type}
                       boostTags={listing.is_boosted ? listing.boost_packages : undefined}
+                      isFavorite={favoriteOverrides[listing.listing_id] ?? listing.is_favorite ?? false}
+                      onToggleFavorite={handleToggleFavorite}
                       onClick={() => handleListingClick(listing)}
                       className='h-full transition-shadow duration-300 hover:shadow-lg'
                     />
