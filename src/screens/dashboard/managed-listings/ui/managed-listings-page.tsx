@@ -13,6 +13,7 @@ import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
 import { CreateListingModal } from '@/features/create-listing-modal';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';

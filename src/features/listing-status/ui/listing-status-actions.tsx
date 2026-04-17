@@ -134,7 +134,7 @@ export function ListingStatusActions({
               disabled={isDisabled}
               onClick={() => {
                 if (enabled && !isPending) {
-                  if (action === 'mark-as-sold' || action === 'mark-as-rented') {
+                  if (action === 'mark-as-sold' || action === 'mark-as-rented' || action === 'unpublish') {
                     setConfirmingAction(action);
                   } else {
                     executeStatusUpdate(mutateAsync, listingId, action, t);
@@ -164,12 +164,16 @@ export function ListingStatusActions({
             <DialogTitle>
               {confirmingAction === 'mark-as-sold'
                 ? t('confirm.markAsSold.title')
-                : t('confirm.markAsRented.title')}
+                : confirmingAction === 'mark-as-rented'
+                ? t('confirm.markAsRented.title')
+                : t('confirm.unpublish.title')}
             </DialogTitle>
             <DialogDescription>
               {confirmingAction === 'mark-as-sold'
                 ? t('confirm.markAsSold.description')
-                : t('confirm.markAsRented.description')}
+                : confirmingAction === 'mark-as-rented'
+                ? t('confirm.markAsRented.description')
+                : t('confirm.unpublish.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2'>

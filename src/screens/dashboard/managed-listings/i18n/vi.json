@@ -1,6 +1,7 @@
 {
   "ManagedListings": {
     "title": "Danh sách",
+    "draftRuleTooltip": "Tin đăng tạm ẩn quá 24h sẽ bị tự động hủy các lịch hẹn đang hoạt động.",
     "createButton": "Tạo mới",
     "filter": "Lọc",
     "filterPanel": {
