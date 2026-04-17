@@ -131,7 +131,7 @@ export function FloatingChatWindow({
       <div
         className={cn(
           'flex h-12 flex-shrink-0 items-center justify-between gap-3 rounded-t-xl border-b border-border px-3',
-          'cursor-pointer bg-white hover:bg-grey-50'
+          'cursor-pointer bg-background hover:bg-muted'
         )}
         onClick={onMinimize}
       >
@@ -152,7 +152,7 @@ export function FloatingChatWindow({
               <span className='text-xs font-bold'>{participant.name.charAt(0).toUpperCase()}</span>
             </div>
           )}
-          <span className='truncate text-sm font-semibold text-main-black'>{participant.name}</span>
+          <span className='truncate text-sm font-semibold text-foreground'>{participant.name}</span>
         </div>
 
         {/* Window controls */}
@@ -163,7 +163,7 @@ export function FloatingChatWindow({
               e.stopPropagation();
               onMinimize?.();
             }}
-            className='flex h-7 w-7 items-center justify-center rounded-full text-grey-500 transition-colors hover:bg-grey-100 hover:text-main-black'
+            className='flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
             aria-label={isMinimized ? t('expand') : t('minimize')}
           >
             <Minus className='h-4 w-4' />
@@ -174,7 +174,7 @@ export function FloatingChatWindow({
               e.stopPropagation();
               onClose?.();
             }}
-            className='flex h-7 w-7 items-center justify-center rounded-full text-grey-500 transition-colors hover:bg-grey-100 hover:text-main-black'
+            className='flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
             aria-label={t('close')}
           >
             <X className='h-4 w-4' />
@@ -199,7 +199,7 @@ export function FloatingChatWindow({
                 <div ref={messagesEndRef} />
               </div>
             ) : (
-              <div className='flex h-full items-center justify-center text-sm text-grey-400'>
+              <div className='flex h-full items-center justify-center text-sm text-muted-foreground/50'>
                 {t('startConversation')}
               </div>
             )}
@@ -216,13 +216,13 @@ export function FloatingChatWindow({
                 onKeyDown={handleKeyDown}
                 placeholder={t('typeMessage')}
                 disabled={isSending}
-                className='flex-1 rounded-full border border-border bg-grey-50 px-4 py-2 text-sm placeholder:text-grey-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50'
+                className='flex-1 rounded-full border border-border bg-muted px-4 py-2 text-sm placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50'
               />
               <button
                 type='button'
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isSending}
-                className='flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary/90 disabled:bg-grey-200 disabled:text-grey-400'
+                className='flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground/50'
                 aria-label={t('send')}
               >
                 {isSending ? (

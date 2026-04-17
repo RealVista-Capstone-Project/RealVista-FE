@@ -24,7 +24,7 @@ export function ListingNameInput({
 }: ListingNameInputProps) {
   return (
     <div className='flex flex-col gap-2'>
-      <label className='text-sm font-medium text-main-black'>
+      <label className='text-sm font-medium text-foreground'>
         {label}
         <span className='text-primary'>*</span>
       </label>
@@ -35,10 +35,10 @@ export function ListingNameInput({
         maxLength={maxLength}
         placeholder={placeholder}
         className={cn(
-          'rounded-lg border bg-white px-4 py-3 text-sm text-main-black placeholder:text-secondary/50 transition-colors focus:outline-none',
+          'rounded-lg border bg-background px-4 py-3 text-sm text-foreground placeholder:text-secondary/50 transition-colors focus:outline-none',
           error
             ? 'border-red-400 focus:border-red-500'
-            : 'border-purple-92 focus:border-primary'
+            : 'border-primary/20 focus:border-primary'
         )}
       />
       {error && <span className='text-xs text-red-500'>{error}</span>}
@@ -65,13 +65,13 @@ export function ListingContentTextarea({
 }: ListingContentTextareaProps) {
   return (
     <div className='flex flex-col gap-2'>
-      <label className='text-sm font-medium text-main-black'>{label}</label>
+      <label className='text-sm font-medium text-foreground'>{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className='rounded-lg border border-purple-92 bg-white px-4 py-3 text-sm text-main-black placeholder:text-secondary/50 transition-colors focus:border-primary focus:outline-none resize-none'
+        className='rounded-lg border border-primary/20 bg-background px-4 py-3 text-sm text-foreground placeholder:text-secondary/50 transition-colors focus:border-primary focus:outline-none resize-none'
       />
     </div>
   );

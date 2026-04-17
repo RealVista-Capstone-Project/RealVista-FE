@@ -243,25 +243,25 @@ function QuotaUsageBar({
 }) {
   if (unlimited || total <= 0) {
     return (
-      <p className='text-xs font-medium text-grey-500'>Không giới hạn quota — không cần theo dõi mức dùng.</p>
+      <p className='text-xs font-medium text-muted-foreground'>Không giới hạn quota — không cần theo dõi mức dùng.</p>
     );
   }
   const pct = Math.min(100, Math.round((used / total) * 100));
   const isHigh = pct >= 80;
   return (
     <div className='space-y-1'>
-      <div className='flex items-center justify-between text-xs text-grey-500'>
+      <div className='flex items-center justify-between text-xs text-muted-foreground'>
         <span>Đã dùng</span>
         <span className='font-semibold text-foreground'>{pct}%</span>
       </div>
       <div className='flex items-center gap-3'>
-        <div className='h-2 flex-1 overflow-hidden rounded-full bg-purple-92'>
+        <div className='h-2 flex-1 overflow-hidden rounded-full bg-primary/10'>
           <div
             className={cn('h-full rounded-full transition-all', isHigh ? 'bg-orange-400' : 'bg-primary')}
             style={{ width: `${pct}%` }}
           />
         </div>
-        <span className='w-20 shrink-0 text-right text-xs font-medium text-grey-500'>
+        <span className='w-20 shrink-0 text-right text-xs font-medium text-muted-foreground'>
           {used}/{total}
         </span>
       </div>
@@ -321,7 +321,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
     return (
       <div>
         <h2 className='mb-4 text-base font-semibold text-foreground'>Gói đang hoạt động</h2>
-        <div className='flex items-center gap-2 text-sm text-grey-500'>
+        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
           <Loader2 className='size-4 animate-spin' /> Đang tải...
         </div>
       </div>
@@ -338,7 +338,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
 
       {/* Display subscriptions */}
       {active.length === 0 && activeBoosts.length === 0 ? (
-        <p className='text-sm text-grey-500'>Bạn chưa có gói nào đang hoạt động.</p>
+        <p className='text-sm text-muted-foreground'>Bạn chưa có gói nào đang hoạt động.</p>
       ) : (
         <div className='space-y-6'>
           {/* Subscriptions section */}
@@ -358,20 +358,20 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 key={sub.subscription_id}
                 className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
               >
-                <div className='flex flex-col rounded-xl border border-border bg-grey-50 p-5 shadow-sm'>
+                <div className='flex flex-col rounded-xl border border-border bg-secondary/50 p-5 shadow-sm'>
                   <div className='flex flex-row items-center justify-between'>
-                    <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói hiện tại</p>
+                    <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Gói hiện tại</p>
                     <div className='flex flex-wrap items-center gap-2'>
-                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-grey-200'>
+                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-border'>
                         {featureTypeLabelVi(sub.feature_type)}
                       </span>
-                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-grey-200'>
+                      <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-border'>
                         {tierLabelVi(tier)}
                       </span>
                     </div>
                   </div>
                   <h3 className='mt-2 text-lg font-bold text-foreground'>{sub.package_name}</h3>
-                  <div className='mt-1 flex items-center gap-1.5 text-xs text-grey-500'>
+                  <div className='mt-1 flex items-center gap-1.5 text-xs text-muted-foreground'>
                     <CalendarDays className='size-3.5 shrink-0' />
                     <span>
                       {sub.end_date ? `Hết hạn: ${formatDate(sub.end_date)}` : 'Không giới hạn thời hạn'}
@@ -395,15 +395,15 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   </div>
                 </div>
 
-                <div className='flex flex-col rounded-xl border border-main-black/10 bg-white p-5 shadow-sm ring-1 ring-grey-100'>
-                  <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Nâng cấp</p>
+                <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
+                  <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Nâng cấp</p>
                   {nextPkg ? (
                     <>
                       <h3 className='mt-2 text-lg font-bold text-foreground'>{nextPkg.name}</h3>
-                      <p className='mt-1 text-sm text-grey-500'>{nextPkg.description}</p>
+                      <p className='mt-1 text-sm text-muted-foreground'>{nextPkg.description}</p>
                       <p className='mt-1 text-2xl font-bold text-foreground'>
                         {(nextPkg.price).toLocaleString('vi-VN')} đ
-                        <span className='text-xs font-normal text-grey-500'>
+                        <span className='text-xs font-normal text-muted-foreground'>
                           /
                           {nextPkg.duration_days === 30 ? 'tháng' : `${nextPkg.duration_days} ngày`}
                         </span>
@@ -419,7 +419,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                       </div>
                     </>
                   ) : (
-                    <p className='mt-4 flex-1 text-sm text-grey-500'>
+                    <p className='mt-4 flex-1 text-sm text-muted-foreground'>
                       Bạn đang ở mức cao nhất cho {featureTypeLabelVi(sub.feature_type)} trong danh mục hiện tại.
                     </p>
                   )}
@@ -434,17 +434,17 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
               key={boost.boost_package_id}
               className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
             >
-              <div className='flex flex-col rounded-xl border border-border bg-grey-50 p-5 shadow-sm'>
+              <div className='flex flex-col rounded-xl border border-border bg-secondary/50 p-5 shadow-sm'>
                 <div className='flex flex-row items-center justify-between'>
-                  <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Gói đẩy tin</p>
+                  <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Gói đẩy tin</p>
                   <div className='flex flex-wrap items-center gap-2'>
-                    <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-grey-200'>
+                    <span className='rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-foreground ring-1 ring-border'>
                       {boost.code}
                     </span>
                   </div>
                 </div>
                 <h3 className='mt-2 text-lg font-bold text-foreground'>{boost.name}</h3>
-                <div className='mt-1 flex items-center gap-1.5 text-xs text-grey-500'>
+                <div className='mt-1 flex items-center gap-1.5 text-xs text-muted-foreground'>
                   <CalendarDays className='size-3.5 shrink-0' />
                   <span>
                     Hết hạn: {formatDate(boost.end_date)}
@@ -475,26 +475,26 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 </div>
               </div>
 
-              <div className='flex flex-col rounded-xl border border-main-black/10 bg-white p-5 shadow-sm ring-1 ring-grey-100'>
-                <p className='text-[10px] font-bold uppercase tracking-wider text-grey-400'>Chi tiết gói</p>
+              <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
+                <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Chi tiết gói</p>
                 <h3 className='mt-2 text-lg font-bold text-foreground'>{boost.name}</h3>
-                <p className='mt-1 text-sm text-grey-500'>{boost.description}</p>
+                <p className='mt-1 text-sm text-muted-foreground'>{boost.description}</p>
                 <ul className='mt-3 space-y-1.5'>
-                  <li className='flex items-start gap-2 text-sm text-grey-700'>
+                  <li className='flex items-start gap-2 text-sm text-foreground/70'>
                     <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     {boost.featured_quota} lượt đẩy nổi bật
                   </li>
-                  <li className='flex items-start gap-2 text-sm text-grey-700'>
+                  <li className='flex items-start gap-2 text-sm text-foreground/70'>
                     <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     {boost.hot_badge_quota} huy hiệu HOT
                   </li>
-                  <li className='flex items-start gap-2 text-sm text-grey-700'>
+                  <li className='flex items-start gap-2 text-sm text-foreground/70'>
                     <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     Hiển thị ưu tiên {boost.duration_days} ngày
                   </li>
                 </ul>
                 <div className='mt-auto pt-4'>
-                  <p className='text-xs text-grey-500 mb-2'>Muốn mua thêm gói khác?</p>
+                  <p className='text-xs text-muted-foreground mb-2'>Muốn mua thêm gói khác?</p>
                   <RealVistaButton
                     size='small'
                     className='w-full sm:w-auto bg-primary text-white hover:bg-primary-dark'
@@ -514,7 +514,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
       {/* Cancel subscription confirmation dialog */}
       {showCancelConfirm && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+          <div className='w-full max-w-sm rounded-xl border border-muted bg-white p-6 shadow-lg'>
             <h3 className='text-lg font-bold text-foreground'>Xác nhận huỷ gói</h3>
             <p className='mt-3 text-sm text-muted-foreground'>
               Huỷ gói này? Bạn sẽ mất quyền lợi ngay sau khi huỷ (theo chính sách hiện tại).
@@ -526,7 +526,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   setShowCancelConfirm(false);
                   setSubscriptionIdToCancel(null);
                 }}
-                className='rounded-lg border border-grey-200 px-4 py-2 text-sm font-medium text-grey-700 hover:bg-grey-50 transition-colors'
+                className='rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground/70 hover:bg-secondary/50 transition-colors'
               >
                 Vẫn giữ gói
               </button>
@@ -550,7 +550,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
       {/* Cancel boost confirmation dialog */}
       {showCancelBoostConfirm && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+          <div className='w-full max-w-sm rounded-xl border border-muted bg-white p-6 shadow-lg'>
             <h3 className='text-lg font-bold text-foreground'>Xác nhận huỷ gói đẩy tin</h3>
             <p className='mt-3 text-sm text-muted-foreground'>
               Huỷ gói này? Bạn sẽ mất lượt đẩy tin còn lại ngay sau khi huỷ.
@@ -562,7 +562,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   setShowCancelBoostConfirm(false);
                   setBoostIdToCancel(null);
                 }}
-                className='rounded-lg border border-grey-200 px-4 py-2 text-sm font-medium text-grey-700 hover:bg-grey-50 transition-colors'
+                className='rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground/70 hover:bg-secondary/50 transition-colors'
               >
                 Vẫn giữ gói
               </button>
@@ -613,12 +613,12 @@ function StepIconCircle({
       className={cn(
         'flex size-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
         active
-          ? 'border-primary bg-primary text-white ring-4 ring-purple-94'
+          ? 'border-primary bg-primary text-white ring-4 ring-primary/20'
           : done
             ? 'border-primary bg-primary text-white'
             : reachable
               ? 'border-primary bg-white text-primary'
-              : 'border-grey-200 bg-white text-grey-400'
+              : 'border-border bg-white text-muted-foreground/80'
       )}
     >
       {done ? <Check className='size-3.5' /> : icon}
@@ -639,19 +639,19 @@ function StepLabel({
 }) {
   return (
     <div className='flex flex-col items-start gap-0.5'>
-      <span className='text-[9px] font-semibold uppercase tracking-wider text-grey-400'>
+      <span className='text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/80'>
         Bước {num}
       </span>
       <span
         className={cn(
           'text-start text-xs font-semibold leading-tight sm:text-sm',
-          active || done ? 'text-foreground' : 'text-grey-400'
+          active || done ? 'text-foreground' : 'text-muted-foreground/80'
         )}
       >
         {label}
       </span>
       {active && (
-        <span className='mt-0.5 inline-flex items-center rounded-full bg-purple-94 px-2 py-0.5 text-[9px] font-bold text-primary'>
+        <span className='mt-0.5 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary'>
           Đang thực hiện
         </span>
       )}
@@ -661,7 +661,7 @@ function StepLabel({
         </span>
       )}
       {!active && !done && (
-        <span className='mt-0.5 inline-flex items-center rounded-full bg-grey-100 px-2 py-0.5 text-[9px] font-semibold text-grey-500'>
+        <span className='mt-0.5 inline-flex items-center rounded-full bg-muted/50 px-2 py-0.5 text-[9px] font-semibold text-muted-foreground'>
           Chờ
         </span>
       )}
@@ -704,7 +704,7 @@ function HorizontalWizardSteps({
                   aria-hidden
                   className={cn(
                     'absolute left-8 right-0 top-4 h-0.5 translate-y-px transition-colors',
-                    done ? 'bg-primary' : 'bg-grey-200'
+                    done ? 'bg-primary' : 'bg-border'
                   )}
                 />
               )}
@@ -751,7 +751,7 @@ function Step1Content({
           className={cn(
             'relative flex flex-col items-start gap-4 rounded-xl p-5 text-left transition-all',
             selected === 'subscription'
-              ? 'bg-purple-98'
+              ? 'bg-primary/5'
               : 'bg-white'
           )}
         >
@@ -759,7 +759,7 @@ function Step1Content({
             <div
               className={cn(
                 'flex size-10 shrink-0 items-center justify-center rounded-lg',
-                selected === 'subscription' ? 'bg-primary text-white' : 'bg-purple-96 text-primary'
+                selected === 'subscription' ? 'bg-primary text-white' : 'bg-primary/5 text-primary'
               )}
             >
               <CreditCard className='size-5' />
@@ -768,16 +768,16 @@ function Step1Content({
             {selected === 'subscription' && <Check className='size-5 shrink-0 text-primary' />}
           </div>
           <ul className='w-full space-y-2'>
-            <li className='flex items-start gap-2 text-sm text-grey-700'>
-              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+            <li className='flex items-start gap-2 text-sm text-foreground/70'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
               Đăng tin bất động sản
             </li>
-            <li className='flex items-start gap-2 text-sm text-grey-700'>
-              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+            <li className='flex items-start gap-2 text-sm text-foreground/70'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
               Lượt AI assistant
             </li>
-            <li className='flex items-start gap-2 text-sm text-grey-700'>
-              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+            <li className='flex items-start gap-2 text-sm text-foreground/70'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
               Tạo 3D model cho bất động sản
             </li>
           </ul>
@@ -789,7 +789,7 @@ function Step1Content({
           className={cn(
             'relative flex flex-col items-start gap-4 rounded-xl p-5 text-left transition-all',
             selected === 'boost'
-              ? 'bg-purple-98'
+              ? 'bg-primary/5'
               : 'bg-white'
           )}
         >
@@ -797,7 +797,7 @@ function Step1Content({
             <div
               className={cn(
                 'flex size-10 shrink-0 items-center justify-center rounded-lg',
-                selected === 'boost' ? 'bg-primary text-white' : 'bg-purple-96 text-primary'
+                selected === 'boost' ? 'bg-primary text-white' : 'bg-primary/5 text-primary'
               )}
             >
               <Rocket className='size-5' />
@@ -806,12 +806,12 @@ function Step1Content({
             {selected === 'boost' && <Check className='size-5 shrink-0 text-primary' />}
           </div>
           <ul className='w-full space-y-2'>
-            <li className='flex items-start gap-2 text-sm text-grey-700'>
-              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+            <li className='flex items-start gap-2 text-sm text-foreground/70'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
               Đẩy nổi bật
             </li>
-            <li className='flex items-start gap-2 text-sm text-grey-700'>
-              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-grey-400' />
+            <li className='flex items-start gap-2 text-sm text-foreground/70'>
+              <span className='mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
               Huy hiệu HOT
             </li>
           </ul>
@@ -964,7 +964,7 @@ function Step2Content({
 
   if (isLoading) {
     return (
-      <div className='flex items-center gap-2 text-sm text-grey-500 py-4'>
+      <div className='flex items-center gap-2 text-sm text-muted-foreground py-4'>
         <Loader2 className='size-4 animate-spin' /> Đang tải gói...
       </div>
     );
@@ -972,7 +972,7 @@ function Step2Content({
 
   if (type === 'subscription' && rawPlans.length === 0) {
     return (
-      <p className='text-sm text-grey-500 py-4'>
+      <p className='text-sm text-muted-foreground py-4'>
         Hiện không có gói tính năng trả phí để mua. Kiểm tra lại API hoặc danh sách gói trên hệ thống.
       </p>
     );
@@ -1020,7 +1020,7 @@ function Step2Content({
                   'rounded-t-lg border-2 border-b-0',
                   selectedFeatureType === featureType
                     ? 'bg-primary text-white border-primary'
-                    : 'bg-white border-grey-300 text-muted-foreground hover:bg-grey-50'
+                    : 'bg-white border-muted text-muted-foreground hover:bg-secondary/50'
                 )}
               >
                 {featureTypeLabelVi(featureType)}
@@ -1050,22 +1050,22 @@ function Step2Content({
                       (blocked || isCurrentActive) && 'cursor-not-allowed',
                       activePlanId === plan.id && !blocked && !isCurrentActive
                         ? 'border-2 border-primary bg-white shadow-md'
-                        : !blocked && !isCurrentActive && 'border border-grey-200 bg-white hover:border-purple-90 hover:bg-purple-98',
-                      (blocked || isCurrentActive) && 'border border-grey-200 bg-grey-50'
+                        : !blocked && !isCurrentActive && 'border border-border bg-white hover:border-primary/30 hover:bg-primary/5',
+                      (blocked || isCurrentActive) && 'border border-border bg-secondary/50'
                     )}
                   >
                     {(plan.isPopular || isCurrentActive) && (
-                      <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-primary')}>
+                      <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-muted-foreground/80' : 'bg-primary')}>
                         {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                       </span>
                     )}
                     <div className='min-w-0'>
                       <p className='font-semibold text-sm text-foreground'>{plan.name}</p>
-                      <p className='text-xs text-grey-500'>{plan.description}</p>
+                      <p className='text-xs text-muted-foreground'>{plan.description}</p>
                     </div>
                     <div className='ml-3 shrink-0 text-right'>
                       <span className='text-lg font-bold text-foreground'>{plan.priceLabel}</span>
-                      <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
+                      <span className='text-xs text-muted-foreground'>/{plan.durationLabel}</span>
                     </div>
                   </button>
                 );
@@ -1073,7 +1073,7 @@ function Step2Content({
             </div>
 
             {/* Plan details - simplified border */}
-            <div className='rounded-xl border border-grey-200 bg-white p-5 lg:flex-1 shadow-sm'>
+            <div className='rounded-xl border border-border bg-white p-5 lg:flex-1 shadow-sm'>
               <div className='mb-4 flex items-start justify-between gap-2'>
                 <div>
                   <div className='flex flex-wrap items-center gap-2'>
@@ -1084,7 +1084,7 @@ function Step2Content({
                       </span>
                     )}
                   </div>
-                  <p className='text-xs text-grey-500'>
+                  <p className='text-xs text-muted-foreground'>
                     {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
                   </p>
                 </div>
@@ -1092,15 +1092,15 @@ function Step2Content({
                   <p className='text-2xl font-bold text-foreground'>
                     {selectedPlan.priceLabel}
                   </p>
-                  <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
+                  <p className='text-xs text-muted-foreground'>/{selectedPlan.durationLabel}</p>
                 </div>
               </div>
 
               <div className='mb-4'>
-                <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+                <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Quyền lợi</p>
                 <ul className='space-y-1.5'>
                   {selectedPlan.benefits.map((b) => (
-                    <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                    <li key={b.label} className='flex items-start gap-2 text-sm text-foreground/70'>
                       <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                       {b.label}
                     </li>
@@ -1109,11 +1109,11 @@ function Step2Content({
               </div>
 
               <div className='mb-5'>
-                <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
+                <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Tính năng</p>
                 <ul className='space-y-1.5'>
                   {selectedPlan.features.map((f) => (
-                    <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
-                      <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
+                    <li key={f.label} className='flex items-start gap-1.5 text-sm text-foreground/70'>
+                      <span className='mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
                       {f.label}
                     </li>
                   ))}
@@ -1146,23 +1146,23 @@ function Step2Content({
                     'relative flex w-full items-center justify-between rounded-lg border-2 px-4 py-3 text-left transition-all',
                     (blocked || isCurrentActive) && 'cursor-not-allowed',
                     activePlanId === plan.id && !blocked && !isCurrentActive
-                      ? 'border-primary bg-purple-98'
-                      : !blocked && !isCurrentActive && 'border-border bg-white hover:border-purple-90 hover:bg-purple-98',
-                    (blocked || isCurrentActive) && 'border-grey-200 bg-grey-100'
+                      ? 'border-primary bg-primary/5'
+                      : !blocked && !isCurrentActive && 'border-border bg-white hover:border-primary/30 hover:bg-primary/5',
+                    (blocked || isCurrentActive) && 'border-border bg-muted/50'
                   )}
                 >
                   {(plan.isPopular || isCurrentActive) && (
-                    <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-grey-400' : 'bg-primary')}>
+                    <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-muted-foreground/80' : 'bg-primary')}>
                       {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                     </span>
                   )}
                   <div className='min-w-0'>
                     <p className='font-semibold text-sm text-foreground'>{plan.name}</p>
-                    <p className='text-xs text-grey-500'>{plan.description}</p>
+                    <p className='text-xs text-muted-foreground'>{plan.description}</p>
                   </div>
                   <div className='ml-3 shrink-0 text-right'>
                     <span className='text-lg font-bold text-foreground'>{plan.priceLabel}</span>
-                    <span className='text-xs text-grey-500'>/{plan.durationLabel}</span>
+                    <span className='text-xs text-muted-foreground'>/{plan.durationLabel}</span>
                   </div>
                   {blocked && !isCurrentActive && (
                     <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>
@@ -1174,7 +1174,7 @@ function Step2Content({
             })}
           </div>
 
-          <div className='rounded-xl border border-border bg-grey-50 p-5 lg:flex-1'>
+          <div className='rounded-xl border border-border bg-secondary/50 p-5 lg:flex-1'>
             <div className='mb-4 flex items-start justify-between gap-2'>
               <div>
                 <div className='flex flex-wrap items-center gap-2'>
@@ -1185,7 +1185,7 @@ function Step2Content({
                     </span>
                   )}
                 </div>
-                <p className='text-xs text-grey-500'>
+                <p className='text-xs text-muted-foreground'>
                   {type === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan.durationLabel}`}
                 </p>
               </div>
@@ -1193,15 +1193,15 @@ function Step2Content({
                 <p className='text-2xl font-bold text-foreground'>
                   {selectedPlan.priceLabel}
                 </p>
-                <p className='text-xs text-grey-500'>/{selectedPlan.durationLabel}</p>
+                <p className='text-xs text-muted-foreground'>/{selectedPlan.durationLabel}</p>
               </div>
             </div>
 
             <div className='mb-4'>
-              <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+              <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Quyền lợi</p>
               <ul className='space-y-1.5'>
                 {selectedPlan.benefits.map((b) => (
-                  <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                  <li key={b.label} className='flex items-start gap-2 text-sm text-foreground/70'>
                     <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                     {b.label}
                   </li>
@@ -1210,11 +1210,11 @@ function Step2Content({
             </div>
 
             <div className='mb-5'>
-              <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Tính năng</p>
+              <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Tính năng</p>
               <ul className='space-y-1.5'>
                 {selectedPlan.features.map((f) => (
-                  <li key={f.label} className='flex items-start gap-1.5 text-sm text-grey-700'>
-                    <span className='mt-2 size-1.5 shrink-0 rounded-full bg-grey-400' />
+                  <li key={f.label} className='flex items-start gap-1.5 text-sm text-foreground/70'>
+                    <span className='mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/80' />
                     {f.label}
                   </li>
                 ))}
@@ -1445,18 +1445,18 @@ function Step3Content({
       <div className='flex flex-col gap-4 lg:flex-row'>
         {/* Left: Payment method selection */}
         <div className='flex flex-col gap-2.5 lg:w-2/5'>
-          <p className='text-xs text-grey-500 mb-1'>Chọn phương thức thanh toán</p>
+          <p className='text-xs text-muted-foreground mb-1'>Chọn phương thức thanh toán</p>
           <button
             type='button'
             onClick={() => handleSelectPayment('vnpay')}
             className={cn(
               'flex items-center gap-3 rounded-xl p-4 text-left transition-all',
               selectedPayment === 'vnpay'
-                ? 'bg-purple-98'
+                ? 'bg-primary/5'
                 : 'bg-white'
             )}
           >
-            <div className='flex size-5 items-center justify-center rounded-full border-2 border-grey-300 shrink-0'>
+            <div className='flex size-5 items-center justify-center rounded-full border-2 border-muted shrink-0'>
               {selectedPayment === 'vnpay' && (
                 <div className='size-2.5 rounded-full bg-primary' />
               )}
@@ -1470,7 +1470,7 @@ function Step3Content({
             />
             <div className='flex-1'>
               <p className='font-semibold text-sm text-foreground'>VNPay</p>
-              <p className='text-xs text-grey-500'>Ví điện tử & ngân hàng</p>
+              <p className='text-xs text-muted-foreground'>Ví điện tử & ngân hàng</p>
             </div>
           </button>
 
@@ -1480,11 +1480,11 @@ function Step3Content({
             className={cn(
               'flex items-center gap-3 rounded-xl p-4 text-left transition-all',
               selectedPayment === 'payos'
-                ? 'bg-purple-98'
+                ? 'bg-primary/5'
                 : 'bg-white'
             )}
           >
-            <div className='flex size-5 items-center justify-center rounded-full border-2 border-grey-300 shrink-0'>
+            <div className='flex size-5 items-center justify-center rounded-full border-2 border-muted shrink-0'>
               {selectedPayment === 'payos' && (
                 <div className='size-2.5 rounded-full bg-primary' />
               )}
@@ -1498,19 +1498,19 @@ function Step3Content({
             />
             <div className='flex-1'>
               <p className='font-semibold text-sm text-foreground'>PayOS</p>
-              <p className='text-xs text-grey-500'>Chuyển khoản ngân hàng</p>
+              <p className='text-xs text-muted-foreground'>Chuyển khoản ngân hàng</p>
             </div>
           </button>
         </div>
 
         {/* Right: Order review */}
-        <div className='rounded-xl border border-border bg-grey-50 p-5 lg:flex-1 bg-white'>
+        <div className='rounded-xl border border-border bg-secondary/50 p-5 lg:flex-1'>
           <div className='mb-4 flex items-start justify-between gap-2'>
             <div>
               <div className='flex flex-wrap items-center gap-2'>
                 <h3 className='text-lg font-bold text-foreground'>{selectedPlan?.name || 'Gói dịch vụ'}</h3>
               </div>
-              <p className='text-xs text-grey-500'>
+              <p className='text-xs text-muted-foreground'>
                 {selectedType === 'subscription' ? 'Gói tính năng (tin đăng / 3D / AI)' : `Gói ${selectedPlan?.durationLabel}`}
               </p>
             </div>
@@ -1518,15 +1518,15 @@ function Step3Content({
               <p className='text-2xl font-bold text-foreground'>
                 {selectedPlan?.priceLabel}
               </p>
-              <p className='text-xs text-grey-500'>/{selectedPlan?.durationLabel}</p>
+              <p className='text-xs text-muted-foreground'>/{selectedPlan?.durationLabel}</p>
             </div>
           </div>
 
           <div className='mb-4'>
-            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Quyền lợi</p>
+            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Quyền lợi</p>
             <ul className='space-y-1.5'>
               {selectedPlan?.benefits.map((b) => (
-                <li key={b.label} className='flex items-start gap-2 text-sm text-grey-700'>
+                <li key={b.label} className='flex items-start gap-2 text-sm text-foreground/70'>
                   <Check className='mt-0.5 size-3.5 shrink-0 text-primary' />
                   {b.label}
                 </li>
@@ -1535,8 +1535,8 @@ function Step3Content({
           </div>
 
           <div className='mb-5'>
-            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-grey-400'>Thời hạn</p>
-            <p className='text-sm text-grey-700'>
+            <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Thời hạn</p>
+            <p className='text-sm text-foreground/70'>
               {startDate} - {endDate}
             </p>
           </div>
@@ -1560,7 +1560,7 @@ function Step3Content({
 
       {/* PayOS: show QR after checkout created */}
       {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
-        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-secondary/50 py-6'>
           {secondsLeft === 0 ? (
             /* Expired state — user may have already scanned and transferred */
             <div className='flex flex-col items-center gap-3 text-center px-6'>
@@ -1568,7 +1568,7 @@ function Step3Content({
                 <Clock className='size-4' />
                 Mã QR đã hết hạn
               </div>
-              <p className='text-xs text-grey-500'>
+              <p className='text-xs text-muted-foreground'>
                 Nếu bạn đã chuyển khoản, nhấn kiểm tra thanh toán.
                 <br />Chưa chuyển? Tạo mã QR mới để tiếp tục.
               </p>
@@ -1577,7 +1577,7 @@ function Step3Content({
                   type='button'
                   onClick={() => { isManualSyncRef.current = true; syncPayOsMutation.mutate(); }}
                   disabled={syncPayOsMutation.isPending}
-                  className='inline-flex items-center gap-1.5 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-purple-98 disabled:opacity-50 transition-colors'
+                  className='inline-flex items-center gap-1.5 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5 disabled:opacity-50 transition-colors'
                 >
                   {syncPayOsMutation.isPending
                     ? <Loader2 className='size-3.5 animate-spin' />
@@ -1598,7 +1598,7 @@ function Step3Content({
           ) : (
             /* Active QR state */
             <>
-              <p className='text-sm font-medium text-grey-700 flex items-center gap-1.5'>
+              <p className='text-sm font-medium text-foreground/70 flex items-center gap-1.5'>
                 Quét mã QR để thanh toán qua{' '}
                 <span className='text-blue-600'>PayOS</span>
                 {!syncPayOsMutation.isPending && (
@@ -1606,7 +1606,7 @@ function Step3Content({
                     type='button'
                     onClick={() => { isManualSyncRef.current = true; syncPayOsMutation.mutate(); }}
                     disabled={syncPayOsMutation.isPending}
-                    className='inline-flex items-center text-grey-700 hover:text-grey-500 transition-colors disabled:opacity-50'
+                    className='inline-flex items-center text-foreground/70 hover:text-muted-foreground transition-colors disabled:opacity-50'
                     title='Kiểm tra thanh toán'
                     aria-label='Confirm payment'
                   >
@@ -1614,7 +1614,7 @@ function Step3Content({
                   </button>
                 )}
                 {syncPayOsMutation.isPending && (
-                  <Loader2 className='size-4 animate-spin text-grey-700' />
+                  <Loader2 className='size-4 animate-spin text-foreground/70' />
                 )}
               </p>
               <div className='rounded-xl border-4 border-white p-1 shadow-md'>
@@ -1631,8 +1631,8 @@ function Step3Content({
               </div>
               <p className={cn(
                 'flex items-center gap-1 text-xs',
-                secondsLeft === null ? 'text-grey-500'
-                  : secondsLeft > 300 ? 'text-grey-500'
+                secondsLeft === null ? 'text-muted-foreground'
+                  : secondsLeft > 300 ? 'text-muted-foreground'
                     : secondsLeft > 60 ? 'text-yellow-600'
                       : 'text-red-500'
               )}>
@@ -1656,8 +1656,8 @@ function Step3Content({
 
       {/* VNPay: show payment button after link created */}
       {selectedPayment === 'vnpay' && checkout && (
-        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-grey-50 py-6'>
-          <p className='text-sm font-medium text-grey-700'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-secondary/50 py-6'>
+          <p className='text-sm font-medium text-foreground/70'>
             Đã tạo link thanh toán VNPay
           </p>
           <RealVistaButton
@@ -1669,7 +1669,7 @@ function Step3Content({
           >
             Chuyển sang VNPay thanh toán
           </RealVistaButton>
-          <p className='text-xs text-grey-500'>Cửa sổ thanh toán sẽ mở trong tab mới. Tự động quay về sau khi thanh toán xong</p>
+          <p className='text-xs text-muted-foreground'>Cửa sổ thanh toán sẽ mở trong tab mới. Tự động quay về sau khi thanh toán xong</p>
         </div>
       )}
 
@@ -1754,7 +1754,7 @@ function Step4Content({
         <Loader2 className='size-16 animate-spin text-primary' />
         <div>
           <h3 className='text-lg font-bold text-foreground'>Đang xử lý thanh toán...</h3>
-          <p className='mt-2 text-sm text-grey-500'>
+          <p className='mt-2 text-sm text-muted-foreground'>
             Trang đang chờ kết quả từ hệ thống.
           </p>
         </div>
@@ -1774,7 +1774,7 @@ function Step4Content({
           <h3 className={cn('text-xl font-bold', isSuccess ? 'text-foreground' : 'text-red-500')}>
             {isSuccess ? 'Thanh toán thành công!' : 'Thanh toán thất bại'}
           </h3>
-          <p className='mt-2 text-sm text-grey-500'>
+          <p className='mt-2 text-sm text-muted-foreground'>
             {isSuccess
               ? 'Gói dịch vụ của bạn đã được kích hoạt.'
               : 'Đã xảy ra lỗi trong quá trình thanh toán. Vui lòng thử lại.'}
@@ -1782,7 +1782,7 @@ function Step4Content({
         </div>
 
         {isSuccess && plan && (
-          <div className='w-full max-w-xs rounded-xl border border-purple-90 bg-purple-98 p-4 text-left'>
+          <div className='w-full max-w-xs rounded-xl border border-primary/30 bg-primary/5 p-4 text-left'>
             <p className='mb-2 text-[10px] font-bold uppercase tracking-wider text-primary'>Chi tiết đơn hàng</p>
             <div className='space-y-1.5 text-sm'>
               <div className='flex justify-between'>
@@ -1793,7 +1793,7 @@ function Step4Content({
                 <span className='text-muted-foreground'>Thời hạn</span>
                 <span className='font-semibold text-foreground'>{startDate} - {endDate}</span>
               </div>
-              <div className='flex justify-between border-t border-purple-90 pt-1.5'>
+              <div className='flex justify-between border-t border-primary/30 pt-1.5'>
                 <span className='text-muted-foreground'>Tổng tiền</span>
                 <span className='font-bold text-primary'>{plan.priceLabel}</span>
               </div>
@@ -1813,7 +1813,7 @@ function Step4Content({
             <div className='overflow-x-auto'>
               <table className='w-full'>
                 <thead>
-                  <tr className='border-b border-grey-200'>
+                  <tr className='border-b border-border'>
                     <th className='pb-4 text-left text-xs font-semibold text-muted-foreground'>Ngày</th>
                     <th className='pb-4 text-left text-xs font-semibold text-muted-foreground'>Sự miêu tả</th>
                     <th className='pb-4 text-left text-xs font-semibold text-muted-foreground'>Trạng thái</th>
@@ -1821,11 +1821,11 @@ function Step4Content({
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className='border-b border-grey-100'>
-                    <td className='py-4 text-sm text-grey-700'>{new Date().toLocaleDateString('vi-VN')}</td>
-                    <td className='py-4 text-sm text-grey-700'>{plan.name}</td>
+                  <tr className='border-b border-muted'>
+                    <td className='py-4 text-sm text-foreground/70'>{new Date().toLocaleDateString('vi-VN')}</td>
+                    <td className='py-4 text-sm text-foreground/70'>{plan.name}</td>
                     <td className='py-4'>
-                      <span className='text-sm text-grey-700'>Đã thanh toán</span>
+                      <span className='text-sm text-foreground/70'>Đã thanh toán</span>
                     </td>
                     <td className='py-4 text-right text-sm font-semibold text-foreground'>{plan.priceLabel}</td>
                   </tr>
@@ -2006,7 +2006,7 @@ function PurchaseWizard() {
         onStepChange={toggleStep}
       />
 
-      <div className='rounded-xl border border-grey-96 bg-white p-4 shadow-sm sm:p-5'>
+      <div className='rounded-xl border border-muted bg-white p-4 shadow-sm sm:p-5'>
         {step === 1 && (
           <Step1Content selected={selectedType} onSelect={setSelectedType} onNext={handleTypeNext} />
         )}
@@ -2025,7 +2025,7 @@ function PurchaseWizard() {
           />
         )}
         {step === 2 && !selectedType && (
-          <p className='text-center text-sm text-grey-500'>Chọn loại gói ở bước 1 để tiếp tục.</p>
+          <p className='text-center text-sm text-muted-foreground'>Chọn loại gói ở bước 1 để tiếp tục.</p>
         )}
         {step === 3 && (
           <Step3Content
@@ -2053,9 +2053,9 @@ function PurchaseWizard() {
 
       {showLoginDialog && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+          <div className='w-full max-w-sm rounded-xl border border-muted bg-white p-6 shadow-lg'>
             <h3 className='text-lg font-bold text-foreground'>Yêu cầu đăng nhập</h3>
-            <p className='mt-2 text-sm text-grey-500'>
+            <p className='mt-2 text-sm text-muted-foreground'>
               Bạn cần đăng nhập để tiếp tục mua gói dịch vụ.
             </p>
             <div className='mt-6 flex flex-col gap-3'>
@@ -2081,7 +2081,7 @@ function PurchaseWizard() {
               <button
                 type='button'
                 onClick={() => setShowLoginDialog(false)}
-                className='text-sm font-medium text-grey-500 hover:text-foreground transition-colors'
+                className='text-sm font-medium text-muted-foreground hover:text-foreground transition-colors'
               >
                 Tiếp tục mua sắm
               </button>
@@ -2093,7 +2093,7 @@ function PurchaseWizard() {
       {/* Conflict dialog: same feature type subscription already active */}
       {showConflictDialog && conflictingPlan && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='w-full max-w-sm rounded-xl border border-grey-96 bg-white p-6 shadow-lg'>
+          <div className='w-full max-w-sm rounded-xl border border-muted bg-white p-6 shadow-lg'>
             <h3 className='text-lg font-bold text-foreground'>Nâng cấp gói dịch vụ</h3>
             <p className='mt-3 text-sm text-muted-foreground'>
               Bạn đã có gói{' '}
@@ -2120,7 +2120,7 @@ function PurchaseWizard() {
                   setPendingPlanId(null);
                   setConflictingPlan(null);
                 }}
-                className='text-sm font-medium text-grey-500 hover:text-foreground transition-colors'
+                className='text-sm font-medium text-muted-foreground hover:text-foreground transition-colors'
               >
                 Hủy bỏ
               </button>
@@ -2160,7 +2160,7 @@ function TransactionsSection() {
       case 'REFUNDED':
         return 'bg-blue-50 text-blue-700';
       default:
-        return 'bg-grey-50 text-grey-700';
+        return 'bg-secondary/50 text-foreground/70';
     }
   };
 
@@ -2181,7 +2181,7 @@ function TransactionsSection() {
 
   if (isLoading) {
     return (
-      <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
+      <div className='rounded-xl border border-border bg-white p-5 shadow-sm'>
         <h2 className='mb-4 text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
         <div className='flex justify-center py-8'>
           <Loader2 className='size-6 animate-spin text-primary' />
@@ -2192,9 +2192,9 @@ function TransactionsSection() {
 
   if (error) {
     return (
-      <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
+      <div className='rounded-xl border border-border bg-white p-5 shadow-sm'>
         <h2 className='mb-4 text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
-        <div className='text-center py-8 text-grey-500'>
+        <div className='text-center py-8 text-muted-foreground'>
           Không thể tải lịch sử giao dịch
         </div>
       </div>
@@ -2203,9 +2203,9 @@ function TransactionsSection() {
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className='rounded-xl border border-grey-200 bg-white p-5 shadow-sm'>
+      <div className='rounded-xl border border-border bg-white p-5 shadow-sm'>
         <h2 className='mb-4 text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
-        <div className='text-center py-8 text-grey-500'>
+        <div className='text-center py-8 text-muted-foreground'>
           Chưa có giao dịch nào
         </div>
       </div>
@@ -2213,14 +2213,14 @@ function TransactionsSection() {
   }
 
   return (
-    <div className='rounded-xl border border-grey-200 bg-white shadow-sm overflow-hidden'>
-      <div className='border-b border-grey-200 px-5 py-4'>
+    <div className='rounded-xl border border-border bg-white shadow-sm overflow-hidden'>
+      <div className='border-b border-border px-5 py-4'>
         <h2 className='text-lg font-bold text-foreground'>Lịch sử giao dịch</h2>
       </div>
       <div className='overflow-x-auto'>
         <table className='w-full'>
           <thead>
-            <tr className='border-b border-grey-200 bg-grey-50'>
+            <tr className='border-b border-border bg-secondary/50'>
               <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
                 Ngày
               </th>
@@ -2237,7 +2237,7 @@ function TransactionsSection() {
           </thead>
           <tbody>
             {transactions.map((transaction) => (
-              <tr key={transaction.transaction_id} className='border-b border-grey-100 hover:bg-grey-50 transition-colors'>
+              <tr key={transaction.transaction_id} className='border-b border-muted hover:bg-secondary/50 transition-colors'>
                 <td className='px-5 py-3 text-sm text-muted-foreground'>
                   {formatDate(transaction.created_at)}
                 </td>
@@ -2279,7 +2279,7 @@ export function SubscriptionTab() {
   return (
     <div className='space-y-6'>
       {/* Top-level tab switcher */}
-      <div className='flex gap-1 rounded-xl bg-purple-96 p-1'>
+      <div className='flex gap-1 rounded-xl bg-primary/5 p-1'>
         <button
           type='button'
           onClick={() => setMainTab('buy')}

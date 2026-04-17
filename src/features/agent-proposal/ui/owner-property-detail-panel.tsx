@@ -39,7 +39,7 @@ function getStatusStyle(status: string): string {
     case 'VERIFIED':
       return 'bg-blue-50 text-blue-700 border-blue-200';
     default:
-      return 'bg-gray-50 text-gray-600 border-gray-200';
+      return 'bg-muted text-muted-foreground border-border';
   }
 }
 
@@ -126,12 +126,12 @@ function PriceBadges({
 
 function InfoTile({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
-    <div className='bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col gap-1.5'>
-      <div className='flex items-center gap-1.5 text-[10px] text-gray-400 font-semibold uppercase tracking-wide'>
+    <div className='bg-muted rounded-xl p-3 border border-border flex flex-col gap-1.5'>
+      <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground/50 font-semibold uppercase tracking-wide'>
         {icon}
         {label}
       </div>
-      <div className='font-bold text-gray-900 text-sm truncate'>{value}</div>
+      <div className='font-bold text-foreground text-sm truncate'>{value}</div>
     </div>
   );
 }
@@ -179,10 +179,10 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
       <div className='flex h-full flex-col bg-white'>
         {/* Mobile back button */}
         {onBack && (
-          <div className='sticky top-0 z-20 flex items-center border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
+          <div className='sticky top-0 z-20 flex items-center border-b border-primary/20 bg-white px-4 py-3 sm:hidden'>
             <button
               onClick={onBack}
-              className='flex items-center gap-2 text-sm font-semibold text-main-black'
+              className='flex items-center gap-2 text-sm font-semibold text-foreground'
             >
               <ArrowLeft className='h-5 w-5' strokeWidth={2.5} />
               <span>{t('detailPanel.backToList')}</span>
@@ -191,7 +191,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
         )}
 
         {/* Hero image */}
-        <div className='relative h-56 w-full flex-shrink-0 bg-gray-100'>
+        <div className='relative h-56 w-full flex-shrink-0 bg-muted'>
           {heroImageUrl && !heroImageError ? (
             <Image
               src={heroImageUrl}
@@ -203,7 +203,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
               onError={() => setHeroImageError(true)}
             />
           ) : (
-            <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
+            <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-primary/5'>
               <Home className='h-14 w-14 text-indigo-200' />
             </div>
           )}
@@ -242,14 +242,14 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
             {/* Property type + category */}
             {property.property_type_info && (
               <div className='flex items-center gap-2'>
-                <Building2 className='h-4 w-4 flex-shrink-0 text-indigo-500' />
-                <span className='text-sm font-semibold text-gray-800'>
+                <Building2 className='h-4 w-4 flex-shrink-0 text-primary' />
+                <span className='text-sm font-semibold text-foreground/80'>
                   {property.property_type_info.property_type_name}
                 </span>
                 {property.property_type_info.property_category_name && (
                   <>
-                    <span className='text-gray-300'>·</span>
-                    <span className='text-sm text-gray-500'>
+                    <span className='text-muted-foreground/30'>·</span>
+                    <span className='text-sm text-muted-foreground'>
                       {property.property_type_info.property_category_name}
                     </span>
                   </>
@@ -302,33 +302,33 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
             {/* Description */}
             {property.descriptions && (
               <section>
-                <h4 className='mb-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
+                <h4 className='mb-2.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50'>
                   {t('detailPanel.description')}
                 </h4>
-                <p className='rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm leading-relaxed text-gray-600'>
+                <p className='rounded-xl border border-border bg-muted p-4 text-sm leading-relaxed text-muted-foreground'>
                   {property.descriptions}
                 </p>
               </section>
             )}
 
-            <Separator className='bg-gray-100' />
+            <Separator className='bg-border' />
 
             {/* Owner info */}
             <section>
-              <h4 className='mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
+              <h4 className='mb-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50'>
                 {t('detailPanel.ownerInfo')}
               </h4>
               <div className='space-y-3'>
                 {property.owner_name && (
                   <div className='flex items-center gap-3'>
-                    <div className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50'>
-                      <User className='h-4 w-4 text-indigo-500' />
+                    <div className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary/5'>
+                      <User className='h-4 w-4 text-primary' />
                     </div>
                     <div>
-                      <div className='text-[10px] font-medium uppercase tracking-wide text-gray-400'>
+                      <div className='text-[10px] font-medium uppercase tracking-wide text-muted-foreground/50'>
                         {t('detailPanel.ownerName')}
                       </div>
-                      <div className='text-sm font-semibold text-gray-800'>
+                      <div className='text-sm font-semibold text-foreground/80'>
                         {property.owner_name}
                       </div>
                     </div>
@@ -340,10 +340,10 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
                       <Phone className='h-4 w-4 text-green-500' />
                     </div>
                     <div>
-                      <div className='text-[10px] font-medium uppercase tracking-wide text-gray-400'>
+                      <div className='text-[10px] font-medium uppercase tracking-wide text-muted-foreground/50'>
                         {t('detailPanel.phone')}
                       </div>
-                      <div className='text-sm font-semibold text-gray-800'>
+                      <div className='text-sm font-semibold text-foreground/80'>
                         {property.owner_phone}
                       </div>
                     </div>
@@ -355,10 +355,10 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
                       <Mail className='h-4 w-4 text-orange-500' />
                     </div>
                     <div>
-                      <div className='text-[10px] font-medium uppercase tracking-wide text-gray-400'>
+                      <div className='text-[10px] font-medium uppercase tracking-wide text-muted-foreground/50'>
                         {t('detailPanel.email')}
                       </div>
-                      <div className='truncate text-sm font-semibold text-gray-800'>
+                      <div className='truncate text-sm font-semibold text-foreground/80'>
                         {property.owner_email}
                       </div>
                     </div>
@@ -371,7 +371,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
 
         {/* Sticky CTA footer */}
         {isAgent && (
-          <div className='flex-shrink-0 border-t border-gray-100 bg-white p-4'>
+          <div className='flex-shrink-0 border-t border-border bg-white p-4'>
             {cannotApplyProposal ? (
               <div className='flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-semibold text-emerald-700'>
                 <CheckCircle2 className='h-4 w-4' />
@@ -379,7 +379,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
               </div>
             ) : (
               <Button
-                className='h-11 w-full gap-2 rounded-xl bg-primary text-sm font-semibold text-white shadow-sm shadow-indigo-200/60 hover:bg-primary/90'
+                className='h-11 w-full gap-2 rounded-xl bg-primary text-sm font-semibold text-white shadow-primary/20 hover:bg-primary/90'
                 onClick={openApplyModal}
               >
                 <SendHorizonal className='h-4 w-4' />

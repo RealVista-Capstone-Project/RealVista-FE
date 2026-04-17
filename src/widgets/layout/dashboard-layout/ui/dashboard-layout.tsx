@@ -202,7 +202,7 @@ export function DashboardLayout({
   }, []);
 
   return (
-    <div className={cn('flex h-screen w-full overflow-hidden bg-slate-50', className)}>
+    <div className={cn('flex h-screen w-full overflow-hidden bg-muted/50', className)}>
       <ChatWindowRenderer />
 
       {/* Sidebar - Now part of the flex flow on desktop */}
@@ -250,7 +250,7 @@ export function DashboardLayout({
                   <span className='text-base font-bold leading-tight text-foreground'>
                     Estatery
                   </span>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-secondary/40'>
+                  <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground/40'>
                     Property Manager
                   </span>
                 </div>
@@ -258,7 +258,7 @@ export function DashboardLayout({
               <button
                 type='button'
                 onClick={() => setIsCollapsed(true)}
-                className='flex size-8 items-center justify-center rounded-lg border-primary/20 bg-white text-secondary/40 transition-all hover:bg-slate-50 hover:text-secondary hover:border-border hover:shadow-sm'
+                className='flex size-8 items-center justify-center rounded-lg border-primary/20 bg-background text-muted-foreground/40 transition-all hover:bg-muted/50 hover:text-foreground hover:border-border hover:shadow-sm'
                 aria-label='Collapse sidebar'
               >
                 <Columns className='h-4 w-4' strokeWidth={2} />
@@ -279,7 +279,7 @@ export function DashboardLayout({
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200',
                   isActive
                     ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
-                    : 'text-secondary/60 hover:bg-primary/10 hover:text-secondary',
+                    : 'text-muted-foreground/60 hover:bg-primary/5 hover:text-foreground',
                   isCollapsed ? 'justify-center' : 'justify-start'
                 )}
                 title={isCollapsed ? item.label : undefined}
@@ -302,7 +302,7 @@ export function DashboardLayout({
               'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
               isSettingsFooterActive
                 ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
-                : 'text-secondary/60 hover:bg-primary/10 hover:text-secondary',
+                : 'text-muted-foreground/60 hover:bg-primary/5 hover:text-foreground',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
@@ -331,7 +331,7 @@ export function DashboardLayout({
         />
 
         {/* Page Content - fills remaining height, scrollable */}
-        <main className='flex-1 overflow-y-auto bg-secondary/30 p-0'>{children}</main>
+        <main className='flex-1 overflow-y-auto bg-muted/30 p-0'>{children}</main>
       </div>
     </div>
   );

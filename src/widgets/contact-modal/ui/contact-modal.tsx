@@ -100,7 +100,7 @@ export function ContactModal({
             />
           </div>
           <div className='flex flex-col justify-center gap-1'>
-            <p className='line-clamp-1 text-sm font-medium text-main-black'>{listing.title}</p>
+            <p className='line-clamp-1 text-sm font-medium text-foreground'>{listing.title}</p>
             <p className='text-base font-bold text-primary'>{formatVND(listing.price)}</p>
           </div>
         </div>

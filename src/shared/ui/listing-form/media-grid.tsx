@@ -62,7 +62,7 @@ export function ExistingMediaGrid({
               'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
               isSelected
                 ? 'border-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
-                : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-primary/40'
+                : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
             )}
           >
             {/* Thumbnail */}
@@ -78,7 +78,7 @@ export function ExistingMediaGrid({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={media.thumbnailUrl} alt='' className='absolute inset-0 h-full w-full object-cover' />
               ) : (
-                <div className='flex h-full w-full items-center justify-center bg-purple-96'>
+                <div className='flex h-full w-full items-center justify-center bg-primary/5'>
                   <Box className='h-8 w-8 text-secondary/30' />
                 </div>
               )
@@ -86,7 +86,7 @@ export function ExistingMediaGrid({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={media.url} alt='' className='absolute inset-0 h-full w-full object-cover' />
             ) : (
-              <div className='flex h-full w-full items-center justify-center bg-purple-96'>
+              <div className='flex h-full w-full items-center justify-center bg-primary/5'>
                 <ImageIcon className='h-8 w-8 text-secondary/30' />
               </div>
             )}
@@ -235,7 +235,7 @@ export function NewFilesGrid({
                   ? 'border-primary/60'
                   : isRejected
                     ? 'border-red-400'
-                    : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-primary/40'
+                    : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
             )}
           >
             {file.type.startsWith('image/') ? (
@@ -252,7 +252,7 @@ export function NewFilesGrid({
             ) : (
               <div
                 className={cn(
-                  'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96 transition-opacity',
+                  'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-primary/5 transition-opacity',
                   !isSelected && 'opacity-40'
                 )}
               >
@@ -417,7 +417,7 @@ export function MediaUploadZone({
             onFilesSelected(files);
           }
         }}
-        className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-purple-98/30 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-purple-98/60 cursor-pointer w-full'
+        className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-primary/10 cursor-pointer w-full'
       >
         <Upload className='mb-2 h-7 w-7 text-primary/50' />
         <p className='text-sm font-medium text-secondary/60'>{labels.dragAndDrop}</p>

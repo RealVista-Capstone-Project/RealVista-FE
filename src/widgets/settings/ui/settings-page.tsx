@@ -864,7 +864,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                           {PROPERTY_TYPES.map((category) => (
                             <div
                               key={category.code}
-                              className='rounded-xl border border-border/80 bg-gradient-to-br from-white to-purple-98/40 p-4 shadow-sm shadow-primary/5'
+                              className='rounded-xl border border-border/80 bg-gradient-to-br from-white to-primary/10 p-4 shadow-sm shadow-primary/5'
                             >
                               <p className='mb-3 text-[11px] font-bold uppercase tracking-wider text-primary/80'>
                                 {category.label}
@@ -895,7 +895,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                       </div>
                       <div className='space-y-3'>
                         <div className='flex items-start gap-3'>
-                          <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary ring-1 ring-purple-92/50'>
+                          <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary ring-1 ring-primary/20'>
                             <MapPin className='size-4' strokeWidth={2} />
                           </div>
                           <div className='min-w-0 flex-1'>
@@ -907,7 +907,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                             </p>
                           </div>
                         </div>
-                        <div className='overflow-hidden rounded-xl border border-border/90 bg-gradient-to-b from-white to-purple-98/25 shadow-sm shadow-primary/5'>
+                        <div className='overflow-hidden rounded-xl border border-border/90 bg-gradient-to-b from-white to-primary/5 shadow-sm shadow-primary/5'>
                           <div
                             className={cn(
                               'min-h-[56px] px-3 py-2.5',
@@ -920,7 +920,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               <ul className='flex flex-wrap gap-2' aria-label={t('agentProfessional.workingArea')}>
                                 {agentWorkingAreaTags.map((tag) => (
                                   <li key={tag}>
-                                    <span className='inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-white py-1 pl-2.5 pr-1 text-sm text-foreground shadow-sm ring-1 ring-purple-92/30'>
+                                    <span className='inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-white py-1 pl-2.5 pr-1 text-sm text-foreground shadow-sm ring-1 ring-primary/10'>
                                       <MapPin
                                         className='size-3 shrink-0 text-primary/70'
                                         aria-hidden
@@ -943,7 +943,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               </ul>
                             )}
                           </div>
-                          <div className='flex flex-col gap-2 border-t border-border/80 bg-grey-50/80 p-3 sm:flex-row sm:items-center'>
+                          <div className='flex flex-col gap-2 border-t border-border/80 bg-muted/80 p-3 sm:flex-row sm:items-center'>
                             <Input
                               ref={workingAreaInputRef}
                               value={workingAreaInput}
@@ -1219,7 +1219,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
                               placeholder={t('myAccount.firstNamePlaceholder')}
                               readOnly={!isEditingProfile}
-                              className={!isEditingProfile ? 'bg-grey-50' : ''}
+                              className={!isEditingProfile ? 'bg-muted' : ''}
                             />
                           </div>
                           <div className='space-y-2'>
@@ -1232,7 +1232,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
                               placeholder={t('myAccount.lastNamePlaceholder')}
                               readOnly={!isEditingProfile}
-                              className={!isEditingProfile ? 'bg-grey-50' : ''}
+                              className={!isEditingProfile ? 'bg-muted' : ''}
                             />
                           </div>
                         </div>
@@ -1246,7 +1246,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                             onChange={(e) => setProfileForm((p) => ({ ...p, businessName: e.target.value }))}
                             placeholder={t('myAccount.businessNamePlaceholder')}
                             readOnly={!isEditingProfile}
-                            className={!isEditingProfile ? 'bg-grey-50' : ''}
+                            className={!isEditingProfile ? 'bg-muted' : ''}
                           />
                         </div>
                       </div>
@@ -1263,7 +1263,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                           setPhoneOtp('');
                           setIsPhoneOtpSent(false);
                         }}
-                        className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-foreground hover:bg-grey-50 transition-colors'
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors'
                       >
                         <span className='text-muted-foreground'>{profileForm.phone || t('myAccount.phonePlaceholder')}</span>
                         <span className='text-sm font-medium text-primary'>
@@ -1344,7 +1344,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                           setIsVerifyingEmail((v) => !v);
                           setNewEmail(profileForm.email || me?.email || '');
                         }}
-                        className='flex w-full items-center justify-between rounded-lg border border-border bg-grey-50 px-4 py-3 text-sm text-foreground hover:bg-secondary transition-colors'
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-muted px-4 py-3 text-sm text-foreground hover:bg-secondary transition-colors'
                       >
                         <span className='text-muted-foreground'>{profileForm.email || me?.email || ''}</span>
                         <span className='flex items-center gap-1 text-sm font-medium text-primary'>
@@ -1419,7 +1419,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                       <button
                         type='button'
                         onClick={() => setIsChangingPassword((v) => !v)}
-                        className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-foreground hover:bg-grey-50 transition-colors'
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors'
                       >
                         <span>{t('myAccount.changePassword')}</span>
                         {isChangingPassword

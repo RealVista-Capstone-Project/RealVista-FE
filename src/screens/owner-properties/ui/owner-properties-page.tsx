@@ -49,7 +49,7 @@ function ListingTypeTabs() {
   ];
 
   return (
-    <div className='flex gap-1.5 p-1.5 bg-purple-98/60 rounded-xl border border-purple-92/40'>
+    <div className='flex gap-1.5 p-1.5 bg-primary/5 border border-primary/20'>
       {tabs.map((tab) => (
         <button
           key={tab.value}
@@ -57,8 +57,8 @@ function ListingTypeTabs() {
           className={cn(
             'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300',
             listingType === tab.value
-              ? 'bg-white text-primary shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-purple-92/60 scale-[1.02]'
-              : 'text-secondary/70 hover:text-main-black hover:bg-white/50 border border-transparent'
+              ? 'bg-white text-primary shadow-sm border border-primary/30 scale-[1.02]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent'
           )}
         >
           {tab.icon}
@@ -159,10 +159,10 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
   if (!isOpen) return null;
 
   return (
-    <div className='border-b border-purple-92/40 bg-purple-98/40 px-4 sm:px-6 pb-6 pt-5 space-y-6 animate-in slide-in-from-top-2 duration-300 shadow-inner'>
+    <div className='border-b border-primary/20 bg-primary/5 px-4 sm:px-6 pb-6 pt-5 space-y-6 animate-in slide-in-from-top-2 duration-300 shadow-inner'>
       {/* Property Type Pills — grouped by category */}
       <div className='space-y-3.5'>
-        <label className='text-[13px] font-bold text-main-black uppercase tracking-wide opacity-90'>
+        <label className='text-[13px] font-bold text-foreground uppercase tracking-wide opacity-90'>
           {t('filter.propertyType')}
         </label>
 
@@ -172,7 +172,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
             {[80, 100, 70, 110, 90].map((w, i) => (
               <div
                 key={i}
-                className='h-8 rounded-full bg-purple-92/40 animate-pulse'
+                className='h-8 rounded-full bg-primary/10 animate-pulse'
                 style={{ width: w }}
               />
             ))}
@@ -187,7 +187,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
                   'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
                   propertyTypeId === null
                     ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
-                    : 'bg-white text-secondary border-purple-92 hover:border-primary/40 hover:bg-purple-98/50 hover:text-main-black'
+                    : 'bg-white text-muted-foreground border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground'
                 )}
               >
                 {t('filter.allTypes')}
@@ -196,7 +196,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
 
             {typesByCategory.map((group) => (
               <div key={group.categoryName} className='space-y-2'>
-                <span className='text-[11px] font-bold text-secondary/50 uppercase tracking-widest'>
+                <span className='text-[11px] font-bold text-muted-foreground/50 uppercase tracking-widest'>
                   {group.categoryName}
                 </span>
                 <div className='flex flex-wrap gap-2.5'>
@@ -208,7 +208,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
                         'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
                         propertyTypeId === type.id
                           ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
-                          : 'bg-white text-secondary border-purple-92 hover:border-primary/40 hover:bg-purple-98/50 hover:text-main-black'
+                          : 'bg-white text-muted-foreground border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground'
                       )}
                     >
                       {type.name}
@@ -224,10 +224,10 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
       {/* Rent Price Range */}
       {showRentFilter && (
         <div className='space-y-2.5'>
-          <label className='text-[13px] font-bold text-main-black uppercase tracking-wide flex items-center gap-1.5 opacity-90'>
+          <label className='text-[13px] font-bold text-foreground uppercase tracking-wide flex items-center gap-1.5 opacity-90'>
             <DollarSign className='h-4 w-4 text-emerald-500' />
             {t('filter.rentPrice')}
-            <span className='font-medium text-secondary/50 normal-case tracking-normal'>
+            <span className='font-medium text-muted-foreground/50 normal-case tracking-normal'>
               (đ)
             </span>
           </label>
@@ -238,7 +238,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
               value={localFilter.minRentPrice}
               onChange={(e) => handlePriceChange('minRentPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-purple-92 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
+                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
                 rentError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
               )}
             />
@@ -248,7 +248,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
               value={localFilter.maxRentPrice}
               onChange={(e) => handlePriceChange('maxRentPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-purple-92 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
+                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
                 rentError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
               )}
             />
@@ -262,10 +262,10 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
       {/* Buy Price Range */}
       {showBuyFilter && (
         <div className='space-y-2.5'>
-          <label className='text-[13px] font-bold text-main-black uppercase tracking-wide flex items-center gap-1.5 opacity-90'>
+          <label className='text-[13px] font-bold text-foreground uppercase tracking-wide flex items-center gap-1.5 opacity-90'>
             <DollarSign className='h-4 w-4 text-blue-500' />
             {t('filter.buyPrice')}
-            <span className='font-medium text-secondary/50 normal-case tracking-normal'>
+            <span className='font-medium text-muted-foreground/50 normal-case tracking-normal'>
               (đ)
             </span>
           </label>
@@ -276,7 +276,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
               value={localFilter.minBuyPrice}
               onChange={(e) => handlePriceChange('minBuyPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-purple-92 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
+                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
                 buyError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
               )}
             />
@@ -286,7 +286,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
               value={localFilter.maxBuyPrice}
               onChange={(e) => handlePriceChange('maxBuyPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-purple-92 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
+                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
                 buyError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
               )}
             />
@@ -309,7 +309,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
         <Button
           variant='outline'
           onClick={handleReset}
-          className='h-11 px-4 rounded-xl border-purple-92 bg-white hover:bg-purple-98/50 hover:text-main-black transition-all duration-200'
+          className='h-11 px-4 rounded-xl border-primary/20 bg-white hover:bg-primary/5 hover:text-foreground transition-all duration-200'
         >
           <X className='h-5 w-5' />
         </Button>
@@ -377,7 +377,7 @@ function OwnerPropertiesContent() {
   if (isLoading) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-98 border-t-primary' />
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
       </div>
     );
   }
@@ -400,32 +400,32 @@ function OwnerPropertiesContent() {
       {/* ── Left Sidebar ── */}
       <aside
         className={cn(
-          'flex-col border-r border-purple-92/50 bg-white transition-all duration-300',
+          'flex-col border-r border-primary/20 bg-white transition-all duration-300',
           isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[55%]'
         )}
       >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-purple-92/40 p-4 sm:p-6 bg-white'>
+          <div className='border-b border-primary/20/40 p-4 sm:p-6 bg-white'>
             <div className='flex items-center gap-3'>
-              <h2 className='text-2xl font-extrabold text-main-black tracking-tight'>
+              <h2 className='text-2xl font-extrabold text-foreground tracking-tight'>
                 {t('pageTitle')}
               </h2>
               <div className='flex items-center justify-center rounded-full bg-primary/10 px-3 py-0.5 border border-primary/20 shadow-sm'>
                 <span className='text-sm font-bold text-primary'>{totalElements}</span>
               </div>
             </div>
-            <p className='mt-1.5 text-sm text-secondary/70'>{t('pageSubtitle')}</p>
+            <p className='mt-1.5 text-sm text-muted-foreground'>{t('pageSubtitle')}</p>
           </div>
 
           {/* Search bar + Filter button (same row) */}
-          <div className='border-b border-purple-92/40 px-4 sm:px-6 py-4 bg-purple-98/30'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-primary/5'>
             <div className='flex items-center gap-3'>
               {/* Search input */}
               <div className='relative flex-1 group'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 transition-colors duration-200 group-focus-within:text-primary'>
                   <Search
-                    className='h-[18px] w-[18px] text-secondary/50 group-focus-within:text-primary transition-colors'
+                    className='h-[18px] w-[18px] text-muted-foreground/50 group-focus-within:text-primary transition-colors'
                     strokeWidth={2.5}
                   />
                 </div>
@@ -434,7 +434,7 @@ function OwnerPropertiesContent() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('filter.searchPlaceholder')}
-                  className='h-11 w-full rounded-xl border border-purple-92 bg-white pl-11 pr-4 text-sm font-medium text-main-black shadow-sm placeholder:text-secondary/50 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300'
+                  className='h-11 w-full rounded-xl border border-primary/20 bg-white pl-11 pr-4 text-sm font-medium text-foreground shadow-sm placeholder:text-muted-foreground/50 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300'
                 />
               </div>
 
@@ -447,7 +447,7 @@ function OwnerPropertiesContent() {
                     ? 'border-primary bg-primary/5 text-primary ring-4 ring-primary/10'
                     : activeFilterCount > 0
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-purple-92 bg-white text-secondary hover:border-primary/50 hover:text-main-black hover:bg-purple-98/50'
+                      : 'border-primary/20 bg-white text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-primary/5'
                 )}
                 aria-label={t('filter.title')}
               >
@@ -462,7 +462,7 @@ function OwnerPropertiesContent() {
           </div>
 
           {/* Listing Type Tabs */}
-          <div className='border-b border-purple-92/40 px-4 sm:px-6 py-4 bg-white'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-white'>
             <ListingTypeTabs />
           </div>
 
@@ -474,22 +474,22 @@ function OwnerPropertiesContent() {
             {/* Properties List */}
             {properties.length === 0 ? (
               <div className='flex flex-col items-center justify-center gap-4 p-12 text-center animate-in fade-in duration-500'>
-                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-purple-98 border border-purple-92/50 shadow-sm'>
+                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 border border-primary/10 shadow-sm'>
                   <Home className='h-8 w-8 text-primary/60' strokeWidth={1.5} />
                 </div>
                 <div className='max-w-[280px]'>
-                  <p className='text-base font-bold text-main-black'>{t('empty.title')}</p>
-                  <p className='mt-1.5 text-sm text-secondary/70 leading-relaxed'>
+                  <p className='text-base font-bold text-foreground'>{t('empty.title')}</p>
+                  <p className='mt-1.5 text-sm text-muted-foreground leading-relaxed'>
                     {t('empty.subtitle')}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className='divide-y divide-purple-92/40'>
+              <div className='divide-y divide-primary/10'>
                 {properties.map((property) => (
                   <div
                     key={property.property_id}
-                    className='transition-colors hover:bg-purple-98/30'
+                    className='transition-colors hover:bg-primary/5'
                   >
                     <OwnerPropertyCard
                       property={property}
@@ -505,12 +505,12 @@ function OwnerPropertiesContent() {
 
                 {isFetchingNextPage && (
                   <div className='flex justify-center py-6'>
-                    <div className='h-6 w-6 animate-spin rounded-full border-4 border-purple-92 border-t-primary' />
+                    <div className='h-6 w-6 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
                   </div>
                 )}
 
                 {!hasNextPage && properties.length > 0 && (
-                  <div className='py-6 text-center text-xs font-medium text-secondary/40 uppercase tracking-wider'>
+                  <div className='py-6 text-center text-xs font-medium text-muted-foreground/40 uppercase tracking-wider'>
                     {t('empty.endOfList')}
                   </div>
                 )}
@@ -523,7 +523,7 @@ function OwnerPropertiesContent() {
       {/* ── Right Detail Panel ── */}
       <main
         className={cn(
-          'flex-1 overflow-y-auto bg-purple-98/40',
+          'flex-1 overflow-y-auto bg-primary/5',
           isMobile ? (selectedProperty ? 'block' : 'hidden') : 'block'
         )}
       >
@@ -535,10 +535,10 @@ function OwnerPropertiesContent() {
           />
         ) : (
           <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>
-            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-purple-92/50'>
+            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20/50'>
               <Building className='h-10 w-10 text-primary/30' strokeWidth={1.5} />
             </div>
-            <p className='text-base font-medium text-secondary/80 max-w-[250px]'>
+            <p className='text-base font-medium text-muted-foreground max-w-[250px]'>
               {t('empty.selectProperty')}
             </p>
           </div>

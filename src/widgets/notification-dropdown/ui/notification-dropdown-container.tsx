@@ -152,10 +152,10 @@ export function NotificationDropdownContainer() {
     return (
       <button
         type='button'
-        className='relative flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black'
+        className='relative flex size-10 items-center justify-center rounded-lg bg-primary/5 text-foreground'
         disabled
       >
-        <span className='h-6 w-6 animate-pulse rounded bg-grey-200' />
+        <span className='h-6 w-6 animate-pulse rounded bg-muted' />
       </button>
     );
   }

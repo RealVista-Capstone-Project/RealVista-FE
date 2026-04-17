@@ -42,7 +42,7 @@ export function ChatMessageItem({ message, onListingClick, className }: ChatMess
   return (
     <div className={cn('flex flex-col gap-1', isOwn ? 'items-end' : 'items-start', className)}>
       {/* Sender name (only for received messages) */}
-      {!isOwn && <span className='px-1 text-xs font-medium text-grey-500'>{senderName}</span>}
+      {!isOwn && <span className='px-1 text-xs font-medium text-muted-foreground'>{senderName}</span>}
 
       {/* Message bubble */}
       <div
@@ -50,7 +50,7 @@ export function ChatMessageItem({ message, onListingClick, className }: ChatMess
           'max-w-[85%] rounded-2xl px-4 py-2',
           isOwn
             ? 'rounded-br-md bg-primary text-white'
-            : 'rounded-bl-md bg-grey-100 text-main-black'
+            : 'rounded-bl-md bg-muted text-foreground'
         )}
       >
         <p className='text-sm leading-relaxed'>{content}</p>
@@ -64,7 +64,7 @@ export function ChatMessageItem({ message, onListingClick, className }: ChatMess
       )}
 
       {/* Timestamp */}
-      <span className={cn('px-1 text-xs text-grey-400', isOwn ? 'text-right' : 'text-left')}>
+      <span className={cn('px-1 text-xs text-muted-foreground/50', isOwn ? 'text-right' : 'text-left')}>
         {formatTime(timestamp)}
       </span>
     </div>

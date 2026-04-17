@@ -28,9 +28,9 @@ export function ContentVerificationStatusPanel({
   if (!hasContent) return null;
 
   return (
-    <div className='flex flex-col gap-2 rounded-lg border border-purple-92 bg-purple-98/30 p-4'>
+    <div className='flex flex-col gap-2 rounded-lg border border-primary/20 bg-primary/5 p-4'>
       <div className='flex items-center gap-2'>
-        <span className='text-sm font-semibold text-main-black'>{labels.title}</span>
+        <span className='text-sm font-semibold text-foreground'>{labels.title}</span>
         {status.isLoading && (
           <Loader2 className='h-4 w-4 animate-spin text-primary' />
         )}

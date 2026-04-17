@@ -47,7 +47,7 @@ export function PropertyMapSection({
   return (
     <div className='flex flex-col gap-6 sm:gap-8'>
       {/* Section Title */}
-      <h2 className='text-main-black text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
+      <h2 className='text-foreground text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
         {t('map')}
       </h2>
 
@@ -60,7 +60,7 @@ export function PropertyMapSection({
           {/* Open Google Maps Button */}
           <button
             onClick={handleOpenGoogleMaps}
-            className='flex items-center gap-2 bg-secondary hover:bg-secondary/90 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors shadow-md text-xs sm:text-sm font-bold leading-[1.5]'
+            className='flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors shadow-md text-xs sm:text-sm font-bold leading-[1.5]'
           >
             <MapPin className='size-4' strokeWidth={2.5} />
             <span className='hidden sm:inline'>{t('openGoogleMaps')}</span>
@@ -70,7 +70,7 @@ export function PropertyMapSection({
           {/* Street View Button */}
           <button
             onClick={handleStreetView}
-            className='flex items-center gap-2 bg-white hover:bg-purple-98 border-[1.5px] border-purple-92 text-main-black px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors shadow-sm text-xs sm:text-sm font-bold leading-[1.5]'
+            className='flex items-center gap-2 bg-background hover:bg-primary/5 border-[1.5px] border-primary/20 text-foreground px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors shadow-sm text-xs sm:text-sm font-bold leading-[1.5]'
           >
             {/* Street View Icon */}
             <svg

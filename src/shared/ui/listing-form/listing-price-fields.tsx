@@ -70,7 +70,7 @@ export function NegotiableToggle({ value, onChange, label }: NegotiableTogglePro
         onClick={() => onChange(!value)}
         className={cn(
           'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-          value ? 'bg-primary' : 'bg-purple-92'
+          value ? 'bg-primary' : 'bg-primary/20'
         )}
       >
         <span

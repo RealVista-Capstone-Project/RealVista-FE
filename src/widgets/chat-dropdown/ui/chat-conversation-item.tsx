@@ -36,8 +36,8 @@ export function ChatConversationItem({
       type='button'
       onClick={() => onClick?.(conversation)}
       className={cn(
-        'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-purple-98',
-        unreadCount > 0 && 'bg-purple-98/50',
+        'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-primary/5',
+        unreadCount > 0 && 'bg-primary/10',
         className
       )}
     >
@@ -71,13 +71,13 @@ export function ChatConversationItem({
         <div className='flex items-center justify-between gap-2'>
           <span
             className={cn(
-              'truncate text-sm text-main-black',
+              'truncate text-sm text-foreground',
               unreadCount > 0 ? 'font-semibold' : 'font-medium'
             )}
           >
             {participant.name}
           </span>
-          <span className='flex-shrink-0 text-xs text-grey-500'>
+          <span className='flex-shrink-0 text-xs text-muted-foreground'>
             {formatDistanceToNow(new Date(lastMessageTime), { addSuffix: false })}
           </span>
         </div>
@@ -85,7 +85,7 @@ export function ChatConversationItem({
         <p
           className={cn(
             'line-clamp-1 text-sm',
-            unreadCount > 0 ? 'font-medium text-main-black' : 'text-grey-500'
+            unreadCount > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'
           )}
         >
           {lastMessage}
@@ -103,7 +103,7 @@ export function ChatConversationItem({
                 sizes='32px'
               />
             </div>
-            <span className='truncate text-xs text-grey-600'>{listing.title}</span>
+            <span className='truncate text-xs text-muted-foreground/80'>{listing.title}</span>
           </div>
         )}
       </div>
