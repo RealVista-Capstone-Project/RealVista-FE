@@ -12,6 +12,7 @@ interface Step {
 interface WizardStepsCardProps {
   steps: Step[];
   currentStep: WizardStep;
+  maxAllowedStep?: WizardStep;
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -34,6 +35,7 @@ function getClipPath(isFirst: boolean, isLast: boolean) {
 export function WizardStepsCard({
   steps,
   currentStep,
+  maxAllowedStep,
   onStepClick,
 }: WizardStepsCardProps) {
   return (
@@ -46,6 +48,8 @@ export function WizardStepsCard({
           const isLast = index === steps.length - 1;
           const isActive = currentStep === step.id;
           const isComplete = currentStep > step.id;
+          // A step is locked if it is beyond the furthest step the user has reached
+          const isLocked = maxAllowedStep !== undefined && step.id > maxAllowedStep;
 
           // Descending z-index: left steps sit ON TOP of right steps
           // so the purple tip of the active step covers the next step's left notch
@@ -61,7 +65,9 @@ export function WizardStepsCard({
             ? 'hover:bg-primary/90'
             : isComplete
               ? 'hover:bg-primary/35'
-              : 'hover:bg-primary/15';
+              : isLocked
+                ? 'cursor-not-allowed'
+                : 'hover:bg-primary/15';
 
           // Extra horizontal padding to compensate for arrow overlap
           const pl = isFirst ? 20 : ARROW + 14;
@@ -71,11 +77,14 @@ export function WizardStepsCard({
             <button
               key={step.id}
               type='button'
-              onClick={() => onStepClick(step.id)}
+              onClick={() => !isLocked && onStepClick(step.id)}
+              disabled={isLocked}
+              title={isLocked ? 'Complete the current step to unlock' : undefined}
               className={cn(
                 'flex h-full items-center gap-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                isLocked ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                 bg,
-                hoverBg,
+                !isLocked && hoverBg,
               )}
               style={{
                 flex: 1,

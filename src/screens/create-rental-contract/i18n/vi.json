@@ -118,6 +118,16 @@
       "draftError": "Không thể lưu bản nháp hợp đồng. Vui lòng thử lại.",
       "sentSuccess": "Đã gửi hợp đồng để ký",
       "sentError": "Không thể gửi hợp đồng để ký. Vui lòng thử lại."
+    },
+    "validation": {
+      "monthlyRentRequired": "Tiền thuê hàng tháng là bắt buộc",
+      "startDateRequired": "Ngày bắt đầu thuê là bắt buộc",
+      "startDatePast": "Ngày bắt đầu không được ở trong quá khứ",
+      "endDateRequired": "Ngày kết thúc thuê là bắt buộc",
+      "endDateBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu",
+      "durationTooShort": "Thời hạn thuê phải ít nhất 3 tháng",
+      "durationHint": "Thời hạn thuê tối thiểu là {min} tháng",
+      "durationOk": "Hợp đồng {months} tháng"
     }
   }
 }
