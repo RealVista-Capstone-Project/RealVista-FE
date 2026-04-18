@@ -30,7 +30,7 @@ interface RealVistaPropertyListingSearchBarProps {
 function IconWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className='relative flex h-5 w-5 shrink-0 items-center justify-center'>
-      <div className='absolute inset-0 rounded-full bg-purple-96' />
+      <div className='absolute inset-0 rounded-full bg-primary/5' />
       {children}
     </div>
   );
@@ -40,7 +40,7 @@ function IconWrapper({ children }: { children: React.ReactNode }) {
 function DropdownIcon() {
   return (
     <IconWrapper>
-      <ChevronDown className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+      <ChevronDown className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
     </IconWrapper>
   );
 }
@@ -49,20 +49,20 @@ function DropdownIcon() {
 function CalendarIcon() {
   return (
     <IconWrapper>
-      <Calendar className='relative h-3 w-3 text-main-primary' strokeWidth={2.5} />
+      <Calendar className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
     </IconWrapper>
   );
 }
 
 // Vertical divider component - 44px height to match Figma design
 function Divider() {
-  return <div className='h-11 w-px shrink-0 bg-grey-200' />;
+  return <div className='h-11 w-px shrink-0 bg-primary/20' />;
 }
 
 // Field label component
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className='text-base font-medium leading-[1.5] text-main-black opacity-50'>
+    <span className='text-base font-medium leading-[1.5] text-foreground opacity-50'>
       {children}
     </span>
   );
@@ -73,7 +73,7 @@ function FieldValue({ children, className }: { children: React.ReactNode; classN
   return (
     <span
       className={cn(
-        'text-lg font-bold leading-[1.45] tracking-[-0.5px] text-main-black',
+        'text-lg font-bold leading-[1.45] tracking-[-0.5px] text-foreground',
         className
       )}
     >
@@ -113,12 +113,12 @@ export function RealVistaPropertyListingSearchBar({
             placeholder='Search location'
             value={location}
             onChange={(e) => onLocationChange?.(e.target.value)}
-            className='h-16 w-full rounded-lg border border-grey-200 bg-white px-4 pr-16 text-base font-medium leading-[1.5] text-main-black placeholder:text-grey-400 outline-none focus:border-main-primary focus:ring-1 focus:ring-main-primary'
+            className='h-16 w-full rounded-lg border border-primary/20 bg-white px-4 pr-16 text-base font-medium leading-[1.5] text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary'
           />
           <Button
             type='button'
             onClick={onSearch}
-            className='absolute right-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-lg bg-main-primary text-white transition-colors hover:bg-main-primary/90'
+            className='absolute right-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-white transition-colors hover:bg-primary/90'
             aria-label='Search'
             size='icon'
           >
@@ -141,7 +141,7 @@ export function RealVistaPropertyListingSearchBar({
             type='text'
             value={location}
             onChange={(e) => onLocationChange?.(e.target.value)}
-            className='h-7 min-w-0 w-full bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.5px] text-main-black outline-none border-none shadow-none p-0 focus:outline-none focus:ring-0'
+            className='h-7 min-w-0 w-full bg-transparent text-lg font-bold leading-[1.45] tracking-[-0.5px] text-foreground outline-none border-none shadow-none p-0 focus:outline-none focus:ring-0'
           />
         </div>
 
@@ -219,7 +219,7 @@ export function RealVistaPropertyListingSearchBar({
               type='button'
               variant='outline'
               onClick={onAdvancedFilters}
-              className='h-[56px] px-4 flex items-center gap-2 border-grey-300 hover:border-main-primary hover:bg-purple-96'
+              className='h-[56px] px-4 flex items-center gap-2 border-primary/30 hover:border-primary hover:bg-primary/5'
               title='Advanced Filters'
             >
               <SlidersHorizontal className='h-5 w-5' />
@@ -232,7 +232,7 @@ export function RealVistaPropertyListingSearchBar({
               type='button'
               variant='outline'
               onClick={onSaveSearch}
-              className='h-[56px] px-4 flex items-center gap-2 border-grey-300 hover:border-main-primary hover:bg-purple-96'
+              className='h-[56px] px-4 flex items-center gap-2 border-primary/30 hover:border-primary hover:bg-primary/5'
               title='Save Search'
             >
               <Bookmark className='h-5 w-5' />
@@ -244,7 +244,7 @@ export function RealVistaPropertyListingSearchBar({
           <Button
             type='button'
             onClick={onSearch}
-            className='w-[125px] h-[56px] flex items-center justify-center rounded-lg bg-main-primary text-base font-bold leading-[1.5] text-white hover:bg-main-primary/90 focus-visible:ring-2 focus-visible:ring-main-primary focus-visible:ring-offset-2'
+            className='w-[125px] h-[56px] flex items-center justify-center rounded-lg bg-primary text-base font-bold leading-[1.5] text-white hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
             style={{ fontFeatureSettings: "'ss06', 'ss04', 'liga' 0" }}
           >
             {searchButtonLabel}

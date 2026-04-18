@@ -21,14 +21,14 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
         <MoneyInput
           value={form.monthlyRent}
           onChange={(raw) => onFieldChange('monthlyRent', raw)}
-          className='h-11 rounded-xl border-[#E5DFFC] bg-white/90'
+          className='h-11 rounded-xl border-primary/10 bg-white/90'
         />
       </Field>
       <Field label={t('form.securityDeposit')}>
         <MoneyInput
           value={form.securityDeposit}
           onChange={(raw) => onFieldChange('securityDeposit', raw)}
-          className='h-11 rounded-xl border-[#E5DFFC] bg-white/90'
+          className='h-11 rounded-xl border-primary/10 bg-white/90'
         />
       </Field>
       <Field label={t('form.leaseStartDate')}>
@@ -36,7 +36,7 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
           type='date'
           value={form.leaseStartDate}
           onChange={(e) => onFieldChange('leaseStartDate', e.target.value)}
-          className='h-11 rounded-xl border-[#E5DFFC] bg-white/90'
+          className='h-11 rounded-xl border-primary/10 bg-white/90'
         />
       </Field>
       <Field label={t('form.leaseEndDate')}>
@@ -44,7 +44,7 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
           type='date'
           value={form.leaseEndDate}
           onChange={(e) => onFieldChange('leaseEndDate', e.target.value)}
-          className='h-11 rounded-xl border-[#E5DFFC] bg-white/90'
+          className='h-11 rounded-xl border-primary/10 bg-white/90'
         />
       </Field>
     </div>

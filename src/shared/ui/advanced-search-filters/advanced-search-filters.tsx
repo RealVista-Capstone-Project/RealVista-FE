@@ -133,9 +133,9 @@ export function AdvancedSearchFilters({
       return (
         <div
           key={attrCode}
-          className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'
+          className='flex items-center justify-between p-3 border border-border rounded-lg'
         >
-          <span className='text-sm text-main-black'>{label}</span>
+          <span className='text-sm text-foreground'>{label}</span>
           <Switch
             checked={currentValue === 'true'}
             onCheckedChange={(checked) => setDynamicAttr(attrCode, checked ? 'true' : undefined)}
@@ -147,7 +147,7 @@ export function AdvancedSearchFilters({
     if (type === 'number') {
       return (
         <div key={attrCode} className='space-y-1.5'>
-          <Label className='text-sm font-medium text-main-black'>{label}</Label>
+          <Label className='text-sm font-medium text-foreground'>{label}</Label>
           <Input
             type='number'
             min='0'
@@ -165,7 +165,7 @@ export function AdvancedSearchFilters({
     // Text / Select
     return (
       <div key={attrCode} className='space-y-1.5'>
-        <Label className='text-sm font-medium text-main-black'>{label}</Label>
+        <Label className='text-sm font-medium text-foreground'>{label}</Label>
         <Input
           type='text'
           placeholder='Nhập giá trị'
@@ -321,7 +321,7 @@ export function AdvancedSearchFilters({
                BEDROOMS/BATHROOMS appear here automatically if the type supports them. */}
           {activeAttributes.length > 0 && (
             <div className='space-y-4 pt-2'>
-              <h4 className='text-sm font-semibold text-main-black'>
+              <h4 className='text-sm font-semibold text-foreground'>
                 Đặc điểm bổ sung
               </h4>
 
@@ -345,8 +345,8 @@ export function AdvancedSearchFilters({
           <div className='space-y-3'>
             <Label>Phương tiện</Label>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
-                <span className='text-sm text-main-black'>Có Video</span>
+              <div className='flex items-center justify-between p-3 border border-border rounded-lg'>
+                <span className='text-sm text-foreground'>Có Video</span>
                 <Switch
                   checked={filters.hasVideo || false}
                   onCheckedChange={(checked) =>
@@ -354,8 +354,8 @@ export function AdvancedSearchFilters({
                   }
                 />
               </div>
-              <div className='flex items-center justify-between p-3 border border-grey-200 rounded-lg'>
-                <span className='text-sm text-main-black'>Có 3D Tour</span>
+              <div className='flex items-center justify-between p-3 border border-border rounded-lg'>
+                <span className='text-sm text-foreground'>Có 3D Tour</span>
                 <Switch
                   checked={filters.has3D || false}
                   onCheckedChange={(checked) =>
@@ -392,7 +392,7 @@ export function AdvancedSearchFilters({
           </div>
         </div>
 
-        <SheetFooter className='p-6 border-t bg-grey-50 sm:flex-row sm:justify-between sm:space-x-0'>
+        <SheetFooter className='p-6 border-t bg-secondary sm:flex-row sm:justify-between sm:space-x-0'>
           <Button type='button' variant='ghost' onClick={handleReset}>
             Đặt lại
           </Button>

@@ -175,8 +175,8 @@ export function PublicAppointmentsPage() {
         {/* Header Section */}
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <h1 className='text-2xl font-bold text-main-black'>{t('title')}</h1>
-            <p className='text-sm text-main-secondary/60'>{t('publicSubtitle') || 'View and manage your tour requests'}</p>
+            <h1 className='text-2xl font-bold text-foreground'>{t('title')}</h1>
+            <p className='text-sm text-muted-foreground'>{t('publicSubtitle') || 'View and manage your tour requests'}</p>
           </div>
 
           <div className='flex items-center gap-2'>
@@ -218,7 +218,7 @@ export function PublicAppointmentsPage() {
         </div>
 
         {/* Content Section */}
-        <div className='flex-1 min-h-0 rounded-2xl border border-purple-92/50 bg-white shadow-sm overflow-hidden'>
+        <div className='flex-1 min-h-0 rounded-2xl border border-primary/20 bg-white shadow-sm overflow-hidden'>
           <Availability
             appointments={filteredAppointments}
             onWeekChange={setCurrentWeekStart}

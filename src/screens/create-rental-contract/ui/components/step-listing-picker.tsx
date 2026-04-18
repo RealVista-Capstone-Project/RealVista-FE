@@ -96,26 +96,26 @@ export function StepListingPicker({
   return (
     <div className='space-y-4'>
       {/* Search header */}
-      <div className='rounded-3xl border border-[#E9E0FF] bg-[#FBF9FF] p-4'>
+      <div className='rounded-3xl border border-primary/20 bg-primary/5 p-4'>
         <div className='flex flex-col gap-3 md:flex-row md:items-end md:justify-between'>
           <div>
-            <p className='text-xs font-semibold uppercase tracking-[0.2em] text-main-primary/70'>
+            <p className='text-xs font-semibold uppercase tracking-[0.2em] text-primary/70'>
               {t('listingPicker.eyebrow')}
             </p>
-            <h3 className='mt-2 text-lg font-semibold text-main-black'>
+            <h3 className='mt-2 text-lg font-semibold text-foreground'>
               {t('listingPicker.title')}
             </h3>
-            <p className='mt-1 text-sm leading-6 text-main-secondary/65'>
+            <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>
               {t('listingPicker.description')}
             </p>
           </div>
           <div className='relative w-full md:max-w-xs'>
-            <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-main-secondary/45' />
+            <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70' />
             <Input
               value={searchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder={t('listingPicker.searchPlaceholder')}
-              className='h-11 rounded-2xl border-[#E5DFFC] bg-white pl-9'
+              className='h-11 rounded-2xl border-primary/25 bg-white pl-9'
             />
           </div>
         </div>
@@ -123,8 +123,8 @@ export function StepListingPicker({
 
       {/* Loading skeleton */}
       {loading && (
-        <div className='flex items-center justify-center rounded-3xl border border-dashed border-[#DDD2FF] bg-[#FBF9FF] px-5 py-16'>
-          <Loader2 className='h-6 w-6 animate-spin text-main-primary/60' />
+        <div className='flex items-center justify-center rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-5 py-16'>
+          <Loader2 className='h-6 w-6 animate-spin text-primary/60' />
         </div>
       )}
 
@@ -148,13 +148,13 @@ export function StepListingPicker({
                   className={cn(
                     'overflow-hidden rounded-3xl border bg-white text-left transition-all',
                     isSelected
-                      ? 'border-main-primary shadow-[0_22px_50px_rgba(92,63,214,0.18)]'
-                      : 'border-[#ECE4FF] shadow-[0_14px_32px_rgba(96,72,179,0.08)] hover:-translate-y-0.5 hover:border-[#D8C8FF]'
+                      ? 'border-primary shadow-primary/20'
+                      : 'border-primary/20 shadow-primary/10 hover:-translate-y-0.5 hover:border-primary/40'
                   )}
                 >
                   <div className='grid gap-0 md:grid-cols-[220px_1fr]'>
                     {/* Thumbnail */}
-                    <div className='relative min-h-[180px] bg-[#F4EEFF]'>
+                    <div className='relative min-h-[180px] bg-primary/10'>
                       {thumbnail ? (
                         <Image
                           src={thumbnail}
@@ -163,14 +163,14 @@ export function StepListingPicker({
                           className='object-cover'
                         />
                       ) : (
-                        <div className='flex h-full items-center justify-center text-main-secondary/30'>
+                        <div className='flex h-full items-center justify-center text-secondary/30'>
                           <Building2 className='h-12 w-12' />
                         </div>
                       )}
                       <div className='absolute left-4 top-4'>
-                         <Badge className='rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-main-black shadow-sm'>
-                           {t(`listingPicker.status.${property.status}`)}
-                         </Badge>
+                        <Badge className='rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-foreground shadow-sm'>
+                          {t(`listingPicker.status.${property.status}`)}
+                        </Badge>
                       </div>
                     </div>
 
@@ -179,14 +179,14 @@ export function StepListingPicker({
                       <div>
                         <div className='flex flex-wrap items-start justify-between gap-3'>
                           <div>
-                            <h4 className='mt-2 text-xl font-semibold tracking-[-0.03em] text-main-black'>
+                            <h4 className='mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground'>
                               {property.street_address}
                             </h4>
                           </div>
                         </div>
 
-                        <div className='mt-4 flex items-start gap-2 text-sm text-main-secondary/72'>
-                          <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-main-primary/70' />
+                        <div className='mt-4 flex items-start gap-2 text-sm text-muted-foreground'>
+                          <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-primary/70' />
                           <span>{address}</span>
                         </div>
 
@@ -207,13 +207,13 @@ export function StepListingPicker({
                         </div>
                       </div>
 
-                      <div className='mt-5 flex items-center justify-end border-t border-[#F1EBFF] pt-4'>
+                        <div className='mt-5 flex items-center justify-end border-t border-primary/15 pt-4'>
                         <span
                           className={cn(
                             'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
                             isSelected
-                              ? 'bg-main-primary text-white'
-                              : 'bg-[#F3EEFF] text-main-primary'
+                              ? 'bg-primary text-white'
+                              : 'bg-primary/10 text-primary'
                           )}
                         >
                           {isSelected && <Check className='h-3.5 w-3.5' />}
@@ -230,12 +230,12 @@ export function StepListingPicker({
 
             {/* Empty state */}
             {properties.length === 0 && (
-              <div className='rounded-3xl border border-dashed border-[#DDD2FF] bg-[#FBF9FF] px-5 py-10 text-center'>
-                <Building2 className='mx-auto mb-3 h-10 w-10 text-main-secondary/25' />
-                <p className='text-sm font-semibold text-main-black'>
+              <div className='rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-5 py-10 text-center'>
+                <Building2 className='mx-auto mb-3 h-10 w-10 text-muted-foreground/40' />
+                <p className='text-sm font-semibold text-foreground'>
                   {t('listingPicker.emptyTitle')}
                 </p>
-                <p className='mt-2 text-sm leading-6 text-main-secondary/65'>
+                <p className='mt-2 text-sm leading-6 text-muted-foreground/80'>
                   {t('listingPicker.emptyDescription')}
                 </p>
               </div>
@@ -248,19 +248,19 @@ export function StepListingPicker({
               <Button
                 type='button'
                 variant='outline'
-                className='h-9 w-9 rounded-xl border-[#DED1FF] p-0'
+                className='h-9 w-9 rounded-xl border-primary/30 p-0'
                 disabled={page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
                 <ChevronLeft className='h-4 w-4' />
               </Button>
-              <span className='text-sm text-main-secondary/70'>
+              <span className='text-sm text-muted-foreground'>
                 {page} / {totalPages}
               </span>
               <Button
                 type='button'
                 variant='outline'
-                className='h-9 w-9 rounded-xl border-[#DED1FF] p-0'
+                className='h-9 w-9 rounded-xl border-primary/30 p-0'
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               >

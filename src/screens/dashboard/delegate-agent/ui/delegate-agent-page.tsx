@@ -98,8 +98,8 @@ function AgentCard({
       className={cn(
         'relative flex flex-col items-center text-center rounded-2xl border transition-all duration-200 p-4 gap-2.5 w-full',
         isSelected
-          ? 'border-main-primary shadow-md bg-purple-50/60 ring-1 ring-main-primary/20'
-          : 'border-slate-200 bg-white hover:border-main-primary/50 hover:shadow-md',
+          ? 'border-primary shadow-md bg-primary/5 ring-1 ring-primary/20'
+          : 'border-slate-200 bg-white hover:border-primary/50 hover:shadow-md',
         isAccepted && 'cursor-not-allowed opacity-80'
       )}
     >
@@ -126,8 +126,8 @@ function AgentCard({
             className='object-cover w-full h-full'
           />
         ) : (
-          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-100'>
-            <User className='h-6 w-6 text-indigo-300' />
+          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10'>
+            <User className='h-6 w-6 text-primary/50' />
           </div>
         )}
       </div>
@@ -162,7 +162,7 @@ function AgentCard({
           {specialtyChips.map((chip) => (
             <span
               key={chip}
-              className='text-[10px] bg-purple-50 text-main-primary border border-purple-100 rounded-md px-1.5 py-0.5 font-medium'
+              className='text-[10px] bg-primary/5 text-primary border border-primary/30 rounded-md px-1.5 py-0.5 font-medium'
             >
               {chip}
             </span>
@@ -265,8 +265,8 @@ function AgentDetailPanel({
               className='object-cover w-full h-full'
             />
           ) : (
-            <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
-              <User className='h-7 w-7 text-indigo-300' />
+            <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
+              <User className='h-7 w-7 text-primary/50' />
             </div>
           )}
         </div>
@@ -363,7 +363,7 @@ function AgentDetailPanel({
       {!isAccepted && (
         <div className='pt-1'>
           <Button
-            className='w-full rounded-xl gap-2 bg-main-primary'
+            className='w-full rounded-xl gap-2 bg-primary'
             onClick={() => setHireDialogOpen(true)}
           >
             <UserCheck className='h-4 w-4' />
@@ -382,7 +382,7 @@ function AgentDetailPanel({
         </div>
         {reviewsLoading ? (
           <div className='flex justify-center py-4'>
-            <div className='h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-main-primary' />
+            <div className='h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-primary' />
           </div>
         ) : reviews.length === 0 ? (
           <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 py-6 text-center'>
@@ -402,7 +402,7 @@ function AgentDetailPanel({
         <DialogContent className='max-w-sm'>
           <DialogHeader>
             <DialogTitle className='flex items-center gap-2'>
-              <UserCheck className='h-5 w-5 text-main-primary' />
+              <UserCheck className='h-5 w-5 text-primary' />
               {t('hireDialogTitle')}
             </DialogTitle>
           </DialogHeader>
@@ -444,7 +444,7 @@ function AgentDetailPanel({
             </DialogClose>
             <Button
               size='sm'
-              className='rounded-lg bg-main-primary'
+              className='rounded-lg bg-primary'
               disabled={isPending}
               onClick={() => sendInvitation()}
             >
@@ -574,7 +574,7 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
           <div className='p-4 flex-1'>
             {isLoading ? (
               <div className='flex justify-center py-10'>
-                <div className='h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-main-primary' />
+                <div className='h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-primary' />
               </div>
             ) : filteredAgents.length === 0 ? (
               <div className='rounded-xl border border-dashed border-slate-200 bg-white py-10 text-center'>
@@ -609,8 +609,8 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
             />
           ) : (
             <div className='h-full flex flex-col items-center justify-center p-6 text-center'>
-              <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-50 border border-purple-100'>
-                <User className='h-7 w-7 text-main-primary/40' strokeWidth={1.5} />
+              <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 border border-primary/30'>
+                <User className='h-7 w-7 text-primary/40' strokeWidth={1.5} />
               </div>
               <p className='text-sm text-slate-400 max-w-[200px]'>{t('selectAgentHint')}</p>
             </div>

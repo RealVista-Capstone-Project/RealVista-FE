@@ -143,7 +143,7 @@ export function ManagedListingsPage() {
   if (isLoading) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-98 border-t-main-primary' />
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary' />
       </div>
     );
   }
@@ -152,8 +152,8 @@ export function ManagedListingsPage() {
     return (
       <div className='flex h-full items-center justify-center'>
         <div className='text-center'>
-          <p className='text-lg font-semibold text-main-black'>{t('error.title')}</p>
-          <p className='mt-2 text-sm text-main-secondary/60'>{error.message}</p>
+          <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
+          <p className='mt-2 text-sm text-muted-foreground'>{error.message}</p>
         </div>
       </div>
     );
@@ -176,17 +176,17 @@ export function ManagedListingsPage() {
       {/* Left Sidebar - Properties List */}
       <aside
         className={cn(
-          'flex-col border-r border-purple-92/50 bg-white transition-all duration-300',
+          'flex-col border-r border-primary/20 bg-white transition-all duration-300',
           isMobile ? (selectedListingId ? 'hidden' : 'flex w-full') : 'flex w-[460px]'
         )}
       >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-purple-92/50 p-4 sm:p-6'>
+          <div className='border-b border-primary/20 p-4 sm:p-6'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-                <h2 className='text-xl font-bold text-main-black'>{t('title')}</h2>
-                <div className='flex items-center justify-center rounded-lg bg-main-primary px-2 py-1'>
+                <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
+                <div className='flex items-center justify-center rounded-lg bg-primary px-2 py-1'>
                   <span className='text-sm font-bold text-white'>{listingCounts.all}</span>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export function ManagedListingsPage() {
               <button
                 type='button'
                 onClick={handleCreateListing}
-                className='flex items-center gap-2 rounded-lg bg-main-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-main-primary/90'
+                className='flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-primary/90'
                 aria-label={t('createButton')}
               >
                 <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
@@ -205,7 +205,7 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Tabs */}
-          <div className='border-b border-purple-92/50 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
             <div className='flex gap-1 min-w-max'>
               <button
                 type='button'
@@ -213,15 +213,15 @@ export function ManagedListingsPage() {
                 className={cn(
                   'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
                   activeTab === 'ALL'
-                    ? 'bg-main-primary text-white'
-                    : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                    ? 'bg-primary text-white'
+                    : 'bg-transparent text-foreground/70 hover:bg-primary/5'
                 )}
               >
                 {t('tabs.all')}
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs font-bold',
-                    activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-purple-92 text-main-black'
+                    activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
                   )}
                 >
                   {listingCounts.all}
@@ -233,8 +233,8 @@ export function ManagedListingsPage() {
                 className={cn(
                   'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
                   activeTab === ListingType.RENT
-                    ? 'bg-main-primary text-white'
-                    : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                    ? 'bg-primary text-white'
+                    : 'bg-transparent text-foreground/70 hover:bg-primary/5'
                 )}
               >
                 {t('tabs.forRent')}
@@ -243,7 +243,7 @@ export function ManagedListingsPage() {
                     'rounded-full px-2 py-0.5 text-xs font-bold',
                     activeTab === ListingType.RENT
                       ? 'bg-white/20 text-white'
-                      : 'bg-purple-92 text-main-black'
+                      : 'bg-primary/15 text-foreground'
                   )}
                 >
                   {listingCounts.rent}
@@ -255,8 +255,8 @@ export function ManagedListingsPage() {
                 className={cn(
                   'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
                   activeTab === ListingType.SALE
-                    ? 'bg-main-primary text-white'
-                    : 'bg-transparent text-main-black/70 hover:bg-purple-98'
+                    ? 'bg-primary text-white'
+                    : 'bg-transparent text-foreground/70 hover:bg-primary/5'
                 )}
               >
                 {t('tabs.forSale')}
@@ -265,7 +265,7 @@ export function ManagedListingsPage() {
                     'rounded-full px-2 py-0.5 text-xs font-bold',
                     activeTab === ListingType.SALE
                       ? 'bg-white/20 text-white'
-                      : 'bg-purple-92 text-main-black'
+                      : 'bg-primary/15 text-foreground'
                   )}
                 >
                   {listingCounts.sale}
@@ -275,18 +275,18 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Search bar + Filter */}
-          <div className='border-b border-purple-92/50 p-4 sm:p-6'>
+          <div className='border-b border-primary/20 p-4 sm:p-6'>
             <div className='flex items-center gap-3'>
               <div className='relative flex-1'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-                  <Search className='h-5 w-5 text-main-secondary/50' strokeWidth={2} />
+                  <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
                 </div>
                 <input
                   type='text'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('search.placeholder')}
-                  className='h-14 w-full rounded-lg border-2 border-purple-92 bg-purple-98 pl-12 pr-4 text-base font-medium text-main-black placeholder:text-main-secondary/50 focus:border-main-primary focus:outline-none focus:ring-0'
+                  className='h-14 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
                 />
               </div>
 
@@ -298,8 +298,8 @@ export function ManagedListingsPage() {
                   className={cn(
                     'flex h-14 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors',
                     hasActiveFilters
-                      ? 'border-main-primary bg-purple-96 text-main-primary'
-                      : 'border-purple-92 bg-white text-main-black hover:bg-purple-98'
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
                   )}
                   aria-label={t('filter')}
                 >
@@ -309,7 +309,7 @@ export function ManagedListingsPage() {
                     strokeWidth={2}
                   />
                   {hasActiveFilters && (
-                    <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-main-primary text-[10px] font-bold text-white'>
+                    <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
                       {(statusFilter !== 'ALL' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)}
                     </span>
                   )}
@@ -317,13 +317,13 @@ export function ManagedListingsPage() {
 
                 {/* Filter Dropdown Panel */}
                 {isFilterOpen && (
-                  <div className='absolute right-0 top-full z-30 mt-2 w-64 rounded-xl border border-purple-92 bg-white shadow-lg'>
-                    <div className='flex items-center justify-between border-b border-purple-92/50 px-4 py-3'>
-                      <span className='text-sm font-semibold text-main-black'>{t('filter')}</span>
+                  <div className='absolute right-0 top-full z-30 mt-2 w-64 rounded-xl border border-primary/20 bg-white shadow-lg'>
+                    <div className='flex items-center justify-between border-b border-primary/20 px-4 py-3'>
+                      <span className='text-sm font-semibold text-foreground'>{t('filter')}</span>
                       <button
                         type='button'
                         onClick={resetFilters}
-                        className='text-xs font-medium text-main-primary hover:underline'
+                        className='text-xs font-medium text-primary hover:underline'
                       >
                         {t('filterPanel.reset')}
                       </button>
@@ -332,7 +332,7 @@ export function ManagedListingsPage() {
                     <div className='p-4 space-y-4'>
                       {/* Status Filter */}
                       <div>
-                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-main-secondary/60'>
+                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                           {t('filterPanel.status')}
                         </p>
                         <div className='flex flex-col gap-1'>
@@ -349,8 +349,8 @@ export function ManagedListingsPage() {
                                 className={cn(
                                   'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
                                   statusFilter === s
-                                    ? 'bg-purple-96 font-medium text-main-primary'
-                                    : 'text-main-black hover:bg-purple-98'
+                                    ? 'bg-primary/5 font-medium text-primary'
+                                    : 'text-foreground hover:bg-primary/5'
                                 )}
                               >
                                 {t(labelKey)}
@@ -365,7 +365,7 @@ export function ManagedListingsPage() {
 
                       {/* Sort By */}
                       <div>
-                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-main-secondary/60'>
+                        <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                           {t('filterPanel.sortBy')}
                         </p>
                         <div className='flex flex-col gap-1'>
@@ -381,8 +381,8 @@ export function ManagedListingsPage() {
                                 className={cn(
                                   'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
                                   sortBy === s
-                                    ? 'bg-purple-96 font-medium text-main-primary'
-                                    : 'text-main-black hover:bg-purple-98'
+                                    ? 'bg-primary/5 font-medium text-primary'
+                                    : 'text-foreground hover:bg-primary/5'
                                 )}
                               >
                                 {t(labelKey)}
@@ -403,10 +403,10 @@ export function ManagedListingsPage() {
           <div className='flex-1 overflow-y-auto'>
             {listings.length === 0 ? (
               <div className='flex items-center justify-center p-8'>
-                <p className='text-sm text-main-secondary/60'>{t('empty.noProperties')}</p>
+                <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
               </div>
             ) : (
-              <div className='divide-y divide-purple-92/50'>
+              <div className='divide-y divide-border'>
                 {listings.map((listing) => (
                   <ListingCard
                     key={listing.listing_id}
@@ -417,7 +417,7 @@ export function ManagedListingsPage() {
                 ))}
                 {/* Pagination Controls */}
                 {listingPage && listingPage.total_pages > 1 && (
-                  <div className='py-6 bg-white border-t border-purple-92/50'>
+                  <div className='py-6 bg-white border-t border-primary/20'>
                     <RealVistaPagination
                       currentPage={page + 1}
                       totalPages={listingPage.total_pages}
@@ -434,7 +434,7 @@ export function ManagedListingsPage() {
       {/* Right Content - Property Detail */}
       <main
         className={cn(
-          'flex-1 overflow-y-auto bg-purple-98',
+          'flex-1 overflow-y-auto bg-primary/5',
           isMobile ? (selectedListingId ? 'block' : 'hidden') : 'block'
         )}
       >
@@ -447,9 +447,9 @@ export function ManagedListingsPage() {
         ) : (
           <div className='flex h-full items-center justify-center'>
             {isDetailLoading ? (
-              <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-98 border-t-main-primary' />
+              <div className='h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary' />
             ) : (
-              <p className='text-sm text-main-secondary/60'>{t('empty.selectProperty')}</p>
+              <p className='text-sm text-muted-foreground'>{t('empty.selectProperty')}</p>
             )}
           </div>
         )}

@@ -30,12 +30,12 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       type='button'
       onClick={onClick}
       className={cn(
-        'w-full border-b border-purple-92/50 p-4 sm:p-6 text-left transition-colors hover:bg-purple-98',
-        isSelected && 'bg-purple-96'
+        'w-full border-b border-primary/20 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5',
+        isSelected && 'bg-primary/5'
       )}
     >
       <div className='flex items-center gap-3 sm:gap-4'>
-        <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-purple-98'>
+        <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-primary/5'>
           {(() => {
             const thumbUrl = listing.primary_media_thumbnail_url || listing.thumbnail;
             const isVideoThumb = thumbUrl?.toLowerCase().endsWith('.mp4');
@@ -54,7 +54,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
             if (listing.total_videos && listing.total_videos > 0) {
               return (
                 <div className='flex h-full w-full flex-col items-center justify-center'>
-                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-main-primary/10 text-main-primary'>
+                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary'>
                     <svg
                       width='16'
                       height='16'
@@ -65,14 +65,14 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
                       <path d='M8 5V19L19 12L8 5Z' />
                     </svg>
                   </div>
-                  <span className='mt-1 text-[10px] font-medium text-main-primary'>Video</span>
+                  <span className='mt-1 text-[10px] font-medium text-primary'>Video</span>
                 </div>
               );
             }
 
             return (
               <div className='flex h-full w-full items-center justify-center'>
-                <span className='text-xs text-main-secondary/60'>{t('noImage')}</span>
+                <span className='text-xs text-muted-foreground'>{t('noImage')}</span>
               </div>
             );
           })()}
@@ -82,7 +82,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
         <div className='flex min-w-0 flex-1 flex-col gap-2'>
           {/* Name & Listing Type */}
           <div className='flex items-center gap-2'>
-            <h3 className='line-clamp-1 text-base sm:text-lg font-medium leading-snug tracking-[-0.09px] text-main-black'>
+            <h3 className='line-clamp-1 text-base sm:text-lg font-medium leading-snug tracking-[-0.09px] text-foreground'>
               {listing.name}
             </h3>
             <span
@@ -98,14 +98,14 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
           </div>
 
           {/* Location */}
-          <p className='line-clamp-1 text-sm font-normal leading-normal text-main-black/70'>
+          <p className='line-clamp-1 text-sm font-normal leading-normal text-foreground/70'>
             {address}
           </p>
 
           {/* Price, Status & Area */}
           <div className='flex items-center gap-2 text-sm'>
-            <span className='font-semibold text-main-primary'>{formattedPrice}</span>
-            <span className='text-main-black/50'>•</span>
+            <span className='font-semibold text-primary'>{formattedPrice}</span>
+            <span className='text-foreground/50'>•</span>
             <div className='flex items-center gap-1.5'>
               <div className={cn('rounded-full px-2 py-0.5', status.className)}>
                 <span className='text-xs font-bold leading-tight'>{tStatus(status.labelKey)}</span>
@@ -113,7 +113,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
               {(listing.status === ListingStatus.DRAFT || listing.status === ListingStatus.ARCHIVED) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button type='button' className='text-main-primary hover:text-main-primary/80 transition-colors' onClick={(e) => e.stopPropagation()}>
+                    <button type='button' className='text-primary hover:text-primary/80 transition-colors' onClick={(e) => e.stopPropagation()}>
                       <Info className='h-3.5 w-3.5' />
                     </button>
                   </TooltipTrigger>
@@ -125,8 +125,8 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
             </div>
             {area && (
               <>
-                <span className='text-main-black/50'>•</span>
-                <span className='text-main-black/70'>{area}</span>
+                <span className='text-foreground/50'>•</span>
+                <span className='text-foreground/70'>{area}</span>
               </>
             )}
           </div>

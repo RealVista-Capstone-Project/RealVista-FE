@@ -131,9 +131,9 @@ export function CreateRentalContractPage() {
   const sendToLandlordMutation = useSendToLandlordMutation();
 
   // ── Pre-fill context from ?listingId=&tenantUserId=&tenantName= ───────────
-  const prefillListingId  = searchParams?.get('listingId')    ?? '';
-  const prefillTenantId   = searchParams?.get('tenantUserId') ?? '';
-  const prefillTenantName = searchParams?.get('tenantName')   ?? '';
+  const prefillListingId = searchParams?.get('listingId') ?? '';
+  const prefillTenantId = searchParams?.get('tenantUserId') ?? '';
+  const prefillTenantName = searchParams?.get('tenantName') ?? '';
 
   // Fetch the listing so we can populate Step 1 fields
   const { data: listingResponse } = useQuery({
@@ -159,10 +159,10 @@ export function CreateRentalContractPage() {
     // Seed tenant fields immediately so Step 2 shows them without lookup
     ...(prefillTenantId
       ? {
-          tenantUserId: prefillTenantId,
-          tenantName: prefillTenantName,
-          tenantLookupDone: true,
-        }
+        tenantUserId: prefillTenantId,
+        tenantName: prefillTenantName,
+        tenantLookupDone: true,
+      }
       : {}),
   }));
   const [tenantLookupLoading, setTenantLookupLoading] = useState(false);
@@ -375,22 +375,22 @@ export function CreateRentalContractPage() {
           />
 
           {/* Step content card */}
-          <Card className='rounded-[30px] border-[#EAE1FF] bg-white/94 shadow-[0_24px_60px_rgba(96,72,179,0.10)]'>
+          <Card className='rounded-[30px] border-primary/10 bg-white/94 shadow-[0_24px_60px_color-mix(in_oklch,var(--primary)_10%,transparent)]'>
             <CardContent className='p-6'>
               {/* Step title + progress */}
               <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
                 <div>
-                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-main-secondary/50'>
+                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground/70'>
                     {t('steps.eyebrow')}
                   </p>
-                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-main-black'>
+                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-foreground'>
                     {t(`steps.titles.${currentStep}` as never)}
                   </h2>
-                  <p className='mt-1 max-w-xl text-sm leading-6 text-main-secondary/60'>
+                  <p className='mt-1 max-w-xl text-sm leading-6 text-muted-foreground'>
                     {t(`steps.descriptions.${currentStep}` as never)}
                   </p>
                 </div>
-                <div className='shrink-0 rounded-full border border-[#E7DDFF] bg-[#FAF8FF] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-main-primary/75'>
+                <div className='shrink-0 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary/75'>
                   {t('progress', { current: currentStep, total: steps.length })}
                 </div>
               </div>

@@ -874,14 +874,14 @@ export function Availability<T extends AppointmentData = AppointmentData>({
                         className={cn(
                           "flex-1 border-r px-2 py-3 text-center text-sm font-medium last:border-r-0",
                           !readOnly && !isEditBlocks && !days.includes(dayIndex) && "bg-muted/30 text-muted-foreground",
-                          todayCol && "bg-purple-96 dark:bg-purple-96/10",
+                          todayCol && "bg-primary/5 dark:bg-primary/5",
                         )}
                       >
-                        <div className={cn(todayCol && "text-main-primary font-semibold")}>
+                        <div className={cn(todayCol && "text-primary font-semibold")}>
                           {(readOnly || isEditBlocks) && isDate ? dayNames[day.getDay()] : dayNames[(dayIndex + 1) % 7]}
                         </div>
                         {(readOnly || isEditBlocks) && isDate && (
-                          <div className={cn("text-xs", todayCol ? "text-main-primary/70 font-medium" : "text-muted-foreground")}>
+                          <div className={cn("text-xs", todayCol ? "text-primary/70 font-medium" : "text-muted-foreground")}>
                             {String(day.getDate()).padStart(2, '0')}/{String(day.getMonth() + 1).padStart(2, '0')}
                           </div>
                         )}
@@ -1075,7 +1075,7 @@ function DayColumn<T extends AppointmentData = AppointmentData>({
       className={cn(
         "flex-1 relative border-r last:border-r-0 min-w-[100px] touch-none",
         isDayDisabled && "bg-muted/30",
-        isTodayCol && "bg-purple-98 dark:bg-purple-96/10",
+        isTodayCol && "bg-primary/5 dark:bg-primary/5",
         context?.activeId && "z-10",
       )}
       onPointerDown={handlePointerDown}

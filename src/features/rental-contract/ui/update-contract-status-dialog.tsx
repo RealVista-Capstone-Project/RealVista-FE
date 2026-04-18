@@ -62,17 +62,17 @@ export function UpdateContractStatusDialog({
       <DialogContent className='max-w-md rounded-2xl border-0 p-0 shadow-2xl'>
         <div className='rounded-2xl bg-white p-6'>
           <DialogHeader className='text-left'>
-            <DialogTitle className='text-xl font-semibold text-main-black'>
+            <DialogTitle className='text-xl font-semibold text-foreground'>
               {config.title}
             </DialogTitle>
-            <DialogDescription className='mt-2 text-sm leading-6 text-main-secondary/70'>
+            <DialogDescription className='mt-2 text-sm leading-6 text-muted-foreground'>
               {config.description}
             </DialogDescription>
           </DialogHeader>
 
           {requiresReason && (
             <div className='mt-5 space-y-2'>
-              <label className='text-sm font-medium text-main-black' htmlFor='contract-status-reason'>
+              <label className='text-sm font-medium text-foreground' htmlFor='contract-status-reason'>
                 {t('statusDialog.reasonLabel')}
               </label>
               <Textarea
@@ -80,9 +80,9 @@ export function UpdateContractStatusDialog({
                 value={reason}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setReason(event.target.value)}
                 placeholder={t('statusDialog.reasonPlaceholder')}
-                className='min-h-28 rounded-xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-main-primary/30'
+                className='min-h-28 rounded-xl border-gray-200 bg-primary/5 text-sm focus-visible:ring-primary/30'
               />
-              <p className='text-xs text-main-secondary/60'>
+              <p className='text-xs text-muted-foreground'>
                 {t('statusDialog.reasonHint')}
               </p>
             </div>
@@ -101,7 +101,7 @@ export function UpdateContractStatusDialog({
               type='button'
               onClick={handleConfirm}
               disabled={disableConfirm}
-              className='rounded-xl bg-main-primary text-white hover:bg-main-primary-hover'
+              className='rounded-xl bg-primary text-white hover:bg-primary/90'
             >
               {isPending ? t('statusDialog.updating') : config.confirmLabel}
             </Button>

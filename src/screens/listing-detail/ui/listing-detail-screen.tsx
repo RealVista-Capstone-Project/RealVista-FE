@@ -153,7 +153,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const formattedPrice = formatVND(property.price);
 
   return (
-    <div className='min-h-screen bg-background pb-[88px] md:pb-8'>
+    <div className='min-h-screen bg-background pb-22 md:pb-8'>
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}
@@ -234,28 +234,28 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         userInfo={
           session?.user
             ? {
-                fullName: session.user.name || '',
-                email: session.user.email,
-                phone: '',
-              }
+              fullName: session.user.name || '',
+              email: session.user.email,
+              phone: '',
+            }
             : undefined
         }
       />
 
       {/* Mobile Sticky Footer */}
-      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-purple-92 px-4 py-3 sm:px-6 md:hidden z-50'>
+      <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-primary/20 px-4 py-3 sm:px-6 md:hidden z-50'>
         <div className='max-w-[1200px] mx-auto flex flex-col xs:flex-row items-center justify-between gap-3 xs:gap-4'>
           <div className='w-full xs:w-auto mb-2 xs:mb-0'>
-            <p className='text-main-black/50 text-xs font-medium leading-[1.4]'>
+            <p className='text-foreground/50 text-xs font-medium leading-[1.4]'>
               {listing.listing_type === 'RENT' ? 'Rent price' : 'Sale price'}
             </p>
             <div className='flex items-baseline gap-1'>
-              <p className='text-main-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
+              <p className='text-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
-              <span className='text-xs font-semibold text-grey-500'>₫</span>
+              <span className='text-xs font-semibold text-muted-foreground'>₫</span>
               {listing.listing_type === 'RENT' && (
-                <span className='text-main-black/50 text-sm font-medium'>/month</span>
+                <span className='text-foreground/50 text-sm font-medium'>/month</span>
               )}
             </div>
           </div>
@@ -280,7 +280,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
         <DialogContent className='max-w-sm p-8'>
           <DialogHeader>
             <DialogTitle className='flex items-center gap-2'>
-              <Heart className='h-5 w-5 fill-purple-100 text-main-primary' strokeWidth={2} />
+              <Heart className='h-5 w-5 fill-primary/30 text-primary' strokeWidth={2} />
               {t('confirmUnfavoriteTitle')}
             </DialogTitle>
             <DialogDescription>{t('confirmUnfavoriteMessage')}</DialogDescription>
@@ -293,7 +293,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
             </DialogClose>
             <Button
               onClick={handleConfirmUnfavorite}
-              className='flex-1 bg-main-primary hover:bg-main-primary/90 text-white border-0'
+              className='flex-1 bg-primary hover:bg-primary/90 text-white border-0'
             >
               {t('unfavorite')}
             </Button>

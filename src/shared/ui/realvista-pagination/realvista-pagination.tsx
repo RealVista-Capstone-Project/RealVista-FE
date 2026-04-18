@@ -63,7 +63,7 @@ export function RealVistaPagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-main-secondary opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
+        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
         aria-label='Previous page'
       >
         <ChevronLeft className='h-5 w-5' strokeWidth={2} />
@@ -75,7 +75,7 @@ export function RealVistaPagination({
           return (
             <span
               key={`ellipsis-${index}`}
-              className='flex h-10 w-10 items-center justify-center text-lg font-bold text-grey-400'
+              className='flex h-10 w-10 items-center justify-center text-lg font-bold text-muted-foreground/60'
             >
               ...
             </span>
@@ -92,8 +92,8 @@ export function RealVistaPagination({
             className={cn(
               'flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold transition-all cursor-pointer',
               isActive
-                ? 'bg-[#100A55] text-white'
-                : 'bg-white text-grey-400 opacity-50 hover:opacity-100'
+                ? 'bg-primary text-white'
+                : 'bg-white text-muted-foreground opacity-50 hover:opacity-100'
             )}
             aria-label={`Page ${pageNum}`}
             aria-current={isActive ? 'page' : undefined}
@@ -107,7 +107,7 @@ export function RealVistaPagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-main-secondary opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
+        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
         aria-label='Next page'
       >
         <ChevronRight className='h-5 w-5' strokeWidth={2} />

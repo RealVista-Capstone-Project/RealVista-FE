@@ -50,12 +50,12 @@ function FilterChip({
       className={cn(
         'flex items-center gap-2 rounded-full border-[1.5px] px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap',
         active
-          ? 'border-main-primary bg-main-primary/5 text-main-primary'
-          : 'border-purple-92 bg-white text-main-black hover:border-main-primary/50'
+          ? 'border-primary bg-primary/5 text-primary'
+          : 'border-primary/20 bg-white text-foreground hover:border-primary/50'
       )}
     >
       <span>{label}</span>
-      <Icon className={cn('h-4 w-4 transition-transform duration-200', active ? 'text-main-primary' : 'text-grey-500')} strokeWidth={2} />
+      <Icon className={cn('h-4 w-4 transition-transform duration-200', active ? 'text-primary' : 'text-muted-foreground')} strokeWidth={2} />
     </button>
   );
 }
@@ -98,11 +98,11 @@ export function PropertyFilters({
           </PopoverTrigger>
           <PopoverContent className='w-[420px] p-6' align='start'>
             <div className='space-y-6'>
-              <h4 className='text-lg font-bold text-main-black'>Khoảng giá</h4>
+              <h4 className='text-lg font-bold text-foreground'>Khoảng giá</h4>
               <div className='flex flex-col gap-5'>
                 <div className='space-y-5'>
                   <div className='space-y-2'>
-                    <Label className='text-sm font-semibold text-grey-500'>Giá tối thiểu (VNĐ)</Label>
+                    <Label className='text-sm font-semibold text-muted-foreground'>Giá tối thiểu (VNĐ)</Label>
                     <VndAmountInput
                       value={priceRange.min}
                       onChange={(val) => onPriceChange(Math.max(0, Math.trunc(val)), priceRange.max)}
@@ -112,7 +112,7 @@ export function PropertyFilters({
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label className='text-sm font-semibold text-grey-500'>Giá tối đa (VNĐ)</Label>
+                    <Label className='text-sm font-semibold text-muted-foreground'>Giá tối đa (VNĐ)</Label>
                     <VndAmountInput
                       value={priceRange.max}
                       onChange={(val) => onPriceChange(priceRange.min, Math.max(0, Math.trunc(val)))}
@@ -122,8 +122,8 @@ export function PropertyFilters({
                     />
                   </div>
                 </div>
-                <div className='flex justify-end gap-2 border-t border-purple-92 pt-4'>
-                   <Button variant='link' size='sm' className='text-sm font-bold text-main-primary h-auto p-0' onClick={() => onPriceChange(0, 20000000000)}>Xóa tất cả</Button>
+                <div className='flex justify-end gap-2 border-t border-primary/20 pt-4'>
+                  <Button variant='link' size='sm' className='text-sm font-bold text-primary h-auto p-0' onClick={() => onPriceChange(0, 20000000000)}>Xóa tất cả</Button>
                 </div>
               </div>
             </div>
@@ -152,8 +152,8 @@ export function PropertyFilters({
                   className={cn(
                     'flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
                     sortBy === opt.value
-                      ? 'bg-main-primary/5 text-main-primary'
-                      : 'text-main-black hover:bg-grey-100'
+                      ? 'bg-primary/5 text-primary'
+                      : 'text-foreground hover:bg-muted'
                   )}
                 >
                   {opt.label}
@@ -167,7 +167,7 @@ export function PropertyFilters({
         <button
           type='button'
           onClick={onMoreFilters}
-          className='flex items-center gap-2 rounded-full border-[1.5px] border-main-primary bg-white px-4 py-2 text-sm font-bold text-main-primary transition-colors hover:bg-main-primary/5 whitespace-nowrap'
+          className='flex items-center gap-2 rounded-full border-[1.5px] border-primary bg-white px-4 py-2 text-sm font-bold text-primary transition-colors hover:bg-primary/5 whitespace-nowrap'
         >
           <Filter className='h-4 w-4' strokeWidth={2.5} />
           <span>Bộ lọc khác</span>
@@ -175,15 +175,15 @@ export function PropertyFilters({
       </div>
 
       {/* View Mode Toggle */}
-      <div className='hidden sm:flex items-center gap-1 rounded-xl border-[1.5px] border-purple-92 bg-white p-1 shadow-sm shrink-0'>
+      <div className='hidden sm:flex items-center gap-1 rounded-xl border-[1.5px] border-primary/20 bg-white p-1 shadow-sm shrink-0'>
         <button
           type='button'
           onClick={() => onViewModeChange?.('grid')}
           className={cn(
             'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
             viewMode === 'grid'
-              ? 'bg-main-primary text-white shadow-md'
-              : 'text-grey-500 hover:text-main-primary hover:bg-main-primary/5'
+              ? 'bg-primary text-white shadow-md'
+              : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
           )}
           aria-label='Grid view'
         >
@@ -195,8 +195,8 @@ export function PropertyFilters({
           className={cn(
             'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
             viewMode === 'list'
-              ? 'bg-main-primary text-white shadow-md'
-              : 'text-grey-500 hover:text-main-primary hover:bg-main-primary/5'
+              ? 'bg-primary text-white shadow-md'
+              : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
           )}
           aria-label='List view'
         >

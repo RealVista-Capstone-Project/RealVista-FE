@@ -61,9 +61,9 @@ export function PropertyMap({
     defaultCenter ||
     (properties.length > 0
       ? {
-          lat: properties.reduce((sum, p) => sum + p.lat, 0) / properties.length,
-          lng: properties.reduce((sum, p) => sum + p.lng, 0) / properties.length,
-        }
+        lat: properties.reduce((sum, p) => sum + p.lat, 0) / properties.length,
+        lng: properties.reduce((sum, p) => sum + p.lng, 0) / properties.length,
+      }
       : MAP_CONFIG.DEFAULT_CENTER.HANOI);
 
   return (
@@ -128,8 +128,8 @@ export function PropertyMap({
             className={cn(
               'rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-md transition-all',
               mapType === 'roadmap'
-                ? 'bg-main-primary text-white'
-                : 'text-main-black hover:bg-purple-98'
+                ? 'bg-primary text-white'
+                : 'text-foreground hover:bg-primary/5'
             )}
           >
             Map
@@ -140,8 +140,8 @@ export function PropertyMap({
             className={cn(
               'rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-md transition-all',
               mapType === 'satellite'
-                ? 'bg-main-primary text-white'
-                : 'text-main-black hover:bg-purple-98'
+                ? 'bg-primary text-white'
+                : 'text-foreground hover:bg-primary/5'
             )}
           >
             Satellite

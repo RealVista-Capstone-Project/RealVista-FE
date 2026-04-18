@@ -21,12 +21,12 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
   return (
     <div className='space-y-6'>
       {/* Search box */}
-      <div className='rounded-3xl border border-[#E9E0FF] bg-[#FBF9FF] p-5'>
-        <p className='text-xs font-semibold uppercase tracking-[0.2em] text-main-primary/70'>
+      <div className='rounded-3xl border border-primary/10 bg-primary/5 p-5'>
+        <p className='text-xs font-semibold uppercase tracking-[0.2em] text-primary/70'>
           {t('tenantLookup.eyebrow')}
         </p>
-        <h3 className='mt-2 text-lg font-semibold text-main-black'>{t('tenantLookup.title')}</h3>
-        <p className='mt-1 text-sm leading-6 text-main-secondary/65'>{t('tenantLookup.description')}</p>
+        <h3 className='mt-2 text-lg font-semibold text-foreground'>{t('tenantLookup.title')}</h3>
+        <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>{t('tenantLookup.description')}</p>
 
         <div className='mt-4 flex gap-3'>
           <div className='flex-1'>
@@ -41,12 +41,12 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
                 }
               }}
               placeholder={t('tenantLookup.emailPlaceholder')}
-              className='h-11 rounded-2xl border-[#E5DFFC] bg-white'
+              className='h-11 rounded-2xl border-primary/10 bg-white'
             />
           </div>
           <Button
             type='button'
-            className='h-11 rounded-2xl bg-main-primary px-5 text-white shadow-[0_12px_24px_rgba(92,63,214,0.2)] hover:bg-main-primary-hover'
+            className='h-11 rounded-2xl bg-primary px-5 text-white shadow-[0_12px_24px_color-mix(in_oklch,var(--primary)_20%,transparent)] hover:bg-primary/90'
             onClick={onLookup}
             disabled={!form.tenantEmail.trim() || isLoading}
           >
@@ -63,21 +63,21 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
             <Input
               value={form.tenantName}
               readOnly
-              className='h-11 rounded-xl border-[#E5DFFC] bg-[#F8F4FF] text-main-secondary/80'
+              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
             />
           </Field>
           <Field label={t('form.tenantPhone')}>
             <Input
               value={form.tenantPhone}
               readOnly
-              className='h-11 rounded-xl border-[#E5DFFC] bg-[#F8F4FF] text-main-secondary/80'
+              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
             />
           </Field>
           <Field label={t('form.tenantEmail')} className='md:col-span-2'>
             <Input
               value={form.tenantEmail}
               readOnly
-              className='h-11 rounded-xl border-[#E5DFFC] bg-[#F8F4FF] text-main-secondary/80'
+              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
             />
           </Field>
         </div>

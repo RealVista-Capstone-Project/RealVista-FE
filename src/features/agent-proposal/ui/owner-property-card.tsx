@@ -25,7 +25,7 @@ function getStatusStyle(status: string): string {
     case 'VERIFIED':
       return 'bg-blue-50 text-blue-700 border-blue-200';
     default:
-      return 'bg-gray-50 text-gray-600 border-gray-200';
+      return 'bg-muted text-muted-foreground border-border';
   }
 }
 
@@ -88,19 +88,19 @@ export function OwnerPropertyCard({
         'group w-full text-left transition-all duration-200',
         variant === 'sidebar'
           ? cn(
-              'flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 hover:bg-purple-98',
-              isSelected ? 'bg-purple-96' : 'bg-white'
-            )
+            'flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 hover:bg-primary/5',
+            isSelected ? 'bg-primary/10' : 'bg-white'
+          )
           : cn(
-              'flex flex-row items-stretch gap-0 rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5',
-              isSelected
-                ? 'border-main-primary shadow-md ring-2 ring-main-primary/20'
-                : 'border-gray-200 shadow-sm hover:border-main-primary/40'
-            )
+            'flex flex-row items-stretch gap-0 rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5',
+            isSelected
+              ? 'border-primary shadow-md ring-2 ring-primary/20'
+              : 'border-border shadow-sm hover:border-primary/40'
+          )
       )}
     >
       {/* Thumbnail */}
-      <div className='relative w-40 h-32 flex-shrink-0 bg-gray-100 overflow-hidden'>
+      <div className='relative w-40 h-32 flex-shrink-0 bg-muted overflow-hidden'>
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -108,8 +108,8 @@ export function OwnerPropertyCard({
             className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
           />
         ) : (
-          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
-            <Home className='h-8 w-8 text-indigo-300' />
+          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
+            <Home className='h-8 w-8 text-primary/50' />
           </div>
         )}
         {/* Status badge */}
@@ -132,19 +132,19 @@ export function OwnerPropertyCard({
         {/* Row 1: address + type badge + proposed chip */}
         <div className='flex items-start justify-between gap-2'>
           <div className='min-w-0 flex-1'>
-            <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-main-primary transition-colors'>
+            <h3 className='font-bold text-foreground text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors'>
               {property.street_address}
             </h3>
             {location && (
               <div className='flex items-center gap-1 mt-0.5'>
-                <MapPin className='h-3 w-3 text-gray-400 flex-shrink-0' />
-                <span className='text-xs text-gray-500 truncate'>{location}</span>
+                <MapPin className='h-3 w-3 text-muted-foreground/50 flex-shrink-0' />
+                <span className='text-xs text-muted-foreground truncate'>{location}</span>
               </div>
             )}
           </div>
           <div className='flex items-center gap-1.5 flex-shrink-0'>
             {property.property_type_info?.property_type_name && (
-              <span className='text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
+              <span className='text-[11px] font-semibold bg-primary/5 text-primary px-2.5 py-0.5 rounded-lg border border-primary/10'>
                 {property.property_type_info.property_type_name}
               </span>
             )}
@@ -159,15 +159,15 @@ export function OwnerPropertyCard({
 
         {/* Row 2: description */}
         {property.descriptions && (
-          <p className='text-xs text-gray-500 leading-relaxed line-clamp-2'>
+          <p className='text-xs text-muted-foreground leading-relaxed line-clamp-2'>
             {property.descriptions}
           </p>
         )}
 
         {/* Row 3: stats (left) + prices (right) */}
-        <div className='flex items-end justify-between gap-3 pt-1.5 border-t border-gray-100'>
+        <div className='flex items-end justify-between gap-3 pt-1.5 border-t border-border'>
           {/* Stats */}
-          <div className='flex items-center gap-3 text-xs text-gray-500'>
+          <div className='flex items-center gap-3 text-xs text-muted-foreground'>
             {area && (
               <div className='flex items-center gap-1'>
                 <Ruler className='h-3.5 w-3.5 text-gray-400' />

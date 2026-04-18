@@ -30,13 +30,13 @@ export function ListingTypeSelector({
           <div
             className={cn(
               'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors',
-              value === type ? 'border-main-primary' : 'border-purple-92',
-              disabled && value === type && 'border-main-secondary/30'
+              value === type ? 'border-primary' : 'border-primary/20',
+              disabled && value === type && 'border-secondary/30'
             )}
           >
             {value === type && (
               <div
-                className={cn('h-2.5 w-2.5 rounded-full bg-main-primary', disabled && 'bg-main-secondary/30')}
+                className={cn('h-2.5 w-2.5 rounded-full bg-primary', disabled && 'bg-secondary/30')}
               />
             )}
           </div>
@@ -49,7 +49,7 @@ export function ListingTypeSelector({
             disabled={disabled}
             className='sr-only'
           />
-          <span className='text-sm font-medium text-main-black'>
+          <span className='text-sm font-medium text-foreground'>
             {type === 'RENT' ? labels.rent : labels.sale}
           </span>
         </label>

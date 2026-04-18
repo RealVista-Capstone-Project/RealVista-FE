@@ -83,7 +83,7 @@ const STATUS_STYLES: Record<string, string> = {
   PENDING: 'bg-rose-50 text-rose-700 border-rose-200',
   VERIFIED: 'bg-green-50 text-green-700 border-green-200',
   REJECTED: 'bg-red-50 text-red-700 border-red-200',
-  RENTED: 'bg-purple-50 text-purple-700 border-purple-200',
+  RENTED: 'bg-primary/5 text-primary border-primary/20',
 };
 
 function getStatusStyle(status: string): string {
@@ -114,7 +114,7 @@ function PropertyListCard({
       onClick={() => onClick(property)}
       className={cn(
         'group w-full text-left flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 transition-all duration-200',
-        isSelected ? 'bg-purple-96' : 'bg-white hover:bg-purple-98'
+        isSelected ? 'bg-primary/5' : 'bg-white hover:bg-primary/5'
       )}
     >
       {/* Thumbnail */}
@@ -127,8 +127,8 @@ function PropertyListCard({
             className='object-cover transition-transform duration-300 group-hover:scale-105'
           />
         ) : (
-          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
-            <Home className='h-8 w-8 text-indigo-300' />
+          <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
+            <Home className='h-8 w-8 text-primary/50' />
           </div>
         )}
         <div className='absolute top-2 left-2'>
@@ -149,7 +149,7 @@ function PropertyListCard({
         {/* Row 1: address + type */}
         <div className='flex items-start justify-between gap-2'>
           <div className='min-w-0 flex-1'>
-            <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-main-primary transition-colors'>
+            <h3 className='font-bold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors'>
               {property.street_address}
             </h3>
             {location && (
@@ -160,7 +160,7 @@ function PropertyListCard({
             )}
           </div>
           {property.property_type_info?.property_type_name && (
-            <span className='flex-shrink-0 text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
+            <span className='flex-shrink-0 text-[11px] font-semibold bg-primary/5 text-primary px-2.5 py-0.5 rounded-lg border border-primary/10'>
               {property.property_type_info.property_type_name}
             </span>
           )}
@@ -247,7 +247,7 @@ function ListingsSection({
         <div className='flex items-center gap-2'>
           <h3 className='text-sm font-bold text-slate-800'>{t('labelListings')}</h3>
           {listings.length > 0 && (
-            <span className='inline-flex items-center justify-center rounded-full bg-main-primary/10 w-5 h-5 text-[11px] font-bold text-main-primary'>
+            <span className='inline-flex items-center justify-center rounded-full bg-primary/10 w-5 h-5 text-[11px] font-bold text-primary'>
               {listings.length}
             </span>
           )}
@@ -262,7 +262,7 @@ function ListingsSection({
 
       {isLoading ? (
         <div className='flex justify-center py-6'>
-          <div className='h-5 w-5 animate-spin rounded-full border-2 border-purple-92 border-t-main-primary' />
+          <div className='h-5 w-5 animate-spin rounded-full border-2 border-primary/20 border-t-primary' />
         </div>
       ) : listings.length === 0 ? (
         <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 flex flex-col items-center gap-2 text-center'>
@@ -279,7 +279,7 @@ function ListingsSection({
               PENDING: { cls: 'bg-amber-50 text-amber-600', label: t('listingStatusPENDING') },
               PUBLISHED: { cls: 'bg-emerald-50 text-emerald-700', label: t('listingStatusPUBLISHED') },
               SOLD: { cls: 'bg-blue-50 text-blue-700', label: t('listingStatusSOLD') },
-              RENTED: { cls: 'bg-purple-50 text-purple-700', label: t('listingStatusRENTED') },
+              RENTED: { cls: 'bg-primary/5 text-primary', label: t('listingStatusRENTED') },
               ARCHIVED: { cls: 'bg-slate-100 text-slate-400', label: t('listingStatusARCHIVED') },
             };
             const sc = statusConfig[listing.status] ?? { cls: 'bg-slate-100 text-slate-500', label: listing.status };
@@ -293,7 +293,7 @@ function ListingsSection({
               <Link
                 key={listing.listing_id}
                 href={`/dashboard/listings?listingId=${listing.listing_id}`}
-                className='flex gap-0 rounded-xl border border-slate-200 bg-white overflow-hidden hover:border-main-primary/40 hover:shadow-sm transition-all group'
+                className='flex gap-0 rounded-xl border border-slate-200 bg-white overflow-hidden hover:border-primary/40 hover:shadow-sm transition-all group'
               >
                 {/* Thumbnail — left column, fixed width */}
                 <div className='relative w-24 flex-shrink-0 bg-slate-100'>
@@ -314,7 +314,7 @@ function ListingsSection({
                 {/* Info — right column */}
                 <div className='flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-between gap-1.5'>
                   {/* Name */}
-                  <p className='text-xs font-semibold text-slate-800 line-clamp-2 leading-snug group-hover:text-main-primary transition-colors'>
+                  <p className='text-xs font-semibold text-slate-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors'>
                     {listing.name}
                   </p>
 
@@ -344,7 +344,7 @@ function ListingsSection({
                     <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-md', sc.cls)}>
                       {sc.label}
                     </span>
-                    <p className='text-xs font-bold text-main-primary whitespace-nowrap'>
+                    <p className='text-xs font-bold text-primary whitespace-nowrap'>
                       {priceDisplay}
                     </p>
                   </div>
@@ -384,7 +384,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
             </span>
           )}
         </div>
-        <Button asChild size='sm' variant='outline' className='rounded-lg gap-1.5 h-8 text-xs border-indigo-200 text-indigo-700 hover:bg-indigo-50'>
+        <Button asChild size='sm' variant='outline' className='rounded-lg gap-1.5 h-8 text-xs border-primary/20 text-primary hover:bg-primary/5'>
           <Link href={`/dashboard/property/${propertyId}/delegate`}>
             <UserCheck className='h-3.5 w-3.5' />
             {t('hireAgent')}
@@ -394,7 +394,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
 
       {isLoading ? (
         <div className='flex justify-center py-6'>
-          <div className='h-5 w-5 animate-spin rounded-full border-2 border-purple-92 border-t-main-primary' />
+          <div className='h-5 w-5 animate-spin rounded-full border-2 border-primary/20 border-t-primary' />
         </div>
       ) : engagements.length === 0 ? (
         <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 flex flex-col items-center gap-2 text-center'>
@@ -450,8 +450,8 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                           className='object-cover w-full h-full'
                         />
                       ) : (
-                        <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50'>
-                          <User className='h-5 w-5 text-indigo-300' />
+                        <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
+                          <User className='h-5 w-5 text-primary/50' />
                         </div>
                       )}
                     </div>
@@ -469,7 +469,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                     {/* Meta pills — right side */}
                     <div className='flex flex-col items-end gap-1.5 flex-shrink-0'>
                       {e.propertyTypeName && (
-                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-full'>
+                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-primary/5 text-primary border border-primary/10 px-2.5 py-1 rounded-full'>
                           <Building className='h-3 w-3' />
                           {e.propertyTypeName}
                         </span>
@@ -480,7 +480,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                         </span>
                       )}
                       {experience != null && (
-                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-purple-50 text-purple-700 border border-purple-100 px-2.5 py-1 rounded-full'>
+                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-primary/5 text-primary border border-primary/30 px-2.5 py-1 rounded-full'>
                           {experience} {t('yearsExperience')}
                         </span>
                       )}
@@ -494,7 +494,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                         asChild
                         size='sm'
                         variant='outline'
-                        className='w-full rounded-lg gap-2 border-indigo-200 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800'
+                        className='w-full rounded-lg gap-2 border-primary/20 text-primary hover:bg-primary/5 hover:text-primary'
                       >
                         <Link href={`/dashboard/my-engagements?engagementId=${e.engagementId}&action=delegate`}>
                           <UserCheck className='h-3.5 w-3.5' />
@@ -579,7 +579,7 @@ function PropertyDetailPanel({
         <button
           type='button'
           onClick={onBack}
-          className='flex items-center gap-2 px-6 py-4 text-sm font-medium text-main-primary hover:underline'
+          className='flex items-center gap-2 px-6 py-4 text-sm font-medium text-primary hover:underline'
         >
           <ChevronLeft className='h-4 w-4' />
           {t('backToList')}
@@ -704,7 +704,7 @@ function PropertyDetailPanel({
             {property.status === 'PENDING' && (
               <Button
                 size='sm'
-                className='rounded-lg gap-2 bg-main-primary'
+                className='rounded-lg gap-2 bg-primary'
                 onClick={() => onVerifyClick(property)}
               >
                 <ShieldCheck className='w-4 h-4' />
@@ -716,7 +716,7 @@ function PropertyDetailPanel({
 
         {/* Info grid — Type + Price + Dimensions */}
         <div className='space-y-3'>
-        {/* Type + Price cards — side by side */}
+          {/* Type + Price cards — side by side */}
           <div className='grid grid-cols-2 gap-3'>
             {/* Left: Property type */}
             {property.property_type_info?.property_type_name && (
@@ -835,16 +835,16 @@ function PropertyDetailPanel({
                           : '—';
                 return (
                   <div key={attr.attribute_id} className='flex flex-col gap-4'>
-                    <p className='text-main-black/50 text-[14px] font-medium leading-[1.5]'>
+                    <p className='text-foreground/50 text-[14px] font-medium leading-[1.5]'>
                       {attr.attribute_name}
                     </p>
                     <div className='flex items-center gap-2'>
                       <AttributeIcon
                         iconName={attr.icon ?? attr.attribute_code}
-                        className='size-5 text-main-black/50'
+                        className='size-5 text-foreground/50'
                         strokeWidth={2}
                       />
-                      <p className='text-main-black font-bold leading-[1.45] tracking-[-0.09px]'>
+                      <p className='text-foreground font-bold leading-[1.45] tracking-[-0.09px]'>
                         {displayValue}
                       </p>
                     </div>
@@ -863,7 +863,7 @@ function PropertyDetailPanel({
               {property.amenities.map((a) => (
                 <span
                   key={a.amenity_id}
-                  className='rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-medium px-3 py-1'
+                  className='rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-medium px-3 py-1'
                 >
                   {a.amenity_name}
                 </span>
@@ -926,7 +926,7 @@ function PropertyDetailPanel({
             </DialogClose>
             <Button
               size='sm'
-              className='rounded-lg bg-main-primary'
+              className='rounded-lg bg-primary'
               disabled={isStatusChanging}
               onClick={() => {
                 if (pendingStatus) changeStatus(pendingStatus);
@@ -1050,7 +1050,7 @@ export default function PropertyDashboardPage() {
       {/* ── Left Panel ── */}
       <aside
         className={cn(
-          'flex-col border-r border-purple-92/50 bg-white transition-all duration-300',
+          'flex-col border-r border-primary/20 bg-white transition-all duration-300',
           isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[42%]'
         )}
       >
@@ -1059,11 +1059,11 @@ export default function PropertyDashboardPage() {
           <div className='p-4 sm:p-6 bg-white'>
             <div className='flex items-center justify-between gap-3'>
               <div className='flex items-center gap-3'>
-                <h2 className='text-xl font-extrabold text-main-black tracking-tight'>
+                <h2 className='text-xl font-extrabold text-foreground tracking-tight'>
                   {t('pageTitle')}
                 </h2>
-                <div className='flex items-center justify-center rounded-full bg-main-primary/10 px-3 py-0.5 border border-main-primary/20 shadow-sm'>
-                  <span className='text-sm font-bold text-main-primary'>{totalElements}</span>
+                <div className='flex items-center justify-center rounded-full bg-primary/10 px-3 py-0.5 border border-primary/20 shadow-sm'>
+                  <span className='text-sm font-bold text-primary'>{totalElements}</span>
                 </div>
               </div>
               <Button asChild size='sm' className='rounded-full gap-1.5 shrink-0'>
@@ -1076,17 +1076,17 @@ export default function PropertyDashboardPage() {
           </div>
 
           {/* 3D promo banner — pinned above search */}
-          <div className='border-b border-purple-92/40 px-4 sm:px-6 py-4 bg-white'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-white'>
             <ThreeDPromoBanner />
           </div>
 
           {/* Search + Status Filter — same row */}
-          <div className='border-b border-purple-92/40 px-4 sm:px-6 py-4 bg-purple-98/30'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-primary/5'>
             <div className='flex items-center gap-2'>
               {/* Search */}
               <div className='relative group flex-1'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-                  <Search className='h-[18px] w-[18px] text-main-secondary/50 group-focus-within:text-main-primary transition-colors' />
+                  <Search className='h-[18px] w-[18px] text-muted-foreground/70 group-focus-within:text-primary transition-colors' />
                 </div>
                 <Input
                   type='text'
@@ -1096,7 +1096,7 @@ export default function PropertyDashboardPage() {
                     setPage(0);
                   }}
                   placeholder={t('searchPlaceholder')}
-                  className='h-10 w-full rounded-xl border border-purple-92 bg-white pl-11 pr-4 text-sm font-medium text-main-black shadow-sm placeholder:text-main-secondary/50 hover:border-main-primary/50 focus:border-main-primary focus:ring-4 focus:ring-main-primary/10 transition-all duration-300'
+                  className='h-10 w-full rounded-xl border border-primary/20 bg-white pl-11 pr-4 text-sm font-medium text-foreground shadow-sm placeholder:text-muted-foreground/70 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300'
                 />
               </div>
               {/* Status filter */}
@@ -1107,7 +1107,7 @@ export default function PropertyDashboardPage() {
                   setPage(0);
                 }}
               >
-                <SelectTrigger className='w-[160px] rounded-xl border-purple-92 h-10 shrink-0'>
+                <SelectTrigger className='w-[160px] rounded-xl border-primary/20 h-10 shrink-0'>
                   <SelectValue placeholder={t('filterStatus')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -1126,20 +1126,20 @@ export default function PropertyDashboardPage() {
           <div className='flex-1 overflow-y-auto bg-gray-50/20'>
             {isLoading ? (
               <div className='flex h-full items-center justify-center'>
-                <div className='h-8 w-8 animate-spin rounded-full border-4 border-purple-92 border-t-main-primary' />
+                <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary/20 border-t-primary' />
               </div>
             ) : properties.length === 0 ? (
               <div className='flex flex-col items-center justify-center gap-4 p-12 text-center animate-in fade-in duration-500'>
-                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-purple-98 border border-purple-92/50 shadow-sm'>
-                  <Home className='h-8 w-8 text-main-primary/60' strokeWidth={1.5} />
+                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 border border-primary/20 shadow-sm'>
+                  <Home className='h-8 w-8 text-primary/60' strokeWidth={1.5} />
                 </div>
                 <div className='max-w-[280px]'>
-                  <p className='text-base font-bold text-main-black'>{t('noProperties')}</p>
-                  <p className='mt-1.5 text-sm text-main-secondary/70'>{t('noPropertiesDesc')}</p>
+                  <p className='text-base font-bold text-foreground'>{t('noProperties')}</p>
+                  <p className='mt-1.5 text-sm text-muted-foreground'>{t('noPropertiesDesc')}</p>
                 </div>
               </div>
             ) : (
-              <div className='divide-y divide-purple-92/40'>
+              <div className='divide-y divide-border'>
                 {properties.map((property) => (
                   <div key={property.property_id} className='transition-colors'>
                     <PropertyListCard
@@ -1155,7 +1155,7 @@ export default function PropertyDashboardPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className='border-t border-purple-92/40 flex items-center justify-between px-4 py-3 bg-white'>
+            <div className='border-t border-primary/20 flex items-center justify-between px-4 py-3 bg-white'>
               <Button
                 variant='outline'
                 size='sm'
@@ -1185,7 +1185,7 @@ export default function PropertyDashboardPage() {
       {/* ── Right Detail Panel ── */}
       <main
         className={cn(
-          'flex-1 overflow-y-auto bg-purple-98/40',
+          'flex-1 overflow-y-auto bg-primary/5',
           isMobile ? (selectedProperty ? 'block' : 'hidden') : 'block'
         )}
       >
@@ -1199,10 +1199,10 @@ export default function PropertyDashboardPage() {
           />
         ) : (
           <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>
-            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-purple-92/50'>
-              <Building className='h-10 w-10 text-main-primary/30' strokeWidth={1.5} />
+            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20'>
+              <Building className='h-10 w-10 text-primary/30' strokeWidth={1.5} />
             </div>
-            <p className='text-base font-medium text-main-secondary/80 max-w-[250px]'>
+            <p className='text-base font-medium text-muted-foreground max-w-[250px]'>
               {t('selectHint')}
             </p>
           </div>

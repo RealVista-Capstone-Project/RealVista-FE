@@ -116,7 +116,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
         variant='outline'
         onClick={handleSaveClick}
         disabled={isPending}
-        className='px-4 py-2 flex items-center justify-center gap-2 transition-all border-main-primary text-main-primary hover:bg-purple-96'
+        className='px-4 py-2 flex items-center justify-center gap-2 transition-all border-primary text-primary hover:bg-primary/5'
         title={t('buttonLabel')}
       >
         <Bookmark className='w-4 h-4' />
@@ -143,7 +143,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
                     <button
                       type='button'
                       onClick={() => setIsAddingProfile(true)}
-                      className='text-xs text-main-primary hover:underline flex items-center gap-1 font-medium'
+                      className='text-xs text-primary hover:underline flex items-center gap-1 font-medium'
                     >
                       <Plus className='w-3 h-3' /> Thêm Profile
                     </button>
@@ -205,16 +205,16 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
                 placeholder='Nhập tên nhóm...'
               />
             </div>
-            <div className='flex items-center justify-between p-3 rounded-xl bg-purple-96 border border-main-primary/10 mt-2'>
+            <div className='flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10 mt-2'>
               <div className='space-y-0.5'>
-                <p className='text-sm font-bold text-main-black'>Sử dụng cho gợi ý AI</p>
-                <p className='text-xs text-grey-500'>Đánh dấu để AI ưu tiên gợi ý dựa trên tiêu chí này</p>
+                <p className='text-sm font-bold text-foreground'>Sử dụng cho gợi ý AI</p>
+                <p className='text-xs text-muted-foreground'>Đánh dấu để AI ưu tiên gợi ý dựa trên tiêu chí này</p>
               </div>
               <input
                 type='checkbox'
                 checked={isRecommendation}
                 onChange={(e) => setIsRecommendation(e.target.checked)}
-                className='h-5 w-5 accent-main-primary cursor-pointer'
+                className='h-5 w-5 accent-primary cursor-pointer'
               />
             </div>
           </div>

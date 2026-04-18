@@ -11,13 +11,13 @@ interface NotificationItemProps {
   onDelete?: (id: string) => void;
 }
 
-const DEFAULT_ICON_ENTRY = { Icon: Bell as LucideIcon, bg: 'bg-grey-400' };
+const DEFAULT_ICON_ENTRY = { Icon: Bell as LucideIcon, bg: 'bg-muted-foreground/50' };
 
 function getNotificationIcon(eventType: Notification['eventType']): { Icon: LucideIcon; bg: string } {
   if (eventType.includes('TOUR')) return { Icon: Calendar, bg: 'bg-emerald-500' };
   if (eventType.includes('APPLICATION')) return { Icon: UserCheck, bg: 'bg-orange-400' };
   if (eventType.includes('DRAFT') || eventType.includes('LISTING')) {
-    return { Icon: Home, bg: 'bg-main-primary' };
+    return { Icon: Home, bg: 'bg-primary' };
   }
   return DEFAULT_ICON_ENTRY;
 }
@@ -39,9 +39,9 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
   return (
     <div
       className={cn(
-        'w-full flex items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-purple-98 group border-l-4',
+        'w-full flex items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-primary/5 group border-l-4',
         !notification.isRead
-          ? 'bg-purple-98/40 border-main-primary'
+          ? 'bg-primary/5 border-primary'
           : 'border-transparent'
       )}
     >
@@ -55,18 +55,18 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
         <div className='flex-1 min-w-0'>
           <p
             className={cn(
-              'text-sm leading-snug text-main-black',
+              'text-sm leading-snug text-foreground',
               !notification.isRead ? 'font-semibold' : 'font-medium'
             )}
           >
             {notification.title}
           </p>
           {notification.message && (
-            <p className='mt-0.5 text-xs text-grey-500 line-clamp-2 leading-snug'>
+            <p className='mt-0.5 text-xs text-muted-foreground line-clamp-2 leading-snug'>
               {notification.message}
             </p>
           )}
-          <p className='mt-1 text-xs text-grey-400'>
+          <p className='mt-1 text-xs text-muted-foreground/50'>
             {formatNotificationDate(notification.createdAt)}
           </p>
         </div>
@@ -93,7 +93,7 @@ export function NotificationItem({ notification, onClick, onDelete }: Notificati
             e.stopPropagation();
             onDelete(notification.id);
           }}
-          className='shrink-0 self-start mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-full text-grey-400 hover:text-red-500 hover:bg-red-50'
+          className='shrink-0 self-start mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10'
         >
           <X className='h-3.5 w-3.5' strokeWidth={2.5} />
         </button>

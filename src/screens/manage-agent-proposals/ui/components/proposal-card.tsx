@@ -46,7 +46,7 @@ export function ProposalCard({
       className={cn(
         'group relative flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all duration-150 select-none',
         isSelected
-          ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-300/50'
+          ? 'border-primary/20 bg-indigo-50 ring-1 ring-indigo-300/50'
           : 'border-transparent hover:border-slate-200 hover:bg-slate-50',
       )}
     >
@@ -65,7 +65,7 @@ export function ProposalCard({
         <div className='flex items-start justify-between gap-2'>
           <h3 className={cn(
             'text-sm font-semibold leading-snug line-clamp-2 transition-colors',
-            isSelected ? 'text-indigo-700' : 'text-slate-800 group-hover:text-slate-900',
+            isSelected ? 'text-primary' : 'text-slate-800 group-hover:text-slate-900',
           )}>
             {proposal.title}
           </h3>
@@ -74,7 +74,7 @@ export function ProposalCard({
             <div className='flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0'>
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                className='rounded-md p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors'
+                className='rounded-md p-1.5 text-slate-400 hover:text-primary hover:bg-indigo-50 transition-colors'
                 title={t('btnEdit')}
               >
                 <Edit3 size={13} />

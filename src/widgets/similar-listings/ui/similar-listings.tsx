@@ -87,10 +87,10 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
   }
 
   return (
-    <div className='bg-purple-98 w-full py-12 sm:py-16'>
+    <div className='bg-primary/5 w-full py-12 sm:py-16'>
       <div className='max-w-[1200px] mx-auto px-10 sm:px-14'>
         {/* Section Title */}
-        <h2 className='text-main-black text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px] mb-6 sm:mb-8'>
+        <h2 className='text-foreground text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px] mb-6 sm:mb-8'>
           {t('similarListings')}
         </h2>
 
@@ -100,7 +100,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
             <CarouselContent>
               {[1, 2, 3].map((i) => (
                 <CarouselItem key={i} className='basis-full sm:basis-1/2 lg:basis-1/3'>
-                  <div className='rounded-lg border-[1.5px] border-purple-96 bg-white p-6 h-full'>
+                  <div className='rounded-lg border-[1.5px] border-primary/10 bg-background p-6 h-full'>
                     <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
                     <Skeleton className='h-8 w-3/4 mb-3' />
                     <Skeleton className='h-6 w-1/2 mb-4' />
@@ -147,7 +147,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
 
         {/* Empty State */}
         {!isLoading && !isError && listings.length === 0 && (
-          <div className='text-center py-12 text-grey-500'>
+          <div className='text-center py-12 text-muted-foreground'>
             <p>{t('noSimilarListings') || 'No similar listings found'}</p>
           </div>
         )}

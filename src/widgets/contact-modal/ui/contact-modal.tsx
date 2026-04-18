@@ -100,8 +100,8 @@ export function ContactModal({
             />
           </div>
           <div className='flex flex-col justify-center gap-1'>
-            <p className='line-clamp-1 text-sm font-medium text-main-black'>{listing.title}</p>
-            <p className='text-base font-bold text-main-primary'>{formatVND(listing.price)}</p>
+            <p className='line-clamp-1 text-sm font-medium text-foreground'>{listing.title}</p>
+            <p className='text-base font-bold text-primary'>{formatVND(listing.price)}</p>
           </div>
         </div>
 
@@ -204,12 +204,12 @@ export function ContactModal({
                             type='button'
                             variant='outline'
                             size='sm'
-                            className='h-auto shrink-0 rounded-full border-border bg-background px-3 py-1.5 text-xs font-normal text-muted-foreground transition-all hover:border-main-primary hover:bg-main-primary/5 hover:text-main-primary'
+                            className='h-auto shrink-0 rounded-full border-border bg-background px-3 py-1.5 text-xs font-normal text-muted-foreground transition-all hover:border-primary hover:bg-primary/5 hover:text-primary'
                             onClick={() =>
                               form.setValue('message', reply, { shouldValidate: true })
                             }
-                            // Prevent drag from triggering click immediately if needed, but usually Button handles click fine.
-                            // Framer motion drag sometimes eats clicks. We can add a check if dragged.
+                          // Prevent drag from triggering click immediately if needed, but usually Button handles click fine.
+                          // Framer motion drag sometimes eats clicks. We can add a check if dragged.
                           >
                             {reply}
                           </Button>

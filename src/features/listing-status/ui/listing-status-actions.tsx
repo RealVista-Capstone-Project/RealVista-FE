@@ -146,9 +146,9 @@ export function ListingStatusActions({
                 'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 isDisabled && 'cursor-not-allowed opacity-50',
                 !isDisabled &&
-                  (variant === 'primary'
-                    ? 'bg-main-primary text-white hover:bg-main-primary/90'
-                    : 'border border-purple-92 bg-white text-main-black hover:bg-purple-98')
+                (variant === 'primary'
+                  ? 'bg-primary text-white hover:bg-primary/90'
+                  : 'border border-primary/20 bg-white text-foreground hover:bg-primary/5')
               )}
             >
               {icon}
@@ -165,22 +165,22 @@ export function ListingStatusActions({
               {confirmingAction === 'mark-as-sold'
                 ? t('confirm.markAsSold.title')
                 : confirmingAction === 'mark-as-rented'
-                ? t('confirm.markAsRented.title')
-                : t('confirm.unpublish.title')}
+                  ? t('confirm.markAsRented.title')
+                  : t('confirm.unpublish.title')}
             </DialogTitle>
             <DialogDescription>
               {confirmingAction === 'mark-as-sold'
                 ? t('confirm.markAsSold.description')
                 : confirmingAction === 'mark-as-rented'
-                ? t('confirm.markAsRented.description')
-                : t('confirm.unpublish.description')}
+                  ? t('confirm.markAsRented.description')
+                  : t('confirm.unpublish.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className='mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2'>
             <button
               type='button'
               onClick={() => setConfirmingAction(null)}
-              className='flex h-11 items-center justify-center rounded-lg border border-purple-92 bg-white px-6 text-sm font-bold text-main-black transition-colors hover:bg-purple-98'
+              className='flex h-11 items-center justify-center rounded-lg border border-primary/20 bg-white px-6 text-sm font-bold text-foreground transition-colors hover:bg-primary/5'
               disabled={isPending}
             >
               {t('confirm.cancel')}
@@ -188,7 +188,7 @@ export function ListingStatusActions({
             <button
               type='button'
               onClick={handleConfirm}
-              className='flex h-11 items-center justify-center rounded-lg bg-main-primary px-6 text-sm font-bold text-white transition-all hover:bg-main-primary/90 shadow-[0px_4px_12px_0px_rgba(112,101,240,0.2)] disabled:opacity-50 disabled:cursor-not-allowed'
+              className='flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-bold text-white transition-all hover:bg-primary/90 shadow-[0px_4px_12px_0px_color-mix(in_oklch,var(--primary)_20%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed'
               disabled={isPending}
             >
               {isPending ? t('common.processing', { fallback: 'Processing...' }) : t('confirm.proceed')}

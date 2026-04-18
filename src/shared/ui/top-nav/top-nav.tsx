@@ -90,13 +90,13 @@ export function TopNav({
         <div className={cn('flex items-center', showNavItems ? 'gap-8' : 'gap-4')}>
           {/* Logo - hide logo text for dashboard variant */}
           {variant === 'dashboard' ? (
-            <span className='font-bold text-xl lg:text-[24px] leading-[1.5] tracking-[-0.24px] text-main-black'>
+            <span className='font-bold text-xl lg:text-[24px] leading-[1.5] tracking-[-0.24px] text-foreground'>
               {pageTitle}
             </span>
           ) : (
             <Link href={`/${locale}${logoHref}`} className='flex items-center gap-2'>
               <RealVistaLogo />
-              <span className='text-lg lg:text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
+              <span className='text-lg lg:text-xl font-bold leading-[1.5] tracking-[-0.24px] text-foreground'>
                 RealVista
               </span>
             </Link>
@@ -126,8 +126,8 @@ export function TopNav({
                     key={item.id}
                     href={`/${locale}${item.href}`}
                     className={cn(
-                      'text-base leading-[1.5] transition-colors hover:text-main-primary',
-                      isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+                      'text-base leading-[1.5] transition-colors hover:text-primary',
+                      isActive ? 'font-bold text-primary' : 'font-medium text-foreground'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -176,11 +176,11 @@ export function TopNav({
           <div className='fixed inset-y-0 right-0 z-50 w-[280px] bg-white shadow-xl lg:hidden'>
             {/* Header */}
             <div className='flex items-center justify-between border-b border-border px-6 py-4'>
-              <span className='text-lg font-bold text-main-black'>Menu</span>
+              <span className='text-lg font-bold text-foreground'>Menu</span>
               <button
                 type='button'
                 onClick={() => setIsMobileMenuOpen(false)}
-                className='flex size-10 items-center justify-center text-main-black'
+                className='flex size-10 items-center justify-center text-foreground'
                 aria-label='Close menu'
               >
                 <X className='h-6 w-6' strokeWidth={2} />
@@ -200,8 +200,8 @@ export function TopNav({
                       className={cn(
                         'py-3 text-base leading-[1.5] transition-colors',
                         isActive
-                          ? 'font-bold text-main-primary'
-                          : 'font-medium text-main-black hover:text-main-primary'
+                          ? 'font-bold text-primary'
+                          : 'font-medium text-foreground hover:text-primary'
                       )}
                       aria-current={isActive ? 'page' : undefined}
                     >
@@ -215,14 +215,14 @@ export function TopNav({
             {/* Profile Section */}
             <div className='border-t border-border px-6 py-4'>
               <div className='flex items-center gap-3'>
-                <div className='flex size-10 items-center justify-center rounded-full bg-main-primary text-white'>
+                <div className='flex size-10 items-center justify-center rounded-full bg-primary text-white'>
                   <span className='text-sm font-bold leading-[1.5]'>{user.initials}</span>
                 </div>
                 <div className='flex flex-col'>
-                  <span className='text-sm font-medium leading-[1.4] text-main-black'>
+                  <span className='text-sm font-medium leading-[1.4] text-foreground'>
                     {user.name}
                   </span>
-                  <span className='text-xs leading-[1.4] text-grey-500'>View Profile</span>
+                  <span className='text-xs leading-[1.4] text-muted-foreground'>View Profile</span>
                 </div>
               </div>
             </div>
@@ -253,8 +253,8 @@ function NavItemDropdown({
       <Link
         href={`/${locale}${item.href}`}
         className={cn(
-          'text-base leading-[1.5] transition-colors hover:text-main-primary',
-          isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black'
+          'text-base leading-[1.5] transition-colors hover:text-primary',
+          isActive ? 'font-bold text-primary' : 'font-medium text-foreground'
         )}
         aria-current={isActive ? 'page' : undefined}
       >
@@ -273,9 +273,9 @@ function NavItemDropdown({
         <Link
           href={`/${locale}${item.href}`}
           className={cn(
-            'flex items-center gap-1 text-base leading-[1.5] transition-colors hover:text-main-primary outline-none',
-            isActive ? 'font-bold text-main-primary' : 'font-medium text-main-black',
-            open && 'text-main-primary'
+            'flex items-center gap-1 text-base leading-[1.5] transition-colors hover:text-primary outline-none',
+            isActive ? 'font-bold text-primary' : 'font-medium text-foreground',
+            open && 'text-primary'
           )}
         >
           {t(item.translationKey)}
@@ -293,7 +293,7 @@ function NavItemDropdown({
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
           className={cn(
-            'z-50 w-[600px] rounded-xl border border-purple-92 bg-white p-6 shadow-xl',
+            'z-50 w-[600px] rounded-xl border border-primary/20 bg-white p-6 shadow-xl',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -305,10 +305,10 @@ function NavItemDropdown({
               <div key={category.code} className='space-y-4'>
                 <Link
                   href={`/${locale}${item.href}?propertyCategory=${category.code}`}
-                  className='flex items-center gap-2 pb-2 border-b border-purple-92 hover:border-main-primary transition-colors group'
+                  className='flex items-center gap-2 pb-2 border-b border-primary/20 hover:border-primary transition-colors group'
                   onClick={() => setOpen(false)}
                 >
-                  <span className='text-sm font-bold uppercase tracking-wider text-main-primary/80 group-hover:text-main-primary transition-colors'>
+                  <span className='text-sm font-bold uppercase tracking-wider text-primary/80 group-hover:text-primary transition-colors'>
                     {category.label}
                   </span>
                 </Link>
@@ -317,7 +317,7 @@ function NavItemDropdown({
                     <Link
                       key={type.code}
                       href={`/${locale}${item.href}?propertyType=${type.code}`}
-                      className='text-sm text-grey-600 hover:text-main-primary hover:bg-purple-98 px-3 py-2 rounded-lg transition-colors capitalize'
+                      className='text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 px-3 py-2 rounded-lg transition-colors capitalize'
                       onClick={() => setOpen(false)}
                     >
                       {type.label}

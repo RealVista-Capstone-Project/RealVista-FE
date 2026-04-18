@@ -189,7 +189,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
       <DialogContent className='sm:max-w-[400px] p-0 overflow-hidden'>
         <DialogHeader className='px-6 pt-6 pb-2'>
           <DialogTitle className='text-xl flex items-center gap-2'>
-            <CalendarIcon className='w-5 h-5 text-main-primary' />
+            <CalendarIcon className='w-5 h-5 text-primary' />
             {t('scheduleTour')}
           </DialogTitle>
         </DialogHeader>
@@ -222,7 +222,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                       type='button'
                       disabled={!date}
                       className={cn(
-                        'flex w-full items-center justify-between rounded-lg border border-purple-92 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-purple-92-hover transition-colors',
+                        'flex w-full items-center justify-between rounded-lg border border-primary/20 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-primary/20-hover transition-colors',
                         !selectedStartTime && 'text-muted-foreground'
                       )}
                     >
@@ -255,8 +255,8 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                               className={cn(
                                 'text-sm py-2 px-1 rounded-md border transition-all duration-200 font-medium',
                                 selectedStartTime === slot
-                                  ? 'bg-main-primary text-white border-main-primary shadow-sm'
-                                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200 hover:border-main-primary/50'
+                                  ? 'bg-primary text-white border-primary shadow-sm'
+                                  : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200 hover:border-primary/50'
                               )}
                             >
                               {slot}
@@ -282,7 +282,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                       type='button'
                       disabled={!selectedStartTime}
                       className={cn(
-                        'flex w-full items-center justify-between rounded-lg border border-purple-92 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-purple-92-hover transition-colors',
+                        'flex w-full items-center justify-between rounded-lg border border-primary/20 bg-white px-4 py-3.5 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 hover:border-primary/20-hover transition-colors',
                         !selectedDuration && 'text-muted-foreground'
                       )}
                     >
@@ -316,7 +316,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                             className={cn(
                               'w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm transition-colors',
                               selectedDuration === duration
-                                ? 'bg-main-secondary/10 text-main-primary font-medium'
+                                ? 'bg-secondary/10 text-primary font-medium'
                                 : isAvailable
                                   ? 'hover:bg-gray-100 text-gray-900'
                                   : 'text-gray-400 cursor-not-allowed opacity-50'
@@ -324,7 +324,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                           >
                             <span>{formatDuration(duration)}</span>
                             {selectedDuration === duration && (
-                              <Check className='w-4 h-4 text-main-primary' />
+                              <Check className='w-4 h-4 text-primary' />
                             )}
                           </button>
                         );
@@ -386,18 +386,18 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
                   <div className='border-t border-dashed border-gray-200 my-1'></div>
 
                   <div className='flex justify-between items-center'>
-                    <span className='text-main-primary font-medium flex items-center gap-2'>
+                    <span className='text-primary font-medium flex items-center gap-2'>
                       {t('endTime')}
                     </span>
-                    <span className='font-bold text-main-primary bg-main-secondary/10 px-3 py-1 rounded-md border border-main-secondary/20'>
+                    <span className='font-bold text-primary bg-secondary/10 px-3 py-1 rounded-md border border-secondary/20'>
                       {selectedStartTime && selectedDuration
                         ? format(
-                            addMinutes(
-                              new Date(`2000-01-01T${selectedStartTime}:00`),
-                              selectedDuration
-                            ),
-                            'HH:mm'
-                          )
+                          addMinutes(
+                            new Date(`2000-01-01T${selectedStartTime}:00`),
+                            selectedDuration
+                          ),
+                          'HH:mm'
+                        )
                         : '-'}
                     </span>
                   </div>

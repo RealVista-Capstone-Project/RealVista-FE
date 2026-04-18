@@ -56,8 +56,8 @@ export function PublicActions({
           className={cn(
             'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
             isRouteActive('/favorited')
-              ? 'bg-main-primary text-white'
-              : 'bg-purple-98 text-main-black hover:bg-purple-92'
+              ? 'bg-primary text-white'
+              : 'bg-primary/5 text-foreground hover:bg-primary/10'
           )}
           aria-label='Bookmarks'
           title='View bookmarks'
@@ -76,8 +76,8 @@ export function PublicActions({
         className={cn(
           'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
           isRouteActive('/subscribe')
-            ? 'bg-main-primary text-white'
-            : 'bg-purple-98 text-main-black hover:bg-purple-92'
+            ? 'bg-primary text-white'
+            : 'bg-primary/5 text-foreground hover:bg-primary/10'
         )}
         aria-label={t('subscribe')}
         title={t('subscribe')}
@@ -113,7 +113,7 @@ export function PublicActions({
 
       {/* Profile / Auth */}
       {isLoadingSession ? (
-        <div className='hidden lg:block w-[100px] h-10 bg-purple-98 animate-pulse rounded-lg' />
+        <div className='hidden lg:block w-[100px] h-10 bg-primary/5 animate-pulse rounded-lg' />
       ) : isUserLoggedIn ? (
         <div className='hidden lg:block'>
           <ProfileDropdown user={user} align='end' menuItems={menuItems} />
@@ -123,13 +123,13 @@ export function PublicActions({
         <div className='hidden lg:flex items-center gap-3'>
           <Link
             href={`/${locale}${ROUTES.login}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg border border-purple-92 bg-white font-medium text-main-primary transition-colors hover:bg-purple-98'
+            className='flex h-12 items-center justify-center px-6 rounded-lg border border-primary/20 bg-white font-medium text-primary transition-colors hover:bg-primary/5'
           >
             {t('login')}
           </Link>
           <Link
             href={`/${locale}${ROUTES.register}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg bg-main-primary text-white font-medium transition-colors hover:bg-main-primary-hover'
+            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-white font-medium transition-colors hover:bg-primary/90'
           >
             {t('signup')}
           </Link>
@@ -140,7 +140,7 @@ export function PublicActions({
       <button
         type='button'
         onClick={onOpenMobileMenu}
-        className='flex lg:hidden size-10 items-center justify-center text-main-black'
+        className='flex lg:hidden size-10 items-center justify-center text-foreground'
         aria-label='Open menu'
       >
         <Menu className='h-6 w-6' strokeWidth={2} />

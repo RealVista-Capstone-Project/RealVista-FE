@@ -55,10 +55,10 @@ export function SharePopover({ url, title }: SharePopoverProps) {
           <FacebookShareButton url={shareUrl} className='w-full' onClick={() => setOpen(false)}>
             <button
               type='button'
-              className='w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-grey-100 transition-colors text-left'
+              className='w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-muted transition-colors text-left'
             >
               <FacebookIcon className='size-5 text-[#1877F2]' />
-              <span className='text-sm font-medium text-grey-700'>{t('facebook')}</span>
+              <span className='text-sm font-medium text-foreground/80'>{t('facebook')}</span>
             </button>
           </FacebookShareButton>
 
@@ -67,8 +67,8 @@ export function SharePopover({ url, title }: SharePopoverProps) {
             type='button'
             onClick={handleCopyLink}
             className={cn(
-              'w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-grey-100 transition-colors text-left',
-              copied && 'text-main-primary'
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-muted transition-colors text-left',
+              copied && 'text-primary'
             )}
           >
             <LinkIcon className='size-5' />

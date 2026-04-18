@@ -12,32 +12,32 @@ export enum ListingStatus {
  * listing-card, listing-detail-panel, and listing-status-actions.
  */
 export const LISTING_STATUS_CONFIG: Record<ListingStatus, { labelKey: string; className: string }> =
-  {
-    [ListingStatus.DRAFT]: {
-      labelKey: 'status.draft',
-      className: 'bg-gray-100 text-gray-600',
-    },
-    [ListingStatus.PENDING]: {
-      labelKey: 'status.pending',
-      className: 'bg-yellow-50 text-yellow-600',
-    },
-    [ListingStatus.PUBLISHED]: {
-      labelKey: 'status.published',
-      className: 'bg-purple-94 text-main-primary',
-    },
-    [ListingStatus.SOLD]: {
-      labelKey: 'status.sold',
-      className: 'bg-green-50 text-green-600',
-    },
-    [ListingStatus.RENTED]: {
-      labelKey: 'status.rented',
-      className: 'bg-green-50 text-green-600',
-    },
-    [ListingStatus.ARCHIVED]: {
-      labelKey: 'status.archived',
-      className: 'bg-gray-100 text-gray-600',
-    },
-  };
+{
+  [ListingStatus.DRAFT]: {
+    labelKey: 'status.draft',
+    className: 'bg-gray-100 text-gray-600',
+  },
+  [ListingStatus.PENDING]: {
+    labelKey: 'status.pending',
+    className: 'bg-yellow-50 text-yellow-600',
+  },
+  [ListingStatus.PUBLISHED]: {
+    labelKey: 'status.published',
+    className: 'bg-primary/10 text-primary',
+  },
+  [ListingStatus.SOLD]: {
+    labelKey: 'status.sold',
+    className: 'bg-green-50 text-green-600',
+  },
+  [ListingStatus.RENTED]: {
+    labelKey: 'status.rented',
+    className: 'bg-green-50 text-green-600',
+  },
+  [ListingStatus.ARCHIVED]: {
+    labelKey: 'status.archived',
+    className: 'bg-gray-100 text-gray-600',
+  },
+};
 
 export enum ListingType {
   RENT = 'RENT',

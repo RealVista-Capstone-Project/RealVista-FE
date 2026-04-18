@@ -31,11 +31,11 @@ interface ListingInformationStepProps {
 function ReadOnlyField({ label, value, badge }: { label: string; value: string; badge?: string }) {
   return (
     <div className='flex flex-col gap-2'>
-      <span className='text-sm font-medium text-main-black'>{label}</span>
-      <div className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/50 px-4 py-3'>
-        <span className='flex-1 text-sm text-main-secondary/60'>{value}</span>
+      <span className='text-sm font-medium text-foreground'>{label}</span>
+      <div className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3'>
+        <span className='flex-1 text-sm text-muted-foreground'>{value}</span>
         {badge && (
-          <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
+          <span className='rounded-full bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
             {badge}
           </span>
         )}
@@ -297,16 +297,16 @@ export function ListingInformationStep({
       {/* Scrollable content */}
       <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
         {/* Property Address Card */}
-        <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6 shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'>
+        <div className='rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6 shadow-primary/10'>
           <div className='flex items-center gap-4'>
-            <div className='flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-main-primary/10'>
-              <Home className='h-6 w-6 text-main-primary' />
+            <div className='flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10'>
+              <Home className='h-6 w-6 text-primary' />
             </div>
             <div className='flex min-w-0 flex-col gap-1'>
-              <span className='text-lg font-bold tracking-tight text-main-black'>
+              <span className='text-lg font-bold tracking-tight text-foreground'>
                 {t('propertyAddress')}
               </span>
-              <span className='flex items-center gap-1 text-sm text-main-secondary/50'>
+              <span className='flex items-center gap-1 text-sm text-muted-foreground/70'>
                 <MapPin className='h-3 w-3 shrink-0' />
                 <span className='truncate'>{fullAddress}</span>
               </span>
@@ -315,8 +315,8 @@ export function ListingInformationStep({
         </div>
 
         {/* Listing Information Form */}
-        <div className='mt-5 rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
-          <h3 className='mb-6 text-lg font-bold tracking-tight text-main-black'>
+        <div className='mt-5 rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
+          <h3 className='mb-6 text-lg font-bold tracking-tight text-foreground'>
             {t('listingInformation')}
           </h3>
 
@@ -351,9 +351,9 @@ export function ListingInformationStep({
 
             {/* Listing Type */}
             <div className='flex flex-col gap-2'>
-              <span className='text-sm font-medium text-main-black'>
+              <span className='text-sm font-medium text-foreground'>
                 {t('listingTypeLabel')}
-                <span className='text-main-primary'>*</span>
+                <span className='text-primary'>*</span>
               </span>
               <ListingTypeSelector
                 value={listingType}
@@ -429,21 +429,21 @@ export function ListingInformationStep({
             {selectedProperty.amenities.length > 0 && (
               <div className='flex flex-col gap-3'>
                 <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium text-main-black'>
+                  <span className='text-sm font-medium text-foreground'>
                     {t('selectAmenities')}
                   </span>
-                  <span className='rounded-full bg-purple-96 px-2 py-0.5 text-xs font-medium text-main-primary'>
+                  <span className='rounded-full bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
                     {t('readOnly')}
                   </span>
                 </div>
-                <div className='rounded-lg border border-purple-92 p-4'>
+                <div className='rounded-lg border border-primary/20 p-4'>
                   <div className='flex flex-wrap gap-2'>
                     {selectedProperty.amenities.map((amenity) => (
                       <div
                         key={amenity.amenityId}
-                        className='flex items-center gap-2 rounded-lg border border-purple-92 bg-purple-98/30 px-3 py-1.5 text-sm font-medium text-main-black/80'
+                        className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm font-medium text-foreground/80'
                       >
-                        <Check className='h-3.5 w-3.5 text-main-primary' strokeWidth={2.5} />
+                        <Check className='h-3.5 w-3.5 text-primary' strokeWidth={2.5} />
                         {amenity.amenityName}
                       </div>
                     ))}
@@ -467,16 +467,16 @@ export function ListingInformationStep({
             {/* Media Section */}
             <div className='flex flex-col gap-3'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-main-black'>{t('mediaUpload')}</span>
+                <span className='text-sm font-medium text-foreground'>{t('mediaUpload')}</span>
                 {selectedProperty.media.filter((m) => m.isPropertyStandard).length > 0 && (
-                  <span className='text-xs text-main-secondary/50'>
+                  <span className='text-xs text-muted-foreground/70'>
                     {selectedMediaIds.size} /{' '}
                     {selectedProperty.media.filter((m) => m.isPropertyStandard).length}{' '}
                     {t('selected', { fallback: 'selected' })}
                   </span>
                 )}
               </div>
-              <p className='text-xs text-main-secondary/50'>{t('mediaUploadHint')}</p>
+              <p className='text-xs text-muted-foreground/70'>{t('mediaUploadHint')}</p>
 
               {selectedMediaIds.size === 0 && newFiles.length === 0 && (
                 <div className='mt-1 flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-[11px] font-medium text-red-600'>
@@ -522,12 +522,12 @@ export function ListingInformationStep({
       </div>
 
       {/* Footer — Previous / Save as Draft / Submit */}
-      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
         <button
           type='button'
           onClick={onPrevious}
           disabled={isSubmitting}
-          className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-purple-98 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-main-primary transition-colors hover:bg-purple-96 disabled:opacity-50'
+          className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-primary/5 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-primary transition-colors hover:bg-primary/5 disabled:opacity-50'
         >
           {t('previous')}
         </button>
@@ -539,8 +539,8 @@ export function ListingInformationStep({
           className={cn(
             'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg border-2 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold transition-all',
             isValid && !isSubmitting
-              ? 'border-main-primary text-main-primary hover:bg-main-primary/5'
-              : 'border-main-primary/20 text-main-primary/20 cursor-not-allowed'
+              ? 'border-primary text-primary hover:bg-primary/5'
+              : 'border-primary/20 text-primary/20 cursor-not-allowed'
           )}
         >
           {t('saveAsDraft', { fallback: 'Save as Draft' })}
@@ -553,8 +553,8 @@ export function ListingInformationStep({
           className={cn(
             'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all',
             isValid && !isSubmitting
-              ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
-              : 'bg-main-primary/30 cursor-not-allowed'
+              ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
+              : 'bg-primary/30 cursor-not-allowed'
           )}
         >
           {isSubmitting ? t('submitting') : t('submit')}
