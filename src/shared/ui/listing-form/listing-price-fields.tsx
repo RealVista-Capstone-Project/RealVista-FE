@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { cn } from '@/shared/lib/utils';
+import type { ListingType } from '@/entities/listing';
 
 /* ─── Currency Input ─── */
 
@@ -43,7 +44,12 @@ export function CurrencyInput({
           type='text'
           inputMode='numeric'
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            const raw = e.target.value
+              .replace(/[^0-9.]/g, '')
+              .replace(/(\..*)\./g, '$1');
+            onChange(raw);
+          }}
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
@@ -94,7 +100,7 @@ export function NegotiableToggle({ value, onChange, label }: NegotiableTogglePro
 /* ─── Price Fields Composite ─── */
 
 interface ListingPriceFieldsProps {
-  listingType: string;
+  listingType: ListingType;
   price: string;
   onPriceChange: (value: string) => void;
   minPrice: string;
@@ -146,6 +152,12 @@ export function ListingPriceFields({
             required
           />
         </div>
+        {/* TODO(tech-debt): Security deposit field is not yet implemented.
+            The UI stub is kept visible but disabled until:
+            1. Backend listing update endpoint is confirmed to accept `security_deposit`
+            2. `securityDeposit` is added to EditListingFormData & EditListingPayload
+            3. State and onChange handler are wired up in edit-listing-modal and create-listing-modal
+            See: src/features/edit-listing-modal/model/types.ts, src/shared/ui/listing-form/listing-price-fields.tsx */}
         {listingType === 'RENT' && (
           <CurrencyInput
             value=''
