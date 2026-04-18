@@ -7,7 +7,7 @@ export default function DashboardRouteLayout({ children }: { children: React.Rea
   return (
     <RoleGuard
       allowedRoles={['admin', 'moderator']}
-      allowedBackendRoles={['OWNER', 'TENANT']}
+      allowedBackendRoles={['OWNER']}
       redirectPath='/'
     >
       <DashboardLayout>{children}</DashboardLayout>

@@ -26,6 +26,7 @@ function MyRentalContractsContent() {
     handleContractClick,
     isError,
     isLoading,
+    inputValue,
     itemsPerPage,
     searchQuery,
     selectedContract,
@@ -37,6 +38,9 @@ function MyRentalContractsContent() {
     totalElements,
     totalPages,
   } = useMyRentalContractsContext();
+
+  // True when the user has typed something but the debounced query hasn't settled yet
+  const isSearchPending = inputValue !== searchQuery;
 
   const t = useTranslations('MyRentalContracts');
   const tStatus = useTranslations('RentalContract.status');
@@ -130,12 +134,18 @@ function MyRentalContractsContent() {
               <div className='relative w-full flex-1'>
                 <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60' />
                 <Input
-                  value={searchQuery}
+                  value={inputValue}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('filter.searchPlaceholder')}
-                  className='h-10 rounded-xl border-transparent bg-primary/5 pl-9 text-sm focus-visible:ring-primary/20'
+                  className='h-10 rounded-xl border-transparent bg-primary/5 pl-9 pr-8 text-sm focus-visible:ring-primary/20'
                   aria-label={t('filter.searchAria')}
                 />
+                {/* Spinner shown while debounce is pending — disappears once API fires */}
+                {isSearchPending && (
+                  <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2'>
+                    <span className='block h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary/30 border-t-primary' />
+                  </span>
+                )}
               </div>
             </div>
 
