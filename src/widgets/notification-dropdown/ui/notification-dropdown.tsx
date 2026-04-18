@@ -65,7 +65,7 @@ export function NotificationDropdown({
           align={align}
           sideOffset={8}
           className={cn(
-            'z-50 w-[400px] rounded-xl border border-primary/20 bg-background shadow-[0px_10px_40px_0px_rgba(16,10,85,0.12)]',
+            'z-50 w-[400px] rounded-xl border border-primary/20 bg-background shadow-[0px_10px_40px_0px_color-mix(in_oklch,var(--primary)_12%,transparent)]',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

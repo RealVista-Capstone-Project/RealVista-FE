@@ -188,7 +188,7 @@ export function ListingStatusActions({
             <button
               type='button'
               onClick={handleConfirm}
-              className='flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-bold text-white transition-all hover:bg-primary/90 shadow-[0px_4px_12px_0px_rgba(112,101,240,0.2)] disabled:opacity-50 disabled:cursor-not-allowed'
+              className='flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-bold text-white transition-all hover:bg-primary/90 shadow-[0px_4px_12px_0px_color-mix(in_oklch,var(--primary)_20%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed'
               disabled={isPending}
             >
               {isPending ? t('common.processing', { fallback: 'Processing...' }) : t('confirm.proceed')}

@@ -375,7 +375,7 @@ export function CreateRentalContractPage() {
           />
 
           {/* Step content card */}
-          <Card className='rounded-[30px] border-primary/10 bg-white/94 shadow-[0_24px_60px_rgba(96,72,179,0.10)]'>
+          <Card className='rounded-[30px] border-primary/10 bg-white/94 shadow-[0_24px_60px_color-mix(in_oklch,var(--primary)_10%,transparent)]'>
             <CardContent className='p-6'>
               {/* Step title + progress */}
               <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>

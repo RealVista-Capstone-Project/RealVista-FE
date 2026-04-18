@@ -78,7 +78,7 @@ function ManageRentalContractContent() {
   return (
     <div className='h-full bg-[radial-gradient(circle_at_top_left,_rgba(122,92,255,0.10),_transparent_28%),linear-gradient(180deg,#F6F4FF_0%,#F9F8FE_32%,#F7F7FD_100%)]'>
       <div className='mx-auto px-6 py-6'>
-        <div className='mb-6 rounded-3xl border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(246,243,255,0.92))] p-6 shadow-[0_20px_60px_rgba(96,72,179,0.08)] backdrop-blur-md'>
+        <div className='mb-6 rounded-3xl border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(246,243,255,0.92))] p-6 shadow-[0_20px_60px_color-mix(in_oklch,var(--primary)_8%,transparent)] backdrop-blur-md'>
           <div className='flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between'>
             <div className='max-w-2xl'>
               <p className='text-xs font-semibold uppercase tracking-[0.24em] text-primary/70'>
@@ -96,7 +96,7 @@ function ManageRentalContractContent() {
               <div className='flex justify-end'>
                 <Button
                   type='button'
-                  className='h-11 rounded-xl bg-primary px-4 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary/90'
+                  className='h-11 rounded-xl bg-primary px-4 text-white shadow-[0_18px_30px_color-mix(in_oklch,var(--primary)_24%,transparent)] hover:bg-primary/90'
                   onClick={() => router.push(ROUTES.dashboard.createRentalContract)}
                 >
                   <Plus className='h-4 w-4' />
@@ -131,7 +131,7 @@ function ManageRentalContractContent() {
               selectedContract ? 'w-full lg:basis-[60%] lg:max-w-[60%]' : 'flex-1 w-full'
             )}
           >
-            <div className='mb-5 flex flex-col gap-3 rounded-3xl border border-white/60 bg-white/90 p-4 shadow-[0_12px_36px_rgba(94,74,175,0.08)] sm:flex-row sm:items-center'>
+            <div className='mb-5 flex flex-col gap-3 rounded-3xl border border-white/60 bg-white/90 p-4 shadow-[0_12px_36px_color-mix(in_oklch,var(--primary)_8%,transparent)] sm:flex-row sm:items-center'>
               <div className='flex w-full flex-shrink-0 items-center gap-2 sm:w-auto'>
                 <SlidersHorizontal className='h-4 w-4 flex-shrink-0 text-muted-foreground/70' />
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -160,7 +160,7 @@ function ManageRentalContractContent() {
               </div>
             </div>
 
-            <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_rgba(96,72,179,0.10)]'>
+            <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_color-mix(in_oklch,var(--primary)_10%,transparent)]'>
               <div className='grid grid-cols-12 gap-4 border-b border-primary/20 bg-secondary px-5 py-4'>
                 <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('table.status')}

@@ -80,7 +80,7 @@ export function CancelContractDialog({
               {t('cancelDialog.title')}
             </DialogTitle>
           </div>
-          <DialogDescription className='text-sm text-gray-500 leading-relaxed pl-[52px]'>
+          <DialogDescription className='text-sm text-gray-500 leading-relaxed pl-13'>
             {t('cancelDialog.description', {
               agentName: agent.agent_full_name,
             })}

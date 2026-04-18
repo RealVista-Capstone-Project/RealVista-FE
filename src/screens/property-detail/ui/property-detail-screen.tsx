@@ -91,7 +91,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
   };
 
   return (
-    <div className='min-h-screen bg-background pb-[88px] md:pb-8'>
+    <div className='min-h-screen bg-background pb-22 md:pb-8'>
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}

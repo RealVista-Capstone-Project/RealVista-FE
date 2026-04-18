@@ -167,7 +167,7 @@ export function BookmarksFilter({
                   <PopoverPrimitive.Content
                     align='start'
                     sideOffset={8}
-                    className='z-50 w-[200px] overflow-hidden rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
+                    className='z-50 w-[200px] overflow-hidden rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_color-mix(in_oklch,var(--primary)_10%,transparent)]'
                   >
                     <div className='flex flex-col'>
                       {[
@@ -213,7 +213,7 @@ export function BookmarksFilter({
                   <PopoverPrimitive.Content
                     align='start'
                     sideOffset={8}
-                    className='z-50 w-[260px] overflow-hidden rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
+                    className='z-50 w-[260px] overflow-hidden rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_color-mix(in_oklch,var(--primary)_10%,transparent)]'
                   >
                     <div className='flex flex-col max-h-[400px] overflow-y-auto'>
                       {/* Tất cả */}

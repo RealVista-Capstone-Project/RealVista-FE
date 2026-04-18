@@ -97,7 +97,7 @@ function PropertyCard({
       className={cn(
         'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
         isSelected
-          ? 'border-primary bg-primary/5 shadow-[0px_0px_20px_0px_rgba(112,101,240,0.15)]'
+          ? 'border-primary bg-primary/5 shadow-[0px_0px_20px_0px_color-mix(in_oklch,var(--primary)_15%,transparent)]'
           : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
       )}
     >
@@ -460,7 +460,7 @@ export function CreateListingPage() {
                 className={cn(
                   'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
                   selectedProperty
-                    ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
+                    ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_color-mix(in_oklch,var(--primary)_30%,transparent)]'
                     : 'bg-primary/30 cursor-not-allowed'
                 )}
               >

@@ -74,7 +74,7 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
 
   return (
     <>
-      <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:basis-[40%] lg:max-w-[40%]'>
+      <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-[0_24px_60px_color-mix(in_oklch,var(--primary)_12%,transparent)] lg:basis-[40%] lg:max-w-[40%]'>
         <div className='flex items-center justify-between border-b border-border px-5 py-4'>
           <div>
             <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground'>
@@ -123,7 +123,7 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
             </div>
 
             <div className='space-y-4 px-4 py-4'>
-              <div className='rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_rgba(234,230,249,0.9)]'>
+              <div className='rounded-xl bg-white p-4 shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--primary)_20%,transparent)]'>
                 <div className='flex items-start gap-3'>
                   <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary'>
                     <FileText className='h-5 w-5' />
@@ -227,7 +227,7 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
 
               <Button
                 type='button'
-                className='h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_rgba(5,150,105,0.22)] hover:bg-emerald-700 disabled:opacity-60'
+                className='h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_color-mix(in_oklch,var(--color-emerald-600,oklch(0.64_0.15_162))_22%,transparent)] hover:bg-emerald-700 disabled:opacity-60'
                 onClick={handleSignNow}
                 disabled={getRenterSigningUrlMutation.isPending}
                 aria-label={t('detailPanel.signNowAria')}

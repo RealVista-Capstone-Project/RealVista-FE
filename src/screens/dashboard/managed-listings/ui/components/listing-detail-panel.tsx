@@ -478,7 +478,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             <button
               type='button'
               onClick={handleDelete}
-              className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_rgba(220,38,38,0.2)] disabled:opacity-50 disabled:cursor-not-allowed'
+              className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_color-mix(in_oklch,var(--destructive)_20%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed'
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending

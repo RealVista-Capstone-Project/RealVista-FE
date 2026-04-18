@@ -61,7 +61,7 @@ export function ExistingMediaGrid({
             className={cn(
               'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
               isSelected
-                ? 'border-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
+                ? 'border-primary shadow-[0px_0px_12px_0px_color-mix(in_oklch,var(--primary)_25%,transparent)]'
                 : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
             )}
           >
@@ -230,7 +230,7 @@ export function NewFilesGrid({
             className={cn(
               'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
               isPrimary
-                ? 'border-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
+                ? 'border-primary shadow-[0px_0px_12px_0px_color-mix(in_oklch,var(--primary)_25%,transparent)]'
                 : isSelected
                   ? 'border-primary/60'
                   : isRejected

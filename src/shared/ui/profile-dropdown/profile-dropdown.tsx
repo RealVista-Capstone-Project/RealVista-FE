@@ -115,7 +115,7 @@ export function ProfileDropdown({
           align={align}
           sideOffset={8}
           className={cn(
-            'z-50 w-[272px] rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]',
+            'z-50 w-[272px] rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_color-mix(in_oklch,var(--primary)_10%,transparent)]',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

@@ -220,7 +220,7 @@ function BuyPageContent() {
 
   if (isMapView) {
     return (
-      <div className='fixed inset-0 top-[72px] w-full bg-white z-10'>
+      <div className='fixed inset-0 top-[4.5rem] w-full bg-white z-10'>
         <PropertyMapBasedSearchPage initialListingType='SALE' onBack={() => setIsMapView(false)} />
       </div>
     );

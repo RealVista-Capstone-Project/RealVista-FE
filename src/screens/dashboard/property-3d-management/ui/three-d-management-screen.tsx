@@ -345,7 +345,7 @@ export function ThreeDManagementScreen({
                     <div className='absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-5 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none'>
                       <div className='flex items-center gap-4'>
                         <div className='w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10'>
-                          <Layers className='w-6 h-6 text-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]' />
+                          <Layers className='w-6 h-6 text-primary shadow-[0_0_15px_color-mix(in_oklch,var(--primary)_50%,transparent)]' />
                         </div>
                         <div className='space-y-0.5'>
                           <div className='flex items-center gap-2'>
@@ -385,7 +385,7 @@ export function ThreeDManagementScreen({
                   <div className='mt-3 flex items-center justify-center gap-4'>
                     <div className='h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent' />
                     <div className='flex items-center gap-2 text-[11px] font-medium text-muted-foreground uppercase tracking-widest'>
-                      <div className='w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),1)]' />
+                      <div className='w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]' />
                       {t('viewingLabel')}
                     </div>
                     <div className='h-px flex-1 bg-gradient-to-r from-border via-border to-transparent' />

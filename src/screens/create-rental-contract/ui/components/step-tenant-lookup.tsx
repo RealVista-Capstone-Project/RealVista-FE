@@ -46,7 +46,7 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
           </div>
           <Button
             type='button'
-            className='h-11 rounded-2xl bg-primary px-5 text-white shadow-[0_12px_24px_rgba(92,63,214,0.2)] hover:bg-primary/90'
+            className='h-11 rounded-2xl bg-primary px-5 text-white shadow-[0_12px_24px_color-mix(in_oklch,var(--primary)_20%,transparent)] hover:bg-primary/90'
             onClick={onLookup}
             disabled={!form.tenantEmail.trim() || isLoading}
           >

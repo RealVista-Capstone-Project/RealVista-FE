@@ -289,7 +289,7 @@ export function PropertySearchStep() {
               className={cn(
                 'cursor-pointer transition-all border-[1.5px]',
                 selectedRole === 'OWNER'
-                  ? 'border-primary bg-primary/5 shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'
+                  ? 'border-primary bg-primary/5 shadow-[0px_4px_20px_0px_color-mix(in_oklch,var(--primary)_8%,transparent)]'
                   : 'border-primary/20 hover:border-primary'
               )}
               onClick={() => {
@@ -317,7 +317,7 @@ export function PropertySearchStep() {
               className={cn(
                 'cursor-pointer transition-all border-[1.5px]',
                 selectedRole === 'AGENT'
-                  ? 'border-[primary] bg-primary/5 shadow-[0px_4px_20px_0px_rgba(14,8,84,0.08)]'
+                  ? 'border-[primary] bg-primary/5 shadow-[0px_4px_20px_0px_color-mix(in_oklch,var(--primary)_8%,transparent)]'
                   : 'border-primary/20 hover:border-[primary]'
               )}
               onClick={() => setValue('role.role', 'AGENT', { shouldValidate: true })}

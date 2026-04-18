@@ -170,7 +170,7 @@ export function ListingBoostSection({ listing }: ListingBoostSectionProps) {
             <button type='button' onClick={() => setRemoveDialogOpen(false)} className='flex h-11 items-center justify-center rounded-lg border border-primary/20 bg-white px-6 text-sm font-bold text-foreground transition-colors hover:bg-primary/5' disabled={removeBoost.isPending}>
               {t('boost.removeConfirmCancel')}
             </button>
-            <button type='button' onClick={handleRemoveConfirm} className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_rgba(220,38,38,0.2)] disabled:opacity-50 disabled:cursor-not-allowed' disabled={removeBoost.isPending}>
+            <button type='button' onClick={handleRemoveConfirm} className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_color-mix(in_oklch,var(--destructive)_20%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed' disabled={removeBoost.isPending}>
               {removeBoost.isPending ? t('boost.removing') : t('boost.removeConfirmApprove')}
             </button>
           </DialogFooter>

@@ -669,7 +669,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                     </SelectValue>
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className='rounded-lg border-primary/20 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'>
+                <SelectContent className='rounded-lg border-primary/20 shadow-[0px_10px_10px_0px_color-mix(in_oklch,var(--primary)_10%,transparent)]'>
                   {PROPERTY_TYPES.map((cat) => (
                     <SelectGroup key={cat.code}>
                       <SelectLabel>{cat.label}</SelectLabel>

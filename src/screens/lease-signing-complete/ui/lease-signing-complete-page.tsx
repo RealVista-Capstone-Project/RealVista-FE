@@ -232,7 +232,7 @@ export function LeaseSigningCompletePage() {
                     )}
                     <Button
                       type='button'
-                      className='h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_rgba(5,150,105,0.22)] hover:bg-emerald-700 disabled:opacity-60'
+                      className='h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_color-mix(in_oklch,var(--color-emerald-600,oklch(0.64_0.15_162))_22%,transparent)] hover:bg-emerald-700 disabled:opacity-60'
                       onClick={handleSendToRenter}
                       disabled={sendToRenterMutation.isPending}
                     >

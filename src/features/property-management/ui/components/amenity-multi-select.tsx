@@ -109,7 +109,7 @@ export function AmenityMultiSelect({
         </PopoverTrigger>
 
         <PopoverContent
-          className='w-[var(--radix-popover-trigger-width)] p-0 rounded-lg border-primary/20 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'
+          className='w-[var(--radix-popover-trigger-width)] p-0 rounded-lg border-primary/20 shadow-[0px_10px_10px_0px_color-mix(in_oklch,var(--primary)_10%,transparent)]'
           align='start'
           sideOffset={4}
         >

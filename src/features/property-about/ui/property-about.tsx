@@ -179,7 +179,7 @@ export function PropertyAbout({ property, isPostedByAgent }: PropertyAboutProps)
                   </span>
                 )}
               </div>
-              <div className='flex flex-col gap-[2px]'>
+              <div className='flex flex-col gap-0.5'>
                 <p className='text-foreground text-[16px] font-bold leading-[1.5]'>
                   {hasListingAgent(property) ? property.agent.full_name : property.agent.name}
                 </p>
