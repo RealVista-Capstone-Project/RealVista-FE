@@ -6,6 +6,7 @@ export interface EditListingFormData {
   minPrice: string;
   maxPrice: string;
   isNegotiable: boolean;
+  securityDeposit: string;
   availableFrom: string;
   content: string;
   selectedMediaIds: string[];
@@ -24,4 +25,5 @@ export interface EditListingPayload {
   media_ids?: string[];
   primary_media_id?: string | null;
   listing_type?: ListingType;
+  security_deposit?: number | null;
 }
