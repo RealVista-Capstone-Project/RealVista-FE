@@ -364,6 +364,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
       is_negotiable: data.isNegotiable,
       available_from: data.availableFrom || null,
       content: data.content.trim() || null,
+      security_deposit: data.securityDeposit.trim() ? Number(data.securityDeposit) : null,
       media_ids: data.selectedMediaIds.length > 0 ? [...data.selectedMediaIds] : [],
       primary_media_id:
         data.primaryMediaId && !data.primaryMediaId.startsWith('new:') ? data.primaryMediaId : null,

@@ -79,6 +79,7 @@ export function ListingInformationStep({
   const [maxPrice, setMaxPrice] = React.useState('');
   const [isNegotiable, setIsNegotiable] = React.useState(false);
   const [availableFrom, setAvailableFrom] = React.useState('');
+  const [securityDeposit, setSecurityDeposit] = React.useState('');
 
   const { contentStatus, isContentValid } = useContentVerification(name, content);
 
@@ -250,6 +251,7 @@ export function ListingInformationStep({
       maxPrice,
       isNegotiable,
       availableFrom,
+      securityDeposit,
       content,
       selectedMediaIds: Array.from(selectedMediaIds).filter(
         (id) => selectedProperty.media.find((m) => m.mediaId === id)?.isPropertyStandard
@@ -421,6 +423,8 @@ export function ListingInformationStep({
               onMaxPriceChange={setMaxPrice}
               isNegotiable={isNegotiable}
               onNegotiableChange={setIsNegotiable}
+              securityDeposit={securityDeposit}
+              onSecurityDepositChange={setSecurityDeposit}
               errors={errors}
               labels={priceLabels}
             />
