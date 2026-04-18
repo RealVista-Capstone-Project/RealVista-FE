@@ -14,8 +14,8 @@ import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/
  * This is the data source layer - pure functions that make HTTP requests
  */
 export const listingApi = {
-  getById: (listingId: string) =>
-    http.get<ApiResponse<Listing>>(`/listings/${listingId}`, {
+  getById: (listingId: string, recordView: boolean = false) =>
+    http.get<ApiResponse<Listing>>(`/listings/${listingId}?recordView=${recordView}`, {
       next: { tags: ['listing-detail', listingId] },
     }),
 

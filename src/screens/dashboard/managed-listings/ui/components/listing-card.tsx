@@ -113,9 +113,9 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
               {(listing.status === ListingStatus.DRAFT || listing.status === ListingStatus.ARCHIVED) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button type='button' className='text-primary hover:text-primary/80 transition-colors' onClick={(e) => e.stopPropagation()}>
+                    <div role='button' tabIndex={0} className='inline-flex text-primary hover:text-primary/80 transition-colors' onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}>
                       <Info className='h-3.5 w-3.5' />
-                    </button>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent side='top' className='max-w-[180px]'>
                     {tManagedListings('draftRuleTooltip')}

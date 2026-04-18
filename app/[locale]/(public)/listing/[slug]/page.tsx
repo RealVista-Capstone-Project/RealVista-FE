@@ -24,7 +24,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
 
     // Fetch listing from API
     // The API returns { success, message, data, timestamp }
-    const { payload: response } = await listingApi.getById(listingId);
+    const { payload: response } = await listingApi.getById(listingId, true);
 
     // Extract the actual listing data from the response
     const listing = response.data;
