@@ -52,6 +52,13 @@ interface FormState {
   leaseEndDate: string;
 }
 
+function getDefaultDates(): { leaseStartDate: string; leaseEndDate: string } {
+  const today = new Date();
+  const start = today.toISOString().slice(0, 10);
+  const end = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().slice(0, 10);
+  return { leaseStartDate: start, leaseEndDate: end };
+}
+
 const INITIAL_FORM_STATE: FormState = {
   propertyId: '',
   propertyTitle: '',
@@ -70,8 +77,7 @@ const INITIAL_FORM_STATE: FormState = {
   tenantLookupDone: false,
   monthlyRent: '',
   securityDeposit: '',
-  leaseStartDate: '2026-04-01',
-  leaseEndDate: '2027-03-31',
+  ...getDefaultDates(),
 };
 
 function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormState> {
@@ -154,6 +160,8 @@ export function CreateRentalContractPage() {
   }, [prefillListingId, prefillTenantId]);
 
   const [currentStep, setCurrentStep] = useState<WizardStep>(initialStep);
+  // Track the highest step the user has legitimately reached (completed previous step)
+  const [maxReachedStep, setMaxReachedStep] = useState<WizardStep>(initialStep);
   const [form, setForm] = useState<FormState>(() => ({
     ...INITIAL_FORM_STATE,
     // Seed tenant fields immediately so Step 2 shows them without lookup
@@ -193,7 +201,13 @@ export function CreateRentalContractPage() {
       return Boolean(form.tenantName && form.tenantEmail && form.tenantLookupDone);
     }
     if (currentStep === 3) {
-      return Boolean(form.monthlyRent && form.leaseStartDate && form.leaseEndDate);
+      const today = new Date().toISOString().slice(0, 10);
+      const hasRent = Boolean(form.monthlyRent);
+      const hasStart = Boolean(form.leaseStartDate);
+      const hasEnd = Boolean(form.leaseEndDate);
+      const startNotPast = form.leaseStartDate >= today;
+      const endAfterStart = form.leaseEndDate > form.leaseStartDate;
+      return hasRent && hasStart && hasEnd && startNotPast && endAfterStart;
     }
     return true;
   }, [currentStep, form]);
@@ -371,7 +385,11 @@ export function CreateRentalContractPage() {
           <WizardStepsCard
             steps={steps}
             currentStep={currentStep}
-            onStepClick={setCurrentStep}
+            maxAllowedStep={maxReachedStep}
+            onStepClick={(step) => {
+              // Only allow navigating to steps already reached
+              if (step <= maxReachedStep) setCurrentStep(step);
+            }}
           />
 
           {/* Step content card */}
@@ -403,7 +421,11 @@ export function CreateRentalContractPage() {
                 isStepValid={isStepValid}
                 isMutating={isMutating}
                 onBack={() => setCurrentStep((prev) => Math.max(1, prev - 1) as WizardStep)}
-                onNext={() => setCurrentStep((prev) => Math.min(4, prev + 1) as WizardStep)}
+                onNext={() => {
+                  const next = Math.min(4, currentStep + 1) as WizardStep;
+                  setCurrentStep(next);
+                  setMaxReachedStep((prev) => (next > prev ? next : prev));
+                }}
                 onSaveDraft={saveDraft}
                 onSendForSigning={sendForSigning}
                 t={(key) => t(key as never)}

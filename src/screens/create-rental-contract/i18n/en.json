@@ -118,6 +118,13 @@
       "draftError": "Unable to save contract draft. Please try again.",
       "sentSuccess": "Contract sent for signing",
       "sentError": "Unable to send contract for signing. Please try again."
+    },
+    "validation": {
+      "monthlyRentRequired": "Monthly rent is required",
+      "startDateRequired": "Lease start date is required",
+      "startDatePast": "Start date cannot be in the past",
+      "endDateRequired": "Lease end date is required",
+      "endDateBeforeStart": "End date must be after the start date"
     }
   }
 }
