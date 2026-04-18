@@ -15,6 +15,7 @@ interface CurrencyInputProps {
   required?: boolean;
   currency?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 export function CurrencyInput({
@@ -26,9 +27,10 @@ export function CurrencyInput({
   required = false,
   currency = '₫',
   disabled = false,
+  className,
 }: CurrencyInputProps) {
   return (
-    <div className={cn('flex flex-col gap-2', disabled && 'opacity-50')}>
+    <div className={cn('flex flex-col gap-2', disabled && 'opacity-50', className)}>
       <label className='text-sm font-medium text-foreground'>
         {label}
         {required && <span className='text-primary'>*</span>}
@@ -142,16 +144,15 @@ export function ListingPriceFields({
     <>
       {/* Price + Security Deposit */}
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-        <div className={cn('flex flex-col gap-2', listingType === 'SALE' && 'sm:col-span-2')}>
-          <CurrencyInput
-            value={price}
-            onChange={onPriceChange}
-            label={listingType === 'RENT' ? labels.priceRent : labels.priceSale}
-            placeholder={labels.pricePlaceholder}
-            error={errors.price}
-            required
-          />
-        </div>
+        <CurrencyInput
+          value={price}
+          onChange={onPriceChange}
+          label={listingType === 'RENT' ? labels.priceRent : labels.priceSale}
+          placeholder={labels.pricePlaceholder}
+          error={errors.price}
+          required
+          className={listingType === 'SALE' ? 'sm:col-span-2' : undefined}
+        />
         {/* TODO(tech-debt): Security deposit field is not yet implemented.
             The UI stub is kept visible but disabled until:
             1. Backend listing update endpoint is confirmed to accept `security_deposit`
