@@ -13,6 +13,7 @@ interface CurrencyInputProps {
   error?: string;
   required?: boolean;
   currency?: string;
+  disabled?: boolean;
 }
 
 export function CurrencyInput({
@@ -23,14 +24,18 @@ export function CurrencyInput({
   error,
   required = false,
   currency = '₫',
+  disabled = false,
 }: CurrencyInputProps) {
   return (
-    <div className='flex flex-col gap-2'>
+    <div className={cn('flex flex-col gap-2', disabled && 'opacity-50')}>
       <label className='text-sm font-medium text-foreground'>
         {label}
         {required && <span className='text-primary'>*</span>}
       </label>
-      <div className='flex items-center rounded-lg border border-primary/20 bg-white overflow-hidden transition-colors focus-within:border-primary'>
+      <div className={cn(
+        'flex items-center rounded-lg border border-primary/20 bg-background overflow-hidden transition-colors',
+        !disabled && 'focus-within:border-primary focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1'
+      )}>
         <span className='flex h-full items-center border-r border-primary/20 bg-primary/5 px-3 text-sm text-muted-foreground/70'>
           {currency}
         </span>
@@ -40,9 +45,11 @@ export function CurrencyInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          disabled={disabled}
           className={cn(
-            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none',
-            error && 'text-red-500'
+            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none bg-transparent',
+            error && 'text-red-500',
+            disabled && 'cursor-not-allowed'
           )}
         />
       </div>
@@ -69,7 +76,7 @@ export function NegotiableToggle({ value, onChange, label }: NegotiableTogglePro
         aria-checked={value}
         onClick={() => onChange(!value)}
         className={cn(
-          'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+          'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
           value ? 'bg-primary' : 'bg-primary/20'
         )}
       >
@@ -145,6 +152,7 @@ export function ListingPriceFields({
             onChange={() => { }}
             label={labels.securityDeposit}
             placeholder={labels.pricePlaceholder}
+            disabled
           />
         )}
       </div>

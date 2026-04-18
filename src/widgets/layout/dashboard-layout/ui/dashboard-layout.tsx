@@ -43,7 +43,6 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
     { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
     { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
     { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
-    { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
     { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     { id: 'manage-agent', label: t('menu.manageAgent'), href: ROUTES.dashboard.manageAgent, icon: Users },

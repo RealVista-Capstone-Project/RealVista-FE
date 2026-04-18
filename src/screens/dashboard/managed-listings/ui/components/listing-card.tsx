@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { formatVND } from '@/shared/lib/utils/format-currency';
+import { formatVND, formatNumber } from '@/shared/lib/utils/format-currency';
 import type { ManagedListing } from '../../types/managed-listing';
 import { LISTING_STATUS_CONFIG, ListingStatus } from '../../types/managed-listing';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui';
@@ -22,7 +22,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
     LISTING_STATUS_CONFIG[listing.status as ListingStatus] ??
     LISTING_STATUS_CONFIG[ListingStatus.DRAFT];
   const address = listing.full_address || t('noAddress');
-  const area = listing.property?.total_area ? `${listing.property.total_area} sq m` : '';
+  const area = listing.property?.total_area ? `${formatNumber(listing.property.total_area)} m²` : '';
   const formattedPrice = formatVND(listing.price);
 
   return (

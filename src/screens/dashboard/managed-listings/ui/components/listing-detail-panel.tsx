@@ -27,6 +27,7 @@ import {
 } from '@/shared/ui/dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 import {
   ArrowLeft,
   BadgeCheck,
@@ -182,9 +183,9 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
       </div>
 
       {/* Content */}
-      <div className='px-4 sm:px-12 py-6 sm:py-8'>
+      <div className='flex flex-col gap-8 px-4 sm:px-12 py-6 sm:py-8'>
         {/* Header with Title, Status Actions, and Calendar Button */}
-        <div className='mb-6 flex flex-col gap-4'>
+        <div className='flex flex-col gap-4'>
           <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
             <div className='flex flex-col gap-2'>
               <h1 className='text-2xl sm:text-[32px] font-bold leading-tight sm:leading-[1.25] tracking-tight sm:tracking-[-0.32px] text-foreground'>
@@ -267,14 +268,15 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         </div>
 
         {/* Listing Analytics Metrics */}
-        <div className='mb-8'>
+        <div>
           <ListingMetricsCard listingId={listing.listing_id} />
         </div>
 
         {/* Agent + Boost - Side by Side */}
-        <div className='flex w-full gap-4 mb-8'>
-          {/* Agent Information Card */}
-          {showAgentInfo && (
+        {(showAgentInfo || (listing.status === 'PUBLISHED' && !!listing.published_at)) && (
+          <div className='flex w-full flex-col sm:flex-row gap-4'>
+            {/* Agent Information Card */}
+            {showAgentInfo && (
             <div className='flex-1 overflow-hidden rounded-xl border border-primary/20 bg-primary/5 shadow-sm'>
               <div className='p-6'>
                 {/* Header */}
@@ -381,10 +383,11 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               <ListingBoostSection listing={listing} />
             </div>
           )}
-        </div>
+          </div>
+        )}
 
         {/* Features Stats - Dynamic attributes from server */}
-        <div className='mb-8 rounded-lg border border-primary/20 p-6'>
+        <div className='rounded-lg border border-primary/20 p-6'>
           {attributes.length > 0 ? (
             <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
               {listing.listing_type === 'RENT' && (
@@ -434,7 +437,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               />
               <FeatureStat
                 label={t('features.livingSpace')}
-                value={`${listing.property?.usable_size_m2 || 0} m²`}
+                value={`${formatNumber(listing.property?.usable_size_m2 || 0)} m²`}
                 icon={Ruler}
               />
               <FeatureStat
@@ -449,7 +452,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         </div>
 
         {/* About this listing */}
-        <div className='mb-8 flex flex-col gap-4'>
+        <div className='flex flex-col gap-4'>
           <h2 className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-foreground'>
             {t('aboutThisListing', { fallback: 'About this listing' })}
           </h2>
@@ -458,11 +461,11 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           </p>
         </div>
 
-        <div className='mb-8 h-px w-full bg-primary/15' />
+        <div className='h-px w-full bg-primary/15' />
 
         {/* Rental Features Section */}
         {property.amenities && property.amenities.length > 0 && (
-          <div className='mb-8'>
+          <div>
             <RentalFeatures property={property} />
           </div>
         )}

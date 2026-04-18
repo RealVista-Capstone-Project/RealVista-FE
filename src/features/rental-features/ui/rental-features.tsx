@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import type { Property } from '@/entities/property';
 import type { Amenity } from '@/entities/listing';
+import { Check } from 'lucide-react';
 
 export interface RentalFeaturesProps {
   property: Property;
@@ -51,36 +52,23 @@ export function RentalFeatures({ property }: RentalFeaturesProps) {
  */
 function AmenitySection({ title, amenities }: { title: string; amenities: Amenity[] }) {
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex flex-col gap-4'>
       {/* Section Title */}
-      <h3 className='text-foreground text-base sm:text-lg font-bold'>{title}</h3>
+      <h3 className='text-foreground text-lg sm:text-xl font-bold tracking-tight'>{title}</h3>
 
-      {/* Amenity List Card */}
-      <div className='bg-primary/5 rounded-lg p-4 sm:p-6'>
-        {/* Mobile: Single column bullet list */}
-        <ul className='sm:hidden flex flex-col gap-2'>
-          {amenities.map((amenity) => (
-            <li key={amenity.amenity_id} className='flex items-center gap-2'>
-              <span className='text-muted-foreground'>•</span>
-              <span className='text-muted-foreground text-base font-medium'>
-                {amenity.amenity_name}
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        {/* Desktop: Two column bullet list */}
-        <ul className='hidden sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-2'>
-          {amenities.map((amenity) => (
-            <li key={amenity.amenity_id} className='flex items-center gap-2'>
-              <span className='text-muted-foreground'>•</span>
-              <span className='text-muted-foreground text-base font-medium'>
-                {amenity.amenity_name}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Amenity Grid */}
+      <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4'>
+        {amenities.map((amenity) => (
+          <li key={amenity.amenity_id} className='flex items-start gap-3'>
+            <div className='mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+              <Check className='h-3.5 w-3.5' strokeWidth={3} />
+            </div>
+            <span className='text-muted-foreground text-base font-medium leading-relaxed'>
+              {amenity.amenity_name}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

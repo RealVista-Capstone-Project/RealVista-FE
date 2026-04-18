@@ -11,6 +11,7 @@ import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { Spinner } from '@/shared/ui/spinner';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
@@ -188,7 +189,7 @@ export function ManagedListingsPage() {
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
                 <div className='flex items-center justify-center rounded-full bg-primary px-2 py-1'>
-                  <span className='text-sm font-bold text-white'>{listingCounts.all}</span>
+                  <span className='text-sm font-bold text-white'>{formatNumber(listingCounts.all)}</span>
                 </div>
               </div>
 
@@ -225,7 +226,7 @@ export function ManagedListingsPage() {
                     activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
                   )}
                 >
-                  {listingCounts.all}
+                  {formatNumber(listingCounts.all)}
                 </span>
               </button>
               <button
@@ -247,7 +248,7 @@ export function ManagedListingsPage() {
                       : 'bg-primary/15 text-foreground'
                   )}
                 >
-                  {listingCounts.rent}
+                  {formatNumber(listingCounts.rent)}
                 </span>
               </button>
               <button
@@ -269,7 +270,7 @@ export function ManagedListingsPage() {
                       : 'bg-primary/15 text-foreground'
                   )}
                 >
-                  {listingCounts.sale}
+                  {formatNumber(listingCounts.sale)}
                 </span>
               </button>
             </div>

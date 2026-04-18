@@ -5,6 +5,7 @@ import { Eye, Users, Calendar, TrendingUp, CircleHelp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui/tooltip';
 import { useListingAnalytics } from '../api/use-listing-analytics';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 
 interface ListingMetricsCardProps {
   listingId: string;
@@ -53,17 +54,17 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
         <MetricItem
           icon={<Eye className='h-6 w-6' strokeWidth={2} />}
           label={t('metrics.totalViews')}
-          value={analytics.total_views.toLocaleString()}
+          value={formatNumber(analytics.total_views)}
         />
         <MetricItem
           icon={<Users className='h-6 w-6' strokeWidth={2} />}
           label={t('metrics.uniqueViewers')}
-          value={analytics.unique_viewers.toLocaleString()}
+          value={formatNumber(analytics.unique_viewers)}
         />
         <MetricItem
           icon={<Calendar className='h-6 w-6' strokeWidth={2} />}
           label={t('metrics.tourBookings')}
-          value={analytics.tour_bookings.toLocaleString()}
+          value={formatNumber(analytics.tour_bookings)}
         />
         <MetricItem
           icon={<TrendingUp className='h-6 w-6' strokeWidth={2} />}

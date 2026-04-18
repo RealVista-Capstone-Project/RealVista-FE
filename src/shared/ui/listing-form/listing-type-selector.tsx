@@ -47,7 +47,7 @@ export function ListingTypeSelector({
             checked={value === type}
             onChange={() => !disabled && onChange(type)}
             disabled={disabled}
-            className='sr-only'
+            className='sr-only focus-visible:not-sr-only'
           />
           <span className='text-sm font-medium text-foreground'>
             {type === 'RENT' ? labels.rent : labels.sale}

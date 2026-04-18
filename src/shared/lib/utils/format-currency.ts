@@ -24,3 +24,10 @@ export const formatVND = (price: number): string => {
     return price.toLocaleString('vi-VN');
   }
 };
+
+/**
+ * Format numbers with Vietnamese locale (e.g., 1.500 instead of 1,500)
+ */
+export const formatNumber = (num: number): string => {
+  return num.toLocaleString('vi-VN');
+};
