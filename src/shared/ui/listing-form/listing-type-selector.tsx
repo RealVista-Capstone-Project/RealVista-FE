@@ -27,9 +27,18 @@ export function ListingTypeSelector({
           key={type}
           className={cn('flex items-center gap-2', disabled ? 'cursor-not-allowed' : 'cursor-pointer')}
         >
+          <input
+            type='radio'
+            name='listingType'
+            value={type}
+            checked={value === type}
+            onChange={() => !disabled && onChange(type)}
+            disabled={disabled}
+            className='sr-only peer'
+          />
           <div
             className={cn(
-              'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors',
+              'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2',
               value === type ? 'border-primary' : 'border-primary/20',
               disabled && value === type && 'border-secondary/30'
             )}
@@ -40,15 +49,6 @@ export function ListingTypeSelector({
               />
             )}
           </div>
-          <input
-            type='radio'
-            name='listingType'
-            value={type}
-            checked={value === type}
-            onChange={() => !disabled && onChange(type)}
-            disabled={disabled}
-            className='sr-only focus-visible:not-sr-only'
-          />
           <span className='text-sm font-medium text-foreground'>
             {type === 'RENT' ? labels.rent : labels.sale}
           </span>

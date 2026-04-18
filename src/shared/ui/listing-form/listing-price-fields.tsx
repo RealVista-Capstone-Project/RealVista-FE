@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { cn } from '@/shared/lib/utils';
+import { formatVND, formatNumber } from '@/shared/lib/utils/format-currency';
 import type { ListingType } from '@/entities/listing';
 
 /* ─── Currency Input ─── */
@@ -29,6 +30,19 @@ export function CurrencyInput({
   disabled = false,
   className,
 }: CurrencyInputProps) {
+  const [focused, setFocused] = React.useState(false);
+
+  // While focused: show raw digits. While blurred: show formatted with dot separators.
+  const numericValue = value.replace(/\D/g, '');
+  const displayValue = focused || !numericValue ? value : formatNumber(Number(numericValue));
+
+  // Helper text: e.g. "2 tỷ VNĐ" or "500 triệu VNĐ"
+  const helperText = React.useMemo(() => {
+    const n = Number(numericValue);
+    if (!numericValue || !Number.isFinite(n) || n <= 0) return null;
+    return `${formatVND(n)} VNĐ`;
+  }, [numericValue]);
+
   return (
     <div className={cn('flex flex-col gap-2', disabled && 'opacity-50', className)}>
       <label className='text-sm font-medium text-foreground'>
@@ -45,11 +59,13 @@ export function CurrencyInput({
         <input
           type='text'
           inputMode='numeric'
-          value={value}
+          value={displayValue}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onBlur={() => setFocused(false)}
           onChange={(e) => {
-            const raw = e.target.value
-              .replace(/[^0-9.]/g, '')
-              .replace(/(\..*)\./g, '$1');
+            const raw = e.target.value.replace(/\D/g, '');
             onChange(raw);
           }}
           placeholder={placeholder}
@@ -61,6 +77,9 @@ export function CurrencyInput({
           )}
         />
       </div>
+      {helperText && !error && (
+        <span className='text-xs text-muted-foreground'>{helperText}</span>
+      )}
       {error && <span className='text-xs text-red-500'>{error}</span>}
     </div>
   );

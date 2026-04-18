@@ -355,7 +355,7 @@ export function AppointmentsPage() {
         )}
 
         {apt.appointment_type === 'BLOCK' && isEditingBlocks && (
-          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm pl-1 rounded-sm">
+          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-background/60 backdrop-blur-sm pl-1 rounded-sm">
             <Button
               variant="ghost"
               size="icon"
@@ -368,13 +368,13 @@ export function AppointmentsPage() {
         )}
 
         {apt.appointment_type !== 'BLOCK' && (isPending || isAccepted) && (
-          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm pl-1 rounded-sm">
+          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-background/60 backdrop-blur-sm pl-1 rounded-sm">
             {isReceiver && isPending && (
               <>
                 <button
                   onClick={(e) => handleQuickAccept(e, apt.appointment_id)}
                   disabled={updateStatus.isPending}
-                  className="rounded bg-green-500/20 p-1 text-green-700 hover:bg-green-500/30 dark:text-green-300"
+                  className="cursor-pointer rounded bg-green-500/20 p-1 text-green-700 hover:bg-green-500/30 dark:text-green-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   title={t('accept')}
                 >
                   <Check className="h-3 w-3" />
@@ -384,7 +384,7 @@ export function AppointmentsPage() {
                     e.stopPropagation();
                     handleOpenReasonDialog(e, apt.appointment_id, 'REJECT');
                   }}
-                  className="rounded bg-red-500/20 p-1 text-red-700 hover:bg-red-500/30 dark:text-red-300"
+                  className="cursor-pointer rounded bg-red-500/20 p-1 text-red-700 hover:bg-red-500/30 dark:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   title={t('reject')}
                 >
                   <X className="h-3 w-3" />
@@ -403,7 +403,7 @@ export function AppointmentsPage() {
                   });
                 }}
                 disabled={updateStatus.isPending}
-                className="rounded bg-blue-500/20 p-1 text-blue-700 hover:bg-blue-500/30 dark:text-blue-300"
+                className="cursor-pointer rounded bg-blue-500/20 p-1 text-blue-700 hover:bg-blue-500/30 dark:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 title={t('complete')}
               >
                 <CheckCircle2 className="h-3 w-3" />
@@ -414,7 +414,7 @@ export function AppointmentsPage() {
                 <TooltipTrigger asChild>
                   <button
                     onClick={(e) => handleOpenReasonDialog(e, apt.appointment_id, 'CANCEL')}
-                    className="rounded bg-gray-500/20 p-1 text-gray-700 hover:bg-gray-500/30 dark:text-gray-300"
+                    className="cursor-pointer rounded bg-gray-500/20 p-1 text-gray-700 hover:bg-gray-500/30 dark:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -438,6 +438,7 @@ export function AppointmentsPage() {
         mode={isEditingBlocks ? 'edit-blocks' : 'view'}
         value={isEditingBlocks ? editableBlocks : undefined}
         onValueChange={isEditingBlocks ? setEditableBlocks : undefined}
+        mergeAdjacent={false}
         appointments={filteredAppointments as AppointmentWithListing[]}
         onAppointmentClick={isEditingBlocks ? undefined : handleAppointmentClick}
         renderAppointmentCard={renderAppointmentCard as any}
@@ -561,6 +562,7 @@ export function AppointmentsPage() {
               }
               rows={3}
               className="resize-none"
+              disabled={updateStatus.isPending}
             />
           </div>
           <DialogFooter className="gap-2">
@@ -569,9 +571,9 @@ export function AppointmentsPage() {
             </DialogClose>
             <Button
               size="sm"
+              variant="destructive"
               onClick={handleSubmitReason}
               disabled={!actionReason.trim() || updateStatus.isPending}
-              className="bg-primary text-white border-0 hover:bg-primary/90 shadow-sm"
             >
               {updateStatus.isPending ? t('saving') || 'Saving...' : t('submit')}
             </Button>
@@ -594,7 +596,7 @@ export function AppointmentsPage() {
               {t('saveBlocksDesc') || 'Save the current busy blocks for this week.'}
             </p>
 
-            <div className="flex items-center justify-between rounded-lg border p-3">
+            <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
                 <RepeatIcon className="h-4 w-4 text-muted-foreground" />
                 <div>
@@ -608,7 +610,7 @@ export function AppointmentsPage() {
                 checked={repeatWeeks}
                 onCheckedChange={setRepeatWeeks}
               />
-            </div>
+            </label>
 
             {repeatWeeks && (
               <div className="flex items-center gap-3 pl-1">

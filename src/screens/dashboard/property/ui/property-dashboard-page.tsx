@@ -253,7 +253,7 @@ function ListingsSection({
           )}
         </div>
         <Button asChild size='sm' className='rounded-lg gap-1.5 h-8 text-xs'>
-          <Link href={`/dashboard/listing/create?propertyId=${propertyId}`}>
+          <Link href={`/dashboard/listings/create?propertyId=${propertyId}`}>
             <Plus className='h-3.5 w-3.5' />
             {t('addListing')}
           </Link>

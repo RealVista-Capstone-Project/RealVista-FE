@@ -1,33 +1,14 @@
 export default function RealVistaLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      xmlns='http://www.w3.org/2000/svg'
-      width='32'
-      height='32'
-      viewBox='0 0 32 32'
-      fill='none'
-      {...props}
-    >
-      <g clipPath='url(#clip0_6373_20110)'>
-        <path
-          d='M25.333 11.6137L18.2224 6.08301C17.5984 5.59755 16.8303 5.33398 16.0397 5.33398C15.2491 5.33398 14.4811 5.59755 13.857 6.08301L6.74505 11.6137C6.31764 11.9461 5.97184 12.3717 5.73405 12.8581C5.49627 13.3446 5.37279 13.8789 5.37305 14.4203V24.0203C5.37305 24.7276 5.654 25.4059 6.1541 25.906C6.65419 26.4061 7.33247 26.687 8.03971 26.687H24.0397C24.747 26.687 25.4252 26.4061 25.9253 25.906C26.4254 25.4059 26.7064 24.7276 26.7064 24.0203V14.4203C26.7064 13.323 26.1997 12.287 25.333 11.6137Z'
-          fill='#7065F0'
-          stroke='#7065F0'
-          strokeWidth='3'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-        />
-        <path
-          d='M21.3327 20C18.386 21.7773 13.61 21.7773 10.666 20'
-          stroke='#F9FAFB'
-          strokeWidth='3'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-        />
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="48" height="48" rx="8" fill="#1C9CF0" />
+      <g clipPath="url(#clip0_203_3570)">
+        <path d="M34.3333 19.6132L27.2226 14.0825C26.5986 13.5971 25.8306 13.3335 25.04 13.3335C24.2494 13.3335 23.4813 13.5971 22.8573 14.0825L15.7453 19.6132C15.3179 19.9456 14.9721 20.3712 14.7343 20.8577C14.4965 21.3441 14.373 21.8784 14.3733 22.4199V32.0199C14.3733 32.7271 14.6542 33.4054 15.1543 33.9055C15.6544 34.4056 16.3327 34.6865 17.04 34.6865H33.04C33.7472 34.6865 34.4255 34.4056 34.9256 33.9055C35.4257 33.4054 35.7066 32.7271 35.7066 32.0199V22.4199C35.7066 21.3225 35.2 20.2865 34.3333 19.6132Z" fill="white" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M30.3334 28C27.3867 29.7773 22.6107 29.7773 19.6667 28" stroke="#1C9CF0" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       </g>
       <defs>
-        <clipPath id='clip0_6373_20110'>
-          <rect width='32' height='32' fill='white' />
+        <clipPath id="clip0_203_3570">
+          <rect width="32" height="32" fill="white" transform="translate(9 8)" />
         </clipPath>
       </defs>
     </svg>

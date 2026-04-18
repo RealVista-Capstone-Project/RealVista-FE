@@ -51,7 +51,7 @@ export function ManagedListingsPage() {
   const isMobile = useIsMobile();
 
   const handleCreateListing = () => {
-    router.push(`/${locale}/dashboard/listing/create`);
+    router.push(`/${locale}/dashboard/listings/create`);
   };
 
   // Fetch summary counts for tabs
@@ -188,7 +188,7 @@ export function ManagedListingsPage() {
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
-                <div className='flex items-center justify-center rounded-full bg-primary px-2 py-1'>
+                <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
                   <span className='text-sm font-bold text-white'>{formatNumber(listingCounts.all)}</span>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export function ManagedListingsPage() {
               <button
                 type='button'
                 onClick={handleCreateListing}
-                className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                 aria-label={t('createButton')}
               >
                 <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
@@ -288,7 +288,7 @@ export function ManagedListingsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('search.placeholder')}
-                  className='h-14 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
+                  className='h-12 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
                 />
               </div>
 
@@ -298,7 +298,7 @@ export function ManagedListingsPage() {
                   type='button'
                   onClick={() => setIsFilterOpen((prev) => !prev)}
                   className={cn(
-                    'flex h-14 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                    'flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                     hasActiveFilters
                       ? 'border-primary bg-primary/5 text-primary'
                       : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
@@ -348,12 +348,12 @@ export function ManagedListingsPage() {
                                 key={s}
                                 type='button'
                                 onClick={() => setStatusFilter(s)}
-                              className={cn(
-                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                                statusFilter === s
-                                  ? 'bg-primary/5 font-medium text-primary'
-                                  : 'text-foreground hover:bg-primary/5'
-                              )}
+                                className={cn(
+                                  'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                                  statusFilter === s
+                                    ? 'bg-primary/5 font-medium text-primary'
+                                    : 'text-foreground hover:bg-primary/5'
+                                )}
                               >
                                 {t(labelKey)}
                                 {statusFilter === s && (
@@ -380,12 +380,12 @@ export function ManagedListingsPage() {
                                 key={s}
                                 type='button'
                                 onClick={() => setSortBy(s)}
-                              className={cn(
-                                'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                                sortBy === s
-                                  ? 'bg-primary/5 font-medium text-primary'
-                                  : 'text-foreground hover:bg-primary/5'
-                              )}
+                                className={cn(
+                                  'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                                  sortBy === s
+                                    ? 'bg-primary/5 font-medium text-primary'
+                                    : 'text-foreground hover:bg-primary/5'
+                                )}
                               >
                                 {t(labelKey)}
                                 {sortBy === s && <X className='h-3.5 w-3.5' strokeWidth={2.5} />}
@@ -405,7 +405,7 @@ export function ManagedListingsPage() {
           <div className='flex-1 overflow-y-auto'>
             {listings.length === 0 ? (
               <div className='flex flex-col items-center justify-center gap-4 p-8 text-center'>
-                <div className='flex h-14 w-14 items-center justify-center rounded-full bg-primary/10'>
+                <div className='flex h-12 w-14 items-center justify-center rounded-full bg-primary/10'>
                   <Building2 className='h-7 w-7 text-primary' strokeWidth={1.5} />
                 </div>
                 <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
