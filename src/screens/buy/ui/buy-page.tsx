@@ -227,7 +227,7 @@ function BuyPageContent() {
   }
 
   return (
-    <div className='min-h-screen bg-secondary'>
+    <div className='min-h-screen bg-background'>
       {/* Hero Section with Search */}
       <section className='px-6 pb-6 pt-8 sm:px-6 sm:pb-8 sm:pt-16 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
