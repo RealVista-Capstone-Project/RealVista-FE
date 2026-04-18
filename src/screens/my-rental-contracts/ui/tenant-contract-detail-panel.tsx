@@ -108,7 +108,7 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
                   <FileText className='h-16 w-16' />
                 </div>
               )}
-              <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-[#120F25]/40 via-transparent to-white/10' />
+              <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-white/10' />
               <div className='absolute bottom-4 left-4 right-4'>
                 <Badge
                   variant='secondary'

@@ -143,7 +143,7 @@ export function PropertyMediaStep() {
                           className='relative group rounded-lg overflow-hidden border border-primary/20 aspect-square'
                         >
                           {item.type === 'VIDEO' ? (
-                            <div className='size-full bg-[#100A55] flex items-center justify-center'>
+                            <div className='size-full bg-foreground flex items-center justify-center'>
                               <Play className='size-10 text-white/80' />
                               <span className='absolute bottom-2 left-2 text-xs text-white/70 bg-black/50 px-2 py-0.5 rounded'>
                                 Video

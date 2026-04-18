@@ -21,7 +21,7 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
   return (
     <div className='space-y-6'>
       {/* Search box */}
-      <div className='rounded-3xl border border-[#E9E0FF] bg-[#FBF9FF] p-5'>
+      <div className='rounded-3xl border border-primary/10 bg-primary/5 p-5'>
         <p className='text-xs font-semibold uppercase tracking-[0.2em] text-primary/70'>
           {t('tenantLookup.eyebrow')}
         </p>
@@ -41,7 +41,7 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
                 }
               }}
               placeholder={t('tenantLookup.emailPlaceholder')}
-              className='h-11 rounded-2xl border-[#E5DFFC] bg-white'
+              className='h-11 rounded-2xl border-primary/10 bg-white'
             />
           </div>
           <Button

@@ -84,13 +84,13 @@ function MyRentalContractsContent() {
             </div>
 
             <div className='grid gap-3 sm:grid-cols-2 xl:min-w-[360px]'>
-              <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
+              <div className='rounded-2xl border border-primary/10 bg-white/80 p-4'>
                 <p className='text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70'>
                   {t('hero.stats.totalContracts')}
                 </p>
                 <p className='mt-2 text-2xl font-semibold text-foreground'>{totalElements}</p>
               </div>
-              <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
+              <div className='rounded-2xl border border-primary/10 bg-white/80 p-4'>
                 <p className='text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70'>
                   {t('hero.stats.activeSelection')}
                 </p>
@@ -142,7 +142,7 @@ function MyRentalContractsContent() {
             {/* Table */}
             <div className='overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_18px_48px_rgba(96,72,179,0.10)]'>
               {/* Status tabs */}
-              <div className='flex items-center gap-1 border-b border-[#F0EEF7] px-5 py-3'>
+              <div className='flex items-center gap-1 border-b border-primary/10 px-5 py-3'>
                 {(['all', 'ACTIVE', 'EXPIRED'] as const).map((tab) => (
                   <button
                     key={tab}
@@ -162,7 +162,7 @@ function MyRentalContractsContent() {
               </div>
 
               {/* Column headers */}
-              <div className='grid grid-cols-12 gap-4 border-b border-[#F0EEF7] bg-[#FAF8FF] px-5 py-4'>
+              <div className='grid grid-cols-12 gap-4 border-b border-primary/10 bg-primary/5 px-5 py-4'>
                 <div className='col-span-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70'>
                   {t('table.status')}
                 </div>
@@ -189,7 +189,7 @@ function MyRentalContractsContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className='divide-y divide-[#F3F1FA]'>
+                  <div className='divide-y divide-primary/5'>
                     {contracts.map((contract) => (
                       <TenantContractListItem
                         key={contract.id}

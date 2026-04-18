@@ -375,7 +375,7 @@ export function CreateRentalContractPage() {
           />
 
           {/* Step content card */}
-          <Card className='rounded-[30px] border-[#EAE1FF] bg-white/94 shadow-[0_24px_60px_rgba(96,72,179,0.10)]'>
+          <Card className='rounded-[30px] border-primary/10 bg-white/94 shadow-[0_24px_60px_rgba(96,72,179,0.10)]'>
             <CardContent className='p-6'>
               {/* Step title + progress */}
               <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
@@ -390,7 +390,7 @@ export function CreateRentalContractPage() {
                     {t(`steps.descriptions.${currentStep}` as never)}
                   </p>
                 </div>
-                <div className='shrink-0 rounded-full border border-[#E7DDFF] bg-[#FAF8FF] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary/75'>
+                <div className='shrink-0 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary/75'>
                   {t('progress', { current: currentStep, total: steps.length })}
                 </div>
               </div>

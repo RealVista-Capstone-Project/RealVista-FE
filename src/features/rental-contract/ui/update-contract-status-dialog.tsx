@@ -80,7 +80,7 @@ export function UpdateContractStatusDialog({
                 value={reason}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setReason(event.target.value)}
                 placeholder={t('statusDialog.reasonPlaceholder')}
-                className='min-h-28 rounded-xl border-gray-200 bg-[#F7F7FD] text-sm focus-visible:ring-primary/30'
+                className='min-h-28 rounded-xl border-gray-200 bg-primary/5 text-sm focus-visible:ring-primary/30'
               />
               <p className='text-xs text-muted-foreground'>
                 {t('statusDialog.reasonHint')}

@@ -53,7 +53,7 @@ function ManageRentalContractContent() {
 
   if (isLoading) {
     return (
-      <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
+      <div className='flex h-full items-center justify-center bg-primary/5'>
         <div className='flex flex-col items-center gap-4'>
           <div className='h-10 w-10 animate-spin rounded-full border-[3px] border-primary border-t-transparent' />
           <p className='text-sm font-medium tracking-wide text-muted-foreground'>{t('loading')}</p>
@@ -64,7 +64,7 @@ function ManageRentalContractContent() {
 
   if (isError) {
     return (
-      <div className='flex h-full items-center justify-center bg-[#F6F4FF]'>
+      <div className='flex h-full items-center justify-center bg-primary/5'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm'>
             <FileSearch className='h-8 w-8 text-primary' />
@@ -105,13 +105,13 @@ function ManageRentalContractContent() {
               </div>
 
               <div className='grid gap-3 sm:grid-cols-2'>
-                <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
+                <div className='rounded-2xl border border-primary/10 bg-white/80 p-4'>
                   <p className='text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70'>
                     {t('hero.stats.totalContracts')}
                   </p>
                   <p className='mt-2 text-2xl font-semibold text-foreground'>{totalElements}</p>
                 </div>
-                <div className='rounded-2xl border border-[#ECE9FB] bg-white/80 p-4'>
+                <div className='rounded-2xl border border-primary/10 bg-white/80 p-4'>
                   <p className='text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70'>
                     {t('hero.stats.activeSelection')}
                   </p>
@@ -135,7 +135,7 @@ function ManageRentalContractContent() {
               <div className='flex w-full flex-shrink-0 items-center gap-2 sm:w-auto'>
                 <SlidersHorizontal className='h-4 w-4 flex-shrink-0 text-muted-foreground/70' />
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className='h-10 w-full rounded-xl border-transparent bg-[#F5F3FF] text-sm font-medium focus:ring-primary/20 sm:w-48'>
+                  <SelectTrigger className='h-10 w-full rounded-xl border-transparent bg-primary/5 text-sm font-medium focus:ring-primary/20 sm:w-48'>
                     <SelectValue placeholder={t('filter.allStatuses')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -155,7 +155,7 @@ function ManageRentalContractContent() {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder={t('filter.searchPlaceholder')}
-                  className='h-10 rounded-xl border-transparent bg-[#F5F3FF] pl-9 text-sm focus-visible:ring-primary/20'
+                  className='h-10 rounded-xl border-transparent bg-primary/5 pl-9 text-sm focus-visible:ring-primary/20'
                 />
               </div>
             </div>

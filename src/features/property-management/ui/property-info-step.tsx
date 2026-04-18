@@ -367,7 +367,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 </FormLabel>
               </div>
               <FormControl>
-                <div className='flex items-center justify-between h-12 px-3 rounded-lg border border-[#E0DEF7] bg-white'>
+                <div className='flex items-center justify-between h-12 px-3 rounded-lg border border-primary/20 bg-white'>
                   <span className='text-sm text-muted-foreground'>
                     {field.value ? 'Có' : 'Không'}
                   </span>
@@ -398,7 +398,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   placeholder='0'
-                  className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
+                  className='h-12 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
                 />
               </FormControl>
               <FormMessage className='text-xs' />
@@ -430,13 +430,13 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 value={attr.ranges?.find((r) => r.label === field.value)?.range_id || ''}
               >
                 <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'>
+                  <SelectTrigger className='h-12 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'>
                     <SelectValue
                       placeholder={t('selectOption', { default: 'Select {label}', label })}
                     />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className='rounded-lg border-[#E0DEF7]'>
+                <SelectContent className='rounded-lg border-primary/20'>
                   {attr.ranges?.map((range) => (
                     <SelectItem key={range.range_id} value={range.range_id}>
                       {range.label}
@@ -449,7 +449,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 <Input
                   type='text'
                   placeholder={label}
-                  className='h-12 rounded-lg border-[#E0DEF7] bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
+                  className='h-12 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
                   {...field}
                   value={field.value || ''}
                   onChange={(e) => field.onChange(e.target.value)}
@@ -514,7 +514,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                       }
                     }}
                     placeholder={t('addressPlaceholder', { default: '123 Main St' })}
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    className='h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
                   />
                 </FormControl>
                 <FormMessage />
@@ -528,7 +528,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
           </p>
         </div>
 
-        <div className='h-48 overflow-hidden rounded-lg bg-[#F0EFFB] relative border border-[#E0DEF7]'>
+        <div className='h-48 overflow-hidden rounded-lg bg-primary/5 relative border border-primary/20'>
           {location && location.lat && location.lng ? (
             <GoogleMap
               defaultZoom={15}
@@ -579,7 +579,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder='0'
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    className='h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
                   />
                 </FormControl>
                 <FormMessage />
@@ -597,7 +597,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder='0'
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    className='h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
                   />
                 </FormControl>
                 <FormMessage />
@@ -615,7 +615,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder='0'
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    className='h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
                   />
                 </FormControl>
                 <FormMessage />
@@ -633,7 +633,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder='0'
-                    className='h-12 rounded-lg border-[#E0DEF7] focus:border-[#7065F0] focus:ring-[#7065F0]'
+                    className='h-12 rounded-lg border-primary/20 focus:border-primary focus:ring-primary'
                   />
                 </FormControl>
                 <FormMessage />
@@ -644,7 +644,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
       </div>
 
       {/* Property Type & Dynamic Attributes */}
-      <div className='pt-4 border-t border-[#E0DEF7]'>
+      <div className='pt-4 border-t border-primary/20'>
         <FormField
           control={control}
           name='info.propertyType'
@@ -659,7 +659,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 value={field.value}
               >
                 <FormControl>
-                  <SelectTrigger className='w-full h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'>
+                  <SelectTrigger className='w-full h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'>
                     <SelectValue
                       placeholder={t('selectType', { default: 'Select property type' })}
                     >
@@ -669,7 +669,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                     </SelectValue>
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className='rounded-lg border-[#E0DEF7] shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'>
+                <SelectContent className='rounded-lg border-primary/20 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]'>
                   {PROPERTY_TYPES.map((cat) => (
                     <SelectGroup key={cat.code}>
                       <SelectLabel>{cat.label}</SelectLabel>
@@ -689,7 +689,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
 
         {/* Dynamic Attributes Section */}
         {attributeDefinitions.length > 0 && (
-          <div className='mt-8 pt-8 border-t border-[#E0DEF7] animate-in fade-in slide-in-from-top-4 duration-500'>
+          <div className='mt-8 pt-8 border-t border-primary/20 animate-in fade-in slide-in-from-top-4 duration-500'>
             <p className='text-sm font-medium text-foreground mb-4'>
               {t('propertyCharacteristics', { default: 'Đặc trưng của bất động sản' })}
             </p>
@@ -700,7 +700,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
         )}
 
         {/* Amenities */}
-        <div className='mt-8 pt-8 border-t border-[#E0DEF7]'>
+        <div className='mt-8 pt-8 border-t border-primary/20'>
           <p className='text-sm font-medium text-foreground mb-4'>
             {t('amenities', { default: 'Amenities' })}
           </p>
@@ -725,7 +725,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
         </div>
 
         {/* Price Range */}
-        <div className='mt-8 pt-8 border-t border-[#E0DEF7]'>
+        <div className='mt-8 pt-8 border-t border-primary/20'>
           <p className='text-sm font-medium text-foreground mb-4'>
             {t('priceRange')}
           </p>
@@ -748,7 +748,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'
+                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>
@@ -767,7 +767,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'
+                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>
@@ -795,7 +795,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'
+                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>
@@ -814,7 +814,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-[#E0DEF7] bg-white focus:border-[#7065F0] focus:ring-[#7065F0]'
+                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>

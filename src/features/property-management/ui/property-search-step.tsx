@@ -225,7 +225,7 @@ export function PropertySearchStep() {
                     >
                       <CardContent className='p-4 flex items-center justify-between'>
                         <div className='flex items-center gap-4'>
-                          <div className='size-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F0EFFB] relative'>
+                          <div className='size-16 rounded-lg overflow-hidden flex-shrink-0 bg-primary/5 relative'>
                             <NextImage
                               src={p.thumbnail || '/placeholder-property.jpg'}
                               alt={p.street_address || p.full_address}
@@ -257,7 +257,7 @@ export function PropertySearchStep() {
                     onClick={() => handleSelect('NEW')}
                   >
                     <CardContent className='p-4 flex items-center gap-4'>
-                      <div className='size-16 rounded-lg bg-[#F0EFFB] flex items-center justify-center text-primary'>
+                      <div className='size-16 rounded-lg bg-primary/5 flex items-center justify-center text-primary'>
                         <Plus size={32} />
                       </div>
                       <div>
@@ -386,7 +386,7 @@ export function PropertySearchStep() {
                 <Card className='border-[1.5px] border-[primary] bg-primary/5'>
                   <CardContent className='p-4 flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
-                      <div className='size-12 rounded-full bg-[#E8E6F9] flex items-center justify-center text-[primary]'>
+                      <div className='size-12 rounded-full bg-primary/10 flex items-center justify-center text-[primary]'>
                         <Check size={24} />
                       </div>
                       <div>

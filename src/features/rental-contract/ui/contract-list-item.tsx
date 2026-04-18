@@ -31,8 +31,8 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
       className={cn(
         'grid cursor-pointer grid-cols-12 items-center gap-4 border-l-[3px] px-5 py-4 transition-all duration-150 group',
         isSelected
-          ? 'border-l-primary bg-[#F2F0FF]'
-          : 'border-l-transparent bg-white hover:border-l-[#D7D1F8] hover:bg-[#FBFAFF]'
+          ? 'border-l-primary bg-primary/5'
+          : 'border-l-transparent bg-white hover:border-l-primary/20 hover:bg-primary/5'
       )}
       onClick={() => onClick(contract)}
     >
@@ -56,7 +56,7 @@ export function ContractListItem({ contract, isSelected, onClick }: ContractList
           )}
         >
           <AvatarImage src={contract.tenant.avatarUrl ?? undefined} alt={contract.tenant.fullName} />
-          <AvatarFallback className='bg-[#EEE9FF] text-[#5B3FD6] text-xs font-bold'>
+          <AvatarFallback className='bg-primary/10 text-primary/90 text-xs font-bold'>
             {getContractInitials(contract.tenant.fullName)}
           </AvatarFallback>
         </Avatar>

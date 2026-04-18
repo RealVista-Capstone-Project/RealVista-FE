@@ -186,8 +186,8 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
 
   return (
     <>
-      <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-[#E9E7F5] bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:basis-[40%] lg:max-w-[40%]'>
-        <div className='flex items-center justify-between border-b border-[#F0EEF7] px-5 py-4'>
+      <div className='sticky top-4 flex max-h-[calc(100vh-120px)] w-full flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-primary/15 bg-white shadow-[0_24px_60px_rgba(80,56,160,0.12)] lg:basis-[40%] lg:max-w-[40%]'>
+        <div className='flex items-center justify-between border-b border-primary/10 px-5 py-4'>
           <div>
             <h2 className='text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground'>
               {t('detailPanel.title')}
@@ -198,7 +198,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
             type='button'
             variant='ghost'
             size='icon'
-            className='rounded-xl text-muted-foreground hover:bg-[#F6F4FF] hover:text-foreground'
+            className='rounded-xl text-muted-foreground hover:bg-primary/5 hover:text-foreground'
             onClick={onClose}
           >
             <X className='h-4 w-4' />
@@ -206,8 +206,8 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
         </div>
 
         <CardContent className='min-h-0 flex-1 space-y-5 overflow-y-auto p-5'>
-          <div className='overflow-hidden rounded-2xl border border-primary/10 bg-[#FBFAFF]'>
-            <div className='relative aspect-[3/4] overflow-hidden bg-[#F3F0FF]'>
+          <div className='overflow-hidden rounded-2xl border border-primary/10 bg-primary/5'>
+            <div className='relative aspect-[3/4] overflow-hidden bg-primary/5'>
               {contract.contractDocumentUrl ? (
                 <img
                   src={contract.contractDocumentUrl}
