@@ -18,6 +18,7 @@ export type NavItem = {
   id: string;
   translationKey: string;
   href: string;
+  authOnly?: boolean; // only render when user is logged in
 };
 
 
@@ -40,6 +41,7 @@ const defaultNavItems: NavItem[] = [
   { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
   { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
   { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
+  { id: 'my-contracts', translationKey: 'myContracts', href: ROUTES.myContracts, authOnly: true },
 ];
 
 const defaultUser = {
@@ -106,6 +108,9 @@ export function TopNav({
           {showNavItems && (
             <nav className='hidden lg:flex items-center gap-6' aria-label='Main navigation'>
               {navItems.map((item) => {
+                // Hide auth-only items when user is not logged in
+                if (item.authOnly && !isUserLoggedIn) return null;
+
                 const isActive = isRouteActive(item.href);
                 // Check if item has dropdown
                 const hasDropdown = item.id === 'buy' || item.id === 'rent';
@@ -191,6 +196,9 @@ export function TopNav({
             {showNavItems && navItems && (
               <nav className='flex flex-col px-6 py-6' aria-label='Mobile navigation'>
                 {navItems.map((item) => {
+                  // Hide auth-only items when user is not logged in
+                  if (item.authOnly && !isUserLoggedIn) return null;
+
                   const isActive = isRouteActive(item.href);
                   return (
                     <Link
