@@ -207,7 +207,11 @@ export function CreateRentalContractPage() {
       const hasEnd = Boolean(form.leaseEndDate);
       const startNotPast = form.leaseStartDate >= today;
       const endAfterStart = form.leaseEndDate > form.leaseStartDate;
-      return hasRent && hasStart && hasEnd && startNotPast && endAfterStart;
+      const s = new Date(form.leaseStartDate);
+      const e = new Date(form.leaseEndDate);
+      const durationMonths = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+      const meetsMinDuration = durationMonths >= 3;
+      return hasRent && hasStart && hasEnd && startNotPast && endAfterStart && meetsMinDuration;
     }
     return true;
   }, [currentStep, form]);
@@ -361,7 +365,7 @@ export function CreateRentalContractPage() {
         <StepLeaseTerms
           form={form}
           onFieldChange={updateField}
-          t={(key) => t(key as never)}
+          t={(key, values) => t(key as never, values as never)}
         />
       );
     }

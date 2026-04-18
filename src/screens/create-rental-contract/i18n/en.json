@@ -124,7 +124,10 @@
       "startDateRequired": "Lease start date is required",
       "startDatePast": "Start date cannot be in the past",
       "endDateRequired": "Lease end date is required",
-      "endDateBeforeStart": "End date must be after the start date"
+      "endDateBeforeStart": "End date must be after the start date",
+      "durationTooShort": "Lease must be at least 3 months long",
+      "durationHint": "Minimum lease duration is {min} months",
+      "durationOk": "{months}-month lease"
     }
   }
 }

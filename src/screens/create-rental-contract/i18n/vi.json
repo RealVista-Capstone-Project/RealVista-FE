@@ -124,7 +124,10 @@
       "startDateRequired": "Ngày bắt đầu thuê là bắt buộc",
       "startDatePast": "Ngày bắt đầu không được ở trong quá khứ",
       "endDateRequired": "Ngày kết thúc thuê là bắt buộc",
-      "endDateBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu"
+      "endDateBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu",
+      "durationTooShort": "Thời hạn thuê phải ít nhất 3 tháng",
+      "durationHint": "Thời hạn thuê tối thiểu là {min} tháng",
+      "durationOk": "Hợp đồng {months} tháng"
     }
   }
 }
