@@ -109,6 +109,8 @@ interface ListingPriceFieldsProps {
   onMinPriceChange: (value: string) => void;
   maxPrice: string;
   onMaxPriceChange: (value: string) => void;
+  securityDeposit: string;
+  onSecurityDepositChange: (value: string) => void;
   isNegotiable: boolean;
   onNegotiableChange: (value: boolean) => void;
   errors: Record<string, string>;
@@ -135,6 +137,8 @@ export function ListingPriceFields({
   onMinPriceChange,
   maxPrice,
   onMaxPriceChange,
+  securityDeposit,
+  onSecurityDepositChange,
   isNegotiable,
   onNegotiableChange,
   errors,
@@ -153,19 +157,12 @@ export function ListingPriceFields({
           required
           className={listingType === 'SALE' ? 'sm:col-span-2' : undefined}
         />
-        {/* TODO(tech-debt): Security deposit field is not yet implemented.
-            The UI stub is kept visible but disabled until:
-            1. Backend listing update endpoint is confirmed to accept `security_deposit`
-            2. `securityDeposit` is added to EditListingFormData & EditListingPayload
-            3. State and onChange handler are wired up in edit-listing-modal and create-listing-modal
-            See: src/features/edit-listing-modal/model/types.ts, src/shared/ui/listing-form/listing-price-fields.tsx */}
         {listingType === 'RENT' && (
           <CurrencyInput
-            value=''
-            onChange={() => { }}
+            value={securityDeposit}
+            onChange={onSecurityDepositChange}
             label={labels.securityDeposit}
             placeholder={labels.pricePlaceholder}
-            disabled
           />
         )}
       </div>
