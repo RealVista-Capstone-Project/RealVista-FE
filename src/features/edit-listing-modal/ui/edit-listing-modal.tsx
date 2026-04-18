@@ -45,6 +45,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const [maxPrice, setMaxPrice] = React.useState(listing.max_price?.toString() || '');
   const [isNegotiable, setIsNegotiable] = React.useState(listing.is_negotiable);
   const [availableFrom, setAvailableFrom] = React.useState(listing.available_from || '');
+  const [securityDeposit, setSecurityDeposit] = React.useState(listing.security_deposit?.toString() ?? '');
 
   // ── Media State ──
   const initialMediaIds = new Set(listing.media?.map((m) => m.media_id) || []);
@@ -85,6 +86,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       setMaxPrice(listing.max_price?.toString() || '');
       setIsNegotiable(listing.is_negotiable);
       setAvailableFrom(listing.available_from || '');
+      setSecurityDeposit(listing.security_deposit?.toString() ?? '');
       setSelectedMediaIds(new Set(listing.media?.map((m) => m.media_id) || []));
       setPrimaryMediaId(listing.media?.find((m) => m.is_primary)?.media_id || null);
       setNewFiles([]);
@@ -236,6 +238,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       max_price: maxPrice.trim() ? Number(maxPrice) : null,
       is_negotiable: isNegotiable,
       available_from: availableFrom || null,
+      security_deposit: securityDeposit.trim() ? Number(securityDeposit) : null,
       media_ids: Array.from(selectedMediaIds),
       primary_media_id:
         primaryMediaId && !primaryMediaId.startsWith('new:') ? primaryMediaId : null,
@@ -398,6 +401,8 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   onMaxPriceChange={setMaxPrice}
                   isNegotiable={isNegotiable}
                   onNegotiableChange={setIsNegotiable}
+                  securityDeposit={securityDeposit}
+                  onSecurityDepositChange={setSecurityDeposit}
                   errors={errors}
                   labels={priceLabels}
                 />
