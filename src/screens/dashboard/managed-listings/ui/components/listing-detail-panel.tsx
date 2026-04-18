@@ -51,6 +51,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { format, isPast, isToday, parseISO } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 interface ListingDetailPanelProps {
   listing: Listing;
@@ -151,7 +152,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
   const displayAvailableFrom = isAvailableNow
     ? t('features.availableImmediately')
     : availabilityDate
-      ? format(availabilityDate, 'PP')
+      ? format(availabilityDate, 'PP', { locale: vi })
       : t('features.availableImmediately');
 
   return (
