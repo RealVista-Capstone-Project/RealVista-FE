@@ -98,7 +98,7 @@ function AgentCard({
       className={cn(
         'relative flex flex-col items-center text-center rounded-2xl border transition-all duration-200 p-4 gap-2.5 w-full',
         isSelected
-          ? 'border-primary shadow-md bg-primary/5/60 ring-1 ring-primary/20'
+          ? 'border-primary shadow-md bg-primary/5 ring-1 ring-primary/20'
           : 'border-slate-200 bg-white hover:border-primary/50 hover:shadow-md',
         isAccepted && 'cursor-not-allowed opacity-80'
       )}
@@ -127,7 +127,7 @@ function AgentCard({
           />
         ) : (
           <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10'>
-            <User className='h-6 w-6 text-primary300' />
+            <User className='h-6 w-6 text-primary/50' />
           </div>
         )}
       </div>
@@ -266,7 +266,7 @@ function AgentDetailPanel({
             />
           ) : (
             <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
-              <User className='h-7 w-7 text-primary300' />
+              <User className='h-7 w-7 text-primary/50' />
             </div>
           )}
         </div>

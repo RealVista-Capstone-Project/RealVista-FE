@@ -260,7 +260,7 @@ export function MessagesPage() {
       />
 
       {/* ── Chat Panel ───────────────────────────────────────────────────── */}
-      <div className='flex flex-1 flex-col bg-primary/5/40'>
+      <div className='flex flex-1 flex-col bg-primary/5'>
         {activeConv && (
           <>
             <ChatHeader

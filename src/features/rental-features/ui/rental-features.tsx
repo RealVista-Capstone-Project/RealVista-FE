@@ -56,7 +56,7 @@ function AmenitySection({ title, amenities }: { title: string; amenities: Amenit
       <h3 className='text-foreground text-base sm:text-lg font-bold'>{title}</h3>
 
       {/* Amenity List Card */}
-      <div className='bg-primary/5/84 rounded-lg p-4 sm:p-6'>
+      <div className='bg-primary/5 rounded-lg p-4 sm:p-6'>
         {/* Mobile: Single column bullet list */}
         <ul className='sm:hidden flex flex-col gap-2'>
           {amenities.map((amenity) => (

@@ -295,7 +295,7 @@ export function PropertyMapBasedSearchPage({
           />
 
           {/* Filters Container */}
-          <div className='mt-6 sticky top-0 z-10 bg-primary/5/80 backdrop-blur-md py-2 px-1'>
+          <div className='mt-6 sticky top-0 z-10 bg-primary/5 backdrop-blur-md py-2 px-1'>
             <PropertyFilters
               priceRange={{
                 min: filters.priceRange.min,

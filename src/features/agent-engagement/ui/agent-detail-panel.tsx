@@ -120,7 +120,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       return (
         <div className='flex flex-col gap-2'>
           <Button
-            className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+            className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-primary/20'
             onClick={() => setCompleteDialogOpen(true)}
           >
             <CheckCircle2 className='h-4 w-4' />
@@ -154,7 +154,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
     if ((status === 'COMPLETED' || status === 'CANCELLED') && !hasReview) {
       return (
         <Button
-          className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+          className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-primary/20'
           onClick={() => setReviewModalOpen(true)}
         >
           <MessageSquarePlus className='h-4 w-4' />
@@ -208,7 +208,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                     src={agent.agent_avatar_url ?? undefined}
                     alt={agent.agent_full_name}
                   />
-                  <AvatarFallback className='bg-indigo-100 text-primary700 text-xl font-bold'>
+                  <AvatarFallback className='bg-primary/10 text-primary text-xl font-bold'>
                     {getInitials(agent.agent_full_name)}
                   </AvatarFallback>
                 </Avatar>
@@ -271,7 +271,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
               {agent.agent_email && (
                 <div className='flex items-center gap-3'>
                   <div className='h-8 w-8 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0'>
-                    <Mail className='h-3.5 w-3.5 text-primary500' />
+                    <Mail className='h-3.5 w-3.5 text-primary/80' />
                   </div>
                   <div className='min-w-0'>
                     <div className='text-[10px] text-gray-400 font-medium'>
@@ -385,7 +385,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                     <Badge
                       key={specialty}
                       variant='outline'
-                      className='text-xs font-semibold bg-primary/5/60 text-primary600 border-indigo-100 rounded-lg px-2.5 py-0.5'
+                      className='text-xs font-semibold bg-primary/5 text-primary border-primary/10 rounded-lg px-2.5 py-0.5'
                     >
                       {specialty}
                     </Badge>
@@ -411,10 +411,10 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
               <h4 className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5'>
                 {t('detailPanel.assignedProperty')}
               </h4>
-              <div className='bg-primary/5/40 border border-indigo-100/70 p-4 rounded-xl space-y-2'>
+              <div className='bg-primary/5 border border-primary/10 p-4 rounded-xl space-y-2'>
                 {agent.property_address && (
                   <div className='flex items-start gap-2'>
-                    <MapPin className='h-3.5 w-3.5 text-primary400 mt-0.5 flex-shrink-0' />
+                    <MapPin className='h-3.5 w-3.5 text-primary/70 mt-0.5 flex-shrink-0' />
                     <span className='text-sm text-gray-700 font-medium leading-snug'>
                       {agent.property_address}
                     </span>
@@ -422,7 +422,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                 )}
                 <div className='flex items-center gap-2 flex-wrap'>
                   {agent.property_type_name && (
-                    <span className='text-xs bg-white text-primary600 border border-indigo-100 px-2.5 py-1 rounded-lg font-semibold'>
+                    <span className='text-xs bg-white text-primary border border-primary/10 px-2.5 py-1 rounded-lg font-semibold'>
                       {agent.property_type_name}
                     </span>
                   )}

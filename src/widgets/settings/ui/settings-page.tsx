@@ -833,7 +833,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                         </div>
                         <div
                           className={cn(
-                            'min-h-[52px] rounded-xl border border-dashed border-border bg-primary/5/30 px-3 py-2.5',
+                            'min-h-[52px] rounded-xl border border-dashed border-border bg-primary/5 px-3 py-2.5',
                             orderedSelectedSpecialties.length === 0 && 'flex items-center'
                           )}
                         >
@@ -881,7 +881,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                                         'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
                                         isOn
                                           ? 'bg-primary text-white shadow-md shadow-primary/25 ring-2 ring-primary/20'
-                                          : 'border border-border bg-white text-muted-foreground hover:border-primary/35 hover:bg-primary/5/80 hover:text-foreground'
+                                          : 'border border-border bg-white text-muted-foreground hover:border-primary/35 hover:bg-primary/5 hover:text-foreground'
                                       )}
                                     >
                                       {type.label}

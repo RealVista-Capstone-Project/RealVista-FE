@@ -33,7 +33,7 @@ export function RentPriceHistory({ property }: RentPriceHistoryProps) {
       <h2 className='text-foreground text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
         {t('title', { title: property.title })}
       </h2>
-      <div className='bg-primary/5/84 rounded-lg p-4'>
+      <div className='bg-primary/5 rounded-lg p-4'>
         {/* Desktop Table */}
         <div className='hidden md:block'>
           {/* Table Header */}

@@ -107,7 +107,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
       return (
         <div className='flex flex-col gap-2'>
           <Button
-            className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+            className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-primary/20'
             onClick={() => setCompleteDialogOpen(true)}
             disabled={finishMutation.isPending}
           >
@@ -144,7 +144,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
     if ((status === 'COMPLETED' || status === 'CANCELLED') && !hasReview) {
       return (
         <Button
-          className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+          className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-primary/20'
           onClick={() => setReviewModalOpen(true)}
           disabled={reviewMutation.isPending}
         >
@@ -176,7 +176,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
           <div className='relative mb-3'>
             <Avatar className='h-20 w-20 ring-4 ring-white shadow-md'>
               <AvatarImage src={agent.agent_avatar_url ?? undefined} alt={agent.agent_full_name} />
-              <AvatarFallback className='bg-indigo-100 text-primary700 text-lg font-bold'>
+              <AvatarFallback className='bg-primary/10 text-primary text-lg font-bold'>
                 {getInitials(agent.agent_full_name)}
               </AvatarFallback>
             </Avatar>
@@ -241,7 +241,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
             {agent.agent_email && (
               <div className='flex items-center gap-3'>
                 <div className='h-8 w-8 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0'>
-                  <Mail className='h-3.5 w-3.5 text-primary500' />
+                  <Mail className='h-3.5 w-3.5 text-primary/80' />
                 </div>
                 <div className='min-w-0'>
                   <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
@@ -289,7 +289,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
           <section>
             <div className='grid grid-cols-3 gap-2.5 text-center'>
               <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
-                <Briefcase className='h-4 w-4 text-primary400 mx-auto mb-1.5' />
+                <Briefcase className='h-4 w-4 text-primary/70 mx-auto mb-1.5' />
                 <p className='text-base font-bold text-gray-900 tabular-nums'>
                   {agent.agent_years_of_experience ?? '—'}
                 </p>
@@ -329,7 +329,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
                   <Badge
                     key={s}
                     variant='outline'
-                    className='text-xs font-semibold bg-primary/5/60 text-primary600 border-indigo-100 rounded-lg px-2.5 py-0.5'
+                    className='text-xs font-semibold bg-primary/5 text-primary border-primary/10 rounded-lg px-2.5 py-0.5'
                   >
                     {s}
                   </Badge>

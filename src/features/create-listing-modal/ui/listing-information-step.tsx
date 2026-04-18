@@ -441,7 +441,7 @@ export function ListingInformationStep({
                     {selectedProperty.amenities.map((amenity) => (
                       <div
                         key={amenity.amenityId}
-                        className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5/30 px-3 py-1.5 text-sm font-medium text-foreground/80'
+                        className='flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5 text-sm font-medium text-foreground/80'
                       >
                         <Check className='h-3.5 w-3.5 text-primary' strokeWidth={2.5} />
                         {amenity.amenityName}

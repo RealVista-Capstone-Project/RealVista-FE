@@ -54,10 +54,10 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
         {/* Icon */}
         <div className='relative flex flex-col items-center gap-2'>
           <div className='h-14 w-14 rounded-2xl bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm border border-white/80'>
-            <Home className='h-7 w-7 text-primary400' />
+            <Home className='h-7 w-7 text-primary/70' />
           </div>
           {agent.property_type_name && (
-            <span className='text-xs font-semibold bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-primary600 border border-white/80 shadow-sm'>
+            <span className='text-xs font-semibold bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-primary border border-white/80 shadow-sm'>
               {agent.property_type_name}
             </span>
           )}
@@ -94,7 +94,7 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
           {agent.property_address && (
             <div className='flex items-start gap-3'>
               <div className='h-8 w-8 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0 mt-0.5'>
-                <MapPin className='h-3.5 w-3.5 text-primary500' />
+                <MapPin className='h-3.5 w-3.5 text-primary/80' />
               </div>
               <div>
                 <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-0.5'>

@@ -128,7 +128,7 @@ function PropertyListCard({
           />
         ) : (
           <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
-            <Home className='h-8 w-8 text-primary300' />
+            <Home className='h-8 w-8 text-primary/50' />
           </div>
         )}
         <div className='absolute top-2 left-2'>
@@ -160,7 +160,7 @@ function PropertyListCard({
             )}
           </div>
           {property.property_type_info?.property_type_name && (
-            <span className='flex-shrink-0 text-[11px] font-semibold bg-primary/5 text-primary700 px-2.5 py-0.5 rounded-lg border border-indigo-100'>
+            <span className='flex-shrink-0 text-[11px] font-semibold bg-primary/5 text-primary px-2.5 py-0.5 rounded-lg border border-primary/10'>
               {property.property_type_info.property_type_name}
             </span>
           )}
@@ -384,7 +384,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
             </span>
           )}
         </div>
-        <Button asChild size='sm' variant='outline' className='rounded-lg gap-1.5 h-8 text-xs border-indigo-200 text-primary700 hover:bg-primary/5'>
+        <Button asChild size='sm' variant='outline' className='rounded-lg gap-1.5 h-8 text-xs border-primary/20 text-primary hover:bg-primary/5'>
           <Link href={`/dashboard/property/${propertyId}/delegate`}>
             <UserCheck className='h-3.5 w-3.5' />
             {t('hireAgent')}
@@ -451,7 +451,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                         />
                       ) : (
                         <div className='h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/5'>
-                          <User className='h-5 w-5 text-primary300' />
+                          <User className='h-5 w-5 text-primary/50' />
                         </div>
                       )}
                     </div>
@@ -469,7 +469,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                     {/* Meta pills — right side */}
                     <div className='flex flex-col items-end gap-1.5 flex-shrink-0'>
                       {e.propertyTypeName && (
-                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-primary/5 text-primary700 border border-indigo-100 px-2.5 py-1 rounded-full'>
+                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-primary/5 text-primary border border-primary/10 px-2.5 py-1 rounded-full'>
                           <Building className='h-3 w-3' />
                           {e.propertyTypeName}
                         </span>
@@ -494,7 +494,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                         asChild
                         size='sm'
                         variant='outline'
-                        className='w-full rounded-lg gap-2 border-indigo-200 text-primary700 hover:bg-primary/5 hover:text-primary800'
+                        className='w-full rounded-lg gap-2 border-primary/20 text-primary hover:bg-primary/5 hover:text-primary'
                       >
                         <Link href={`/dashboard/my-engagements?engagementId=${e.engagementId}&action=delegate`}>
                           <UserCheck className='h-3.5 w-3.5' />
@@ -863,7 +863,7 @@ function PropertyDetailPanel({
               {property.amenities.map((a) => (
                 <span
                   key={a.amenity_id}
-                  className='rounded-full bg-primary/5 border border-indigo-100 text-primary700 text-xs font-medium px-3 py-1'
+                  className='rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-medium px-3 py-1'
                 >
                   {a.amenity_name}
                 </span>
@@ -1081,7 +1081,7 @@ export default function PropertyDashboardPage() {
           </div>
 
           {/* Search + Status Filter — same row */}
-          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-primary/5/30'>
+          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-primary/5'>
             <div className='flex items-center gap-2'>
               {/* Search */}
               <div className='relative group flex-1'>
@@ -1185,7 +1185,7 @@ export default function PropertyDashboardPage() {
       {/* ── Right Detail Panel ── */}
       <main
         className={cn(
-          'flex-1 overflow-y-auto bg-primary/5/40',
+          'flex-1 overflow-y-auto bg-primary/5',
           isMobile ? (selectedProperty ? 'block' : 'hidden') : 'block'
         )}
       >

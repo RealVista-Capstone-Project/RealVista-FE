@@ -97,8 +97,8 @@ export function SubmitProposalModal({
 
           {/* Property summary */}
           <div className='flex items-start gap-4'>
-            <div className='h-14 w-14 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0'>
-              <Home className='h-7 w-7 text-primary500' />
+            <div className='h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0'>
+              <Home className='h-7 w-7 text-primary/80' />
             </div>
             <div className='min-w-0'>
               <h3 className='font-bold text-gray-900 text-base leading-tight truncate'>
@@ -106,12 +106,12 @@ export function SubmitProposalModal({
               </h3>
               {location && (
                 <div className='flex items-center gap-1 mt-1'>
-                  <MapPin className='h-3.5 w-3.5 text-primary400 flex-shrink-0' />
+                  <MapPin className='h-3.5 w-3.5 text-primary/70 flex-shrink-0' />
                   <span className='text-sm text-gray-500 truncate'>{location}</span>
                 </div>
               )}
               {property.property_type_info?.property_type_name && (
-                <span className='inline-block mt-1.5 text-xs bg-indigo-100 text-primary700 px-2.5 py-0.5 rounded-lg font-semibold'>
+                <span className='inline-block mt-1.5 text-xs bg-primary/10 text-primary px-2.5 py-0.5 rounded-lg font-semibold'>
                   {property.property_type_info.property_type_name}
                 </span>
               )}
