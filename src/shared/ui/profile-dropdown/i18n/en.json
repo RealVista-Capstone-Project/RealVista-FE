@@ -1,6 +1,7 @@
 {
   "Profile": {
     "profile": "My Profile",
+    "myContracts": "My Contracts",
     "help": "Help",
     "logout": "Logout",
     "loggingOut": "Logging out...",

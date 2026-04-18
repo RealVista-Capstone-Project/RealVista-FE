@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
-import { User, HelpCircle, LogOut, LayoutDashboard, Home } from 'lucide-react';
+import { User, HelpCircle, LogOut, LayoutDashboard, Home, FileText } from 'lucide-react';
 import type { ProfileMenuItem } from './profile-dropdown';
 import { ROUTES } from '@/shared/config/routes';
 
@@ -30,6 +30,7 @@ export function useProfileMenuItems(): ProfileMenuItem[] {
 
     const defaultItems: ProfileMenuItem[] = [
       { id: 'profile', label: 'profile', icon: User, href: `/${locale}${ROUTES.settings}` },
+      { id: 'my-contracts', label: 'myContracts', icon: FileText, href: `/${locale}${ROUTES.myContracts}` },
       { id: 'help', label: 'help', icon: HelpCircle },
       { id: 'logout', label: 'logout', icon: LogOut },
     ];
