@@ -14,13 +14,18 @@ import {
   type RentalContract,
 } from '@/entities/rental-contract';
 import { useRenterContractsQuery, useAgentContractsQuery } from '@/features/rental-contract/hooks/use-rental-contracts';
+import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 
 const ITEMS_PER_PAGE = 10;
+const SEARCH_DEBOUNCE_MS = 400;
 
 interface MyRentalContractsContextValue {
   contracts: RentalContract[];
   isLoading: boolean;
   isError: boolean;
+  /** Instant value bound directly to the input — zero lag while typing */
+  inputValue: string;
+  /** Debounced value actually sent to the API */
   searchQuery: string;
   setSearchQuery: (value: string) => void;
   statusFilter: string;
@@ -39,10 +44,15 @@ const MyRentalContractsContext = createContext<MyRentalContractsContextValue | n
 
 export function MyRentalContractsProvider({ children }: { children: ReactNode }) {
   const { data: session } = useSession();
-  const [searchQuery, setSearchQuery] = useState('');
+
+  // Raw input value — updated on every keystroke, never triggers the API directly
+  const [inputValue, setInputValue] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedContract, setSelectedContract] = useState<RentalContract | null>(null);
+
+  // Debounced value — the only thing that flows into queryParams / API calls
+  const searchQuery = useDebounce(inputValue, SEARCH_DEBOUNCE_MS);
 
   const userId = session?.user?.id ?? '';
   const backendRoles: string[] = (session?.user as { backendRoles?: string[] })?.backendRoles ?? [];
@@ -80,21 +90,26 @@ export function MyRentalContractsProvider({ children }: { children: ReactNode })
     setSelectedContract((previous) => (previous?.id === contract.id ? null : contract));
   }, []);
 
+  const handleSetSearchQuery = useCallback((v: string) => {
+    setInputValue(v);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSetStatusFilter = useCallback((v: string) => {
+    setStatusFilter(v);
+    setCurrentPage(1);
+  }, []);
+
   const value = useMemo<MyRentalContractsContextValue>(
     () => ({
       contracts,
       isLoading,
       isError,
+      inputValue,
       searchQuery,
-      setSearchQuery: (v: string) => {
-        setSearchQuery(v);
-        setCurrentPage(1);
-      },
+      setSearchQuery: handleSetSearchQuery,
       statusFilter,
-      setStatusFilter: (v: string) => {
-        setStatusFilter(v);
-        setCurrentPage(1);
-      },
+      setStatusFilter: handleSetStatusFilter,
       currentPage,
       setCurrentPage,
       selectedContract,
@@ -108,6 +123,9 @@ export function MyRentalContractsProvider({ children }: { children: ReactNode })
       contracts,
       currentPage,
       handleContractClick,
+      handleSetSearchQuery,
+      handleSetStatusFilter,
+      inputValue,
       isError,
       isLoading,
       searchQuery,

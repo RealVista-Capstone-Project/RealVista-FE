@@ -13,6 +13,7 @@ export const ROUTES = {
   sell: '/sell',
   favorited: '/favorited',
   appointments: '/appointments',
+  myContracts: '/my-contracts',
   dashboard: {
     root: '/dashboard',
     insight: '/dashboard/insight',
