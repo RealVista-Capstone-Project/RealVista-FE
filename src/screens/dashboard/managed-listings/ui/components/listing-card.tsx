@@ -30,12 +30,12 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       type='button'
       onClick={onClick}
       className={cn(
-        'w-full border-b border-primary/20 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5',
+        'w-full cursor-pointer border-b border-primary/20 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset',
         isSelected && 'bg-primary/5'
       )}
     >
       <div className='flex items-center gap-3 sm:gap-4'>
-        <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-primary/5'>
+        <div className='relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-primary/5'>
           {(() => {
             const thumbUrl = listing.primary_media_thumbnail_url || listing.thumbnail;
             const isVideoThumb = thumbUrl?.toLowerCase().endsWith('.mp4');
