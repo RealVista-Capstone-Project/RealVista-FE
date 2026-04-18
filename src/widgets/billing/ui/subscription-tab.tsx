@@ -1588,7 +1588,7 @@ function Step3Content({
                   type='button'
                   onClick={() => { setCheckout(null); requestCheckout('PAYOS'); }}
                   disabled={isLoading}
-                  className='inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover disabled:opacity-50 transition-colors'
+                  className='inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90 disabled:opacity-50 transition-colors'
                 >
                   <RefreshCw className='size-3.5' />
                   Tạo mã QR mới
@@ -2060,7 +2060,7 @@ function PurchaseWizard() {
             </p>
             <div className='mt-6 flex flex-col gap-3'>
               <RealVistaButton
-                className='w-full bg-primary text-white hover:bg-primary-hover'
+                className='w-full bg-primary text-white hover:bg-primary/90'
                 onClick={() => {
                   setShowLoginDialog(false);
                   router.push(`/${locale}${ROUTES.login}?redirectTo=${ROUTES.subscribe}`);
@@ -2108,7 +2108,7 @@ function PurchaseWizard() {
             </p>
             <div className='mt-6 flex flex-col gap-3'>
               <RealVistaButton
-                className='w-full bg-primary text-white hover:bg-primary-hover'
+                className='w-full bg-primary text-white hover:bg-primary/90'
                 onClick={handleConfirmPlanSwap}
               >
                 Đồng ý, hủy và mua gói mới

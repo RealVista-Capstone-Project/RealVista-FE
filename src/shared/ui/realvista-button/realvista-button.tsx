@@ -26,7 +26,7 @@ const realVistaButtonVariants = cva(
        * - google: White background with gray border for OAuth
        */
       variant: {
-        primary: 'bg-primary text-background hover:bg-primary-hover active:bg-primary-active',
+        primary: 'bg-primary text-background hover:bg-primary/90 active:bg-primary/80',
         secondary: 'bg-background border-2 border-primary/20 text-primary hover:bg-primary/15-hover active:bg-primary/15-active',
         google: 'bg-background border border-border text-foreground hover:bg-muted',
       },

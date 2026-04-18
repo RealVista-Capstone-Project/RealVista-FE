@@ -96,7 +96,7 @@ function ManageRentalContractContent() {
               <div className='flex justify-end'>
                 <Button
                   type='button'
-                  className='h-11 rounded-xl bg-primary px-4 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary-hover'
+                  className='h-11 rounded-xl bg-primary px-4 text-white shadow-[0_18px_30px_rgba(92,63,214,0.24)] hover:bg-primary/90'
                   onClick={() => router.push(ROUTES.dashboard.createRentalContract)}
                 >
                   <Plus className='h-4 w-4' />

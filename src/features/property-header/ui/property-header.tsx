@@ -37,7 +37,7 @@ export function PropertyHeader({
         <button
           type='button'
           onClick={() => router.back()}
-          className='flex items-center gap-2 text-primary hover:text-primary-hover transition-colors font-medium text-sm'
+          className='flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium text-sm'
         >
           <ArrowLeft className='size-4' />
         </button>

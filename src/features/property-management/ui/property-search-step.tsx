@@ -368,7 +368,7 @@ export function PropertySearchStep() {
                           type='button'
                           onClick={handleUserSearch}
                           disabled={isUserFetching || !field.value?.includes('@')}
-                          className='h-12 rounded-lg bg-primary hover:bg-primary-hover'
+                          className='h-12 rounded-lg bg-primary hover:bg-primary/90'
                         >
                           {isUserFetching ? (
                             <Loader2 className='size-4 animate-spin' />

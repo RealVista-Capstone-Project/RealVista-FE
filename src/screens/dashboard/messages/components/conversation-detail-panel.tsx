@@ -130,7 +130,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
                   {event.link && (
                     <a
                       href={event.link.href}
-                      className='mt-1 text-sm font-semibold text-primary underline underline-offset-2 hover:text-primary-hover'
+                      className='mt-1 text-sm font-semibold text-primary underline underline-offset-2 hover:text-primary/80'
                     >
                       {event.link.label}
                     </a>
@@ -144,7 +144,7 @@ export function ConversationDetailPanel({ detail, onClose }: ConversationDetailP
 
       {/* End contract button */}
       <div className='px-4 pb-6 pt-2'>
-        <button className='w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary-hover active:bg-primary-active'>
+        <button className='w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90 active:bg-primary/80'>
           {t('endContract')}
         </button>
       </div>

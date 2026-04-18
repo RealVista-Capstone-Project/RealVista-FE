@@ -120,7 +120,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       return (
         <div className='flex flex-col gap-2'>
           <Button
-            className='w-full bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+            className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
             onClick={() => setCompleteDialogOpen(true)}
           >
             <CheckCircle2 className='h-4 w-4' />
@@ -154,7 +154,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
     if ((status === 'COMPLETED' || status === 'CANCELLED') && !hasReview) {
       return (
         <Button
-          className='w-full bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+          className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
           onClick={() => setReviewModalOpen(true)}
         >
           <MessageSquarePlus className='h-4 w-4' />
@@ -442,7 +442,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
           {renderActionButtons()}
           <Link
             href={`/${locale}${ROUTES.dashboard.agentDetail(agent.engagement_id)}`}
-            className='flex items-center justify-center gap-1.5 w-full text-xs text-primary hover:text-primary-hover font-semibold py-2 rounded-xl hover:bg-primary/5 transition-colors'
+            className='flex items-center justify-center gap-1.5 w-full text-xs text-primary hover:text-primary/80 font-semibold py-2 rounded-xl hover:bg-primary/5 transition-colors'
           >
             <ExternalLink className='h-3 w-3' />
             {t('detailPage.viewFullDetails')}

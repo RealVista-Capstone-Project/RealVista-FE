@@ -120,7 +120,7 @@ export function LeaseSigningCompletePage() {
       <div className='flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(120,80,255,0.10),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(39,197,255,0.08),transparent_22%),linear-gradient(180deg,#F7F4FF_0%,#FBFAFF_100%)]'>
         <div className='mx-auto w-full max-w-md px-6'>
           <div className='overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-primary/20'>
-            <div className='bg-linear-to-br from-primary to-primary-active px-8 pb-8 pt-10 text-center'>
+            <div className='bg-linear-to-br from-primary to-primary/80 px-8 pb-8 pt-10 text-center'>
               <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm'>
                 <Loader2 className='h-8 w-8 animate-spin text-white' />
               </div>
@@ -153,7 +153,7 @@ export function LeaseSigningCompletePage() {
             <div className='space-y-3 px-8 py-7'>
               <Button
                 type='button'
-                className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary-hover'
+                className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary/90'
                 onClick={runConfirm}
               >
                 <RefreshCw className='h-4 w-4' />
@@ -184,7 +184,7 @@ export function LeaseSigningCompletePage() {
           {isSuccess ? (
             <>
               {/* Success header */}
-              <div className='bg-linear-to-br from-primary to-primary-active px-8 pb-8 pt-10 text-center'>
+              <div className='bg-linear-to-br from-primary to-primary/80 px-8 pb-8 pt-10 text-center'>
                 <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm'>
                   <CheckCircle2 className='h-8 w-8 text-white' />
                 </div>
@@ -257,7 +257,7 @@ export function LeaseSigningCompletePage() {
                   className={
                     isLandlord && confirmState === 'confirmed'
                       ? 'h-11 w-full rounded-xl border-primary/30 text-muted-foreground hover:bg-primary/5'
-                      : 'mt-2 h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary-hover'
+                      : 'mt-2 h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary/90'
                   }
                 >
                   <Link
@@ -288,7 +288,7 @@ export function LeaseSigningCompletePage() {
               <div className='px-8 py-7'>
                 <Button
                   asChild
-                  className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary-hover'
+                  className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary/90'
                 >
                   <Link href={ROUTES.dashboard.rentalContracts}>
                     <ArrowLeft className='h-4 w-4' />

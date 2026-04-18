@@ -158,7 +158,7 @@ export function MediaViewer({
                 variant='secondary'
                 size='small'
                 onClick={onRequestTour}
-                className='!bg-primary !border-primary !text-white hover:!bg-primary-hover'
+                className='!bg-primary !border-primary !text-white hover:!bg-primary/90'
               >
                 {t('requestTour')}
               </RealVistaButton>

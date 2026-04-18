@@ -129,7 +129,7 @@ export function PublicActions({
           </Link>
           <Link
             href={`/${locale}${ROUTES.register}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-white font-medium transition-colors hover:bg-primary-hover'
+            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-white font-medium transition-colors hover:bg-primary/90'
           >
             {t('signup')}
           </Link>

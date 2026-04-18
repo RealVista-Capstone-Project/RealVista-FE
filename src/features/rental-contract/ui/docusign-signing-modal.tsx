@@ -63,7 +63,7 @@ export function DocuSignSigningModal({
           )}
         >
           {/* Header */}
-          <div className='relative rounded-t-3xl bg-linear-to-br from-primary to-primary-active px-6 pb-5 pt-6'>
+          <div className='relative rounded-t-3xl bg-linear-to-br from-primary to-primary/80 px-6 pb-5 pt-6'>
             <button
               type='button'
               onClick={onClose}
@@ -133,7 +133,7 @@ export function DocuSignSigningModal({
             <div className='flex flex-col gap-2.5'>
               <Button
                 type='button'
-                className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/30 hover:bg-primary-hover'
+                className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/30 hover:bg-primary/90'
                 onClick={handleOpenDocuSign}
               >
                 <ExternalLink className='h-4 w-4' />

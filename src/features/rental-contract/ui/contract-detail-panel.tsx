@@ -348,7 +348,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                 <Button
                   type='button'
                   disabled={availableActions.length === 0 || isPending}
-                  className='h-11 w-full rounded-xl bg-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-primary-hover'
+                  className='h-11 w-full rounded-xl bg-primary text-white shadow-[0_18px_30px_rgba(92,63,214,0.26)] hover:bg-primary/90'
                 >
                   {availableActions.length === 0
                     ? t('statusActions.noAvailableAction')

@@ -43,8 +43,7 @@
 
   /* Main Colors */
   --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-active: var(--primary-active);
+
 
   /* Border Radius */
   --radius-sm: var(--radius-sm);
@@ -62,8 +61,6 @@
 :root {
   /* Brand Colors (Mapped to standard variables) */
   --primary: oklch(0.6723 0.1606 244.9955);
-  --primary-hover: #5b52d1;
-  --primary-active: #4a42a8;
   --primary-foreground: oklch(1.0000 0 0);
 
   /* Semantic Colors */
@@ -118,8 +115,6 @@
   --popover: oklch(0 0 0);
   --popover-foreground: oklch(0.9328 0.0025 228.7857);
   --primary: oklch(0.6692 0.1607 245.0110); /* Slightly lighter for dark mode */
-  --primary-hover: #7b72e5;
-  --primary-active: #6c63d6;
   --primary-foreground: oklch(1.0000 0 0);
   --secondary: oklch(0.9622 0.0035 219.5331);
   --secondary-foreground: oklch(0.1884 0.0128 248.5103);

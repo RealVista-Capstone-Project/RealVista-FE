@@ -523,7 +523,7 @@ export function AppointmentsPage() {
                 size="sm"
                 onClick={() => setShowSaveDialog(true)}
                 disabled={syncBlocks.isPending}
-                className="h-8 gap-1.5 text-xs bg-primary text-white border-0 hover:bg-primary-hover shadow-sm"
+                className="h-8 gap-1.5 text-xs bg-primary text-white border-0 hover:bg-primary/90 shadow-sm"
               >
                 <Save className="h-3.5 w-3.5" />
                 {t('save') || 'Save'}
@@ -571,7 +571,7 @@ export function AppointmentsPage() {
               size="sm"
               onClick={handleSubmitReason}
               disabled={!actionReason.trim() || updateStatus.isPending}
-              className="bg-primary text-white border-0 hover:bg-primary-hover shadow-sm"
+              className="bg-primary text-white border-0 hover:bg-primary/90 shadow-sm"
             >
               {updateStatus.isPending ? t('saving') || 'Saving...' : t('submit')}
             </Button>
@@ -641,7 +641,7 @@ export function AppointmentsPage() {
               size="sm"
               onClick={() => handleSaveBlocks(repeatWeeks, repeatCount)}
               disabled={syncBlocks.isPending}
-              className="gap-2 bg-primary text-white border-0 hover:bg-primary-hover shadow-sm"
+              className="gap-2 bg-primary text-white border-0 hover:bg-primary/90 shadow-sm"
             >
               <Save className="h-4 w-4" />
               {syncBlocks.isPending ? (t('saving') || 'Saving...') : (t('confirm') || 'Confirm')}

@@ -501,7 +501,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                   type='button'
                   onClick={handleNext}
                   disabled={isNextDisabled}
-                  className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary-hover border-none shadow-none disabled:opacity-50'
+                  className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 border-none shadow-none disabled:opacity-50'
                 >
                   {t('continue')}
                 </Button>
@@ -525,7 +525,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                       !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
                     }
                     onClick={() => setSubmissionStatus('AVAILABLE')}
-                    className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary-hover border-none shadow-none'
+                    className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 border-none shadow-none'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}
                   </Button>

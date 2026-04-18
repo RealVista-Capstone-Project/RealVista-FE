@@ -212,7 +212,7 @@ export function SubmitProposalModal({
             type='submit'
             form='proposal-form'
             disabled={isLoading}
-            className='bg-primary hover:bg-primary-hover text-white gap-2 flex-1'
+            className='bg-primary hover:bg-primary/90 text-white gap-2 flex-1'
           >
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />

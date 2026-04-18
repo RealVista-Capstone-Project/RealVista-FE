@@ -101,7 +101,7 @@ export function UpdateContractStatusDialog({
               type='button'
               onClick={handleConfirm}
               disabled={disableConfirm}
-              className='rounded-xl bg-primary text-white hover:bg-primary-hover'
+              className='rounded-xl bg-primary text-white hover:bg-primary/90'
             >
               {isPending ? t('statusDialog.updating') : config.confirmLabel}
             </Button>

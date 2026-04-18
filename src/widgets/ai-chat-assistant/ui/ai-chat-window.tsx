@@ -197,7 +197,7 @@ export function AiChatWindow({
           className={cn(
             'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200',
             input.trim() && !isTyping
-              ? 'bg-primary text-white shadow-md hover:bg-primary-hover hover:scale-105 active:scale-95'
+              ? 'bg-primary text-white shadow-md hover:bg-primary/90 hover:scale-105 active:scale-95'
               : 'bg-secondary text-muted-foreground'
           )}
           aria-label={t('send')}
@@ -249,7 +249,7 @@ function ErrorBanner({
         </div>
         <Link
           href={subscribeUrl || '/subscribe'}
-          className='group relative flex items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary-hover hover:shadow-lg active:scale-95'
+          className='group relative flex items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg active:scale-95'
         >
           <span className='z-10'>{t('buyMore')}</span>
           <div className='absolute inset-0 z-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer' />

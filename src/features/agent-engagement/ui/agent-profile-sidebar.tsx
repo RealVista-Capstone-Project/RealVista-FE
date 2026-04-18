@@ -107,7 +107,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
       return (
         <div className='flex flex-col gap-2'>
           <Button
-            className='w-full bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+            className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
             onClick={() => setCompleteDialogOpen(true)}
             disabled={finishMutation.isPending}
           >
@@ -144,7 +144,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
     if ((status === 'COMPLETED' || status === 'CANCELLED') && !hasReview) {
       return (
         <Button
-          className='w-full bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
+          className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-indigo-200/60'
           onClick={() => setReviewModalOpen(true)}
           disabled={reviewMutation.isPending}
         >

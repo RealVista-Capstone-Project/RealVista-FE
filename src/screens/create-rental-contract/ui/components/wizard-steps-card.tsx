@@ -58,7 +58,7 @@ export function WizardStepsCard({
               : 'bg-primary/10';
 
           const hoverBg = isActive
-            ? 'hover:bg-primary-hover'
+            ? 'hover:bg-primary/90'
             : isComplete
               ? 'hover:bg-primary/35'
               : 'hover:bg-primary/15';
