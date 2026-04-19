@@ -114,6 +114,12 @@
       "hoursRemaining": "Còn {count} giờ",
       "expiresToday": "Hết hạn hôm nay",
       "expired": "Đã hết hạn"
+    },
+    "subscriptionGate": {
+      "title": "Hết lượt đăng tin",
+      "noSubscription": "Bạn chưa có gói đăng tin",
+      "description": "Mua gói đăng tin để tiếp tục publish bài đăng của bạn.",
+      "cta": "Mua gói đăng tin"
     }
   }
 }

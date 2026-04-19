@@ -71,6 +71,8 @@ export function RealVistaListingCard({
   onClick,
   className,
 }: RealVistaListingCardProps) {
+  const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
+  const resolvedImage = image || PLACEHOLDER_IMAGE;
   const t = useTranslations('PropertyCard');
 
   const [imgError, setImgError] = useState(false);
@@ -333,7 +335,7 @@ export function RealVistaListingCard({
 
           {/* Image – fixed width */}
           <div className='relative w-[280px] min-h-[200px] shrink-0 overflow-hidden rounded-l-xl'>
-            <Image src={image} alt={title} fill className='object-cover' sizes='280px' />
+            <Image src={resolvedImage} alt={title} fill className='object-cover' sizes='280px' />
           </div>
 
           {/* Badges Container - Outside overflow-hidden to allow ribbon fold */}
@@ -411,7 +413,7 @@ export function RealVistaListingCard({
         {/* Property Image Container */}
         <div className='relative aspect-[4/3] w-full overflow-hidden rounded-t-xl'>
           <Image
-            src={imgError ? 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image' : image}
+            src={imgError ? PLACEHOLDER_IMAGE : resolvedImage}
             alt={title}
             fill
             className='object-cover transition-transform duration-700 group-hover:scale-110'

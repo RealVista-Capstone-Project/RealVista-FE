@@ -114,6 +114,12 @@
       "hoursRemaining": "{count} hours remaining",
       "expiresToday": "Expires today",
       "expired": "Expired"
+    },
+    "subscriptionGate": {
+      "title": "No publish credits left",
+      "noSubscription": "You don't have a listing subscription",
+      "description": "Purchase a listing plan to continue publishing your listings.",
+      "cta": "Buy listing plan"
     }
   }
 }

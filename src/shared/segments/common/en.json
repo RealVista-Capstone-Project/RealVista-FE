@@ -138,6 +138,12 @@
       "contentVerification": "AI Content Verification",
       "verified": "Verified ✅",
       "violated": "Policy Violation"
+    },
+    "quota": {
+      "remaining": "You have {count} publish credits remaining",
+      "unlimited": "Unlimited publish credits",
+      "exhausted": "You have no publish credits left",
+      "loading": "Checking..."
     }
   },
   "Common": {
