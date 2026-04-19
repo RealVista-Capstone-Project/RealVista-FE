@@ -74,7 +74,7 @@ function formatFullPrice(value: number, locale: string): string {
 const chartConfig = {
   price: {
     label: 'Price',
-    color: 'var(--main-primary)',
+    color: 'var(--primary)',
   },
   minPrice: {
     label: 'Min Price',
@@ -154,32 +154,31 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
   return (
     <div className='flex flex-col gap-6'>
       <div className='flex flex-col gap-2'>
-        <h2 className='text-main-black text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
+        <h2 className='text-foreground text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
           {t('title')}
         </h2>
-        <p className='text-main-black/70 text-[16px] font-medium leading-[1.6]'>
+        <p className='text-foreground/70 text-[16px] font-medium leading-[1.6]'>
           {t('description')}
         </p>
       </div>
 
-      <Card className='border-purple-92 bg-white'>
+      <Card className='border-primary/20 bg-white'>
         <CardHeader className='pb-2'>
           <div className='flex items-center justify-between'>
             <div>
-              <CardTitle className='text-main-black text-lg font-bold'>
+              <CardTitle className='text-foreground text-lg font-bold'>
                 {t('priceHistory')}
               </CardTitle>
-              <CardDescription className='text-main-black/50'>
+              <CardDescription className='text-muted-foreground'>
                 {chartData.length} {t('priceChanges')}
               </CardDescription>
             </div>
             {hasPriceChange && (
               <div
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${
-                  isIncrease
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${isIncrease
                     ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
-                }`}
+                  }`}
               >
                 {isIncrease ? (
                   <TrendingUp className='h-4 w-4' />
@@ -206,7 +205,7 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
             >
               <CartesianGrid
                 vertical={false}
-                stroke='#e8e6f9'
+                stroke='var(--border)'
                 strokeDasharray='4 4'
               />
               <XAxis
@@ -214,13 +213,13 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tick={{ fill: '#6c727f', fontSize: 12 }}
+                tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tick={{ fill: '#6c727f', fontSize: 12 }}
+                tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
                 tickFormatter={(value) => formatPrice(value, locale)}
                 domain={[yMin, yMax]}
               />
@@ -234,25 +233,25 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
 
                   return (
                     <div className='border-border/50 bg-background grid min-w-[10rem] items-start gap-1.5 rounded-lg border px-3 py-2 text-xs shadow-xl'>
-                      <span className='text-main-black/50 text-xs font-medium'>
+                      <span className='text-muted-foreground text-xs font-medium'>
                         {data.fullDate}
                       </span>
                       <div className='flex flex-col gap-1'>
                         <div className='flex items-center gap-2'>
                           <div
                             className='h-2.5 w-2.5 rounded-full'
-                            style={{ backgroundColor: 'var(--main-primary)' }}
+                            style={{ backgroundColor: 'var(--primary)' }}
                           />
-                          <span className='text-main-black/70'>{t('price')}:</span>
-                          <span className='text-main-black font-bold'>{data.formattedPrice}</span>
+                          <span className='text-foreground/70'>{t('price')}:</span>
+                          <span className='text-foreground font-bold'>{data.formattedPrice}</span>
                         </div>
                         <div className='flex items-center gap-2'>
                           <div
                             className='h-2.5 w-2.5 rounded-full'
                             style={{ backgroundColor: 'var(--chart-2)' }}
                           />
-                          <span className='text-main-black/70'>{t('minPrice')}:</span>
-                          <span className='text-main-black font-medium'>
+                          <span className='text-foreground/70'>{t('minPrice')}:</span>
+                          <span className='text-foreground font-medium'>
                             {data.formattedMinPrice}
                           </span>
                         </div>
@@ -261,17 +260,16 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
                             className='h-2.5 w-2.5 rounded-full'
                             style={{ backgroundColor: 'var(--chart-3)' }}
                           />
-                          <span className='text-main-black/70'>{t('maxPrice')}:</span>
-                          <span className='text-main-black font-medium'>
+                          <span className='text-foreground/70'>{t('maxPrice')}:</span>
+                          <span className='text-foreground font-medium'>
                             {data.formattedMaxPrice}
                           </span>
                         </div>
                       </div>
                       {data.changeType !== 'UNCHANGED' && (
                         <span
-                          className={`text-xs font-medium ${
-                            data.changeType === 'INCREASED' ? 'text-green-600' : 'text-red-600'
-                          }`}
+                          className={`text-xs font-medium ${data.changeType === 'INCREASED' ? 'text-green-600' : 'text-red-600'
+                            }`}
                         >
                           {data.changeType === 'INCREASED' ? '+' : '-'}
                           {Math.abs(data.changePercent).toFixed(1)}%
@@ -325,10 +323,10 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
               <Line
                 dataKey='price'
                 type='monotone'
-                stroke='var(--main-primary)'
+                stroke='var(--primary)'
                 strokeWidth={3}
                 dot={{
-                  fill: 'var(--main-primary)',
+                  fill: 'var(--primary)',
                   strokeWidth: 2,
                   stroke: '#fff',
                   r: 5,
@@ -337,7 +335,7 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
                   r: 7,
                   strokeWidth: 2,
                   stroke: '#fff',
-                  fill: 'var(--main-primary)',
+                  fill: 'var(--primary)',
                 }}
               />
             </LineChart>

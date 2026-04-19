@@ -98,16 +98,14 @@ export function LeaseSigningCompletePage() {
       {steps.map((step, i) => (
         <div key={i} className='flex items-center gap-3'>
           <div
-            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-              step.done ? 'bg-emerald-500 text-white' : 'bg-[#EDE8FF] text-main-secondary/50'
-            }`}
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${step.done ? 'bg-emerald-500 text-white' : 'bg-primary/10 text-muted-foreground/70'
+              }`}
           >
             {step.done ? '✓' : i + 1}
           </div>
           <span
-            className={`text-sm ${
-              step.done ? 'font-semibold text-main-black' : 'text-main-secondary/55'
-            }`}
+            className={`text-sm ${step.done ? 'font-semibold text-foreground' : 'text-muted-foreground'
+              }`}
           >
             {step.label}
           </span>
@@ -121,8 +119,8 @@ export function LeaseSigningCompletePage() {
     return (
       <div className='flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(120,80,255,0.10),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(39,197,255,0.08),transparent_22%),linear-gradient(180deg,#F7F4FF_0%,#FBFAFF_100%)]'>
         <div className='mx-auto w-full max-w-md px-6'>
-          <div className='overflow-hidden rounded-3xl border border-[#E9E0FF] bg-white shadow-[0_32px_80px_rgba(92,63,214,0.14)]'>
-            <div className='bg-[linear-gradient(135deg,#6B46C1,#4F46E5)] px-8 pb-8 pt-10 text-center'>
+          <div className='overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-primary/20'>
+            <div className='bg-linear-to-br from-primary to-primary/80 px-8 pb-8 pt-10 text-center'>
               <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm'>
                 <Loader2 className='h-8 w-8 animate-spin text-white' />
               </div>
@@ -142,8 +140,8 @@ export function LeaseSigningCompletePage() {
     return (
       <div className='flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(120,80,255,0.10),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(39,197,255,0.08),transparent_22%),linear-gradient(180deg,#F7F4FF_0%,#FBFAFF_100%)]'>
         <div className='mx-auto w-full max-w-md px-6'>
-          <div className='overflow-hidden rounded-3xl border border-[#E9E0FF] bg-white shadow-[0_32px_80px_rgba(92,63,214,0.14)]'>
-            <div className='bg-[linear-gradient(135deg,#78350F,#B45309)] px-8 pb-8 pt-10 text-center'>
+          <div className='overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-primary/20'>
+            <div className='bg-linear-to-br from-amber-800 to-amber-700 px-8 pb-8 pt-10 text-center'>
               <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm'>
                 <AlertCircle className='h-8 w-8 text-white' />
               </div>
@@ -155,7 +153,7 @@ export function LeaseSigningCompletePage() {
             <div className='space-y-3 px-8 py-7'>
               <Button
                 type='button'
-                className='h-11 w-full rounded-xl bg-main-primary text-white shadow-[0_14px_28px_rgba(92,63,214,0.22)] hover:bg-main-primary-hover'
+                className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary/90'
                 onClick={runConfirm}
               >
                 <RefreshCw className='h-4 w-4' />
@@ -164,7 +162,7 @@ export function LeaseSigningCompletePage() {
               <Button
                 asChild
                 variant='outline'
-                className='h-11 w-full rounded-xl border-[#DDD2FF] text-main-secondary/70 hover:bg-[#F8F4FF]'
+                className='h-11 w-full rounded-xl border-primary/30 text-muted-foreground hover:bg-primary/5'
               >
                 <Link href={ROUTES.dashboard.rentalContracts}>
                   <ArrowLeft className='h-4 w-4' />
@@ -182,11 +180,11 @@ export function LeaseSigningCompletePage() {
   return (
     <div className='flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(120,80,255,0.10),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(39,197,255,0.08),transparent_22%),linear-gradient(180deg,#F7F4FF_0%,#FBFAFF_100%)]'>
       <div className='mx-auto w-full max-w-md px-6'>
-        <div className='overflow-hidden rounded-3xl border border-[#E9E0FF] bg-white shadow-[0_32px_80px_rgba(92,63,214,0.14)]'>
+        <div className='overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-primary/20'>
           {isSuccess ? (
             <>
               {/* Success header */}
-              <div className='bg-[linear-gradient(135deg,#6B46C1,#4F46E5)] px-8 pb-8 pt-10 text-center'>
+              <div className='bg-linear-to-br from-primary to-primary/80 px-8 pb-8 pt-10 text-center'>
                 <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm'>
                   <CheckCircle2 className='h-8 w-8 text-white' />
                 </div>
@@ -200,20 +198,20 @@ export function LeaseSigningCompletePage() {
 
               {/* Success body */}
               <div className='space-y-4 px-8 py-7'>
-                <div className='rounded-2xl border border-[#E5DFFC] bg-[#F8F5FF] px-4 py-4'>
+                <div className='rounded-2xl border border-primary/25 bg-primary/5 px-4 py-4'>
                   <div className='flex items-start gap-3'>
-                    <div className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-main-primary/10'>
-                      <FileText className='h-4 w-4 text-main-primary' />
+                    <div className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10'>
+                      <FileText className='h-4 w-4 text-primary' />
                     </div>
                     <div>
-                      <p className='text-sm font-semibold text-main-black'>
+                      <p className='text-sm font-semibold text-foreground'>
                         {isRenter
                           ? t('renter.infoTitle')
                           : isLandlord
                             ? t('landlord.sendToRenterTitle')
                             : t('infoTitle')}
                       </p>
-                      <p className='mt-1 text-sm leading-6 text-main-secondary/70'>
+                      <p className='mt-1 text-sm leading-6 text-muted-foreground'>
                         {isRenter
                           ? t('renter.infoBody')
                           : isLandlord
@@ -234,7 +232,7 @@ export function LeaseSigningCompletePage() {
                     )}
                     <Button
                       type='button'
-                      className='h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_rgba(5,150,105,0.22)] hover:bg-emerald-700 disabled:opacity-60'
+                      className='h-11 w-full rounded-xl bg-emerald-600 text-white shadow-[0_14px_28px_color-mix(in_oklch,var(--color-emerald-600,oklch(0.64_0.15_162))_22%,transparent)] hover:bg-emerald-700 disabled:opacity-60'
                       onClick={handleSendToRenter}
                       disabled={sendToRenterMutation.isPending}
                     >
@@ -258,8 +256,8 @@ export function LeaseSigningCompletePage() {
                   variant={isLandlord && confirmState === 'confirmed' ? 'outline' : 'default'}
                   className={
                     isLandlord && confirmState === 'confirmed'
-                      ? 'h-11 w-full rounded-xl border-[#DDD2FF] text-main-secondary/70 hover:bg-[#F8F4FF]'
-                      : 'mt-2 h-11 w-full rounded-xl bg-main-primary text-white shadow-[0_14px_28px_rgba(92,63,214,0.22)] hover:bg-main-primary-hover'
+                      ? 'h-11 w-full rounded-xl border-primary/30 text-muted-foreground hover:bg-primary/5'
+                      : 'mt-2 h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary/90'
                   }
                 >
                   <Link
@@ -276,7 +274,7 @@ export function LeaseSigningCompletePage() {
           ) : (
             <>
               {/* Error header */}
-              <div className='bg-[linear-gradient(135deg,#78350F,#B45309)] px-8 pb-8 pt-10 text-center'>
+              <div className='bg-linear-to-br from-amber-800 to-amber-700 px-8 pb-8 pt-10 text-center'>
                 <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm'>
                   <AlertCircle className='h-8 w-8 text-white' />
                 </div>
@@ -290,7 +288,7 @@ export function LeaseSigningCompletePage() {
               <div className='px-8 py-7'>
                 <Button
                   asChild
-                  className='h-11 w-full rounded-xl bg-main-primary text-white shadow-[0_14px_28px_rgba(92,63,214,0.22)] hover:bg-main-primary-hover'
+                  className='h-11 w-full rounded-xl bg-primary text-white shadow-primary/20 hover:bg-primary/90'
                 >
                   <Link href={ROUTES.dashboard.rentalContracts}>
                     <ArrowLeft className='h-4 w-4' />

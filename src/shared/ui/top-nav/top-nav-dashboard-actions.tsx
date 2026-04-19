@@ -42,8 +42,8 @@ export function DashboardActions({
         className={cn(
           'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
           isRouteActive('/subscribe')
-            ? 'bg-main-primary text-white'
-            : 'bg-purple-98 text-main-black hover:bg-purple-92'
+            ? 'bg-primary text-white'
+            : 'bg-primary/5 text-foreground hover:bg-primary/10'
         )}
         aria-label={t('subscribe')}
         title={t('subscribe')}

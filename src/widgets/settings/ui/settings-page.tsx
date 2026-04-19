@@ -601,7 +601,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   useEffect(() => {
     if (!isChangingPhone) {
       if (recaptchaVerifier.current) {
-        try { recaptchaVerifier.current.clear(); } catch {}
+        try { recaptchaVerifier.current.clear(); } catch { }
         recaptchaVerifier.current = null;
       }
       confirmationResultRef.current = null;
@@ -625,7 +625,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
         'expired-callback': () => {
           console.warn('[Settings] Recaptcha expired');
           if (recaptchaVerifier.current) {
-            try { recaptchaVerifier.current.clear(); } catch {}
+            try { recaptchaVerifier.current.clear(); } catch { }
             recaptchaVerifier.current = null;
           }
           setIsPhoneOtpSent(false);
@@ -675,7 +675,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       console.error('[Settings] Firebase phone auth error:', err);
       // Clear spent verifier so next attempt gets a fresh one
       if (recaptchaVerifier.current) {
-        try { recaptchaVerifier.current.clear(); } catch {}
+        try { recaptchaVerifier.current.clear(); } catch { }
         recaptchaVerifier.current = null;
       }
 
@@ -762,7 +762,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   ];
 
   return (
-    <div className='relative min-h-screen bg-grey-100'>
+    <div className='relative min-h-screen bg-secondary'>
       <BillingReturnQueryEffects />
       {/* Left sidebar */}
       <aside className='absolute left-0 top-0 w-[200px] bg-transparent py-8 z-10'>
@@ -772,11 +772,10 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
               key={tab.id}
               type='button'
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-r-lg text-sm font-medium transition-colors text-left w-full ${
-                activeTab === tab.id
-                  ? 'bg-purple-98 text-main-primary border-l-4 border-main-primary'
-                  : 'text-grey-600 hover:bg-grey-100'
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-r-lg text-sm font-medium transition-colors text-left w-full ${activeTab === tab.id
+                  ? 'bg-primary/5 text-primary border-l-4 border-primary'
+                  : 'text-muted-foreground hover:bg-secondary'
+                }`}
             >
               {tab.label}
             </button>
@@ -787,788 +786,813 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       {/* Main: starts after sidebar (~200px) */}
       <main className='flex min-h-screen justify-center py-8 pl-[200px] pr-4 sm:pr-6 lg:pr-8'>
         <div className='w-full max-w-[700px] px-8'>
-        {activeTab === 'profile' && (
-          <div className='space-y-6'>
-            {isAgentDashboard && (
-              <section className='bg-white rounded-xl border border-border p-6'>
-                <h2 className='text-base font-semibold text-main-black mb-1'>{t('agentProfessional.title')}</h2>
-                <p className='text-sm text-grey-500 mb-4'>{t('agentProfessional.description')}</p>
-                {agentProfileLoading ? (
-                  <div className='text-sm text-grey-400'>{t('agentProfessional.loading')}</div>
-                ) : (
-                  <div className='space-y-4'>
-                    <div className='flex flex-wrap gap-6 text-sm'>
-                      <div>
-                        <span className='text-grey-500'>{t('agentProfessional.statsRating')}: </span>
-                        <span className='font-medium text-main-black'>
-                          {agentProfile?.rating != null && agentProfile.rating !== ''
-                            ? String(agentProfile.rating)
-                            : '—'}
-                        </span>
-                      </div>
-                      <div>
-                        <span className='text-grey-500'>{t('agentProfessional.statsSold')}: </span>
-                        <span className='font-medium text-main-black'>
-                          {agentProfile?.properties_sold != null ? agentProfile.properties_sold : '—'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className='space-y-2'>
-                      <Label className='text-sm text-grey-500'>{t('agentProfessional.bio')}</Label>
-                      <Textarea
-                        value={agentProfessionalForm.bio}
-                        onChange={(e) =>
-                          setAgentProfessionalForm((f) => ({ ...f, bio: e.target.value }))
-                        }
-                        placeholder={t('agentProfessional.bioPlaceholder')}
-                        rows={4}
-                        className='resize-y min-h-[100px]'
-                      />
-                    </div>
-                    <div className='space-y-3'>
-                      <div>
-                        <Label className='text-sm text-grey-500'>{t('agentProfessional.specialties')}</Label>
-                        <p className='text-xs text-grey-400 mt-1 leading-relaxed'>
-                          {t('agentProfessional.specialtiesHint')}
-                        </p>
-                      </div>
-                      <div
-                        className={cn(
-                          'min-h-[52px] rounded-xl border border-dashed border-border bg-purple-98/30 px-3 py-2.5',
-                          orderedSelectedSpecialties.length === 0 && 'flex items-center'
-                        )}
-                      >
-                        {orderedSelectedSpecialties.length === 0 ? (
-                          <span className='text-sm text-grey-400'>{t('agentProfessional.specialtiesEmpty')}</span>
-                        ) : (
-                          <div className='flex flex-wrap gap-2'>
-                            {orderedSelectedSpecialties.map((item) => (
-                              <span
-                                key={item.code}
-                                className='group inline-flex items-center gap-1 rounded-full border border-main-primary/25 bg-white pl-3 pr-1 py-1 text-sm font-medium text-main-primary shadow-sm ring-1 ring-purple-92/40'
-                              >
-                                <span className='max-w-[200px] truncate'>{item.label}</span>
-                                <button
-                                  type='button'
-                                  onClick={() => toggleAgentSpecialty(item.code)}
-                                  className='flex size-7 shrink-0 items-center justify-center rounded-full text-grey-400 transition-colors hover:bg-purple-98 hover:text-main-primary'
-                                  aria-label={t('agentProfessional.specialtiesRemoveAria', { label: item.label })}
-                                >
-                                  <X className='size-3.5' strokeWidth={2.5} />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className='space-y-4'>
-                        {PROPERTY_TYPES.map((category) => (
-                          <div
-                            key={category.code}
-                            className='rounded-xl border border-border/80 bg-gradient-to-br from-white to-purple-98/40 p-4 shadow-sm shadow-purple-92/10'
-                          >
-                            <p className='mb-3 text-[11px] font-bold uppercase tracking-wider text-main-primary/80'>
-                              {category.label}
-                            </p>
-                            <div className='flex flex-wrap gap-2'>
-                              {category.types.map((type) => {
-                                const isOn = agentSpecialtyCodes.includes(type.code);
-                                return (
-                                  <button
-                                    key={type.code}
-                                    type='button'
-                                    onClick={() => toggleAgentSpecialty(type.code)}
-                                    className={cn(
-                                      'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
-                                      isOn
-                                        ? 'bg-main-primary text-white shadow-md shadow-main-primary/25 ring-2 ring-main-primary/20'
-                                        : 'border border-border bg-white text-grey-600 hover:border-main-primary/35 hover:bg-purple-98/80 hover:text-main-black'
-                                    )}
-                                  >
-                                    {type.label}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className='space-y-3'>
-                      <div className='flex items-start gap-3'>
-                        <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple-98 text-main-primary ring-1 ring-purple-92/50'>
-                          <MapPin className='size-4' strokeWidth={2} />
+          {activeTab === 'profile' && (
+            <div className='space-y-6'>
+              {isAgentDashboard && (
+                <section className='bg-white rounded-xl border border-border p-6'>
+                  <h2 className='text-base font-semibold text-foreground mb-1'>{t('agentProfessional.title')}</h2>
+                  <p className='text-sm text-muted-foreground mb-4'>{t('agentProfessional.description')}</p>
+                  {agentProfileLoading ? (
+                    <div className='text-sm text-muted-foreground'>{t('agentProfessional.loading')}</div>
+                  ) : (
+                    <div className='space-y-4'>
+                      <div className='flex flex-wrap gap-6 text-sm'>
+                        <div>
+                          <span className='text-muted-foreground'>{t('agentProfessional.statsRating')}: </span>
+                          <span className='font-medium text-foreground'>
+                            {agentProfile?.rating != null && agentProfile.rating !== ''
+                              ? String(agentProfile.rating)
+                              : '—'}
+                          </span>
                         </div>
-                        <div className='min-w-0 flex-1'>
-                          <Label className='text-sm font-medium text-main-black'>
-                            {t('agentProfessional.workingArea')}
-                          </Label>
-                          <p className='text-xs text-grey-400 mt-1 leading-relaxed'>
-                            {t('agentProfessional.workingAreaHint')}
+                        <div>
+                          <span className='text-muted-foreground'>{t('agentProfessional.statsSold')}: </span>
+                          <span className='font-medium text-foreground'>
+                            {agentProfile?.properties_sold != null ? agentProfile.properties_sold : '—'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className='space-y-2'>
+                        <Label className='text-sm text-muted-foreground'>{t('agentProfessional.bio')}</Label>
+                        <Textarea
+                          value={agentProfessionalForm.bio}
+                          onChange={(e) =>
+                            setAgentProfessionalForm((f) => ({ ...f, bio: e.target.value }))
+                          }
+                          placeholder={t('agentProfessional.bioPlaceholder')}
+                          rows={4}
+                          className='resize-y min-h-[100px]'
+                        />
+                      </div>
+                      <div className='space-y-3'>
+                        <div>
+                          <Label className='text-sm text-muted-foreground'>{t('agentProfessional.specialties')}</Label>
+                          <p className='text-xs text-muted-foreground mt-1 leading-relaxed'>
+                            {t('agentProfessional.specialtiesHint')}
                           </p>
                         </div>
-                      </div>
-                      <div className='overflow-hidden rounded-xl border border-border/90 bg-gradient-to-b from-white to-purple-98/25 shadow-sm shadow-purple-92/10'>
                         <div
                           className={cn(
-                            'min-h-[56px] px-3 py-2.5',
-                            agentWorkingAreaTags.length === 0 && 'flex items-center'
+                            'min-h-[52px] rounded-xl border border-dashed border-border bg-primary/5 px-3 py-2.5',
+                            orderedSelectedSpecialties.length === 0 && 'flex items-center'
                           )}
                         >
-                          {agentWorkingAreaTags.length === 0 ? (
-                            <p className='text-sm text-grey-400 pl-1'>{t('agentProfessional.workingAreaEmpty')}</p>
+                          {orderedSelectedSpecialties.length === 0 ? (
+                            <span className='text-sm text-muted-foreground'>{t('agentProfessional.specialtiesEmpty')}</span>
                           ) : (
-                            <ul className='flex flex-wrap gap-2' aria-label={t('agentProfessional.workingArea')}>
-                              {agentWorkingAreaTags.map((tag) => (
-                                <li key={tag}>
-                                  <span className='inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-white py-1 pl-2.5 pr-1 text-sm text-main-black shadow-sm ring-1 ring-purple-92/30'>
-                                    <MapPin
-                                      className='size-3 shrink-0 text-main-primary/70'
-                                      aria-hidden
-                                      strokeWidth={2.5}
-                                    />
-                                    <span className='max-w-[220px] truncate' title={tag}>
-                                      {tag}
-                                    </span>
-                                    <button
-                                      type='button'
-                                      onClick={() => removeWorkingAreaTag(tag)}
-                                      className='flex size-7 shrink-0 items-center justify-center rounded-full text-grey-400 transition-colors hover:bg-red-50 hover:text-red-600'
-                                      aria-label={t('agentProfessional.workingAreaRemoveAria', { label: tag })}
-                                    >
-                                      <X className='size-3.5' strokeWidth={2.5} />
-                                    </button>
-                                  </span>
-                                </li>
+                            <div className='flex flex-wrap gap-2'>
+                              {orderedSelectedSpecialties.map((item) => (
+                                <span
+                                  key={item.code}
+                                  className='group inline-flex items-center gap-1 rounded-full border border-primary/20 bg-white pl-3 pr-1 py-1 text-sm font-medium text-primary shadow-sm ring-1 ring-primary/10'
+                                >
+                                  <span className='max-w-[200px] truncate'>{item.label}</span>
+                                  <button
+                                    type='button'
+                                    onClick={() => toggleAgentSpecialty(item.code)}
+                                    className='flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary'
+                                    aria-label={t('agentProfessional.specialtiesRemoveAria', { label: item.label })}
+                                  >
+                                    <X className='size-3.5' strokeWidth={2.5} />
+                                  </button>
+                                </span>
                               ))}
-                            </ul>
+                            </div>
                           )}
                         </div>
-                        <div className='flex flex-col gap-2 border-t border-border/80 bg-grey-50/80 p-3 sm:flex-row sm:items-center'>
-                          <Input
-                            ref={workingAreaInputRef}
-                            value={workingAreaInput}
-                            onChange={(e) => setWorkingAreaInput(e.target.value)}
-                            onPaste={onWorkingAreaPaste}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addWorkingAreaTag();
-                              }
-                            }}
-                            placeholder={t('agentProfessional.workingAreaInputPlaceholder')}
-                            className='h-10 flex-1 border-border bg-white'
-                            autoComplete='off'
-                          />
-                          <Button
-                            type='button'
-                            variant='outline'
-                            onClick={addWorkingAreaTag}
-                            disabled={!workingAreaInput.trim()}
-                            className='h-10 shrink-0 border-main-primary/30 text-main-primary hover:bg-purple-98 hover:text-main-primary sm:min-w-[88px]'
-                          >
-                            {t('agentProfessional.workingAreaAdd')}
-                          </Button>
+                        <div className='space-y-4'>
+                          {PROPERTY_TYPES.map((category) => (
+                            <div
+                              key={category.code}
+                              className='rounded-xl border border-border/80 bg-gradient-to-br from-white to-primary/10 p-4 shadow-sm shadow-primary/5'
+                            >
+                              <p className='mb-3 text-[11px] font-bold uppercase tracking-wider text-primary/80'>
+                                {category.label}
+                              </p>
+                              <div className='flex flex-wrap gap-2'>
+                                {category.types.map((type) => {
+                                  const isOn = agentSpecialtyCodes.includes(type.code);
+                                  return (
+                                    <button
+                                      key={type.code}
+                                      type='button'
+                                      onClick={() => toggleAgentSpecialty(type.code)}
+                                      className={cn(
+                                        'rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-200',
+                                        isOn
+                                          ? 'bg-primary text-white shadow-md shadow-primary/25 ring-2 ring-primary/20'
+                                          : 'border border-border bg-white text-muted-foreground hover:border-primary/35 hover:bg-primary/5 hover:text-foreground'
+                                      )}
+                                    >
+                                      {type.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <p className='text-[11px] text-grey-400 leading-relaxed'>
-                        {t('agentProfessional.workingAreaPasteHint')}
-                      </p>
-                    </div>
-                    <div className='space-y-2 max-w-xs'>
-                      <Label className='text-sm text-grey-500' htmlFor='agent-years-experience'>
-                        {t('agentProfessional.yearsExperience')}
-                      </Label>
-                      <p className='text-xs text-grey-400 leading-relaxed'>
-                        {t('agentProfessional.yearsExperienceHint', {
-                          min: AGENT_MIN_YEARS_EXPERIENCE,
-                          max: AGENT_MAX_YEARS_EXPERIENCE,
-                        })}
-                      </p>
-                      <Input
-                        id='agent-years-experience'
-                        type='text'
-                        inputMode='numeric'
-                        autoComplete='off'
-                        aria-invalid={yearsExperienceIssue != null}
-                        value={agentProfessionalForm.years_of_experience}
-                        onChange={(e) => {
-                          const v = e.target.value.replace(/\D/g, '').slice(0, 2);
-                          setAgentProfessionalForm((f) => ({ ...f, years_of_experience: v }));
-                        }}
-                        placeholder={t('agentProfessional.yearsPlaceholder')}
-                        className={yearsExperienceIssue ? 'border-red-400 focus-visible:ring-red-200' : undefined}
-                      />
-                      {yearsExperienceIssue === 'out_of_range' && (
-                        <p className='text-xs text-red-600' role='alert'>
-                          {t('agentProfessional.yearsExperienceErrorOutOfRange', {
+                      <div className='space-y-3'>
+                        <div className='flex items-start gap-3'>
+                          <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary ring-1 ring-primary/20'>
+                            <MapPin className='size-4' strokeWidth={2} />
+                          </div>
+                          <div className='min-w-0 flex-1'>
+                            <Label className='text-sm font-medium text-foreground'>
+                              {t('agentProfessional.workingArea')}
+                            </Label>
+                            <p className='text-xs text-muted-foreground mt-1 leading-relaxed'>
+                              {t('agentProfessional.workingAreaHint')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className='overflow-hidden rounded-xl border border-border/90 bg-gradient-to-b from-white to-primary/5 shadow-sm shadow-primary/5'>
+                          <div
+                            className={cn(
+                              'min-h-[56px] px-3 py-2.5',
+                              agentWorkingAreaTags.length === 0 && 'flex items-center'
+                            )}
+                          >
+                            {agentWorkingAreaTags.length === 0 ? (
+                              <p className='text-sm text-muted-foreground pl-1'>{t('agentProfessional.workingAreaEmpty')}</p>
+                            ) : (
+                              <ul className='flex flex-wrap gap-2' aria-label={t('agentProfessional.workingArea')}>
+                                {agentWorkingAreaTags.map((tag) => (
+                                  <li key={tag}>
+                                    <span className='inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-white py-1 pl-2.5 pr-1 text-sm text-foreground shadow-sm ring-1 ring-primary/10'>
+                                      <MapPin
+                                        className='size-3 shrink-0 text-primary/70'
+                                        aria-hidden
+                                        strokeWidth={2.5}
+                                      />
+                                      <span className='max-w-[220px] truncate' title={tag}>
+                                        {tag}
+                                      </span>
+                                      <button
+                                        type='button'
+                                        onClick={() => removeWorkingAreaTag(tag)}
+                                        className='flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600'
+                                        aria-label={t('agentProfessional.workingAreaRemoveAria', { label: tag })}
+                                      >
+                                        <X className='size-3.5' strokeWidth={2.5} />
+                                      </button>
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                          <div className='flex flex-col gap-2 border-t border-border/80 bg-muted/80 p-3 sm:flex-row sm:items-center'>
+                            <Input
+                              ref={workingAreaInputRef}
+                              value={workingAreaInput}
+                              onChange={(e) => setWorkingAreaInput(e.target.value)}
+                              onPaste={onWorkingAreaPaste}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  addWorkingAreaTag();
+                                }
+                              }}
+                              placeholder={t('agentProfessional.workingAreaInputPlaceholder')}
+                              className='h-10 flex-1 border-border bg-white'
+                              autoComplete='off'
+                            />
+                            <Button
+                              type='button'
+                              variant='outline'
+                              onClick={addWorkingAreaTag}
+                              disabled={!workingAreaInput.trim()}
+                              className='h-10 shrink-0 border-primary/30 text-primary hover:bg-primary/5 hover:text-primary sm:min-w-[88px]'
+                            >
+                              {t('agentProfessional.workingAreaAdd')}
+                            </Button>
+                          </div>
+                        </div>
+                        <p className='text-[11px] text-muted-foreground leading-relaxed'>
+                          {t('agentProfessional.workingAreaPasteHint')}
+                        </p>
+                      </div>
+                      <div className='space-y-2 max-w-xs'>
+                        <Label className='text-sm text-muted-foreground' htmlFor='agent-years-experience'>
+                          {t('agentProfessional.yearsExperience')}
+                        </Label>
+                        <p className='text-xs text-muted-foreground leading-relaxed'>
+                          {t('agentProfessional.yearsExperienceHint', {
                             min: AGENT_MIN_YEARS_EXPERIENCE,
                             max: AGENT_MAX_YEARS_EXPERIENCE,
                           })}
                         </p>
-                      )}
-                      {yearsExperienceIssue === 'invalid_format' && (
-                        <p className='text-xs text-red-600' role='alert'>
-                          {t('agentProfessional.yearsExperienceErrorInvalid')}
-                        </p>
-                      )}
-                    </div>
-                    <div className='flex justify-end pt-2'>
-                      <Button
-                        type='button'
-                        onClick={saveAgentProfessionalProfile}
-                        disabled={
-                          updateAgentProfileMutation.isPending ||
-                          yearsExperienceIssue != null ||
-                          !isAgentProfessionalDirty
-                        }
-                        className='bg-main-primary text-white hover:bg-main-primary/90 disabled:opacity-50'
-                      >
-                        {updateAgentProfileMutation.isPending
-                          ? t('agentProfessional.savingProfessional')
-                          : t('agentProfessional.saveProfessional')}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {/* Profile Management (buyer / multi-profile) — hidden on agent dashboard */}
-            {!isAgentDashboard && (
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <div className='flex items-center justify-between mb-2'>
-                <h2 className='text-base font-semibold text-main-black'>{t('profileManagement.title')}</h2>
-                {!showAddProfile && (
-                  <Button
-                    size='sm'
-                    onClick={() => setShowAddProfile(true)}
-                    className='bg-main-primary text-white hover:bg-main-primary/90 h-8 px-3 text-xs'
-                  >
-                    {t('profileManagement.addButton')}
-                  </Button>
-                )}
-              </div>
-              <p className='text-sm text-grey-500 mb-4'>
-                {t('profileManagement.description')}
-              </p>
-
-              {profilesLoading ? (
-                <div className='text-sm text-grey-400'>{t('profileManagement.loading')}</div>
-              ) : (
-                <div className='space-y-2'>
-                  {profiles.map((profile: CustomerProfile) => (
-                    <div
-                      key={profile.customer_profile_id}
-                      className='flex items-center justify-between py-3 border-b border-border last:border-0'
-                    >
-                      <div className='flex items-center gap-3'>
-                        <div className='flex size-8 items-center justify-center rounded-full bg-grey-100 text-grey-500'>
-                          <User className='h-4 w-4' />
-                        </div>
-                        <div className='flex items-center gap-2'>
-                          <span className='text-sm font-medium text-main-black'>
-                            {profile.profile_name?.trim() || t('profileManagement.defaultName')}
-                          </span>
-                          {profile.is_active && (
-                            <span className='text-xs text-main-primary font-medium bg-purple-98 px-2 py-0.5 rounded-full'>
-                              {t('profileManagement.activeBadge')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        {!profile.is_active && (
-                          <>
-                            <button
-                              type='button'
-                              onClick={() => switchProfileMutation.mutate(profile.customer_profile_id)}
-                              disabled={switchProfileMutation.isPending}
-                              className='text-grey-400 hover:text-main-primary transition-colors disabled:opacity-50'
-                              aria-label={t('profileManagement.switchButton')}
-                            >
-                              <RefreshCw className='h-4 w-4' />
-                            </button>
-                            <button
-                              type='button'
-                              onClick={() => deleteProfileMutation.mutate(profile.customer_profile_id)}
-                              disabled={deleteProfileMutation.isPending}
-                              className='text-grey-400 hover:text-red-500 transition-colors'
-                              aria-label='Delete profile'
-                            >
-                              <Trash2 className='h-4 w-4' />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {showAddProfile && (
-                <div className='mt-4 flex items-center gap-2'>
-                  <Input
-                    placeholder={t('profileManagement.namePlaceholder')}
-                    value={newProfileName}
-                    onChange={(e) => setNewProfileName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newProfileName.trim()) {
-                        createProfileMutation.mutate(newProfileName.trim());
-                      }
-                    }}
-                    className='flex-1'
-                    autoFocus
-                  />
-                  <Button
-                    size='sm'
-                    onClick={() => createProfileMutation.mutate(newProfileName.trim())}
-                    disabled={!newProfileName.trim() || createProfileMutation.isPending}
-                  >
-                    <Plus className='h-4 w-4' />
-                    {t('profileManagement.addConfirm')}
-                  </Button>
-                  <Button
-                    size='sm'
-                    variant='ghost'
-                    onClick={() => { setShowAddProfile(false); setNewProfileName(''); }}
-                  >
-                    {t('profileManagement.cancel')}
-                  </Button>
-                </div>
-              )}
-            </section>
-            )}
-
-            {/* My Account */}
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <div className='flex items-center justify-between mb-6'>
-                <h2 className='text-base font-semibold text-main-black'>{t('myAccount.title')}</h2>
-                {!isEditingProfile && (
-                  <Button
-                    size='sm'
-                    className='bg-main-primary text-white hover:bg-main-primary/90 h-8 px-3 text-xs'
-                    onClick={() => setIsEditingProfile(true)}
-                  >
-                    {t('myAccount.updateButton')}
-                  </Button>
-                )}
-              </div>
-
-              {meLoading ? (
-                <div className='text-sm text-grey-400'>{t('myAccount.loading')}</div>
-              ) : (
-                <div className='space-y-5'>
-                  {/* Avatar */}
-                  <div className='flex items-start gap-6'>
-                    <div className='flex flex-col gap-2'>
-                      <Label className='text-sm text-grey-500'>{t('myAccount.avatar')}</Label>
-                      <div className='flex size-[72px] items-center justify-center rounded-full bg-grey-100 overflow-hidden'>
-                        {(avatarPreviewUrl || (!pendingRemoveAvatar && me?.avatar_url)) ? (
-                          <Image
-                            src={avatarPreviewUrl || me?.avatar_url || ''}
-                            alt='avatar'
-                            width={72}
-                            height={72}
-                            className='size-full rounded-full object-cover'
-                          />
-                        ) : (
-                          <User className='h-8 w-8 text-grey-400' />
-                        )}
-                      </div>
-                      <input
-                        ref={avatarInputRef}
-                        type='file'
-                        accept='image/*'
-                        className='hidden'
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleAvatarSelect(file);
-                          e.target.value = '';
-                        }}
-                      />
-                      {isEditingProfile && (
-                        <div className='flex gap-2'>
-                          <Button
-                            variant='default'
-                            size='sm'
-                            disabled={isUploadingAvatar}
-                            onClick={() => avatarInputRef.current?.click()}
-                            className='bg-main-primary text-white hover:bg-main-primary/90'
-                          >
-                            <Upload className='h-3 w-3 mr-1' />
-                            {isUploadingAvatar ? t('myAccount.uploading') : t('myAccount.upload')}
-                          </Button>
-                          {(avatarPreviewUrl || me?.avatar_url) && (
-                            <Button variant='outline' size='sm' onClick={handleAvatarRemove}>
-                              {t('myAccount.remove')}
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='flex-1 space-y-4'>
-                      <div className='grid grid-cols-2 gap-4'>
-                        <div className='space-y-2'>
-                          <Label htmlFor='firstName' className='text-sm text-grey-500'>
-                            {t('myAccount.firstName')}
-                          </Label>
-                          <Input
-                            id='firstName'
-                            value={profileForm.firstName}
-                            onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
-                            placeholder={t('myAccount.firstNamePlaceholder')}
-                            readOnly={!isEditingProfile}
-                            className={!isEditingProfile ? 'bg-grey-50' : ''}
-                          />
-                        </div>
-                        <div className='space-y-2'>
-                          <Label htmlFor='lastName' className='text-sm text-grey-500'>
-                            {t('myAccount.lastName')}
-                          </Label>
-                          <Input
-                            id='lastName'
-                            value={profileForm.lastName}
-                            onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
-                            placeholder={t('myAccount.lastNamePlaceholder')}
-                            readOnly={!isEditingProfile}
-                            className={!isEditingProfile ? 'bg-grey-50' : ''}
-                          />
-                        </div>
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='businessName' className='text-sm text-grey-500'>
-                          {t('myAccount.businessName')}
-                        </Label>
                         <Input
-                          id='businessName'
-                          value={profileForm.businessName}
-                          onChange={(e) => setProfileForm((p) => ({ ...p, businessName: e.target.value }))}
-                          placeholder={t('myAccount.businessNamePlaceholder')}
-                          readOnly={!isEditingProfile}
-                          className={!isEditingProfile ? 'bg-grey-50' : ''}
+                          id='agent-years-experience'
+                          type='text'
+                          inputMode='numeric'
+                          autoComplete='off'
+                          aria-invalid={yearsExperienceIssue != null}
+                          value={agentProfessionalForm.years_of_experience}
+                          onChange={(e) => {
+                            const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+                            setAgentProfessionalForm((f) => ({ ...f, years_of_experience: v }));
+                          }}
+                          placeholder={t('agentProfessional.yearsPlaceholder')}
+                          className={yearsExperienceIssue ? 'border-red-400 focus-visible:ring-red-200' : undefined}
                         />
+                        {yearsExperienceIssue === 'out_of_range' && (
+                          <p className='text-xs text-red-600' role='alert'>
+                            {t('agentProfessional.yearsExperienceErrorOutOfRange', {
+                              min: AGENT_MIN_YEARS_EXPERIENCE,
+                              max: AGENT_MAX_YEARS_EXPERIENCE,
+                            })}
+                          </p>
+                        )}
+                        {yearsExperienceIssue === 'invalid_format' && (
+                          <p className='text-xs text-red-600' role='alert'>
+                            {t('agentProfessional.yearsExperienceErrorInvalid')}
+                          </p>
+                        )}
+                      </div>
+                      <div className='flex justify-end pt-2'>
+                        <Button
+                          type='button'
+                          onClick={saveAgentProfessionalProfile}
+                          disabled={
+                            updateAgentProfileMutation.isPending ||
+                            yearsExperienceIssue != null ||
+                            !isAgentProfessionalDirty
+                          }
+                          className='bg-primary text-white hover:bg-primary/90 disabled:opacity-50'
+                        >
+                          {updateAgentProfileMutation.isPending
+                            ? t('agentProfessional.savingProfessional')
+                            : t('agentProfessional.saveProfessional')}
+                        </Button>
                       </div>
                     </div>
-                  </div>
+                  )}
+                </section>
+              )}
 
-                  {/* Phone */}
-                  <div className='space-y-2'>
-                    <Label className='text-sm text-grey-500'>{t('myAccount.phone')}</Label>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        setIsChangingPhone((v) => !v);
-                        setNewPhone(profileForm.phone);
-                        setPhoneOtp('');
-                        setIsPhoneOtpSent(false);
-                      }}
-                      className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-main-black hover:bg-grey-50 transition-colors'
-                    >
-                      <span className='text-grey-600'>{profileForm.phone || t('myAccount.phonePlaceholder')}</span>
-                      <span className='text-sm font-medium text-main-primary'>
-                        {isChangingPhone
-                          ? <ChevronDown className='h-4 w-4' />
-                          : (me?.is_phone_verified ? t('myAccount.changeAction') : t('myAccount.verifyAction'))}
-                      </span>
-                    </button>
-                    {/* Recaptcha container must always be in DOM for Firebase to work */}
-                    <div id={phoneRecaptchaContainerId} />
-                    {isChangingPhone && (
-                      <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
-                        <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>{t('myAccount.newPhone')}</Label>
-                          <Input
-                            type='tel'
-                            value={newPhone}
-                            onChange={(e) => setNewPhone(e.target.value)}
-                            placeholder={t('myAccount.phonePlaceholder')}
-                          />
-                        </div>
-                        {isPhoneOtpSent && (
-                          <div className='space-y-1.5'>
-                            <Label className='text-sm text-grey-500'>{t('myAccount.otpLabel')}</Label>
-                            <Input
-                              value={phoneOtp}
-                              onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                              placeholder={t('myAccount.otpPlaceholder')}
-                              maxLength={6}
-                              className='tracking-[0.25em] font-mono'
-                            />
-                          </div>
-                        )}
-                        <div className='flex justify-end gap-2 pt-1'>
-                          <Button
-                            size='sm'
-                            variant='ghost'
-                            onClick={() => {
-                              setIsChangingPhone(false);
-                              setNewPhone('');
-                              setPhoneOtp('');
-                              setIsPhoneOtpSent(false);
-                            }}
-                          >
-                            {t('myAccount.cancel')}
-                          </Button>
-                          <Button
-                            size='sm'
-                            variant='outline'
-                            disabled={!newPhone.trim() || phoneOtpCountdown > 0}
-                            onClick={handleSendPhoneOtp}
-                          >
-                            {phoneOtpCountdown > 0
-                              ? t('myAccount.otpCountdown', { seconds: phoneOtpCountdown })
-                              : isPhoneOtpSent
-                                ? t('myAccount.resendOtp')
-                                : t('myAccount.sendOtp')}
-                          </Button>
-                          <Button
-                            size='sm'
-                            disabled={phoneOtp.length !== 6 || verifyPhoneMutation.isPending}
-                            onClick={handleVerifyPhoneOtp}
-                            className='bg-main-primary text-white hover:bg-main-primary/90'
-                          >
-                            {verifyPhoneMutation.isPending ? t('myAccount.verifying') : t('myAccount.verifyOtp')}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Email */}
-                  <div className='space-y-2'>
-                    <Label className='text-sm text-grey-500'>{t('myAccount.email')}</Label>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        setIsVerifyingEmail((v) => !v);
-                        setNewEmail(profileForm.email || me?.email || '');
-                      }}
-                      className='flex w-full items-center justify-between rounded-lg border border-border bg-grey-50 px-4 py-3 text-sm text-main-black hover:bg-grey-100 transition-colors'
-                    >
-                      <span className='text-grey-600'>{profileForm.email || me?.email || ''}</span>
-                      <span className='flex items-center gap-1 text-sm font-medium text-main-primary'>
-                        {me?.is_email_verified
-                          ? t('myAccount.changeAction')
-                          : (isVerifyingEmail ? <ChevronDown className='h-4 w-4' /> : t('myAccount.verifyAction'))}
-                      </span>
-                    </button>
-                    {isVerifyingEmail && (
-                      <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
-                        <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>{t('myAccount.email')}</Label>
-                          <Input
-                            type='email'
-                            value={newEmail}
-                            onChange={(e) => setNewEmail(e.target.value)}
-                            placeholder='example@email.com'
-                          />
-                        </div>
-                        <p className='text-xs text-grey-500'>{t('myAccount.otpSent')}</p>
-                        <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>{t('myAccount.otpLabel')}</Label>
-                          <div className='flex gap-2'>
-                            <Input
-                              value={emailOtp}
-                              onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                              placeholder={t('myAccount.otpPlaceholder')}
-                              maxLength={6}
-                              className='flex-1 tracking-[0.25em] font-mono'
-                            />
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              disabled={otpCountdown > 0 || sendEmailOtpMutation.isPending}
-                              onClick={() => sendEmailOtpMutation.mutate()}
-                              className='shrink-0'
-                            >
-                              {sendEmailOtpMutation.isPending
-                                ? '...'
-                                : otpCountdown > 0
-                                  ? t('myAccount.otpCountdown', { seconds: otpCountdown })
-                                  : sendEmailOtpMutation.isIdle
-                                    ? t('myAccount.sendOtp')
-                                    : t('myAccount.resendOtp')}
-                            </Button>
-                          </div>
-                        </div>
-                        <div className='flex justify-end gap-2 pt-1'>
-                          <Button
-                            size='sm'
-                            variant='ghost'
-                            onClick={() => { setIsVerifyingEmail(false); setEmailOtp(''); setNewEmail(''); }}
-                          >
-                            {t('myAccount.cancel')}
-                          </Button>
-                          <Button
-                            size='sm'
-                            disabled={emailOtp.length !== 6 || verifyEmailMutation.isPending}
-                            onClick={() => verifyEmailMutation.mutate(emailOtp)}
-                            className='bg-main-primary text-white hover:bg-main-primary/90'
-                          >
-                            {verifyEmailMutation.isPending ? t('myAccount.verifying') : t('myAccount.verifyOtp')}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Password */}
-                  <div className='space-y-2'>
-                    <Label className='text-sm text-grey-500'>{t('myAccount.password')}</Label>
-                    <button
-                      type='button'
-                      onClick={() => setIsChangingPassword((v) => !v)}
-                      className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-main-black hover:bg-grey-50 transition-colors'
-                    >
-                      <span>{t('myAccount.changePassword')}</span>
-                      {isChangingPassword
-                        ? <ChevronDown className='h-4 w-4 text-grey-400' />
-                        : <ChevronRight className='h-4 w-4 text-grey-400' />
-                      }
-                    </button>
-                    {isChangingPassword && (
-                      <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
-                        <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>{t('myAccount.currentPassword')}</Label>
-                          <Input
-                            type='password'
-                            value={changePasswordForm.current}
-                            onChange={(e) => setChangePasswordForm((f) => ({ ...f, current: e.target.value }))}
-                            placeholder={t('myAccount.currentPasswordPlaceholder')}
-                          />
-                        </div>
-                        <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>{t('myAccount.newPassword')}</Label>
-                          <Input
-                            type='password'
-                            value={changePasswordForm.next}
-                            onChange={(e) => setChangePasswordForm((f) => ({ ...f, next: e.target.value }))}
-                            placeholder={t('myAccount.newPasswordPlaceholder')}
-                          />
-                        </div>
-                        <div className='space-y-1.5'>
-                          <Label className='text-sm text-grey-500'>{t('myAccount.confirmPassword')}</Label>
-                          <Input
-                            type='password'
-                            value={changePasswordForm.confirm}
-                            onChange={(e) => setChangePasswordForm((f) => ({ ...f, confirm: e.target.value }))}
-                            placeholder={t('myAccount.confirmPasswordPlaceholder')}
-                          />
-                        </div>
-                        {changePasswordForm.next && changePasswordForm.confirm && changePasswordForm.next !== changePasswordForm.confirm && (
-                          <p className='text-xs text-red-500'>{t('myAccount.passwordMismatch')}</p>
-                        )}
-                        <div className='flex justify-end gap-2 pt-1'>
-                          <Button
-                            size='sm'
-                            variant='ghost'
-                            onClick={() => { setIsChangingPassword(false); setChangePasswordForm({ current: '', next: '', confirm: '' }); }}
-                          >
-                            {t('myAccount.cancel')}
-                          </Button>
-                          <Button
-                            size='sm'
-                            onClick={() => changePasswordMutation.mutate({ current_password: changePasswordForm.current, new_password: changePasswordForm.next })}
-                            disabled={
-                              !changePasswordForm.current ||
-                              !changePasswordForm.next ||
-                              changePasswordForm.next !== changePasswordForm.confirm ||
-                              changePasswordMutation.isPending
-                            }
-                            className='bg-main-primary text-white hover:bg-main-primary/90'
-                          >
-                            {changePasswordMutation.isPending ? t('myAccount.saving') : t('myAccount.confirm')}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Save */}
-                  {isEditingProfile && (
-                    <div className='flex justify-end gap-2 pt-2'>
+              {/* Profile Management (buyer / multi-profile) — hidden on agent dashboard */}
+              {!isAgentDashboard && (
+                <section className='bg-white rounded-xl border border-border p-6'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <h2 className='text-base font-semibold text-foreground'>{t('profileManagement.title')}</h2>
+                    {!showAddProfile && (
                       <Button
-                        variant='ghost'
-                        onClick={() => {
-                          setIsEditingProfile(false);
-                          if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
-                          setAvatarPreviewUrl(null);
-                          setSelectedAvatarFile(null);
-                          setPendingRemoveAvatar(false);
-                          if (me) setProfileForm({ email: me.email ?? '', firstName: me.first_name ?? '', lastName: me.last_name ?? '', businessName: me.business_name ?? '', phone: me.phone ?? '' });
-                        }}
+                        size='sm'
+                        onClick={() => setShowAddProfile(true)}
+                        className='bg-primary text-white hover:bg-primary/90 h-8 px-3 text-xs'
                       >
-                        {t('myAccount.cancel')}
+                        {t('profileManagement.addButton')}
+                      </Button>
+                    )}
+                  </div>
+                  <p className='text-sm text-muted-foreground mb-4'>
+                    {t('profileManagement.description')}
+                  </p>
+
+                  {profilesLoading ? (
+                    <div className='text-sm text-muted-foreground'>{t('profileManagement.loading')}</div>
+                  ) : (
+                    <div className='space-y-2'>
+                      {profiles.map((profile: CustomerProfile) => (
+                        <div
+                          key={profile.customer_profile_id}
+                          className='flex items-center justify-between py-3 border-b border-border last:border-0'
+                        >
+                          <div className='flex items-center gap-3'>
+                            <div className='flex size-8 items-center justify-center rounded-full bg-secondary text-muted-foreground'>
+                              <User className='h-4 w-4' />
+                            </div>
+                            <div className='flex items-center gap-2'>
+                              <span className='text-sm font-medium text-foreground'>
+                                {profile.profile_name?.trim() || t('profileManagement.defaultName')}
+                              </span>
+                              {profile.is_active && (
+                                <span className='text-xs text-primary font-medium bg-primary/5 px-2 py-0.5 rounded-full'>
+                                  {t('profileManagement.activeBadge')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            {!profile.is_active && (
+                              <>
+                                <button
+                                  type='button'
+                                  onClick={() => switchProfileMutation.mutate(profile.customer_profile_id)}
+                                  disabled={switchProfileMutation.isPending}
+                                  className='text-muted-foreground hover:text-primary transition-colors disabled:opacity-50'
+                                  aria-label={t('profileManagement.switchButton')}
+                                >
+                                  <RefreshCw className='h-4 w-4' />
+                                </button>
+                                <button
+                                  type='button'
+                                  onClick={() => deleteProfileMutation.mutate(profile.customer_profile_id)}
+                                  disabled={deleteProfileMutation.isPending}
+                                  className='text-muted-foreground hover:text-red-500 transition-colors'
+                                  aria-label='Delete profile'
+                                >
+                                  <Trash2 className='h-4 w-4' />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {showAddProfile && (
+                    <div className='mt-4 flex items-center gap-2'>
+                      <Input
+                        placeholder={t('profileManagement.namePlaceholder')}
+                        value={newProfileName}
+                        onChange={(e) => setNewProfileName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newProfileName.trim()) {
+                            createProfileMutation.mutate(newProfileName.trim());
+                          }
+                        }}
+                        className='flex-1'
+                        autoFocus
+                      />
+                      <Button
+                        size='sm'
+                        onClick={() => createProfileMutation.mutate(newProfileName.trim())}
+                        disabled={!newProfileName.trim() || createProfileMutation.isPending}
+                      >
+                        <Plus className='h-4 w-4' />
+                        {t('profileManagement.addConfirm')}
                       </Button>
                       <Button
-                        onClick={handleSaveProfile}
-                        disabled={updateMeMutation.isPending}
-                        className='bg-main-primary text-white hover:bg-main-primary/90 px-8'
+                        size='sm'
+                        variant='ghost'
+                        onClick={() => { setShowAddProfile(false); setNewProfileName(''); }}
                       >
-                        {updateMeMutation.isPending ? t('myAccount.saving') : t('myAccount.saveChanges')}
+                        {t('profileManagement.cancel')}
                       </Button>
                     </div>
                   )}
-                </div>
+                </section>
               )}
-            </section>
 
-            {/* Delete Account */}
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-1'>{t('deleteAccount.title')}</h2>
-              <p className='text-sm text-grey-500 mb-4'>{t('deleteAccount.description')}</p>
-              <div className='flex justify-end'>
-                <Button variant='outline' size='sm' className='border-destructive text-destructive hover:bg-destructive/5' onClick={() => setShowDeleteDialog(true)}>
-                  {t('deleteAccount.button')}
-                </Button>
-              </div>
-            </section>
+              {/* My Account */}
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <div className='flex items-center justify-between mb-6'>
+                  <h2 className='text-base font-semibold text-foreground'>{t('myAccount.title')}</h2>
+                  {!isEditingProfile && (
+                    <Button
+                      size='sm'
+                      className='bg-primary text-white hover:bg-primary/90 h-8 px-3 text-xs'
+                      onClick={() => setIsEditingProfile(true)}
+                    >
+                      {t('myAccount.updateButton')}
+                    </Button>
+                  )}
+                </div>
 
-            <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-              <DialogContent className='max-w-sm'>
-                <DialogHeader className='space-y-3'>
-                  <DialogTitle>{t('deleteAccount.dialogTitle')}</DialogTitle>
-                  <DialogDescription className='leading-relaxed'>
-                    {t('deleteAccount.dialogDescription')}
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter className='mt-2'>
-                  <Button variant='ghost' onClick={() => setShowDeleteDialog(false)}>
-                    {t('deleteAccount.cancel')}
+                {meLoading ? (
+                  <div className='text-sm text-muted-foreground'>{t('myAccount.loading')}</div>
+                ) : (
+                  <div className='space-y-5'>
+                    {/* Avatar */}
+                    <div className='flex items-start gap-6'>
+                      <div className='flex flex-col gap-2'>
+                        <Label className='text-sm text-muted-foreground'>{t('myAccount.avatar')}</Label>
+                        <div className='flex size-[72px] items-center justify-center rounded-full bg-secondary overflow-hidden'>
+                          {(avatarPreviewUrl || (!pendingRemoveAvatar && me?.avatar_url)) ? (
+                            <Image
+                              src={avatarPreviewUrl || me?.avatar_url || ''}
+                              alt='avatar'
+                              width={72}
+                              height={72}
+                              className='size-full rounded-full object-cover'
+                            />
+                          ) : (
+                            <User className='h-8 w-8 text-muted-foreground' />
+                          )}
+                        </div>
+                        <input
+                          ref={avatarInputRef}
+                          type='file'
+                          accept='image/*'
+                          className='hidden'
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleAvatarSelect(file);
+                            e.target.value = '';
+                          }}
+                        />
+                        {isEditingProfile && (
+                          <div className='flex gap-2'>
+                            <Button
+                              variant='default'
+                              size='sm'
+                              disabled={isUploadingAvatar}
+                              onClick={() => avatarInputRef.current?.click()}
+                              className='bg-primary text-white hover:bg-primary/90'
+                            >
+                              <Upload className='h-3 w-3 mr-1' />
+                              {isUploadingAvatar ? t('myAccount.uploading') : t('myAccount.upload')}
+                            </Button>
+                            {(avatarPreviewUrl || me?.avatar_url) && (
+                              <Button variant='outline' size='sm' onClick={handleAvatarRemove}>
+                                {t('myAccount.remove')}
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className='flex-1 space-y-4'>
+                        <div className='grid grid-cols-2 gap-4'>
+                          <div className='space-y-2'>
+                            <Label htmlFor='firstName' className='text-sm text-muted-foreground'>
+                              {t('myAccount.firstName')}
+                            </Label>
+                            <Input
+                              id='firstName'
+                              value={profileForm.firstName}
+                              onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
+                              placeholder={t('myAccount.firstNamePlaceholder')}
+                              readOnly={!isEditingProfile}
+                              className={!isEditingProfile ? 'bg-muted' : ''}
+                            />
+                          </div>
+                          <div className='space-y-2'>
+                            <Label htmlFor='lastName' className='text-sm text-muted-foreground'>
+                              {t('myAccount.lastName')}
+                            </Label>
+                            <Input
+                              id='lastName'
+                              value={profileForm.lastName}
+                              onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
+                              placeholder={t('myAccount.lastNamePlaceholder')}
+                              readOnly={!isEditingProfile}
+                              className={!isEditingProfile ? 'bg-muted' : ''}
+                            />
+                          </div>
+                        </div>
+                        <div className='space-y-2'>
+                          <Label htmlFor='businessName' className='text-sm text-muted-foreground'>
+                            {t('myAccount.businessName')}
+                          </Label>
+                          <Input
+                            id='businessName'
+                            value={profileForm.businessName}
+                            onChange={(e) => setProfileForm((p) => ({ ...p, businessName: e.target.value }))}
+                            placeholder={t('myAccount.businessNamePlaceholder')}
+                            readOnly={!isEditingProfile}
+                            className={!isEditingProfile ? 'bg-muted' : ''}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-muted-foreground'>{t('myAccount.phone')}</Label>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setIsChangingPhone((v) => !v);
+                          setNewPhone(profileForm.phone);
+                          setPhoneOtp('');
+                          setIsPhoneOtpSent(false);
+                        }}
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors'
+                      >
+                        <span className='text-muted-foreground'>{profileForm.phone || t('myAccount.phonePlaceholder')}</span>
+                        <span className='text-sm font-medium text-primary'>
+                          {isChangingPhone
+                            ? <ChevronDown className='h-4 w-4' />
+                            : (me?.is_phone_verified ? t('myAccount.changeAction') : t('myAccount.verifyAction'))}
+                        </span>
+                      </button>
+                      {/* Recaptcha container must always be in DOM for Firebase to work */}
+                      <div id={phoneRecaptchaContainerId} />
+                      {isChangingPhone && (
+                        <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
+                          <div className='space-y-1.5'>
+                            <Label className='text-sm text-muted-foreground'>{t('myAccount.newPhone')}</Label>
+                            <Input
+                              type='tel'
+                              value={newPhone}
+                              onChange={(e) => setNewPhone(e.target.value)}
+                              placeholder={t('myAccount.phonePlaceholder')}
+                            />
+                          </div>
+                          {isPhoneOtpSent && (
+                            <div className='space-y-1.5'>
+                              <Label className='text-sm text-muted-foreground'>{t('myAccount.otpLabel')}</Label>
+                              <Input
+                                value={phoneOtp}
+                                onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                placeholder={t('myAccount.otpPlaceholder')}
+                                maxLength={6}
+                                className='tracking-[0.25em] font-mono'
+                              />
+                            </div>
+                          )}
+                          <div className='flex justify-end gap-2 pt-1'>
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={() => {
+                                setIsChangingPhone(false);
+                                setNewPhone('');
+                                setPhoneOtp('');
+                                setIsPhoneOtpSent(false);
+                              }}
+                            >
+                              {t('myAccount.cancel')}
+                            </Button>
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              disabled={!newPhone.trim() || phoneOtpCountdown > 0}
+                              onClick={handleSendPhoneOtp}
+                            >
+                              {phoneOtpCountdown > 0
+                                ? t('myAccount.otpCountdown', { seconds: phoneOtpCountdown })
+                                : isPhoneOtpSent
+                                  ? t('myAccount.resendOtp')
+                                  : t('myAccount.sendOtp')}
+                            </Button>
+                            <Button
+                              size='sm'
+                              disabled={phoneOtp.length !== 6 || verifyPhoneMutation.isPending}
+                              onClick={handleVerifyPhoneOtp}
+                              className='bg-primary text-white hover:bg-primary/90'
+                            >
+                              {verifyPhoneMutation.isPending ? t('myAccount.verifying') : t('myAccount.verifyOtp')}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Email */}
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-muted-foreground'>{t('myAccount.email')}</Label>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setIsVerifyingEmail((v) => !v);
+                          setNewEmail(profileForm.email || me?.email || '');
+                        }}
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-muted px-4 py-3 text-sm text-foreground hover:bg-secondary transition-colors'
+                      >
+                        <span className='text-muted-foreground'>{profileForm.email || me?.email || ''}</span>
+                        <span className='flex items-center gap-1 text-sm font-medium text-primary'>
+                          {me?.is_email_verified
+                            ? t('myAccount.changeAction')
+                            : (isVerifyingEmail ? <ChevronDown className='h-4 w-4' /> : t('myAccount.verifyAction'))}
+                        </span>
+                      </button>
+                      {isVerifyingEmail && (
+                        <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
+                          <div className='space-y-1.5'>
+                            <Label className='text-sm text-muted-foreground'>{t('myAccount.email')}</Label>
+                            <Input
+                              type='email'
+                              value={newEmail}
+                              onChange={(e) => setNewEmail(e.target.value)}
+                              placeholder='example@email.com'
+                            />
+                          </div>
+                          <p className='text-xs text-muted-foreground'>{t('myAccount.otpSent')}</p>
+                          <div className='space-y-1.5'>
+                            <Label className='text-sm text-muted-foreground'>{t('myAccount.otpLabel')}</Label>
+                            <div className='flex gap-2'>
+                              <Input
+                                value={emailOtp}
+                                onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                placeholder={t('myAccount.otpPlaceholder')}
+                                maxLength={6}
+                                className='flex-1 tracking-[0.25em] font-mono'
+                              />
+                              <Button
+                                size='sm'
+                                variant='outline'
+                                disabled={otpCountdown > 0 || sendEmailOtpMutation.isPending}
+                                onClick={() => sendEmailOtpMutation.mutate()}
+                                className='shrink-0'
+                              >
+                                {sendEmailOtpMutation.isPending
+                                  ? '...'
+                                  : otpCountdown > 0
+                                    ? t('myAccount.otpCountdown', { seconds: otpCountdown })
+                                    : sendEmailOtpMutation.isIdle
+                                      ? t('myAccount.sendOtp')
+                                      : t('myAccount.resendOtp')}
+                              </Button>
+                            </div>
+                          </div>
+                          <div className='flex justify-end gap-2 pt-1'>
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={() => { setIsVerifyingEmail(false); setEmailOtp(''); setNewEmail(''); }}
+                            >
+                              {t('myAccount.cancel')}
+                            </Button>
+                            <Button
+                              size='sm'
+                              disabled={emailOtp.length !== 6 || verifyEmailMutation.isPending}
+                              onClick={() => verifyEmailMutation.mutate(emailOtp)}
+                              className='bg-primary text-white hover:bg-primary/90'
+                            >
+                              {verifyEmailMutation.isPending ? t('myAccount.verifying') : t('myAccount.verifyOtp')}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Password */}
+                    <div className='space-y-2'>
+                      <Label className='text-sm text-muted-foreground'>{t('myAccount.password')}</Label>
+                      <button
+                        type='button'
+                        onClick={() => setIsChangingPassword((v) => !v)}
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-white px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors'
+                      >
+                        <span>{t('myAccount.changePassword')}</span>
+                        {isChangingPassword
+                          ? <ChevronDown className='h-4 w-4 text-muted-foreground' />
+                          : <ChevronRight className='h-4 w-4 text-muted-foreground' />
+                        }
+                      </button>
+                      {isChangingPassword && (
+                        <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
+                          <div className='space-y-1.5'>
+                            <Label className='text-sm text-muted-foreground'>{t('myAccount.currentPassword')}</Label>
+                            <Input
+                              type='password'
+                              value={changePasswordForm.current}
+                              onChange={(e) => setChangePasswordForm((f) => ({ ...f, current: e.target.value }))}
+                              placeholder={t('myAccount.currentPasswordPlaceholder')}
+                            />
+                          </div>
+                          <div className='space-y-1.5'>
+                            <Label className='text-sm text-muted-foreground'>{t('myAccount.newPassword')}</Label>
+                            <Input
+                              type='password'
+                              value={changePasswordForm.next}
+                              onChange={(e) => setChangePasswordForm((f) => ({ ...f, next: e.target.value }))}
+                              placeholder={t('myAccount.newPasswordPlaceholder')}
+                            />
+                          </div>
+                          <div className='space-y-1.5'>
+                            <Label className='text-sm text-muted-foreground'>{t('myAccount.confirmPassword')}</Label>
+                            <Input
+                              type='password'
+                              value={changePasswordForm.confirm}
+                              onChange={(e) => setChangePasswordForm((f) => ({ ...f, confirm: e.target.value }))}
+                              placeholder={t('myAccount.confirmPasswordPlaceholder')}
+                            />
+                          </div>
+                          {changePasswordForm.next && changePasswordForm.confirm && changePasswordForm.next !== changePasswordForm.confirm && (
+                            <p className='text-xs text-red-500'>{t('myAccount.passwordMismatch')}</p>
+                          )}
+                          <div className='flex justify-end gap-2 pt-1'>
+                            <Button
+                              size='sm'
+                              variant='ghost'
+                              onClick={() => { setIsChangingPassword(false); setChangePasswordForm({ current: '', next: '', confirm: '' }); }}
+                            >
+                              {t('myAccount.cancel')}
+                            </Button>
+                            <Button
+                              size='sm'
+                              onClick={() => changePasswordMutation.mutate({ current_password: changePasswordForm.current, new_password: changePasswordForm.next })}
+                              disabled={
+                                !changePasswordForm.current ||
+                                !changePasswordForm.next ||
+                                changePasswordForm.next !== changePasswordForm.confirm ||
+                                changePasswordMutation.isPending
+                              }
+                              className='bg-primary text-white hover:bg-primary/90'
+                            >
+                              {changePasswordMutation.isPending ? t('myAccount.saving') : t('myAccount.confirm')}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Save */}
+                    {isEditingProfile && (
+                      <div className='flex justify-end gap-2 pt-2'>
+                        <Button
+                          variant='ghost'
+                          onClick={() => {
+                            setIsEditingProfile(false);
+                            if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+                            setAvatarPreviewUrl(null);
+                            setSelectedAvatarFile(null);
+                            setPendingRemoveAvatar(false);
+                            if (me) setProfileForm({ email: me.email ?? '', firstName: me.first_name ?? '', lastName: me.last_name ?? '', businessName: me.business_name ?? '', phone: me.phone ?? '' });
+                          }}
+                        >
+                          {t('myAccount.cancel')}
+                        </Button>
+                        <Button
+                          onClick={handleSaveProfile}
+                          disabled={updateMeMutation.isPending}
+                          className='bg-primary text-white hover:bg-primary/90 px-8'
+                        >
+                          {updateMeMutation.isPending ? t('myAccount.saving') : t('myAccount.saveChanges')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </section>
+
+              {/* Delete Account */}
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <h2 className='text-base font-semibold text-foreground mb-1'>{t('deleteAccount.title')}</h2>
+                <p className='text-sm text-muted-foreground mb-4'>{t('deleteAccount.description')}</p>
+                <div className='flex justify-end'>
+                  <Button variant='outline' size='sm' className='border-destructive text-destructive hover:bg-destructive/5' onClick={() => setShowDeleteDialog(true)}>
+                    {t('deleteAccount.button')}
                   </Button>
-                  <Button
-                    variant='destructive'
-                    onClick={() => deleteAccountMutation.mutate()}
-                    disabled={deleteAccountMutation.isPending}
-                  >
-                    {deleteAccountMutation.isPending ? t('deleteAccount.deleting') : t('deleteAccount.confirm')}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
+                </div>
+              </section>
 
-        {activeTab === 'settings' && (
-          <div className='space-y-6'>
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-6'>{t('notifications.title')}</h2>
+              <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <DialogContent className='max-w-sm'>
+                  <DialogHeader className='space-y-3'>
+                    <DialogTitle>{t('deleteAccount.dialogTitle')}</DialogTitle>
+                    <DialogDescription className='leading-relaxed'>
+                      {t('deleteAccount.dialogDescription')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className='mt-2'>
+                    <Button variant='ghost' onClick={() => setShowDeleteDialog(false)}>
+                      {t('deleteAccount.cancel')}
+                    </Button>
+                    <Button
+                      variant='destructive'
+                      onClick={() => deleteAccountMutation.mutate()}
+                      disabled={deleteAccountMutation.isPending}
+                    >
+                      {deleteAccountMutation.isPending ? t('deleteAccount.deleting') : t('deleteAccount.confirm')}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
 
-              {settingsLoading ? (
-                <div className='text-sm text-grey-400'>{t('notifications.loading')}</div>
-              ) : (
+          {activeTab === 'settings' && (
+            <div className='space-y-6'>
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <h2 className='text-base font-semibold text-foreground mb-6'>{t('notifications.title')}</h2>
+
+                {settingsLoading ? (
+                  <div className='text-sm text-muted-foreground'>{t('notifications.loading')}</div>
+                ) : (
+                  <div className='space-y-5'>
+                    {[
+                      { key: 'inAppEnabled' as const, label: t('notifications.inApp'), desc: t('notifications.inAppDesc') },
+                      { key: 'emailEnabled' as const, label: t('notifications.email'), desc: t('notifications.emailDesc') },
+                      { key: 'pushEnabled' as const, label: t('notifications.push'), desc: t('notifications.pushDesc') },
+                    ].map(({ key, label, desc }) => (
+                      <div key={key} className='flex items-center justify-between py-3 border-b border-border last:border-0'>
+                        <div>
+                          <p className='text-sm font-medium text-foreground'>{label}</p>
+                          <p className='text-xs text-muted-foreground'>{desc}</p>
+                        </div>
+                        <Switch
+                          checked={notifForm[key]}
+                          disabled={updateSettingsMutation.isPending}
+                          onCheckedChange={(checked) => handleToggleSetting(key, checked)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <h2 className='text-base font-semibold text-foreground mb-6'>{t('contactPreferences.title')}</h2>
                 <div className='space-y-5'>
                   {[
-                    { key: 'inAppEnabled' as const, label: t('notifications.inApp'), desc: t('notifications.inAppDesc') },
-                    { key: 'emailEnabled' as const, label: t('notifications.email'), desc: t('notifications.emailDesc') },
-                    { key: 'pushEnabled' as const, label: t('notifications.push'), desc: t('notifications.pushDesc') },
+                    { key: 'contactViaEmail' as const, label: t('contactPreferences.viaEmail'), desc: t('contactPreferences.viaEmailDesc') },
+                    { key: 'contactViaPhone' as const, label: t('contactPreferences.viaPhone'), desc: t('contactPreferences.viaPhoneDesc') },
+                    { key: 'hidePhoneNumber' as const, label: t('contactPreferences.hidePhone'), desc: t('contactPreferences.hidePhoneDesc') },
+                    { key: 'hideEmail' as const, label: t('contactPreferences.hideEmail'), desc: t('contactPreferences.hideEmailDesc') },
                   ].map(({ key, label, desc }) => (
                     <div key={key} className='flex items-center justify-between py-3 border-b border-border last:border-0'>
                       <div>
-                        <p className='text-sm font-medium text-main-black'>{label}</p>
-                        <p className='text-xs text-grey-500'>{desc}</p>
+                        <p className='text-sm font-medium text-foreground'>{label}</p>
+                        <p className='text-xs text-muted-foreground'>{desc}</p>
                       </div>
                       <Switch
                         checked={notifForm[key]}
@@ -1578,51 +1602,26 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                     </div>
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
 
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-6'>{t('contactPreferences.title')}</h2>
-              <div className='space-y-5'>
-                {[
-                  { key: 'contactViaEmail' as const, label: t('contactPreferences.viaEmail'), desc: t('contactPreferences.viaEmailDesc') },
-                  { key: 'contactViaPhone' as const, label: t('contactPreferences.viaPhone'), desc: t('contactPreferences.viaPhoneDesc') },
-                  { key: 'hidePhoneNumber' as const, label: t('contactPreferences.hidePhone'), desc: t('contactPreferences.hidePhoneDesc') },
-                  { key: 'hideEmail' as const, label: t('contactPreferences.hideEmail'), desc: t('contactPreferences.hideEmailDesc') },
-                ].map(({ key, label, desc }) => (
-                  <div key={key} className='flex items-center justify-between py-3 border-b border-border last:border-0'>
-                    <div>
-                      <p className='text-sm font-medium text-main-black'>{label}</p>
-                      <p className='text-xs text-grey-500'>{desc}</p>
-                    </div>
-                    <Switch
-                      checked={notifForm[key]}
-                      disabled={updateSettingsMutation.isPending}
-                      onCheckedChange={(checked) => handleToggleSetting(key, checked)}
-                    />
+              <section className='bg-white rounded-xl border border-border p-6'>
+                <h2 className='text-base font-semibold text-foreground mb-6'>{t('personalization.title') || 'Smart Search'}</h2>
+                <div className='flex items-center justify-between py-3'>
+                  <div>
+                    <p className='text-sm font-medium text-foreground'>{t('personalization.autoRefresh') || 'Smart Search Auto-Refresh'}</p>
+                    <p className='text-xs text-muted-foreground'>{t('personalization.autoRefreshDesc') || 'Automatically refresh recommendations based on your behavior.'}</p>
                   </div>
-                ))}
-              </div>
-            </section>
-
-            <section className='bg-white rounded-xl border border-border p-6'>
-              <h2 className='text-base font-semibold text-main-black mb-6'>{t('personalization.title') || 'Smart Search'}</h2>
-              <div className='flex items-center justify-between py-3'>
-                <div>
-                  <p className='text-sm font-medium text-main-black'>{t('personalization.autoRefresh') || 'Smart Search Auto-Refresh'}</p>
-                  <p className='text-xs text-grey-500'>{t('personalization.autoRefreshDesc') || 'Automatically refresh recommendations based on your behavior.'}</p>
+                  <Switch
+                    checked={notifForm.autoRefreshEnabled}
+                    disabled={updateSettingsMutation.isPending}
+                    onCheckedChange={(checked) => handleToggleSetting('autoRefreshEnabled', checked)}
+                  />
                 </div>
-                <Switch
-                  checked={notifForm.autoRefreshEnabled}
-                  disabled={updateSettingsMutation.isPending}
-                  onCheckedChange={(checked) => handleToggleSetting('autoRefreshEnabled', checked)}
-                />
-              </div>
-            </section>
+              </section>
 
 
-          </div>
-        )}
+            </div>
+          )}
         </div>
       </main>
     </div>

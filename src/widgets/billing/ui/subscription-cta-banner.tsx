@@ -81,10 +81,10 @@ export function SubscriptionCTABanner() {
 
             {/* Text */}
             <div className='flex flex-col gap-1'>
-              <p className='text-sm font-bold text-main-black leading-snug'>
+              <p className='text-sm font-bold text-foreground leading-snug'>
                 {t('title')}
               </p>
-              <p className='text-xs text-grey-500 leading-snug'>
+              <p className='text-xs text-muted-foreground leading-snug'>
                 {t('description')}
               </p>
             </div>
@@ -93,7 +93,7 @@ export function SubscriptionCTABanner() {
             <button
               type='button'
               onClick={handleUpgrade}
-              className='w-full rounded-lg bg-main-black text-white text-xs font-semibold py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
+              className='w-full rounded-lg bg-foreground text-background text-xs font-semibold py-2 hover:bg-foreground/90 transition-colors cursor-pointer'
             >
               {t('cta')}
             </button>
@@ -102,7 +102,7 @@ export function SubscriptionCTABanner() {
             <button
               type='button'
               onClick={handleDismiss}
-              className='text-[11px] text-grey-400 hover:text-grey-600 transition-colors cursor-pointer text-center'
+              className='text-[11px] text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-pointer text-center'
             >
               {t('dismiss')}
             </button>

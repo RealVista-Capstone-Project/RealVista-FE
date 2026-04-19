@@ -68,16 +68,16 @@ export function ThreeDPromoBanner() {
                 <span className='w-fit text-[10px] font-bold uppercase tracking-widest text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full'>
                   {t('badge')}
                 </span>
-                <p className='text-sm font-bold text-main-black leading-snug'>
+                <p className='text-sm font-bold text-foreground leading-snug'>
                   {t('title')}
                 </p>
-                <p className='text-xs text-grey-500 leading-snug'>
+                <p className='text-xs text-muted-foreground leading-snug'>
                   {t('description')}
                 </p>
                 <button
                   type='button'
                   onClick={handleUpgrade}
-                  className='mt-2 w-fit rounded-lg bg-main-black text-white text-xs font-semibold px-4 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
+                  className='mt-2 w-fit rounded-lg bg-foreground text-background text-xs font-semibold px-4 py-2 hover:bg-foreground/90 transition-colors cursor-pointer'
                 >
                   {t('cta')}
                 </button>

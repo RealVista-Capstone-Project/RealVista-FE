@@ -37,17 +37,17 @@ export function PropertyHeader({
         <button
           type='button'
           onClick={() => router.back()}
-          className='flex items-center gap-2 text-main-primary hover:text-main-primary-hover transition-colors font-medium text-sm'
+          className='flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium text-sm'
         >
           <ArrowLeft className='size-4' />
         </button>
 
         {/* Property title and address */}
         <div className='flex flex-col gap-1'>
-          <h1 className='text-2xl sm:text-3xl font-bold leading-tight text-main-black break-words'>
+          <h1 className='text-2xl sm:text-3xl font-bold leading-tight text-foreground break-words'>
             {property.title}
           </h1>
-          <p className='text-sm sm:text-base text-grey-600 break-words'>{property.address}</p>
+          <p className='text-sm sm:text-base text-muted-foreground break-words'>{property.address}</p>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export function PropertyHeader({
           variant='secondary'
           size='medium'
           onClick={onFavorite}
-          className={`gap-2 w-full sm:w-auto ${isFavorite ? 'bg-purple-92-hover' : ''}`}
+          className={`gap-2 w-full sm:w-auto ${isFavorite ? 'bg-primary/15-hover' : ''}`}
         >
           <Heart className={`size-4 ${isFavorite ? 'fill-current text-red-500' : ''}`} />
           <span>{isFavorite ? t('saved') : t('save')}</span>

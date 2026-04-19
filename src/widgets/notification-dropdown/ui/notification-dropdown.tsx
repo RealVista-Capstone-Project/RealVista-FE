@@ -45,7 +45,7 @@ export function NotificationDropdown({
         <button
           type='button'
           className={cn(
-            'relative flex size-10 items-center justify-center rounded-lg bg-purple-98 text-main-black transition-colors hover:bg-purple-92',
+            'relative flex size-10 items-center justify-center rounded-lg bg-primary/5 text-foreground transition-colors hover:bg-primary/10',
             className
           )}
           aria-label={t('notifications')}
@@ -65,7 +65,7 @@ export function NotificationDropdown({
           align={align}
           sideOffset={8}
           className={cn(
-            'z-50 w-[400px] rounded-xl border border-purple-92 bg-white shadow-[0px_10px_40px_0px_rgba(16,10,85,0.12)]',
+            'z-50 w-[400px] rounded-xl border border-primary/20 bg-background shadow-[0px_10px_40px_0px_color-mix(in_oklch,var(--primary)_12%,transparent)]',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -75,9 +75,9 @@ export function NotificationDropdown({
           {/* Header */}
           <div className='flex items-center justify-between px-4 py-3.5 border-b border-border'>
             <div className='flex items-center gap-2.5'>
-              <h3 className='text-base font-semibold text-main-black'>{t('notifications')}</h3>
+              <h3 className='text-base font-semibold text-foreground'>{t('notifications')}</h3>
               {unreadCount > 0 && (
-                <span className='flex h-5 min-w-5 items-center justify-center rounded-full bg-main-primary px-1.5 text-xs font-bold text-white'>
+                <span className='flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-white'>
                   {unreadCount} {t('new')}
                 </span>
               )}
@@ -89,7 +89,7 @@ export function NotificationDropdown({
                   onMarkAllRead();
                   setOpen(false);
                 }}
-                className='flex items-center gap-1 text-sm font-medium text-main-primary transition-colors hover:text-main-primary/80'
+                className='flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80'
               >
                 <CheckCheck className='h-4 w-4' />
                 {t('markAsRead')}
@@ -106,7 +106,7 @@ export function NotificationDropdown({
                 ))}
               </div>
             ) : (
-              <div className='flex flex-col items-center justify-center gap-2 py-10 text-grey-500'>
+              <div className='flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground'>
                 <Bell className='h-10 w-10 opacity-40' />
                 <p className='text-sm'>{t('noNotifications')}</p>
               </div>
@@ -121,7 +121,7 @@ export function NotificationDropdown({
                 onViewAll?.();
                 setOpen(false);
               }}
-              className='text-sm font-semibold text-main-primary transition-colors hover:text-main-primary/80'
+              className='text-sm font-semibold text-primary transition-colors hover:text-primary/80'
             >
               {t('viewAll')}
             </button>

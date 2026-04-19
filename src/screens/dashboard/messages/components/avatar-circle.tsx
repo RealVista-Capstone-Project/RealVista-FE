@@ -35,7 +35,7 @@ export function AvatarCircle({ initials, avatarBg, src, size = 'md' }: AvatarCir
     <div
       className={cn(
         'flex shrink-0 items-center justify-center rounded-full font-semibold text-white',
-        avatarBg ?? 'bg-grey-400',
+        avatarBg ?? 'bg-muted-foreground/60',
         sizeClass
       )}
     >

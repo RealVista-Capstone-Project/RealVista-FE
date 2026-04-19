@@ -26,12 +26,12 @@ export function CurrencyInput({
 }: CurrencyInputProps) {
   return (
     <div className='flex flex-col gap-2'>
-      <label className='text-sm font-medium text-main-black'>
+      <label className='text-sm font-medium text-foreground'>
         {label}
-        {required && <span className='text-main-primary'>*</span>}
+        {required && <span className='text-primary'>*</span>}
       </label>
-      <div className='flex items-center rounded-lg border border-purple-92 bg-white overflow-hidden transition-colors focus-within:border-main-primary'>
-        <span className='flex h-full items-center border-r border-purple-92 bg-purple-98/50 px-3 text-sm text-main-secondary/50'>
+      <div className='flex items-center rounded-lg border border-primary/20 bg-white overflow-hidden transition-colors focus-within:border-primary'>
+        <span className='flex h-full items-center border-r border-primary/20 bg-primary/5 px-3 text-sm text-muted-foreground/70'>
           {currency}
         </span>
         <input
@@ -41,7 +41,7 @@ export function CurrencyInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className={cn(
-            'flex-1 px-4 py-3 text-sm text-main-black placeholder:text-main-secondary/50 focus:outline-none',
+            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none',
             error && 'text-red-500'
           )}
         />
@@ -62,7 +62,7 @@ interface NegotiableToggleProps {
 export function NegotiableToggle({ value, onChange, label }: NegotiableToggleProps) {
   return (
     <div className='flex items-center justify-between'>
-      <span className='text-sm font-medium text-main-black'>{label}</span>
+      <span className='text-sm font-medium text-foreground'>{label}</span>
       <button
         type='button'
         role='switch'
@@ -70,7 +70,7 @@ export function NegotiableToggle({ value, onChange, label }: NegotiableTogglePro
         onClick={() => onChange(!value)}
         className={cn(
           'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
-          value ? 'bg-main-primary' : 'bg-purple-92'
+          value ? 'bg-primary' : 'bg-primary/20'
         )}
       >
         <span
@@ -142,7 +142,7 @@ export function ListingPriceFields({
         {listingType === 'RENT' && (
           <CurrencyInput
             value=''
-            onChange={() => {}}
+            onChange={() => { }}
             label={labels.securityDeposit}
             placeholder={labels.pricePlaceholder}
           />

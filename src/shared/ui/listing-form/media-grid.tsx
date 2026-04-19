@@ -61,8 +61,8 @@ export function ExistingMediaGrid({
             className={cn(
               'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
               isSelected
-                ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
-                : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-main-primary/40'
+                ? 'border-primary shadow-[0px_0px_12px_0px_color-mix(in_oklch,var(--primary)_25%,transparent)]'
+                : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
             )}
           >
             {/* Thumbnail */}
@@ -78,16 +78,16 @@ export function ExistingMediaGrid({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={media.thumbnailUrl} alt='' className='absolute inset-0 h-full w-full object-cover' />
               ) : (
-                <div className='flex h-full w-full items-center justify-center bg-purple-96'>
-                  <Box className='h-8 w-8 text-main-secondary/30' />
+                <div className='flex h-full w-full items-center justify-center bg-primary/5'>
+                  <Box className='h-8 w-8 text-secondary/30' />
                 </div>
               )
             ) : media.url && media.url !== 'null' ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={media.url} alt='' className='absolute inset-0 h-full w-full object-cover' />
             ) : (
-              <div className='flex h-full w-full items-center justify-center bg-purple-96'>
-                <ImageIcon className='h-8 w-8 text-main-secondary/30' />
+              <div className='flex h-full w-full items-center justify-center bg-primary/5'>
+                <ImageIcon className='h-8 w-8 text-secondary/30' />
               </div>
             )}
 
@@ -111,7 +111,7 @@ export function ExistingMediaGrid({
 
             {/* 3D badge */}
             {is3D && (
-              <div className='absolute left-1.5 top-1.5 z-10 rounded-full bg-main-primary/80 px-2 py-0.5 text-[10px] font-semibold text-white'>
+              <div className='absolute left-1.5 top-1.5 z-10 rounded-full bg-primary/80 px-2 py-0.5 text-[10px] font-semibold text-white'>
                 3D
               </div>
             )}
@@ -119,7 +119,7 @@ export function ExistingMediaGrid({
             {/* Selected overlay */}
             <div
               className={cn(
-                'absolute inset-0 bg-main-primary/10 transition-opacity',
+                'absolute inset-0 bg-primary/10 transition-opacity',
                 isSelected ? 'opacity-100' : 'opacity-0'
               )}
             />
@@ -131,27 +131,27 @@ export function ExistingMediaGrid({
                 isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
               )}
             >
-              <CheckCircle2 className='h-5 w-5 text-main-primary drop-shadow' fill='white' />
+              <CheckCircle2 className='h-5 w-5 text-primary drop-shadow' fill='white' />
             </div>
 
             {/* Primary badge/button */}
             {!is3D && (
-            <button
-              type='button'
-              onClick={(e) => {
-                e.stopPropagation();
-                onSetPrimary(media.id);
-              }}
-              className={cn(
-                'absolute left-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
-                media.roomName ? 'bottom-7' : 'bottom-1.5',
-                primaryId === media.id
-                  ? 'bg-main-primary text-white'
-                  : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
-              )}
-            >
-              {primaryId === media.id ? labels.primary : labels.makePrimary}
-            </button>
+              <button
+                type='button'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSetPrimary(media.id);
+                }}
+                className={cn(
+                  'absolute left-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
+                  media.roomName ? 'bottom-7' : 'bottom-1.5',
+                  primaryId === media.id
+                    ? 'bg-primary text-white'
+                    : 'bg-black/40 text-white/80 hover:bg-primary/80 opacity-0 group-hover:opacity-100'
+                )}
+              >
+                {primaryId === media.id ? labels.primary : labels.makePrimary}
+              </button>
             )}
 
             {/* Room name bar */}
@@ -230,12 +230,12 @@ export function NewFilesGrid({
             className={cn(
               'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
               isPrimary
-                ? 'border-main-primary shadow-[0px_0px_12px_0px_rgba(112,101,240,0.25)]'
+                ? 'border-primary shadow-[0px_0px_12px_0px_color-mix(in_oklch,var(--primary)_25%,transparent)]'
                 : isSelected
-                  ? 'border-main-primary/60'
+                  ? 'border-primary/60'
                   : isRejected
                     ? 'border-red-400'
-                    : 'border-purple-92 opacity-70 hover:opacity-100 hover:border-main-primary/40'
+                    : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
             )}
           >
             {file.type.startsWith('image/') ? (
@@ -252,12 +252,12 @@ export function NewFilesGrid({
             ) : (
               <div
                 className={cn(
-                  'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-purple-96 transition-opacity',
+                  'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-primary/5 transition-opacity',
                   !isSelected && 'opacity-40'
                 )}
               >
-                <Play className='h-6 w-6 text-main-primary/60' />
-                <span className='truncate text-[10px] text-main-secondary/60 w-full text-center'>
+                <Play className='h-6 w-6 text-primary/60' />
+                <span className='truncate text-[10px] text-muted-foreground w-full text-center'>
                   {file.name}
                 </span>
               </div>
@@ -298,7 +298,7 @@ export function NewFilesGrid({
             {/* Selected overlay */}
             <div
               className={cn(
-                'absolute inset-0 bg-main-primary/10 transition-opacity',
+                'absolute inset-0 bg-primary/10 transition-opacity',
                 isSelected ? 'opacity-100' : 'opacity-0'
               )}
             />
@@ -310,14 +310,14 @@ export function NewFilesGrid({
                 isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
               )}
             >
-              <CheckCircle2 className='h-5 w-5 text-main-primary drop-shadow' fill='white' />
+              <CheckCircle2 className='h-5 w-5 text-primary drop-shadow' fill='white' />
             </div>
 
             {/* Feedback Tooltip on Hover */}
             {!status?.isLoading && feedback && !isRejected && (
               <div className='absolute inset-x-0 bottom-8 z-20 px-1.5 opacity-0 transition-opacity group-hover:opacity-100'>
                 <div className='rounded bg-black/80 p-1.5 text-[10px] leading-tight text-white shadow-lg'>
-                  <p className='font-bold text-main-primary/40'>{labels.feedbackLabel}</p>
+                  <p className='font-bold text-primary/40'>{labels.feedbackLabel}</p>
                   <p className='mt-0.5 line-clamp-3 italic'>{feedback}</p>
                 </div>
               </div>
@@ -346,8 +346,8 @@ export function NewFilesGrid({
                 className={cn(
                   'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
                   isPrimary
-                    ? 'bg-main-primary text-white'
-                    : 'bg-black/40 text-white/80 hover:bg-main-primary/80 opacity-0 group-hover:opacity-100'
+                    ? 'bg-primary text-white'
+                    : 'bg-black/40 text-white/80 hover:bg-primary/80 opacity-0 group-hover:opacity-100'
                 )}
               >
                 {isPrimary
@@ -417,11 +417,11 @@ export function MediaUploadZone({
             onFilesSelected(files);
           }
         }}
-        className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-92 bg-purple-98/30 px-6 py-8 text-center transition-colors hover:border-main-primary/40 hover:bg-purple-98/60 cursor-pointer w-full'
+        className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-primary/10 cursor-pointer w-full'
       >
-        <Upload className='mb-2 h-7 w-7 text-main-primary/50' />
-        <p className='text-sm font-medium text-main-secondary/60'>{labels.dragAndDrop}</p>
-        <p className='mt-0.5 text-xs text-main-secondary/40'>{labels.uploadHint}</p>
+        <Upload className='mb-2 h-7 w-7 text-primary/50' />
+        <p className='text-sm font-medium text-muted-foreground'>{labels.dragAndDrop}</p>
+        <p className='mt-0.5 text-xs text-muted-foreground/60'>{labels.uploadHint}</p>
       </button>
     </>
   );

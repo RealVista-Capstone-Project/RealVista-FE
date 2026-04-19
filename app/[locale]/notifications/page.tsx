@@ -79,30 +79,30 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <main className='min-h-screen bg-grey-100 flex items-center justify-center'>
-        <p className='text-sm text-grey-400'>{t('loading')}</p>
+      <main className='min-h-screen bg-muted flex items-center justify-center'>
+        <p className='text-sm text-muted-foreground/60'>{t('loading')}</p>
       </main>
     );
   }
 
   if (isError) {
     return (
-      <main className='min-h-screen bg-grey-100 flex items-center justify-center'>
+      <main className='min-h-screen bg-muted flex items-center justify-center'>
         <p className='text-sm text-red-500'>{t('error')}</p>
       </main>
     );
   }
 
   return (
-    <main className='min-h-screen bg-grey-100 py-8 px-4 sm:px-6 lg:px-8'>
+    <main className='min-h-screen bg-muted py-8 px-4 sm:px-6 lg:px-8'>
       <div className='mx-auto max-w-2xl'>
         <div className='flex items-center justify-between mb-6'>
-          <h1 className='text-xl font-semibold text-main-black'>{t('notifications')}</h1>
+          <h1 className='text-xl font-semibold text-foreground'>{t('notifications')}</h1>
           {notifications.some((n) => !n.isRead) && (
             <button
               type='button'
               onClick={handleMarkAllRead}
-              className='text-sm text-main-primary hover:underline'
+              className='text-sm text-primary hover:underline'
             >
               {t('markAsRead')}
             </button>
@@ -111,7 +111,7 @@ export default function NotificationsPage() {
 
         <div className='rounded-xl bg-white border border-border overflow-hidden divide-y divide-border'>
           {notifications.length === 0 ? (
-            <p className='px-6 py-10 text-center text-sm text-grey-400'>{t('noNotificationsPage')}</p>
+            <p className='px-6 py-10 text-center text-sm text-muted-foreground/60'>{t('noNotificationsPage')}</p>
           ) : (
             notifications.map((n) => (
               <NotificationItem

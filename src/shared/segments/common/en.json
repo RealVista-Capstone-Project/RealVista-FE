@@ -11,7 +11,8 @@
       "messages": "Messages",
       "myContracts": "My Contracts",
       "ownerProperties": "Owner Properties",
-      "proposals": "My Proposals"
+      "proposals": "My Proposals",
+      "appointments": "Appointments"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -26,7 +27,8 @@
       "manageProposals": "Proposal Library",
       "property": "Property",
       "ownerProperties": "Owner properties & proposals",
-      "agentSetting": "Agent profile & settings"
+      "agentSetting": "Agent profile & settings",
+      "appointments": "Appointments"
     },
     "actionButton": {
       "addProperty": "Add a property",
@@ -381,6 +383,7 @@
     "favorited": "Favorited",
     "subscribe": "Plans & billing",
     "appointments": "Appointments",
+    "myContracts": "My Contracts",
     "myEngagements": "My Engagements",
     "login": "Login",
     "signup": "Sign up",

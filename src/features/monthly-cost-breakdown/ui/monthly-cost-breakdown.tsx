@@ -108,22 +108,22 @@ export function MonthlyCostBreakdown({
 
   // Direct hex colors for legend (outside ChartContainer scope)
   const legendColors = [
-    '#7065f0', // chart-1
-    '#100a55', // chart-2
-    '#6c727f', // chart-3
-    '#d8d6f5', // chart-4
-    '#e8e6f9', // chart-5
+    'var(--chart-1)',
+    'var(--chart-2)',
+    'var(--chart-3)',
+    'var(--chart-4)',
+    'var(--chart-5)',
   ];
   const getDirectColor = (index: number) => {
     return legendColors[index % legendColors.length];
   };
 
   return (
-    <Card className='border-purple-92 gap-3'>
+    <Card className='border-primary/20 gap-3'>
       <CardHeader className='items-center gap-0'>
         <div className='flex items-center gap-2'>
-          <BanknoteIcon className='w-5 h-5 sm:w-6 sm:h-6 text-main-primary' />
-          <CardTitle className='text-main-black text-[20px] sm:text-[24px] font-bold leading-[1.6]'>
+          <BanknoteIcon className='w-5 h-5 sm:w-6 sm:h-6 text-primary' />
+          <CardTitle className='text-foreground text-[20px] sm:text-[24px] font-bold leading-[1.6]'>
             {t('title')}
           </CardTitle>
         </div>
@@ -150,14 +150,14 @@ export function MonthlyCostBreakdown({
                           <tspan
                             x={viewBox.cx}
                             y={(viewBox.cy || 0) - 10}
-                            className='fill-main-primary text-2xl font-bold'
+                            className='fill-primary text-2xl font-bold'
                           >
                             {formatCurrency(costBreakdown.totalCost)}
                           </tspan>
                           <tspan
                             x={viewBox.cx}
                             y={(viewBox.cy || 0) + 12}
-                            className='fill-grey-500 text-sm'
+                            className='fill-muted-foreground text-sm'
                           >
                             {t('totalMonthlyPayment')}
                           </tspan>
@@ -198,12 +198,12 @@ export function MonthlyCostBreakdown({
                     style={{ backgroundColor: color }}
                   />
                   {/* Label */}
-                  <span className='text-main-black text-[14px] sm:text-[16px] font-medium leading-[1.5] truncate'>
+                  <span className='text-foreground text-[14px] sm:text-[16px] font-medium leading-[1.5] truncate'>
                     {item.name}
                   </span>
                 </div>
                 {/* Amount */}
-                <span className='text-main-black text-[14px] sm:text-[16px] font-semibold leading-[1.4] tabular-nums flex-shrink-0'>
+                <span className='text-foreground text-[14px] sm:text-[16px] font-semibold leading-[1.4] tabular-nums flex-shrink-0'>
                   {formatCurrency(item.amount)}
                 </span>
               </div>
@@ -212,7 +212,7 @@ export function MonthlyCostBreakdown({
 
           {/* Disclaimer */}
           {costBreakdown.disclaimer && (
-            <p className='text-grey-500 text-xs italic mt-2'>{costBreakdown.disclaimer}</p>
+            <p className='text-muted-foreground text-xs italic mt-2'>{costBreakdown.disclaimer}</p>
           )}
         </div>
       </CardContent>

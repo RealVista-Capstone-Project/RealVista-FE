@@ -62,7 +62,7 @@ export function PriceRangeSlider({
 
   return (
     <div className='space-y-3'>
-      {title && <h3 className='text-sm font-semibold text-[#4D5461]'>{title}</h3>}
+      {title && <h3 className='text-sm font-semibold text-muted-foreground'>{title}</h3>}
       <div className='space-y-4'>
         {/* Price Histogram */}
         <div className='flex items-end justify-between gap-1 h-16 px-1'>
@@ -73,7 +73,7 @@ export function PriceRangeSlider({
               <div
                 key={index}
                 className={`flex-1 rounded-t-sm transition-colors duration-300 ${
-                  isActive ? 'bg-main-primary opacity-80' : 'bg-[#E5E7EB]'
+                  isActive ? 'bg-primary opacity-80' : 'bg-muted'
                 }`}
                 style={{ height: `${height}px` }}
               />
@@ -83,9 +83,9 @@ export function PriceRangeSlider({
 
         {/* Dual Range Slider */}
         <div className='relative px-2 h-6'>
-          <div className='absolute left-2 right-2 top-2.5 h-1.5 bg-[#E0DEF7] rounded-full'>
+          <div className='absolute left-2 right-2 top-2.5 h-1.5 bg-primary/20 rounded-full'>
             <div
-              className='absolute h-full bg-main-primary rounded-full shadow-[0_0_10px_rgba(112,101,240,0.3)]'
+              className='absolute h-full bg-primary rounded-full shadow-primary/30'
               style={{
                 left: `${((internalLow - minValue) / (maxValue - minValue)) * 100}%`,
                 right: `${100 - ((internalHigh - minValue) / (maxValue - minValue)) * 100}%`,
@@ -101,7 +101,7 @@ export function PriceRangeSlider({
             onChange={(e) => handleMinChange(Number(e.target.value))}
             onMouseUp={handleMinDragEnd}
             onTouchEnd={handleMinDragEnd}
-            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-main-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
+            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
             style={{ zIndex: internalLow > maxValue / 2 ? 11 : 10 }}
           />
           <input
@@ -113,15 +113,15 @@ export function PriceRangeSlider({
             onChange={(e) => handleMaxChange(Number(e.target.value))}
             onMouseUp={handleMaxDragEnd}
             onTouchEnd={handleMaxDragEnd}
-            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-main-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
+            className='absolute top-0 left-0 w-full h-6 appearance-none bg-transparent pointer-events-none z-10 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb:active]:cursor-grabbing'
             style={{ zIndex: internalHigh < maxValue / 2 ? 11 : 10 }}
           />
         </div>
 
         {/* Price Labels */}
         <div className='flex justify-between px-2'>
-          <span className='text-lg font-bold text-main-black'>{formatVND(internalLow)}</span>
-          <span className='text-lg font-bold text-main-black'>{formatVND(internalHigh)}</span>
+          <span className='text-lg font-bold text-foreground'>{formatVND(internalLow)}</span>
+          <span className='text-lg font-bold text-foreground'>{formatVND(internalHigh)}</span>
         </div>
       </div>
     </div>

@@ -92,24 +92,24 @@ export function RegisterForm({ role, onRoleChange }: { role: Role; onRoleChange:
         {/* ── Name ────────────────────────────────────────────────── */}
         <div className='grid grid-cols-2 gap-2.5'>
           <div>
-            <Input id='firstName' placeholder={t('firstNamePlaceholder')} disabled={isLoading} aria-label={t('firstName')} aria-invalid={!!errors.firstName} className='h-9 border-purple-92 bg-purple-98' {...register('firstName')} />
+            <Input id='firstName' placeholder={t('firstNamePlaceholder')} disabled={isLoading} aria-label={t('firstName')} aria-invalid={!!errors.firstName} className='h-9 border-primary/20 bg-primary/5' {...register('firstName')} />
             {errors.firstName && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.firstName.message}</p>}
           </div>
           <div>
-            <Input id='lastName' placeholder={t('lastNamePlaceholder')} disabled={isLoading} aria-label={t('lastName')} aria-invalid={!!errors.lastName} className='h-9 border-purple-92 bg-purple-98' {...register('lastName')} />
+            <Input id='lastName' placeholder={t('lastNamePlaceholder')} disabled={isLoading} aria-label={t('lastName')} aria-invalid={!!errors.lastName} className='h-9 border-primary/20 bg-primary/5' {...register('lastName')} />
             {errors.lastName && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.lastName.message}</p>}
           </div>
         </div>
 
         {/* ── Email ───────────────────────────────────────────────── */}
         <div>
-          <Input id='email' type='email' placeholder={t('emailPlaceholder')} disabled={isLoading} aria-label={t('email')} aria-invalid={!!errors.email} autoComplete='email' className='h-9 border-purple-92 bg-purple-98' {...register('email')} />
+          <Input id='email' type='email' placeholder={t('emailPlaceholder')} disabled={isLoading} aria-label={t('email')} aria-invalid={!!errors.email} autoComplete='email' className='h-9 border-primary/20 bg-primary/5' {...register('email')} />
           {errors.email && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.email.message}</p>}
         </div>
 
         {/* ── Phone ───────────────────────────────────────────────── */}
         <div>
-          <Input id='phoneNumber' placeholder={t('phonePlaceholder')} inputMode='tel' disabled={isLoading} aria-label={t('phoneNumber')} aria-invalid={!!errors.phoneNumber} autoComplete='tel' className='h-9 border-purple-92 bg-purple-98' {...register('phoneNumber')} />
+          <Input id='phoneNumber' placeholder={t('phonePlaceholder')} inputMode='tel' disabled={isLoading} aria-label={t('phoneNumber')} aria-invalid={!!errors.phoneNumber} autoComplete='tel' className='h-9 border-primary/20 bg-primary/5' {...register('phoneNumber')} />
           {errors.phoneNumber && <p role='alert' className='mt-1 text-xs text-red-500'>{errors.phoneNumber.message}</p>}
         </div>
 
@@ -124,7 +124,7 @@ export function RegisterForm({ role, onRoleChange }: { role: Role; onRoleChange:
               aria-label={t('password')}
               aria-invalid={!!errors.password}
               autoComplete='new-password'
-              className='h-9 pr-10 border-purple-92 bg-purple-98'
+              className='h-9 pr-10 border-primary/20 bg-primary/5'
               {...register('password')}
             />
             <button
@@ -169,7 +169,7 @@ export function RegisterForm({ role, onRoleChange }: { role: Role; onRoleChange:
               aria-label={t('confirmPassword')}
               aria-invalid={!!errors.confirmPassword}
               autoComplete='new-password'
-              className='h-9 pr-10 border-purple-92 bg-purple-98'
+              className='h-9 pr-10 border-primary/20 bg-primary/5'
               {...register('confirmPassword')}
             />
             <button
@@ -201,15 +201,14 @@ export function RegisterForm({ role, onRoleChange }: { role: Role; onRoleChange:
               onChange={(e) => onRoleChange(e.target.checked ? 'AGENT' : 'CUSTOMER')}
             />
             <div
-              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-colors duration-150 ${
-                role === 'AGENT'
-                  ? 'border-main-primary bg-main-primary'
-                  : 'border-purple-92 bg-purple-98 group-hover:border-main-primary'
-              }`}
+              className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-colors duration-150 ${role === 'AGENT'
+                  ? 'border-primary bg-primary'
+                  : 'border-primary/20 bg-primary/5 group-hover:border-primary'
+                }`}
             >
               {role === 'AGENT' && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
             </div>
-            <span className='text-sm font-normal text-main-black'>{t('agentCheckboxLabel')}</span>
+            <span className='text-sm font-normal text-foreground'>{t('agentCheckboxLabel')}</span>
           </label>
 
           <Button type='submit' className='w-full' disabled={isLoading}>

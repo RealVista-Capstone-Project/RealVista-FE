@@ -76,7 +76,7 @@ export function StarRatingInput({
 
       {/* Label under stars */}
       {!readonly && displayValue > 0 && (
-        <span className='text-xs font-medium text-main-primary transition-all duration-150'>
+        <span className='text-xs font-medium text-primary transition-all duration-150'>
           {labelMap[displayValue]?.vi}
         </span>
       )}

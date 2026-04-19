@@ -22,7 +22,7 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] | stri
   const statusConfig: Record<string, { label: string; className: string }> = {
     DRAFT: {
       label: t('propertyStatus.draft'),
-      className: 'bg-grey-100 text-grey-600',
+      className: 'bg-muted text-muted-foreground',
     },
     PENDING: {
       label: t('propertyStatus.pending'),
@@ -56,7 +56,7 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] | stri
 
   const config = statusConfig[status] || {
     label: status,
-    className: 'bg-grey-100 text-grey-600',
+    className: 'bg-muted text-muted-foreground',
   };
 
   return (
@@ -97,8 +97,8 @@ function PropertyCard({
       className={cn(
         'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
         isSelected
-          ? 'border-main-primary bg-purple-98 shadow-[0px_0px_20px_0px_rgba(112,101,240,0.15)]'
-          : 'border-purple-92 bg-white hover:border-main-primary/40 hover:bg-purple-98/50'
+          ? 'border-primary bg-primary/5 shadow-[0px_0px_20px_0px_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+          : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
       )}
     >
       {/* Thumbnail */}
@@ -112,8 +112,8 @@ function PropertyCard({
             sizes='112px'
           />
         ) : (
-          <div className='flex h-full w-full items-center justify-center bg-purple-96'>
-            <Home className='h-6 w-6 text-main-secondary/40' />
+          <div className='flex h-full w-full items-center justify-center bg-primary/5'>
+            <Home className='h-6 w-6 text-muted-foreground/60' />
           </div>
         )}
       </div>
@@ -121,18 +121,18 @@ function PropertyCard({
       {/* Info */}
       <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
         <div className='flex items-center gap-2'>
-          <span className='truncate text-sm font-bold leading-tight text-main-black'>
+          <span className='truncate text-sm font-bold leading-tight text-foreground'>
             {property.streetAddress}
           </span>
           <PropertyStatusBadge status={property.status} />
         </div>
 
-        <div className='flex items-center gap-1 text-xs text-main-secondary/60'>
+        <div className='flex items-center gap-1 text-xs text-muted-foreground'>
           <MapPin className='h-3 w-3 shrink-0' />
           <span className='truncate'>{fullAddress}</span>
         </div>
 
-        <div className='flex flex-wrap items-center gap-3 text-xs text-main-secondary/60'>
+        <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
           <span className='flex items-center gap-1'>
             <Home className='h-3 w-3' />
             {property.propertyType.propertyTypeName}
@@ -157,8 +157,8 @@ function PropertyCard({
         className={cn(
           'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
           isSelected
-            ? 'border-main-primary bg-main-primary'
-            : 'border-purple-92 bg-white group-hover:border-main-primary/40'
+            ? 'border-primary bg-primary'
+            : 'border-primary/20 bg-white group-hover:border-primary/40'
         )}
       >
         {isSelected && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
@@ -184,8 +184,8 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
               className={cn(
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
                 step.number <= currentStep
-                  ? 'bg-main-primary text-white'
-                  : 'bg-purple-96 text-main-black'
+                  ? 'bg-primary text-white'
+                  : 'bg-primary/5 text-foreground'
               )}
             >
               {step.number}
@@ -193,13 +193,13 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep ? 'text-main-black' : 'text-main-secondary/50'
+                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground/70'
               )}
             >
               {step.label}
             </span>
           </div>
-          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-main-secondary/50' />}
+          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-muted-foreground/70' />}
         </React.Fragment>
       ))}
     </div>
@@ -386,20 +386,20 @@ export function CreateListingPage() {
 
   return (
     <div className='h-full overflow-hidden flex flex-col p-4 md:p-6'>
-      <div className='rounded-2xl border border-purple-92 overflow-hidden bg-white shadow-lg flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0'>
+      <div className='rounded-2xl border border-primary/20 overflow-hidden bg-white shadow-lg flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0'>
         {/* Header - Fixed */}
         <div className='shrink-0'>
           <div className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
-            <h1 className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-main-black'>
+            <h1 className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-foreground'>
               {t('title')}
             </h1>
-            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-main-secondary/50'>
+            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-muted-foreground/70'>
               {t('subtitle')}
             </p>
           </div>
 
           {/* Step indicator */}
-          <div className='flex justify-center border-b border-purple-92/50 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
+          <div className='flex justify-center border-b border-primary/20 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
             <StepIndicator currentStep={currentStep} />
           </div>
         </div>
@@ -410,19 +410,19 @@ export function CreateListingPage() {
             {/* Scrollable content - Flex 1 */}
             <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
               {/* Property Selection */}
-              <div className='rounded-xl border-[1.5px] border-purple-92 p-4 md:p-6'>
-                <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-main-black'>
+              <div className='rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
+                <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-foreground'>
                   {t('selectProperty')}
                 </h3>
 
                 <div className='flex flex-col gap-3'>
                   {isLoading ? (
                     <div className='flex justify-center py-8'>
-                      <div className='h-8 w-8 animate-spin rounded-full border-4 border-main-primary border-t-transparent' />
+                      <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
                     </div>
                   ) : properties.length === 0 ? (
                     <div className='flex justify-center py-8'>
-                      <span className='text-main-secondary/50'>
+                      <span className='text-muted-foreground/70'>
                         {t('noProperties', { fallback: 'No properties found' })}
                       </span>
                     </div>
@@ -452,7 +452,7 @@ export function CreateListingPage() {
             </div>
 
             {/* Footer — Next button - Fixed */}
-            <div className='shrink-0 flex justify-end border-t border-purple-92/50 px-4 md:px-8 py-4 md:py-5 bg-white'>
+            <div className='shrink-0 flex justify-end border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
               <button
                 type='button'
                 disabled={!selectedProperty}
@@ -460,8 +460,8 @@ export function CreateListingPage() {
                 className={cn(
                   'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
                   selectedProperty
-                    ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
-                    : 'bg-main-primary/30 cursor-not-allowed'
+                    ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_color-mix(in_oklch,var(--primary)_30%,transparent)]'
+                    : 'bg-primary/30 cursor-not-allowed'
                 )}
               >
                 {t('next')}

@@ -29,8 +29,8 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
       className={cn(
         'grid cursor-pointer grid-cols-12 items-center gap-4 border-l-[3px] px-5 py-4 transition-all duration-150 group',
         isSelected
-          ? 'border-l-main-primary bg-[#F2F0FF]'
-          : 'border-l-transparent bg-white hover:border-l-[#D7D1F8] hover:bg-[#FBFAFF]'
+          ? 'border-l-primary bg-primary/5'
+          : 'border-l-transparent bg-white hover:border-l-primary/20 hover:bg-primary/5'
       )}
       onClick={() => onClick(contract)}
     >
@@ -47,33 +47,33 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
       </div>
 
       <div className='col-span-5 flex items-center gap-3'>
-        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1ECFF]'>
-          <MapPin className='h-5 w-5 text-main-primary' />
+        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/5'>
+          <MapPin className='h-5 w-5 text-primary' />
         </div>
 
         <div className='min-w-0'>
-          <div className='truncate text-sm font-semibold text-main-black'>
+          <div className='truncate text-sm font-semibold text-foreground'>
             {contract.property.title}
           </div>
-          <div className='mt-0.5 truncate text-xs text-main-secondary/60'>
+          <div className='mt-0.5 truncate text-xs text-muted-foreground'>
             {contract.property.address}
           </div>
         </div>
       </div>
 
       <div className='col-span-3'>
-        <div className='text-sm font-semibold text-main-black'>
+        <div className='text-sm font-semibold text-foreground'>
           {formatContractCurrency(contract.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
         </div>
-        <div className='mt-0.5 text-xs text-main-secondary/60'>{t('table.perMonth')}</div>
+        <div className='mt-0.5 text-xs text-muted-foreground'>{t('table.perMonth')}</div>
       </div>
 
       <div className='col-span-2 flex items-center justify-between gap-2'>
         <div>
-          <div className='text-sm font-semibold text-main-black tabular-nums'>
+          <div className='text-sm font-semibold text-foreground tabular-nums'>
             {formatContractDate(contract.leaseStartDate, locale, 'dd MMM')}
           </div>
-          <div className='mt-0.5 text-xs text-main-secondary/60 tabular-nums'>
+          <div className='mt-0.5 text-xs text-muted-foreground tabular-nums'>
             {formatContractDate(contract.leaseStartDate, locale, 'yyyy')}
           </div>
         </div>
@@ -81,7 +81,7 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
         <ChevronRight
           className={cn(
             'h-4 w-4 flex-shrink-0 transition-all duration-150',
-            isSelected ? 'text-main-primary' : 'text-gray-200 group-hover:text-gray-400'
+            isSelected ? 'text-primary' : 'text-gray-200 group-hover:text-gray-400'
           )}
         />
       </div>

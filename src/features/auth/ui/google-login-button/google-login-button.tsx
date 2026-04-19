@@ -61,7 +61,7 @@ export function GoogleLoginButton() {
   return (
     <Button
       variant='outline'
-      className='h-11 w-full rounded-lg border-[1.5px] border-grey-200 bg-white text-base font-semibold text-main-black hover:bg-grey-50 focus:ring-4 focus:ring-purple-92'
+      className='h-11 w-full rounded-lg border-[1.5px] border-border bg-white text-base font-semibold text-foreground hover:bg-muted/50 focus:ring-4 focus:ring-primary/20'
       onClick={handleClick}
       disabled={isLoading}
     >

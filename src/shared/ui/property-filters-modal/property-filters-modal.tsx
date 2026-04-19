@@ -104,7 +104,7 @@ function SegmentedSelector({
   const options = Array.from({ length: maxItems }, (_, i) => i);
 
   return (
-    <div className='relative flex h-10 w-full items-center gap-1 rounded-xl bg-purple-96 p-1'>
+    <div className='relative flex h-10 w-full items-center gap-1 rounded-xl bg-primary/5 p-1'>
       {options.map((opt) => {
         const isActive = value === opt;
         return (
@@ -114,13 +114,13 @@ function SegmentedSelector({
             onClick={() => onChange(opt)}
             className={cn(
               'relative z-10 flex flex-1 items-center justify-center text-sm font-bold transition-all duration-300',
-              isActive ? 'text-white' : 'text-grey-500 hover:text-main-black'
+              isActive ? 'text-white' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             {opt === 0 ? 'Bất kỳ' : `${opt}${opt === maxItems - 1 ? '+' : ''}`}
             {isActive && (
               <div
-                className='absolute inset-0 -z-10 rounded-lg bg-main-primary shadow-md animate-in fade-in zoom-in-95 duration-200'
+                className='absolute inset-0 -z-10 rounded-lg bg-primary shadow-md animate-in fade-in zoom-in-95 duration-200'
               />
             )}
           </button>
@@ -154,10 +154,10 @@ function AttributeSlider({
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
-          {Icon && <Icon className='h-4 w-4 text-grey-400' />}
-          <span className='text-[13px] font-bold text-main-black'>{label}</span>
+          {Icon && <Icon className='h-4 w-4 text-muted-foreground' />}
+          <span className='text-[13px] font-bold text-foreground'>{label}</span>
         </div>
-        <span className='text-sm font-black text-main-primary'>
+        <span className='text-sm font-black text-primary'>
           {value === 0 ? 'Bất kỳ' : `Từ ${value}${unit}+`}
         </span>
       </div>
@@ -228,7 +228,7 @@ export function PropertyFiltersModal({
         className='flex flex-col p-0 gap-0 w-full sm:max-w-[420px] border-none outline-none overflow-hidden'
       >
         <SheetHeader className='px-6 pt-6 pb-4'>
-          <SheetTitle className='text-xl font-bold tracking-tight text-main-black'>
+          <SheetTitle className='text-xl font-bold tracking-tight text-foreground'>
             {translations.title}
           </SheetTitle>
         </SheetHeader>
@@ -239,9 +239,9 @@ export function PropertyFiltersModal({
             {/* 1. Category Picker */}
             <section className='space-y-4'>
               <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.category}</h3>
+                <h3 className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>{translations.category}</h3>
                 {selectedType && (
-                  <button className='text-xs font-bold text-main-primary hover:underline' onClick={() => setSelectedType(undefined)}>Xóa bộ lọc</button>
+                  <button className='text-xs font-bold text-primary hover:underline' onClick={() => setSelectedType(undefined)}>Xóa bộ lọc</button>
                 )}
               </div>
               <div className='grid grid-cols-4 gap-3'>
@@ -262,11 +262,11 @@ export function PropertyFiltersModal({
                     >
                       <div className={cn(
                         'flex h-12 w-12 items-center justify-center rounded-2xl border-1.5 transition-all duration-300',
-                        isSelected ? 'border-main-primary bg-main-primary/5 text-main-primary shadow-sm' : 'border-purple-92 bg-white text-grey-500 group-hover:border-main-primary/50'
+                        isSelected ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-primary/20 bg-white text-muted-foreground group-hover:border-primary/50'
                       )}>
                         <Icon className='h-6 w-6' strokeWidth={isSelected ? 2.5 : 2} />
                       </div>
-                      <span className={cn('text-[10px] font-bold uppercase tracking-tight', isSelected ? 'text-main-primary' : 'text-grey-500')}>
+                      <span className={cn('text-[10px] font-bold uppercase tracking-tight', isSelected ? 'text-primary' : 'text-muted-foreground')}>
                         {capitalizedLabel}
                       </span>
                     </button>
@@ -283,8 +283,8 @@ export function PropertyFiltersModal({
                       className={cn(
                         'px-3.5 py-1.5 rounded-lg text-xs font-bold border-1.5 transition-all',
                         selectedType === t.code
-                          ? 'bg-main-primary text-white border-main-primary shadow-sm'
-                          : 'bg-white text-grey-500 border-purple-92 hover:border-main-primary/30'
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-white text-muted-foreground border-primary/20 hover:border-primary/30'
                       )}
                     >
                       {t.label}
@@ -296,7 +296,7 @@ export function PropertyFiltersModal({
 
             {/* 2. Essential Features */}
             <section className='space-y-8'>
-              <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.features}</h3>
+              <h3 className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>{translations.features}</h3>
               <div className='space-y-8'>
                 {essentials.map((attrKey) => {
                   const Icon = ATTRIBUTE_ICONS[attrKey];
@@ -310,8 +310,8 @@ export function PropertyFiltersModal({
                     return (
                       <div key={attrKey} className='space-y-3'>
                         <div className='flex items-center gap-2'>
-                          {Icon && <Icon className='h-4 w-4 text-grey-400' />}
-                          <span className='text-[13px] font-bold text-main-black'>{label}</span>
+                          {Icon && <Icon className='h-4 w-4 text-muted-foreground' />}
+                          <span className='text-[13px] font-bold text-foreground'>{label}</span>
                         </div>
                         <SegmentedSelector
                           value={val}
@@ -349,7 +349,7 @@ export function PropertyFiltersModal({
 
             {/* 3. Comfort Features */}
             <section className='space-y-4'>
-              <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>Tiện nghi & Dịch vụ</h3>
+              <h3 className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Tiện nghi & Dịch vụ</h3>
               <div className='grid grid-cols-1 gap-1'>
                 {comfort.map((attrKey) => {
                   const Icon = ATTRIBUTE_ICONS[attrKey];
@@ -360,12 +360,12 @@ export function PropertyFiltersModal({
                       key={attrKey}
                       className={cn(
                         'flex items-center justify-between rounded-xl px-4 py-2.5 transition-colors',
-                        isChecked ? 'bg-main-primary/[0.03]' : 'hover:bg-grey-50'
+                        isChecked ? 'bg-primary/[0.03]' : 'hover:bg-secondary'
                       )}
                     >
                       <div className='flex items-center gap-3'>
-                        {Icon && <Icon className={cn('h-4.5 w-4.5', isChecked ? 'text-main-primary' : 'text-grey-400')} />}
-                        <span className={cn('text-sm font-medium', isChecked ? 'text-main-black font-semibold' : 'text-grey-600')}>{label}</span>
+                        {Icon && <Icon className={cn('h-4.5 w-4.5', isChecked ? 'text-primary' : 'text-muted-foreground')} />}
+                        <span className={cn('text-sm font-medium', isChecked ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{label}</span>
                       </div>
                       <Switch
                         checked={isChecked}
@@ -383,7 +383,7 @@ export function PropertyFiltersModal({
             {/* 4. Rental Period */}
             {listingType === 'RENT' && (
               <section className='space-y-4 pb-4'>
-                <h3 className='text-sm font-bold uppercase tracking-wider text-grey-400'>{translations.rentalPeriod.label}</h3>
+                <h3 className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>{translations.rentalPeriod.label}</h3>
                 <div className='grid grid-cols-2 gap-2'>
                   {['any', '1-12', '13-24', '24+'].map((period) => (
                     <button
@@ -392,8 +392,8 @@ export function PropertyFiltersModal({
                       className={cn(
                         'flex h-11 items-center justify-center rounded-xl border-1.5 text-sm font-bold transition-all',
                         localFilters.rentalPeriod === period
-                          ? 'bg-main-primary text-white border-main-primary shadow-sm'
-                          : 'bg-white text-grey-500 border-purple-92 hover:border-main-primary/30'
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-white text-muted-foreground border-primary/20 hover:border-primary/30'
                       )}
                     >
                       {period === 'any' ? translations.rentalPeriod.any : translations.rentalPeriod[period as '1-12']}
@@ -405,11 +405,11 @@ export function PropertyFiltersModal({
           </div>
         </div>
 
-        <SheetFooter className='p-6 border-t border-purple-92 bg-white flex flex-col gap-3'>
+        <SheetFooter className='p-6 border-t border-primary/20 bg-white flex flex-col gap-3'>
           <Button
             type='button'
             onClick={handleApply}
-            className='w-full h-12 rounded-xl bg-main-primary text-sm font-bold text-white shadow-lg shadow-main-primary/20 hover:bg-main-primary/90 transition-all active:scale-95'
+            className='w-full h-12 rounded-xl bg-primary text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95'
           >
             {translations.apply}
           </Button>
@@ -417,7 +417,7 @@ export function PropertyFiltersModal({
             type='button'
             onClick={handleReset}
             variant='ghost'
-            className='w-full h-10 rounded-xl text-sm font-bold text-grey-500 hover:text-main-black transition-colors'
+            className='w-full h-10 rounded-xl text-sm font-bold text-muted-foreground hover:text-foreground transition-colors'
           >
             {translations.reset}
           </Button>

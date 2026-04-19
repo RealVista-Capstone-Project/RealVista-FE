@@ -31,7 +31,7 @@ const MediaViewerContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Content
     ref={ref}
-    className={cn('fixed left-0 right-0 top-0 bottom-0 z-50 bg-main-black/90', className)}
+    className={cn('fixed left-0 right-0 top-0 bottom-0 z-50 bg-foreground/90', className)}
     {...props}
   />
 ));
@@ -43,7 +43,7 @@ const MediaViewerOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn('fixed inset-0 z-50 bg-main-black/90', className)}
+    className={cn('fixed inset-0 z-50 bg-foreground/90', className)}
     {...props}
   />
 ));
@@ -114,7 +114,7 @@ export function MediaViewer({
       <DialogPrimitive.Portal>
         <MediaViewerOverlay />
         <MediaViewerContent
-          className='fixed left-0 right-0 top-0 bottom-0 z-50 flex flex-col bg-main-black/50'
+          className='fixed left-0 right-0 top-0 bottom-0 z-50 flex flex-col bg-foreground/50'
           onKeyDown={handleKeyDown}
         >
           <VisuallyHidden>
@@ -145,7 +145,7 @@ export function MediaViewer({
                     >
                       {tab.label}
                       {activeTab === tab.id && (
-                        <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-main-primary rounded-full' />
+                        <div className='absolute -bottom-[3px] left-0 right-0 h-0.5 bg-primary rounded-full' />
                       )}
                     </button>
                   )
@@ -158,7 +158,7 @@ export function MediaViewer({
                 variant='secondary'
                 size='small'
                 onClick={onRequestTour}
-                className='!bg-main-primary !border-main-primary !text-white hover:!bg-main-primary-hover'
+                className='!bg-primary !border-primary !text-white hover:!bg-primary/90'
               >
                 {t('requestTour')}
               </RealVistaButton>
@@ -276,7 +276,7 @@ export function MediaViewer({
 
             {/* Counter */}
             {currentMediaItems.length > 1 && (
-              <div className='absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-main-black px-4 py-2 text-white text-sm'>
+              <div className='absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-white text-sm'>
                 <span>{currentIndex + 1}</span>
                 <span>/</span>
                 <span>{currentMediaItems.length}</span>

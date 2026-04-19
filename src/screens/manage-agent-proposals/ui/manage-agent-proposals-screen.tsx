@@ -112,7 +112,7 @@ export function ManageAgentProposalsScreen() {
       <div className='flex h-full items-center justify-center bg-slate-50/50'>
         <div className='flex flex-col items-center gap-4 text-slate-400'>
           <div className='relative flex size-12 items-center justify-center'>
-            <div className='absolute inset-0 animate-ping rounded-full bg-indigo-100 opacity-75' />
+            <div className='absolute inset-0 animate-ping rounded-full bg-primary/10 opacity-75' />
             <div className='relative size-8 animate-spin rounded-full border-2 border-slate-200 border-t-indigo-600' />
           </div>
           <p className='text-sm font-bold text-slate-500 animate-pulse'>{t('loadingProposals')}</p>
@@ -328,7 +328,7 @@ function TableRow({
       <div
         className={cn(
           'w-[98px] shrink-0 text-center',
-          isSelected ? 'text-indigo-700' : 'text-slate-500'
+          isSelected ? 'text-primary' : 'text-slate-500'
         )}
       >
         <p className='text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-0.5'>
@@ -342,14 +342,14 @@ function TableRow({
         <p
           className={cn(
             'text-sm font-bold truncate transition-colors',
-            isSelected ? 'text-indigo-700' : 'text-slate-800 group-hover:text-indigo-600'
+            isSelected ? 'text-primary' : 'text-slate-800 group-hover:text-primary'
           )}
         >
           {proposal.title}
         </p>
         <div className='mt-1 flex items-center gap-2 min-w-0'>
           {specialtyLabel && (
-            <span className='inline-flex max-w-[45%] items-center gap-1 rounded-full border border-indigo-100 bg-indigo-50/70 px-2.5 py-0.5 text-[10px] font-semibold text-indigo-700'>
+            <span className='inline-flex max-w-[45%] items-center gap-1 rounded-full border border-primary/10 bg-indigo-50/70 px-2.5 py-0.5 text-[10px] font-semibold text-primary'>
               <Sparkles size={10} className='shrink-0 opacity-80' />
               <span className='truncate'>{specialtyLabel}</span>
             </span>
@@ -398,7 +398,7 @@ function TableRow({
             e.stopPropagation();
             onEdit();
           }}
-          className='rounded-lg p-2 text-slate-400 hover:text-indigo-600 hover:bg-white hover:shadow-sm transition-all active:scale-90 border border-transparent hover:border-slate-100'
+          className='rounded-lg p-2 text-slate-400 hover:text-primary hover:bg-white hover:shadow-sm transition-all active:scale-90 border border-transparent hover:border-slate-100'
           title={t('btnEdit')}
         >
           <svg

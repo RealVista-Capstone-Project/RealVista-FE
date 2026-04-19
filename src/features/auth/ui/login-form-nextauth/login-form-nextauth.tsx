@@ -85,7 +85,7 @@ export function LoginFormNextAuth() {
   }
 
   const inputClass =
-    'h-11 rounded-lg border-purple-92 bg-purple-98 px-4 text-main-black placeholder:text-grey-400 focus:border-main-primary focus:bg-white focus:ring-main-primary';
+    'h-11 rounded-lg border-purple-92 bg-purple-98 px-4 text-main-black placeholder:text-grey-400 focus:border-primary focus:bg-white focus:ring-primary';
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
@@ -131,7 +131,7 @@ export function LoginFormNextAuth() {
       <div className='flex justify-end'>
         <Link
           href='/forgot-password'
-          className='text-sm font-semibold text-main-primary hover:text-main-primary-hover transition-colors'
+          className='text-sm font-semibold text-primary hover:text-primary-hover transition-colors'
         >
           {t('forgotPassword')}
         </Link>
@@ -139,7 +139,7 @@ export function LoginFormNextAuth() {
 
       <Button
         type='submit'
-        className='h-11 w-full rounded-lg bg-main-primary text-base font-semibold text-white hover:bg-main-primary-hover focus:ring-4 focus:ring-purple-92'
+        className='h-11 w-full rounded-lg bg-primary text-base font-semibold text-white hover:bg-primary-hover focus:ring-4 focus:ring-purple-92'
         disabled={isLoading}
       >
         {isLoading ? t('loggingIn') : t('login')}

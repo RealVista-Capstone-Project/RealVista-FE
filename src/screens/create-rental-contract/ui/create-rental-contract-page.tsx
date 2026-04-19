@@ -52,6 +52,13 @@ interface FormState {
   leaseEndDate: string;
 }
 
+function getDefaultDates(): { leaseStartDate: string; leaseEndDate: string } {
+  const today = new Date();
+  const start = today.toISOString().slice(0, 10);
+  const end = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().slice(0, 10);
+  return { leaseStartDate: start, leaseEndDate: end };
+}
+
 const INITIAL_FORM_STATE: FormState = {
   propertyId: '',
   propertyTitle: '',
@@ -70,8 +77,7 @@ const INITIAL_FORM_STATE: FormState = {
   tenantLookupDone: false,
   monthlyRent: '',
   securityDeposit: '',
-  leaseStartDate: '2026-04-01',
-  leaseEndDate: '2027-03-31',
+  ...getDefaultDates(),
 };
 
 function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormState> {
@@ -131,9 +137,9 @@ export function CreateRentalContractPage() {
   const sendToLandlordMutation = useSendToLandlordMutation();
 
   // ── Pre-fill context from ?listingId=&tenantUserId=&tenantName= ───────────
-  const prefillListingId  = searchParams?.get('listingId')    ?? '';
-  const prefillTenantId   = searchParams?.get('tenantUserId') ?? '';
-  const prefillTenantName = searchParams?.get('tenantName')   ?? '';
+  const prefillListingId = searchParams?.get('listingId') ?? '';
+  const prefillTenantId = searchParams?.get('tenantUserId') ?? '';
+  const prefillTenantName = searchParams?.get('tenantName') ?? '';
 
   // Fetch the listing so we can populate Step 1 fields
   const { data: listingResponse } = useQuery({
@@ -154,15 +160,17 @@ export function CreateRentalContractPage() {
   }, [prefillListingId, prefillTenantId]);
 
   const [currentStep, setCurrentStep] = useState<WizardStep>(initialStep);
+  // Track the highest step the user has legitimately reached (completed previous step)
+  const [maxReachedStep, setMaxReachedStep] = useState<WizardStep>(initialStep);
   const [form, setForm] = useState<FormState>(() => ({
     ...INITIAL_FORM_STATE,
     // Seed tenant fields immediately so Step 2 shows them without lookup
     ...(prefillTenantId
       ? {
-          tenantUserId: prefillTenantId,
-          tenantName: prefillTenantName,
-          tenantLookupDone: true,
-        }
+        tenantUserId: prefillTenantId,
+        tenantName: prefillTenantName,
+        tenantLookupDone: true,
+      }
       : {}),
   }));
   const [tenantLookupLoading, setTenantLookupLoading] = useState(false);
@@ -193,7 +201,17 @@ export function CreateRentalContractPage() {
       return Boolean(form.tenantName && form.tenantEmail && form.tenantLookupDone);
     }
     if (currentStep === 3) {
-      return Boolean(form.monthlyRent && form.leaseStartDate && form.leaseEndDate);
+      const today = new Date().toISOString().slice(0, 10);
+      const hasRent = Boolean(form.monthlyRent);
+      const hasStart = Boolean(form.leaseStartDate);
+      const hasEnd = Boolean(form.leaseEndDate);
+      const startNotPast = form.leaseStartDate >= today;
+      const endAfterStart = form.leaseEndDate > form.leaseStartDate;
+      const s = new Date(form.leaseStartDate);
+      const e = new Date(form.leaseEndDate);
+      const durationMonths = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+      const meetsMinDuration = durationMonths >= 3;
+      return hasRent && hasStart && hasEnd && startNotPast && endAfterStart && meetsMinDuration;
     }
     return true;
   }, [currentStep, form]);
@@ -347,7 +365,7 @@ export function CreateRentalContractPage() {
         <StepLeaseTerms
           form={form}
           onFieldChange={updateField}
-          t={(key) => t(key as never)}
+          t={(key, values) => t(key as never, values as never)}
         />
       );
     }
@@ -371,26 +389,30 @@ export function CreateRentalContractPage() {
           <WizardStepsCard
             steps={steps}
             currentStep={currentStep}
-            onStepClick={setCurrentStep}
+            maxAllowedStep={maxReachedStep}
+            onStepClick={(step) => {
+              // Only allow navigating to steps already reached
+              if (step <= maxReachedStep) setCurrentStep(step);
+            }}
           />
 
           {/* Step content card */}
-          <Card className='rounded-[30px] border-[#EAE1FF] bg-white/94 shadow-[0_24px_60px_rgba(96,72,179,0.10)]'>
+          <Card className='rounded-[30px] border-primary/10 bg-white/94 shadow-[0_24px_60px_color-mix(in_oklch,var(--primary)_10%,transparent)]'>
             <CardContent className='p-6'>
               {/* Step title + progress */}
               <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
                 <div>
-                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-main-secondary/50'>
+                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground/70'>
                     {t('steps.eyebrow')}
                   </p>
-                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-main-black'>
+                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-foreground'>
                     {t(`steps.titles.${currentStep}` as never)}
                   </h2>
-                  <p className='mt-1 max-w-xl text-sm leading-6 text-main-secondary/60'>
+                  <p className='mt-1 max-w-xl text-sm leading-6 text-muted-foreground'>
                     {t(`steps.descriptions.${currentStep}` as never)}
                   </p>
                 </div>
-                <div className='shrink-0 rounded-full border border-[#E7DDFF] bg-[#FAF8FF] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-main-primary/75'>
+                <div className='shrink-0 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary/75'>
                   {t('progress', { current: currentStep, total: steps.length })}
                 </div>
               </div>
@@ -403,7 +425,11 @@ export function CreateRentalContractPage() {
                 isStepValid={isStepValid}
                 isMutating={isMutating}
                 onBack={() => setCurrentStep((prev) => Math.max(1, prev - 1) as WizardStep)}
-                onNext={() => setCurrentStep((prev) => Math.min(4, prev + 1) as WizardStep)}
+                onNext={() => {
+                  const next = Math.min(4, currentStep + 1) as WizardStep;
+                  setCurrentStep(next);
+                  setMaxReachedStep((prev) => (next > prev ? next : prev));
+                }}
                 onSaveDraft={saveDraft}
                 onSendForSigning={sendForSigning}
                 t={(key) => t(key as never)}

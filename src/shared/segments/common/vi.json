@@ -11,7 +11,8 @@
       "messages": "Tin nhắn",
       "myContracts": "Hợp đồng của tôi",
       "ownerProperties": "Bất động sản chủ nhà",
-      "proposals": "Đề xuất của tôi"
+      "proposals": "Đề xuất của tôi",
+      "appointments": "Lịch hẹn"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -26,7 +27,8 @@
       "manageProposals": "Hồ sơ cá nhân",
       "property": "Bất động sản",
       "ownerProperties": "Bảng tin bất động sản",
-      "agentSetting": "Hồ sơ & cài đặt môi giới"
+      "agentSetting": "Hồ sơ & cài đặt môi giới",
+      "appointments": "Lịch hẹn"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
@@ -381,6 +383,7 @@
     "favorited": "Yêu thích",
     "subscribe": "Gói dịch vụ & thanh toán",
     "appointments": "Lịch hẹn",
+    "myContracts": "Hợp đồng",
     "myEngagements": "Engagement của tôi",
     "login": "Đăng nhập",
     "signup": "Đăng ký",

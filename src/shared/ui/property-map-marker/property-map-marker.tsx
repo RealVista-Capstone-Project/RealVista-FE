@@ -32,10 +32,10 @@ export function PropertyMapMarker({
         'relative flex items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-1.5 shadow-md transition-all duration-200 hover:scale-110',
         'border-2',
         isSelected || isHovered
-          ? 'border-main-primary bg-main-primary'
+          ? 'border-primary bg-primary'
           : isBoosted
-          ? 'border-orange-500 bg-white'
-          : 'border-white',
+            ? 'border-orange-500 bg-white'
+            : 'border-white',
         'cursor-pointer',
         className
       )}
@@ -52,7 +52,7 @@ export function PropertyMapMarker({
       <span
         className={cn(
           'text-sm font-bold leading-tight',
-          isSelected || isHovered ? 'text-white' : 'text-main-black'
+          isSelected || isHovered ? 'text-white' : 'text-foreground'
         )}
       >
         {label || formatVND(price ?? 0)}

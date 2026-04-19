@@ -83,7 +83,7 @@ export function ReviewModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[440px] p-0 overflow-hidden'>
         {/* Gradient header */}
-        <div className='bg-gradient-to-br from-purple-98 to-purple-96 px-6 pt-6 pb-5 border-b border-purple-94'>
+        <div className='bg-gradient-to-br from-primary/5 to-primary/5 px-6 pt-6 pb-5 border-b border-primary/15'>
           <DialogHeader className='gap-0'>
             <DialogTitle className='sr-only'>{t('reviewModal.title')}</DialogTitle>
             <DialogDescription className='sr-only'>
@@ -93,12 +93,12 @@ export function ReviewModal({
 
           {/* Agent profile summary */}
           <div className='flex flex-col items-center gap-3'>
-            <Avatar className='h-16 w-16 border-2 border-white shadow-md ring-2 ring-main-primary/20'>
+            <Avatar className='h-16 w-16 border-2 border-white shadow-md ring-2 ring-primary/20'>
               <AvatarImage
                 src={agent.agent_avatar_url ?? undefined}
                 alt={agent.agent_full_name}
               />
-              <AvatarFallback className='bg-purple-92 text-main-primary font-bold text-lg'>
+              <AvatarFallback className='bg-primary/15 text-primary font-bold text-lg'>
                 {getInitials(agent.agent_full_name)}
               </AvatarFallback>
             </Avatar>
@@ -191,7 +191,7 @@ export function ReviewModal({
             type='submit'
             form='review-form'
             disabled={isLoading || rating === 0}
-            className='bg-main-primary hover:bg-main-primary-hover text-white gap-2 flex-1'
+            className='bg-primary hover:bg-primary/90 text-white gap-2 flex-1'
           >
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />

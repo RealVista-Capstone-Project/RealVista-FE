@@ -3,7 +3,7 @@ import type { Conversation, ConversationDetail, Message, Participant } from './t
 export const MOCK_CONVERSATION_DETAIL: ConversationDetail = {
   name: 'Matriks Studio',
   initials: 'M',
-  avatarBg: 'bg-main-primary',
+  avatarBg: 'bg-primary',
   company: 'Matriks Studio',
   timezone: '11:36 PM WIB (same timezone)',
   isOnline: true,
@@ -34,7 +34,7 @@ export const MOCK_CONVERSATION_DETAIL: ConversationDetail = {
 
 export const MOCK_PARTICIPANTS: Participant[] = [
   { id: 'p1', name: 'Nick Jo', initials: 'NJ', avatarBg: 'bg-slate-500' },
-  { id: 'p2', name: 'Dimas Eza', initials: 'DE', avatarBg: 'bg-purple-500' },
+  { id: 'p2', name: 'Dimas Eza', initials: 'DE', avatarBg: 'bg-primary/50' },
   { id: 'p3', name: 'Ellaslls', initials: 'EL', avatarBg: 'bg-pink-400' },
   { id: 'p4', name: 'Nopals', initials: 'NO', avatarBg: 'bg-orange-400' },
 ];
@@ -45,7 +45,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     otherUserId: '',
     name: 'Matriks Studio',
     initials: 'M',
-    avatarBg: 'bg-main-primary',
+    avatarBg: 'bg-primary',
     lastMessage: 'Dimas Eza Typing...',
     time: '4.30 PM',
     unread: 2,
@@ -87,7 +87,7 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     otherUserId: '',
     name: 'Dimas Eza',
     initials: 'DE',
-    avatarBg: 'bg-purple-500',
+    avatarBg: 'bg-primary/50',
     lastMessage: 'Redesign udah siap nihh, kira kira ...',
     time: '4.30 PM',
   },
@@ -139,13 +139,13 @@ export const MOCK_MESSAGES: Message[] = [
   },
   {
     id: 'm2',
-    sender: { id: 'p2', name: 'Dimas Eza', initials: 'DE', avatarBg: 'bg-purple-500' },
+    sender: { id: 'p2', name: 'Dimas Eza', initials: 'DE', avatarBg: 'bg-primary/50' },
     text: 'Ngedesign dashboard yu gais gaskeun ga sih?',
     time: '4.30 PM',
   },
   {
     id: 'm3',
-    sender: { id: 'me', name: 'Me', initials: 'ME', avatarBg: 'bg-main-primary' },
+    sender: { id: 'me', name: 'Me', initials: 'ME', avatarBg: 'bg-primary' },
     text: 'Wahhh boleh tuh dashboard design 👍',
     time: '4.30 PM',
   },

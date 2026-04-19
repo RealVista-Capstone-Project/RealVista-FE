@@ -253,11 +253,11 @@ export function AgentVerificationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()} modal={false}>
-      <DialogContent className='sm:max-w-md rounded-lg border-[#E0DEF7]'>
+      <DialogContent className='sm:max-w-md rounded-lg border-primary/20'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-foreground'>
-            <div className='size-10 rounded-full bg-[#E8E6F9] flex items-center justify-center'>
-              <ShieldCheck className='size-5 text-[#7065F0]' />
+            <div className='size-10 rounded-full bg-primary/10 flex items-center justify-center'>
+              <ShieldCheck className='size-5 text-primary' />
             </div>
             {t('verifyPropertyTitle', { default: 'Agent Verification' })}
           </DialogTitle>
@@ -270,9 +270,9 @@ export function AgentVerificationModal({
         </DialogHeader>
 
         <div className='py-6 flex flex-col gap-4'>
-          <div className='flex items-center gap-3 p-4 rounded-lg bg-[#F7F7FD] border border-[#E0DEF7]'>
-            <div className='size-10 rounded-full bg-[#E8E6F9] flex items-center justify-center'>
-              <Smartphone className='size-5 text-[#7065F0]' />
+          <div className='flex items-center gap-3 p-4 rounded-lg bg-primary/5 border border-primary/20'>
+            <div className='size-10 rounded-full bg-primary/10 flex items-center justify-center'>
+              <Smartphone className='size-5 text-primary' />
             </div>
             <div className='flex-1 text-sm font-medium text-foreground'>
               {ownerPhone}
@@ -282,7 +282,7 @@ export function AgentVerificationModal({
                 size='sm'
                 onClick={handleSendOtp}
                 disabled={isLoadingProperty}
-                className='rounded-lg bg-[#7065F0] hover:bg-[#5B51D9] text-white font-bold'
+                className='rounded-lg bg-primary hover:bg-primary/90 text-white font-bold'
               >
                 {isLoadingProperty ? (
                   <Loader2 className='size-4 animate-spin' />
@@ -313,30 +313,30 @@ export function AgentVerificationModal({
                   <InputOTPGroup>
                     <InputOTPSlot
                       index={0}
-                      className='size-14 text-xl font-bold rounded-lg border-[#E0DEF7] data-[active=true]:border-[#7065F0] data-[active=true]:ring-[#7065F0]/30'
+                      className='size-14 text-xl font-bold rounded-lg border-primary/20 data-[active=true]:border-primary data-[active=true]:ring-primary/30'
                     />
                     <InputOTPSlot
                       index={1}
-                      className='size-14 text-xl font-bold rounded-lg border-[#E0DEF7] data-[active=true]:border-[#7065F0] data-[active=true]:ring-[#7065F0]/30'
+                      className='size-14 text-xl font-bold rounded-lg border-primary/20 data-[active=true]:border-primary data-[active=true]:ring-primary/30'
                     />
                     <InputOTPSlot
                       index={2}
-                      className='size-14 text-xl font-bold rounded-lg border-[#E0DEF7] data-[active=true]:border-[#7065F0] data-[active=true]:ring-[#7065F0]/30'
+                      className='size-14 text-xl font-bold rounded-lg border-primary/20 data-[active=true]:border-primary data-[active=true]:ring-primary/30'
                     />
                   </InputOTPGroup>
                   <InputOTPSeparator />
                   <InputOTPGroup>
                     <InputOTPSlot
                       index={3}
-                      className='size-14 text-xl font-bold rounded-lg border-[#E0DEF7] data-[active=true]:border-[#7065F0] data-[active=true]:ring-[#7065F0]/30'
+                      className='size-14 text-xl font-bold rounded-lg border-primary/20 data-[active=true]:border-primary data-[active=true]:ring-primary/30'
                     />
                     <InputOTPSlot
                       index={4}
-                      className='size-14 text-xl font-bold rounded-lg border-[#E0DEF7] data-[active=true]:border-[#7065F0] data-[active=true]:ring-[#7065F0]/30'
+                      className='size-14 text-xl font-bold rounded-lg border-primary/20 data-[active=true]:border-primary data-[active=true]:ring-primary/30'
                     />
                     <InputOTPSlot
                       index={5}
-                      className='size-14 text-xl font-bold rounded-lg border-[#E0DEF7] data-[active=true]:border-[#7065F0] data-[active=true]:ring-[#7065F0]/30'
+                      className='size-14 text-xl font-bold rounded-lg border-primary/20 data-[active=true]:border-primary data-[active=true]:ring-primary/30'
                     />
                   </InputOTPGroup>
                 </InputOTP>
@@ -352,7 +352,7 @@ export function AgentVerificationModal({
               </div>
 
               <Button
-                className='w-full h-12 text-base rounded-lg bg-[#7065F0] hover:bg-[#5B51D9] text-white font-bold'
+                className='w-full h-12 text-base rounded-lg bg-primary hover:bg-primary/90 text-white font-bold'
                 onClick={handleVerifyOtp}
                 disabled={otp.length !== 6}
               >
@@ -363,7 +363,7 @@ export function AgentVerificationModal({
 
           {step === 'VERIFYING' && (
             <div className='flex flex-col items-center justify-center py-6 gap-4'>
-              <Loader2 className='size-10 animate-spin text-[#7065F0]' />
+              <Loader2 className='size-10 animate-spin text-primary' />
               <p className='text-sm text-muted-foreground'>
                 {t('verifying', { default: 'Verifying OTP...' })}
               </p>
@@ -372,7 +372,7 @@ export function AgentVerificationModal({
 
           {step === 'SUCCESS' && (
             <div className='flex flex-col items-center justify-center py-6 gap-4 animate-in zoom-in-95 duration-300'>
-              <div className='size-16 rounded-full bg-[#E8E6F9] flex items-center justify-center text-[#7065F0]'>
+              <div className='size-16 rounded-full bg-primary/10 flex items-center justify-center text-primary'>
                 <CheckCircle2 size={40} />
               </div>
               <h3 className='text-xl font-bold text-center text-foreground'>
@@ -396,7 +396,7 @@ export function AgentVerificationModal({
               size='sm'
               onClick={handleSendOtp}
               disabled={resendCountdown > 0 || step === 'SENDING'}
-              className='text-[#7065F0] hover:text-[#5B51D9] underline'
+              className='text-primary hover:text-primary/90 underline'
             >
               {resendCountdown > 0
                 ? t('resendOtpCountdown', {

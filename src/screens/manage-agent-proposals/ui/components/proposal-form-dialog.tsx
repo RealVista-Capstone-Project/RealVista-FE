@@ -348,7 +348,7 @@ export function ProposalFormDialog({
         {/* ── Dialog Header ── */}
         <DialogHeader className='px-6 pt-6 pb-4 border-b border-slate-100'>
           <div className='flex items-center gap-3'>
-            <div className='flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600'>
+            <div className='flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-primary'>
               {mode === 'create' ? <Plus size={18} strokeWidth={2.5} /> : <Edit3 size={18} />}
             </div>
             <div>
@@ -482,7 +482,7 @@ export function ProposalFormDialog({
               <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5'>
                 {/* Rent Range */}
                 <div className='space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 min-w-0'>
-                  <span className='text-[11px] font-bold text-indigo-600 uppercase tracking-wider'>
+                  <span className='text-[11px] font-bold text-primary uppercase tracking-wider'>
                     {t('rentRange')}
                   </span>
                   <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4'>

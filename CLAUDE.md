@@ -153,7 +153,7 @@ Beyond shadcn/ui, the project includes custom branded components in `src/shared/
 - **RealVistaButton** - Custom button with variants (primary, secondary, google) and sizes
   - Uses `class-variance-authority` for type-safe variants
   - Supports `asChild` for rendering as Next.js Link
-  - Custom color tokens matching Figma design (e.g., `bg-main-primary`, `border-purple-92`)
+  - Custom color tokens matching Figma design (e.g., `bg-primary`, `border-purple-92`)
 
 ```typescript
 import { RealVistaButton } from '@/shared/ui/real-vista-button';
@@ -228,7 +228,7 @@ All routes are defined as `const` for type safety and should be imported from th
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **RealVista-FE** (2848 symbols, 6121 relationships, 126 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **RealVista-FE** (3344 symbols, 7420 relationships, 161 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 

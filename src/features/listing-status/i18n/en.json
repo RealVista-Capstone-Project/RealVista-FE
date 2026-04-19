@@ -30,6 +30,10 @@
         "title": "Mark as Rented",
         "description": "Are you sure you want to mark this property as rented? This will close all other active listings for this property and notify other agents."
       },
+      "unpublish": {
+        "title": "Unpublish Listing",
+        "description": "Are you sure you want to unpublish this listing? Active appointments will be cancelled if the listing remains unpublished for more than 24 hours."
+      },
       "cancel": "Cancel",
       "proceed": "Confirm"
     },

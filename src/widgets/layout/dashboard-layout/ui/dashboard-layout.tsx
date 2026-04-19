@@ -41,7 +41,8 @@ type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
 function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
     { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
     { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
     { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
@@ -53,6 +54,7 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
 
 function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
+    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
     { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
     { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
@@ -63,7 +65,8 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
     { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
     { id: 'owner-properties', label: t('menu.ownerProperties'), href: ROUTES.dashboard.ownerProperties, icon: Search },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Calendar },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     { id: 'proposals', label: t('menu.proposals'), href: ROUTES.dashboard.manageProposals, icon: FileText },
     { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
@@ -102,6 +105,11 @@ export function DashboardLayout({
       return t('pageTitle.managedListings');
     if (pathname === ROUTES.dashboard.insight || pathname.startsWith(ROUTES.dashboard.insight))
       return t('pageTitle.insight');
+    if (
+      pathname === ROUTES.dashboard.appointments ||
+      pathname.startsWith(ROUTES.dashboard.appointments)
+    )
+      return t('pageTitle.appointments');
     if (pathname === ROUTES.dashboard.tenants || pathname.startsWith(ROUTES.dashboard.tenants))
       return t('pageTitle.tenants');
     if (
@@ -194,20 +202,20 @@ export function DashboardLayout({
   }, []);
 
   return (
-    <div className={cn('flex h-screen w-full overflow-hidden bg-slate-50', className)}>
+    <div className={cn('flex h-screen w-full overflow-hidden bg-muted/50', className)}>
       <ChatWindowRenderer />
 
       {/* Sidebar - Now part of the flex flow on desktop */}
       <aside
         className={cn(
-          'relative z-20 flex h-screen flex-col border-r border-purple-92/50 bg-white transition-all duration-300 ease-in-out shrink-0',
+          'relative z-20 flex h-screen flex-col border-primary/20 bg-white transition-all duration-300 ease-in-out shrink-0',
           isCollapsed ? 'w-20' : 'w-[280px]'
         )}
       >
         {/* Logo */}
         <div
           className={cn(
-            'flex h-16 items-center border-purple-92/50 p-5',
+            'flex h-16 items-center border-primary/20 p-5',
             isCollapsed ? 'justify-center' : 'justify-between'
           )}
         >
@@ -215,7 +223,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={() => setIsCollapsed(false)}
-              className='flex size-8 items-center justify-center rounded-xl bg-main-primary transition-opacity hover:opacity-90 shadow-sm shadow-indigo-100'
+              className='flex size-8 items-center justify-center rounded-xl bg-primary transition-opacity hover:opacity-90 shadow-sm shadow-primary/10'
               aria-label='Expand sidebar'
             >
               <Image
@@ -229,7 +237,7 @@ export function DashboardLayout({
           ) : (
             <>
               <Link href={logoHref} className='flex items-center gap-3 group'>
-                <div className='flex items-center justify-center rounded-xl bg-main-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-indigo-100'>
+                <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-primary/10'>
                   <Image
                     src='/logo.png'
                     alt='RealVista Logo'
@@ -239,10 +247,10 @@ export function DashboardLayout({
                   />
                 </div>
                 <div className='flex flex-col'>
-                  <span className='text-base font-bold leading-tight text-main-black'>
+                  <span className='text-base font-bold leading-tight text-foreground'>
                     Estatery
                   </span>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-main-secondary/40'>
+                  <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground/40'>
                     Property Manager
                   </span>
                 </div>
@@ -250,7 +258,7 @@ export function DashboardLayout({
               <button
                 type='button'
                 onClick={() => setIsCollapsed(true)}
-                className='flex size-8 items-center justify-center rounded-lg border border-purple-92 bg-white text-main-secondary/40 transition-all hover:bg-slate-50 hover:text-main-secondary hover:border-slate-300 hover:shadow-sm'
+                className='flex size-8 items-center justify-center rounded-lg border-primary/20 bg-background text-muted-foreground/40 transition-all hover:bg-muted/50 hover:text-foreground hover:border-border hover:shadow-sm'
                 aria-label='Collapse sidebar'
               >
                 <Columns className='h-4 w-4' strokeWidth={2} />
@@ -270,8 +278,8 @@ export function DashboardLayout({
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200',
                   isActive
-                    ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
-                    : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                    ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
+                    : 'text-muted-foreground/60 hover:bg-primary/5 hover:text-foreground',
                   isCollapsed ? 'justify-center' : 'justify-start'
                 )}
                 title={isCollapsed ? item.label : undefined}
@@ -287,14 +295,14 @@ export function DashboardLayout({
         </nav>
 
         {/* Footer */}
-        <div className='border-t border-purple-92/50 p-3'>
+        <div className='border-t border-primary/20 p-3'>
           <Link
             href={settingsHref}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
               isSettingsFooterActive
-                ? 'bg-purple-96 text-main-primary font-semibold ring-1 ring-purple-92/50'
-                : 'text-main-secondary/60 hover:bg-purple-98 hover:text-main-secondary',
+                ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
+                : 'text-muted-foreground/60 hover:bg-primary/5 hover:text-foreground',
               isCollapsed ? 'justify-center' : 'justify-start'
             )}
             title={isCollapsed ? 'Settings' : undefined}
@@ -323,7 +331,7 @@ export function DashboardLayout({
         />
 
         {/* Page Content - fills remaining height, scrollable */}
-        <main className='flex-1 overflow-y-auto bg-slate-50/50 p-0'>{children}</main>
+        <main className='flex-1 overflow-y-auto bg-muted/30 p-0'>{children}</main>
       </div>
     </div>
   );

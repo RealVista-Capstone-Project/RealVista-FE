@@ -73,15 +73,15 @@ export function ListingLifetimeCard({ listing }: ListingLifetimeCardProps) {
 
   return (
     <div className='flex items-center gap-4'>
-      <div className='flex h-8 w-8 items-center justify-center rounded-md bg-main-primary/10'>
-        <Clock className='h-4 w-4 text-main-primary' strokeWidth={2} />
+      <div className='flex h-8 w-8 items-center justify-center rounded-md bg-primary/10'>
+        <Clock className='h-4 w-4 text-primary' strokeWidth={2} />
       </div>
       <div className='flex-1'>
         <div className='mb-1 flex items-center gap-2'>
-          <span className='text-sm font-semibold text-main-black'>{t('lifetime.title')}</span>
+          <span className='text-sm font-semibold text-foreground'>{t('lifetime.title')}</span>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button type='button' className='flex items-center text-main-secondary/40 hover:text-main-secondary/70 transition-colors' aria-label={t('lifetime.tooltip')}>
+              <button type='button' className='flex items-center text-muted-foreground/60 hover:text-muted-foreground transition-colors' aria-label={t('lifetime.tooltip')}>
                 <Info className='h-3 w-3' strokeWidth={2} />
               </button>
             </TooltipTrigger>

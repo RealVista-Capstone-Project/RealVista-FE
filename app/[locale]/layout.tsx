@@ -39,8 +39,8 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={`${plusJakartaSans.variable} antialiased`}>
+    <html lang={locale} className={plusJakartaSans.variable} suppressHydrationWarning>
+      <body className="antialiased font-sans">
         <Providers>
           <NextIntlClientProvider messages={messages} locale={locale}>
             {children}

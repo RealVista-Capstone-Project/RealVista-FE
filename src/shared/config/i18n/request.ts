@@ -32,6 +32,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/auth/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing-status/i18n/${locale}.json`)).default,
       ...(await import(`@/features/price-and-tour/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/appointments/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-about/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-gallery/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-header/i18n/${locale}.json`)).default,

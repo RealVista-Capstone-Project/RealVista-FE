@@ -1,6 +1,7 @@
 {
   "ManagedListings": {
     "title": "Listings",
+    "draftRuleTooltip": "Listings unpublished for more than 24 hours will have their associated active appointments automatically cancelled.",
     "createButton": "Create Listing",
     "filter": "Filter",
     "filterPanel": {
@@ -52,6 +53,7 @@
   "ListingDetailPanel": {
     "addressNotAvailable": "Address not available",
     "showCalendar": "Show Property Calendar",
+    "viewAppointments": "View Appointments",
     "preview": "Preview",
     "actions": "Actions",
     "editListing": "Edit Listing",

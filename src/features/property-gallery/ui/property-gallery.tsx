@@ -63,8 +63,8 @@ export function PropertyGallery({
 
   if (!mainImage) {
     return (
-      <div className='flex items-center justify-center aspect-[4/3] rounded-xl border-2 border-dashed border-grey-300 bg-grey-100'>
-        <span className='text-sm text-grey-500'>{t('noImage')}</span>
+      <div className='flex items-center justify-center aspect-[4/3] rounded-xl border-2 border-dashed border-border bg-muted'>
+        <span className='text-sm text-muted-foreground'>{t('noImage')}</span>
       </div>
     );
   }
@@ -72,7 +72,7 @@ export function PropertyGallery({
   return (
     <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
       {/* Hero Image */}
-      <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-purple-98'>
+      <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-primary/5'>
         {mainImage.type === 'video' ? (
           <video
             src={mainImage.url}
@@ -95,14 +95,14 @@ export function PropertyGallery({
                 group flex items-center gap-2 px-3 py-2
                 bg-white/95 backdrop-blur-sm rounded-lg
                 border-2 border-transparent
-                hover:border-purple-92 hover:p-1.5
+                hover:border-primary/20 hover:p-1.5
                 transition-all duration-200 ease-out
                 shadow-sm hover:shadow-md
                 sm:static sm:bottom-auto sm:right-auto
               '
             >
               <Camera className='size-4' />
-              <span className='text-sm font-medium text-main-black'>
+              <span className='text-sm font-medium text-foreground'>
                 {t('viewAllPhotos')} ({photoCount})
               </span>
             </button>
@@ -117,13 +117,13 @@ export function PropertyGallery({
                   group flex items-center gap-2 px-3 py-2
                   bg-white/95 backdrop-blur-sm rounded-lg
                   border-2 border-transparent
-                  hover:border-main-primary hover:p-1.5
+                  hover:border-primary hover:p-1.5
                   transition-all duration-200 ease-out
                   shadow-sm hover:shadow-md
                 '
               >
                 <Box className='size-4' />
-                <span className='text-sm font-medium text-main-black'>
+                <span className='text-sm font-medium text-foreground'>
                   {t('tour3D')} ({tourCount})
                 </span>
               </button>
@@ -136,13 +136,13 @@ export function PropertyGallery({
                   group flex items-center gap-2 px-3 py-2
                   bg-white/95 backdrop-blur-sm rounded-lg
                   border-2 border-transparent
-                  hover:border-main-primary hover:p-1.5
+                  hover:border-primary hover:p-1.5
                   transition-all duration-200 ease-out
                   shadow-sm hover:shadow-md
                 '
               >
                 <Video className='size-4' />
-                <span className='text-sm font-medium text-main-black'>
+                <span className='text-sm font-medium text-foreground'>
                   {t('video')} ({videoCount})
                 </span>
               </button>
@@ -163,11 +163,11 @@ export function PropertyGallery({
               className={cn(
                 'group relative rounded-xl overflow-hidden w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 border-2 border-transparent transition-all duration-200 ease-out',
                 mainImage.id === image.id
-                  ? 'border-main-primary p-1'
-                  : 'hover:border-main-primary hover:p-1'
+                  ? 'border-primary p-1'
+                  : 'hover:border-primary hover:p-1'
               )}
             >
-              <div className='relative w-full h-full rounded-lg overflow-hidden bg-purple-98'>
+              <div className='relative w-full h-full rounded-lg overflow-hidden bg-primary/5'>
                 {displayedUrl ? (
                   <Image
                     src={displayedUrl}
@@ -178,14 +178,14 @@ export function PropertyGallery({
                   />
                 ) : (
                   <div className='flex h-full w-full items-center justify-center'>
-                    <span className='text-[10px] sm:text-xs text-main-secondary/60'>
+                    <span className='text-[10px] sm:text-xs text-muted-foreground'>
                       {isVideo ? t('video') : t('noImage')}
                     </span>
                   </div>
                 )}
                 {isVideo && (
                   <div className='absolute inset-0 flex items-center justify-center bg-black/20'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-main-primary shadow-sm'>
+                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm'>
                       <svg
                         width='16'
                         height='16'
@@ -208,9 +208,9 @@ export function PropertyGallery({
           Array.from({ length: 2 - thumbnailImages.length }).map((_, index) => (
             <div
               key={`placeholder-${index}`}
-              className='w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 rounded-xl border-2 border-dashed border-grey-300 bg-grey-100 flex items-center justify-center hover:border-main-primary hover:p-1 transition-all duration-200'
+              className='w-[48%] aspect-[4/3] sm:w-full sm:aspect-auto sm:flex-1 rounded-xl border-2 border-dashed border-border bg-muted flex items-center justify-center hover:border-primary hover:p-1 transition-all duration-200'
             >
-              <span className='text-sm text-grey-500'>{t('noImage')}</span>
+              <span className='text-sm text-muted-foreground'>{t('noImage')}</span>
             </div>
           ))}
       </div>

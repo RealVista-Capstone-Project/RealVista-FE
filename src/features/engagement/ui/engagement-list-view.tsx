@@ -481,7 +481,7 @@ export const EngagementListView = ({
                                   <Percent className='h-3 w-3' />
                                   {t('outlook.commission')}
                                 </div>
-                                <span className='text-sm font-bold text-indigo-600'>
+                                <span className='text-sm font-bold text-primary'>
                                   {c?.commissionRate != null ? `${c.commissionRate}%` : '—'}
                                 </span>
                               </div>
@@ -572,7 +572,7 @@ export const EngagementListView = ({
                                   <DollarSign className='h-3 w-3' />
                                   {t('outlook.offeredCommission')}
                                 </div>
-                                <span className='text-sm font-bold text-indigo-600'>
+                                <span className='text-sm font-bold text-primary'>
                                   {c.offeredCommission}
                                 </span>
                               </div>
@@ -681,7 +681,7 @@ export const EngagementListView = ({
                     {t('outlook.proposalTitle')}
                   </h4>
                   <div className='bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden'>
-                    <div className='bg-indigo-50 px-5 py-3 border-b border-indigo-100'>
+                    <div className='bg-indigo-50 px-5 py-3 border-b border-primary/10'>
                       <div className='flex items-center gap-3'>
                         <AvatarWithInitials
                           name={eng.agentFullName ?? '?'}
@@ -703,7 +703,7 @@ export const EngagementListView = ({
                           <Percent className='h-3 w-3' />
                           {t('outlook.commission')}
                         </div>
-                        <span className='text-sm font-bold text-indigo-600'>
+                        <span className='text-sm font-bold text-primary'>
                           {engContent.commissionRate != null ? `${engContent.commissionRate}%` : '—'}
                         </span>
                       </div>
@@ -766,7 +766,7 @@ export const EngagementListView = ({
                   <div className='bg-gray-50 rounded-lg p-4 border border-gray-200 text-sm'>
                     <div className='flex justify-between'>
                       <span className='text-gray-500'>{t('outlook.offeredCommission')}</span>
-                      <span className='font-medium text-indigo-600'>
+                      <span className='font-medium text-primary'>
                         {engContent.offeredCommission}
                       </span>
                     </div>

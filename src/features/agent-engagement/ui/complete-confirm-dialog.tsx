@@ -42,7 +42,7 @@ export function CompleteConfirmDialog({
               {t('completeDialog.title')}
             </DialogTitle>
           </div>
-          <DialogDescription className='text-sm text-gray-500 leading-relaxed pl-[52px]'>
+          <DialogDescription className='text-sm text-gray-500 leading-relaxed pl-13'>
             {t('completeDialog.description', {
               agentName: agent.agent_full_name,
               property: agent.property_address ?? agent.property_type_name ?? t('common.thisProperty'),
@@ -82,7 +82,7 @@ export function CompleteConfirmDialog({
           <Button
             onClick={onConfirm}
             disabled={isLoading}
-            className='bg-main-primary hover:bg-main-primary-hover text-white gap-2'
+            className='bg-primary hover:bg-primary/90 text-white gap-2'
           >
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />

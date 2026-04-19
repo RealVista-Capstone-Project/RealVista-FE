@@ -31,13 +31,13 @@ import {
   ArrowLeft,
   BadgeCheck,
   Building2,
-  Calendar,
   Eye,
   Mail,
   Phone,
   ChevronDown,
   Pencil,
   Trash2,
+  CalendarDays,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -138,10 +138,10 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
       {/* Mobile Back Button */}
       {onBack && (
-        <div className='sticky top-0 z-20 flex items-center border-b border-purple-92 bg-white px-4 py-3 sm:hidden'>
+        <div className='sticky top-0 z-20 flex items-center border-b border-primary/20 bg-white px-4 py-3 sm:hidden'>
           <button
             onClick={onBack}
-            className='flex items-center gap-2 text-sm font-semibold text-main-black'
+            className='flex items-center gap-2 text-sm font-semibold text-foreground'
           >
             <ArrowLeft className='h-5 w-5' strokeWidth={2.5} />
             <span>{t('backToList')}</span>
@@ -149,7 +149,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
           <Link
             href={`/listing/${listing.slug}`}
-            className='flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-1.5 text-xs font-bold text-main-black transition-colors hover:bg-purple-98'
+            className='flex items-center gap-2 rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-bold text-foreground transition-colors hover:bg-primary/5'
           >
             <Eye className='h-3.5 w-3.5' strokeWidth={2.5} />
             <span>{t('preview')}</span>
@@ -168,10 +168,10 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         <div className='mb-6 flex flex-col gap-4'>
           <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
             <div className='flex flex-col gap-2'>
-              <h1 className='text-2xl sm:text-[32px] font-bold leading-tight sm:leading-[1.25] tracking-tight sm:tracking-[-0.32px] text-main-black'>
+              <h1 className='text-2xl sm:text-[32px] font-bold leading-tight sm:leading-[1.25] tracking-tight sm:tracking-[-0.32px] text-foreground'>
                 {property.title}
               </h1>
-              <p className='text-sm sm:text-base font-medium leading-relaxed sm:leading-[1.6] text-main-black/50'>
+              <p className='text-sm sm:text-base font-medium leading-relaxed sm:leading-[1.6] text-muted-foreground'>
                 {property.address || t('addressNotAvailable')}
               </p>
             </div>
@@ -181,7 +181,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                 <button
                   type='button'
                   onClick={() => setIsActionsOpen(!isActionsOpen)}
-                  className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-purple-92 bg-white px-4 py-2.5 text-sm font-medium text-main-black transition-colors hover:bg-purple-98 shadow-sm'
+                  className='flex w-full whitespace-nowrap sm:w-auto items-center justify-center gap-2 rounded-lg border border-primary/20 bg-white px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/5 shadow-sm'
                   aria-label={t('actions')}
                   aria-expanded={isActionsOpen}
                 >
@@ -193,14 +193,14 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                 </button>
 
                 {isActionsOpen && (
-                  <div className='absolute right-0 top-full z-30 mt-2 w-48 rounded-xl border border-purple-92 bg-white shadow-lg p-2 flex flex-col gap-1'>
+                  <div className='absolute right-0 top-full z-30 mt-2 w-48 rounded-xl border border-primary/20 bg-white shadow-lg p-2 flex flex-col gap-1'>
                     <button
                       type='button'
                       onClick={() => {
                         setIsActionsOpen(false);
                         setIsEditModalOpen(true);
                       }}
-                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-lg transition-colors font-medium'
                     >
                       <Pencil className='h-4 w-4' strokeWidth={2} />
                       <span>{t('editListing')}</span>
@@ -208,20 +208,20 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     <Link
                       href={`/listing/${listing.slug}`}
                       onClick={() => setIsActionsOpen(false)}
-                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-lg transition-colors font-medium'
                     >
                       <Eye className='h-4 w-4' strokeWidth={2} />
                       <span>{t('preview')}</span>
                     </Link>
-                    <button
-                      type='button'
+                    <Link
+                      href={`/dashboard/appointments?listing=${listing.listing_id}`}
                       onClick={() => setIsActionsOpen(false)}
-                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-main-black hover:bg-purple-98 rounded-lg transition-colors font-medium'
+                      className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-lg transition-colors font-medium'
                     >
-                      <Calendar className='h-4 w-4' strokeWidth={2} />
-                      <span>{t('showCalendar')}</span>
-                    </button>
-                    <div className='my-1 h-px bg-purple-92/50' />
+                      <CalendarDays className='h-4 w-4' strokeWidth={2} />
+                      <span>{t('viewAppointments')}</span>
+                    </Link>
+                    <div className='my-1 h-px bg-border' />
                     <button
                       type='button'
                       onClick={() => {
@@ -256,21 +256,21 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         <div className='flex w-full gap-4 mb-8'>
           {/* Agent Information Card */}
           {showAgentInfo && (
-            <div className='flex-1 overflow-hidden rounded-xl border border-purple-92 bg-gradient-to-br from-purple-98 to-white shadow-sm'>
+            <div className='flex-1 overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-white shadow-sm'>
               <div className='p-6'>
                 {/* Header */}
                 <div className='mb-4 flex items-center gap-2'>
-                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-main-primary/10'>
-                    <Building2 className='h-4 w-4 text-main-primary' strokeWidth={2} />
+                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10'>
+                    <Building2 className='h-4 w-4 text-primary' strokeWidth={2} />
                   </div>
                   <div>
-                    <h3 className='text-sm font-semibold text-main-black'>{t('agent.title')}</h3>
-                    <p className='text-xs text-main-secondary/60'>{t('agent.subtitle')}</p>
+                    <h3 className='text-sm font-semibold text-foreground'>{t('agent.title')}</h3>
+                    <p className='text-xs text-muted-foreground'>{t('agent.subtitle')}</p>
                   </div>
                 </div>
 
                 {/* Agent Card */}
-                <div className='flex items-start gap-4 rounded-lg border border-purple-92 bg-white p-4'>
+                <div className='flex items-start gap-4 rounded-lg border border-primary/20 bg-white p-4'>
                   {/* Avatar */}
                   <div className='relative shrink-0'>
                     {listing.agent!.avatar_url ? (
@@ -282,7 +282,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                         className='h-14 w-14 rounded-full object-cover'
                       />
                     ) : (
-                      <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-main-primary to-purple-600'>
+                      <div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary'>
                         <span className='text-lg font-bold text-white'>
                           {listing.agent!.first_name?.[0]}
                           {listing.agent!.last_name?.[0]}
@@ -300,11 +300,11 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                   <div className='flex-1 space-y-3'>
                     {/* Name and verification */}
                     <div>
-                      <h4 className='text-lg font-bold text-main-black'>
+                      <h4 className='text-lg font-bold text-foreground'>
                         {listing.agent!.business_name || listing.agent!.full_name}
                       </h4>
                       {listing.agent!.business_name && listing.agent!.full_name && (
-                        <p className='text-sm text-main-secondary/70'>{listing.agent!.full_name}</p>
+                        <p className='text-sm text-muted-foreground'>{listing.agent!.full_name}</p>
                       )}
                       {listing.agent!.is_verified && (
                         <div className='mt-1 flex items-center gap-1.5'>
@@ -319,19 +319,19 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     {/* Contact Info */}
                     <div className='space-y-2 text-sm'>
                       {listing.agent!.phone && (
-                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                        <div className='flex items-center gap-2 text-muted-foreground'>
                           <Phone className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.phone}</span>
                         </div>
                       )}
                       {listing.agent!.email && (
-                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                        <div className='flex items-center gap-2 text-muted-foreground'>
                           <Mail className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.email}</span>
                         </div>
                       )}
                       {listing.agent!.company && (
-                        <div className='flex items-center gap-2 text-main-secondary/70'>
+                        <div className='flex items-center gap-2 text-muted-foreground'>
                           <Building2 className='h-4 w-4' strokeWidth={2} />
                           <span>{listing.agent!.company}</span>
                         </div>
@@ -342,7 +342,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     <button
                       type='button'
                       onClick={handleContact}
-                      className='mt-2 w-full rounded-lg bg-main-primary py-2.5 text-sm font-semibold text-white transition-all hover:bg-main-primary/90 hover:shadow-md'
+                      className='mt-2 w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-md'
                     >
                       {t('agent.contact')}
                     </button>
@@ -356,7 +356,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           {listing.status === 'PUBLISHED' && listing.published_at && (
             <div className='flex flex-1 flex-col gap-4'>
               {/* Listing Lifetime - Above Metrics */}
-              <div className='rounded-lg border border-purple-92 bg-purple-98/50 p-4'>
+              <div className='rounded-lg border border-primary/20 bg-primary/5 p-4'>
                 <ListingLifetimeCard listing={listing} />
               </div>
               <ListingBoostSection listing={listing} />
@@ -365,7 +365,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         </div>
 
         {/* Features Stats - Dynamic attributes from server */}
-        <div className='mb-8 rounded-lg border border-purple-92 p-6'>
+        <div className='mb-8 rounded-lg border border-primary/20 p-6'>
           {attributes.length > 0 ? (
             <div className='grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6'>
               {listing.listing_type === 'RENT' && (
@@ -377,16 +377,16 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               )}
               {attributes.map((attribute) => (
                 <div key={attribute.attribute_id} className='flex flex-col gap-4'>
-                  <p className='text-base font-medium leading-[1.5] text-grey-500'>
+                  <p className='text-base font-medium leading-[1.5] text-muted-foreground'>
                     {attribute.attribute_name}
                   </p>
                   <div className='flex items-center gap-2'>
                     <AttributeIcon
                       iconName={attribute.icon}
-                      className='size-6 text-main-black/50'
+                      className='size-6 text-foreground/50'
                       strokeWidth={2}
                     />
-                    <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
+                    <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-foreground'>
                       {attribute.display_value}
                     </p>
                   </div>
@@ -431,15 +431,15 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
         {/* About this listing */}
         <div className='mb-8 flex flex-col gap-4'>
-          <h2 className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-main-black'>
+          <h2 className='text-xl font-bold leading-[1.5] tracking-[-0.24px] text-foreground'>
             {t('aboutThisListing', { fallback: 'About this listing' })}
           </h2>
-          <p className='text-base font-medium leading-[1.6] text-main-black/70 whitespace-pre-wrap font-sans'>
+          <p className='text-base font-medium leading-[1.6] text-muted-foreground whitespace-pre-wrap font-sans'>
             {listing.content || property.description}
           </p>
         </div>
 
-        <div className='mb-8 h-px w-full bg-purple-92' />
+        <div className='mb-8 h-px w-full bg-primary/15' />
 
         {/* Rental Features Section */}
         {property.amenities && property.amenities.length > 0 && (
@@ -470,7 +470,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             <button
               type='button'
               onClick={() => setIsDeleteDialogOpen(false)}
-              className='flex h-11 items-center justify-center rounded-lg border border-purple-92 bg-white px-6 text-sm font-bold text-main-black transition-colors hover:bg-purple-98'
+              className='flex h-11 items-center justify-center rounded-lg border border-primary/20 bg-white px-6 text-sm font-bold text-foreground transition-colors hover:bg-primary/5'
               disabled={deleteMutation.isPending}
             >
               {t('deleteConfirmCancel', { fallback: 'Cancel' })}
@@ -478,7 +478,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
             <button
               type='button'
               onClick={handleDelete}
-              className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_rgba(220,38,38,0.2)] disabled:opacity-50 disabled:cursor-not-allowed'
+              className='flex h-11 items-center justify-center rounded-lg bg-red-600 px-6 text-sm font-bold text-white transition-all hover:bg-red-700 shadow-[0px_4px_12px_0px_color-mix(in_oklch,var(--destructive)_20%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed'
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending
@@ -495,10 +495,10 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 function FeatureStat({ label, value, icon }: { label: string; value: string; icon: string }) {
   return (
     <div className='flex flex-col gap-4'>
-      <p className='text-base font-medium leading-[1.5] text-grey-500'>{label}</p>
+      <p className='text-base font-medium leading-[1.5] text-muted-foreground'>{label}</p>
       <div className='flex items-center gap-2'>
         <span className='text-2xl opacity-50'>{icon}</span>
-        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-main-black'>
+        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-foreground'>
           {value}
         </p>
       </div>

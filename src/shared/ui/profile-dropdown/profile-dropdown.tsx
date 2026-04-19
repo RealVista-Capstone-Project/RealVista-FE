@@ -71,7 +71,7 @@ export function ProfileDropdown({
         <button
           type='button'
           className={cn(
-            'flex items-center gap-2 rounded-lg border border-purple-92 bg-white px-3 py-2 shadow-[0px_0px_40px_0px_rgba(112,101,240,0.1)] transition-shadow hover:shadow-md',
+            'flex items-center gap-2 rounded-lg border border-primary/20 bg-white px-3 py-2 shadow-primary/10 transition-shadow hover:shadow-md',
             className
           )}
           aria-label='User menu'
@@ -87,17 +87,17 @@ export function ProfileDropdown({
               priority
             />
           ) : (
-            <div className='flex size-8 items-center justify-center rounded-full bg-main-primary'>
+            <div className='flex size-8 items-center justify-center rounded-full bg-primary'>
               <span className='text-sm font-bold leading-[1.5] text-white'>{user.initials}</span>
             </div>
           )}
 
           {/* Name */}
-          <span className='text-base font-medium leading-[1.5] text-main-black'>{user.name}</span>
+          <span className='text-base font-medium leading-[1.5] text-foreground'>{user.name}</span>
 
           {/* Chevron */}
           <svg
-            className={cn('h-4 w-4 text-main-black transition-transform', open && 'rotate-180')}
+            className={cn('h-4 w-4 text-foreground transition-transform', open && 'rotate-180')}
             viewBox='0 0 16 16'
             fill='none'
             stroke='currentColor'
@@ -115,7 +115,7 @@ export function ProfileDropdown({
           align={align}
           sideOffset={8}
           className={cn(
-            'z-50 w-[272px] rounded-lg border border-purple-92 bg-white p-0 shadow-[0px_10px_10px_0px_rgba(16,10,85,0.1)]',
+            'z-50 w-[272px] rounded-lg border border-primary/20 bg-white p-0 shadow-[0px_10px_10px_0px_color-mix(in_oklch,var(--primary)_10%,transparent)]',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -146,8 +146,8 @@ export function ProfileDropdown({
                     disabled={isLoggingOut && item.id === 'logout'}
                     className='flex h-16 w-full items-center gap-4 px-6 opacity-70 transition-opacity hover:opacity-100 disabled:opacity-50'
                   >
-                    <Icon className='h-5 w-5 text-main-black' />
-                    <span className='text-base font-medium leading-[1.5] text-main-black'>
+                    <Icon className='h-5 w-5 text-foreground' />
+                    <span className='text-base font-medium leading-[1.5] text-foreground'>
                       {isLoggingOut && item.id === 'logout' ? t('loggingOut') : t(item.label)}
                     </span>
                   </button>

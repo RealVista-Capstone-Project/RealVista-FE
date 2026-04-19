@@ -38,20 +38,20 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
         <div className='px-6 pt-4 pb-4 lg:px-8 lg:pt-5'>
           <Link href='/buy' className='flex items-center gap-2'>
             <RealVistaLogo />
-            <span className='text-xl font-bold text-main-black'>RealVista</span>
+            <span className='text-xl font-bold'>RealVista</span>
           </Link>
         </div>
-        <div className='border-b border-grey-200' />
+        <div className='border-b border-border' />
 
         {/* Form Container */}
         <div className='flex flex-1 items-center justify-center px-6 pb-6 lg:px-8'>
           <div className='w-full max-w-md space-y-6'>
             {/* Header */}
             <div>
-              <h1 className='text-3xl font-bold tracking-tight text-main-black'>
+              <h1 className='text-3xl font-bold tracking-tight text-foreground'>
                 {t('welcomeBack')}
               </h1>
-              <p className='mt-1.5 text-sm text-grey-500'>{t('welcomeBackSubtitle')}</p>
+              <p className='mt-1.5 text-sm text-muted-foreground'>{t('welcomeBackSubtitle')}</p>
             </div>
 
             {/* Email/Password Form */}
@@ -62,10 +62,10 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
                 {/* Visual Separator */}
                 <div className='relative'>
                   <div className='absolute inset-0 flex items-center'>
-                    <span className='w-full border-t border-grey-200' />
+                    <span className='w-full border-t border-border' />
                   </div>
                   <div className='relative flex justify-center text-sm'>
-                    <span className='bg-white px-4 text-grey-500'>{t('continueWith')}</span>
+                    <span className='bg-white px-4 text-muted-foreground'>{t('continueWith')}</span>
                   </div>
                 </div>
 
@@ -75,11 +75,11 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
             </div>
 
             {/* Footer Links */}
-            <div className='text-center text-sm text-grey-600'>
+            <div className='text-center text-sm text-muted-foreground'>
               {t('noAccount')}{' '}
               <Link
                 href='/register'
-                className='font-semibold text-main-black hover:text-main-primary transition-colors'
+                className='font-semibold text-foreground hover:text-primary transition-colors'
               >
                 {t('signUpForFree')}
               </Link>
@@ -89,10 +89,10 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
       </div>
 
       {/* Right Column - Featured Property */}
-      <div className='hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-purple-98 lg:via-purple-96 lg:to-purple-92 lg:p-8 overflow-y-auto'>
+      <div className='hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-primary/5 lg:via-primary/5 lg:to-primary/20 lg:p-8 overflow-y-auto'>
         <div className='relative mx-auto w-full max-w-sm'>
           {/* Decorative Shape */}
-          <div className='absolute -right-8 -top-8 h-48 w-48 rounded-full bg-main-primary opacity-10' />
+          <div className='absolute -right-8 -top-8 h-48 w-48 rounded-full bg-primary opacity-10' />
 
           {/* Property Card */}
           <PropertyCardFeatured
@@ -117,15 +117,15 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
           {/* Footer */}
           <div className='relative z-10 mt-6 text-center'>
-            <p className='text-xs leading-relaxed text-grey-500'>
+            <p className='text-xs leading-relaxed text-muted-foreground'>
               {t.rich('footerDisclaimer', {
                 termsOfUse: (chunks) => (
-                  <Link href='/terms' className='underline hover:text-grey-700'>
+                  <Link href='/terms' className='underline hover:text-foreground/80'>
                     {chunks}
                   </Link>
                 ),
                 privacyPolicy: (chunks) => (
-                  <Link href='/privacy' className='underline hover:text-grey-700'>
+                  <Link href='/privacy' className='underline hover:text-foreground/80'>
                     {chunks}
                   </Link>
                 ),

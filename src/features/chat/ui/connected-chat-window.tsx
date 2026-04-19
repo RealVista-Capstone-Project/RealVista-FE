@@ -117,7 +117,7 @@ export function ConnectedChatWindow({
       onMinimize={() => onMinimize(chatWindow.id)}
       onSendMessage={handleSendMessage}
       onListingClick={handleListingClick}
-      className={typingUserName ? 'border-main-primary' : undefined}
+      className={typingUserName ? 'border-primary' : undefined}
     />
   );
 }

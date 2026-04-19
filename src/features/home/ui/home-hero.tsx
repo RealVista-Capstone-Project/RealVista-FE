@@ -26,7 +26,7 @@ export function HomeHero() {
   };
 
   return (
-    <div className='flex flex-col gap-[32px] items-center w-full max-w-2xl mx-auto'>
+    <div className='flex flex-col gap-8 items-center w-full max-w-2xl mx-auto'>
       <h1 className='text-3xl md:text-5xl font-bold text-center'>{t('title')}</h1>
       <p className='text-lg text-center text-gray-600 dark:text-gray-300'>
         Find your dream home with RealVista.
@@ -46,7 +46,7 @@ export function HomeHero() {
           />
         </div>
         <Button
-          className='w-full md:w-auto h-12 px-8 rounded-md bg-main-primary hover:bg-main-primary/90 text-white font-medium'
+          className='w-full md:w-auto h-12 px-8 rounded-md bg-primary hover:bg-primary/90 text-white font-medium'
           onClick={handleSearch}
         >
           Search

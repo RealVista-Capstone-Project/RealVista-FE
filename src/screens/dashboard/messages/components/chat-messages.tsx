@@ -164,7 +164,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
   if (messagesLoading) {
     return (
       <div className='flex flex-1 items-center justify-center'>
-        <Loader2 className='size-5 animate-spin text-main-primary/50' />
+        <Loader2 className='size-5 animate-spin text-primary/50' />
       </div>
     );
   }
@@ -173,7 +173,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
   if (messages.length === 0) {
     return (
       <div className='flex flex-1 items-center justify-center'>
-        <p className='text-sm text-grey-400'>{t('noMessages')}</p>
+        <p className='text-sm text-muted-foreground/60'>{t('noMessages')}</p>
       </div>
     );
   }
@@ -186,9 +186,9 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
           <div key={group.dateKey} className='space-y-5'>
             {/* Date divider */}
             <div className='flex items-center gap-3'>
-              <div className='h-px flex-1 bg-purple-92' />
-              <span className='text-xs font-medium text-grey-400'>{group.dateLabel}</span>
-              <div className='h-px flex-1 bg-purple-92' />
+              <div className='h-px flex-1 bg-primary/15' />
+              <span className='text-xs font-medium text-muted-foreground/60'>{group.dateLabel}</span>
+              <div className='h-px flex-1 bg-primary/15' />
             </div>
 
             {group.msgs.map((msg) => (
