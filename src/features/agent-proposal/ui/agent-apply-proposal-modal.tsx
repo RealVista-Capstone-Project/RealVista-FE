@@ -9,6 +9,7 @@ import { agentEngagementApi } from '@/entities/agent-engagement/api/agent-engage
 import { AgentProposalStatus } from '@/entities/agent-proposal/model/types';
 import { toast } from 'sonner';
 import { cn } from '@/shared/lib/utils';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 import { useMyProposalsQuery } from '../hooks/use-agent-proposal';
 
 interface AgentApplyProposalModalProps {
@@ -25,6 +26,7 @@ export function AgentApplyProposalModal({
   onSubmitSuccess,
 }: AgentApplyProposalModalProps) {
   const t = useTranslations('ApplyProposal');
+  const tGlobal = useTranslations();
 
   const [step, setStep] = React.useState<1 | 2>(1);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -79,9 +81,7 @@ export function AgentApplyProposalModal({
       onSubmitSuccess?.();
       onClose();
     } catch (err: unknown) {
-      const errorMsg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message || t('toastError');
-      toast.error(errorMsg);
+      handleErrorApi({ error: err, t: tGlobal });
     } finally {
       setIsSubmitting(false);
     }

@@ -12,6 +12,7 @@ import { ListingStatusActions } from '@/features/listing-status';
 import { PropertyGallery } from '@/features/property-gallery';
 import { RentalFeatures } from '@/features/rental-features';
 import { useDeleteListing } from '@/features/edit-listing-modal/api/use-delete-listing';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 import { ListingLifetimeCard } from './listing-lifetime-card';
 import { ListingBoostSection } from './listing-boost-section';
 import { Link } from '@/shared/config/i18n/navigation';
@@ -60,6 +61,7 @@ interface ListingDetailPanelProps {
 
 export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps) {
   const t = useTranslations('ListingDetailPanel');
+  const tGlobal = useTranslations();
   const property: Property = mapListingToProperty(listing);
 
   const { data: session } = useAuthSession();
@@ -95,7 +97,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
       setIsDeleteDialogOpen(false);
       if (onBack) onBack();
     } catch (error) {
-      console.error('Failed to delete listing:', error);
+      handleErrorApi({ error, t: tGlobal });
     }
   };
 
@@ -136,7 +138,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
         }
       }
     } catch (error) {
-      console.error('Failed to create or get conversation:', error);
+      handleErrorApi({ error, t: tGlobal });
     }
   };
 

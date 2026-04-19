@@ -22,12 +22,18 @@ interface ListingDateFieldProps {
 export function ListingDateField({ value, onChange, label, error }: ListingDateFieldProps) {
   const [open, setOpen] = React.useState(false);
 
-  const date = value ? new Date(value) : undefined;
+  const date = React.useMemo(() => {
+    if (!value) return undefined;
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }, [value]);
   const displayValue = date ? format(date, 'PP', { locale: vi }) : '';
 
   const handleSelect = (selected: Date | undefined) => {
     if (selected) {
-      onChange(selected.toISOString().split('T')[0]);
+      onChange(
+          `${selected.getFullYear()}-${String(selected.getMonth() + 1).padStart(2, '0')}-${String(selected.getDate()).padStart(2, '0')}`
+        );
       setOpen(false);
     }
   };

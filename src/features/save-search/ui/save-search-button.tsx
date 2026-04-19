@@ -94,12 +94,9 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
           setShowBoardModal(false);
         },
         onError: (error: any) => {
-          const payload = error?.response?.data;
-          const errorCode = payload?.payload?.error_code
-            ?? payload?.error_code
-            ?? payload?.errorCode;
+          const errorCode = error?.payload?.error_code;
 
-          if (error?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
+          if (error?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
             toast.error(t('duplicateAlert'));
             return;
           }

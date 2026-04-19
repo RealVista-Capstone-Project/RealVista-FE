@@ -91,6 +91,7 @@ export function ListingStatusActions({
   listingType,
 }: ListingStatusActionsProps) {
   const t = useTranslations('ListingStatus');
+  const tGlobal = useTranslations();
   const { mutateAsync, isPending } = useUpdateListingStatus();
   const [confirmingAction, setConfirmingAction] = React.useState<ListingStatusAction | null>(null);
 
@@ -103,7 +104,7 @@ export function ListingStatusActions({
 
   const handleConfirm = async () => {
     if (confirmingAction) {
-      await executeStatusUpdate(mutateAsync, listingId, confirmingAction, t);
+      await executeStatusUpdate(mutateAsync, listingId, confirmingAction, tGlobal);
       setConfirmingAction(null);
     }
   };
@@ -137,7 +138,7 @@ export function ListingStatusActions({
                   if (action === 'mark-as-sold' || action === 'mark-as-rented' || action === 'unpublish') {
                     setConfirmingAction(action);
                   } else {
-                    executeStatusUpdate(mutateAsync, listingId, action, t);
+                    executeStatusUpdate(mutateAsync, listingId, action, tGlobal);
                   }
                 }
               }}

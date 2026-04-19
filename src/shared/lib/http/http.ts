@@ -19,6 +19,11 @@ export class HttpError extends Error {
   status: number;
   payload: {
     message: string;
+    error_code?: string;   // snake_case — Jackson SNAKE_CASE naming strategy is active globally
+    status?: number;
+    path?: string;
+    timestamp?: string;
+    errors?: { field: string; message: string }[];
     [key: string]: any;
   };
   constructor({ status, payload }: { status: number; payload: any }) {
@@ -50,13 +55,21 @@ const request = async <Response>(
   } else if (options?.body) {
     body = JSON.stringify(options.body);
   }
+  // Read the next-intl locale cookie to forward Accept-Language to the backend
+  function getAcceptLanguage(): string {
+    if (typeof window === 'undefined') return 'vi'; // SSR fallback
+    const match = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]*)/);
+    return match ? match[1] : 'vi';
+  }
+
   const baseHeaders: {
     [key: string]: string;
   } =
     body instanceof FormData
-      ? {}
+      ? { 'Accept-Language': getAcceptLanguage() }
       : {
           'Content-Type': 'application/json',
+          'Accept-Language': getAcceptLanguage(),
         };
   if (isClient()) {
     // Fast path: synchronous cache read (<1ms)

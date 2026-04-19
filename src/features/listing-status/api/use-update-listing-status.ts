@@ -1,9 +1,8 @@
-'use client';
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { listingApi } from '@/entities/listing/api';
 import { listingKeys } from '@/entities/listing/api/keys';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 export type ListingStatusAction = 'publish' | 'unpublish' | 'mark-as-sold' | 'mark-as-rented';
 
@@ -88,30 +87,6 @@ export async function executeStatusUpdate(
     await mutateAsync({ listingId, action });
     toast.success(messages.success);
   } catch (error: any) {
-    // 1. Extract error details safely
-    const payload = error?.payload || error?.response?.data || error;
-    const errorCode = payload?.error_code || payload?.errorCode;
-    const backendMessage = payload?.message;
-
-    // 2. Handle specific business logic errors (localized)
-    if (errorCode === 'DUPLICATE_LISTING_PUBLISH') {
-      toast.error(t('errors.duplicatePublish'));
-      return;
-    }
-
-    if (errorCode === 'PROPERTY_NOT_AVAILABLE') {
-      toast.error(t('errors.propertyNotAvailable'));
-      return;
-    }
-
-    // 3. Log UNEXPECTED errors for debugging
-    console.error('Unhandled Listing Status Update Error:', error);
-
-    // 4. Final decision on what message to show
-    // We prioritize: Backend custom message > Generic action error message
-    const displayMessage =
-      backendMessage && backendMessage !== 'Http Error' ? backendMessage : messages.error;
-
-    toast.error(displayMessage);
+    handleErrorApi({ error, t });
   }
 }
