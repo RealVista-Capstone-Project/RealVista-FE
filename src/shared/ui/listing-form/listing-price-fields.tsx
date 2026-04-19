@@ -194,6 +194,7 @@ export function ListingPriceFields({
           label={labels.minPrice}
           placeholder={labels.pricePlaceholder}
           error={errors.minPrice}
+          required
         />
         <CurrencyInput
           value={maxPrice}
@@ -201,6 +202,7 @@ export function ListingPriceFields({
           label={labels.maxPrice}
           placeholder={labels.pricePlaceholder}
           error={errors.maxPrice}
+          required
         />
       </div>
 

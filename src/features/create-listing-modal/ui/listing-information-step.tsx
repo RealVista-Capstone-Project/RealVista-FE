@@ -223,6 +223,8 @@ export function ListingInformationStep({
     if (!maxPrice.trim()) errs.maxPrice = t('validation.maxPriceRequired');
     else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0)
       errs.maxPrice = t('validation.maxPriceInvalid');
+    else if (!errs.minPrice && Number(minPrice) > Number(maxPrice))
+      errs.maxPrice = t('validation.maxPriceLessThanMin', { fallback: 'Giá cao nhất phải lớn hơn hoặc bằng giá thấp nhất' });
 
     if (listingType === 'RENT' && availableFrom) {
       const d = new Date(availableFrom);

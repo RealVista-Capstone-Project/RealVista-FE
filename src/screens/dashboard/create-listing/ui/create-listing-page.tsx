@@ -15,6 +15,7 @@ import { ListingInformationStep } from '@/features/create-listing-modal/ui/listi
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
   const t = useTranslations('CreateListingModal');
@@ -236,6 +237,7 @@ function useItemsPerPage(): number {
 
 export function CreateListingPage() {
   const t = useTranslations('CreateListingModal');
+  const tGlobal = useTranslations();
   const router = useRouter();
   const itemsPerPage = useItemsPerPage();
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -411,8 +413,8 @@ export function CreateListingPage() {
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
       router.push('/dashboard/listings');
-    } catch {
-      toast.error(t('createError'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
     }
   };
 

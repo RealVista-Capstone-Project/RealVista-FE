@@ -15,6 +15,7 @@ import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 export interface CreateListingModalProps {
   open: boolean;
@@ -216,6 +217,7 @@ const ITEMS_PER_PAGE = 4;
 
 export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }: CreateListingModalProps) {
   const t = useTranslations('CreateListingModal');
+  const tGlobal = useTranslations();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
@@ -407,8 +409,8 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
       onOpenChange(false);
-    } catch {
-      toast.error(t('createError'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
     }
   };
 

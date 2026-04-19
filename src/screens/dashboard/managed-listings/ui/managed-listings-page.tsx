@@ -142,25 +142,6 @@ export function ManagedListingsPage() {
     }
   }, [listings, selectedListingId]);
 
-  if (isLoading) {
-    return (
-      <div className='flex h-full items-center justify-center'>
-        <Spinner className='size-8 text-primary' />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className='flex h-full items-center justify-center'>
-        <div className='text-center'>
-          <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
-          <p className='mt-2 text-sm text-muted-foreground'>{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
   const statusOptions: StatusFilter[] = [
     'ALL',
     ListingStatus.DRAFT,
@@ -402,9 +383,20 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Properties List */}
-          <div className='flex-1 overflow-y-auto'>
-            {listings.length === 0 ? (
-              <div className='flex flex-col items-center justify-center gap-4 p-8 text-center'>
+          <div className='flex-1 overflow-y-auto flex flex-col'>
+            {isLoading ? (
+              <div className='flex flex-1 items-center justify-center'>
+                <Spinner className='size-8 text-primary' />
+              </div>
+            ) : error ? (
+              <div className='flex flex-1 items-center justify-center'>
+                <div className='text-center'>
+                  <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
+                  <p className='mt-2 text-sm text-muted-foreground'>{error.message}</p>
+                </div>
+              </div>
+            ) : listings.length === 0 ? (
+              <div className='flex flex-col items-center justify-center gap-4 p-8 text-center flex-1'>
                 <div className='flex h-12 w-14 items-center justify-center rounded-full bg-primary/10'>
                   <Building2 className='h-7 w-7 text-primary' strokeWidth={1.5} />
                 </div>

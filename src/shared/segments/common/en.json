@@ -124,6 +124,7 @@
       "minPriceInvalid": "Min price must be a valid number greater than 0",
       "maxPriceRequired": "Max price is required",
       "maxPriceInvalid": "Max price must be a valid number greater than 0",
+      "maxPriceLessThanMin": "Maximum price must be greater than or equal to minimum price",
       "dateInvalid": "Please enter a valid date",
       "mediaRequired": "At least one media item is required to create a listing"
     },
