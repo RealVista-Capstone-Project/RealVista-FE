@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, X } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { billingQueries } from '@/entities/billing';
 import type { ActiveSubscriptionResponse } from '@/entities/billing';
 
@@ -28,7 +29,10 @@ export function ThreeDPromoBanner() {
     }
   }, []);
 
-  const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
+
+  const { data: subscriptions, isLoading } = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
 
   const has3dTour =
     !isLoading && subscriptions != null && hasActive3dTourPlan(subscriptions);

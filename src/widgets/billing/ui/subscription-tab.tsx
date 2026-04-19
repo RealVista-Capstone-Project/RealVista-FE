@@ -275,8 +275,10 @@ function QuotaUsageBar({
 
 function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => void }) {
   const queryClient = useQueryClient();
-  const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
-  const { data: boosts, isLoading: boostsLoading } = useQuery(billingQueries.myBoosts());
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
+  const { data: subscriptions, isLoading } = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
+  const { data: boosts, isLoading: boostsLoading } = useQuery({ ...billingQueries.myBoosts(), enabled: isAuthenticated });
   const { data: catalogRaw } = useQuery(billingQueries.subscriptionPlans());
   const [showCancelConfirm, setShowCancelConfirm] = React.useState(false);
   const [subscriptionIdToCancel, setSubscriptionIdToCancel] = React.useState<string | null>(null);
@@ -380,6 +382,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   <div className='mt-2'>
                     <QuotaUsageBar used={used} total={totalForBar} unlimited={sub.unlimited} />
                   </div>
+                  {tier > 0 && (
                   <div className='mt-3 flex flex-wrap gap-2 pt-0'>
                     <RealVistaButton
                       variant='secondary'
@@ -393,6 +396,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                       {cancelMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
                     </RealVistaButton>
                   </div>
+                  )}
                 </div>
 
                 <div className='flex flex-col rounded-xl border border-main-black/10 bg-white p-5 shadow-sm ring-1 ring-grey-100'>
@@ -737,14 +741,16 @@ function Step1Content({
   selected,
   onSelect,
   onNext,
+  canBuyBoost,
 }: {
   selected: PackageType | null;
   onSelect: (t: PackageType) => void;
   onNext: () => void;
+  canBuyBoost: boolean;
 }) {
   return (
     <div className='space-y-4'>
-      <div className='grid gap-3 sm:grid-cols-2'>
+      <div className={cn('grid gap-3', canBuyBoost && 'sm:grid-cols-2')}>
         <button
           type='button'
           onClick={() => onSelect('subscription')}
@@ -783,6 +789,7 @@ function Step1Content({
           </ul>
         </button>
 
+        {canBuyBoost && (
         <button
           type='button'
           onClick={() => onSelect('boost')}
@@ -816,6 +823,7 @@ function Step1Content({
             </li>
           </ul>
         </button>
+        )}
       </div>
 
       <div className='flex justify-end pt-1'>
@@ -856,22 +864,32 @@ function Step2Content({
   onSelectPlan,
   onNext,
   onRetry,
+  allowedFeatureTypes,
 }: {
   type: PackageType;
   selectedPlanId: string | null;
   onSelectPlan: (id: string) => void;
   onNext: () => void;
   onRetry: () => void;
+  allowedFeatureTypes?: string[];
 }) {
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
-  const { data: mySubs } = useQuery(billingQueries.mySubscriptions());
-  const { data: myBoosts } = useQuery(billingQueries.myBoosts());
+  const { data: mySubs } = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
+  const { data: myBoosts } = useQuery({ ...billingQueries.myBoosts(), enabled: isAuthenticated });
 
-  const rawPlans =
-    type === 'subscription'
-      ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
-      : (boostQuery.data ?? []).map(mapBoostPackage);
+  const rawPlans = React.useMemo(() => {
+    const plans =
+      type === 'subscription'
+        ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
+        : (boostQuery.data ?? []).map(mapBoostPackage);
+    if (allowedFeatureTypes && type === 'subscription') {
+      return plans.filter((p) => p.featureType && allowedFeatureTypes.includes(p.featureType));
+    }
+    return plans;
+  }, [type, subQuery.data, boostQuery.data, allowedFeatureTypes]);
 
   const isLoading = type === 'subscription' ? subQuery.isLoading : boostQuery.isLoading;
 
@@ -1864,6 +1882,8 @@ function PurchaseWizard() {
   const { data: session } = useSession();
   const router = useRouter();
   const locale = useLocale();
+  const backendRoles: string[] = session?.user?.backendRoles ?? [];
+  const isOwnerOrAgent = backendRoles.includes('OWNER') || backendRoles.includes('AGENT');
 
   const [step, setStep] = React.useState<WizardStep>(1);
   const [selectedType, setSelectedType] = React.useState<PackageType | null>('subscription');
@@ -1877,15 +1897,22 @@ function PurchaseWizard() {
     ActiveSubscriptionResponse | ActiveBoostPackageResponse | null
   >(null);
 
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
-  const mySubsQuery = useQuery(billingQueries.mySubscriptions());
-  const myBoostsQuery = useQuery(billingQueries.myBoosts());
+  const mySubsQuery = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
+  const myBoostsQuery = useQuery({ ...billingQueries.myBoosts(), enabled: isAuthenticated });
 
-  const rawPlans =
-    selectedType === 'subscription'
-      ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
-      : (boostQuery.data ?? []).map(mapBoostPackage);
+  const rawPlans = React.useMemo(() => {
+    const plans =
+      selectedType === 'subscription'
+        ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
+        : (boostQuery.data ?? []).map(mapBoostPackage);
+    if (!isOwnerOrAgent && selectedType === 'subscription') {
+      return plans.filter((p) => p.featureType === 'AI_REQUEST');
+    }
+    return plans;
+  }, [selectedType, subQuery.data, boostQuery.data, isOwnerOrAgent]);
 
   const selectedPlan = rawPlans.find((p) => p.id === selectedPlanId) ?? null;
 
@@ -2008,7 +2035,7 @@ function PurchaseWizard() {
 
       <div className='rounded-xl border border-grey-96 bg-white p-4 shadow-sm sm:p-5'>
         {step === 1 && (
-          <Step1Content selected={selectedType} onSelect={setSelectedType} onNext={handleTypeNext} />
+          <Step1Content selected={selectedType} onSelect={setSelectedType} onNext={handleTypeNext} canBuyBoost={isOwnerOrAgent} />
         )}
         {step === 2 && selectedType && (
           <Step2Content
@@ -2022,6 +2049,7 @@ function PurchaseWizard() {
               setSelectedPayment(null);
               setCheckoutData(null);
             }}
+            allowedFeatureTypes={isOwnerOrAgent ? undefined : ['AI_REQUEST']}
           />
         )}
         {step === 2 && !selectedType && (
@@ -2137,7 +2165,9 @@ function PurchaseWizard() {
 // ---------------------------------------------------------------------------
 
 function TransactionsSection() {
-  const { data: transactions, isLoading, error } = useQuery(billingQueries.myTransactions());
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
+  const { data: transactions, isLoading, error } = useQuery({ ...billingQueries.myTransactions(), enabled: isAuthenticated });
 
   const formatStatus = (status: string): string => {
     const statusMap: Record<string, string> = {
