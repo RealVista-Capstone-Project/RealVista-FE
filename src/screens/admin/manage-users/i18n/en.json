@@ -65,7 +65,8 @@
       "AGENT": "Agent",
       "OWNER": "Owner",
       "BUYER": "Buyer",
-      "TENANT": "Tenant"
+      "TENANT": "Tenant",
+      "VERIFIER": "Verifier"
     },
     "detail": {
       "title": "User Profile",

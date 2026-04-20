@@ -5,7 +5,7 @@
 
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'BLOCKED' | 'SUSPENDED' | 'BANNED' | 'VERIFIED'
 
-export type RoleCode = 'ADMIN' | 'AGENT' | 'OWNER' | 'BUYER' | 'TENANT'
+export type RoleCode = 'ADMIN' | 'AGENT' | 'OWNER' | 'BUYER' | 'TENANT' | 'VERIFIER'
 
 export interface User {
   id: string

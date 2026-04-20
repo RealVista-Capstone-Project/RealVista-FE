@@ -65,7 +65,8 @@
       "AGENT": "Môi giới",
       "OWNER": "Chủ nhà",
       "BUYER": "Người mua",
-      "TENANT": "Người thuê"
+      "TENANT": "Người thuê",
+      "VERIFIER": "Kiểm duyệt viên"
     },
     "detail": {
       "title": "Hồ sơ người dùng",

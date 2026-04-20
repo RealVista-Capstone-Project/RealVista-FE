@@ -427,6 +427,7 @@ export function ManageUsersPage() {
                     <SelectItem value='OWNER'>{t('roles.OWNER')}</SelectItem>
                     <SelectItem value='BUYER'>{t('roles.BUYER')}</SelectItem>
                     <SelectItem value='TENANT'>{t('roles.TENANT')}</SelectItem>
+                    <SelectItem value='VERIFIER'>{t('roles.VERIFIER')}</SelectItem>
                   </SelectContent>
                 </Select>
 
