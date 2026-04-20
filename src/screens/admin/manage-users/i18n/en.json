@@ -26,9 +26,6 @@
     },
     "status": {
       "ACTIVE": "Active",
-      "INACTIVE": "Inactive",
-      "PENDING": "Pending",
-      "BLOCKED": "Blocked",
       "SUSPENDED": "Suspended",
       "BANNED": "Banned",
       "VERIFIED": "Verified"

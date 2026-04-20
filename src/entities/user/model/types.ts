@@ -3,7 +3,7 @@
  * Domain models for the User entity
  */
 
-export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'BLOCKED' | 'SUSPENDED' | 'BANNED' | 'VERIFIED'
+export type UserStatus = 'ACTIVE' | 'VERIFIED' | 'SUSPENDED' | 'BANNED'
 
 export type RoleCode = 'ADMIN' | 'AGENT' | 'OWNER' | 'BUYER' | 'TENANT' | 'VERIFIER'
 

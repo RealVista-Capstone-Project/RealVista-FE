@@ -245,21 +245,6 @@ export function ManageUsersPage() {
               icon: CheckCircle2,
               className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
             },
-            INACTIVE: {
-              label: t('status.INACTIVE'),
-              icon: Clock,
-              className: 'bg-slate-50 text-slate-700 border-slate-200',
-            },
-            PENDING: {
-              label: t('status.PENDING'),
-              icon: Clock,
-              className: 'bg-amber-50 text-amber-700 border-amber-200',
-            },
-            BLOCKED: {
-              label: t('status.BLOCKED'),
-              icon: Ban,
-              className: 'bg-rose-50 text-rose-700 border-rose-200',
-            },
             SUSPENDED: {
               label: t('status.SUSPENDED'),
               icon: UserX,
@@ -441,9 +426,9 @@ export function ManageUsersPage() {
                   <SelectContent>
                     <SelectItem value='ALL'>{t('filters.allStatuses')}</SelectItem>
                     <SelectItem value='ACTIVE'>{t('status.ACTIVE')}</SelectItem>
-                    <SelectItem value='INACTIVE'>{t('status.INACTIVE')}</SelectItem>
-                    <SelectItem value='PENDING'>{t('status.PENDING')}</SelectItem>
-                    <SelectItem value='BLOCKED'>{t('status.BLOCKED')}</SelectItem>
+                    <SelectItem value='VERIFIED'>{t('status.VERIFIED')}</SelectItem>
+                    <SelectItem value='SUSPENDED'>{t('status.SUSPENDED')}</SelectItem>
+                    <SelectItem value='BANNED'>{t('status.BANNED')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
