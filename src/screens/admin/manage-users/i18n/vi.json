@@ -28,7 +28,21 @@
       "ACTIVE": "Hoạt động",
       "INACTIVE": "Không hoạt động",
       "PENDING": "Đang chờ",
-      "BLOCKED": "Đã chặn"
+      "BLOCKED": "Đã chặn",
+      "SUSPENDED": "Đã đình chỉ",
+      "BANNED": "Đã cấm",
+      "VERIFIED": "Đã xác minh"
+    },
+    "actions": {
+      "suspend": "Đình chỉ người dùng",
+      "activate": "Kích hoạt người dùng",
+      "copyId": "Sao chép ID người dùng",
+      "viewDetails": "Xem chi tiết",
+      "suspendSuccess": "Đã đình chỉ người dùng thành công",
+      "suspendError": "Không thể đình chỉ người dùng",
+      "activateSuccess": "Đã kích hoạt người dùng thành công",
+      "activateError": "Không thể kích hoạt người dùng",
+      "copyIdSuccess": "Đã sao chép ID người dùng vào bộ nhớ tạm"
     },
     "roles": {
       "ADMIN": "Quản trị viên",

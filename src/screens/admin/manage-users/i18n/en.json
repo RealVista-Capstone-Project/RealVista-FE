@@ -28,7 +28,21 @@
       "ACTIVE": "Active",
       "INACTIVE": "Inactive",
       "PENDING": "Pending",
-      "BLOCKED": "Blocked"
+      "BLOCKED": "Blocked",
+      "SUSPENDED": "Suspended",
+      "BANNED": "Banned",
+      "VERIFIED": "Verified"
+    },
+    "actions": {
+      "suspend": "Suspend User",
+      "activate": "Activate User",
+      "copyId": "Copy User ID",
+      "viewDetails": "View Details",
+      "suspendSuccess": "User suspended successfully",
+      "suspendError": "Failed to suspend user",
+      "activateSuccess": "User activated successfully",
+      "activateError": "Failed to activate user",
+      "copyIdSuccess": "User ID copied to clipboard"
     },
     "roles": {
       "ADMIN": "Admin",

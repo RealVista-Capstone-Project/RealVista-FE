@@ -1,9 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { toast } from 'sonner';
 import {
   Users,
   Search,
@@ -16,9 +17,11 @@ import {
   XCircle,
   Clock,
   Ban,
+  UserX,
+  UserCheck,
 } from 'lucide-react';
 
-import { userQueries } from '@/entities/user/api';
+import { userQueries, userApi, userKeys } from '@/entities/user/api';
 import { UserProfile, UserStatus, RoleCode } from '@/entities/user/model/types';
 import { DataTable } from '@/shared/ui/data-table';
 import { Input } from '@/shared/ui/input';
@@ -46,6 +49,7 @@ import { UserDetailSheet } from './user-detail-sheet';
  */
 export function ManageUsersPage() {
   const t = useTranslations('ManageUsers');
+  const queryClient = useQueryClient();
 
   // State for filters and pagination
   const [search, setSearch] = React.useState('');
@@ -95,6 +99,29 @@ export function ManageUsersPage() {
       sort: 'createdAt,desc', // Default sort
     })
   );
+
+  // Mutations for user actions
+  const suspendMutation = useMutation({
+    mutationFn: userApi.suspend,
+    onSuccess: () => {
+      toast.success(t('actions.suspendSuccess'));
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    },
+    onError: () => {
+      toast.error(t('actions.suspendError'));
+    },
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: userApi.activate,
+    onSuccess: () => {
+      toast.success(t('actions.activateSuccess'));
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    },
+    onError: () => {
+      toast.error(t('actions.activateError'));
+    },
+  });
 
   const columns = React.useMemo<ColumnDef<UserProfile>[]>(
     () => [
@@ -178,6 +205,21 @@ export function ManageUsersPage() {
               icon: Ban,
               className: 'bg-rose-50 text-rose-700 border-rose-200',
             },
+            SUSPENDED: {
+              label: t('status.SUSPENDED'),
+              icon: UserX,
+              className: 'bg-amber-50 text-amber-700 border-amber-200',
+            },
+            BANNED: {
+              label: t('status.BANNED'),
+              icon: Ban,
+              className: 'bg-red-50 text-red-700 border-red-200',
+            },
+            VERIFIED: {
+              label: t('status.VERIFIED'),
+              icon: CheckCircle2,
+              className: 'bg-blue-50 text-blue-700 border-blue-200',
+            },
           };
           const config = variants[status] || { label: status, icon: XCircle, className: '' };
           const Icon = config.icon;
@@ -215,20 +257,46 @@ export function ManageUsersPage() {
                   <MoreHorizontal className='h-4 w-4' />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[160px]'>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuContent align='end' className='w-[200px]'>
+                <DropdownMenuLabel>{t('table.columns.actions')}</DropdownMenuLabel>
                 <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(row.original.user_id)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(row.original.user_id);
+                    toast.success(t('actions.copyIdSuccess'));
+                  }}
+                  className='gap-2'
                 >
-                  Copy User ID
+                  <Mail className='h-4 w-4 opacity-70' />
+                  {t('actions.copyId')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleViewDetails(row.original.user_id)}>
-                  View Details
+                <DropdownMenuItem
+                  onClick={() => handleViewDetails(row.original.user_id)}
+                  className='gap-2'
+                >
+                  <Users className='h-4 w-4 opacity-70' />
+                  {t('actions.viewDetails')}
                 </DropdownMenuItem>
-                <DropdownMenuItem className='text-rose-600 font-medium'>
-                  Block User
-                </DropdownMenuItem>
+
+                {row.original.status !== 'SUSPENDED' ? (
+                  <DropdownMenuItem
+                    onClick={() => suspendMutation.mutate(row.original.user_id)}
+                    className='text-amber-600 font-medium gap-2'
+                    disabled={suspendMutation.isPending}
+                  >
+                    <UserX className='h-4 w-4' />
+                    {t('actions.suspend')}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={() => activateMutation.mutate(row.original.user_id)}
+                    className='text-emerald-600 font-medium gap-2'
+                    disabled={activateMutation.isPending}
+                  >
+                    <UserCheck className='h-4 w-4' />
+                    {t('actions.activate')}
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -315,11 +383,7 @@ export function ManageUsersPage() {
           emptyDescription={t('table.empty.description')}
         />
       </div>
-      <UserDetailSheet
-        userId={selectedUserId}
-        open={isDetailOpen}
-        onOpenChange={setIsDetailOpen}
-      />
+      <UserDetailSheet userId={selectedUserId} open={isDetailOpen} onOpenChange={setIsDetailOpen} />
     </div>
   );
 }

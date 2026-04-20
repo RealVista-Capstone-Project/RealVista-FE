@@ -143,6 +143,16 @@ export const userApi = {
       `/users${queryString ? `?${queryString}` : ''}`
     );
   },
+
+  /**
+   * Suspend a user account (Admin only)
+   */
+  suspend: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/suspend`),
+
+  /**
+   * Activate a user account (Admin only)
+   */
+  activate: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/activate`),
 } as const;
 
 // Re-export query keys and queries
