@@ -1,0 +1,41 @@
+{
+  "ManageUsers": {
+    "title": "User Management",
+    "description": "Manage all users in the system, search for specific accounts, and filter by role or status.",
+    "search": {
+      "placeholder": "Search by name, email..."
+    },
+    "filters": {
+      "role": "Role",
+      "status": "Status",
+      "allRoles": "All Roles",
+      "allStatuses": "All Statuses"
+    },
+    "table": {
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "status": "Status",
+        "joinedAt": "Joined At",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No users found",
+        "description": "Try adjusting your search or filters to find what you're looking for."
+      }
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "PENDING": "Pending",
+      "BLOCKED": "Blocked"
+    },
+    "roles": {
+      "ADMIN": "Admin",
+      "AGENT": "Agent",
+      "OWNER": "Owner",
+      "BUYER": "Buyer",
+      "TENANT": "Tenant"
+    }
+  }
+}

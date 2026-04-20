@@ -1,6 +1,8 @@
 import { queryOptions } from '@tanstack/react-query';
 import { userApi } from './index';
 import { userKeys } from './keys';
+import type { UserFilterParams } from '../model/types';
+import { unwrapApiResponse } from '@/shared/types/api';
 
 /**
  * User Query Factory
@@ -8,6 +10,15 @@ import { userKeys } from './keys';
  * Uses userKeys from keys.ts for consistent query key management
  */
 export const userQueries = {
+  /**
+   * Get paginated users (Admin only)
+   */
+  paged: (params?: UserFilterParams & { page?: number; size?: number; sort?: string }) =>
+    queryOptions({
+      queryKey: userKeys.list(params),
+      queryFn: () => userApi.getPagedUsers(params).then(unwrapApiResponse),
+    }),
+
   /**
    * Get list of users
    */

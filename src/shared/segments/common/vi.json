@@ -12,7 +12,8 @@
       "myContracts": "Hợp đồng của tôi",
       "ownerProperties": "Bất động sản chủ nhà",
       "proposals": "Đề xuất của tôi",
-      "appointments": "Lịch hẹn"
+      "appointments": "Lịch hẹn",
+      "users": "Quản lý người dùng"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -28,7 +29,8 @@
       "property": "Bất động sản",
       "ownerProperties": "Bảng tin bất động sản",
       "agentSetting": "Hồ sơ & cài đặt môi giới",
-      "appointments": "Lịch hẹn"
+      "appointments": "Lịch hẹn",
+      "manageUsers": "Quản lý người dùng"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

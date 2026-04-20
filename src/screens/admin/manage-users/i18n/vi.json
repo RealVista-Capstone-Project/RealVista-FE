@@ -1,0 +1,41 @@
+{
+  "ManageUsers": {
+    "title": "Quản lý người dùng",
+    "description": "Quản lý tất cả người dùng trong hệ thống, tìm kiếm tài khoản cụ thể và lọc theo vai trò hoặc trạng thái.",
+    "search": {
+      "placeholder": "Tìm kiếm theo tên, email..."
+    },
+    "filters": {
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "allRoles": "Tất cả vai trò",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "table": {
+      "columns": {
+        "user": "Người dùng",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "joinedAt": "Ngày tham gia",
+        "actions": "Thao tác"
+      },
+      "empty": {
+        "title": "Không tìm thấy người dùng",
+        "description": "Thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm thấy thông tin bạn cần."
+      }
+    },
+    "status": {
+      "ACTIVE": "Hoạt động",
+      "INACTIVE": "Không hoạt động",
+      "PENDING": "Đang chờ",
+      "BLOCKED": "Đã chặn"
+    },
+    "roles": {
+      "ADMIN": "Quản trị viên",
+      "AGENT": "Môi giới",
+      "OWNER": "Chủ nhà",
+      "BUYER": "Người mua",
+      "TENANT": "Người thuê"
+    }
+  }
+}

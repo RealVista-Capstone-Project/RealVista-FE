@@ -3,15 +3,25 @@
  * Domain models for the User entity
  */
 
+export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'BLOCKED'
+
+export type RoleCode = 'ADMIN' | 'AGENT' | 'OWNER' | 'BUYER' | 'TENANT'
+
 export interface User {
   id: string
   email: string
   name?: string
   avatar?: string
-  role?: 'user' | 'admin' | 'moderator' | 'AGENT'
+  role?: RoleCode | string
   emailVerified?: boolean
   createdAt: string
   updatedAt: string
+}
+
+export interface UserFilterParams {
+  search?: string
+  status?: UserStatus
+  role?: RoleCode
 }
 
 /** UserProfile matches the raw snake_case fields returned by the backend */
