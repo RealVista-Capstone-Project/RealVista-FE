@@ -47,7 +47,18 @@
       "suspendConfirmDescription": "Are you sure you want to suspend this user? This will log them out and prevent them from accessing most system features.",
       "suspending": "Suspending...",
       "cancel": "Cancel",
-      "confirm": "Confirm Suspend"
+      "confirm": "Confirm Suspend",
+      "ban": "Ban User",
+      "banSuccess": "User banned permanently",
+      "banError": "Failed to ban user",
+      "banConfirmTitle": "Ban User Permanently",
+      "banConfirmDescription": "Are you sure you want to PERMANENTLY ban this user? This action is IRREVERSIBLE and will cancel all their listings, properties, appointments, and active subscriptions.",
+      "banning": "Banning...",
+      "confirmBan": "Confirm Ban",
+      "banWarning": "This action will permanently delete all business data for this user and cannot be undone.",
+      "confirmBanPlaceholder": "Enter email to confirm",
+      "confirmBanInstruction": "Please type \"{email}\" to confirm this action.",
+      "confirmBanMismatch": "Email does not match."
     },
     "roles": {
       "ADMIN": "Admin",

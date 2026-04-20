@@ -76,8 +76,29 @@ export function UserDetailSheet({ userId, open, onOpenChange }: UserDetailSheetP
         icon: Ban,
         className: 'bg-rose-50 text-rose-700 border-rose-200',
       },
+      SUSPENDED: {
+        label: t('status.SUSPENDED'),
+        icon: XCircle,
+        className: 'bg-amber-50 text-amber-700 border-amber-200',
+      },
+      BANNED: {
+        label: t('status.BANNED'),
+        icon: Ban,
+        className: 'bg-red-50 text-red-700 border-red-200',
+      },
+      VERIFIED: {
+        label: t('status.VERIFIED'),
+        icon: CheckCircle2,
+        className: 'bg-blue-50 text-blue-700 border-blue-200',
+      },
     };
-    return variants[s] || { label: status, icon: Info, className: 'bg-gray-50 text-gray-700 border-gray-200' };
+    return (
+      variants[s] || {
+        label: status,
+        icon: Info,
+        className: 'bg-gray-50 text-gray-700 border-gray-200',
+      }
+    );
   };
 
   return (

@@ -153,6 +153,11 @@ export const userApi = {
    * Activate a user account (Admin only)
    */
   activate: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/activate`),
+
+  /**
+   * Ban a user account permanently (Admin only)
+   */
+  ban: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/ban`),
 } as const;
 
 // Re-export query keys and queries
