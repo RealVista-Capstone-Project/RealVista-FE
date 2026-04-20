@@ -42,7 +42,12 @@
       "suspendError": "Failed to suspend user",
       "activateSuccess": "User activated successfully",
       "activateError": "Failed to activate user",
-      "copyIdSuccess": "User ID copied to clipboard"
+      "copyIdSuccess": "User ID copied to clipboard",
+      "suspendConfirmTitle": "Suspend User",
+      "suspendConfirmDescription": "Are you sure you want to suspend this user? This will log them out and prevent them from accessing most system features.",
+      "suspending": "Suspending...",
+      "cancel": "Cancel",
+      "confirm": "Confirm Suspend"
     },
     "roles": {
       "ADMIN": "Admin",

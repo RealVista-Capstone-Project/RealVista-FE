@@ -37,6 +37,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/shared/ui/dialog';
 import { useDebounce } from '@/shared/lib/hooks';
 import { cn } from '@/shared/lib/utils';
 
@@ -60,6 +68,24 @@ export function ManageUsersPage() {
   // State for user detail view
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+
+  // State for suspension confirmation
+  const [userToSuspend, setUserToSuspend] = React.useState<{ id: string; name: string } | null>(
+    null
+  );
+  const [isSuspendConfirmOpen, setIsSuspendConfirmOpen] = React.useState(false);
+
+  const handleOpenSuspendConfirm = (userId: string, userName: string) => {
+    setUserToSuspend({ id: userId, name: userName });
+    setIsSuspendConfirmOpen(true);
+  };
+
+  const handleConfirmSuspend = () => {
+    if (userToSuspend) {
+      suspendMutation.mutate(userToSuspend.id);
+      setIsSuspendConfirmOpen(false);
+    }
+  };
 
   const handleViewDetails = (userId: string) => {
     setSelectedUserId(userId);
@@ -280,7 +306,7 @@ export function ManageUsersPage() {
 
                 {row.original.status !== 'SUSPENDED' ? (
                   <DropdownMenuItem
-                    onClick={() => suspendMutation.mutate(row.original.user_id)}
+                    onClick={() => handleOpenSuspendConfirm(row.original.user_id, row.original.full_name || row.original.email)}
                     className='text-amber-600 font-medium gap-2'
                     disabled={suspendMutation.isPending}
                   >
@@ -384,6 +410,41 @@ export function ManageUsersPage() {
         />
       </div>
       <UserDetailSheet userId={selectedUserId} open={isDetailOpen} onOpenChange={setIsDetailOpen} />
+
+      {/* Suspension Confirmation Dialog */}
+      <Dialog open={isSuspendConfirmOpen} onOpenChange={setIsSuspendConfirmOpen}>
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2 text-amber-600'>
+              <UserX className='h-5 w-5' />
+              {t('actions.suspendConfirmTitle')}
+            </DialogTitle>
+            <DialogDescription className='pt-2'>
+              {t('actions.suspendConfirmDescription')}
+              {userToSuspend && (
+                <span className='block mt-2 font-bold text-foreground'>{userToSuspend.name}</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className='mt-4 grow sm:justify-end gap-2'>
+            <Button
+              variant='outline'
+              onClick={() => setIsSuspendConfirmOpen(false)}
+              disabled={suspendMutation.isPending}
+            >
+              {t('actions.cancel')}
+            </Button>
+            <Button
+              variant='destructive'
+              className='bg-amber-600 hover:bg-amber-700 border-none'
+              onClick={handleConfirmSuspend}
+              disabled={suspendMutation.isPending}
+            >
+              {suspendMutation.isPending ? t('actions.suspending' as any) || '...' : t('actions.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

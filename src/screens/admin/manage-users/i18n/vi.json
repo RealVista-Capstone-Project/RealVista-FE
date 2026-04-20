@@ -42,7 +42,12 @@
       "suspendError": "Không thể đình chỉ người dùng",
       "activateSuccess": "Đã kích hoạt người dùng thành công",
       "activateError": "Không thể kích hoạt người dùng",
-      "copyIdSuccess": "Đã sao chép ID người dùng vào bộ nhớ tạm"
+      "copyIdSuccess": "Đã sao chép ID người dùng vào bộ nhớ tạm",
+      "suspendConfirmTitle": "Đình chỉ người dùng",
+      "suspendConfirmDescription": "Bạn có chắc chắn muốn đình chỉ người dùng này không? Hành động này sẽ đăng xuất họ và ngăn họ truy cập hầu hết các tính năng của hệ thống.",
+      "suspending": "Đang đình chỉ...",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận đình chỉ"
     },
     "roles": {
       "ADMIN": "Quản trị viên",
