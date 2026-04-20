@@ -35,7 +35,7 @@ export const userQueries = {
   detail: (id: string) =>
     queryOptions({
       queryKey: userKeys.detail(id),
-      queryFn: () => userApi.getById(id),
+      queryFn: () => userApi.getById(id).then(unwrapApiResponse),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
     }),

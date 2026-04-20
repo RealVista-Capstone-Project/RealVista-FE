@@ -36,6 +36,11 @@
       "OWNER": "Chủ nhà",
       "BUYER": "Người mua",
       "TENANT": "Người thuê"
+    },
+    "detail": {
+      "title": "Hồ sơ người dùng",
+      "description": "Thông tin chi tiết và toàn diện cho tài khoản người dùng này.",
+      "back": "Quay lại danh sách"
     }
   }
 }

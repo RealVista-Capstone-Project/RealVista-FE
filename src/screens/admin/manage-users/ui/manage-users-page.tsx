@@ -37,6 +37,8 @@ import {
 import { useDebounce } from '@/shared/lib/hooks';
 import { cn } from '@/shared/lib/utils';
 
+import { UserDetailSheet } from './user-detail-sheet';
+
 /**
  * Manage Users Page (Admin Only)
  *
@@ -50,6 +52,15 @@ export function ManageUsersPage() {
   const debouncedSearch = useDebounce(search, 500);
   const [role, setRole] = React.useState<RoleCode | 'ALL'>('ALL');
   const [status, setStatus] = React.useState<UserStatus | 'ALL'>('ALL');
+
+  // State for user detail view
+  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+
+  const handleViewDetails = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsDetailOpen(true);
+  };
 
   const [{ pageIndex, pageSize }, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -212,7 +223,9 @@ export function ManageUsersPage() {
                   Copy User ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>View Details</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewDetails(row.original.user_id)}>
+                  View Details
+                </DropdownMenuItem>
                 <DropdownMenuItem className='text-rose-600 font-medium'>
                   Block User
                 </DropdownMenuItem>
@@ -302,6 +315,11 @@ export function ManageUsersPage() {
           emptyDescription={t('table.empty.description')}
         />
       </div>
+      <UserDetailSheet
+        userId={selectedUserId}
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+      />
     </div>
   );
 }

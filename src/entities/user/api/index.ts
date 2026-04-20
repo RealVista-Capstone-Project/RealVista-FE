@@ -43,7 +43,7 @@ export const userApi = {
   /**
    * Get user by ID
    */
-  getById: (id: string) => http.get<User>(`/users/${id}`),
+  getById: (id: string) => http.get<ApiResponse<UserProfile>>(`/users/${id}`),
 
   /**
    * Get list of users

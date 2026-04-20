@@ -36,6 +36,11 @@
       "OWNER": "Owner",
       "BUYER": "Buyer",
       "TENANT": "Tenant"
+    },
+    "detail": {
+      "title": "User Profile",
+      "description": "Comprehensive details and information for this user account.",
+      "back": "Back to list"
     }
   }
 }
