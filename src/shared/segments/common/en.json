@@ -144,7 +144,8 @@
   },
   "Common": {
     "title": "Hello world common!",
-    "about": "Go to the about page"
+    "about": "Go to the about page",
+    "loading": "Loading..."
   },
   "Chat": {
     "title": "Chat",

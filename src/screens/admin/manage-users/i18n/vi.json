@@ -70,7 +70,19 @@
     "detail": {
       "title": "Hồ sơ người dùng",
       "description": "Thông tin chi tiết và toàn diện cho tài khoản người dùng này.",
-      "back": "Quay lại danh sách"
+      "back": "Quay lại danh sách",
+      "accountStatus": "Trạng thái tài khoản",
+      "verification": "Xác thực",
+      "unverified": "Chưa xác thực",
+      "contactInfo": "Thông tin liên hệ",
+      "emailAddress": "Địa chỉ Email",
+      "phoneNumber": "Số điện thoại",
+      "verifiedAt": "Đã xác thực lúc {date}",
+      "businessName": "Tên doanh nghiệp",
+      "accountTimeline": "Dòng thời gian tài khoản",
+      "createdAt": "Ngày tạo",
+      "lastUpdated": "Cập nhật lần cuối",
+      "userNotFound": "Không tìm thấy người dùng."
     }
   }
 }

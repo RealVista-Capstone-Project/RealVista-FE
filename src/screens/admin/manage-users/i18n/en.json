@@ -70,7 +70,19 @@
     "detail": {
       "title": "User Profile",
       "description": "Comprehensive details and information for this user account.",
-      "back": "Back to list"
+      "back": "Back to list",
+      "accountStatus": "Account Status",
+      "verification": "Verification",
+      "unverified": "Unverified",
+      "contactInfo": "Contact Information",
+      "emailAddress": "Email Address",
+      "phoneNumber": "Phone Number",
+      "verifiedAt": "Verified at {date}",
+      "businessName": "Business Name",
+      "accountTimeline": "Account Timeline",
+      "createdAt": "Created At",
+      "lastUpdated": "Last Updated",
+      "userNotFound": "User not found."
     }
   }
 }

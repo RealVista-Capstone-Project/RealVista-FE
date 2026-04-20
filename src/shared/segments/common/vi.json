@@ -144,7 +144,8 @@
   },
   "Common": {
     "title": "Xin chào common!",
-    "about": "Về trang chủ"
+    "about": "Về trang chủ",
+    "loading": "Đang tải..."
   },
   "Chat": {
     "title": "Trò chuyện",
