@@ -9,7 +9,7 @@ export const userKeys = {
 
   // All user lists (with optional filters)
   lists: () => [...userKeys.all, 'list'] as const,
-  list: (filters: string) => [...userKeys.lists(), filters] as const,
+  list: (filters?: any) => [...userKeys.lists(), filters] as const,
 
   // Single user queries
   detail: (id: string) => [...userKeys.all, 'detail', id] as const,

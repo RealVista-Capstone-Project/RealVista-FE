@@ -8,7 +8,9 @@ import type {
   UpdateUserData,
   UpdateMeData,
   UserSearchResponse,
+  UserFilterParams,
 } from '../model/types';
+import type { PageResponse } from '@/shared/types/search';
 
 /** Response shape from POST /auth/register */
 export interface RegisterResponse {
@@ -41,7 +43,7 @@ export const userApi = {
   /**
    * Get user by ID
    */
-  getById: (id: string) => http.get<User>(`/users/${id}`),
+  getById: (id: string) => http.get<ApiResponse<UserProfile>>(`/users/${id}`),
 
   /**
    * Get list of users
@@ -121,6 +123,41 @@ export const userApi = {
    * Add OWNER role to current user (idempotent)
    */
   addOwnerRole: () => http.post<ApiResponse<UserProfile>>('/me/add-role', {}),
+
+  /**
+   * Get paginated list of users (Admin only)
+   */
+  getPagedUsers: (
+    params?: UserFilterParams & { page?: number; size?: number; sort?: string }
+  ) => {
+    const query = new URLSearchParams();
+    if (params?.page !== undefined) query.append('page', params.page.toString());
+    if (params?.size !== undefined) query.append('size', params.size.toString());
+    if (params?.search) query.append('search', params.search);
+    if (params?.status) query.append('status', params.status);
+    if (params?.role) query.append('role', params.role);
+    if (params?.sort) query.append('sort', params.sort);
+
+    const queryString = query.toString();
+    return http.get<ApiResponse<PageResponse<UserProfile>>>(
+      `/users${queryString ? `?${queryString}` : ''}`
+    );
+  },
+
+  /**
+   * Suspend a user account (Admin only)
+   */
+  suspend: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/suspend`, {}),
+
+  /**
+   * Activate a user account (Admin only)
+   */
+  activate: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/activate`, {}),
+
+  /**
+   * Ban a user account permanently (Admin only)
+   */
+  ban: (id: string) => http.put<ApiResponse<UserProfile>>(`/users/${id}/ban`, {}),
 } as const;
 
 // Re-export query keys and queries
