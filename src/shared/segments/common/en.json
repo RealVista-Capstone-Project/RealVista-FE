@@ -140,6 +140,12 @@
       "contentVerification": "AI Content Verification",
       "verified": "Verified ✅",
       "violated": "Policy Violation"
+    },
+    "quota": {
+      "remaining": "You have {count} publish credits remaining",
+      "unlimited": "Unlimited publish credits",
+      "exhausted": "You have no publish credits left",
+      "loading": "Checking..."
     }
   },
   "Common": {
@@ -258,6 +264,8 @@
       "otpLabel": "OTP Code",
       "otpPlaceholder": "Enter 6-digit code",
       "otpCountdown": "Resend in {seconds}s",
+      "otpExpiresIn": "Expires in {time}",
+      "otpExpired": "OTP expired",
       "verifying": "Verifying...",
       "verifyOtp": "Verify",
       "phoneOtpSent": "OTP code has been sent to your phone number",
@@ -757,5 +765,27 @@
     "success": "Saved search successfully",
     "error": "Failed to save search. Please try again later.",
     "buttonLabel": "Save search"
+  },
+  "HeroSearch": {
+    "heroTitle": "Find Your Dream Home",
+    "heroWith": "With RealVista",
+    "heroSubtitle": "Explore thousands of verified properties nationwide",
+    "tabBuy": "Buy",
+    "tabRent": "Rent",
+    "propertyType": "Property Type",
+    "location": "Location",
+    "locationPlaceholder": "Hanoi, Vietnam",
+    "price": "Price",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "any": "Any",
+    "search": "Search",
+    "allTypes": "All Types",
+    "allDistricts": "District",
+    "filters": "Filters",
+    "listingTypeSale": "Buy",
+    "listingTypeRent": "Rent",
+    "mapView": "Map View",
+    "listView": "List View"
   }
 }

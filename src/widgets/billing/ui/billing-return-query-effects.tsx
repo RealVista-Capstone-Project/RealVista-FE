@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { billingKeys } from '@/entities/billing';
+import { listingBoostKeys } from '@/entities/listing';
 import { env } from '@/shared/lib/env/env';
 
 /**
@@ -55,7 +56,12 @@ export function BillingReturnQueryEffects() {
     switch (payment) {
       case 'success':
         toast.success('Thanh toán thành công! Gói dịch vụ đã được kích hoạt.');
-        queryClient.invalidateQueries({ queryKey: billingKeys.all });
+        void Promise.all([
+          queryClient.resetQueries({ queryKey: billingKeys.all }),
+          queryClient.resetQueries({ queryKey: listingBoostKeys.all }),
+        ]).catch(() => {
+          /* non-fatal */
+        });
         break;
       case 'failed':
         toast.error('Thanh toán không thành công. Vui lòng thử lại.');

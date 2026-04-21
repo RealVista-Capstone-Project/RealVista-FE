@@ -8,7 +8,7 @@ export function usePropertyAttributes(propertyTypeId?: string) {
       const response = await propertyApi.getAttributes(propertyTypeId);
       return response.payload.success ? response.payload.data : [];
     },
-    enabled: !!propertyTypeId,
+    enabled: propertyTypeId !== undefined ? !!propertyTypeId : true,
     staleTime: 1000 * 60 * 30, // 30 minutes
   });
 }

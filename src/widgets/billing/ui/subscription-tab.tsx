@@ -30,6 +30,7 @@ import {
   type FeaturePackage,
   type TransactionStatusResponse,
 } from '@/entities/billing';
+import { listingBoostKeys } from '@/entities/listing';
 import { toast } from 'sonner';
 import { HttpError } from '@/shared/lib/http';
 import { useSession } from 'next-auth/react';
@@ -275,8 +276,10 @@ function QuotaUsageBar({
 
 function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => void }) {
   const queryClient = useQueryClient();
-  const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
-  const { data: boosts, isLoading: boostsLoading } = useQuery(billingQueries.myBoosts());
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
+  const { data: subscriptions, isLoading } = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
+  const { data: boosts, isLoading: boostsLoading } = useQuery({ ...billingQueries.myBoosts(), enabled: isAuthenticated });
   const { data: catalogRaw } = useQuery(billingQueries.subscriptionPlans());
   const [showCancelConfirm, setShowCancelConfirm] = React.useState(false);
   const [subscriptionIdToCancel, setSubscriptionIdToCancel] = React.useState<string | null>(null);
@@ -358,7 +361,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 key={sub.subscription_id}
                 className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
               >
-                <div className='flex flex-col rounded-xl border border-border bg-secondary/50 p-5 shadow-sm'>
+                <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
                   <div className='flex flex-row items-center justify-between'>
                     <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Gói hiện tại</p>
                     <div className='flex flex-wrap items-center gap-2'>
@@ -380,6 +383,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                   <div className='mt-2'>
                     <QuotaUsageBar used={used} total={totalForBar} unlimited={sub.unlimited} />
                   </div>
+                  {tier > 0 && (
                   <div className='mt-3 flex flex-wrap gap-2 pt-0'>
                     <RealVistaButton
                       variant='secondary'
@@ -393,6 +397,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                       {cancelMut.isPending ? 'Đang huỷ…' : 'Huỷ gói'}
                     </RealVistaButton>
                   </div>
+                  )}
                 </div>
 
                 <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
@@ -434,7 +439,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
               key={boost.boost_package_id}
               className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
             >
-              <div className='flex flex-col rounded-xl border border-border bg-secondary/50 p-5 shadow-sm'>
+              <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
                 <div className='flex flex-row items-center justify-between'>
                   <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Gói đẩy tin</p>
                   <div className='flex flex-wrap items-center gap-2'>
@@ -737,14 +742,16 @@ function Step1Content({
   selected,
   onSelect,
   onNext,
+  canBuyBoost,
 }: {
   selected: PackageType | null;
   onSelect: (t: PackageType) => void;
   onNext: () => void;
+  canBuyBoost: boolean;
 }) {
   return (
     <div className='space-y-4'>
-      <div className='grid gap-3 sm:grid-cols-2'>
+      <div className={cn('grid gap-3', canBuyBoost && 'sm:grid-cols-2')}>
         <button
           type='button'
           onClick={() => onSelect('subscription')}
@@ -783,6 +790,7 @@ function Step1Content({
           </ul>
         </button>
 
+        {canBuyBoost && (
         <button
           type='button'
           onClick={() => onSelect('boost')}
@@ -816,6 +824,7 @@ function Step1Content({
             </li>
           </ul>
         </button>
+        )}
       </div>
 
       <div className='flex justify-end pt-1'>
@@ -856,22 +865,32 @@ function Step2Content({
   onSelectPlan,
   onNext,
   onRetry,
+  allowedFeatureTypes,
 }: {
   type: PackageType;
   selectedPlanId: string | null;
   onSelectPlan: (id: string) => void;
   onNext: () => void;
   onRetry: () => void;
+  allowedFeatureTypes?: string[];
 }) {
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
-  const { data: mySubs } = useQuery(billingQueries.mySubscriptions());
-  const { data: myBoosts } = useQuery(billingQueries.myBoosts());
+  const { data: mySubs } = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
+  const { data: myBoosts } = useQuery({ ...billingQueries.myBoosts(), enabled: isAuthenticated });
 
-  const rawPlans =
-    type === 'subscription'
-      ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
-      : (boostQuery.data ?? []).map(mapBoostPackage);
+  const rawPlans = React.useMemo(() => {
+    const plans =
+      type === 'subscription'
+        ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
+        : (boostQuery.data ?? []).map(mapBoostPackage);
+    if (allowedFeatureTypes && type === 'subscription') {
+      return plans.filter((p) => p.featureType && allowedFeatureTypes.includes(p.featureType));
+    }
+    return plans;
+  }, [type, subQuery.data, boostQuery.data, allowedFeatureTypes]);
 
   const isLoading = type === 'subscription' ? subQuery.isLoading : boostQuery.isLoading;
 
@@ -1073,7 +1092,7 @@ function Step2Content({
             </div>
 
             {/* Plan details - simplified border */}
-            <div className='rounded-xl border border-border bg-white p-5 lg:flex-1 shadow-sm'>
+            <div className='rounded-xl border border-primary/20 bg-primary/5 p-5 lg:flex-1 shadow-sm'>
               <div className='mb-4 flex items-start justify-between gap-2'>
                 <div>
                   <div className='flex flex-wrap items-center gap-2'>
@@ -1174,7 +1193,7 @@ function Step2Content({
             })}
           </div>
 
-          <div className='rounded-xl border border-border bg-secondary/50 p-5 lg:flex-1'>
+          <div className='rounded-xl border border-primary/20 bg-primary/5 p-5 lg:flex-1 shadow-sm'>
             <div className='mb-4 flex items-start justify-between gap-2'>
               <div>
                 <div className='flex flex-wrap items-center gap-2'>
@@ -1388,8 +1407,8 @@ function Step3Content({
             const data = res.payload.data;
             setCheckout(data);
             setError(null);
-            queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
-            queryClient.invalidateQueries({ queryKey: ['billing', 'my-boosts'] });
+            void queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
+            void queryClient.invalidateQueries({ queryKey: billingKeys.myBoosts() });
             onCheckoutCreated(data);
             onDone?.(data);
           },
@@ -1504,7 +1523,7 @@ function Step3Content({
         </div>
 
         {/* Right: Order review */}
-        <div className='rounded-xl border border-border bg-secondary/50 p-5 lg:flex-1'>
+        <div className='rounded-xl border border-primary/20 bg-primary/5 p-5 lg:flex-1 shadow-sm'>
           <div className='mb-4 flex items-start justify-between gap-2'>
             <div>
               <div className='flex flex-wrap items-center gap-2'>
@@ -1560,7 +1579,7 @@ function Step3Content({
 
       {/* PayOS: show QR after checkout created */}
       {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
-        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-secondary/50 py-6'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-white py-6 shadow-sm'>
           {secondsLeft === 0 ? (
             /* Expired state — user may have already scanned and transferred */
             <div className='flex flex-col items-center gap-3 text-center px-6'>
@@ -1617,7 +1636,7 @@ function Step3Content({
                   <Loader2 className='size-4 animate-spin text-foreground/70' />
                 )}
               </p>
-              <div className='rounded-xl border-4 border-white p-1 shadow-md'>
+              <div className='rounded-xl border border-border bg-white p-1 shadow-md'>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
@@ -1656,7 +1675,7 @@ function Step3Content({
 
       {/* VNPay: show payment button after link created */}
       {selectedPayment === 'vnpay' && checkout && (
-        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-secondary/50 py-6'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-white py-6 shadow-sm'>
           <p className='text-sm font-medium text-foreground/70'>
             Đã tạo link thanh toán VNPay
           </p>
@@ -1700,6 +1719,7 @@ function Step4Content({
   onDone: () => void;
 }) {
   const queryClient = useQueryClient();
+  const savedTxnRef = React.useRef<string | null>(null);
 
   const { data: statusData, isLoading } = useQuery({
     ...billingQueries.transactionStatus(transactionId ?? ''),
@@ -1709,24 +1729,27 @@ function Step4Content({
   const saveTransactionMutation = useMutation({
     mutationFn: (id: string) => billingApi.saveTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['billing', 'my-transactions'] });
-    },
-  });
-
-  // Refresh subscriptions and transactions when payment completes
-  React.useEffect(() => {
-    if (statusData?.status === 'COMPLETED' && transactionId && !saveTransactionMutation.isPending) {
-      saveTransactionMutation.mutate(transactionId);
-      // Refetch plans + subscriptions + transactions
-      Promise.all([
-        queryClient.refetchQueries({ queryKey: ['billing', 'my-subscriptions'] }),
-        queryClient.refetchQueries({ queryKey: ['billing', 'my-transactions'] }),
-        queryClient.refetchQueries({ queryKey: ['billing', 'plans'] }),
+      // Billing + per-listing boost caches (separate query roots) so quota/3D/boost UI match the new purchase
+      void Promise.all([
+        queryClient.resetQueries({ queryKey: billingKeys.all }),
+        queryClient.resetQueries({ queryKey: listingBoostKeys.all }),
       ]).catch((err) => {
         console.error('Failed to refetch billing data:', err);
       });
-    }
-  }, [statusData?.status, transactionId, queryClient, saveTransactionMutation]);
+    },
+  });
+
+  // Ghi nhận giao dịch một lần khi cổng báo COMPLETED; refresh subscriptions chạy trong onSuccess
+  React.useEffect(() => {
+    if (statusData?.status !== 'COMPLETED' || !transactionId) return;
+    if (savedTxnRef.current === transactionId) return;
+    savedTxnRef.current = transactionId;
+    saveTransactionMutation.mutate(transactionId, {
+      onError: () => {
+        if (savedTxnRef.current === transactionId) savedTxnRef.current = null;
+      },
+    });
+  }, [statusData?.status, transactionId, saveTransactionMutation]);
 
   const isPending = !statusData || statusData.status === 'PENDING' || isLoading;
   const isSuccess = statusData?.status === 'COMPLETED';
@@ -1864,6 +1887,8 @@ function PurchaseWizard() {
   const { data: session } = useSession();
   const router = useRouter();
   const locale = useLocale();
+  const backendRoles: string[] = session?.user?.backendRoles ?? [];
+  const isOwnerOrAgent = backendRoles.includes('OWNER') || backendRoles.includes('AGENT');
 
   const [step, setStep] = React.useState<WizardStep>(1);
   const [selectedType, setSelectedType] = React.useState<PackageType | null>('subscription');
@@ -1877,15 +1902,22 @@ function PurchaseWizard() {
     ActiveSubscriptionResponse | ActiveBoostPackageResponse | null
   >(null);
 
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
   const subQuery = useQuery(billingQueries.subscriptionPlans());
   const boostQuery = useQuery(billingQueries.boostPackages());
-  const mySubsQuery = useQuery(billingQueries.mySubscriptions());
-  const myBoostsQuery = useQuery(billingQueries.myBoosts());
+  const mySubsQuery = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
+  const myBoostsQuery = useQuery({ ...billingQueries.myBoosts(), enabled: isAuthenticated });
 
-  const rawPlans =
-    selectedType === 'subscription'
-      ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
-      : (boostQuery.data ?? []).map(mapBoostPackage);
+  const rawPlans = React.useMemo(() => {
+    const plans =
+      selectedType === 'subscription'
+        ? paidFeaturePackages(subQuery.data ?? []).map(mapFeaturePackage)
+        : (boostQuery.data ?? []).map(mapBoostPackage);
+    if (!isOwnerOrAgent && selectedType === 'subscription') {
+      return plans.filter((p) => p.featureType === 'AI_REQUEST');
+    }
+    return plans;
+  }, [selectedType, subQuery.data, boostQuery.data, isOwnerOrAgent]);
 
   const selectedPlan = rawPlans.find((p) => p.id === selectedPlanId) ?? null;
 
@@ -2008,7 +2040,7 @@ function PurchaseWizard() {
 
       <div className='rounded-xl border border-muted bg-white p-4 shadow-sm sm:p-5'>
         {step === 1 && (
-          <Step1Content selected={selectedType} onSelect={setSelectedType} onNext={handleTypeNext} />
+          <Step1Content selected={selectedType} onSelect={setSelectedType} onNext={handleTypeNext} canBuyBoost={isOwnerOrAgent} />
         )}
         {step === 2 && selectedType && (
           <Step2Content
@@ -2022,6 +2054,7 @@ function PurchaseWizard() {
               setSelectedPayment(null);
               setCheckoutData(null);
             }}
+            allowedFeatureTypes={isOwnerOrAgent ? undefined : ['AI_REQUEST']}
           />
         )}
         {step === 2 && !selectedType && (
@@ -2137,7 +2170,9 @@ function PurchaseWizard() {
 // ---------------------------------------------------------------------------
 
 function TransactionsSection() {
-  const { data: transactions, isLoading, error } = useQuery(billingQueries.myTransactions());
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
+  const { data: transactions, isLoading, error } = useQuery({ ...billingQueries.myTransactions(), enabled: isAuthenticated });
 
   const formatStatus = (status: string): string => {
     const statusMap: Record<string, string> = {
@@ -2220,24 +2255,27 @@ function TransactionsSection() {
       <div className='overflow-x-auto'>
         <table className='w-full'>
           <thead>
-            <tr className='border-b border-border bg-secondary/50'>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+            <tr className='border-b border-border bg-muted/45'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Ngày
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Mô tả
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Trạng thái
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Số tiền
               </th>
             </tr>
           </thead>
           <tbody>
             {transactions.map((transaction) => (
-              <tr key={transaction.transaction_id} className='border-b border-muted hover:bg-secondary/50 transition-colors'>
+              <tr
+                key={transaction.transaction_id}
+                className='border-b border-border bg-white transition-colors hover:bg-primary/10'
+              >
                 <td className='px-5 py-3 text-sm text-muted-foreground'>
                   {formatDate(transaction.created_at)}
                 </td>

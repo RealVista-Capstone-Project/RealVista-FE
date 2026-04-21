@@ -22,8 +22,9 @@ import {
   type GetBookmarksParams,
 } from '@/entities/bookmark';
 import { type ListingSearchResponse } from '@/shared/types/search';
+import { ROUTES } from '@/shared/config/routes';
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 12;
 
 /**
  * Transforms a bookmark listing DTO to card props format
@@ -134,7 +135,7 @@ export function FavoritedPage() {
                 {t('emptyDescription')}
               </p>
               <Link
-                href={`/${locale}/`}
+                href={`/${locale}${ROUTES.buy}`}
                 className='inline-block rounded-lg bg-primary px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-primary/90'
               >
                 {t('browseListing')}
@@ -143,7 +144,7 @@ export function FavoritedPage() {
           ) : (
             <>
               {/* Property Grid */}
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
                 {items.map((item) => {
                   const cardProps = mapBookmarkListingToCardProps(item);
                   return (

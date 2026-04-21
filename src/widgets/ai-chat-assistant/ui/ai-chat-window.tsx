@@ -4,7 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import { X, Send, RotateCcw, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { ChevronLeft, Send, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { AiChatMessageItem, TypingIndicator } from './ai-chat-message-item';
@@ -21,6 +21,7 @@ interface AiChatWindowProps {
   onSendMessage: (content: string) => void;
   onClose: () => void;
   onQuickAction: (text: string) => void;
+  /** @deprecated - reload button removed from header */
   onNewChat?: () => void;
   className?: string;
 }
@@ -40,7 +41,6 @@ export function AiChatWindow({
   onSendMessage,
   onClose,
   onQuickAction,
-  onNewChat,
   className,
 }: AiChatWindowProps) {
   const t = useTranslations('AiAssistant');
@@ -61,6 +61,20 @@ export function AiChatWindow({
   React.useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Auto-grow textarea up to 5 lines based on content
+  React.useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const computed = window.getComputedStyle(el);
+    const lineHeight = parseFloat(computed.lineHeight) || 20;
+    const paddingY = parseFloat(computed.paddingTop) + parseFloat(computed.paddingBottom);
+    const maxHeight = lineHeight * 5 + paddingY;
+    const next = Math.min(el.scrollHeight, maxHeight);
+    el.style.height = `${next}px`;
+    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+  }, [input]);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -101,17 +115,17 @@ export function AiChatWindow({
       )}
     >
       {/* Header */}
-      <div className='flex items-center gap-3 bg-primary px-4 py-3'>
-        <Image
-          src='/images/ai-avatar.png'
-          alt='AI Assistant'
-          width={36}
-          height={36}
-          className='h-9 w-9 rounded-full object-cover'
-        />
-        <div className='flex-1'>
-          <h3 className='text-sm font-semibold text-white'>{t('title')}</h3>
-          <p className='text-xs text-white/70'>
+      <div className='flex items-center gap-3 border-b border-border bg-white px-3 py-3'>
+        <button
+          onClick={onClose}
+          className='flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground'
+          aria-label={t('close')}
+        >
+          <ChevronLeft className='h-5 w-5' />
+        </button>
+        <div className='flex-1 min-w-0'>
+          <h3 className='text-sm font-semibold text-foreground'>{t('title')}</h3>
+          <p className='truncate text-xs text-muted-foreground'>
             {quota && !quota.isUnlimited ? (
               <span>{t('dailyQuotaRemaining', { count: quota.remaining, total: quota.limit })}</span>
             ) : (
@@ -119,32 +133,17 @@ export function AiChatWindow({
             )}
           </p>
         </div>
-        {/* New chat button */}
-        {onNewChat && messages.length > 0 && (
-          <button
-            onClick={onNewChat}
-            disabled={isClearing}
-            className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white',
-              isClearing && 'pointer-events-none opacity-50'
-            )}
-            aria-label={t('newChat')}
-            title={t('newChat')}
-          >
-            {isClearing ? (
-              <Loader2 className='h-4 w-4 animate-spin' />
-            ) : (
-              <RotateCcw className='h-4 w-4' />
-            )}
-          </button>
-        )}
-        <button
-          onClick={onClose}
-          className='flex h-8 w-8 items-center justify-center rounded-lg text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
-          aria-label={t('close')}
-        >
-          <X className='h-4.5 w-4.5' />
-        </button>
+        {/* AI avatar - top right */}
+        <div className='relative'>
+          <Image
+            src='/images/ai-avatar.png'
+            alt='AI Assistant'
+            width={32}
+            height={32}
+            className='h-8 w-8 rounded-full object-cover ring-2 ring-white'
+          />
+          <span className='absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white' />
+        </div>
       </div>
 
       {/* Messages area */}
@@ -179,31 +178,33 @@ export function AiChatWindow({
       {/* Input bar */}
       <form
         onSubmit={handleSubmit}
-        className='flex items-end gap-2 border-t border-border px-4 py-3 bg-white'
+        className='bg-white px-4 py-3'
       >
-        <textarea
-          ref={inputRef}
-          rows={1}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={t('placeholder')}
-          className='flex-1 max-h-32 min-h-[40px] resize-y overflow-y-auto bg-transparent py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground scrollbar-thin'
-          disabled={isTyping || isClearing}
-        />
-        <button
-          type='submit'
-          disabled={!input.trim() || isTyping || isClearing}
-          className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-200',
-            input.trim() && !isTyping
-              ? 'bg-primary text-white shadow-md hover:bg-primary/90 hover:scale-105 active:scale-95'
-              : 'bg-secondary text-muted-foreground'
-          )}
-          aria-label={t('send')}
-        >
-          <Send className='h-5 w-5' />
-        </button>
+        <div className='flex items-end gap-2 rounded-full bg-gradient-to-r from-violet-100 via-sky-50 to-sky-100 px-2 py-1.5 shadow-sm ring-1 ring-black/5'>
+          <textarea
+            ref={inputRef}
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={t('placeholder')}
+            className='flex-1 resize-none bg-transparent px-3 py-1.5 text-sm leading-5 text-foreground outline-none placeholder:text-muted-foreground scrollbar-thin'
+            disabled={isTyping || isClearing}
+          />
+          <button
+            type='submit'
+            disabled={!input.trim() || isTyping || isClearing}
+            className={cn(
+              'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-md transition-all duration-200',
+              input.trim() && !isTyping
+                ? 'hover:bg-primary/90 hover:scale-105 active:scale-95'
+                : 'opacity-60'
+            )}
+            aria-label={t('send')}
+          >
+            <Send className='h-4 w-4' />
+          </button>
+        </div>
       </form>
     </div>
   );

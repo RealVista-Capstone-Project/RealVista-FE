@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bookmark, Plus } from 'lucide-react';
 import { Button } from '@/shared/ui/button/button';
@@ -26,9 +26,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface SaveSearchButtonProps {
   searchType: SearchType;
   criteria: Record<string, unknown>;
+  fullWidth?: boolean;
 }
 
-export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps) {
+export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearchButtonProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBoardModal, setShowBoardModal] = useState(false);
   const [boardId, setBoardId] = useState('Mặc định');
@@ -64,12 +65,15 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
   });
   const profiles: CustomerProfile[] = profilesResponse?.payload?.data || [];
 
-  // When profiles load, set the default selection to the active profile
-  if (!selectedProfileId && profiles.length > 0) {
-    const activeProfile = profiles.find((p) => p.is_active);
-    if (activeProfile) setSelectedProfileId(activeProfile.customer_profile_id);
-    else setSelectedProfileId(profiles[0].customer_profile_id);
-  }
+  // Set default selection to the active profile once when profiles first load
+  useEffect(() => {
+    if (!selectedProfileId && profiles.length > 0) {
+      const activeProfile = profiles.find((p) => p.is_active);
+      setSelectedProfileId(
+        activeProfile ? activeProfile.customer_profile_id : profiles[0].customer_profile_id
+      );
+    }
+  }, [profiles, selectedProfileId]);
 
   const handleSaveClick = () => {
     if (!session?.user) {
@@ -86,20 +90,17 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
         criteria: criteria as any,
         board_id: boardId.trim() || 'Mặc định',
         profile_id: selectedProfileId || undefined,
-        is_recommendation: isRecommendation
+        is_recommendation: isRecommendation,
       },
       {
         onSuccess: () => {
           toast.success(t('success'));
           setShowBoardModal(false);
         },
-        onError: (error: any) => {
-          const payload = error?.response?.data;
-          const errorCode = payload?.payload?.error_code
-            ?? payload?.error_code
-            ?? payload?.errorCode;
+        onError: (error: unknown) => {
+          const httpErr = error as { status?: number; payload?: { error_code?: string } };
 
-          if (error?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
+          if (httpErr?.status === 409 || httpErr?.payload?.error_code === 'SAVED_SEARCH_DUPLICATE') {
             toast.error(t('duplicateAlert'));
             return;
           }
@@ -114,13 +115,18 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
       <Button
         type='button'
         variant='outline'
+        size={fullWidth ? 'default' : 'icon'}
         onClick={handleSaveClick}
         disabled={isPending}
-        className='px-4 py-2 flex items-center justify-center gap-2 transition-all border-primary text-primary hover:bg-primary/5'
+        className={
+          fullWidth
+            ? 'w-full h-9 border-transparent bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 text-sm'
+            : 'h-9 w-9 shrink-0 border-primary text-primary hover:bg-primary/5'
+        }
         title={t('buttonLabel')}
       >
         <Bookmark className='w-4 h-4' />
-        <span className='hidden sm:inline'>{t('buttonLabel')}</span>
+        {fullWidth && <span>Lưu tìm kiếm</span>}
       </Button>
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
 

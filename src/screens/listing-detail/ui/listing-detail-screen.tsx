@@ -153,7 +153,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
   const formattedPrice = formatVND(property.price);
 
   return (
-    <div className='min-h-screen bg-background pb-22 md:pb-8'>
+    <div className='min-h-screen bg-background pb-22 md:pb-0'>
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}
@@ -253,7 +253,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <p className='text-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
-              <span className='text-xs font-semibold text-muted-foreground'>₫</span>
+              <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
               {listing.listing_type === 'RENT' && (
                 <span className='text-foreground/50 text-sm font-medium'>/month</span>
               )}

@@ -53,11 +53,13 @@ function createMessage(content: string, role: 'user' | 'assistant'): AiChatMessa
  * Map a backend message to the frontend AiChatMessage shape.
  */
 function mapBackendMessage(msg: BackendMessage): AiChatMessage {
+  const parsed = msg.created_at ? new Date(msg.created_at) : null;
+  const timestamp = parsed && !Number.isNaN(parsed.getTime()) ? parsed : new Date();
   return {
     id: msg.message_id,
     content: msg.content,
     role: msg.role.toLowerCase() as 'user' | 'assistant',
-    timestamp: new Date(msg.created_at),
+    timestamp,
   };
 }
 

@@ -26,6 +26,9 @@ export function AiChatMessageItem({ message, className }: AiChatMessageItemProps
   const isUser = message.role === 'user';
 
   const formatTime = (date: Date) => {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return '';
+    }
     try {
       return date.toLocaleTimeString([], {
         hour: '2-digit',
@@ -55,8 +58,8 @@ export function AiChatMessageItem({ message, className }: AiChatMessageItemProps
           className={cn(
             'rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
             isUser
-              ? 'rounded-br-md bg-primary text-white'
-              : 'rounded-bl-md bg-secondary text-foreground'
+              ? 'rounded-br-md bg-primary text-primary-foreground'
+              : 'rounded-bl-md bg-gray-100 text-foreground'
           )}
         >
           {isUser ? (
@@ -105,7 +108,7 @@ export function TypingIndicator({ className }: TypingIndicatorProps) {
         height={28}
         className='h-7 w-7 shrink-0 rounded-full object-cover'
       />
-      <div className='flex items-center gap-1 rounded-2xl rounded-bl-md bg-secondary px-4 py-3'>
+      <div className='flex items-center gap-1 rounded-2xl rounded-bl-md bg-gray-100 px-4 py-3'>
         <span className='h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]' />
         <span className='h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:150ms]' />
         <span className='h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:300ms]' />

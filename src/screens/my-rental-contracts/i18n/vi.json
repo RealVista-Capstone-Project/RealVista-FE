@@ -57,6 +57,33 @@
     "toast": {
       "signingUnavailable": "Đường dẫn ký không khả dụng. Vui lòng thử lại.",
       "signingError": "Không thể lấy đường dẫn ký. Vui lòng thử lại."
+    },
+    "emptyCta": {
+      "title": "Bạn chưa có hợp đồng thuê nào",
+      "subtitle": "Người thuê không tự tạo hợp đồng. Sau khi thống nhất với chủ nhà, bạn sẽ nhận được hợp đồng để ký điện tử ngay tại đây.",
+      "stepsTitle": "Cách bạn nhận hợp đồng",
+      "steps": [
+        {
+          "label": "Tìm bất động sản phù hợp",
+          "desc": "Duyệt hàng nghìn tin cho thuê trên RealVista để chọn nơi ưng ý."
+        },
+        {
+          "label": "Liên hệ chủ nhà hoặc môi giới",
+          "desc": "Đặt lịch xem, nhắn tin và thống nhất điều khoản thuê."
+        },
+        {
+          "label": "Nhận & ký hợp đồng qua DocuSign",
+          "desc": "Chủ nhà gửi hợp đồng, bạn ký điện tử an toàn trong vài phút."
+        }
+      ],
+      "card1Title": "Mục yêu thích",
+      "card1Desc": "Xem lại các bất động sản bạn đã lưu.",
+      "card2Title": "Lịch hẹn của tôi",
+      "card2Desc": "Theo dõi các cuộc hẹn xem nhà bạn đã đặt.",
+      "ctaTitle": "Sẵn sàng tìm tổ ấm tiếp theo?",
+      "ctaSubtitle": "Khám phá hàng nghìn bất động sản cho thuê đã được xác thực và bắt đầu hành trình của bạn ngay hôm nay.",
+      "ctaButton": "Tìm nhà thuê ngay",
+      "hint": "Đã liên hệ chủ nhà? Khi họ gửi hợp đồng, bạn sẽ thấy nó xuất hiện ngay ở trang này và nhận được thông báo."
     }
   }
 }

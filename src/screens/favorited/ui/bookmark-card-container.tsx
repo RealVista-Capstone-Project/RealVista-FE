@@ -32,7 +32,12 @@ export function BookmarkCardContainer({
   return (
     <div className='relative'>
       {/* Card */}
-      <RealVistaListingCard id={id} {...cardProps} onToggleFavorite={handleCardToggleFavorite} />
+      <RealVistaListingCard
+        id={id}
+        {...cardProps}
+        compact
+        onToggleFavorite={handleCardToggleFavorite}
+      />
 
       {/* Selection Checkbox - Only show in selection mode */}
       {isSelectionMode && (
