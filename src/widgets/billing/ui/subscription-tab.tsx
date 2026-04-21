@@ -30,6 +30,7 @@ import {
   type FeaturePackage,
   type TransactionStatusResponse,
 } from '@/entities/billing';
+import { listingBoostKeys } from '@/entities/listing';
 import { toast } from 'sonner';
 import { HttpError } from '@/shared/lib/http';
 import { useSession } from 'next-auth/react';
@@ -360,7 +361,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
                 key={sub.subscription_id}
                 className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
               >
-                <div className='flex flex-col rounded-xl border border-border bg-secondary/50 p-5 shadow-sm'>
+                <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
                   <div className='flex flex-row items-center justify-between'>
                     <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Gói hiện tại</p>
                     <div className='flex flex-wrap items-center gap-2'>
@@ -438,7 +439,7 @@ function CurrentPlansSection({ onUpgrade }: { onUpgrade: (planId: string) => voi
               key={boost.boost_package_id}
               className='grid gap-4 lg:grid-cols-2 lg:items-stretch'
             >
-              <div className='flex flex-col rounded-xl border border-border bg-secondary/50 p-5 shadow-sm'>
+              <div className='flex flex-col rounded-xl border border-foreground/10 bg-white p-5 shadow-sm ring-1 ring-border'>
                 <div className='flex flex-row items-center justify-between'>
                   <p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80'>Gói đẩy tin</p>
                   <div className='flex flex-wrap items-center gap-2'>
@@ -1091,7 +1092,7 @@ function Step2Content({
             </div>
 
             {/* Plan details - simplified border */}
-            <div className='rounded-xl border border-border bg-white p-5 lg:flex-1 shadow-sm'>
+            <div className='rounded-xl border border-primary/20 bg-primary/5 p-5 lg:flex-1 shadow-sm'>
               <div className='mb-4 flex items-start justify-between gap-2'>
                 <div>
                   <div className='flex flex-wrap items-center gap-2'>
@@ -1192,7 +1193,7 @@ function Step2Content({
             })}
           </div>
 
-          <div className='rounded-xl border border-border bg-secondary/50 p-5 lg:flex-1'>
+          <div className='rounded-xl border border-primary/20 bg-primary/5 p-5 lg:flex-1 shadow-sm'>
             <div className='mb-4 flex items-start justify-between gap-2'>
               <div>
                 <div className='flex flex-wrap items-center gap-2'>
@@ -1406,8 +1407,8 @@ function Step3Content({
             const data = res.payload.data;
             setCheckout(data);
             setError(null);
-            queryClient.invalidateQueries({ queryKey: ['billing', 'my-subscriptions'] });
-            queryClient.invalidateQueries({ queryKey: ['billing', 'my-boosts'] });
+            void queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
+            void queryClient.invalidateQueries({ queryKey: billingKeys.myBoosts() });
             onCheckoutCreated(data);
             onDone?.(data);
           },
@@ -1522,7 +1523,7 @@ function Step3Content({
         </div>
 
         {/* Right: Order review */}
-        <div className='rounded-xl border border-border bg-secondary/50 p-5 lg:flex-1'>
+        <div className='rounded-xl border border-primary/20 bg-primary/5 p-5 lg:flex-1 shadow-sm'>
           <div className='mb-4 flex items-start justify-between gap-2'>
             <div>
               <div className='flex flex-wrap items-center gap-2'>
@@ -1718,6 +1719,7 @@ function Step4Content({
   onDone: () => void;
 }) {
   const queryClient = useQueryClient();
+  const savedTxnRef = React.useRef<string | null>(null);
 
   const { data: statusData, isLoading } = useQuery({
     ...billingQueries.transactionStatus(transactionId ?? ''),
@@ -1727,24 +1729,27 @@ function Step4Content({
   const saveTransactionMutation = useMutation({
     mutationFn: (id: string) => billingApi.saveTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['billing', 'my-transactions'] });
-    },
-  });
-
-  // Refresh subscriptions and transactions when payment completes
-  React.useEffect(() => {
-    if (statusData?.status === 'COMPLETED' && transactionId && !saveTransactionMutation.isPending) {
-      saveTransactionMutation.mutate(transactionId);
-      // Refetch plans + subscriptions + transactions
-      Promise.all([
-        queryClient.refetchQueries({ queryKey: ['billing', 'my-subscriptions'] }),
-        queryClient.refetchQueries({ queryKey: ['billing', 'my-transactions'] }),
-        queryClient.refetchQueries({ queryKey: ['billing', 'plans'] }),
+      // Billing + per-listing boost caches (separate query roots) so quota/3D/boost UI match the new purchase
+      void Promise.all([
+        queryClient.resetQueries({ queryKey: billingKeys.all }),
+        queryClient.resetQueries({ queryKey: listingBoostKeys.all }),
       ]).catch((err) => {
         console.error('Failed to refetch billing data:', err);
       });
-    }
-  }, [statusData?.status, transactionId, queryClient, saveTransactionMutation]);
+    },
+  });
+
+  // Ghi nhận giao dịch một lần khi cổng báo COMPLETED; refresh subscriptions chạy trong onSuccess
+  React.useEffect(() => {
+    if (statusData?.status !== 'COMPLETED' || !transactionId) return;
+    if (savedTxnRef.current === transactionId) return;
+    savedTxnRef.current = transactionId;
+    saveTransactionMutation.mutate(transactionId, {
+      onError: () => {
+        if (savedTxnRef.current === transactionId) savedTxnRef.current = null;
+      },
+    });
+  }, [statusData?.status, transactionId, saveTransactionMutation]);
 
   const isPending = !statusData || statusData.status === 'PENDING' || isLoading;
   const isSuccess = statusData?.status === 'COMPLETED';
@@ -2250,24 +2255,27 @@ function TransactionsSection() {
       <div className='overflow-x-auto'>
         <table className='w-full'>
           <thead>
-            <tr className='border-b border-border bg-secondary/50'>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+            <tr className='border-b border-border bg-muted/45'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Ngày
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Mô tả
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Trạng thái
               </th>
-              <th className='px-5 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+              <th className='px-5 py-3 text-left text-xs font-semibold text-foreground/70 uppercase tracking-wider'>
                 Số tiền
               </th>
             </tr>
           </thead>
           <tbody>
             {transactions.map((transaction) => (
-              <tr key={transaction.transaction_id} className='border-b border-muted hover:bg-secondary/50 transition-colors'>
+              <tr
+                key={transaction.transaction_id}
+                className='border-b border-border bg-white transition-colors hover:bg-primary/10'
+              >
                 <td className='px-5 py-3 text-sm text-muted-foreground'>
                   {formatDate(transaction.created_at)}
                 </td>

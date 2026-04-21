@@ -40,7 +40,7 @@ export function SearchSidebarFilters({
   className,
 }: SearchSidebarFiltersProps) {
   const [localFilters, setLocalFilters] = useState<AdvancedSearchRequest>(filters);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const { data: districts = [] } = useDistricts();
   const { data: apiAttributes = [] } = usePropertyAttributes(localFilters.propertyType);

@@ -57,6 +57,33 @@
     "toast": {
       "signingUnavailable": "Signing URL is not available. Please try again.",
       "signingError": "Failed to get signing link. Please try again."
+    },
+    "emptyCta": {
+      "title": "You don't have any rental contracts yet",
+      "subtitle": "Tenants don't create contracts themselves. Once you've agreed with an owner, they'll send you a contract to sign electronically right here.",
+      "stepsTitle": "How you receive a contract",
+      "steps": [
+        {
+          "label": "Find a property you love",
+          "desc": "Browse thousands of verified rental listings on RealVista."
+        },
+        {
+          "label": "Connect with the owner or agent",
+          "desc": "Book a viewing, chat, and agree on the rental terms."
+        },
+        {
+          "label": "Receive & sign via DocuSign",
+          "desc": "The owner sends the contract, you e-sign securely in minutes."
+        }
+      ],
+      "card1Title": "Favorited listings",
+      "card1Desc": "Revisit the properties you've saved.",
+      "card2Title": "My appointments",
+      "card2Desc": "Track the viewings you've already scheduled.",
+      "ctaTitle": "Ready to find your next home?",
+      "ctaSubtitle": "Explore thousands of verified rental properties and kick off your journey today.",
+      "ctaButton": "Find a rental now",
+      "hint": "Already in touch with an owner? As soon as they send you a contract, it'll show up here and you'll get a notification."
     }
   }
 }

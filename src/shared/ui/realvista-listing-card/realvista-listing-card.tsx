@@ -142,11 +142,15 @@ export function RealVistaListingCard({
         .filter((attr) => {
           if (attr.value_boolean !== null && attr.value_boolean !== undefined)
             return attr.value_boolean === true;
-          if (attr.value_number !== null && attr.value_number !== undefined) return true;
-          if (attr.value_text !== null && attr.value_text !== undefined) return true;
+          if (attr.value_number !== null && attr.value_number !== undefined)
+            return attr.value_number !== 0;
+          if (attr.value_text !== null && attr.value_text !== undefined)
+            return attr.value_text.trim() !== '';
           return false;
         })
         .slice(0, 3);
+
+      if (visible.length === 0) return null;
 
       return (
         <div className={cn('flex flex-wrap items-center', compact ? 'gap-2' : 'gap-3')}>
@@ -172,29 +176,39 @@ export function RealVistaListingCard({
       );
     }
 
-    // Fallback: fixed beds / bathrooms / area — only shown when values are explicitly provided
-    if (!beds && !bathrooms && !area) return null;
+    // Fallback: render each spec individually — skip any spec with a falsy (0 / undefined) value
+    const hasBeds = !!beds;
+    const hasBathrooms = !!bathrooms;
+    const hasArea = !!area;
+    if (!hasBeds && !hasBathrooms && !hasArea) return null;
+
     return (
       <div className={cn('flex items-center', compact ? 'gap-2.5' : 'gap-4')}>
-        <div className='flex items-center gap-1'>
-          <BedSingle className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')} strokeWidth={2.3} />
-          <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
-            {beds} {t('beds')}
-          </span>
-        </div>
-        <div className='flex items-center gap-1'>
-          <Bath className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')} strokeWidth={2.3} />
-          <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
-            {bathrooms} {t('bathrooms')}
-          </span>
-        </div>
-        <div className='flex items-center gap-1'>
-          <AreaIcon />
-          <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
-            {area}
-            {areaUnit}
-          </span>
-        </div>
+        {hasBeds && (
+          <div className='flex items-center gap-1'>
+            <BedSingle className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')} strokeWidth={2.3} />
+            <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+              {beds} {t('beds')}
+            </span>
+          </div>
+        )}
+        {hasBathrooms && (
+          <div className='flex items-center gap-1'>
+            <Bath className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')} strokeWidth={2.3} />
+            <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+              {bathrooms} {t('bathrooms')}
+            </span>
+          </div>
+        )}
+        {hasArea && (
+          <div className='flex items-center gap-1'>
+            <AreaIcon />
+            <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+              {area}
+              {areaUnit}
+            </span>
+          </div>
+        )}
       </div>
     );
   };
@@ -215,7 +229,7 @@ export function RealVistaListingCard({
     </Button>
   );
 
-  // Shared Status Tag (SOLD / RENTED)
+  // Shared Status Tag (SOLD / RENTED) — primary blue, compact sizing when `compact`
   const StatusTag = ({
     marginClass,
     paddingClass,
@@ -226,7 +240,8 @@ export function RealVistaListingCard({
     <div className={cn('relative', marginClass)}>
       <div
         className={cn(
-          'bg-red-500 rounded-tl-lg rounded-tr-lg rounded-br-lg text-xl font-bold text-white py-1.5 pr-5',
+          'rounded-tl-lg rounded-tr-lg rounded-br-lg bg-primary font-semibold text-primary-foreground',
+          compact ? 'py-1.5 pl-2 pr-3 text-xs' : 'py-1.5 pr-4 pl-3 text-sm',
           paddingClass
         )}
       >
@@ -240,10 +255,10 @@ export function RealVistaListingCard({
           fill='none'
           xmlns='http://www.w3.org/2000/svg'
           preserveAspectRatio='none'
-          className='block'
+          className='block fill-primary'
           style={{ overflow: 'visible' }}
         >
-          <path d='M8 8L0 0H8V8Z' fill='#991b1b' />
+          <path d='M8 8L0 0H8V8Z' />
         </svg>
       </div>
     </div>
@@ -356,7 +371,10 @@ export function RealVistaListingCard({
             <div>
               <div className='mb-2 flex items-start justify-between'>
                 {isUnavailable ? (
-                  <StatusTag marginClass='-ml-5' paddingClass='pl-6' />
+                  <StatusTag
+                    marginClass={compact ? '-ml-4' : '-ml-5'}
+                    paddingClass={compact ? 'pl-4' : 'pl-6'}
+                  />
                 ) : (
                   <div className='flex items-baseline gap-1'>
                     <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-primary'>
@@ -413,7 +431,7 @@ export function RealVistaListingCard({
         )}
 
         {/* Property Image Container */}
-        <div className={cn('relative w-full overflow-hidden rounded-t-xl', compact ? 'aspect-[16/10]' : 'aspect-[4/3]')}>
+        <div className={cn('relative w-full overflow-hidden rounded-t-xl', compact ? 'aspect-[5/3]' : 'aspect-[4/3]')}>
           <Image
             src={imgError ? PLACEHOLDER_IMAGE : resolvedImage}
             alt={title}
@@ -426,7 +444,7 @@ export function RealVistaListingCard({
         </div>
 
         {/* Badges Container - Outside overflow-hidden to allow ribbon fold */}
-        <div className={cn('absolute left-0 top-0 w-full pointer-events-none z-10', compact ? 'aspect-[16/10]' : 'aspect-[4/3]')}>
+        <div className={cn('absolute left-0 top-0 w-full pointer-events-none z-10', compact ? 'aspect-[5/3]' : 'aspect-[4/3]')}>
           <HotBadge />
         </div>
 
@@ -435,7 +453,10 @@ export function RealVistaListingCard({
           {/* Price and Favorite */}
           <div className={cn('flex items-center justify-between', compact ? 'mb-1.5' : 'mb-3')}>
             {isUnavailable ? (
-              <StatusTag marginClass='-ml-8' paddingClass='pl-9' />
+              <StatusTag
+                marginClass={compact ? '-ml-6' : '-ml-8'}
+                paddingClass={compact ? 'pl-6' : 'pl-9'}
+              />
             ) : (
               <div className='flex items-baseline gap-1'>
                 <span className={cn('font-bold tracking-[-0.5px] text-primary', compact ? 'text-base leading-[1.4]' : 'text-2xl leading-[1.5] tracking-[-1px]')}>
@@ -468,7 +489,7 @@ export function RealVistaListingCard({
           </div>
 
           {/* Title */}
-          <h3 className={cn('font-bold text-foreground truncate', compact ? 'mb-0.5 text-sm leading-[1.4] tracking-[-0.3px]' : 'mb-1 text-2xl leading-[1.5] tracking-[-1px]')}>
+          <h3 className={cn('font-bold text-foreground truncate', compact ? 'mb-0.5 text-sm leading-[1.4] tracking-[-0.25px]' : 'mb-1 text-2xl leading-[1.5] tracking-[-1px]')}>
             {title}
           </h3>
 

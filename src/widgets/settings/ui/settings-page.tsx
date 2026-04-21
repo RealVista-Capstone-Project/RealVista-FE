@@ -162,8 +162,18 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [emailOtp, setEmailOtp] = useState('');
+  // Resend cooldown (seconds) — short window (60s) during which the user
+  // cannot request another OTP. Independent of the OTP's own validity.
   const [otpCountdown, setOtpCountdown] = useState(0);
+  // OTP validity window (seconds) — how long the currently-sent OTP is still
+  // usable. Driven by the BE's expirySeconds (typically 300s).
+  const [otpExpire, setOtpExpire] = useState(0);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const expireRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Resend cooldown for the email OTP in seconds. Intentionally shorter than
+  // the OTP TTL so users can resend quickly if the email doesn't arrive.
+  const EMAIL_OTP_RESEND_COOLDOWN = 60;
 
   // Phone change
   const [isChangingPhone, setIsChangingPhone] = useState(false);
@@ -359,6 +369,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   useEffect(() => {
     return () => {
       if (countdownRef.current) clearInterval(countdownRef.current);
+      if (expireRef.current) clearInterval(expireRef.current);
       if (phoneCountdownRef.current) clearInterval(phoneCountdownRef.current);
       if (recaptchaVerifier.current) {
         recaptchaVerifier.current.clear();
@@ -367,6 +378,22 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
     };
   }, [avatarPreviewUrl]);
+
+  // Stop timers and clear OTP state when user closes the verify-email panel.
+  useEffect(() => {
+    if (isVerifyingEmail) return;
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    if (expireRef.current) {
+      clearInterval(expireRef.current);
+      expireRef.current = null;
+    }
+    setOtpCountdown(0);
+    setOtpExpire(0);
+    setEmailOtp('');
+  }, [isVerifyingEmail]);
 
   // Mutations
   const updateMeMutation = useMutation({
@@ -493,7 +520,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     onError: () => toast.error(t('toast.accountDeleteFailed')),
   });
 
-  // Countdown timer for OTP resend
+  // Countdown for the resend cooldown (short window between sends).
   const startCountdown = useCallback((seconds: number) => {
     setOtpCountdown(seconds);
     if (countdownRef.current) clearInterval(countdownRef.current);
@@ -501,11 +528,36 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       setOtpCountdown((s) => {
         if (s <= 1) {
           clearInterval(countdownRef.current!);
+          countdownRef.current = null;
           return 0;
         }
         return s - 1;
       });
     }, 1000);
+  }, []);
+
+  // Countdown for the OTP's validity. After it hits 0 the OTP is expired and
+  // the user must request a new one before they can verify.
+  const startExpireCountdown = useCallback((seconds: number) => {
+    setOtpExpire(seconds);
+    if (expireRef.current) clearInterval(expireRef.current);
+    expireRef.current = setInterval(() => {
+      setOtpExpire((s) => {
+        if (s <= 1) {
+          clearInterval(expireRef.current!);
+          expireRef.current = null;
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  }, []);
+
+  const formatMmSs = useCallback((totalSeconds: number) => {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
   }, []);
 
   const uploadAvatarToStorage = async (file: File) => {
@@ -544,6 +596,9 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   };
 
   // Send email OTP mutation
+  // Note: BE does NOT persist the target email until verifyEmail succeeds,
+  // so we intentionally do not invalidate user queries here — the user's
+  // stored email is unchanged until the OTP is confirmed.
   const sendEmailOtpMutation = useMutation({
     mutationFn: async () => {
       const trimmedEmail = newEmail.trim();
@@ -551,10 +606,9 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       return userApi.sendEmailOtp(trimmedEmail);
     },
     onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: userQueries.me().queryKey });
-      queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
-      const seconds = res.payload.data?.expirySeconds ?? 300;
-      startCountdown(seconds);
+      const expirySeconds = res.payload.data?.expirySeconds ?? 300;
+      startExpireCountdown(expirySeconds);
+      startCountdown(EMAIL_OTP_RESEND_COOLDOWN);
       toast.success(t('myAccount.otpSent'));
     },
     onError: (err: unknown) => {
@@ -570,6 +624,16 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userQueries.me().queryKey });
       queryClient.invalidateQueries({ queryKey: userQueries.current().queryKey });
+      if (expireRef.current) {
+        clearInterval(expireRef.current);
+        expireRef.current = null;
+      }
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+      setOtpExpire(0);
+      setOtpCountdown(0);
       setIsVerifyingEmail(false);
       setNewEmail('');
       setEmailOtp('');
@@ -721,11 +785,11 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   }, [newPhone, phoneOtp, t, verifyPhoneMutation]);
 
   const handleSaveProfile = async () => {
+    // Do not send email here — email changes only via send-email-otp + verify-email (PATCH /me rejects email changes).
     const payload: UpdateMeData = {
       first_name: profileForm.firstName,
       last_name: profileForm.lastName,
       business_name: profileForm.businessName,
-      email: profileForm.email,
     };
 
     try {
@@ -762,7 +826,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   ];
 
   return (
-    <div className='relative min-h-screen bg-secondary'>
+    <div className='relative min-h-screen bg-muted/30'>
       <BillingReturnQueryEffects />
       {/* Left sidebar */}
       <aside className='absolute left-0 top-0 w-[200px] bg-transparent py-8 z-10'>
@@ -774,7 +838,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-3 px-4 py-3 rounded-r-lg text-sm font-medium transition-colors text-left w-full ${activeTab === tab.id
                   ? 'bg-primary/5 text-primary border-l-4 border-primary'
-                  : 'text-muted-foreground hover:bg-secondary'
+                  : 'text-muted-foreground hover:bg-muted'
                 }`}
             >
               {tab.label}
@@ -1062,9 +1126,6 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                           className='flex items-center justify-between py-3 border-b border-border last:border-0'
                         >
                           <div className='flex items-center gap-3'>
-                            <div className='flex size-8 items-center justify-center rounded-full bg-secondary text-muted-foreground'>
-                              <User className='h-4 w-4' />
-                            </div>
                             <div className='flex items-center gap-2'>
                               <span className='text-sm font-medium text-foreground'>
                                 {profile.profile_name?.trim() || t('profileManagement.defaultName')}
@@ -1162,7 +1223,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                     <div className='flex items-start gap-6'>
                       <div className='flex flex-col gap-2'>
                         <Label className='text-sm text-muted-foreground'>{t('myAccount.avatar')}</Label>
-                        <div className='flex size-[72px] items-center justify-center rounded-full bg-secondary overflow-hidden'>
+                        <div className='flex size-[72px] items-center justify-center rounded-full border-2 border-primary overflow-hidden'>
                           {(avatarPreviewUrl || (!pendingRemoveAvatar && me?.avatar_url)) ? (
                             <Image
                               src={avatarPreviewUrl || me?.avatar_url || ''}
@@ -1172,7 +1233,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               className='size-full rounded-full object-cover'
                             />
                           ) : (
-                            <User className='h-8 w-8 text-muted-foreground' />
+                            <User className='h-8 w-8 text-primary' />
                           )}
                         </div>
                         <input
@@ -1219,7 +1280,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               onChange={(e) => setProfileForm((p) => ({ ...p, firstName: e.target.value }))}
                               placeholder={t('myAccount.firstNamePlaceholder')}
                               readOnly={!isEditingProfile}
-                              className={!isEditingProfile ? 'bg-muted' : ''}
+                              className={!isEditingProfile ? 'bg-primary/5' : ''}
                             />
                           </div>
                           <div className='space-y-2'>
@@ -1232,7 +1293,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               onChange={(e) => setProfileForm((p) => ({ ...p, lastName: e.target.value }))}
                               placeholder={t('myAccount.lastNamePlaceholder')}
                               readOnly={!isEditingProfile}
-                              className={!isEditingProfile ? 'bg-muted' : ''}
+                              className={!isEditingProfile ? 'bg-primary/5' : ''}
                             />
                           </div>
                         </div>
@@ -1246,7 +1307,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                             onChange={(e) => setProfileForm((p) => ({ ...p, businessName: e.target.value }))}
                             placeholder={t('myAccount.businessNamePlaceholder')}
                             readOnly={!isEditingProfile}
-                            className={!isEditingProfile ? 'bg-muted' : ''}
+                            className={!isEditingProfile ? 'bg-primary/5' : ''}
                           />
                         </div>
                       </div>
@@ -1344,7 +1405,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                           setIsVerifyingEmail((v) => !v);
                           setNewEmail(profileForm.email || me?.email || '');
                         }}
-                        className='flex w-full items-center justify-between rounded-lg border border-border bg-muted px-4 py-3 text-sm text-foreground hover:bg-secondary transition-colors'
+                        className='flex w-full items-center justify-between rounded-lg border border-border bg-primary/5 px-4 py-3 text-sm text-foreground hover:bg-primary/10 transition-colors'
                       >
                         <span className='text-muted-foreground'>{profileForm.email || me?.email || ''}</span>
                         <span className='flex items-center gap-1 text-sm font-medium text-primary'>
@@ -1364,9 +1425,24 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                               placeholder='example@email.com'
                             />
                           </div>
-                          <p className='text-xs text-muted-foreground'>{t('myAccount.otpSent')}</p>
+                          {sendEmailOtpMutation.isSuccess && (
+                            <p className='text-xs text-muted-foreground'>{t('myAccount.otpSent')}</p>
+                          )}
                           <div className='space-y-1.5'>
-                            <Label className='text-sm text-muted-foreground'>{t('myAccount.otpLabel')}</Label>
+                            <div className='flex items-center justify-between'>
+                              <Label className='text-sm text-muted-foreground'>{t('myAccount.otpLabel')}</Label>
+                              {sendEmailOtpMutation.isSuccess && (
+                                otpExpire > 0 ? (
+                                  <span className='text-xs font-medium text-muted-foreground'>
+                                    {t('myAccount.otpExpiresIn', { time: formatMmSs(otpExpire) })}
+                                  </span>
+                                ) : (
+                                  <span className='text-xs font-medium text-red-600'>
+                                    {t('myAccount.otpExpired')}
+                                  </span>
+                                )
+                              )}
+                            </div>
                             <div className='flex gap-2'>
                               <Input
                                 value={emailOtp}
@@ -1374,6 +1450,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                                 placeholder={t('myAccount.otpPlaceholder')}
                                 maxLength={6}
                                 className='flex-1 tracking-[0.25em] font-mono'
+                                disabled={sendEmailOtpMutation.isSuccess && otpExpire === 0}
                               />
                               <Button
                                 size='sm'
@@ -1402,7 +1479,12 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                             </Button>
                             <Button
                               size='sm'
-                              disabled={emailOtp.length !== 6 || verifyEmailMutation.isPending}
+                              disabled={
+                                emailOtp.length !== 6 ||
+                                verifyEmailMutation.isPending ||
+                                !sendEmailOtpMutation.isSuccess ||
+                                otpExpire === 0
+                              }
                               onClick={() => verifyEmailMutation.mutate(emailOtp)}
                               className='bg-primary text-white hover:bg-primary/90'
                             >

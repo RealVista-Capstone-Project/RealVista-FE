@@ -264,6 +264,8 @@
       "otpLabel": "Mã OTP",
       "otpPlaceholder": "Nhập mã 6 chữ số",
       "otpCountdown": "Gửi lại sau {seconds}s",
+      "otpExpiresIn": "Mã hết hạn sau {time}",
+      "otpExpired": "Mã OTP đã hết hạn",
       "verifying": "Đang xác minh...",
       "verifyOtp": "Xác minh",
       "phoneOtpSent": "Mã OTP đã được gửi tới số điện thoại của bạn",

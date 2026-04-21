@@ -264,6 +264,8 @@
       "otpLabel": "OTP Code",
       "otpPlaceholder": "Enter 6-digit code",
       "otpCountdown": "Resend in {seconds}s",
+      "otpExpiresIn": "Expires in {time}",
+      "otpExpired": "OTP expired",
       "verifying": "Verifying...",
       "verifyOtp": "Verify",
       "phoneOtpSent": "OTP code has been sent to your phone number",

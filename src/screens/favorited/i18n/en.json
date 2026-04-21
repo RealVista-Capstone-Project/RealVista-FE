@@ -29,7 +29,7 @@
     "noSearchResults": "No bookmarks match \"{searchQuery}\"",
     "emptyTitle": "No bookmarks yet",
     "emptyDescription": "Start adding your favorite properties by clicking the heart icon on listing cards.",
-    "browseListing": "Browse listings",
+    "browseListing": "Search properties",
     "selectedTypes": "{count} types selected",
     "allTypes": "All",
     "compare": "Compare"
