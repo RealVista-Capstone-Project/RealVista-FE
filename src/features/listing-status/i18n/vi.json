@@ -24,11 +24,11 @@
     "confirm": {
       "markAsSold": {
         "title": "Đánh dấu đã bán",
-        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã bán? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các đại lý khác."
+        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã bán? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các môi giới khác."
       },
       "markAsRented": {
         "title": "Đánh dấu đã cho thuê",
-        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã cho thuê? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các đại lý khác."
+        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã cho thuê? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các môi giới khác."
       },
       "unpublish": {
         "title": "Gỡ bài đăng",

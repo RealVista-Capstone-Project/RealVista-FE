@@ -1,5 +1,12 @@
 {
   "PropertyDashboard": {
+    "filter": "Lọc theo trạng thái",
+    "filterPanelReset": "Đặt lại",
+    "filterPanelStatus": "Trạng thái",
+    "actions": "Thao tác",
+    "tabInformation": "Thông tin",
+    "tabListings": "Bài đăng",
+    "tabAgents": "Môi giới",
     "pageTitle": "Quản lý Bất động sản",
     "pageDesc": "Quản lý các danh sách bất động sản của bạn, thống kê lượt xem và trạng thái hoạt động.",
     "createNew": "Thêm mới",

@@ -1,13 +1,13 @@
 {
   "ManageAgent": {
-    "title": "Quản lý đại lý",
-    "subtitle": "Xem và quản lý các đại lý được giao cho bất động sản của bạn",
+    "title": "Quản lý môi giới",
+    "subtitle": "Xem và quản lý các môi giới được giao cho bất động sản của bạn",
     "hero": {
-      "shortTitle": "Quản lý đại lý"
+      "shortTitle": "Quản lý môi giới"
     },
     "filter": {
       "allStatuses": "Tất cả trạng thái",
-      "searchPlaceholder": "Tìm theo tên đại lý...",
+      "searchPlaceholder": "Tìm theo tên môi giới...",
       "filterTitle": "Lọc theo trạng thái",
       "reset": "Đặt lại",
       "statusLabel": "Trạng thái",
@@ -26,14 +26,14 @@
       "actions": "Thao tác"
     },
     "empty": {
-      "title": "Không tìm thấy đại lý nào.",
+      "title": "Không tìm thấy môi giới nào.",
       "subtitle": "Thử điều chỉnh tìm kiếm hoặc bộ lọc."
     },
     "pagination": {
       "showing": "Hiển thị {from}-{to} trong tổng số {total}",
       "pageInfo": "Trang {current} của {total}"
     },
-    "loading": "Đang tải danh sách đại lý...",
+    "loading": "Đang tải danh sách môi giới...",
     "error": "Tải danh sách thất bại. Vui lòng thử lại."
   }
 }
