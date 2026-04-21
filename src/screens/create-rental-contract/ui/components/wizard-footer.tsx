@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight, Loader2, Save, SendHorizontal } from 'lucide-react';
-import { Button } from '@/shared/ui';
+import { ArrowLeft, Loader2, Save, SendHorizontal } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
 
 type WizardStep = 1 | 2 | 3 | 4;
 
@@ -26,52 +26,50 @@ export function WizardFooter({
   onSendForSigning,
   t,
 }: WizardFooterProps) {
-  return (
-    <div className='mt-8 flex flex-col gap-3 border-t border-primary/10 pt-6 sm:flex-row sm:items-center sm:justify-between'>
-      {/* Left: Save draft + Back */}
-      <div className='flex flex-wrap gap-3'>
-        <Button
-          type='button'
-          variant='outline'
-          className='h-11 rounded-xl border-primary/30 bg-white px-4 hover:bg-primary/5'
-          onClick={onSaveDraft}
-          disabled={isMutating}
-        >
-          <Save className='h-4 w-4' />
-          {t('actions.saveDraft')}
-        </Button>
+  const isLastStep = currentStep >= totalSteps;
+  const canProceed = isLastStep ? !isMutating : isStepValid && !isMutating;
 
+  return (
+    <div className='shrink-0 flex items-center justify-between border-t border-primary/20 bg-white px-4 md:px-8 py-4 md:py-5'>
+      {/* Left: Back */}
+      <div className='flex items-center gap-2'>
         {currentStep > 1 && (
-          <Button
+          <button
             type='button'
-            variant='ghost'
-            className='h-11 rounded-xl px-4 text-muted-foreground hover:bg-primary/5 hover:text-foreground'
             onClick={onBack}
+            className='flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-primary/5 hover:text-foreground'
           >
             <ArrowLeft className='h-4 w-4' />
             {t('actions.back')}
-          </Button>
+          </button>
         )}
       </div>
 
-      {/* Right: Next or Send */}
-      <div className='flex flex-wrap gap-3'>
-        {currentStep < totalSteps ? (
-          <Button
+      {/* Right: Save Draft + Next/Send */}
+      <div className='flex items-center gap-2'>
+        {isLastStep && (
+          <button
             type='button'
-            className='h-11 rounded-xl bg-primary px-5 text-white shadow-primary/30 hover:bg-primary/90'
-            onClick={onNext}
-            disabled={!isStepValid || isMutating}
+            onClick={onSaveDraft}
+            disabled={isMutating}
+            className='flex items-center gap-1.5 rounded-lg border border-primary/20 bg-white px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-primary/5 disabled:opacity-50'
           >
-            {t('actions.next')}
-            <ArrowRight className='h-4 w-4' />
-          </Button>
-        ) : (
-          <Button
+            <Save className='h-4 w-4' />
+            {t('actions.saveDraft')}
+          </button>
+        )}
+
+        {isLastStep ? (
+          <button
             type='button'
-            className='h-11 rounded-xl bg-primary px-5 text-white shadow-primary/30 hover:bg-primary/90'
             onClick={onSendForSigning}
             disabled={isMutating}
+            className={cn(
+              'flex sm:min-w-[160px] items-center justify-center gap-2 rounded-lg px-8 py-3 text-base font-bold text-white transition-all',
+              !isMutating
+                ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_color-mix(in_oklch,var(--primary)_30%,transparent)]'
+                : 'cursor-not-allowed bg-primary/30',
+            )}
           >
             {isMutating ? (
               <>
@@ -84,7 +82,21 @@ export function WizardFooter({
                 {t('actions.sendForSigning')}
               </>
             )}
-          </Button>
+          </button>
+        ) : (
+          <button
+            type='button'
+            onClick={onNext}
+            disabled={!canProceed}
+            className={cn(
+              'flex sm:min-w-[160px] items-center justify-center rounded-lg px-8 py-3 text-base font-bold text-white transition-all',
+              canProceed
+                ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_color-mix(in_oklch,var(--primary)_30%,transparent)]'
+                : 'cursor-not-allowed bg-primary/30',
+            )}
+          >
+            {t('actions.next')}
+          </button>
         )}
       </div>
     </div>

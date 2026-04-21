@@ -21,7 +21,7 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
   return (
     <div className='space-y-6'>
       {/* Search box */}
-      <div className='rounded-3xl border border-primary/10 bg-primary/5 p-5'>
+      <div className='rounded-xl border-[1.5px] border-primary/20 bg-primary/5 p-5'>
         <p className='text-xs font-semibold uppercase tracking-[0.2em] text-primary/70'>
           {t('tenantLookup.eyebrow')}
         </p>
@@ -41,7 +41,7 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
                 }
               }}
               placeholder={t('tenantLookup.emailPlaceholder')}
-              className='h-11 rounded-2xl border-primary/10 bg-white'
+              className='h-11 rounded-xl border-[1.5px] border-primary/25 bg-white placeholder:text-muted-foreground/40'
             />
           </div>
           <Button
@@ -63,21 +63,21 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
             <Input
               value={form.tenantName}
               readOnly
-              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
+              className='h-11 rounded-xl border-[1.5px] border-primary/20 bg-primary/5 text-muted-foreground'
             />
           </Field>
           <Field label={t('form.tenantPhone')}>
             <Input
               value={form.tenantPhone}
               readOnly
-              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
+              className='h-11 rounded-xl border-[1.5px] border-primary/20 bg-primary/5 text-muted-foreground'
             />
           </Field>
           <Field label={t('form.tenantEmail')} className='md:col-span-2'>
             <Input
               value={form.tenantEmail}
               readOnly
-              className='h-11 rounded-xl border-primary/25 bg-primary/5 text-muted-foreground'
+              className='h-11 rounded-xl border-[1.5px] border-primary/20 bg-primary/5 text-muted-foreground'
             />
           </Field>
         </div>

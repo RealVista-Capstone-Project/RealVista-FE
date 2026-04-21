@@ -38,10 +38,12 @@ export function MoneyInput({
   value,
   onChange,
   className,
+  placeholder,
 }: {
   value: string;
   onChange: (raw: string) => void;
   className?: string;
+  placeholder?: string;
 }) {
   return (
     <div className='relative'>
@@ -49,7 +51,8 @@ export function MoneyInput({
         inputMode='numeric'
         value={formatNumberDisplay(value)}
         onChange={(event) => onChange(sanitizeNumericInput(event.target.value))}
-        className={cn('pr-14', className)}
+        placeholder={placeholder}
+        className={cn('pr-14 placeholder:text-muted-foreground/40', className)}
       />
       <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 select-none text-xs font-semibold text-muted-foreground'>
         VND
