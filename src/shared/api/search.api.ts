@@ -24,6 +24,7 @@ export class SearchAPI {
       if (request.propertyType) params.append('propertyType', request.propertyType);
       if (request.propertyCategory) params.append('propertyCategory', request.propertyCategory);
       if (request.location) params.append('location', request.location);
+      if (request.locationId) params.append('locationId', request.locationId);
 
       // Price range
       if (request.price && request.price.length === 2) {

@@ -45,6 +45,7 @@ export interface RealVistaListingCardProps {
   boostTags?: string[];
   userType?: 'AGENT' | 'OWNER';
   variant?: 'grid' | 'list';
+  compact?: boolean;
   listingType?: 'RENT' | 'SALE';
   onToggleFavorite?: (id: string) => void;
   onClick?: (id: string) => void;
@@ -66,6 +67,7 @@ export function RealVistaListingCard({
   attributes,
   boostTags,
   variant = 'grid',
+  compact = false,
   listingType = 'RENT',
   onToggleFavorite,
   onClick,
@@ -147,17 +149,17 @@ export function RealVistaListingCard({
         .slice(0, 3);
 
       return (
-        <div className='flex flex-wrap items-center gap-3'>
+        <div className={cn('flex flex-wrap items-center', compact ? 'gap-2' : 'gap-3')}>
           {visible.map((attr) => (
-            <div key={attr.attribute_id} className='flex items-center gap-1.5'>
+            <div key={attr.attribute_id} className='flex items-center gap-1'>
               {attr.icon && (
                 <AttributeIcon
                   iconName={attr.icon}
-                  className='h-5 w-5 text-primary'
+                  className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')}
                   strokeWidth={2.3}
                 />
               )}
-              <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
+              <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
                 {attr.value_boolean === true
                   ? attr.attribute_name
                   : attr.value_text !== null && attr.value_text !== undefined
@@ -173,22 +175,22 @@ export function RealVistaListingCard({
     // Fallback: fixed beds / bathrooms / area — only shown when values are explicitly provided
     if (!beds && !bathrooms && !area) return null;
     return (
-      <div className='flex items-center gap-4'>
-        <div className='flex items-center gap-1.5'>
-          <BedSingle className='h-5 w-5 text-primary' strokeWidth={2.3} />
-          <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
+      <div className={cn('flex items-center', compact ? 'gap-2.5' : 'gap-4')}>
+        <div className='flex items-center gap-1'>
+          <BedSingle className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')} strokeWidth={2.3} />
+          <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
             {beds} {t('beds')}
           </span>
         </div>
-        <div className='flex items-center gap-1.5'>
-          <Bath className='h-5 w-5 text-primary' strokeWidth={2.3} />
-          <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
+        <div className='flex items-center gap-1'>
+          <Bath className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')} strokeWidth={2.3} />
+          <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
             {bathrooms} {t('bathrooms')}
           </span>
         </div>
-        <div className='flex items-center gap-1.5'>
+        <div className='flex items-center gap-1'>
           <AreaIcon />
-          <span className='text-sm font-normal leading-[1.4] text-muted-foreground'>
+          <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
             {area}
             {areaUnit}
           </span>
@@ -258,7 +260,7 @@ export function RealVistaListingCard({
 
     return (
       <div className='absolute -bottom-2 -left-2 z-10'>
-        <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-red-500 px-4 py-2'>
+        <div className='relative h-8 rounded-br-lg rounded-tl-lg rounded-tr-lg bg-gradient-to-r from-red-600 via-red-500 to-orange-400 px-4 py-2 shadow-[0_2px_8px_rgba(239,68,68,0.45)]'>
           <div className='flex items-center gap-1.5'>
             <Flame className='h-4 w-4 fill-white text-white' strokeWidth={2.5} />
             <span
@@ -321,7 +323,7 @@ export function RealVistaListingCard({
       <>
         <div
           className={cn(
-            'relative flex rounded-xl border-[1.5px] border-primary/10 bg-white transition-shadow hover:shadow-md',
+            'relative flex rounded-xl border-[1.5px] border-primary/10 bg-white transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1',
             !isUnavailable && onClick && 'cursor-pointer',
             isUnavailable && 'cursor-default',
             className
@@ -360,7 +362,7 @@ export function RealVistaListingCard({
                     <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-primary'>
                       {formatVND(price)}
                     </span>
-                    <span className='text-xs font-semibold text-muted-foreground'>₫</span>
+                    <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
                     {listingType === 'RENT' && (
                       <span className='text-sm font-normal leading-[1.5] text-muted-foreground'>
                         {t('perMonth')}
@@ -398,7 +400,7 @@ export function RealVistaListingCard({
     <>
       <div
         className={cn(
-          'relative rounded-xl border-[1.5px] border-primary/10 bg-white transition-shadow hover:shadow-md flex flex-col h-full',
+          'relative rounded-xl border-[1.5px] border-primary/10 bg-white flex flex-col h-full transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1',
           !isUnavailable && onClick && 'cursor-pointer',
           isUnavailable && 'cursor-default',
           className
@@ -411,7 +413,7 @@ export function RealVistaListingCard({
         )}
 
         {/* Property Image Container */}
-        <div className='relative aspect-[4/3] w-full overflow-hidden rounded-t-xl'>
+        <div className={cn('relative w-full overflow-hidden rounded-t-xl', compact ? 'aspect-[16/10]' : 'aspect-[4/3]')}>
           <Image
             src={imgError ? PLACEHOLDER_IMAGE : resolvedImage}
             alt={title}
@@ -424,44 +426,59 @@ export function RealVistaListingCard({
         </div>
 
         {/* Badges Container - Outside overflow-hidden to allow ribbon fold */}
-        <div className='absolute left-0 top-0 aspect-[4/3] w-full pointer-events-none z-10'>
+        <div className={cn('absolute left-0 top-0 w-full pointer-events-none z-10', compact ? 'aspect-[16/10]' : 'aspect-[4/3]')}>
           <HotBadge />
         </div>
 
         {/* Property Details */}
-        <div className={cn('p-6 flex-1 flex flex-col', isUnavailable && 'relative z-[6]')}>
+        <div className={cn('flex-1 flex flex-col', compact ? 'p-3.5' : 'p-6', isUnavailable && 'relative z-[6]')}>
           {/* Price and Favorite */}
-          <div className='mb-3 flex items-center justify-between'>
+          <div className={cn('flex items-center justify-between', compact ? 'mb-1.5' : 'mb-3')}>
             {isUnavailable ? (
               <StatusTag marginClass='-ml-8' paddingClass='pl-9' />
             ) : (
               <div className='flex items-baseline gap-1'>
-                <span className='text-2xl font-bold leading-[1.5] tracking-[-1px] text-primary'>
+                <span className={cn('font-bold tracking-[-0.5px] text-primary', compact ? 'text-base leading-[1.4]' : 'text-2xl leading-[1.5] tracking-[-1px]')}>
                   {formatVND(price)}
                 </span>
-                <span className='text-sm font-semibold text-muted-foreground'>₫</span>
+                <span className={cn('font-semibold text-muted-foreground', compact ? 'text-[11px]' : 'text-sm')}>VNĐ</span>
                 {listingType === 'RENT' && (
-                  <span className='text-base font-normal leading-[1.5] text-muted-foreground'>
+                  <span className={cn('font-normal leading-[1.5] text-muted-foreground', compact ? 'text-xs' : 'text-base')}>
                     {t('perMonth')}
                   </span>
                 )}
               </div>
             )}
-            <FavoriteButton />
+            {compact ? (
+              <Button
+                onClick={handleFavoriteClick}
+                className='flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white transition-colors hover:bg-primary/5'
+                aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                variant='outline'
+                size='icon'
+              >
+                <Heart
+                  className={cn('h-3.5 w-3.5', isFavorite ? 'fill-red-500 text-red-500' : 'text-primary')}
+                  strokeWidth={2.3}
+                />
+              </Button>
+            ) : (
+              <FavoriteButton />
+            )}
           </div>
 
           {/* Title */}
-          <h3 className='mb-1 text-2xl font-bold leading-[1.5] tracking-[-1px] text-foreground truncate'>
+          <h3 className={cn('font-bold text-foreground truncate', compact ? 'mb-0.5 text-sm leading-[1.4] tracking-[-0.3px]' : 'mb-1 text-2xl leading-[1.5] tracking-[-1px]')}>
             {title}
           </h3>
 
           {/* Address */}
-          <p className='mb-4 text-base font-normal leading-[1.5] text-muted-foreground line-clamp-2 min-h-[48px]'>
+          <p className={cn('font-normal leading-[1.5] text-muted-foreground', compact ? 'mb-2.5 text-xs line-clamp-1' : 'mb-4 text-base line-clamp-2 min-h-[48px]')}>
             {address}
           </p>
 
           {/* Divider Line */}
-          <div className='mb-4 h-[1px] bg-primary/10 mt-auto' />
+          <div className={cn('h-[1px] bg-primary/10 mt-auto', compact ? 'mb-2.5' : 'mb-4')} />
 
           {/* Property Specs */}
           <div className='flex items-center justify-center'>

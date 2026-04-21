@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { MapPin, Banknote, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search } from 'lucide-react';
 import {
-  RealVistaListingCard,
   type ListingAttribute,
 } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
-import { AdvancedSearchFilters } from '@/shared/ui/advanced-search-filters/advanced-search-filters';
+import { HorizontalListingCard } from '@/shared/ui/horizontal-listing-card';
+import { SearchSidebarFilters } from '@/shared/ui/search-sidebar-filters';
 import { Pagination } from '@/shared/ui/realvista-pagination';
-import { Button } from '@/shared/ui/button/button';
 import { Skeleton } from '@/shared/ui/skeleton/skeleton';
 import { SearchAPI } from '@/shared/api/search.api';
 import { AdvancedSearchRequest, ListingSearchResponse } from '@/shared/types/search';
@@ -17,13 +16,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyMapBasedSearchPage } from '@/screens/property-map-based-search/ui/property-map-based-search-page';
-import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
 import { useHideFooter } from '@/widgets/layout';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { behaviorTracker } from '@/shared/lib/analytics';
-import { SaveSearchButton, SavedSearchesPopover } from '@/features/save-search';
+import { SaveSearchButton } from '@/features/save-search';
 import { RecommendedListings } from '@/widgets/recommended-listings';
+import { HeroSearchBanner } from '@/shared/ui/hero-search-banner/hero-search-banner';
+import { GlobalProfileSwitcher } from '@/shared/ui/global-profile-switcher';
+import { useCities, useChildrenLocations } from '@/entities/location/api/use-locations';
 
 function RentPageContent() {
   const t = useTranslations('Rent');
@@ -38,7 +39,6 @@ function RentPageContent() {
   const [listings, setListings] = useState<ListingSearchResponse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();
@@ -71,6 +71,18 @@ function RentPageContent() {
   const [location, setLocation] = useState(searchParams?.get('location') || '');
   const [minPrice, setMinPrice] = useState(searchParams?.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams?.get('maxPrice') || '');
+  const [propertyType, setPropertyType] = useState<string | undefined>(
+    searchParams?.get('propertyType') || undefined
+  );
+  const [districtId, setDistrictId] = useState<string | undefined>(
+    searchParams?.get('districtId') || undefined
+  );
+
+  const { data: cities = [] } = useCities();
+  const hcmCity = cities.find(
+    (c) => c.name.includes('Hồ Chí Minh') || c.name.includes('Ho Chi Minh')
+  );
+  const { data: districts = [] } = useChildrenLocations(hcmCity?.location_id);
 
   // Construct initial criteria from URL
   const getInitialCriteria = useCallback((): AdvancedSearchRequest => {
@@ -86,6 +98,7 @@ function RentPageContent() {
     return {
       listingType: 'RENT' as const,
       location: searchParams?.get('location') || undefined,
+      locationId: searchParams?.get('locationId') || undefined,
       price:
         searchParams?.get('minPrice') || searchParams?.get('maxPrice')
           ? [
@@ -137,6 +150,8 @@ function RentPageContent() {
     setLocation(searchParams?.get('location') || '');
     setMinPrice(searchParams?.get('minPrice') || '');
     setMaxPrice(searchParams?.get('maxPrice') || '');
+    setPropertyType(searchParams?.get('propertyType') || undefined);
+    setDistrictId(searchParams?.get('locationId') || undefined);
 
     const criteria = getInitialCriteria();
     setSearchCriteria(criteria);
@@ -144,11 +159,12 @@ function RentPageContent() {
     performSearch(criteria, page);
   }, [searchParams, getInitialCriteria, performSearch]);
 
-  const updateUrl = (criteria: AdvancedSearchRequest, page: number) => {
+  const updateUrl = useCallback((criteria: AdvancedSearchRequest, page: number) => {
     const params = new URLSearchParams();
     if (page > 1) params.set('page', page.toString());
 
     if (criteria.location) params.set('location', criteria.location);
+    if (criteria.locationId) params.set('locationId', criteria.locationId);
     if (criteria.price && criteria.price[0] !== null)
       params.set('minPrice', criteria.price[0]!.toString());
     if (criteria.price && criteria.price[1] !== null)
@@ -173,14 +189,25 @@ function RentPageContent() {
       });
     }
 
-    router.push(`/${locale}/rent?${params.toString()}`);
-  };
+    const queryString = params.toString();
+    const newUrl = `/${locale}/rent${queryString ? `?${queryString}` : ''}`;
+
+    // Update URL without navigation to avoid full page reload
+    window.history.replaceState(window.history.state, '', newUrl);
+
+    // Update state and fetch directly
+    setSearchCriteria(criteria);
+    setCurrentPage(page);
+    performSearch(criteria, page);
+  }, [locale, performSearch]);
 
   const handleBasicSearch = () => {
     const updatedCriteria: AdvancedSearchRequest = {
       ...searchCriteria,
       listingType: 'RENT' as const,
       location: location || undefined,
+      locationId: districtId || undefined,
+      propertyType: propertyType || undefined,
       price:
         minPrice || maxPrice
           ? [minPrice ? Number(minPrice) : null, maxPrice ? Number(maxPrice) : null]
@@ -190,10 +217,23 @@ function RentPageContent() {
     updateUrl(updatedCriteria, 1);
   };
 
-  const handleAdvancedFiltersApply = (filters: Partial<AdvancedSearchRequest>) => {
+  const handleSidebarFiltersChange = (sidebarFilters: AdvancedSearchRequest) => {
+    // Sync hero state with sidebar values
+    setLocation(sidebarFilters.location || '');
+    setPropertyType(sidebarFilters.propertyType || undefined);
+    setMinPrice(sidebarFilters.price?.[0] ? String(sidebarFilters.price[0]) : '');
+    setMaxPrice(sidebarFilters.price?.[1] ? String(sidebarFilters.price[1]) : '');
+
     const updatedCriteria = {
       ...searchCriteria,
-      ...filters,
+      location: sidebarFilters.location,
+      propertyType: sidebarFilters.propertyType,
+      price: sidebarFilters.price,
+      area: sidebarFilters.area,
+      dynamicAttributes: sidebarFilters.dynamicAttributes,
+      hasVideo: sidebarFilters.hasVideo,
+      has3D: sidebarFilters.has3D,
+      sortBy: sidebarFilters.sortBy,
       listingType: 'RENT' as const,
     };
     updateUrl(updatedCriteria, 1);
@@ -201,13 +241,15 @@ function RentPageContent() {
 
   const handlePageChange = (page: number) => {
     updateUrl(searchCriteria, page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to results section, not top of page
+    document.getElementById('search-results')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleResetFilters = () => {
     setLocation('');
     setMinPrice('');
     setMaxPrice('');
+    setPropertyType(undefined);
 
     const defaultCriteria: AdvancedSearchRequest = {
       listingType: 'RENT' as const,
@@ -226,226 +268,146 @@ function RentPageContent() {
   }
 
   return (
-    <div className='min-h-screen bg-primary/5'>
+    <div className='min-h-screen bg-background'>
       {/* Hero Section with Search */}
-      <section className='px-6 pb-6 pt-8 sm:px-6 sm:pb-8 sm:pt-16 lg:px-8'>
-        <div className='mx-auto max-w-7xl'>
-          {/* Header */}
-          <div className='mb-6 flex flex-col items-start justify-between gap-4 sm:mb-8 sm:flex-row sm:items-center sm:gap-6'>
-            <h1 className='text-2xl font-bold leading-[1.2] tracking-[-0.4px] text-foreground sm:text-3xl lg:text-[40px] sm:leading-[1.4]'>
-              {t('searchTitle')}
-            </h1>
-
-            {/* Search Option Toggle */}
-            <div className='flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0'>
-              <SavedSearchesPopover searchType='RENT' />
-              <SaveSearchButton searchType='RENT' criteria={searchCriteria} />
-              <Button
-                type='button'
-                onClick={() => setIsMapView(!isMapView)}
-                className='flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] border-primary/20 bg-white px-4 py-3 text-base font-medium text-secondary opacity-70 transition-all hover:opacity-100 sm:w-auto cursor-pointer'
-                variant='outline'
-              >
-                <span>{isMapView ? t('searchWithSearchBar') : t('searchWithMap')}</span>
-                <div className='relative flex h-5 w-5 items-center justify-center'>
-                  <div className='absolute inset-0 rounded-full bg-primary/5'></div>
-                  <MapPin className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
-                </div>
-              </Button>
-            </div>
-          </div>
-
-          {/* Simple Search Bar */}
-          <div className='bg-white rounded-lg border border-primary/20 p-6'>
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-              {/* Location */}
-              <div>
-                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
-                  <MapPin className='w-4 h-4 text-primary' />
-                  Địa điểm
-                </label>
-                <div className='relative'>
-                  <input
-                    type='text'
-                    placeholder='Hà Nội, Việt Nam'
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                    className='w-full px-4 h-11 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10'
-                    maxLength={100}
-                  />
-                  {location && (
-                    <button
-                      onClick={() => setLocation('')}
-                      className='absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground/60 hover:text-foreground transition-colors'
-                    >
-                      <X className='h-4 w-4' />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Min Price */}
-              <div>
-                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
-                  <Banknote className='w-4 h-4 text-primary' />
-                  Giá tối thiểu
-                </label>
-                <VndAmountInput
-                  placeholder='0'
-                  value={Number(minPrice) || 0}
-                  onChange={(val) => setMinPrice(val ? val.toString() : '')}
-                  onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  hidePreview
-                  inputClassName='w-full px-4 h-11 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
-                />
-              </div>
-
-              {/* Max Price */}
-              <div>
-                <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
-                  <Banknote className='w-4 h-4 text-primary' />
-                  Giá tối đa
-                </label>
-                <VndAmountInput
-                  placeholder='Bất kỳ'
-                  value={Number(maxPrice) || 0}
-                  onChange={(val) => setMaxPrice(val ? val.toString() : '')}
-                  onKeyDown={(e) => e.key === 'Enter' && handleBasicSearch()}
-                  hidePreview
-                  inputClassName='w-full px-4 h-11 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
-                />
-              </div>
-
-              {/* Search Button & Filters */}
-              <div className='flex items-end gap-2'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  onClick={() => setIsFiltersOpen(true)}
-                  className='border-primary text-primary hover:bg-primary/5 px-4 py-2 flex items-center justify-center gap-2'
-                  title='Bộ lọc nâng cao'
-                >
-                  <SlidersHorizontal className='w-4 h-4' />
-                </Button>
-                <Button
-                  type='button'
-                  onClick={handleBasicSearch}
-                  className='flex-1 bg-primary hover:bg-primary/90 text-white px-6 py-2 flex items-center justify-center gap-2'
-                >
-                  <Search className='w-4 h-4' />
-                  Tìm kiếm
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Advanced Search Filters Side Sheet */}
-          <AdvancedSearchFilters
-            open={isFiltersOpen}
-            onOpenChange={setIsFiltersOpen}
-            onApplyFilters={handleAdvancedFiltersApply}
-            initialFilters={{
-              ...searchCriteria,
-              location: location || undefined,
-              price: [
-                minPrice ? Number(minPrice) : null,
-                maxPrice ? Number(maxPrice) : null
-              ]
-            }}
-            onReset={handleResetFilters}
-          />
-        </div>
-      </section>
+      <HeroSearchBanner
+        activeTab='rent'
+        location={location}
+        onLocationChange={setLocation}
+        minPrice={minPrice}
+        onMinPriceChange={setMinPrice}
+        maxPrice={maxPrice}
+        onMaxPriceChange={setMaxPrice}
+        propertyType={propertyType}
+        onPropertyTypeChange={setPropertyType}
+        districtId={districtId}
+        onDistrictChange={setDistrictId}
+        districts={districts}
+        onSearch={handleBasicSearch}
+        onOpenFilters={() => {
+          const el = document.getElementById('sidebar-filters');
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        onToggleMapView={() => setIsMapView(!isMapView)}
+        isMapView={isMapView}
+        secondaryActions={
+          <>
+            <GlobalProfileSwitcher searchType='RENT' />
+            <SaveSearchButton searchType='RENT' criteria={searchCriteria} />
+          </>
+        }
+      />
 
       {/* Recommended Listings */}
       <RecommendedListings sourcePage='rent' />
 
-      {/* Results Section */}
-      <section className='px-6 pb-12 pt-2 sm:px-6 lg:px-8'>
+      {/* Results Section — Sidebar + Horizontal Cards */}
+      <section id='search-results' className='px-6 pb-12 pt-8 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
-          {/* Results Header */}
-          <div className='mb-6 flex items-center justify-between'>
+          <div className='mb-6'>
             <h2 className='text-xl font-bold text-foreground sm:text-2xl'>
               {t('resultsHeader')}
+              {totalResults > 0 && (
+                <span className='ml-2 text-base font-normal text-muted-foreground'>
+                  ({totalResults})
+                </span>
+              )}
             </h2>
           </div>
 
-          {isLoading ? (
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {Array.from({ length: itemsPerPage }).map((_, i) => (
-                <div key={i} className='rounded-lg border-[1.5px] border-primary/10 bg-white p-4'>
-                  <Skeleton className='aspect-[16/10] w-full rounded-lg mb-4' />
-                  <Skeleton className='h-6 w-3/4 mb-2' />
-                  <Skeleton className='h-5 w-1/2 mb-3' />
-                  <Skeleton className='h-px w-full mb-3' />
-                  <div className='flex gap-4 justify-center'>
-                    <Skeleton className='h-4 w-12' />
-                    <Skeleton className='h-4 w-12' />
-                    <Skeleton className='h-4 w-12' />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <>
-              {/* Property Grid */}
-              {listings.length > 0 && (
-                <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                  {listings.map((listing, index) => (
-                    <RealVistaListingCard
-                      key={listing.listing_id || index}
-                      id={listing.listing_id}
-                      title={listing.name}
-                      price={listing.price || 0}
-                      image={
-                        listing.thumbnail ||
-                        'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
-                      }
-                      address={listing.full_address || 'Unknown'}
-                      attributes={listing.attributes as ListingAttribute[]}
-                      isFavorite={listing.is_favorite ?? false}
-                      boostTags={listing.is_boosted ? listing.boost_packages : undefined}
-                      userType={listing.user_type as 'AGENT' | 'OWNER'}
-                      onToggleFavorite={handleToggleFavorite}
-                      onClick={() => {
-                        behaviorTracker.trackClick(listing.listing_id, {
-                          listing_type: 'RENT',
-                          price: listing.price,
-                          source_page: 'rent',
-                        });
-                        router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`);
-                      }}
-                    />
+          <div className='flex items-start gap-8'>
+            {/* Sidebar Filters */}
+            <aside id='sidebar-filters' className='w-72 shrink-0'>
+              <div className='sticky top-20 rounded-xl border border-border bg-white p-4'>
+                <SearchSidebarFilters
+                  filters={searchCriteria}
+                  onFiltersChange={handleSidebarFiltersChange}
+                  onReset={handleResetFilters}
+                />
+              </div>
+            </aside>
+
+            {/* Results */}
+            <div className='flex-1 min-w-0'>
+              {isLoading ? (
+                <div className='space-y-4'>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className='flex rounded-xl border border-border bg-white overflow-hidden'>
+                      <Skeleton className='w-[260px] min-h-[180px] shrink-0' />
+                      <div className='flex-1 p-4 space-y-3'>
+                        <Skeleton className='h-6 w-1/3' />
+                        <Skeleton className='h-5 w-2/3' />
+                        <Skeleton className='h-4 w-1/2' />
+                        <div className='flex gap-4 pt-2'>
+                          <Skeleton className='h-4 w-16' />
+                          <Skeleton className='h-4 w-16' />
+                          <Skeleton className='h-4 w-16' />
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              )}
+              ) : (
+                <>
+                  {listings.length > 0 && (
+                    <div className='space-y-4'>
+                      {listings.map((listing, index) => (
+                        <HorizontalListingCard
+                          key={listing.listing_id || index}
+                          listingType='RENT'
+                          id={listing.listing_id}
+                          title={listing.name}
+                          price={listing.price || 0}
+                          image={
+                            listing.thumbnail ||
+                            'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image'
+                          }
+                          address={listing.full_address || 'Unknown'}
+                          attributes={listing.attributes as ListingAttribute[]}
+                          isFavorite={listing.is_favorite ?? false}
+                          boostTags={listing.is_boosted ? listing.boost_packages : undefined}
+                          userType={listing.user_type as 'AGENT' | 'OWNER'}
+                          onToggleFavorite={handleToggleFavorite}
+                          onClick={() => {
+                            behaviorTracker.trackClick(listing.listing_id, {
+                              listing_type: 'RENT',
+                              price: listing.price,
+                              source_page: 'rent',
+                            });
+                            router.push(`/${locale}/listing/${listing.slug || listing.listing_id}`);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
 
-              {/* No Results */}
-              {listings.length === 0 && (
-                <div className='py-16 text-center'>
-                  <Search className='mx-auto h-12 w-12 text-primary/80 mb-4' />
-                  <p className='text-lg font-medium text-foreground mb-2'>
-                    {t('noResults')}
-                  </p>
-                  <p className='text-sm text-secondary'>
-                    {t('noResultsHint')}
-                  </p>
-                </div>
-              )}
+                  {/* No Results */}
+                  {listings.length === 0 && (
+                    <div className='py-16 text-center'>
+                      <Search className='mx-auto h-12 w-12 text-primary/60 mb-4' />
+                      <p className='text-lg font-medium text-foreground mb-2'>
+                        {t('noResults')}
+                      </p>
+                      <p className='text-sm text-muted-foreground'>
+                        {t('noResultsHint')}
+                      </p>
+                    </div>
+                  )}
 
-              {/* Pagination */}
-              {listings.length > 0 && (
-                <div className='mt-12'>
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
+                  {/* Pagination */}
+                  {listings.length > 0 && (
+                    <div className='mt-8'>
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </div>
+          </div>
         </div>
       </section>
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />

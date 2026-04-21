@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bookmark, Plus } from 'lucide-react';
 import { Button } from '@/shared/ui/button/button';
@@ -64,12 +64,15 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
   });
   const profiles: CustomerProfile[] = profilesResponse?.payload?.data || [];
 
-  // When profiles load, set the default selection to the active profile
-  if (!selectedProfileId && profiles.length > 0) {
-    const activeProfile = profiles.find((p) => p.is_active);
-    if (activeProfile) setSelectedProfileId(activeProfile.customer_profile_id);
-    else setSelectedProfileId(profiles[0].customer_profile_id);
-  }
+  // Set default selection to the active profile once when profiles first load
+  useEffect(() => {
+    if (!selectedProfileId && profiles.length > 0) {
+      const activeProfile = profiles.find((p) => p.is_active);
+      setSelectedProfileId(
+        activeProfile ? activeProfile.customer_profile_id : profiles[0].customer_profile_id
+      );
+    }
+  }, [profiles, selectedProfileId]);
 
   const handleSaveClick = () => {
     if (!session?.user) {
@@ -93,13 +96,10 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
           toast.success(t('success'));
           setShowBoardModal(false);
         },
-        onError: (error: any) => {
-          const payload = error?.response?.data;
-          const errorCode = payload?.payload?.error_code
-            ?? payload?.error_code
-            ?? payload?.errorCode;
+        onError: (error: unknown) => {
+          const httpErr = error as { status?: number; payload?: { error_code?: string } };
 
-          if (error?.response?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
+          if (httpErr?.status === 409 || httpErr?.payload?.error_code === 'SAVED_SEARCH_DUPLICATE') {
             toast.error(t('duplicateAlert'));
             return;
           }
@@ -114,13 +114,13 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
       <Button
         type='button'
         variant='outline'
+        size='icon'
         onClick={handleSaveClick}
         disabled={isPending}
-        className='px-4 py-2 flex items-center justify-center gap-2 transition-all border-primary text-primary hover:bg-primary/5'
+        className='h-9 w-9 shrink-0 border-primary text-primary hover:bg-primary/5'
         title={t('buttonLabel')}
       >
         <Bookmark className='w-4 h-4' />
-        <span className='hidden sm:inline'>{t('buttonLabel')}</span>
       </Button>
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
 

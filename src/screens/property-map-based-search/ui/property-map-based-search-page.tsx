@@ -1,24 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
-import { ChevronLeft, Search } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
-import { Button } from '@/shared/ui/button/button';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
 import { PropertySearchHeader } from '@/shared/ui/property-search-header';
 import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
-import { Skeleton } from '@/shared/ui/skeleton';
-import {
-  RealVistaListingCard,
-  type ListingAttribute,
-} from '@/shared/ui/realvista-listing-card/realvista-listing-card';
-import { Pagination } from '@/shared/ui/realvista-pagination';
 import {
   propertyQueries,
   type PropertyListingDto,
@@ -32,6 +25,7 @@ import {
 } from '@/shared/ui/property-filters-modal';
 import { HCM_CITY_CENTER } from '@/shared/constants';
 import { FLAT_PROPERTY_TYPES } from '@/shared/config/property-types';
+import { SearchListingResults } from './search-listing-results';
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
@@ -197,25 +191,30 @@ export function PropertyMapBasedSearchPage({
     setCurrentPage(1);
   };
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
     // Scroll to top of listings
     document.getElementById('property-listings-top')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
-  const handleToggleFavorite = async (id: string) => {
+  const handleToggleFavorite = useCallback(async (id: string) => {
     if (!session?.user) {
       setShowLoginModal(true);
       return;
     }
-    const currentFavorite =
-      favoriteOverrides[id] ?? properties.find((p: PropertyListingDto) => p.listing_id === id)?.is_favorite ?? false;
-    setFavoriteOverrides((prev) => ({ ...prev, [id]: !currentFavorite }));
+    // Use refs to current state via setState callback to avoid stale closures
+    let currentFavorite = false;
+    setFavoriteOverrides((prev) => {
+      const properties = searchResponse?.payload.data.content || [];
+      currentFavorite =
+        prev[id] ?? properties.find((p: PropertyListingDto) => p.listing_id === id)?.is_favorite ?? false;
+      return { ...prev, [id]: !currentFavorite };
+    });
     try {
       await bookmarkApi.toggleBookmark(id);
       void queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
@@ -223,7 +222,15 @@ export function PropertyMapBasedSearchPage({
       // revert optimistic update on failure
       setFavoriteOverrides((prev) => ({ ...prev, [id]: currentFavorite }));
     }
-  };
+  }, [session, searchResponse, queryClient]);
+
+  const handleHoverProperty = useCallback((ids: string[]) => {
+    setHoveredPropertyIds(ids);
+  }, []);
+
+  const handleSelectProperty = useCallback((ids: string[]) => {
+    setSelectedPropertyIds(ids);
+  }, []);
 
   return (
     <div className='flex h-full w-full'>
@@ -329,83 +336,22 @@ export function PropertyMapBasedSearchPage({
             />
           </div>
 
-          {/* Property Grid/List */}
-          <div id='property-listings-top' />
-          <div
-            className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col gap-4'}`}
-          >
-            {isLoading ? (
-              <div className='col-span-full grid grid-cols-1 md:grid-cols-2 gap-6'>
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className='flex flex-col gap-3 rounded-2xl border border-primary/20 bg-white p-3'>
-                    <Skeleton className='aspect-[4/3] w-full rounded-xl' />
-                    <div className='space-y-2 px-1'>
-                      <Skeleton className='h-6 w-3/4' />
-                      <Skeleton className='h-4 w-1/2' />
-                      <div className='flex gap-2 pt-2'>
-                        <Skeleton className='h-8 w-20 rounded-full' />
-                        <Skeleton className='h-8 w-20 rounded-full' />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : properties.length === 0 ? (
-              <div className='col-span-full flex flex-col items-center justify-center py-20 text-center opacity-60'>
-                <div className='mb-4 rounded-full bg-primary/5 p-6'>
-                  <Search className='h-10 w-10 text-primary' />
-                </div>
-                <h3 className='text-xl font-bold text-foreground'>Không tìm thấy kết quả</h3>
-                <p className='text-muted-foreground'>Thử thay đổi bộ lọc hoặc vùng tìm kiếm của bạn</p>
-                <Button variant='link' onClick={handleResetFilters} className='mt-2 text-primary font-bold'>Xóa tất cả bộ lọc</Button>
-              </div>
-            ) : (
-              properties.map((property: PropertyListingDto) => (
-                <div
-                  key={property.listing_id}
-                  id={`property-${property.listing_id}`}
-                  onMouseEnter={() => setHoveredPropertyIds([property.listing_id])}
-                  onMouseLeave={() => setHoveredPropertyIds([])}
-                  onClick={() => setSelectedPropertyIds([property.listing_id])}
-                >
-                  <RealVistaListingCard
-                    id={property.listing_id}
-                    title={property.name}
-                    address={property.full_address}
-                    price={property.price}
-                    image={property.thumbnail ?? ''}
-                    attributes={property.attributes as ListingAttribute[]}
-                    areaUnit='m²'
-                    isFavorite={favoriteOverrides[property.listing_id] ?? property.is_favorite}
-                    boostTags={property.is_boosted ? property.boost_packages : undefined}
-                    userType={property.user_type as 'AGENT' | 'OWNER'}
-                    variant={viewMode}
-                    listingType={initialListingType}
-                    onToggleFavorite={handleToggleFavorite}
-                    onClick={() =>
-                      router.push(`/${locale}/listing/${property.slug || property.listing_id}`)
-                    }
-                    className={
-                      selectedPropertyIds.includes(property.listing_id)
-                        ? 'ring-2 ring-primary'
-                        : ''
-                    }
-                  />
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className='mt-8 pb-4'>
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
+          <SearchListingResults
+            properties={properties}
+            isLoading={isLoading}
+            viewMode={viewMode}
+            selectedPropertyIds={selectedPropertyIds}
+            favoriteOverrides={favoriteOverrides}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            locale={locale}
+            listingType={initialListingType}
+            onHoverProperty={handleHoverProperty}
+            onSelectProperty={handleSelectProperty}
+            onToggleFavorite={handleToggleFavorite}
+            onPageChange={handlePageChange}
+            onResetFilters={handleResetFilters}
+          />
         </div>
 
         {/* Filters Modal */}

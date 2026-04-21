@@ -253,7 +253,7 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
               <p className='text-primary text-xl font-extrabold leading-[1.5] tracking-tight'>
                 {formattedPrice}
               </p>
-              <span className='text-xs font-semibold text-muted-foreground'>₫</span>
+              <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
               {listing.listing_type === 'RENT' && (
                 <span className='text-foreground/50 text-sm font-medium'>/month</span>
               )}

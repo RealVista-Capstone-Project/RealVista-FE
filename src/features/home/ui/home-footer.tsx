@@ -34,7 +34,7 @@ export function HomeFooter() {
   const t = useTranslations('Footer');
 
   return (
-    <footer className='bg-white'>
+    <footer className='bg-primary/5'>
       {/* Main footer content */}
       <div className='mx-auto max-w-7xl px-6 py-12 lg:px-8'>
         <div className='grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4'>

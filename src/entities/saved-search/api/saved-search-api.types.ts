@@ -17,6 +17,7 @@ export interface SearchCriteria {
 
 export interface SavedSearchDto {
   saved_search_id: string;
+  profile_id?: string;
   search_type: SearchType;
   criteria: SearchCriteria;
   board_id?: string;
