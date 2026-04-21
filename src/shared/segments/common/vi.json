@@ -20,7 +20,7 @@
       "dashboard": "Dashboard",
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
-      "myEngagements": "Engagement của tôi",
+      "myEngagements": "Hợp tác của tôi",
       "tenants": "Người thuê",
       "rentalContracts": "Hợp đồng thuê",
       "myContracts": "Hợp đồng của tôi",
@@ -30,7 +30,8 @@
       "ownerProperties": "Bảng tin bất động sản",
       "agentSetting": "Hồ sơ & cài đặt môi giới",
       "appointments": "Lịch hẹn",
-      "manageUsers": "Quản lý người dùng"
+      "manageUsers": "Quản lý người dùng",
+      "manageAgent": "Quản lý đại lý"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
@@ -423,7 +424,7 @@
     "subscribe": "Gói dịch vụ & thanh toán",
     "appointments": "Lịch hẹn",
     "myContracts": "Hợp đồng",
-    "myEngagements": "Engagement của tôi",
+    "myEngagements": "Hợp tác của tôi",
     "login": "Đăng nhập",
     "signup": "Đăng ký",
     "switchPersona": "Chuyển Profile"
