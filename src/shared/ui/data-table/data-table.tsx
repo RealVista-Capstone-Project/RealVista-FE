@@ -34,6 +34,10 @@ export interface DataTableProps<TData> {
   toolbar?: React.ReactNode
   /** Override the "Page X of Y" label. Receives (currentPage, totalPages). */
   pageInfoText?: (current: number, total: number) => string
+  /** Callback when a row is clicked. */
+  onRowClick?: (row: TData) => void
+  /** Check if a row is selected (for highlighting). */
+  isRowSelected?: (row: TData) => boolean
   className?: string
 }
 
@@ -49,6 +53,8 @@ export function DataTable<TData>({
   emptyDescription,
   toolbar,
   pageInfoText,
+  onRowClick,
+  isRowSelected,
   className,
 }: DataTableProps<TData>) {
   const table = useReactTable({
@@ -102,18 +108,28 @@ export function DataTable<TData>({
                 )
               )
             ) : table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                const isSelected = isRowSelected ? isRowSelected(row.original) : false;
+                return (
+                  <TableRow
+                    key={row.id}
+                    className={cn(
+                      onRowClick && 'cursor-pointer transition-colors hover:bg-muted/50',
+                      isSelected && 'bg-primary/5'
+                    )}
+                    onClick={() => onRowClick?.(row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               /* Empty state */
               <TableRow>
