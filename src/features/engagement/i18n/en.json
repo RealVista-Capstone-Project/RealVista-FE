@@ -1,50 +1,122 @@
 {
   "Engagement": {
-    "title": "My Engagements",
-    "sidebar": {
-      "title": "Engagements"
+    "page": {
+      "title": "Engagement Management",
+      "subtitle": "Track the status of your rental requests",
+      "viewApplications": "View Applications",
+      "loading": "Loading...",
+      "loadError": "Failed to load data",
+      "createButton": "Invite Collaboration",
+      "shortTitle": "My Engagements"
     },
-    "list": {
-      "status": {
-        "all": "All",
-        "submitted": "Submitted",
-        "accepted": "Accepted",
-        "rejected": "Rejected",
-        "holding": "Holding",
-        "cancelled": "Cancelled",
-        "finished": "Finished"
-      },
-      "columns": {
-        "id": "ID",
-        "property": "Property",
-        "agent": "Agent",
-        "customer": "Customer",
-        "status": "Status",
-        "createdAt": "Created At",
-        "updatedAt": "Updated At",
-        "actions": "Actions"
-      },
-      "empty": "No engagement requests found"
+    "tabs": {
+      "sent": "Sent",
+      "received": "Received"
+    },
+    "filter": {
+      "allStatuses": "All statuses",
+      "all": "All",
+      "searchPlaceholder": "Search by property name or address...",
+      "pickDate": "Pick a date",
+      "clearDate": "Clear date filter",
+      "filterTitle": "Filter by status",
+      "reset": "Reset",
+      "directionLabel": "Direction",
+      "statusLabel": "Status"
+    },
+    "table": {
+      "dateColumn": "Date Submitted",
+      "propertyColumn": "Property / Address",
+      "counterpartyColumn": "Counterparty",
+      "typeColumn": "Type",
+      "typeInvitation": "Invitation",
+      "typeProposal": "Proposal",
+      "statusColumn": "Status",
+      "actionsColumn": "Actions",
+      "roleAgent": "Agent",
+      "roleOwner": "Owner",
+      "empty": "No engagements found.",
+      "clearDateFilter": "Clear date filter"
+    },
+    "status": {
+      "SUBMITTED": "Submitted",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled",
+      "FINISHED": "Finished"
+    },
+    "listItem": {
+      "noTitle": "No title",
+      "viewDetail": "Details",
+      "cancelTooltip": "Cancel request"
+    },
+    "cancel": {
+      "button": "Cancel Request",
+      "dialogTitle": "Confirm cancellation",
+      "dialogDescription": "Are you sure you want to cancel this rental request? This action cannot be undone.",
+      "reasonPlaceholder": "Enter a reason for cancellation...",
+      "no": "No",
+      "confirm": "Confirm cancel"
+    },
+    "accept": {
+      "button": "Accept",
+      "dialogTitle": "Confirm acceptance",
+      "dialogDescription": "Are you sure you want to accept this engagement?",
+      "no": "No",
+      "confirm": "Confirm"
+    },
+    "reject": {
+      "button": "Reject",
+      "dialogTitle": "Confirm rejection",
+      "dialogDescription": "Are you sure you want to reject this engagement? This action cannot be undone.",
+      "no": "No",
+      "confirm": "Confirm rejection"
+    },
+    "overview": {
+      "title": "Overview",
+      "last30Days": "Last 30 days",
+      "total": "Total engagements",
+      "accepted": "Accepted",
+      "pendingRejected": "Pending / Rejected",
+      "pending": "pending",
+      "rejected": "rejected"
+    },
+    "outlook": {
+      "selectPrompt": "Select an engagement to view details",
+      "messageTitle": "Message",
+      "proposalTitle": "Agent Proposal",
+      "commission": "Commission Rate",
+      "experience": "Experience",
+      "years": "years",
+      "rentRange": "Rent Price Range",
+      "saleRange": "Sale Price Range",
+      "bio": "About",
+      "finish": "Finish",
+      "invitationDetails": "Invitation Details",
+      "offeredCommission": "Offered Commission"
     },
     "detail": {
-      "title": "Engagement Details",
-      "propertyInfo": "Property Information",
-      "agentInfo": "Agent Information",
-      "customerInfo": "Customer Information",
-      "statusInfo": "Engagement Status",
-      "dates": {
-        "createdAt": "Created At",
-        "updatedAt": "Updated At"
-      },
-      "actions": {
-        "accept": "Accept",
-        "reject": "Reject",
-        "cancel": "Cancel Request"
-      },
-      "tenants": "Number of Tenants",
+      "panelTitle": "Rental Request Detail",
+      "panelTitleInvitation": "Collaboration Invitation Details",
+      "typeOwnerInvitation": "Owner's Invitation",
+      "offeredCommission": "Offered Commission",
+      "ownerMessage": "Message from Owner",
+      "acceptedMessageInvitation": "Congratulations! Your invitation has been accepted.",
+      "noTitle": "No title",
+      "statusLabel": "Status",
+      "submittedDate": "Submitted",
+      "updatedDate": "Updated",
+      "requestType": "Request Type",
+      "applicationTitle": "Application Title",
+      "income": "Income",
+      "incomePerMonth": "/mo",
+      "leaseTerm": "Lease Term",
+      "leaseTermMonths": "{months} months",
+      "moveInDate": "Move-in Date",
+      "tenants": "Tenants",
       "tenantNote": "Tenant Note",
-      "acceptedMessage": "Congratulations! Your request has been accepted.",
-      "rejectedMessage": "Sorry, your request has been rejected.",
+      "acceptedMessage": "Congratulations! Your request has been accepted by the landlord.",
+      "rejectedMessage": "Unfortunately, your request has been rejected.",
       "statusSubmitted": "Submitted",
       "statusAccepted": "Accepted",
       "statusRejected": "Rejected",
