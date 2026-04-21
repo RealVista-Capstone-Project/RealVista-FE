@@ -186,7 +186,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
                 step.number <= currentStep
                   ? 'bg-primary text-white'
-                  : 'bg-primary/5 text-foreground'
+                  : 'bg-muted text-muted-foreground'
               )}
             >
               {step.number}
@@ -194,7 +194,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground/70'
+                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
               {step.label}
