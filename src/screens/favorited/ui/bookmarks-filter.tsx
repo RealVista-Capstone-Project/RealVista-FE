@@ -116,6 +116,8 @@ export function BookmarksFilter({
   const dropdownButtonClass =
     'flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/5';
 
+  const dividerClass = 'mx-2 h-6 w-px shrink-0 bg-muted-foreground/40';
+
   return (
     <section className='pt-10 px-6 sm:px-6 lg:px-8'>
       <div className='mx-auto max-w-7xl'>
@@ -124,18 +126,6 @@ export function BookmarksFilter({
           <div className='flex items-center gap-4'>
             {/* Listing Type Tabs */}
             <div className='flex items-center gap-2'>
-              <button
-                type='button'
-                onClick={() => onListingTypeChange('rent')}
-                className={cn(
-                  'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                  listingType === 'rent'
-                    ? 'bg-primary text-white'
-                    : 'text-muted-foreground hover:bg-primary/5'
-                )}
-              >
-                {t('rent')}
-              </button>
               <button
                 type='button'
                 onClick={() => onListingTypeChange('buy')}
@@ -148,7 +138,22 @@ export function BookmarksFilter({
               >
                 {t('buy')}
               </button>
+              <button
+                type='button'
+                onClick={() => onListingTypeChange('rent')}
+                className={cn(
+                  'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                  listingType === 'rent'
+                    ? 'bg-primary text-white'
+                    : 'text-muted-foreground hover:bg-primary/5'
+                )}
+              >
+                {t('rent')}
+              </button>
             </div>
+
+            {/* Divider */}
+            <div className={dividerClass} aria-hidden='true' />
 
             {/* Sort By Dropdown */}
             <div className='flex items-center gap-2'>
@@ -195,6 +200,9 @@ export function BookmarksFilter({
                 </PopoverPrimitive.Portal>
               </PopoverPrimitive.Root>
             </div>
+
+            {/* Divider */}
+            <div className={dividerClass} aria-hidden='true' />
 
             {/* Property Dropdown */}
             <div className='flex items-center gap-2'>

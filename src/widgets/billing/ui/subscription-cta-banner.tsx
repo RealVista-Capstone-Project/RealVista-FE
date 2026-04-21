@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 import { billingQueries } from '@/entities/billing';
 import type { ActiveSubscriptionResponse } from '@/entities/billing';
 
@@ -38,7 +39,10 @@ export function SubscriptionCTABanner() {
     return () => clearTimeout(timer);
   }, []);
 
-  const { data: subscriptions, isLoading } = useQuery(billingQueries.mySubscriptions());
+  const { data: session } = useSession();
+  const isAuthenticated = !!(session as any)?.user?.accessToken;
+
+  const { data: subscriptions, isLoading } = useQuery({ ...billingQueries.mySubscriptions(), enabled: isAuthenticated });
 
   const isOnTargetPage = pathname != null && ALLOWED_PATH_SUFFIXES.some((suffix) =>
     pathname.endsWith(suffix)

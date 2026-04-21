@@ -5,6 +5,7 @@ export interface AdvancedSearchRequest {
   propertyType?: string;
   propertyCategory?: string;
   location?: string;
+  locationId?: string;
   price?: [number | null, number | null];
   area?: [number | null, number | null];
   /** Dynamic attributes sent as { BEDROOMS: '2', DIRECTION: 'North', ... }

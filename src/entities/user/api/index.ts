@@ -91,7 +91,8 @@ export const userApi = {
 
 
   /**
-   * Send email OTP to the given email address (updates user's email if changed)
+   * Send OTP to the target email. Backend stores a pending address until verify succeeds;
+   * the profile email is committed only after `/me/verify-email` with a valid OTP.
    */
   sendEmailOtp: (email: string) =>
     http.post<ApiResponse<{ expirySeconds: number }>>('/me/send-email-otp', { email }),

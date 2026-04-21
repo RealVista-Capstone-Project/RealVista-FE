@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Filter, X, ChevronDown, Plus, Building2 } from 'lucide-react';
+import { Search, Filter, X, ChevronDown, Plus, Building2, Lock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -16,6 +16,7 @@ import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
+import { useListingQuota } from '@/entities/billing';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
@@ -48,7 +49,9 @@ export function ManagedListingsPage() {
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const filterRef = React.useRef<HTMLDivElement>(null);
   const t = useTranslations('ManagedListings');
+  const tDetail = useTranslations('ListingDetailPanel');
   const isMobile = useIsMobile();
+  const { isLocked, isLoading: quotaLoading } = useListingQuota();
 
   const handleCreateListing = () => {
     router.push(`/${locale}/dashboard/listings/create`);
@@ -170,7 +173,9 @@ export function ManagedListingsPage() {
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
                 <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-                  <span className='text-sm font-bold text-white'>{formatNumber(listingCounts.all)}</span>
+                  <span className='text-sm font-bold text-white'>
+                    {formatNumber(listingCounts.all)}
+                  </span>
                 </div>
               </div>
 
@@ -186,6 +191,28 @@ export function ManagedListingsPage() {
               </button>
             </div>
           </div>
+
+          {/* Subscription Gate */}
+          {isLocked && !quotaLoading && (
+            <div className='border-b border-purple-92/50 px-4 sm:px-6 py-4'>
+              <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
+                <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
+                <h3 className='text-sm font-semibold text-main-black mb-1'>
+                  {tDetail('subscriptionGate.title')}
+                </h3>
+                <p className='text-xs text-grey-500 mb-4'>
+                  {tDetail('subscriptionGate.description')}
+                </p>
+                <button
+                  type='button'
+                  onClick={() => router.push(`/${locale}/subscribe`)}
+                  className='inline-flex items-center justify-center rounded-lg bg-main-black text-white text-xs font-semibold px-6 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
+                >
+                  {tDetail('subscriptionGate.cta')}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Tabs */}
           <div className='border-b border-primary/20 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>

@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
-import { ProfileDropdown, Separator, useProfileMenuItems, GlobalProfileSwitcher } from '@/shared/ui';
+import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
 import { ChatDropdownContainer } from '@/widgets/chat-dropdown';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 
@@ -96,13 +96,6 @@ export function PublicActions({
       {isUserLoggedIn && (
         <div className='hidden lg:block'>
           <NotificationDropdownContainer />
-        </div>
-      )}
-
-      {/* Profile Switcher — logged-in only, hidden on mobile */}
-      {isUserLoggedIn && (
-        <div className='hidden lg:block'>
-          <GlobalProfileSwitcher />
         </div>
       )}
 

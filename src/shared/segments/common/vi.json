@@ -143,6 +143,12 @@
       "contentVerification": "Xác thực nội dung bằng AI",
       "verified": "Đã xác thực ✅",
       "violated": "Vi phạm chính sách"
+    },
+    "quota": {
+      "remaining": "Bạn còn {count} lượt publish listing",
+      "unlimited": "Không giới hạn lượt publish",
+      "exhausted": "Bạn đã hết lượt publish listing",
+      "loading": "Đang kiểm tra..."
     }
   },
   "Common": {
@@ -300,6 +306,8 @@
       "otpLabel": "Mã OTP",
       "otpPlaceholder": "Nhập mã 6 chữ số",
       "otpCountdown": "Gửi lại sau {seconds}s",
+      "otpExpiresIn": "Mã hết hạn sau {time}",
+      "otpExpired": "Mã OTP đã hết hạn",
       "verifying": "Đang xác minh...",
       "verifyOtp": "Xác minh",
       "phoneOtpSent": "Mã OTP đã được gửi tới số điện thoại của bạn",
@@ -456,7 +464,7 @@
     "searchWithMap": "Tìm kiếm với Bản đồ",
     "searchWithSearchBar": "Tìm kiếm với Thanh tìm kiếm",
     "location": "Vị trí",
-    "locationDefault": "Hà Nội, Việt Nam",
+    "locationDefault": "Tìm kiếm với địa chỉ cụ thể",
     "when": "Khi nào",
     "selectMoveInDate": "Chọn ngày chuyển đến",
     "price": "Giá",
@@ -816,5 +824,27 @@
     "success": "Đã lưu tìm kiếm thành công",
     "error": "Lưu tìm kiếm thất bại. Vui lòng thử lại sau.",
     "buttonLabel": "Lưu tìm kiếm"
+  },
+  "HeroSearch": {
+    "heroTitle": "Tìm Ngôi Nhà Mơ Ước Của Bạn",
+    "heroWith": "Cùng RealVista",
+    "heroSubtitle": "Khám phá hàng ngàn bất động sản đã được xác thực trên toàn quốc",
+    "tabBuy": "Mua",
+    "tabRent": "Thuê",
+    "propertyType": "Loại Bất động sản",
+    "location": "Địa điểm",
+    "locationPlaceholder": "Tìm kiếm với địa chỉ cụ thể",
+    "price": "Giá",
+    "minPrice": "Giá tối thiểu",
+    "maxPrice": "Giá tối đa",
+    "any": "Bất kỳ",
+    "search": "Tìm kiếm",
+    "allTypes": "Tất cả",
+    "allDistricts": "Quận/Huyện",
+    "filters": "Bộ lọc",
+    "listingTypeSale": "Mua",
+    "listingTypeRent": "Thuê",
+    "mapView": "Xem bản đồ",
+    "listView": "Xem danh sách"
   }
 }

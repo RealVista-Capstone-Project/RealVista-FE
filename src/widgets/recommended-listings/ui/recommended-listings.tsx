@@ -191,7 +191,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
 
   return (
     <motion.section
-      className='bg-primary/5 w-full py-12 sm:py-16'
+      className='bg-primary/5 w-full py-8 sm:py-10'
       variants={sectionVariants}
       initial='hidden'
       whileInView='visible'
@@ -234,26 +234,26 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
 
           {/* Loading State - Horizontal skeleton cards */}
           {(isLoading || isFetching) && (
-            <div className='flex gap-4 overflow-hidden relative'>
+            <div className='flex gap-3 overflow-hidden relative'>
               {/* Optional slight slide/fade for skeleton */}
               <AnimatePresence>
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
-                  className='flex gap-4'
+                  className='flex gap-3'
                 >
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className='w-[300px] flex-shrink-0'>
-                      <div className='rounded-lg border-[1.5px] border-primary/10 bg-background p-6'>
-                        <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
-                        <Skeleton className='h-8 w-3/4 mb-3' />
-                        <Skeleton className='h-6 w-1/2 mb-4' />
-                        <Skeleton className='h-px w-full mb-4' />
-                        <div className='flex gap-4 justify-center'>
-                          <Skeleton className='h-5 w-12' />
-                          <Skeleton className='h-5 w-12' />
-                          <Skeleton className='h-5 w-12' />
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className='w-[240px] flex-shrink-0'>
+                      <div className='rounded-lg border-[1.5px] border-primary/10 bg-background p-3.5'>
+                        <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-3' />
+                        <Skeleton className='h-5 w-3/4 mb-2' />
+                        <Skeleton className='h-4 w-1/2 mb-3' />
+                        <Skeleton className='h-px w-full mb-3' />
+                        <div className='flex gap-3 justify-center'>
+                          <Skeleton className='h-4 w-10' />
+                          <Skeleton className='h-4 w-10' />
+                          <Skeleton className='h-4 w-10' />
                         </div>
                       </div>
                     </div>
@@ -273,11 +273,11 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
 
           {/* Recommendations Carousel */}
           {(!isLoading && !isFetching && !isError && recommendations.length > 0) && (
-            <CarouselContent className='-ml-4'>
+            <CarouselContent className='-ml-3'>
               {recommendations.map((listing, index) => (
                 <CarouselItem
                   key={listing.listing_id}
-                  className='pl-4 basis-[280px] sm:basis-[300px] lg:basis-1/4'
+                  className='pl-3 basis-[220px] sm:basis-[240px] lg:basis-1/5'
                 >
                   <motion.div
                     custom={index}
@@ -300,6 +300,7 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
                       isFavorite={favoriteOverrides[listing.listing_id] ?? listing.is_favorite ?? false}
                       onToggleFavorite={handleToggleFavorite}
                       onClick={() => handleListingClick(listing)}
+                      compact
                       className='h-full transition-shadow duration-300 hover:shadow-lg'
                     />
                   </motion.div>

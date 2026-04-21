@@ -5,7 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Slider } from '@/shared/ui/slider';
 import { Switch } from '@/shared/ui/switch';
 import { AdvancedSearchRequest } from '@/shared/types/search';
-import { PROPERTY_TYPES, ATTRIBUTE_LABELS, ATTRIBUTE_TYPES, PropertyAttribute } from '@/shared/config/property-types';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
+import { useDistricts } from '@/entities/location/api/use-locations';
+import { usePropertyAttributes } from '@/entities/property/api/use-property-attributes';
+import type { PropertyAttributeDefinition } from '@/entities/property/api/property-api.types';
 
 interface InlineAdvancedFiltersProps {
   onApplyFilters: (filters: Partial<AdvancedSearchRequest>) => void;
@@ -21,26 +24,30 @@ export function InlineAdvancedFilters({
   const [isExpanded, setIsExpanded] = useState(false);
   const [filters, setFilters] = useState<Partial<AdvancedSearchRequest>>(initialFilters);
 
+  const { data: districts = [] } = useDistricts();
+  const { data: apiAttributes = [] } = usePropertyAttributes(filters.propertyType);
+
+  // Build lookup map: attribute code → definition (with ranges)
+  const attributeDefMap = useMemo(() => {
+    const map = new Map<string, PropertyAttributeDefinition>();
+    apiAttributes.forEach((attr) => map.set(attr.attribute_code.toUpperCase(), attr));
+    return map;
+  }, [apiAttributes]);
+
   // Sync filters with initialFilters when it changes (e.g., from URL navigation)
   useEffect(() => {
     setFilters(initialFilters);
   }, [initialFilters]);
 
-  // Derive the selected property type from URL params or state
-  const selectedPropertyType = useMemo(() => {
-    return filters.propertyType as string | undefined;
-  }, [filters]);
-
-  // Find attributes for the selected type
-  const activeAttributes = useMemo(() => {
-    if (!selectedPropertyType) return [];
-
+  // Active attribute codes based on selected property type
+  const activeAttributeCodes = useMemo(() => {
+    if (!filters.propertyType) return [];
     for (const category of PROPERTY_TYPES) {
-      const type = category.types.find((t) => t.code === selectedPropertyType);
-      if (type) return type.attributes;
+      const type = category.types.find((t) => t.code === filters.propertyType);
+      if (type) return type.attributes as string[];
     }
-    return []
-  }, [selectedPropertyType]);
+    return [];
+  }, [filters]);
 
   const handleApply = () => {
     onApplyFilters(filters);
@@ -54,13 +61,11 @@ export function InlineAdvancedFilters({
     onApplyFilters(resetFilters);
   };
 
-  /** Strip non-integer / negative input: keep only digits, return undefined if empty */
   const sanitizePositiveInt = (raw: string): string | undefined => {
     const digits = raw.replace(/[^0-9]/g, '');
     return digits === '' ? undefined : String(parseInt(digits, 10));
   };
 
-  /** Update a single key inside filters.dynamicAttributes */
   const setDynamicAttr = (attrCode: string, value: string | undefined) => {
     const prev = filters.dynamicAttributes || {};
     if (value === undefined || value === '') {
@@ -72,37 +77,75 @@ export function InlineAdvancedFilters({
     }
   };
 
-  // Helper to render dynamic input — stores into dynamicAttributes
-  const renderDynamicField = (attrCode: PropertyAttribute) => {
-    const label = ATTRIBUTE_LABELS[attrCode];
-    const type = ATTRIBUTE_TYPES[attrCode];
-    const currentValue = filters.dynamicAttributes?.[attrCode];
+  const encodeRangeValue = (min: number | null, max: number | null): string => {
+    const minStr = min !== null ? String(min) : '';
+    const maxStr = max !== null ? String(max) : '';
+    return `${minStr}:${maxStr}`;
+  };
 
-    if (type === 'boolean') {
+  const renderDynamicField = (attrCode: string) => {
+    const upperCode = attrCode.toUpperCase();
+    const attrDef = attributeDefMap.get(upperCode);
+    const currentValue = filters.dynamicAttributes?.[upperCode];
+
+    const label = attrDef?.attribute_name ?? attrCode;
+    const dataType = attrDef?.data_type ?? 'TEXT';
+    const ranges = attrDef?.ranges ?? [];
+
+    // NUMBER with ranges → dropdown
+    if (dataType === 'NUMBER' && ranges.length > 0) {
       return (
-        <div key={attrCode} className='flex items-center justify-between p-3 border border-primary/20 rounded-lg'>
+        <div key={upperCode}>
+          <label className='block text-sm font-medium text-foreground mb-2'>{label}</label>
+          <Select
+            value={currentValue || ''}
+            onValueChange={(val) => setDynamicAttr(upperCode, val || undefined)}
+          >
+            <SelectTrigger className='w-full px-4 py-2 border border-primary/20 rounded-lg'>
+              <SelectValue placeholder='Bất kỳ' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value=''>Bất kỳ</SelectItem>
+              {ranges
+                .slice()
+                .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+                .map((range) => (
+                  <SelectItem
+                    key={range.range_id}
+                    value={encodeRangeValue(range.min_value, range.max_value)}
+                  >
+                    {range.label}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    if (dataType === 'BOOLEAN') {
+      return (
+        <div key={upperCode} className='flex items-center justify-between p-3 border border-primary/20 rounded-lg'>
           <span className='text-sm text-foreground'>{label}</span>
           <Switch
             checked={currentValue === 'true'}
-            onCheckedChange={(checked) => setDynamicAttr(attrCode, checked ? 'true' : undefined)}
+            onCheckedChange={(checked) => setDynamicAttr(upperCode, checked ? 'true' : undefined)}
           />
         </div>
       );
     }
 
-    if (type === 'number') {
+    if (dataType === 'NUMBER') {
       return (
-        <div key={attrCode}>
-          <label className='block text-sm font-medium text-foreground mb-2'>
-            {label}
-          </label>
+        <div key={upperCode}>
+          <label className='block text-sm font-medium text-foreground mb-2'>{label}</label>
           <input
             type='number'
             min='0'
             step='1'
             placeholder='Bất kỳ'
             value={currentValue || ''}
-            onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
+            onChange={(e) => setDynamicAttr(upperCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
             className='w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
             maxLength={10}
@@ -111,17 +154,43 @@ export function InlineAdvancedFilters({
       );
     }
 
-    // Text / Select
+    // TEXT with ranges → dropdown
+    if (dataType === 'TEXT' && ranges.length > 0) {
+      return (
+        <div key={upperCode}>
+          <label className='block text-sm font-medium text-foreground mb-2'>{label}</label>
+          <Select
+            value={currentValue || ''}
+            onValueChange={(val) => setDynamicAttr(upperCode, val || undefined)}
+          >
+            <SelectTrigger className='w-full px-4 py-2 border border-primary/20 rounded-lg'>
+              <SelectValue placeholder='Bất kỳ' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value=''>Bất kỳ</SelectItem>
+              {ranges
+                .slice()
+                .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+                .map((range) => (
+                  <SelectItem key={range.range_id} value={range.label}>
+                    {range.label}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // TEXT
     return (
-      <div key={attrCode}>
-        <label className='block text-sm font-medium text-foreground mb-2'>
-          {label}
-        </label>
+      <div key={upperCode}>
+        <label className='block text-sm font-medium text-foreground mb-2'>{label}</label>
         <input
           type='text'
           placeholder='Nhập giá trị'
           value={currentValue || ''}
-          onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
+          onChange={(e) => setDynamicAttr(upperCode, e.target.value || undefined)}
           className='w-full px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary'
           maxLength={100}
         />
@@ -147,6 +216,31 @@ export function InlineAdvancedFilters({
       {/* Filters Content */}
       {isExpanded && (
         <div className='px-6 pb-6 pt-2 border-t border-primary/20'>
+
+          {/* District */}
+          <div className='mb-6'>
+            <label className='flex items-center gap-2 text-sm font-medium text-foreground mb-2'>
+              Quận / Huyện
+            </label>
+            <Select
+              value={filters.locationId || 'ALL'}
+              onValueChange={(value) =>
+                setFilters({ ...filters, locationId: value === 'ALL' ? undefined : value })
+              }
+            >
+              <SelectTrigger className='w-full md:w-1/2 lg:w-1/3'>
+                <SelectValue placeholder='Tất cả' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='ALL'>Tất cả</SelectItem>
+                {districts.map((d) => (
+                  <SelectItem key={d.location_id} value={d.location_id}>
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Property Type Selector */}
           <div className='mb-6'>
@@ -201,29 +295,39 @@ export function InlineAdvancedFilters({
             </div>
           </div>
 
-          {/* Dynamic Attributes Section — BEDROOMS/BATHROOMS appear here automatically if the type supports them */}
-          {activeAttributes.length > 0 && (
+          {/* Dynamic Attributes Section */}
+          {activeAttributeCodes.length > 0 && (
             <div className='mb-6'>
               <h4 className='text-sm font-semibold text-foreground mb-4'>Đặc điểm bổ sung</h4>
 
-              {/* Number and Text Inputs */}
-              {activeAttributes
-                .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
+              {activeAttributeCodes
+                .filter((code) => {
+                  const def = attributeDefMap.get(code.toUpperCase());
+                  return def?.data_type !== 'BOOLEAN';
+                })
                 .length > 0 && (
                   <div className='grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-4'>
-                    {activeAttributes
-                      .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
+                    {activeAttributeCodes
+                      .filter((code) => {
+                        const def = attributeDefMap.get(code.toUpperCase());
+                        return def?.data_type !== 'BOOLEAN';
+                      })
                       .map((attr) => renderDynamicField(attr))}
                   </div>
                 )}
 
-              {/* Boolean Switches */}
-              {activeAttributes
-                .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
+              {activeAttributeCodes
+                .filter((code) => {
+                  const def = attributeDefMap.get(code.toUpperCase());
+                  return def?.data_type === 'BOOLEAN';
+                })
                 .length > 0 && (
                   <div className='grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4'>
-                    {activeAttributes
-                      .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
+                    {activeAttributeCodes
+                      .filter((code) => {
+                        const def = attributeDefMap.get(code.toUpperCase());
+                        return def?.data_type === 'BOOLEAN';
+                      })
                       .map((attr) => renderDynamicField(attr))}
                   </div>
                 )}
@@ -241,14 +345,18 @@ export function InlineAdvancedFilters({
                 <span className='text-sm text-foreground'>Có Video</span>
                 <Switch
                   checked={filters.hasVideo || false}
-                  onCheckedChange={(checked) => setFilters({ ...filters, hasVideo: checked })}
+                  onCheckedChange={(checked) =>
+                    setFilters({ ...filters, hasVideo: checked || undefined })
+                  }
                 />
               </div>
               <div className='flex items-center justify-between p-3 border border-primary/20 rounded-lg'>
                 <span className='text-sm text-foreground'>Có 3D Tour</span>
                 <Switch
                   checked={filters.has3D || false}
-                  onCheckedChange={(checked) => setFilters({ ...filters, has3D: checked })}
+                  onCheckedChange={(checked) =>
+                    setFilters({ ...filters, has3D: checked || undefined })
+                  }
                 />
               </div>
             </div>

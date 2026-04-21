@@ -59,7 +59,7 @@ export function PriceAndTour({
             <p className='text-primary text-[24px] font-extrabold leading-[1.5] tracking-[-1px]'>
               {formatVND(price)}
             </p>
-            <span className='text-sm font-semibold text-muted-foreground'>₫</span>
+            <span className='text-sm font-semibold text-muted-foreground'>VNĐ</span>
             {priceSuffix && (
               <span className='text-foreground/50 text-[14px] font-medium h-8 flex items-center'>
                 {priceSuffix}

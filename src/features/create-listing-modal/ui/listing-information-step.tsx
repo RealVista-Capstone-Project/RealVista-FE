@@ -8,6 +8,7 @@ import type { UserProperty, ListingType, CreateListingFormData } from '../model/
 import { Check } from 'lucide-react';
 import { useContentVerification } from '@/shared/lib/hooks/use-content-verification';
 import { useMediaAnalysis } from '@/shared/lib/hooks/use-media-analysis';
+import { useListingQuota } from '@/entities/billing';
 import {
   ListingTypeSelector,
   ListingNameInput,
@@ -51,6 +52,7 @@ export function ListingInformationStep({
   isSubmitting = false,
 }: ListingInformationStepProps) {
   const t = useTranslations('CreateListingModal');
+  const { remaining, unlimited, isLocked, isLoading: quotaLoading } = useListingQuota();
 
   // ── Media Selection State ──
   const [selectedMediaIds, setSelectedMediaIds] = React.useState<Set<string>>(
@@ -528,7 +530,23 @@ export function ListingInformationStep({
       </div>
 
       {/* Footer — Previous / Save as Draft / Submit */}
-      <div className='shrink-0 flex items-center justify-end gap-3 md:gap-4 border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
+      <div className='shrink-0 border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
+        {/* Quota info */}
+        <div className='mb-3 text-right'>
+          {quotaLoading ? (
+            <span className='text-xs text-grey-500'>{t('quota.loading')}</span>
+          ) : unlimited ? (
+            <span className='text-xs text-green-600 font-medium'>{t('quota.unlimited')}</span>
+          ) : isLocked ? (
+            <span className='text-xs text-red-500 font-medium'>{t('quota.exhausted')}</span>
+          ) : (
+            <span className='text-xs text-grey-600'>
+              {t('quota.remaining', { count: remaining ?? 0 })}
+            </span>
+          )}
+        </div>
+
+        <div className='flex items-center justify-end gap-3 md:gap-4'>
         <button
           type='button'
           onClick={onPrevious}
@@ -555,16 +573,17 @@ export function ListingInformationStep({
         <button
           type='button'
           onClick={() => handleSubmit(true)}
-          disabled={!isValid || isSubmitting}
+          disabled={!isValid || isSubmitting || isLocked}
           className={cn(
             'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all',
-            isValid && !isSubmitting
-              ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
-              : 'bg-primary/30 cursor-not-allowed'
+            isValid && !isSubmitting && !isLocked
+              ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
+              : 'bg-main-primary/30 cursor-not-allowed'
           )}
         >
           {isSubmitting ? t('submitting') : t('submit')}
         </button>
+        </div>
       </div>
     </>
   );
