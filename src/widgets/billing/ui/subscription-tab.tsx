@@ -1579,7 +1579,7 @@ function Step3Content({
 
       {/* PayOS: show QR after checkout created */}
       {selectedPayment === 'payos' && checkout && (checkout.qr_code || checkout.checkout_url) && (
-        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-secondary/50 py-6'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-white py-6 shadow-sm'>
           {secondsLeft === 0 ? (
             /* Expired state — user may have already scanned and transferred */
             <div className='flex flex-col items-center gap-3 text-center px-6'>
@@ -1636,7 +1636,7 @@ function Step3Content({
                   <Loader2 className='size-4 animate-spin text-foreground/70' />
                 )}
               </p>
-              <div className='rounded-xl border-4 border-white p-1 shadow-md'>
+              <div className='rounded-xl border border-border bg-white p-1 shadow-md'>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
@@ -1675,7 +1675,7 @@ function Step3Content({
 
       {/* VNPay: show payment button after link created */}
       {selectedPayment === 'vnpay' && checkout && (
-        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-secondary/50 py-6'>
+        <div className='flex flex-col items-center gap-3 rounded-xl border border-border bg-white py-6 shadow-sm'>
           <p className='text-sm font-medium text-foreground/70'>
             Đã tạo link thanh toán VNPay
           </p>
