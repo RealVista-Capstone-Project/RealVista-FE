@@ -14,15 +14,13 @@ function ManageRentalContractContent() {
   const {
     contracts,
     currentPage,
-    handleContractClick,
     isError,
     isLoading,
     searchQuery,
-    selectedContract,
-    setCurrentPage,
     setSearchQuery,
     setStatusFilter,
     statusFilter,
+    setCurrentPage,
     totalElements,
     totalPages,
   } = useManageRentalContractContext();
@@ -64,8 +62,6 @@ function ManageRentalContractContent() {
       totalPages={totalPages}
       itemsPerPage={10}
       onPageChange={setCurrentPage}
-      selectedContract={selectedContract}
-      onSelect={handleContractClick}
     />
   );
 }

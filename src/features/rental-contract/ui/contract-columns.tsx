@@ -14,6 +14,7 @@ import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 import {
   useGetLandlordSigningUrlMutation,
+  useSendToLandlordMutation,
   useUpdateRentalContractStatusMutation,
 } from '../hooks/use-rental-contracts';
 import {
@@ -33,12 +34,16 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
 
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
   const getLandlordSigningUrlMutation = useGetLandlordSigningUrlMutation();
+  const sendToLandlordMutation = useSendToLandlordMutation();
 
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
   const [signingModal, setSigningModal] = useState<{
     url: string;
     role: 'landlord' | 'renter';
   } | null>(null);
+
+  // Show "Send to owner to sign" when DRAFT
+  const canSendToLandlord = contract.status === RentalContractStatus.DRAFT;
 
   // Show "Sign Now" when PENDING_LANDLORD, owner hasn't signed yet, envelope exists
   const canSignNow =
@@ -51,6 +56,15 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
 
   // Show "Terminate" when ACTIVE
   const canTerminate = contract.status === RentalContractStatus.ACTIVE;
+
+  const handleSendToLandlord = async () => {
+    try {
+      await sendToLandlordMutation.mutateAsync({ leaseId: contract.id });
+      toast.success(t('toast.sentSuccess'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
+    }
+  };
 
   const handleSignNow = async () => {
     try {
@@ -94,6 +108,26 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
   return (
     <>
       <div className='flex items-center gap-2'>
+        {/* Send to owner to sign — DRAFT */}
+        {canSendToLandlord && (
+          <Button
+            type='button'
+            size='sm'
+            className='h-8 rounded-lg bg-primary px-3 text-white hover:bg-primary/90 disabled:opacity-60'
+            onClick={handleSendToLandlord}
+            disabled={sendToLandlordMutation.isPending}
+          >
+            {sendToLandlordMutation.isPending ? (
+              <Loader2 className='h-3.5 w-3.5 animate-spin' />
+            ) : (
+              <>
+                <Pen className='h-3.5 w-3.5' />
+                {t('statusActions.sendToOwner')}
+              </>
+            )}
+          </Button>
+        )}
+
         {/* Sign Now — PENDING_LANDLORD */}
         {canSignNow && (
           <Button

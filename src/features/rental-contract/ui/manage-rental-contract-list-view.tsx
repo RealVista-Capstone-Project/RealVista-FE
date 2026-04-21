@@ -1,8 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronDown, FileSearch, Filter, Search, X } from 'lucide-react';
+import { ChevronDown, FileSearch, Filter, Plus, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 import type { PaginationState } from '@tanstack/react-table';
 
 import { type RentalContract, RentalContractStatus } from '@/entities/rental-contract/model/types';
@@ -13,7 +15,6 @@ import { formatNumber } from '@/shared/lib/utils/format-currency';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 
 import { useContractColumns } from './contract-columns';
-import { ContractDetailPanel } from './contract-detail-panel';
 
 type StatusFilter = 'all' | RentalContractStatus;
 
@@ -30,8 +31,6 @@ interface ManageRentalContractListViewProps {
   totalPages: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
-  selectedContract?: RentalContract | null;
-  onSelect?: (contract: RentalContract) => void;
 }
 
 export const ManageRentalContractListView = ({
@@ -47,10 +46,9 @@ export const ManageRentalContractListView = ({
   totalPages,
   itemsPerPage,
   onPageChange,
-  selectedContract,
-  onSelect,
 }: ManageRentalContractListViewProps) => {
   const t = useTranslations('ManageRentalContract');
+  const router = useRouter();
 
   const [inputValue, setInputValue] = React.useState(search);
   const debouncedInput = useDebounce(inputValue, 400);
@@ -108,6 +106,16 @@ export const ManageRentalContractListView = ({
             <span className='text-sm font-bold text-white'>{formatNumber(totalElements ?? 0)}</span>
           </div>
         </div>
+
+        {/* Create Button */}
+        <button
+          type='button'
+          onClick={() => router.push(ROUTES.dashboard.createRentalContract)}
+          className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+        >
+          <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
+          <span>{t('hero.createButton')}</span>
+        </button>
       </div>
 
       {/* Search + filter row */}
@@ -235,17 +243,8 @@ export const ManageRentalContractListView = ({
             const to = Math.min(current * itemsPerPage, totalElements);
             return t('pagination.showing', { from, to, total: totalElements });
           }}
-          onRowClick={onSelect}
-          isRowSelected={(row) => row.id === selectedContract?.id}
         />
       </div>
-
-      {selectedContract && onSelect && (
-        <ContractDetailPanel
-          contract={selectedContract}
-          onClose={() => onSelect(selectedContract)}
-        />
-      )}
     </div>
   );
 };
