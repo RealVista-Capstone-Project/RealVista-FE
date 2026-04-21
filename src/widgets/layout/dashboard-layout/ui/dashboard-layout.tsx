@@ -40,47 +40,152 @@ type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
 
 function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
-    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
-    { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
+    {
+      id: 'dashboard',
+      label: t('menu.dashboard'),
+      href: ROUTES.dashboard.root,
+      icon: LayoutDashboard,
+    },
+    {
+      id: 'listings',
+      label: t('menu.listings'),
+      href: ROUTES.dashboard.managedListings,
+      icon: Columns,
+    },
+    {
+      id: 'appointments',
+      label: t('menu.appointments'),
+      href: ROUTES.dashboard.appointments,
+      icon: Calendar,
+    },
+    {
+      id: 'rental-contracts',
+      label: t('menu.rentalContracts'),
+      href: ROUTES.dashboard.rentalContracts,
+      icon: FileText,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
-    { id: 'manage-agent', label: t('menu.manageAgent'), href: ROUTES.dashboard.manageAgent, icon: Users },
-    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'manage-agent',
+      label: t('menu.manageAgent'),
+      href: ROUTES.dashboard.manageAgent,
+      icon: Users,
+    },
+    {
+      id: 'my-engagements',
+      label: t('menu.myEngagements'),
+      href: ROUTES.dashboard.myEngagements,
+      icon: Handshake,
+    },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
   ];
 }
 
 function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
-    { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'appointments',
+      label: t('menu.appointments'),
+      href: ROUTES.dashboard.appointments,
+      icon: Calendar,
+    },
+    {
+      id: 'my-contracts',
+      label: t('menu.myContracts'),
+      href: ROUTES.dashboard.myContracts,
+      icon: FileText,
+    },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
   ];
 }
 
 function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
-    { id: 'owner-properties', label: t('menu.ownerProperties'), href: ROUTES.dashboard.ownerProperties, icon: Search },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
-    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
+    {
+      id: 'dashboard',
+      label: t('menu.dashboard'),
+      href: ROUTES.dashboard.root,
+      icon: LayoutDashboard,
+    },
+    {
+      id: 'owner-properties',
+      label: t('menu.ownerProperties'),
+      href: ROUTES.dashboard.ownerProperties,
+      icon: Search,
+    },
+    {
+      id: 'listings',
+      label: t('menu.listings'),
+      href: ROUTES.dashboard.managedListings,
+      icon: Columns,
+    },
+    {
+      id: 'appointments',
+      label: t('menu.appointments'),
+      href: ROUTES.dashboard.appointments,
+      icon: Calendar,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
-    { id: 'proposals', label: t('menu.proposals'), href: ROUTES.dashboard.manageProposals, icon: FileText },
-    { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
-    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'proposals',
+      label: t('menu.proposals'),
+      href: ROUTES.dashboard.manageProposals,
+      icon: FileText,
+    },
+    {
+      id: 'my-contracts',
+      label: t('menu.myContracts'),
+      href: ROUTES.dashboard.myContracts,
+      icon: FileText,
+    },
+    {
+      id: 'my-engagements',
+      label: t('menu.myEngagements'),
+      href: ROUTES.dashboard.myEngagements,
+      icon: Handshake,
+    },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
   ];
 }
 
 function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    {
+      id: 'dashboard',
+      label: t('menu.dashboard'),
+      href: ROUTES.dashboard.root,
+      icon: LayoutDashboard,
+    },
     { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    {
+      id: 'listings',
+      label: t('menu.listings'),
+      href: ROUTES.dashboard.managedListings,
+      icon: Columns,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
   ];
 }
 
@@ -158,10 +263,7 @@ export function DashboardLayout({
     ) {
       return t('pageTitle.myEngagements');
     }
-    if (
-      pathname === ROUTES.dashboard.property ||
-      pathname.startsWith(ROUTES.dashboard.property)
-    ) {
+    if (pathname === ROUTES.dashboard.property || pathname.startsWith(ROUTES.dashboard.property)) {
       return t('pageTitle.property');
     }
     if (
@@ -264,10 +366,10 @@ export function DashboardLayout({
                 </div>
                 <div className='flex flex-col'>
                   <span className='text-base font-bold leading-tight text-foreground'>
-                    Estatery
+                    {t('pageTitle.default')}
                   </span>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground/40'>
-                    Property Manager
+                    {t('pageTitle.dashboardManager')}
                   </span>
                 </div>
               </Link>
@@ -341,10 +443,7 @@ export function DashboardLayout({
       {/* Main Content Area - Properly fills space without margin hacks */}
       <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
         {/* Top Nav */}
-        <TopNavContainer
-          variant='dashboard'
-          pageTitle={pageTitle}
-        />
+        <TopNavContainer variant='dashboard' pageTitle={pageTitle} />
 
         {/* Page Content - fills remaining height, scrollable */}
         <main className='flex-1 overflow-y-auto bg-muted/30 p-0'>{children}</main>

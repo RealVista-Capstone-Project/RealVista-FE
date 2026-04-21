@@ -17,6 +17,7 @@
     },
     "pageTitle": {
       "default": "RealVista",
+      "dashboardManager": "Dashboard Manager",
       "dashboard": "Dashboard",
       "insight": "Insight",
       "managedListings": "Managed Listings",

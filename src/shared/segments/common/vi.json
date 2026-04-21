@@ -17,6 +17,7 @@
     },
     "pageTitle": {
       "default": "RealVista",
+      "dashboardManager": "Quản lý Dashboard",
       "dashboard": "Dashboard",
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
