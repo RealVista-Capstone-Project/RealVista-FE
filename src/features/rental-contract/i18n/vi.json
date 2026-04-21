@@ -46,7 +46,9 @@
       "markActive": "Đánh dấu hoạt động",
       "terminate": "Chấm dứt hợp đồng",
       "noAvailableAction": "Không có thao tác",
-      "signNow": "Ký ngay"
+      "signNow": "Ký ngay",
+      "sendToOwner": "Gửi chủ nhà ký",
+      "sentSuccess": "Đã gửi hợp đồng để ký"
     },
     "statusActionHints": {
       "sendForSigning": "Tạo hoặc sử dụng lại phong bì DocuSign và gửi cho cả hai bên.",

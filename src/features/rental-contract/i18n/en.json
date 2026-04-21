@@ -44,7 +44,9 @@
       "markActive": "Mark As Active",
       "terminate": "Terminate Contract",
       "noAvailableAction": "No Available Action",
-      "signNow": "Sign Now"
+      "signNow": "Sign Now",
+      "sendToOwner": "Send to Owner",
+      "sentSuccess": "Contract sent for signing"
     },
     "statusActionHints": {
       "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",

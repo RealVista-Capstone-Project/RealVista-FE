@@ -1,6 +1,8 @@
 {
   "CreateRentalContract": {
     "backToContracts": "Quay lại hợp đồng thuê",
+    "pageTitle": "Tạo hợp đồng thuê",
+    "pageSubtitle": "Chọn bất động sản, tra cứu người thuê, thiết lập điều khoản rồi gửi để ký.",
     "progress": "Bước {current} / {total}",
     "hero": {
       "eyebrow": "Xưởng hợp đồng DocuSign",
@@ -49,7 +51,7 @@
     },
     "listingPicker": {
       "eyebrow": "Nguồn bất động sản",
-      "title": "Chọn bất động sản trước khi soạn hợp đồng",
+      "title": "Chọn bất động sản",
       "description": "Chọn bất động sản của bạn để hợp đồng bắt đầu với đúng ngữ cảnh và chi tiết.",
       "searchPlaceholder": "Tìm theo địa chỉ hoặc loại bất động sản",
       "bedroomsValue": "{count} phòng ngủ",
@@ -109,7 +111,7 @@
     "actions": {
       "saveDraft": "Lưu nháp",
       "back": "Quay lại",
-      "next": "Bước tiếp theo",
+      "next": "Tiếp theo",
       "sendForSigning": "Gửi để ký",
       "sending": "Đang gửi..."
     },

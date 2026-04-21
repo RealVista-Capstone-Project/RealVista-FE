@@ -1,6 +1,8 @@
 {
   "CreateRentalContract": {
     "backToContracts": "Back to rental contracts",
+    "pageTitle": "Create Rental Contract",
+    "pageSubtitle": "Choose a property, look up the tenant, set the lease terms, then send for signing.",
     "progress": "Step {current} of {total}",
     "hero": {
       "eyebrow": "DocuSign Contract Studio",
