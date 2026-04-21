@@ -6,7 +6,7 @@
       "tenants": "Người thuê",
       "rentalContracts": "Hợp đồng thuê",
       "property": "Bất động sản",
-      "manageAgent": "Quản lý đại lý",
+      "manageAgent": "Quản lý môi giới",
       "myEngagements": "Hợp tác của tôi",
       "messages": "Tin nhắn",
       "myContracts": "Hợp đồng của tôi",
@@ -182,6 +182,10 @@
       "cancellationReasonRequired": "Vui lòng cung cấp lý do khi hủy.",
       "reviewAlreadyExists": "Đánh giá đã tồn tại cho giao dịch này.",
       "businessConflict": "Khung giờ này đã được đặt. Vui lòng chọn thời gian khác."
+    },
+    "pagination": {
+      "showing": "Hiển thị {from} - {to} trong tổng số {total} kết quả",
+      "pageInfo": "Trang {current} của {total}"
     }
   },
   "Chat": {
@@ -209,7 +213,7 @@
     "startConversation": "Bắt đầu cuộc trò chuyện"
   },
   "Contact": {
-    "title": "Liên hệ đại lý",
+    "title": "Liên hệ môi giới",
     "description": "Gửi tin nhắn về bất động sản này",
     "descriptionWithAgent": "Gửi tin nhắn cho {agent} về bất động sản này",
     "suggestedInquiries": "Gợi ý cho bạn",

@@ -30,7 +30,8 @@
       "ownerProperties": "Owner properties & proposals",
       "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
-      "manageUsers": "User Management"
+      "manageUsers": "User Management",
+      "manageAgent": "Manage Agent"
     },
     "actionButton": {
       "addProperty": "Add a property",
@@ -181,6 +182,10 @@
       "cancellationReasonRequired": "A reason is required when cancelling.",
       "reviewAlreadyExists": "A review already exists for this engagement.",
       "businessConflict": "This time slot is already booked. Please choose a different time."
+    },
+    "pagination": {
+      "showing": "Showing {from} - {to} of {total} results",
+      "pageInfo": "Page {current} of {total}"
     }
   },
   "Chat": {
