@@ -17,7 +17,7 @@ import {
 import { DocuSignSigningModal } from '@/features/rental-contract/ui/docusign-signing-modal';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
-import { Card, CardContent } from '@/shared/ui';
+
 import { ContractPageHeader } from './components/contract-page-header';
 import { WizardStepsCard } from './components/wizard-steps-card';
 import { StepListingPicker, getPropertyThumbnail, getPropertyAddress, getAttributeNumber } from './components/step-listing-picker';
@@ -376,67 +376,62 @@ export function CreateRentalContractPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(120,80,255,0.14),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(39,197,255,0.10),_transparent_22%),linear-gradient(180deg,#F7F4FF_0%,#FBFAFF_100%)]'>
-      <div className='mx-auto max-w-[1320px] px-6 py-6'>
-        {/* Back button — no giant card wrapper */}
-        <ContractPageHeader
-          label={t('backToContracts')}
-          onBack={() => router.push(contractsRoute)}
-        />
+    <div className='h-full overflow-hidden flex flex-col p-4 md:p-6'>
+      <div className='rounded-2xl border border-primary/20 overflow-hidden bg-white shadow-lg flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0'>
 
-        <div className='space-y-6'>
-          {/* Wizard step indicator */}
-          <WizardStepsCard
-            steps={steps}
-            currentStep={currentStep}
-            maxAllowedStep={maxReachedStep}
-            onStepClick={(step) => {
-              // Only allow navigating to steps already reached
-              if (step <= maxReachedStep) setCurrentStep(step);
-            }}
-          />
+        {/* Header — back button + page title + step indicator */}
+        <div className='shrink-0'>
+          <div className='flex items-center px-4 md:px-8 pt-5 pb-0'>
+            <ContractPageHeader
+              label={t('backToContracts')}
+              onBack={() => router.push(contractsRoute)}
+            />
+          </div>
 
-          {/* Step content card */}
-          <Card className='rounded-[30px] border-primary/10 bg-white/94 shadow-[0_24px_60px_color-mix(in_oklch,var(--primary)_10%,transparent)]'>
-            <CardContent className='p-6'>
-              {/* Step title + progress */}
-              <div className='mb-5 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-                <div>
-                  <p className='text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground/70'>
-                    {t('steps.eyebrow')}
-                  </p>
-                  <h2 className='mt-1 text-xl font-semibold tracking-[-0.03em] text-foreground'>
-                    {t(`steps.titles.${currentStep}` as never)}
-                  </h2>
-                  <p className='mt-1 max-w-xl text-sm leading-6 text-muted-foreground'>
-                    {t(`steps.descriptions.${currentStep}` as never)}
-                  </p>
-                </div>
-                <div className='shrink-0 rounded-full border border-primary/10 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary/75'>
-                  {t('progress', { current: currentStep, total: steps.length })}
-                </div>
-              </div>
+          {/* Centered page title + subtitle */}
+          <div className='space-y-1 px-4 md:px-8 pt-4 pb-0 text-center'>
+            <h1 className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-foreground'>
+              {t('pageTitle')}
+            </h1>
+            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-muted-foreground/70'>
+              {t('pageSubtitle')}
+            </p>
+          </div>
 
-              {renderStepContent()}
-
-              <WizardFooter
-                currentStep={currentStep}
-                totalSteps={steps.length}
-                isStepValid={isStepValid}
-                isMutating={isMutating}
-                onBack={() => setCurrentStep((prev) => Math.max(1, prev - 1) as WizardStep)}
-                onNext={() => {
-                  const next = Math.min(4, currentStep + 1) as WizardStep;
-                  setCurrentStep(next);
-                  setMaxReachedStep((prev) => (next > prev ? next : prev));
-                }}
-                onSaveDraft={saveDraft}
-                onSendForSigning={sendForSigning}
-                t={(key) => t(key as never)}
-              />
-            </CardContent>
-          </Card>
+          {/* Step indicator */}
+          <div className='flex justify-center border-b border-primary/20 px-4 md:px-8 pb-4 md:pb-5 mt-4'>
+            <WizardStepsCard
+              steps={steps}
+              currentStep={currentStep}
+              maxAllowedStep={maxReachedStep}
+              onStepClick={(step) => {
+                if (step <= maxReachedStep) setCurrentStep(step);
+              }}
+            />
+          </div>
         </div>
+
+        {/* Scrollable step content */}
+        <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
+          {renderStepContent()}
+        </div>
+
+        {/* Sticky wizard footer */}
+        <WizardFooter
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          isStepValid={isStepValid}
+          isMutating={isMutating}
+          onBack={() => setCurrentStep((prev) => Math.max(1, prev - 1) as WizardStep)}
+          onNext={() => {
+            const next = Math.min(4, currentStep + 1) as WizardStep;
+            setCurrentStep(next);
+            setMaxReachedStep((prev) => (next > prev ? next : prev));
+          }}
+          onSaveDraft={saveDraft}
+          onSendForSigning={sendForSigning}
+          t={(key) => t(key as never)}
+        />
       </div>
 
       {signingModal && (

@@ -2,11 +2,10 @@
 
 import Image from 'next/image';
 import { ChevronDown, CreditCard } from 'lucide-react';
-import { ProfileDropdown, Separator, useProfileMenuItems, GlobalProfileSwitcher } from '@/shared/ui';
+import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 import { cn } from '@/shared/lib/utils';
 import { ROUTES } from '@/shared/config/routes';
-
 
 export interface DashboardActionsProps {
   user: { name: string; initials: string; avatar?: string };
@@ -53,10 +52,6 @@ export function DashboardActions({
 
       {/* Notifications — always visible in dashboard */}
       <NotificationDropdownContainer />
-
-      <div className='hidden lg:block'>
-        <GlobalProfileSwitcher />
-      </div>
 
       <div className='hidden lg:flex h-10 items-center'>
         <Separator orientation='vertical' className='h-6' />
