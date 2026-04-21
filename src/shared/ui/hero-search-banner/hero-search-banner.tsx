@@ -105,7 +105,7 @@ export function HeroSearchBanner({
                 onClick={() => router.push(`/${locale}/buy`)}
                 className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors cursor-pointer ${
                   activeTab === 'buy'
-                    ? 'bg-muted text-foreground'
+                    ? 'bg-slate-100 text-foreground'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -116,7 +116,7 @@ export function HeroSearchBanner({
                 onClick={() => router.push(`/${locale}/rent`)}
                 className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors cursor-pointer ${
                   activeTab === 'rent'
-                    ? 'bg-muted text-foreground'
+                    ? 'bg-slate-100 text-foreground'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -125,7 +125,7 @@ export function HeroSearchBanner({
             </div>
 
             {/* Location Input */}
-            <div className='relative flex-1 min-w-0 rounded-full bg-muted'>
+            <div className='relative flex-1 min-w-0 rounded-full bg-slate-100'>
               <MapPin className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <input
                 type='text'
@@ -154,7 +154,7 @@ export function HeroSearchBanner({
                 <button
                   type='button'
                   onClick={onToggleMapView}
-                  className='flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer'
+                  className='flex h-9 w-9 items-center justify-center rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors cursor-pointer'
                   title={isMapView ? t('listView') : t('mapView')}
                 >
                   <Map className='h-4 w-4' />
@@ -257,7 +257,7 @@ export function HeroSearchBanner({
             <button
               type='button'
               onClick={onOpenFilters}
-              className='mr-1.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer'
+              className='mr-1.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-500 hover:bg-blue-200 transition-colors cursor-pointer'
               title={t('filters')}
             >
               <SlidersHorizontal className='h-4 w-4' />

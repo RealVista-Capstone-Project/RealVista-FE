@@ -87,7 +87,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
   }
 
   return (
-    <div className='bg-primary/5 w-full py-12 sm:py-16'>
+    <div className='bg-white w-full pt-8 pb-12 sm:pt-10 sm:pb-16'>
       <div className='max-w-[1200px] mx-auto px-10 sm:px-14'>
         {/* Section Title */}
         <h2 className='text-foreground text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px] mb-6 sm:mb-8'>
@@ -133,6 +133,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
                 <CarouselItem key={property.id} className='basis-full sm:basis-1/2 lg:basis-1/3'>
                   <RealVistaListingCard
                     {...property}
+                    compact
                     isFavorite={favoriteOverrides[property.id] ?? property.isFavorite}
                     onToggleFavorite={handleToggleFavorite}
                     onClick={() => handlePropertyClick(property.slug, property.id)}

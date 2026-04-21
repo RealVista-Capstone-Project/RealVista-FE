@@ -16,19 +16,19 @@ import { Label } from '@/shared/ui/label/label';
 import { Slider } from '@/shared/ui/slider/slider';
 import { Switch } from '@/shared/ui/switch/switch';
 import { Button } from '@/shared/ui/button/button';
-import {
-  PROPERTY_TYPES,
-  ATTRIBUTE_LABELS,
-  ATTRIBUTE_TYPES,
-  PropertyAttribute,
-} from '@/shared/config/property-types';
+import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
 import { RotateCcw } from 'lucide-react';
+import { useDistricts } from '@/entities/location/api/use-locations';
+import { usePropertyAttributes } from '@/entities/property/api/use-property-attributes';
+import type { PropertyAttributeDefinition } from '@/entities/property/api/property-api.types';
+import { SaveSearchButton } from '@/features/save-search';
 
 interface SearchSidebarFiltersProps {
   filters: AdvancedSearchRequest;
   onFiltersChange: (filters: AdvancedSearchRequest) => void;
   onReset: () => void;
+  searchType?: 'BUY' | 'RENT';
   className?: string;
 }
 
@@ -36,10 +36,21 @@ export function SearchSidebarFilters({
   filters,
   onFiltersChange,
   onReset,
+  searchType,
   className,
 }: SearchSidebarFiltersProps) {
   const [localFilters, setLocalFilters] = useState<AdvancedSearchRequest>(filters);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const { data: districts = [] } = useDistricts();
+  const { data: apiAttributes = [] } = usePropertyAttributes(localFilters.propertyType);
+
+  // Build lookup map: attribute code → definition (with ranges)
+  const attributeDefMap = useMemo(() => {
+    const map = new Map<string, PropertyAttributeDefinition>();
+    apiAttributes.forEach((attr) => map.set(attr.attribute_code.toUpperCase(), attr));
+    return map;
+  }, [apiAttributes]);
 
   // Sync from parent when filters change externally
   useEffect(() => {
@@ -65,12 +76,12 @@ export function SearchSidebarFilters({
     };
   }, []);
 
-  // Active attributes based on selected property type
-  const activeAttributes = useMemo(() => {
+  // Active attribute codes based on selected property type (from hardcoded config)
+  const activeAttributeCodes = useMemo(() => {
     if (!localFilters.propertyType) return [];
     for (const category of PROPERTY_TYPES) {
       const type = category.types.find((t) => t.code === localFilters.propertyType);
-      if (type) return type.attributes;
+      if (type) return type.attributes as string[];
     }
     return [];
   }, [localFilters.propertyType]);
@@ -99,37 +110,79 @@ export function SearchSidebarFilters({
     }
   };
 
-  const renderDynamicField = (attrCode: PropertyAttribute) => {
-    const label = ATTRIBUTE_LABELS[attrCode];
-    const type = ATTRIBUTE_TYPES[attrCode];
-    const currentValue = localFilters.dynamicAttributes?.[attrCode];
+  /** Encode a range selection as "min:max" for BE range query */
+  const encodeRangeValue = (min: number | null | undefined, max: number | null | undefined): string => {
+    const minStr = min != null ? String(min) : '';
+    const maxStr = max != null ? String(max) : '';
+    return `${minStr}:${maxStr}`;
+  };
 
-    if (type === 'boolean') {
+  const renderDynamicField = (attrCode: string) => {
+    const upperCode = attrCode.toUpperCase();
+    const attrDef = attributeDefMap.get(upperCode);
+    const currentValue = localFilters.dynamicAttributes?.[upperCode];
+
+    const label = attrDef?.attribute_name ?? attrCode;
+    const dataType = attrDef?.data_type ?? 'TEXT';
+    const ranges = attrDef?.ranges ?? [];
+
+    // NUMBER attributes with ranges → dropdown
+    if (dataType === 'NUMBER' && ranges.length > 0) {
+      return (
+        <div key={upperCode} className='space-y-1'>
+          <Label className='text-xs font-medium text-muted-foreground'>{label}</Label>
+          <Select
+            value={currentValue || 'ALL'}
+            onValueChange={(val) => setDynamicAttr(upperCode, val === 'ALL' ? undefined : val)}
+          >
+            <SelectTrigger className='h-9 text-sm'>
+              <SelectValue placeholder='Tất cả' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='ALL'>Tất cả</SelectItem>
+              {ranges
+                .slice()
+                .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+                .map((range) => {
+                  const value = encodeRangeValue(range.min_value, range.max_value);
+                  return (
+                    <SelectItem key={range.range_id} value={value}>
+                      {range.label}
+                    </SelectItem>
+                  );
+                })}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    if (dataType === 'BOOLEAN') {
       return (
         <div
-          key={attrCode}
+          key={upperCode}
           className='flex items-center justify-between rounded-lg border border-border p-2.5'
         >
           <span className='text-sm text-foreground'>{label}</span>
           <Switch
             checked={currentValue === 'true'}
-            onCheckedChange={(checked) => setDynamicAttr(attrCode, checked ? 'true' : undefined)}
+            onCheckedChange={(checked) => setDynamicAttr(upperCode, checked ? 'true' : undefined)}
           />
         </div>
       );
     }
 
-    if (type === 'number') {
+    if (dataType === 'NUMBER') {
       return (
-        <div key={attrCode} className='space-y-1'>
+        <div key={upperCode} className='space-y-1'>
           <Label className='text-xs font-medium text-muted-foreground'>{label}</Label>
           <Input
             type='number'
             min='0'
             step='1'
-            placeholder='--'
+            placeholder='Tất cả'
             value={currentValue || ''}
-            onChange={(e) => setDynamicAttr(attrCode, sanitizePositiveInt(e.target.value))}
+            onChange={(e) => setDynamicAttr(upperCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
             className='h-9 text-sm'
             maxLength={10}
@@ -138,14 +191,43 @@ export function SearchSidebarFilters({
       );
     }
 
+    // TEXT with ranges → dropdown
+    if (dataType === 'TEXT' && ranges.length > 0) {
+      return (
+        <div key={upperCode} className='space-y-1'>
+          <Label className='text-xs font-medium text-muted-foreground'>{label}</Label>
+          <Select
+            value={currentValue || 'ALL'}
+            onValueChange={(val) => setDynamicAttr(upperCode, val === 'ALL' ? undefined : val)}
+          >
+            <SelectTrigger className='h-9 text-sm'>
+              <SelectValue placeholder='Tất cả' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='ALL'>Tất cả</SelectItem>
+              {ranges
+                .slice()
+                .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+                .map((range) => (
+                  <SelectItem key={range.range_id} value={range.label}>
+                    {range.label}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    // TEXT
     return (
-      <div key={attrCode} className='space-y-1'>
+      <div key={upperCode} className='space-y-1'>
         <Label className='text-xs font-medium text-muted-foreground'>{label}</Label>
         <Input
           type='text'
           placeholder='--'
           value={currentValue || ''}
-          onChange={(e) => setDynamicAttr(attrCode, e.target.value || undefined)}
+          onChange={(e) => setDynamicAttr(upperCode, e.target.value || undefined)}
           className='h-9 text-sm'
           maxLength={100}
         />
@@ -156,7 +238,30 @@ export function SearchSidebarFilters({
   return (
     <div className={className}>
       <div className='space-y-5'>
-        {/* Location */}
+        {/* District / Location ID */}
+        <div className='space-y-2'>
+          <Label className='text-sm font-semibold text-foreground'>Quận / Huyện</Label>
+          <Select
+            value={localFilters.locationId || 'ALL'}
+            onValueChange={(value) =>
+              applyFilters({ ...localFilters, locationId: value === 'ALL' ? undefined : value })
+            }
+          >
+            <SelectTrigger className='h-9 text-sm'>
+              <SelectValue placeholder='Tất cả' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='ALL'>Tất cả</SelectItem>
+              {districts.map((d) => (
+                <SelectItem key={d.location_id} value={d.location_id}>
+                  {d.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Location text search */}
         <div className='space-y-2'>
           <Label className='text-sm font-semibold text-foreground'>Địa điểm</Label>
           <Input
@@ -287,16 +392,22 @@ export function SearchSidebarFilters({
         </div>
 
         {/* Dynamic Attributes */}
-        {activeAttributes.length > 0 && (
+        {activeAttributeCodes.length > 0 && (
           <div className='space-y-3'>
             <Label className='text-sm font-semibold text-foreground'>Đặc điểm</Label>
             <div className='grid grid-cols-2 gap-2'>
-              {activeAttributes
-                .filter((attr) => ATTRIBUTE_TYPES[attr] !== 'boolean')
+              {activeAttributeCodes
+                .filter((code) => {
+                  const def = attributeDefMap.get(code.toUpperCase());
+                  return def?.data_type !== 'BOOLEAN';
+                })
                 .map((attr) => renderDynamicField(attr))}
             </div>
-            {activeAttributes
-              .filter((attr) => ATTRIBUTE_TYPES[attr] === 'boolean')
+            {activeAttributeCodes
+              .filter((code) => {
+                const def = attributeDefMap.get(code.toUpperCase());
+                return def?.data_type === 'BOOLEAN';
+              })
               .map((attr) => renderDynamicField(attr))}
           </div>
         )}
@@ -310,7 +421,7 @@ export function SearchSidebarFilters({
               <Switch
                 checked={localFilters.hasVideo || false}
                 onCheckedChange={(checked) =>
-                  applyFilters({ ...localFilters, hasVideo: checked })
+                  applyFilters({ ...localFilters, hasVideo: checked || undefined })
                 }
               />
             </div>
@@ -319,7 +430,7 @@ export function SearchSidebarFilters({
               <Switch
                 checked={localFilters.has3D || false}
                 onCheckedChange={(checked) =>
-                  applyFilters({ ...localFilters, has3D: checked })
+                  applyFilters({ ...localFilters, has3D: checked || undefined })
                 }
               />
             </div>
@@ -350,16 +461,27 @@ export function SearchSidebarFilters({
           </Select>
         </div>
 
-        {/* Reset */}
-        <Button
-          type='button'
-          variant='ghost'
-          onClick={onReset}
-          className='w-full text-sm text-muted-foreground hover:text-foreground'
-        >
-          <RotateCcw className='mr-2 h-3.5 w-3.5' />
-          Đặt lại bộ lọc
-        </Button>
+        {/* Reset + Save row */}
+        <div className='grid grid-cols-2 gap-2'>
+          <Button
+            type='button'
+            variant='ghost'
+            onClick={onReset}
+            className='w-full text-sm text-muted-foreground hover:text-foreground'
+          >
+            <RotateCcw className='mr-1 h-3.5 w-3.5' />
+            Đặt lại
+          </Button>
+          {searchType ? (
+            <SaveSearchButton
+              searchType={searchType}
+              criteria={localFilters as Record<string, unknown>}
+              fullWidth
+            />
+          ) : (
+            <div />
+          )}
+        </div>
       </div>
     </div>
   );

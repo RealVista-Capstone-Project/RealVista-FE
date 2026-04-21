@@ -26,9 +26,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface SaveSearchButtonProps {
   searchType: SearchType;
   criteria: Record<string, unknown>;
+  fullWidth?: boolean;
 }
 
-export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps) {
+export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearchButtonProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBoardModal, setShowBoardModal] = useState(false);
   const [boardId, setBoardId] = useState('Mặc định');
@@ -89,7 +90,7 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
         criteria: criteria as any,
         board_id: boardId.trim() || 'Mặc định',
         profile_id: selectedProfileId || undefined,
-        is_recommendation: isRecommendation
+        is_recommendation: isRecommendation,
       },
       {
         onSuccess: () => {
@@ -114,13 +115,18 @@ export function SaveSearchButton({ searchType, criteria }: SaveSearchButtonProps
       <Button
         type='button'
         variant='outline'
-        size='icon'
+        size={fullWidth ? 'default' : 'icon'}
         onClick={handleSaveClick}
         disabled={isPending}
-        className='h-9 w-9 shrink-0 border-primary text-primary hover:bg-primary/5'
+        className={
+          fullWidth
+            ? 'w-full h-9 border-transparent bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 text-sm'
+            : 'h-9 w-9 shrink-0 border-primary text-primary hover:bg-primary/5'
+        }
         title={t('buttonLabel')}
       >
         <Bookmark className='w-4 h-4' />
+        {fullWidth && <span>Lưu tìm kiếm</span>}
       </Button>
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
 

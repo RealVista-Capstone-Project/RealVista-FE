@@ -24,7 +24,7 @@ import { SaveSearchButton } from '@/features/save-search';
 import { RecommendedListings } from '@/widgets/recommended-listings';
 import { HeroSearchBanner } from '@/shared/ui/hero-search-banner/hero-search-banner';
 import { GlobalProfileSwitcher } from '@/shared/ui/global-profile-switcher';
-import { useCities, useChildrenLocations } from '@/entities/location/api/use-locations';
+import { useDistricts } from '@/entities/location/api/use-locations';
 
 function BuyPageContent() {
   const t = useTranslations('Buy');
@@ -75,14 +75,10 @@ function BuyPageContent() {
     searchParams?.get('propertyType') || undefined
   );
   const [districtId, setDistrictId] = useState<string | undefined>(
-    searchParams?.get('districtId') || undefined
+    searchParams?.get('locationId') || undefined
   );
 
-  const { data: cities = [] } = useCities();
-  const hcmCity = cities.find(
-    (c) => c.name.includes('Hồ Chí Minh') || c.name.includes('Ho Chi Minh')
-  );
-  const { data: districts = [] } = useChildrenLocations(hcmCity?.location_id);
+  const { data: districts = [] } = useDistricts();
 
   // Construct initial criteria from URL
   const getInitialCriteria = useCallback((): AdvancedSearchRequest => {
@@ -214,6 +210,9 @@ function BuyPageContent() {
 
     // This will trigger the useEffect
     updateUrl(updatedCriteria, 1);
+
+    const el = document.getElementById('search-results');
+    el?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSidebarFiltersChange = (sidebarFilters: AdvancedSearchRequest) => {
@@ -222,9 +221,11 @@ function BuyPageContent() {
     setPropertyType(sidebarFilters.propertyType || undefined);
     setMinPrice(sidebarFilters.price?.[0] ? String(sidebarFilters.price[0]) : '');
     setMaxPrice(sidebarFilters.price?.[1] ? String(sidebarFilters.price[1]) : '');
+    setDistrictId(sidebarFilters.locationId || undefined);
 
     const updatedCriteria = {
       ...searchCriteria,
+      locationId: sidebarFilters.locationId,
       location: sidebarFilters.location,
       propertyType: sidebarFilters.propertyType,
       price: sidebarFilters.price,
@@ -249,6 +250,7 @@ function BuyPageContent() {
     setMinPrice('');
     setMaxPrice('');
     setPropertyType(undefined);
+    setDistrictId(undefined);
 
     const defaultCriteria: AdvancedSearchRequest = {
       listingType: 'SALE' as const,
@@ -322,6 +324,7 @@ function BuyPageContent() {
                   filters={searchCriteria}
                   onFiltersChange={handleSidebarFiltersChange}
                   onReset={handleResetFilters}
+                  searchType='BUY'
                 />
               </div>
             </aside>

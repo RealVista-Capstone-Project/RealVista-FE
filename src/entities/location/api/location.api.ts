@@ -8,6 +8,12 @@ export const locationApi = {
     });
   },
 
+  getDistricts: () => {
+    return http.get<ApiResponse<LocationResponse[]>>('locations/districts', {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
   getChildrenLocations: (parentId: string) => {
     return http.get<ApiResponse<LocationResponse[]>>(`locations/${parentId}/children`, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,

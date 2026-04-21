@@ -11,6 +11,17 @@ export const useCities = () => {
   });
 };
 
+export const useDistricts = () => {
+  return useQuery({
+    queryKey: ['locations', 'districts'],
+    queryFn: async () => {
+      const response = await locationApi.getDistricts();
+      return response?.payload?.data || [];
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutes — districts rarely change
+  });
+};
+
 export const useChildrenLocations = (parentId?: string) => {
   return useQuery({
     queryKey: ['locations', 'children', parentId],

@@ -41,16 +41,18 @@ export class SearchAPI {
       // Standard property filters
       // (bedrooms and bathrooms are now sent via dynamicAttributes)
 
-      // Dynamic attributes - send as dynamicAttributes[KEY]=value
+      // Dynamic attributes - send as attr_KEY=value (e.g. attr_bathrooms=4:)
       if (request.dynamicAttributes && Object.keys(request.dynamicAttributes).length > 0) {
         Object.entries(request.dynamicAttributes).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
-            params.append(`dynamicAttributes[${key}]`, value.toString());
+            params.append(`attr_${key.toLowerCase()}`, value.toString());
           }
         });
       }
 
       if (request.sortBy) params.append('sortBy', request.sortBy);
+      if (request.hasVideo) params.append('hasVideo', 'true');
+      if (request.has3D) params.append('has3D', 'true');
 
       const url = `${API_BASE_URL}/listings/search?${params.toString()}`;
 
