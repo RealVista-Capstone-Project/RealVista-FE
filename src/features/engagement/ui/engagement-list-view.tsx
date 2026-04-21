@@ -284,7 +284,11 @@ export const EngagementListView = ({
           toolbar={toolbar}
           emptyIcon={<FileSearch className='h-10 w-10 text-primary/40 mb-2' />}
           emptyTitle={t('table.empty')}
-          pageInfoText={(current, total) => t('pagination.pageInfo', { current, total })}
+          pageInfoText={(current) => {
+            const from = (current - 1) * itemsPerPage + 1;
+            const to = Math.min(current * itemsPerPage, totalElements);
+            return t('pagination.showing', { from, to, total: totalElements });
+          }}
           onRowClick={onSelect}
           isRowSelected={(row) => row.engagementId === selectedEngagement?.engagementId}
         />

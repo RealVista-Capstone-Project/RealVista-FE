@@ -1,62 +1,68 @@
 'use client';
 
 import * as React from 'react';
-import {
-  ManageAgentProvider,
-  useManageAgentContext,
-} from '@/features/agent-engagement/model/manage-agent-context';
-import { useAgentColumns } from '@/features/agent-engagement/ui/agent-columns';
-import { AgentDetailPanel } from '@/features/agent-engagement/ui/agent-detail-panel';
-import { cn } from '@/shared/lib/utils';
-import { ChevronDown, Filter, Search, Users, X } from 'lucide-react';
+import { ChevronDown, FileSearch, Filter, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Spinner } from '@/shared/ui/spinner';
+import type { PaginationState } from '@tanstack/react-table';
+
+import { type RentalContract, RentalContractStatus } from '@/entities/rental-contract/model/types';
 import { DataTable } from '@/shared/ui/data-table';
+import { Spinner } from '@/shared/ui/spinner';
+import { cn } from '@/shared/lib/utils';
 import { formatNumber } from '@/shared/lib/utils/format-currency';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
-import type { PaginationState } from '@tanstack/react-table';
-import type { AgentEngagement } from '@/entities/agent-engagement';
 
-function ManageAgentContent() {
-  const {
-    agents,
-    currentPage,
-    isError,
-    isLoading,
-    searchQuery: contextSearchQuery,
-    setCurrentPage,
-    setSearchQuery,
-    setStatusFilter,
-    statusFilter,
-    totalElements,
-    totalPages,
-    ITEMS_PER_PAGE,
-    selectedAgent,
-    handleAgentClick,
-    setSelectedAgent,
-  } = useManageAgentContext();
+import { useContractColumns } from './contract-columns';
+import { ContractDetailPanel } from './contract-detail-panel';
 
-  const t = useTranslations('ManageAgent');
+type StatusFilter = 'all' | RentalContractStatus;
 
-  const [inputValue, setInputValue] = React.useState(contextSearchQuery);
+interface ManageRentalContractListViewProps {
+  contracts: RentalContract[];
+  totalElements: number;
+  isLoading: boolean;
+  isError: boolean;
+  search: string;
+  onSearchChange: (value: string) => void;
+  statusFilter: string;
+  onStatusFilterChange: (value: string) => void;
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  selectedContract?: RentalContract | null;
+  onSelect?: (contract: RentalContract) => void;
+}
+
+export const ManageRentalContractListView = ({
+  contracts,
+  totalElements,
+  isLoading,
+  isError,
+  search,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  currentPage,
+  totalPages,
+  itemsPerPage,
+  onPageChange,
+  selectedContract,
+  onSelect,
+}: ManageRentalContractListViewProps) => {
+  const t = useTranslations('ManageRentalContract');
+
+  const [inputValue, setInputValue] = React.useState(search);
   const debouncedInput = useDebounce(inputValue, 400);
-
-  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
-  const filterRef = React.useRef<HTMLDivElement>(null);
+  const isSearchPending = inputValue !== debouncedInput;
 
   React.useEffect(() => {
-    setSearchQuery(debouncedInput);
+    onSearchChange(debouncedInput);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInput]);
 
-  const isSearchPending = inputValue !== debouncedInput;
-
-  const hasActiveFilter = statusFilter !== 'all';
-
-  const resetFilters = () => {
-    setStatusFilter('all');
-    setIsFilterOpen(false);
-  };
+  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
+  const filterRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -64,34 +70,42 @@ function ManageAgentContent() {
         setIsFilterOpen(false);
       }
     }
-    if (isFilterOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    if (isFilterOpen) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterOpen]);
 
-  type StatusOption = { value: string; labelKey: string };
-  const filterStatusOptions: StatusOption[] = [
-    { value: 'ACCEPTED', labelKey: 'filter.tabs.accepted' },
-    { value: 'FINISHED', labelKey: 'filter.tabs.finished' },
-    { value: 'CANCELLED', labelKey: 'filter.tabs.cancelled' },
+  const hasActiveStatus = statusFilter !== 'all';
+  const activeFilterCount = hasActiveStatus ? 1 : 0;
+
+  const resetFilters = () => {
+    onStatusFilterChange('all');
+    setIsFilterOpen(false);
+  };
+
+  const filterStatusOptions: { value: RentalContractStatus; labelKey: string }[] = [
+    { value: RentalContractStatus.PENDING_RENTER, labelKey: 'filter.tabs.pendingRenter' },
+    { value: RentalContractStatus.PENDING_LANDLORD, labelKey: 'filter.tabs.pendingLandlord' },
+    { value: RentalContractStatus.ACTIVE, labelKey: 'filter.tabs.active' },
+    { value: RentalContractStatus.EXPIRED, labelKey: 'filter.tabs.expired' },
+    { value: RentalContractStatus.TERMINATED, labelKey: 'filter.tabs.terminated' },
   ];
 
-  const columns = useAgentColumns();
+  const columns = useContractColumns();
 
   const pagination: PaginationState = {
     pageIndex: currentPage - 1,
-    pageSize: ITEMS_PER_PAGE,
+    pageSize: itemsPerPage,
   };
 
   const toolbar = (
     <div className='flex flex-col gap-4 p-4 sm:p-5'>
-      {/* Title row — same height as rental contract toolbar (min-h matches the create button height) */}
-      <div className='flex items-center justify-between min-h-[42px]'>
-        <div className='flex items-center gap-2'>
-          <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
+      {/* Title row */}
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
+          <h2 className='text-xl font-bold text-foreground'>{t('hero.shortTitle')}</h2>
+          {/* Count badge */}
           <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-            <span className='text-sm font-bold text-white'>{formatNumber(totalElements)}</span>
+            <span className='text-sm font-bold text-white'>{formatNumber(totalElements ?? 0)}</span>
           </div>
         </div>
       </div>
@@ -123,7 +137,7 @@ function ManageAgentContent() {
             onClick={() => setIsFilterOpen((prev) => !prev)}
             className={cn(
               'flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-              hasActiveFilter
+              hasActiveStatus
                 ? 'border-primary bg-primary/5 text-primary'
                 : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
             )}
@@ -133,9 +147,9 @@ function ManageAgentContent() {
               className={cn('h-4 w-4 transition-transform', isFilterOpen && 'rotate-180')}
               strokeWidth={2}
             />
-            {hasActiveFilter && (
+            {hasActiveStatus && (
               <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
-                1
+                {activeFilterCount}
               </span>
             )}
           </button>
@@ -143,18 +157,16 @@ function ManageAgentContent() {
           {isFilterOpen && (
             <div className='absolute right-0 top-full z-30 mt-2 w-56 rounded-xl border border-primary/20 bg-white shadow-lg'>
               <div className='flex items-center justify-between border-b border-primary/20 px-4 py-3'>
-                <span className='text-sm font-semibold text-foreground'>
-                  {t('filter.filterTitle')}
-                </span>
+                <span className='text-sm font-semibold text-foreground'>{t('filter.filterTitle')}</span>
                 <button
                   type='button'
                   onClick={resetFilters}
-                  className='cursor-pointer text-xs font-medium text-primary hover:underline focus-visible:outline-none'
+                  className='cursor-pointer text-xs font-medium text-primary hover:underline'
                 >
                   {t('filter.reset')}
                 </button>
               </div>
-              <div className='p-4'>
+              <div className='p-3'>
                 <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                   {t('filter.statusLabel')}
                 </p>
@@ -164,7 +176,7 @@ function ManageAgentContent() {
                       key={opt.value}
                       type='button'
                       onClick={() => {
-                        setStatusFilter(opt.value);
+                        onStatusFilterChange(opt.value);
                         setIsFilterOpen(false);
                       }}
                       className={cn(
@@ -191,10 +203,10 @@ function ManageAgentContent() {
 
   if (isError) {
     return (
-      <div className='flex h-full items-center justify-center'>
+      <div className='p-4 sm:p-6 flex h-full items-center justify-center'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
-            <Users className='h-6 w-6 text-primary' />
+            <FileSearch className='h-6 w-6 text-primary' />
           </div>
           <p className='font-semibold text-foreground'>{t('error')}</p>
         </div>
@@ -203,54 +215,37 @@ function ManageAgentContent() {
   }
 
   return (
-    <div className='p-4 sm:p-6'>
-      <div className='flex gap-6 items-start'>
-        {/* Main table */}
-        <div className='min-w-0 flex-1'>
-          <DataTable
-            columns={columns}
-            data={agents}
-            isLoading={isLoading}
-            pageCount={totalPages}
-            pagination={pagination}
-            onPaginationChange={(updater) => {
-              const next = typeof updater === 'function' ? updater(pagination) : updater;
-              setCurrentPage(next.pageIndex + 1);
-            }}
-            toolbar={toolbar}
-            emptyIcon={<Users className='h-10 w-10 text-primary/40 mb-2' />}
-            emptyTitle={t('empty.title')}
-            emptyDescription={t('empty.subtitle')}
-            pageInfoText={(current) => {
-              const from = (current - 1) * ITEMS_PER_PAGE + 1;
-              const to = Math.min(current * ITEMS_PER_PAGE, totalElements);
-              return t('pagination.showing', { from, to, total: totalElements });
-            }}
-            onRowClick={(agent: AgentEngagement) => handleAgentClick(agent)}
-            isRowSelected={(agent: AgentEngagement) =>
-              selectedAgent?.engagement_id === agent.engagement_id
-            }
-          />
-        </div>
-
-        {/* Detail panel */}
-        {selectedAgent && (
-          <div className='w-[380px] shrink-0'>
-            <AgentDetailPanel
-              agent={selectedAgent}
-              onClose={() => setSelectedAgent(null)}
-            />
-          </div>
-        )}
+    <div className='p-4 sm:p-6 flex gap-4 items-start'>
+      <div className='flex-1 min-w-0'>
+        <DataTable
+          columns={columns}
+          data={contracts}
+          isLoading={isLoading}
+          pageCount={totalPages}
+          pagination={pagination}
+          onPaginationChange={(updater) => {
+            const next = typeof updater === 'function' ? updater(pagination) : updater;
+            onPageChange(next.pageIndex + 1);
+          }}
+          toolbar={toolbar}
+          emptyIcon={<FileSearch className='h-10 w-10 text-primary/40 mb-2' />}
+          emptyTitle={t('empty.title')}
+          pageInfoText={(current) => {
+            const from = (current - 1) * itemsPerPage + 1;
+            const to = Math.min(current * itemsPerPage, totalElements);
+            return t('pagination.showing', { from, to, total: totalElements });
+          }}
+          onRowClick={onSelect}
+          isRowSelected={(row) => row.id === selectedContract?.id}
+        />
       </div>
+
+      {selectedContract && onSelect && (
+        <ContractDetailPanel
+          contract={selectedContract}
+          onClose={() => onSelect(selectedContract)}
+        />
+      )}
     </div>
   );
-}
-
-export function ManageAgentPage() {
-  return (
-    <ManageAgentProvider>
-      <ManageAgentContent />
-    </ManageAgentProvider>
-  );
-}
+};
