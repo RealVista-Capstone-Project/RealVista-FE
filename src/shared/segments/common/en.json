@@ -682,6 +682,21 @@
     "statusActive": "Active",
     "statusDraft": "Draft",
     "statusArchived": "Archived",
+    "table": {
+      "title": "Title",
+      "commission": "Commission",
+      "experience": "Experience",
+      "status": "Status",
+      "updatedAt": "Updated"
+    },
+    "filterTitle": "Filters",
+    "filterReset": "Reset",
+    "filterStatus": "Status",
+    "filter": {
+      "allStatuses": "All Statuses"
+    },
+    "paginationShowing": "Showing {from}–{to} of {total}",
+    "errorLoading": "Failed to load proposals. Please try again.",
     "metricExperience": "Experience",
     "metricCommission": "Commission",
     "metricStatus": "Status",

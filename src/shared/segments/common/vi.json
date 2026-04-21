@@ -684,6 +684,21 @@
     "statusActive": "Hoạt động",
     "statusDraft": "Bản nháp",
     "statusArchived": "Đã lưu trữ",
+    "table": {
+      "title": "Tiêu đề",
+      "commission": "Hoa hồng",
+      "experience": "Kinh nghiệm",
+      "status": "Trạng thái",
+      "updatedAt": "Cập nhật"
+    },
+    "filterTitle": "Bộ lọc",
+    "filterReset": "Đặt lại",
+    "filterStatus": "Trạng thái",
+    "filter": {
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "paginationShowing": "Hiển thị {from}–{to} trong {total}",
+    "errorLoading": "Không thể tải hồ sơ. Vui lòng thử lại.",
     "metricExperience": "Kinh nghiệm",
     "metricCommission": "Hoa hồng",
     "metricStatus": "Trạng thái",

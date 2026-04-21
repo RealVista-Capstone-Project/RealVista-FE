@@ -16,6 +16,13 @@
       "allStatuses": "Tất cả trạng thái",
       "searchPlaceholder": "Tìm theo bất động sản...",
       "searchAria": "Tìm kiếm hợp đồng theo tên bất động sản",
+      "filterTitle": "Bộ lọc",
+      "reset": "Đặt lại",
+      "statusLabel": "Trạng thái",
+      "pendingRenter": "Chờ người thuê",
+      "active": "Đang hiệu lực",
+      "expired": "Đã hết hạn",
+      "terminated": "Đã chấm dứt",
       "tabs": {
         "all": "Tất cả",
         "active": "Đang hiệu lực",
