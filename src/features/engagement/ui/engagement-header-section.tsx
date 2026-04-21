@@ -8,8 +8,8 @@ export const EngagementHeaderSection = () => {
   const t = useTranslations('Engagement');
 
   return (
-    <div className='bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between'>
-      <h2 className='text-lg font-semibold text-gray-900'>{t('page.title')}</h2>
+    <div className='bg-background border-b border-border px-6 py-3 flex items-center justify-between'>
+      <h2 className='text-lg font-semibold text-foreground'>{t('page.title')}</h2>
     </div>
   );
 };
