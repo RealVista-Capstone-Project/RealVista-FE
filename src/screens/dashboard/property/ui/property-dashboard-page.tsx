@@ -238,7 +238,9 @@ function ListingsSection({
 }) {
   const t = useTranslations('PropertyDashboard');
   const PREVIEW_SIZE = 5;
-  const { data: listingsPage, isLoading } = useQuery(listingQueries.byProperty(propertyId, PREVIEW_SIZE));
+  const { data: listingsPage, isLoading } = useQuery(
+    listingQueries.byProperty(propertyId, PREVIEW_SIZE)
+  );
   const listings = listingsPage?.content ?? [];
   const totalCount = listingsPage?.total_elements ?? listings.length;
 
@@ -804,9 +806,9 @@ function PropertyDetailPanel({
 
           const STATUS_OPTIONS: { status: OwnerStatus; icon: React.ReactNode }[] = [
             { status: 'AVAILABLE', icon: <Globe className='h-3.5 w-3.5' strokeWidth={2} /> },
-            { status: 'DRAFT',     icon: <EyeOff className='h-3.5 w-3.5' strokeWidth={2} /> },
-            { status: 'RESERVED',  icon: <Clock className='h-3.5 w-3.5' strokeWidth={2} /> },
-            { status: 'SOLD',      icon: <CheckCircle2 className='h-3.5 w-3.5' strokeWidth={2} /> },
+            { status: 'DRAFT', icon: <EyeOff className='h-3.5 w-3.5' strokeWidth={2} /> },
+            { status: 'RESERVED', icon: <Clock className='h-3.5 w-3.5' strokeWidth={2} /> },
+            { status: 'SOLD', icon: <CheckCircle2 className='h-3.5 w-3.5' strokeWidth={2} /> },
           ];
 
           const currentOpt = STATUS_OPTIONS.find((o) => o.status === property.status);
@@ -849,24 +851,26 @@ function PropertyDetailPanel({
               {/* Dropdown */}
               {isStatusOpen && (
                 <div className='absolute left-0 top-full z-30 mt-1.5 min-w-[160px] rounded-xl border border-primary/20 bg-white shadow-lg p-1.5 flex flex-col gap-0.5'>
-                  {STATUS_OPTIONS.filter((o) => o.status !== property.status).map(({ status, icon }) => (
-                    <button
-                      key={status}
-                      type='button'
-                      onClick={() => {
-                        setIsStatusOpen(false);
-                        setPendingStatus(status);
-                        setStatusConfirmOpen(true);
-                      }}
-                      className={cn(
-                        'flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors hover:bg-primary/5',
-                        getStatusStyle(status)
-                      )}
-                    >
-                      {icon}
-                      {t(`status${status}` as Parameters<typeof t>[0])}
-                    </button>
-                  ))}
+                  {STATUS_OPTIONS.filter((o) => o.status !== property.status).map(
+                    ({ status, icon }) => (
+                      <button
+                        key={status}
+                        type='button'
+                        onClick={() => {
+                          setIsStatusOpen(false);
+                          setPendingStatus(status);
+                          setStatusConfirmOpen(true);
+                        }}
+                        className={cn(
+                          'flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors hover:bg-primary/5',
+                          getStatusStyle(status)
+                        )}
+                      >
+                        {icon}
+                        {t(`status${status}` as Parameters<typeof t>[0])}
+                      </button>
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -952,7 +956,12 @@ function PropertyDetailPanel({
             const hasRight = facts.length > 0;
 
             return (
-              <div className={cn('flex gap-5', hasLeft && hasRight ? 'flex-col sm:flex-row sm:items-start' : 'flex-col')}>
+              <div
+                className={cn(
+                  'flex gap-5',
+                  hasLeft && hasRight ? 'flex-col sm:flex-row sm:items-start' : 'flex-col'
+                )}
+              >
                 {/* Left — description, attributes, amenities */}
                 {hasLeft && (
                   <div className='flex flex-col gap-5 flex-1 min-w-0'>
@@ -989,7 +998,9 @@ function PropertyDetailPanel({
                                   : attr.value_text != null
                                     ? attr.value_text
                                     : attr.value_boolean != null
-                                      ? attr.value_boolean ? 'Có' : 'Không'
+                                      ? attr.value_boolean
+                                        ? 'Có'
+                                        : 'Không'
                                       : '—';
                             return (
                               <div key={attr.attribute_id} className='flex flex-col gap-3'>
@@ -1038,11 +1049,19 @@ function PropertyDetailPanel({
                   <div className='sm:w-52 shrink-0'>
                     <div className='rounded-xl border border-primary/20 bg-white divide-y divide-primary/10'>
                       {facts.map((f, i) => (
-                        <div key={i} className='flex items-center justify-between px-3 py-2.5 gap-3'>
+                        <div
+                          key={i}
+                          className='flex items-center justify-between px-3 py-2.5 gap-3'
+                        >
                           <span className='text-xs font-medium text-muted-foreground shrink-0'>
                             {f.label}
                           </span>
-                          <span className={cn('text-xs font-semibold text-right', f.accent ?? 'text-foreground')}>
+                          <span
+                            className={cn(
+                              'text-xs font-semibold text-right',
+                              f.accent ?? 'text-foreground'
+                            )}
+                          >
                             {f.value}
                           </span>
                         </div>
@@ -1076,7 +1095,6 @@ function PropertyDetailPanel({
           if (!open) {
             setStatusConfirmOpen(false);
             setPendingStatus(null);
-
           }
         }}
       >
@@ -1234,7 +1252,7 @@ export default function PropertyDashboardPage() {
     if (!isMobile && properties.length > 0) {
       setSelectedProperty((prev) => prev ?? properties[0]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile, properties]);
 
   // Sync selectedProperty with latest query data (e.g. after edit/update)

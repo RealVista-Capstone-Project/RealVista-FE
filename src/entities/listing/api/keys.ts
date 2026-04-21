@@ -24,4 +24,8 @@ export const listingKeys = {
   managed: (params?: Record<string, unknown>) =>
     params ? ([...listingKeys.all, 'managed', params] as const) : ([...listingKeys.all, 'managed'] as const),
   managedSummary: () => [...listingKeys.all, 'managed-summary'] as const,
+
+  // Listings by property ID
+  byProperty: (propertyId: string, size: number) =>
+    ([...listingKeys.all, 'by-property', propertyId, size] as const),
 } as const;

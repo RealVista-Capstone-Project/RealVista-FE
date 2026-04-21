@@ -78,11 +78,11 @@ export const listingQueries = {
   /**
    * Get listings by property ID
    */
-  byProperty: (propertyId: string) =>
+  byProperty: (propertyId: string, size: number = 10) =>
     queryOptions({
-      queryKey: [...listingKeys.all, 'by-property', propertyId] as const,
+      queryKey: listingKeys.byProperty(propertyId, size),
       queryFn: async () => {
-        const response = await listingApi.getManagedListings({ propertyId, size: 50 });
+        const response = await listingApi.getManagedListings({ propertyId, size });
         return response.payload.data;
       },
       staleTime: 2 * 60 * 1000,
