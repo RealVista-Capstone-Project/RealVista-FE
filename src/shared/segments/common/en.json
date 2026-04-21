@@ -12,7 +12,8 @@
       "myContracts": "My Contracts",
       "ownerProperties": "Owner Properties",
       "proposals": "My Proposals",
-      "appointments": "Appointments"
+      "appointments": "Appointments",
+      "users": "User Management"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -28,7 +29,8 @@
       "property": "Property",
       "ownerProperties": "Owner properties & proposals",
       "agentSetting": "Agent profile & settings",
-      "appointments": "Appointments"
+      "appointments": "Appointments",
+      "manageUsers": "User Management"
     },
     "actionButton": {
       "addProperty": "Add a property",
@@ -144,6 +146,7 @@
   "Common": {
     "title": "Hello world common!",
     "about": "Go to the about page",
+    "loading": "Loading...",
     "errors": {
       "resourceNotFound": "The requested resource was not found.",
       "authenticationError": "Authentication failed. Please sign in again.",

@@ -24,6 +24,7 @@ export * from './textarea';
 export * from './tooltip';
 export * from './top-nav';
 export * from './badge';
+export * from './dropdown-menu';
 export * from './visually-hidden';
 export * from './data-table';
 export * from './table';

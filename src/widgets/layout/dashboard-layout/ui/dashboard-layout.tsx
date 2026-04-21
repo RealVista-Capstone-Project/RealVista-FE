@@ -74,6 +74,16 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
   ];
 }
 
+function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
+  return [
+    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
+    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+  ];
+}
+
 export function DashboardLayout({
   children,
   sidebarItems,
@@ -91,10 +101,11 @@ export function DashboardLayout({
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
+    if (backendRoles.includes('ADMIN')) return getAdminSidebarItems(t);
     if (isAgent) return getAgentSidebarItems(t);
     if (isTenant) return getTenantSidebarItems(t);
     return getOwnerSidebarItems(t);
-  }, [sidebarItems, isAgent, isTenant, t]);
+  }, [sidebarItems, isAgent, isTenant, backendRoles, t]);
 
   const pageTitle = React.useMemo(() => {
     if (
@@ -158,6 +169,12 @@ export function DashboardLayout({
       pathname.startsWith(ROUTES.dashboard.manageAgent)
     ) {
       return t('pageTitle.manageAgent');
+    }
+    if (
+      pathname === ROUTES.dashboard.manageUsers ||
+      pathname.startsWith(ROUTES.dashboard.manageUsers)
+    ) {
+      return t('pageTitle.manageUsers');
     }
     if (
       pathname === ROUTES.dashboard.ownerProperties ||

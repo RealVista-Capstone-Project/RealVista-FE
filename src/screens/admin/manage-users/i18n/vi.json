@@ -1,0 +1,86 @@
+{
+  "ManageUsers": {
+    "title": "Quản lý người dùng",
+    "description": "Quản lý tất cả người dùng trong hệ thống, tìm kiếm tài khoản cụ thể và lọc theo vai trò hoặc trạng thái.",
+    "search": {
+      "placeholder": "Tìm kiếm theo tên, email..."
+    },
+    "filters": {
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "allRoles": "Tất cả vai trò",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "table": {
+      "columns": {
+        "user": "Người dùng",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "joinedAt": "Ngày tham gia",
+        "actions": "Thao tác"
+      },
+      "empty": {
+        "title": "Không tìm thấy người dùng",
+        "description": "Thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm thấy thông tin bạn cần."
+      }
+    },
+    "status": {
+      "ACTIVE": "Hoạt động",
+      "SUSPENDED": "Đã đình chỉ",
+      "BANNED": "Đã cấm",
+      "VERIFIED": "Đã xác minh"
+    },
+    "actions": {
+      "suspend": "Đình chỉ người dùng",
+      "activate": "Kích hoạt người dùng",
+      "copyId": "Sao chép ID người dùng",
+      "viewDetails": "Xem chi tiết",
+      "suspendSuccess": "Đã đình chỉ người dùng thành công",
+      "suspendError": "Không thể đình chỉ người dùng",
+      "activateSuccess": "Đã kích hoạt người dùng thành công",
+      "activateError": "Không thể kích hoạt người dùng",
+      "copyIdSuccess": "Đã sao chép ID người dùng vào bộ nhớ tạm",
+      "suspendConfirmTitle": "Đình chỉ người dùng",
+      "suspendConfirmDescription": "Bạn có chắc chắn muốn đình chỉ người dùng này không? Hành động này sẽ đăng xuất họ và ngăn họ truy cập hầu hết các tính năng của hệ thống.",
+      "suspending": "Đang đình chỉ...",
+      "cancel": "Hủy",
+      "confirm": "Xác nhận đình chỉ",
+      "ban": "Cấm người dùng",
+      "banSuccess": "Đã cấm người dùng vĩnh viễn",
+      "banError": "Không thể cấm người dùng",
+      "banConfirmTitle": "Cấm người dùng vĩnh viễn",
+      "banConfirmDescription": "Bạn có chắc chắn muốn cấm người dùng này VĨNH VIỄN không? Hành động này KHÔNG THỂ HOÀN TÁC và sẽ hủy tất cả tin đăng, bất động sản, lịch hẹn và các gói dịch vụ đang hoạt động của họ.",
+      "banning": "Đang cấm...",
+      "confirmBan": "Xác nhận cấm",
+      "banWarning": "Hành động này sẽ hủy tất cả dữ liệu kinh doanh của người dùng này và không thể thu hồi.",
+      "confirmBanPlaceholder": "Nhập email để xác nhận",
+      "confirmBanInstruction": "Vui lòng nhập \"{email}\" để xác nhận hành động này.",
+      "confirmBanMismatch": "Email không khớp."
+    },
+    "roles": {
+      "ADMIN": "Quản trị viên",
+      "AGENT": "Môi giới",
+      "OWNER": "Chủ nhà",
+      "BUYER": "Người mua",
+      "TENANT": "Người thuê",
+      "VERIFIER": "Kiểm duyệt viên"
+    },
+    "detail": {
+      "title": "Hồ sơ người dùng",
+      "description": "Thông tin chi tiết và toàn diện cho tài khoản người dùng này.",
+      "back": "Quay lại danh sách",
+      "accountStatus": "Trạng thái tài khoản",
+      "verification": "Xác thực",
+      "unverified": "Chưa xác thực",
+      "contactInfo": "Thông tin liên hệ",
+      "emailAddress": "Địa chỉ Email",
+      "phoneNumber": "Số điện thoại",
+      "verifiedAt": "Đã xác thực lúc {date}",
+      "businessName": "Tên doanh nghiệp",
+      "accountTimeline": "Dòng thời gian tài khoản",
+      "createdAt": "Ngày tạo",
+      "lastUpdated": "Cập nhật lần cuối",
+      "userNotFound": "Không tìm thấy người dùng."
+    }
+  }
+}
