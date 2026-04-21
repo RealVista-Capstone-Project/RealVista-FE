@@ -7,9 +7,7 @@
     "tabs": {
       "all": "Tất cả",
       "sell": "Bán",
-      "rent": "Cho thuê",
-      "sellCount": "-",
-      "rentCount": "-"
+      "rent": "Cho thuê"
     },
     "filter": {
       "title": "Lọc",

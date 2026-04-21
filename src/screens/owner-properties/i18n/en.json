@@ -7,9 +7,7 @@
     "tabs": {
       "all": "All",
       "sell": "For Sell",
-      "rent": "For Rent",
-      "sellCount": "-",
-      "rentCount": "-"
+      "rent": "For Rent"
     },
     "filter": {
       "title": "Filter",
