@@ -1,29 +1,39 @@
 {
   "ManageAgent": {
-    "title": "Qu\u1EA3n l\u00FD \u0111\u1EA1i l\u00FD",
-    "subtitle": "Xem v\u00E0 qu\u1EA3n l\u00FD c\u00E1c \u0111\u1EA1i l\u00FD \u0111\u01B0\u1EE3c giao cho b\u1EA5t \u0111\u1ED9ng s\u1EA3n c\u1EE7a b\u1EA1n",
-    "sidebar": {
-      "manageAgents": "Qu\u1EA3n l\u00FD \u0111\u1EA1i l\u00FD"
+    "title": "Quản lý đại lý",
+    "subtitle": "Xem và quản lý các đại lý được giao cho bất động sản của bạn",
+    "hero": {
+      "shortTitle": "Quản lý đại lý"
     },
     "filter": {
-      "allStatuses": "T\u1EA5t c\u1EA3 tr\u1EA1ng th\u00E1i",
-      "searchPlaceholder": "T\u00ECm theo t\u00EAn \u0111\u1EA1i l\u00FD..."
+      "allStatuses": "Tất cả trạng thái",
+      "searchPlaceholder": "Tìm theo tên đại lý...",
+      "filterTitle": "Lọc theo trạng thái",
+      "reset": "Đặt lại",
+      "statusLabel": "Trạng thái",
+      "tabs": {
+        "accepted": "Đang hoạt động",
+        "finished": "Hoàn thành",
+        "cancelled": "Đã hủy"
+      }
     },
     "table": {
-      "hiredDate": "Ng\u00E0y thu\u00EA",
-      "agent": "\u0110\u1EA1i l\u00FD",
-      "rating": "\u0110\u00E1nh gi\u00E1",
-      "property": "B\u1EA5t \u0111\u1ED9ng s\u1EA3n",
-      "status": "Tr\u1EA1ng th\u00E1i"
+      "hiredDate": "Ngày thuê",
+      "agent": "Môi giới",
+      "rating": "Đánh giá",
+      "property": "Bất động sản",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
     },
     "empty": {
-      "title": "Kh\u00F4ng t\u00ECm th\u1EA5y \u0111\u1EA1i l\u00FD n\u00E0o.",
-      "subtitle": "Th\u1EED \u0111i\u1EC1u ch\u1EC9nh t\u00ECm ki\u1EBFm ho\u1EB7c b\u1ED9 l\u1ECDc."
+      "title": "Không tìm thấy đại lý nào.",
+      "subtitle": "Thử điều chỉnh tìm kiếm hoặc bộ lọc."
     },
     "pagination": {
-      "showing": "Hi\u1EC3n th\u1ECB {from}-{to} trong t\u1ED5ng s\u1ED1 {total}"
+      "showing": "Hiển thị {from}-{to} trong tổng số {total}",
+      "pageInfo": "Trang {current} của {total}"
     },
-    "loading": "\u0110ang t\u1EA3i danh s\u00E1ch \u0111\u1EA1i l\u00FD...",
-    "error": "T\u1EA3i danh s\u00E1ch th\u1EA5t b\u1EA1i. Vui l\u00F2ng th\u1EED l\u1EA1i."
+    "loading": "Đang tải danh sách đại lý...",
+    "error": "Tải danh sách thất bại. Vui lòng thử lại."
   }
 }

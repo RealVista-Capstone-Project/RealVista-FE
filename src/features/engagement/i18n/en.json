@@ -6,7 +6,8 @@
       "viewApplications": "View Applications",
       "loading": "Loading...",
       "loadError": "Failed to load data",
-      "createButton": "Invite Collaboration"
+      "createButton": "Invite Collaboration",
+      "shortTitle": "My Engagements"
     },
     "tabs": {
       "sent": "Sent",
@@ -17,12 +18,23 @@
       "all": "All",
       "searchPlaceholder": "Search by property name or address...",
       "pickDate": "Pick a date",
-      "clearDate": "Clear date filter"
+      "clearDate": "Clear date filter",
+      "filterTitle": "Filter by status",
+      "reset": "Reset",
+      "directionLabel": "Direction",
+      "statusLabel": "Status"
     },
     "table": {
       "dateColumn": "Date Submitted",
       "propertyColumn": "Property / Address",
+      "counterpartyColumn": "Counterparty",
+      "typeColumn": "Type",
+      "typeInvitation": "Invitation",
+      "typeProposal": "Proposal",
       "statusColumn": "Status",
+      "actionsColumn": "Actions",
+      "roleAgent": "Agent",
+      "roleOwner": "Owner",
       "empty": "No engagements found.",
       "clearDateFilter": "Clear date filter"
     },
@@ -85,6 +97,11 @@
     },
     "detail": {
       "panelTitle": "Rental Request Detail",
+      "panelTitleInvitation": "Collaboration Invitation Details",
+      "typeOwnerInvitation": "Owner's Invitation",
+      "offeredCommission": "Offered Commission",
+      "ownerMessage": "Message from Owner",
+      "acceptedMessageInvitation": "Congratulations! Your invitation has been accepted.",
       "noTitle": "No title",
       "statusLabel": "Status",
       "submittedDate": "Submitted",
@@ -105,6 +122,10 @@
       "statusRejected": "Rejected",
       "statusCancelled": "Cancelled",
       "statusFinished": "Finished"
+    },
+    "pagination": {
+      "showing": "Showing {from}-{to} of {total}",
+      "pageInfo": "Page {current} of {total}"
     }
   }
 }
