@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn } from '@/shared/lib/utils';
 import { ROUTES } from '@/shared/config/routes';
@@ -48,11 +49,13 @@ export function ProfileDropdown({
     { id: 'logout', label: 'logout', icon: LogOut, onClick: undefined },
   ];
 
+  const router = useRouter();
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
 
     try {
-      await signOut({ redirect: false });
+      await signOut({ redirect: true, callbackUrl: `/${locale}${ROUTES.buy}` });
       localStorage.removeItem('subscription-wizard-state');
       queryClient.clear();
       toast.success(t('logoutSuccess'));
