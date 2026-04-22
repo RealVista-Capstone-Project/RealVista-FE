@@ -40,6 +40,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/rental-features/i18n/${locale}.json`)).default,
       ...(await import(`@/features/agent-engagement/i18n/${locale}.json`)).default,
       ...(await import(`@/features/rental-contract/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/listing-detail/i18n/${locale}.json`)).default,
       // Screen segments
       ...(await import(`@/screens/dashboard/property/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/property-3d-management/i18n/${locale}.json`)).default,
