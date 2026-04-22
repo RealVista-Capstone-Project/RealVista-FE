@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 import { useAuthSession } from '@/features/auth/model';
@@ -58,6 +58,7 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
       href: ROUTES.dashboard.appointments,
       icon: Calendar,
     },
+    // { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
     {
       id: 'rental-contracts',
       label: t('menu.rentalContracts'),
@@ -203,6 +204,7 @@ export function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
+  const locale = useLocale();
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
@@ -354,7 +356,7 @@ export function DashboardLayout({
             </button>
           ) : (
             <>
-              <Link href={logoHref} className='flex items-center gap-3 group'>
+              <Link href={`/buy`} className='flex items-center gap-3 group'>
                 <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-primary/10'>
                   <Image
                     src='/logo.png'

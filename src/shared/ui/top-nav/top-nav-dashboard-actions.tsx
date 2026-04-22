@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { ChevronDown, CreditCard } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 import { cn } from '@/shared/lib/utils';

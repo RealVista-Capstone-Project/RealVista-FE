@@ -6,4 +6,7 @@ export const routing = defineRouting({
 
   // Used when no locale matches
   defaultLocale: 'vi',
+
+  // Always show locale prefix in URLs
+  localePrefix: 'always',
 });

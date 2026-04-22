@@ -43,14 +43,17 @@ import {
 
 export interface ListingDetailScreenProps {
   listing: Listing;
+  /** When true, renders a "Preview Mode" banner — listing is not yet published */
+  isPreview?: boolean;
 }
 
-export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
+export function ListingDetailScreen({ listing, isPreview = false }: ListingDetailScreenProps) {
   const property: Property = mapListingToProperty(listing);
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyCard');
+  const tScreen = useTranslations('ListingDetailScreen');
   const sendMessage = useSendMessage();
   const chatListingData = mapListingToChatData(listing);
   const router = useRouter();
@@ -154,6 +157,20 @@ export function ListingDetailScreen({ listing }: ListingDetailScreenProps) {
 
   return (
     <div className='min-h-screen bg-background pb-22 md:pb-0'>
+      {/* Preview Mode Banner — visible only to the listing creator when not yet published */}
+      {isPreview && (
+        <div className='sticky top-0 z-40 w-full bg-amber-50 border-b border-amber-200'>
+          <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-center gap-2'>
+            <span className='text-[10px] font-bold uppercase tracking-widest text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full'>
+              {tScreen('previewBadge')}
+            </span>
+            <p className='text-sm font-medium text-amber-800'>
+              {tScreen('previewMessage')}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className='max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-8'>
         <PropertyHeader
           property={property}

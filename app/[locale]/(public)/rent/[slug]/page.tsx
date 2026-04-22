@@ -1,5 +1,6 @@
 import { ListingDetailScreen } from '@/screens/listing-detail';
 import { listingApi, extractListingId } from '@/entities/listing';
+import { auth } from '@/shared/lib/auth/config';
 import { notFound } from 'next/navigation';
 
 interface ListingPageProps {
@@ -15,6 +16,10 @@ interface ListingPageProps {
  *
  * Slug format: {listing-name}-i.{listing-id}
  * Example: luxury-2-bedroom-apartment-nguyen-hue-i.610e8400-e29b-41d4-a716-446655440001
+ *
+ * Access control:
+ * - PUBLISHED listings → accessible by anyone
+ * - Non-PUBLISHED listings → only the listing creator can preview; others get 404
  */
 export default async function ListingPage({ params }: ListingPageProps) {
   const { slug } = await params;
@@ -23,14 +28,25 @@ export default async function ListingPage({ params }: ListingPageProps) {
     // Extract listing_id from slug using the utility function
     const listingId = extractListingId(slug);
 
-    // Fetch listing from API
-    // The API returns { success, message, data, timestamp }
-    const { payload: response } = await listingApi.getById(listingId, true);
+    // Fetch listing and session in parallel
+    const [{ payload: response }, session] = await Promise.all([
+      listingApi.getById(listingId, true),
+      auth(),
+    ]);
 
     // Extract the actual listing data from the response
     const listing = response.data;
 
-    return <ListingDetailScreen listing={listing} />;
+    const isPublished = listing.status === 'PUBLISHED';
+    const isCreator = !!session && session.user.id === listing.user_id;
+
+    // Non-published listings: only the creator can preview — everyone else gets 404
+    // Returning notFound() (not 403) to avoid leaking that the listing exists
+    if (!isPublished && !isCreator) {
+      notFound();
+    }
+
+    return <ListingDetailScreen listing={listing} isPreview={!isPublished} />;
   } catch {
     // If listing not found, return 404
     notFound();
