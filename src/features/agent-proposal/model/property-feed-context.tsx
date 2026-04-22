@@ -31,7 +31,7 @@ export interface PropertyTypeOption {
   categoryName: string;
 }
 
-interface OwnerPropertiesContextValue {
+interface PropertyFeedContextValue {
   properties: OwnerPropertySummary[];
   isLoading: boolean;
   isError: boolean;
@@ -54,9 +54,9 @@ interface OwnerPropertiesContextValue {
   handlePropertyClick: (property: OwnerPropertySummary) => void;
 }
 
-const OwnerPropertiesContext = createContext<OwnerPropertiesContextValue | null>(null);
+const PropertyFeedContext = createContext<PropertyFeedContextValue | null>(null);
 
-export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
+export function PropertyFeedProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQueryRaw] = useState('');
   const [priceFilter, setPriceFilterRaw] = useState<PriceFilter>({});
   const [listingType, setListingTypeRaw] = useState<ListingType>('ALL');
@@ -135,7 +135,7 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const value = useMemo<OwnerPropertiesContextValue>(
+  const value = useMemo<PropertyFeedContextValue>(
     () => ({
       properties,
       isLoading: queryResult.isLoading,
@@ -182,16 +182,16 @@ export function OwnerPropertiesProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <OwnerPropertiesContext.Provider value={value}>
+    <PropertyFeedContext.Provider value={value}>
       {children}
-    </OwnerPropertiesContext.Provider>
+    </PropertyFeedContext.Provider>
   );
 }
 
-export function useOwnerPropertiesContext() {
-  const ctx = useContext(OwnerPropertiesContext);
+export function usePropertyFeedContext() {
+  const ctx = useContext(PropertyFeedContext);
   if (!ctx) {
-    throw new Error('useOwnerPropertiesContext must be used within OwnerPropertiesProvider');
+    throw new Error('usePropertyFeedContext must be used within PropertyFeedProvider');
   }
   return ctx;
 }

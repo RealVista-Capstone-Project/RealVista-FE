@@ -1,7 +1,7 @@
 'use client';
 
 import type { OwnerPropertySummary } from '@/entities/property';
-import type { ListingType } from '@/features/agent-proposal/model/owner-properties-context';
+import type { ListingType } from '@/features/agent-proposal/model/property-feed-context';
 import { Badge } from '@/shared/ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { MapPin, Ruler, Home, BedDouble, CheckCircle2 } from 'lucide-react';
@@ -59,7 +59,7 @@ export function OwnerPropertyCard({
   variant = 'sidebar',
   listingType = 'ALL',
 }: OwnerPropertyCardProps) {
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
 
   const thumbnailUrl =
     property.media?.find((m) => m.is_primary)?.media_url ??
@@ -88,8 +88,11 @@ export function OwnerPropertyCard({
         'group w-full text-left transition-all duration-200',
         variant === 'sidebar'
           ? cn(
-            'flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 hover:bg-primary/5',
-            isSelected ? 'bg-primary/10' : 'bg-white'
+            'relative flex flex-row items-stretch gap-0 px-4 py-3 sm:px-5 sm:py-4 transition-all duration-200',
+            'after:absolute after:left-0 after:top-0 after:bottom-0 after:w-1',
+            isSelected
+              ? cn('bg-primary/10 border-l-4 border-l-primary', 'after:bg-primary')
+              : 'bg-white hover:bg-primary/5 after:w-0'
           )
           : cn(
             'flex flex-row items-stretch gap-0 rounded-2xl border overflow-hidden hover:shadow-md hover:-translate-y-0.5',
@@ -130,15 +133,13 @@ export function OwnerPropertyCard({
       <div className='flex-1 min-w-0 flex flex-col justify-between px-4 py-3 gap-2'>
 
         {/* Row 1: address + type badge + proposed chip */}
-        <div className='flex items-start justify-between gap-2'>
+        <div className={cn('flex items-start justify-between gap-2', isSelected && 'text-primary')}>
           <div className='min-w-0 flex-1'>
-            <h3 className='font-bold text-foreground text-sm leading-snug line-clamp-1 group-hover:text-primary transition-colors'>
-              {property.street_address}
-            </h3>
+            <h3 className='font-bold text-foreground text-sm leading-snug line-clamp-1'>{property.street_address}</h3>
             {location && (
               <div className='flex items-center gap-1 mt-0.5'>
                 <MapPin className='h-3 w-3 text-muted-foreground/50 flex-shrink-0' />
-                <span className='text-xs text-muted-foreground truncate'>{location}</span>
+                <span className={cn('text-xs truncate', isSelected ? 'text-primary/80' : 'text-muted-foreground')}>{location}</span>
               </div>
             )}
           </div>

@@ -17,7 +17,12 @@
       "assignedProperty": "BĐS được giao",
       "addReview": "Thêm đánh giá",
       "agent": "Môi giới",
-      "property": "Bất động sản"
+      "property": "Bất động sản",
+      "type": {
+        "agentProposal": "Đề xuất từ môi giới",
+        "ownerInvitation": "Lời mời từ chủ nhà",
+        "tenantApplication": "Đơn đăng ký thuê"
+      }
     },
     "listItem": {
       "noEmail": "Chưa có email"
@@ -29,7 +34,9 @@
       "cancelled": "Đã hủy",
       "accepted": "Đã chấp nhận",
       "rejected": "Từ chối",
-      "expired": "Hết hạn"
+      "expired": "Hết hạn",
+      "submitted": "Đã gửi",
+      "finished": "Hoàn thành"
     },
     "common": {
       "na": "N/A",

@@ -447,7 +447,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                     ? 'bg-primary text-white'
                     : currentStep === index
                       ? 'bg-primary text-white'
-                      : 'bg-secondary text-foreground'
+                      : 'bg-white text-foreground border border-border'
                 )}
               >
                 {currentStep > index ? <Check className='size-4' /> : index + 1}

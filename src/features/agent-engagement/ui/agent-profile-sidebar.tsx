@@ -21,7 +21,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { getInitials, getStatusColor, toStringArray } from '../lib/utils';
+import { getInitials, getStatusColor, toStringArray, getEngagementTypeLabel } from '../lib/utils';
 import { useTranslations } from 'next-intl';
 import { CompleteConfirmDialog } from './complete-confirm-dialog';
 import { CancelContractDialog } from './cancel-contract-dialog';
@@ -309,7 +309,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
               <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
                 <Award className='h-4 w-4 text-primary/60 mx-auto mb-1.5' />
                 <p className='text-[11px] font-bold text-gray-900 truncate'>
-                  {agent.engagement_type}
+                  {getEngagementTypeLabel(agent.engagement_type, t)}
                 </p>
                 <p className='text-[10px] text-gray-400 leading-tight mt-0.5'>
                   {t('detailPanel.engagementType')}

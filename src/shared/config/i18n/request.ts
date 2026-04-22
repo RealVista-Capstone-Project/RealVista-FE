@@ -51,7 +51,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/screens/create-rental-contract/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/lease-signing-complete/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/my-rental-contracts/i18n/${locale}.json`)).default,
-      ...(await import(`@/screens/owner-properties/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/property-feed/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/managed-listings/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/messages/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/admin/manage-users/i18n/${locale}.json`)).default,

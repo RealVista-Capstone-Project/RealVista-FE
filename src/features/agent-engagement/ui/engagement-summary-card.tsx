@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { MapPin, Home, CalendarDays, Award } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { formatDate, getStatusColor } from '../lib/utils';
+import { formatDate, getStatusColor, getEngagementTypeLabel } from '../lib/utils';
 import { useTranslations, useLocale } from 'next-intl';
 
 interface EngagementSummaryCardProps {
@@ -129,7 +129,7 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
                 {t('detailPage.engagementType')}
               </span>
             </div>
-            <p className='text-sm font-bold text-gray-900'>{agent.engagement_type}</p>
+            <p className='text-sm font-bold text-gray-900'>{getEngagementTypeLabel(agent.engagement_type, t)}</p>
           </div>
 
           <div className='bg-gray-50 rounded-xl p-3.5 border border-gray-100'>

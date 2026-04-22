@@ -41,10 +41,7 @@ export function useAgentColumns(): ColumnDef<AgentEngagement, unknown>[] {
         return (
           <div className='flex items-center gap-3'>
             <Avatar className='h-9 w-9 flex-shrink-0 ring-2 ring-offset-1 ring-primary/20'>
-              <AvatarImage
-                src={agent.agent_avatar_url ?? undefined}
-                alt={agent.agent_full_name}
-              />
+              <AvatarImage src={agent.agent_avatar_url ?? undefined} alt={agent.agent_full_name} />
               <AvatarFallback className='bg-primary/10 text-primary text-xs font-bold'>
                 {getInitials(agent.agent_full_name)}
               </AvatarFallback>
@@ -75,9 +72,7 @@ export function useAgentColumns(): ColumnDef<AgentEngagement, unknown>[] {
                 agent.agent_rating != null ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
-              {agent.agent_rating != null
-                ? agent.agent_rating.toFixed(1)
-                : t('common.na')}
+              {agent.agent_rating != null ? agent.agent_rating.toFixed(1) : t('common.na')}
             </span>
           </div>
         );
@@ -114,13 +109,13 @@ export function useAgentColumns(): ColumnDef<AgentEngagement, unknown>[] {
         const statusLabel = t.has(statusKey) ? t(statusKey) : agent.status;
 
         const statusIconMap: Record<string, React.ReactNode> = {
-          ACTIVE:    <CheckCircle2 className='h-3.5 w-3.5' />,
-          PENDING:   <Clock className='h-3.5 w-3.5' />,
-          ACCEPTED:  <CheckCircle2 className='h-3.5 w-3.5' />,
-          COMPLETED: <Trophy className='h-3.5 w-3.5' />,
+          ACTIVE: <CheckCircle2 className='h-3.5 w-3.5' />,
+          PENDING: <Clock className='h-3.5 w-3.5' />,
+          ACCEPTED: <CheckCircle2 className='h-3.5 w-3.5' />,
+          FINISHED: <Trophy className='h-3.5 w-3.5' />,
           CANCELLED: <XCircle className='h-3.5 w-3.5' />,
-          REJECTED:  <XCircle className='h-3.5 w-3.5' />,
-          EXPIRED:   <XCircle className='h-3.5 w-3.5' />,
+          REJECTED: <XCircle className='h-3.5 w-3.5' />,
+          EXPIRED: <XCircle className='h-3.5 w-3.5' />,
         };
         const icon = statusIconMap[(agent.status ?? '').toUpperCase()];
 

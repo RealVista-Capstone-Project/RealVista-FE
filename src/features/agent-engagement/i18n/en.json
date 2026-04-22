@@ -17,7 +17,12 @@
       "assignedProperty": "Assigned Property",
       "addReview": "Add Review",
       "agent": "Agent",
-      "property": "Property"
+      "property": "Property",
+      "type": {
+        "agentProposal": "Agent Proposal",
+        "ownerInvitation": "Owner Invitation",
+        "tenantApplication": "Tenant Application"
+      }
     },
     "listItem": {
       "noEmail": "No email"
@@ -29,7 +34,9 @@
       "cancelled": "Cancelled",
       "accepted": "Accepted",
       "rejected": "Rejected",
-      "expired": "Expired"
+      "expired": "Expired",
+      "submitted": "Submitted",
+      "finished": "Finished"
     },
     "common": {
       "na": "N/A",
