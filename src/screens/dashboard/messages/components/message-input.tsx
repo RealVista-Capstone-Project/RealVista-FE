@@ -452,23 +452,23 @@ export function MessageInput({
               handleSend();
             }
           }}
-          className='flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50'
+          className='flex-1 bg-transparent text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none disabled:opacity-50'
         />
 
-        {/* Send / Mic button */}
+        {/* Send button */}
         {canSend ? (
           <button
             onClick={handleSend}
             disabled={isSending}
-            className='shrink-0 text-primary transition-colors hover:text-primary/70 disabled:opacity-50'
+            className='shrink-0 text-blue-500 transition-colors hover:text-blue-600 disabled:opacity-50'
             aria-label='Send message'
           >
             {isSending ? <Loader2 className='size-5 animate-spin' /> : <Send className='size-5' />}
           </button>
         ) : (
-          <button className='shrink-0 text-muted-foreground transition-colors hover:text-primary'>
-            <Mic className='size-5' />
-          </button>
+          <span className='shrink-0 text-slate-300'>
+            <Send className='size-5' />
+          </span>
         )}
       </div>
 
