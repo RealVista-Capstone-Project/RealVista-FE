@@ -322,20 +322,24 @@ export function MessageInput({
     : '';
 
   return (
-    <div className='border-t border-slate-200 bg-white'>
+    <div className='border-primary/20 bg-white px-6 py-4'>
+      {/* Offline banner */}
+      {!isConnected && (
+        <p className='mb-2 text-center text-xs text-muted-foreground'>{t('connecting')}</p>
+      )}
 
       {/* ── Listing URL preview banner ────────────────────────────────────── */}
       {showPreview && (
-        <div className='mx-4 mb-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all'>
+        <div className='mb-3 overflow-hidden rounded-xl border border-primary/20 bg-primary/5'>
           {/* Header row */}
           <div className='flex items-center justify-between px-3 py-2'>
-            <span className='text-xs font-semibold text-blue-600'>
+            <span className='text-xs font-semibold text-primary'>
               {t('listingPreview.label')}
             </span>
             <button
               type='button'
               onClick={() => setPreviewDismissed(true)}
-              className='rounded p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600'
+              className='text-muted-foreground transition-colors hover:text-foreground'
               aria-label={t('listingPreview.dismiss')}
             >
               <X className='size-3.5' />
@@ -344,34 +348,34 @@ export function MessageInput({
 
           {/* Content */}
           {isFetchingCard && (
-            <div className='flex items-center gap-2 border-t border-slate-200 px-3 py-2'>
-              <Loader2 className='size-3.5 animate-spin text-blue-500' />
-              <span className='text-xs text-slate-500'>{t('listingPreview.fetching')}</span>
+            <div className='flex items-center gap-2 border-t border-primary/20 px-3 py-2'>
+              <Loader2 className='size-3.5 animate-spin text-primary/60' />
+              <span className='text-xs text-muted-foreground'>{t('listingPreview.fetching')}</span>
             </div>
           )}
 
           {!isFetchingCard && cardFetchError && (
-            <div className='flex items-center gap-2 border-t border-red-200 bg-red-50 px-3 py-2'>
-              <AlertTriangle className='size-3.5 shrink-0 text-red-500' />
-              <span className='text-xs text-red-600'>{t('listingPreview.error')}</span>
+            <div className='flex items-center gap-2 border-t border-amber-200 bg-amber-50 px-3 py-2'>
+              <AlertTriangle className='size-3.5 shrink-0 text-amber-500' />
+              <span className='text-xs text-amber-700'>{t('listingPreview.error')}</span>
             </div>
           )}
 
           {!isFetchingCard && resolvedCard && (
-            <div className='flex items-center gap-3 border-t border-slate-200 px-3 py-2'>
+            <div className='flex items-center gap-3 border-t border-primary/20 px-3 py-2'>
               {resolvedCard.image && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={resolvedCard.image}
                   alt={resolvedCard.title}
-                  className='h-10 w-14 shrink-0 rounded-lg object-cover ring-1 ring-slate-200'
+                  className='h-10 w-14 shrink-0 rounded-md object-cover'
                 />
               )}
               <div className='min-w-0 flex-1'>
-                <p className='truncate text-xs font-semibold text-slate-700'>{resolvedCard.title}</p>
-                <p className='truncate text-xs text-slate-400'>{resolvedCard.address}</p>
+                <p className='truncate text-xs font-semibold text-foreground'>{resolvedCard.title}</p>
+                <p className='truncate text-xs text-muted-foreground'>{resolvedCard.address}</p>
               </div>
-              <span className='shrink-0 text-xs font-bold text-blue-600'>
+              <span className='shrink-0 text-xs font-bold text-primary'>
                 {resolvedCard.price?.toLocaleString()}
               </span>
             </div>
@@ -387,7 +391,7 @@ export function MessageInput({
               <button
                 type='button'
                 onClick={() => setSendAnywayConfirmed(true)}
-                className='shrink-0 text-xs font-semibold text-amber-600 underline underline-offset-2 transition-colors hover:text-amber-800'
+                className='shrink-0 text-xs font-semibold text-amber-700 underline underline-offset-2 transition-colors hover:text-amber-900'
               >
                 {t('listingPreview.sendAnyway')}
               </button>
@@ -397,16 +401,16 @@ export function MessageInput({
       )}
 
       {/* ── Input row ────────────────────────────────────────────────────── */}
-      <div className='flex items-end gap-3 p-4'>
+      <div className='flex items-center gap-3 rounded-2xl border border-primary/20 bg-white px-4 py-3 shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10'>
         {/* Plus button with popover — only rendered for owner / AGENT */}
         {canCreateContract && (
-          <div className='relative shrink-0 pb-0.5'>
+          <div className='relative shrink-0'>
             <button
               ref={plusBtnRef}
               onClick={() => setPopoverOpen((v) => !v)}
               className={cn(
-                'flex size-9 items-center justify-center rounded-xl transition-all',
-                popoverOpen ? 'bg-blue-500 text-white shadow-sm shadow-blue-500/20' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                'flex size-5 items-center justify-center rounded-full transition-colors',
+                popoverOpen ? 'bg-primary text-white' : 'text-muted-foreground hover:text-primary'
               )}
               aria-label='More actions'
             >
@@ -416,7 +420,7 @@ export function MessageInput({
             {popoverOpen && (
               <div
                 ref={popoverRef}
-                className='absolute bottom-full left-0 mb-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg ring-1 ring-slate-100'
+                className='absolute bottom-full left-0 mb-2 w-52 overflow-hidden rounded-xl border border-primary/20 bg-white shadow-lg'
               >
                 <button
                   onClick={() => {
@@ -424,7 +428,7 @@ export function MessageInput({
                     setSelectedListing(listings[0] ?? null);
                     setModalOpen(true);
                   }}
-                  className='flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent'
+                  className='flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-primary/5'
                 >
                   <FileText className='size-4 shrink-0 text-primary' />
                   {t('createContract')}
@@ -434,42 +438,38 @@ export function MessageInput({
           </div>
         )}
 
-        <div className='flex flex-1 items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm transition-all focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100/30'>
-          <input
-            type='text'
-            placeholder={t('typeYourMessage')}
-            value={value}
-            disabled={isSending}
-            onChange={(e) => {
-              onChange(e.target.value);
-              onTyping?.();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && canSend) {
-                handleSend();
-              }
-            }}
-            className='flex-1 bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none disabled:opacity-50'
-          />
-        </div>
+        <input
+          type='text'
+          placeholder={t('typeYourMessage')}
+          value={value}
+          disabled={isSending}
+          onChange={(e) => {
+            onChange(e.target.value);
+            onTyping?.();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && canSend) {
+              handleSend();
+            }
+          }}
+          className='flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50'
+        />
 
         {/* Send / Mic button */}
-        <div className='flex shrink-0 items-center gap-1 pb-0.5'>
-          {canSend ? (
-            <button
-              onClick={handleSend}
-              disabled={isSending}
-              className='flex size-10 items-center justify-center rounded-xl bg-blue-500 text-white transition-all hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 disabled:opacity-50'
-              aria-label='Send message'
-            >
-              {isSending ? <Loader2 className='size-4 animate-spin' /> : <Send className='size-4' />}
-            </button>
-          ) : (
-            <button className='flex size-10 items-center justify-center rounded-xl text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-500'>
-              <Mic className='size-4' />
-            </button>
-          )}
-        </div>
+        {canSend ? (
+          <button
+            onClick={handleSend}
+            disabled={isSending}
+            className='shrink-0 text-primary transition-colors hover:text-primary/70 disabled:opacity-50'
+            aria-label='Send message'
+          >
+            {isSending ? <Loader2 className='size-5 animate-spin' /> : <Send className='size-5' />}
+          </button>
+        ) : (
+          <button className='shrink-0 text-muted-foreground transition-colors hover:text-primary'>
+            <Mic className='size-5' />
+          </button>
+        )}
       </div>
 
       {/* ── Confirmation modal ──────────────────────────────────────────────── */}

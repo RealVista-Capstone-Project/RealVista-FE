@@ -164,7 +164,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
   if (messagesLoading) {
     return (
       <div className='flex flex-1 items-center justify-center'>
-        <Loader2 className='size-5 animate-spin text-primary' />
+        <Loader2 className='size-5 animate-spin text-primary/50' />
       </div>
     );
   }
@@ -172,32 +172,23 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
   // ── Empty state ────────────────────────────────────────────────────────────
   if (messages.length === 0) {
     return (
-      <div className='flex flex-1 flex-col items-center justify-center gap-3 py-20'>
-        <div className='flex size-16 items-center justify-center rounded-full bg-muted/50'>
-          <svg className='size-8 text-muted-foreground/40' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-            <path strokeLinecap='round' strokeLinejoin='round' d='M20.25 8.51a11.25 11.25 0 010 6.98a11.25 11.25 0 01-5.61 5.61a11.25 11.25 0 01-6.98 0a11.25 11.25 0 01-5.61-5.61a11.25 11.25 0 010-6.98a11.25 11.25 0 016.98-5.61c1.99-.01 3.92.54 5.56 1.5a11.25 11.25 0 015.56-1.5zm-5.61 5.61a1.75 1.75 0 010 2.49a1.75 1.75 0 01-2.49 0a1.75 1.75 0 010-2.49zm4.94 4.94a1.75 1.75 0 010 2.49a1.75 1.75 0 01-2.49 0a1.75 1.75 0 010-2.49zM7.87 7.87a.75.75 0 010 1.06l-2.12 2.12h2.08a.75.75 0 010 1.5H5.75l2.12 2.12a.75.75 0 11-1.06 1.06L3.69 12.56l2.12-2.12a.75.75 0 010-1.06l2.12-2.12a.75.75 0 011.06 0zm5.12 2.12a.75.75 0 010 1.06l-2.12 2.12h2.08a.75.75 0 010 1.5H10.87l2.12 2.12a.75.75 0 11-1.06 1.06l-2.12-2.12 2.12-2.12a.75.75 0 011.06 0z' />
-          </svg>
-        </div>
-        <div className='text-center'>
-          <p className='text-sm font-medium text-foreground'>{t('noMessagesTitle')}</p>
-          <p className='mt-1 text-xs text-muted-foreground'>{t('noMessages')}</p>
-        </div>
+      <div className='flex flex-1 items-center justify-center'>
+        <p className='text-sm text-muted-foreground/60'>{t('noMessages')}</p>
       </div>
     );
   }
 
   // ── Messages ───────────────────────────────────────────────────────────────
   return (
-    <div className='relative flex-1 overflow-y-auto bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50'>
-      <div className='mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-8'>
+    <div className='flex-1 overflow-y-auto px-6 py-5'>
+      <div className='space-y-5'>
         {groups.map((group) => (
-          <div key={group.dateKey} className='mb-6'>
-            {/* Date divider - centered badge with line */}
-            <div className='relative flex items-center justify-center py-3'>
-              <div className='absolute inset-x-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent' />
-              <span className='relative z-10 rounded-full bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border border-slate-100 shadow-sm'>
-                {group.dateLabel}
-              </span>
+          <div key={group.dateKey} className='space-y-5'>
+            {/* Date divider */}
+            <div className='flex items-center gap-3'>
+              <div className='h-px flex-1 bg-primary/15' />
+              <span className='text-xs font-medium text-muted-foreground/60'>{group.dateLabel}</span>
+              <div className='h-px flex-1 bg-primary/15' />
             </div>
 
             {group.msgs.map((msg) => (
@@ -211,8 +202,8 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
             ))}
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
+      <div ref={bottomRef} />
     </div>
   );
 }

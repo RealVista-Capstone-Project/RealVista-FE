@@ -11,10 +11,7 @@
     "viewContract": "View contract",
     "activityTimeline": "Activity timeline",
     "endContract": "End contract",
-    "noMessagesTitle": "No messages yet",
     "noMessages": "No messages yet. Say hello!",
-    "noConversations": "No conversations yet",
-    "selectConversation": "Select a conversation to start chatting",
     "connected": "Connected",
     "connecting": "Connecting...",
     "listingPreview": {

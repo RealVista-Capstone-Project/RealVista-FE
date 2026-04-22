@@ -3,7 +3,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import type { ConversationListItemResponse, MessageResponse } from '@/entities/conversation';
 import type { ChatListingData } from '@/entities/contact';
@@ -88,7 +88,6 @@ function stringToAvatarBg(str: string): string {
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export function MessagesPage() {
-  const t = useTranslations('Messages');
   const [messageInput, setMessageInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
@@ -261,7 +260,7 @@ export function MessagesPage() {
       />
 
       {/* ── Chat Panel ───────────────────────────────────────────────────── */}
-      <div className='flex flex-1 flex-col bg-gradient-to-b from-slate-50 via-white to-slate-50'>
+      <div className='flex flex-1 flex-col bg-primary/5'>
         {activeConv && (
           <>
             <ChatHeader
@@ -293,15 +292,9 @@ export function MessagesPage() {
           </>
         )}
 
-        {conversations.length === 0 && !isLoading && (
+        {!activeConv && !isLoading && (
           <div className='flex flex-1 items-center justify-center text-sm text-muted-foreground/70'>
-            {t('noConversations')}
-          </div>
-        )}
-
-        {conversations.length > 0 && !activeConv && !isLoading && (
-          <div className='flex flex-1 items-center justify-center text-sm text-muted-foreground/70'>
-            {t('selectConversation')}
+            Select a conversation to start chatting
           </div>
         )}
       </div>
