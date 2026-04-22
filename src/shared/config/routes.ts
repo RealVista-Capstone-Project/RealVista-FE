@@ -31,7 +31,7 @@ export const ROUTES = {
     manageProposals: '/dashboard/manage-proposals',
     manageUsers: '/admin',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
-    ownerProperties: '/dashboard/owner-properties',
+    propertyFeed: '/dashboard/property-feed',
     /** Agent-only dashboard profile & account settings */
     agentSetting: '/dashboard/setting',
   },

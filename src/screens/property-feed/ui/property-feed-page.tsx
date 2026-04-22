@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  OwnerPropertiesProvider,
-  useOwnerPropertiesContext,
+  PropertyFeedProvider,
+  usePropertyFeedContext,
   type PriceFilter,
   type ListingType,
-} from '@/features/agent-proposal/model/owner-properties-context';
+} from '@/features/agent-proposal/model/property-feed-context';
 import { OwnerPropertyCard } from '@/features/agent-proposal/ui/owner-property-card';
 import { OwnerPropertyDetailPanel } from '@/features/agent-proposal/ui/owner-property-detail-panel';
 import { Input } from '@/shared/ui/input';
@@ -40,8 +40,8 @@ interface LocalPriceFilter {
 }
 
 function ListingTypeTabs() {
-  const t = useTranslations('OwnerProperties');
-  const { listingType, setListingType, totalElements } = useOwnerPropertiesContext();
+  const t = useTranslations('PropertyFeed');
+  const { listingType, setListingType, totalElements } = usePropertyFeedContext();
 
   return (
     <div className='flex gap-1 min-w-max'>
@@ -99,7 +99,7 @@ interface FilterPanelProps {
 }
 
 function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
   const {
     priceFilter,
     setPriceFilter,
@@ -108,7 +108,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
     setPropertyTypeId,
     availablePropertyTypes,
     isLoadingPropertyTypes,
-  } = useOwnerPropertiesContext();
+  } = usePropertyFeedContext();
 
   const [localFilter, setLocalFilter] = useState<LocalPriceFilter>({
     minRentPrice: priceFilter.minRentPrice
@@ -342,7 +342,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
   );
 }
 
-function OwnerPropertiesContent() {
+function PropertyFeedContent() {
   const {
     properties,
     isLoading,
@@ -359,9 +359,9 @@ function OwnerPropertiesContent() {
     handlePropertyClick,
     priceFilter,
     propertyTypeId,
-  } = useOwnerPropertiesContext();
+  } = usePropertyFeedContext();
 
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
   const isMobile = useIsMobile();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
@@ -575,10 +575,10 @@ function OwnerPropertiesContent() {
   );
 }
 
-export function OwnerPropertiesPage() {
+export function PropertyFeedPage() {
   return (
-    <OwnerPropertiesProvider>
-      <OwnerPropertiesContent />
-    </OwnerPropertiesProvider>
+    <PropertyFeedProvider>
+      <PropertyFeedContent />
+    </PropertyFeedProvider>
   );
 }

@@ -1,17 +1,17 @@
 {
-  "OwnerProperties": {
+  "PropertyFeed": {
     "loading": "Loading properties...",
     "error": "Failed to load properties. Please try again.",
-    "pageTitle": "Available Properties",
-    "pageSubtitle": "Browse properties from owners looking for an agent.",
+    "pageTitle": "Discover Properties",
+    "pageSubtitle": "Find properties near you and submit your proposal.",
     "tabs": {
       "all": "All",
-      "sell": "For Sell",
+      "sell": "For Sale",
       "rent": "For Rent"
     },
     "filter": {
       "title": "Filter",
-      "searchPlaceholder": "Search by address, owner, or type...",
+      "searchPlaceholder": "Search by address, location, or type...",
       "resultCount": "{count} properties found",
       "rentPrice": "Rental Price",
       "buyPrice": "Purchase Price",
@@ -25,7 +25,7 @@
     },
     "card": {
       "bedrooms": "beds",
-      "viewDetails": "View details",
+      "viewDetails": "View Details",
       "proposed": "Proposed",
       "priceFrom": "Price from",
       "rent": "Rent",
@@ -34,7 +34,7 @@
     "empty": {
       "title": "No properties found.",
       "subtitle": "Try adjusting your search or check back later.",
-      "selectProperty": "Select a property to view details",
+      "selectProperty": "Pick a property to see full details",
       "endOfList": "You've reached the end of the list"
     },
     "pagination": {

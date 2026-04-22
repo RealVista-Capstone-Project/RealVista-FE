@@ -23,7 +23,7 @@ import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { AgentApplyProposalModal } from './agent-apply-proposal-modal';
 import { useAgentProposalCtaForOwnerProperty } from '../hooks/use-agent-proposal-cta-for-owner-property';
-import { useOwnerPropertiesContext, type ListingType } from '../model/owner-properties-context';
+import { usePropertyFeedContext, type ListingType } from '../model/property-feed-context';
 
 interface OwnerPropertyDetailPanelProps {
   property: OwnerPropertySummary;
@@ -99,7 +99,7 @@ function PriceBadges({
   property: OwnerPropertySummary;
   listingType: ListingType;
 }) {
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
   const rentDisplay = formatPriceRange(property.price_range?.rent);
   const buyDisplay = formatPriceRange(property.price_range?.buy);
 
@@ -138,11 +138,11 @@ function InfoTile({ label, value, icon }: { label: string; value: string; icon: 
 
 /**
  * Inline detail panel — renders directly inside the right-side main area
- * (used by the two-panel layout in OwnerPropertiesPage).
+ * (used by the two-panel layout in PropertyFeedPage).
  */
 export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDetailPanelProps) {
-  const t = useTranslations('OwnerProperties');
-  const { listingType } = useOwnerPropertiesContext();
+  const t = useTranslations('PropertyFeed');
+  const { listingType } = usePropertyFeedContext();
   const {
     isAgent,
     isApplyModalOpen,

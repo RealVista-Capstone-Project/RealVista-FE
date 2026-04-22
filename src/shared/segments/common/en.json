@@ -10,7 +10,7 @@
       "myEngagements": "My Engagements",
       "messages": "Messages",
       "myContracts": "My Contracts",
-      "ownerProperties": "Owner Properties",
+      "propertyFeed": "Discover Properties",
       "proposals": "My Proposals",
       "appointments": "Appointments",
       "users": "User Management"
@@ -28,7 +28,7 @@
       "messages": "Messages",
       "manageProposals": "Proposal Library",
       "property": "Property",
-      "ownerProperties": "Owner properties & proposals",
+      "propertyFeed": "Discover Properties",
       "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
       "manageUsers": "User Management",
@@ -217,7 +217,8 @@
     "minimize": "Minimize",
     "expand": "Expand",
     "close": "Close",
-    "startConversation": "Start a conversation"
+    "startConversation": "Start a conversation",
+    "selectConversation": "Select a conversation to start chatting"
   },
   "Contact": {
     "title": "Contact Agent",

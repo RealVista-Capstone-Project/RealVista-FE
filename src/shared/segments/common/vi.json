@@ -10,7 +10,7 @@
       "myEngagements": "Hợp tác của tôi",
       "messages": "Tin nhắn",
       "myContracts": "Hợp đồng của tôi",
-      "ownerProperties": "Bất động sản chủ nhà",
+      "propertyFeed": "Khám phá BĐS",
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
       "users": "Quản lý người dùng"
@@ -28,7 +28,7 @@
       "messages": "Tin nhắn",
       "manageProposals": "Hồ sơ cá nhân",
       "property": "Bất động sản",
-      "ownerProperties": "Bảng tin bất động sản",
+      "propertyFeed": "Khám phá BĐS",
       "agentSetting": "Hồ sơ & cài đặt môi giới",
       "appointments": "Lịch hẹn",
       "manageUsers": "Quản lý người dùng",
@@ -217,7 +217,8 @@
     "minimize": "Thu nhỏ",
     "expand": "Mở rộng",
     "close": "Đóng",
-    "startConversation": "Bắt đầu cuộc trò chuyện"
+    "startConversation": "Bắt đầu cuộc trò chuyện",
+    "selectConversation": "Chọn một cuộc trò chuyện để bắt đầu nhắn tin"
   },
   "Contact": {
     "title": "Liên hệ môi giới",
