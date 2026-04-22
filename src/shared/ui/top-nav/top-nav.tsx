@@ -21,7 +21,6 @@ export type NavItem = {
   authOnly?: boolean; // only render when user is logged in
 };
 
-
 export interface TopNavProps {
   variant?: 'public' | 'dashboard';
   navItems?: NavItem[];
@@ -40,7 +39,7 @@ const defaultNavItems: NavItem[] = [
   { id: 'buy', translationKey: 'buy', href: ROUTES.buy },
   { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
   { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
-  { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments },
+  { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments, authOnly: true },
   { id: 'my-contracts', translationKey: 'myContracts', href: ROUTES.myContracts, authOnly: true },
 ];
 

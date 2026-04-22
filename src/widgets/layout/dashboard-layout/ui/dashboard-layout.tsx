@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 import { useAuthSession } from '@/features/auth/model';
@@ -40,48 +40,153 @@ type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
 
 function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
-    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
-    { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
-    { id: 'rental-contracts', label: t('menu.rentalContracts'), href: ROUTES.dashboard.rentalContracts, icon: FileText },
+    {
+      id: 'dashboard',
+      label: t('menu.dashboard'),
+      href: ROUTES.dashboard.root,
+      icon: LayoutDashboard,
+    },
+    {
+      id: 'listings',
+      label: t('menu.listings'),
+      href: ROUTES.dashboard.managedListings,
+      icon: Columns,
+    },
+    {
+      id: 'appointments',
+      label: t('menu.appointments'),
+      href: ROUTES.dashboard.appointments,
+      icon: Calendar,
+    },
+    // { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
+    {
+      id: 'rental-contracts',
+      label: t('menu.rentalContracts'),
+      href: ROUTES.dashboard.rentalContracts,
+      icon: FileText,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
-    { id: 'manage-agent', label: t('menu.manageAgent'), href: ROUTES.dashboard.manageAgent, icon: Users },
-    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'manage-agent',
+      label: t('menu.manageAgent'),
+      href: ROUTES.dashboard.manageAgent,
+      icon: Users,
+    },
+    {
+      id: 'my-engagements',
+      label: t('menu.myEngagements'),
+      href: ROUTES.dashboard.myEngagements,
+      icon: Handshake,
+    },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
   ];
 }
 
 function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
-    { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'appointments',
+      label: t('menu.appointments'),
+      href: ROUTES.dashboard.appointments,
+      icon: Calendar,
+    },
+    {
+      id: 'my-contracts',
+      label: t('menu.myContracts'),
+      href: ROUTES.dashboard.myContracts,
+      icon: FileText,
+    },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
   ];
 }
 
 function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
-    { id: 'owner-properties', label: t('menu.ownerProperties'), href: ROUTES.dashboard.ownerProperties, icon: Search },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
-    { id: 'appointments', label: t('menu.appointments'), href: ROUTES.dashboard.appointments, icon: Calendar },
+    {
+      id: 'dashboard',
+      label: t('menu.dashboard'),
+      href: ROUTES.dashboard.root,
+      icon: LayoutDashboard,
+    },
+    {
+      id: 'owner-properties',
+      label: t('menu.ownerProperties'),
+      href: ROUTES.dashboard.ownerProperties,
+      icon: Search,
+    },
+    {
+      id: 'listings',
+      label: t('menu.listings'),
+      href: ROUTES.dashboard.managedListings,
+      icon: Columns,
+    },
+    {
+      id: 'appointments',
+      label: t('menu.appointments'),
+      href: ROUTES.dashboard.appointments,
+      icon: Calendar,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
-    { id: 'proposals', label: t('menu.proposals'), href: ROUTES.dashboard.manageProposals, icon: FileText },
-    { id: 'my-contracts', label: t('menu.myContracts'), href: ROUTES.dashboard.myContracts, icon: FileText },
-    { id: 'my-engagements', label: t('menu.myEngagements'), href: ROUTES.dashboard.myEngagements, icon: Handshake },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'proposals',
+      label: t('menu.proposals'),
+      href: ROUTES.dashboard.manageProposals,
+      icon: FileText,
+    },
+    {
+      id: 'my-contracts',
+      label: t('menu.myContracts'),
+      href: ROUTES.dashboard.myContracts,
+      icon: FileText,
+    },
+    {
+      id: 'my-engagements',
+      label: t('menu.myEngagements'),
+      href: ROUTES.dashboard.myEngagements,
+      icon: Handshake,
+    },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
   ];
 }
 
 function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
   return [
-    { id: 'dashboard', label: t('menu.dashboard'), href: ROUTES.dashboard.root, icon: LayoutDashboard },
+    {
+      id: 'dashboard',
+      label: t('menu.dashboard'),
+      href: ROUTES.dashboard.root,
+      icon: LayoutDashboard,
+    },
     { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
-    { id: 'listings', label: t('menu.listings'), href: ROUTES.dashboard.managedListings, icon: Columns },
+    {
+      id: 'listings',
+      label: t('menu.listings'),
+      href: ROUTES.dashboard.managedListings,
+      icon: Columns,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
-    { id: 'messages', label: t('menu.messages'), href: ROUTES.dashboard.messages, icon: MessageCircle },
+    {
+      id: 'messages',
+      label: t('menu.messages'),
+      href: ROUTES.dashboard.messages,
+      icon: MessageCircle,
+    },
   ];
 }
 
@@ -99,6 +204,7 @@ export function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
+  const locale = useLocale();
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
@@ -159,10 +265,7 @@ export function DashboardLayout({
     ) {
       return t('pageTitle.myEngagements');
     }
-    if (
-      pathname === ROUTES.dashboard.property ||
-      pathname.startsWith(ROUTES.dashboard.property)
-    ) {
+    if (pathname === ROUTES.dashboard.property || pathname.startsWith(ROUTES.dashboard.property)) {
       return t('pageTitle.property');
     }
     if (
@@ -253,7 +356,7 @@ export function DashboardLayout({
             </button>
           ) : (
             <>
-              <Link href={logoHref} className='flex items-center gap-3 group'>
+              <Link href={`/buy`} className='flex items-center gap-3 group'>
                 <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-primary/10'>
                   <Image
                     src='/logo.png'
@@ -342,10 +445,7 @@ export function DashboardLayout({
       {/* Main Content Area - Properly fills space without margin hacks */}
       <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
         {/* Top Nav */}
-        <TopNavContainer
-          variant='dashboard'
-          pageTitle={pageTitle}
-        />
+        <TopNavContainer variant='dashboard' pageTitle={pageTitle} />
 
         {/* Page Content - fills remaining height, scrollable */}
         <main className='flex-1 overflow-y-auto bg-muted/30 p-0'>{children}</main>
