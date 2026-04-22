@@ -18,6 +18,7 @@ export * from './sidebar';
 export * from './skeleton';
 export * from './slider';
 export * from './sonner';
+export * from './spinner';
 export * from './switch';
 export * from './textarea';
 export * from './tooltip';

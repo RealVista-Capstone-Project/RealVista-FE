@@ -6,7 +6,6 @@ import {
   RentalContractStatus,
   type RentalContract,
 } from '@/entities/rental-contract';
-import { useManageRentalContractContext } from '../model/manage-rental-contract-context';
 import {
   useGetLandlordSigningUrlMutation,
   useSendToLandlordMutation,
@@ -46,7 +45,6 @@ type DialogAction = RentalContractStatus.TERMINATED;
 export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelProps) {
   const t = useTranslations('RentalContract');
   const locale = useLocale();
-  const { setSelectedContract } = useManageRentalContractContext();
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
   const sendToLandlordMutation = useSendToLandlordMutation();
   const sendToRenterMutation = useSendToRenterMutation();
@@ -144,8 +142,6 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
         status: RentalContractStatus.TERMINATED,
         reason,
       });
-      // Invalidation happens in the mutation; close the panel
-      setSelectedContract(null);
       setShowTerminateDialog(false);
       toast.success(t('toast.updateSuccess'));
     } catch {

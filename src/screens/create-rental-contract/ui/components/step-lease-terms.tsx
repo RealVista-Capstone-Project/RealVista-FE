@@ -96,7 +96,8 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
             onFieldChange('monthlyRent', raw);
             markTouched('monthlyRent');
           }}
-          className='h-11 rounded-xl border-primary/10 bg-white/90'
+          placeholder='Nhập tiền thuê'
+          className='h-11 rounded-xl border-[1.5px] border-primary/25 bg-white/90 placeholder:text-muted-foreground/40'
         />
         {rentError && (
           <p className='mt-1.5 flex items-center gap-1.5 text-xs font-medium text-destructive'>
@@ -111,7 +112,8 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
         <MoneyInput
           value={form.securityDeposit}
           onChange={(raw) => onFieldChange('securityDeposit', raw)}
-          className='h-11 rounded-xl border-primary/10 bg-white/90'
+          placeholder='Nhập tiền cọc'
+          className='h-11 rounded-xl border-[1.5px] border-primary/25 bg-white/90 placeholder:text-muted-foreground/40'
         />
       </Field>
 
@@ -128,8 +130,10 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
             if (form.leaseEndDate) markTouched('leaseEndDate');
           }}
           onBlur={() => markTouched('leaseStartDate')}
-          className={`h-11 rounded-xl border-primary/10 bg-white/90 ${
-            touched.leaseStartDate && startError ? 'border-destructive focus-visible:ring-destructive/30' : ''
+          className={`h-11 rounded-xl border-[1.5px] bg-white/90 placeholder:text-muted-foreground/40 ${
+            touched.leaseStartDate && startError
+              ? 'border-destructive focus-visible:ring-destructive/30'
+              : 'border-primary/25'
           }`}
         />
         {touched.leaseStartDate && startError && (
@@ -151,8 +155,10 @@ export function StepLeaseTerms({ form, onFieldChange, t }: StepLeaseTermsProps) 
             markTouched('leaseEndDate');
           }}
           onBlur={() => markTouched('leaseEndDate')}
-          className={`h-11 rounded-xl border-primary/10 bg-white/90 ${
-            touched.leaseEndDate && endError ? 'border-destructive focus-visible:ring-destructive/30' : ''
+          className={`h-11 rounded-xl border-[1.5px] bg-white/90 placeholder:text-muted-foreground/40 ${
+            touched.leaseEndDate && endError
+              ? 'border-destructive focus-visible:ring-destructive/30'
+              : 'border-primary/25'
           }`}
         />
         {touched.leaseEndDate && endError ? (

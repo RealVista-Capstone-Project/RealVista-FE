@@ -39,6 +39,7 @@ import { settingPreferenceApi, settingPreferenceQueries } from '@/entities/setti
 import { customerProfileApi, customerProfileQueries } from '@/entities/customer-profile/api';
 import { agentProfileApi, agentProfileKeys, agentProfileQueries } from '@/entities/agent-profile/api';
 import http from '@/shared/lib/http';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 import type { ApiResponse } from '@/shared/types/api';
 import { BillingReturnQueryEffects } from '@/widgets/billing/ui/billing-return-query-effects';
 import type { UpdateMeData } from '@/entities/user/model/types';
@@ -488,7 +489,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       queryClient.invalidateQueries({ queryKey: customerProfileQueries.me().queryKey });
       toast.success(t('toast.profileDeleted'));
     },
-    onError: () => toast.error(t('toast.profileDeleteFailed')),
+    onError: (error) => handleErrorApi({ error }),
   });
 
   const switchProfileMutation = useMutation({
@@ -508,7 +509,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       setChangePasswordForm({ current: '', next: '', confirm: '' });
       toast.success(t('toast.passwordChanged'));
     },
-    onError: () => toast.error(t('toast.passwordChangeFailed')),
+    onError: (error) => handleErrorApi({ error }),
   });
 
   const deleteAccountMutation = useMutation({

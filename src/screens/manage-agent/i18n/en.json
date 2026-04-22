@@ -2,26 +2,31 @@
   "ManageAgent": {
     "title": "Manage Agents",
     "subtitle": "View and manage agents assigned to your properties",
-    "sidebar": {
-      "manageAgents": "Manage Agents"
+    "hero": {
+      "shortTitle": "Manage Agents"
     },
     "filter": {
       "allStatuses": "All Statuses",
-      "searchPlaceholder": "Search by agent name..."
+      "searchPlaceholder": "Search by agent name...",
+      "filterTitle": "Filter by status",
+      "reset": "Reset",
+      "statusLabel": "Status"
     },
     "table": {
       "hiredDate": "Hired Date",
       "agent": "Agent",
       "rating": "Rating",
       "property": "Property",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
     },
     "empty": {
       "title": "No agents found.",
       "subtitle": "Try adjusting your search or filters."
     },
     "pagination": {
-      "showing": "Showing {from}-{to} of {total}"
+      "showing": "Showing {from}-{to} of {total}",
+      "pageInfo": "Page {current} of {total}"
     },
     "loading": "Loading agents...",
     "error": "Failed to load agents. Please try again."

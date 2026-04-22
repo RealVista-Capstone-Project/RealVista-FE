@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { engagementApi } from '@/entities/engagement/api';
 import { Engagement } from '@/entities/engagement/model/types';
 import { getAccessToken, type AuthSession } from '@/features/auth/model';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 function engagementSortKey(e: Engagement): number {
   const t = new Date(e.createdAt as string | Date).getTime();
@@ -56,7 +57,7 @@ export const useCancelEngagementMutation = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-    onError: () => toast.error('Hủy thất bại'),
+    onError: (error) => handleErrorApi({ error }),
   });
 };
 
@@ -79,7 +80,7 @@ export const useFinishEngagementMutation = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-    onError: () => toast.error('Hoàn thành thất bại'),
+    onError: (error) => handleErrorApi({ error }),
   });
 };
 
@@ -102,7 +103,7 @@ export const useAcceptEngagementMutation = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-    onError: () => toast.error('Chấp nhận thất bại'),
+    onError: (error) => handleErrorApi({ error }),
   });
 };
 
@@ -125,6 +126,6 @@ export const useRejectEngagementMutation = (onSuccessCallback?: () => void) => {
         onSuccessCallback();
       }
     },
-    onError: () => toast.error('Từ chối thất bại'),
+    onError: (error) => handleErrorApi({ error }),
   });
 };

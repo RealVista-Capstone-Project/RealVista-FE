@@ -21,7 +21,13 @@ import {
   DialogFooter,
 } from '@/shared/ui/dialog/dialog';
 import { Input } from '@/shared/ui/input/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/select/select';
 
 interface SaveSearchButtonProps {
   searchType: SearchType;
@@ -97,10 +103,10 @@ export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearch
           toast.success(t('success'));
           setShowBoardModal(false);
         },
-        onError: (error: unknown) => {
-          const httpErr = error as { status?: number; payload?: { error_code?: string } };
+        onError: (error: any) => {
+          const errorCode = error?.payload?.error_code;
 
-          if (httpErr?.status === 409 || httpErr?.payload?.error_code === 'SAVED_SEARCH_DUPLICATE') {
+          if (error?.status === 409 || errorCode === 'SAVED_SEARCH_DUPLICATE') {
             toast.error(t('duplicateAlert'));
             return;
           }
@@ -135,7 +141,8 @@ export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearch
           <DialogHeader>
             <DialogTitle>Lưu tìm kiếm</DialogTitle>
             <DialogDescription>
-              Nhập tên nhóm để phân loại mục đích tìm kiếm của bạn (ví dụ: Nhà đầu tư, Thuê cho con học...)
+              Nhập tên nhóm để phân loại mục đích tìm kiếm của bạn (ví dụ: Nhà đầu tư, Thuê cho con
+              học...)
             </DialogDescription>
           </DialogHeader>
           <div className='grid gap-4 py-4'>
@@ -214,7 +221,9 @@ export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearch
             <div className='flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10 mt-2'>
               <div className='space-y-0.5'>
                 <p className='text-sm font-bold text-foreground'>Sử dụng cho gợi ý AI</p>
-                <p className='text-xs text-muted-foreground'>Đánh dấu để AI ưu tiên gợi ý dựa trên tiêu chí này</p>
+                <p className='text-xs text-muted-foreground'>
+                  Đánh dấu để AI ưu tiên gợi ý dựa trên tiêu chí này
+                </p>
               </div>
               <input
                 type='checkbox'

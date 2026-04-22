@@ -5,6 +5,7 @@
       "title": "Manage DocuSign rental contracts with clear signing control",
       "subtitle": "Track owner-side rental contracts, monitor each DocuSign signing milestone, and move every contract through its managed lifecycle without leaving the dashboard.",
       "createButton": "Create Contract",
+      "shortTitle": "Rental Contracts",
       "stats": {
         "totalContracts": "Contracts in View",
         "activeSelection": "Current Selection"
@@ -13,20 +14,39 @@
     },
     "filter": {
       "allStatuses": "All Statuses",
-      "searchPlaceholder": "Search by tenant or property..."
+      "searchPlaceholder": "Search by tenant or property...",
+      "filterTitle": "Filter by status",
+      "reset": "Reset",
+      "statusLabel": "Status",
+      "tabs": {
+        "pendingRenter": "Pending Renter",
+        "pendingLandlord": "Pending Landlord",
+        "active": "Active",
+        "expired": "Expired",
+        "terminated": "Terminated"
+      }
     },
     "table": {
       "status": "Status",
       "tenant": "Tenant",
+      "property": "Property",
       "monthlyRent": "Monthly Rent",
-      "createdDate": "Created Date"
+      "leasePeriod": "Lease Period",
+      "createdDate": "Created Date",
+      "actions": "Actions",
+      "perMonth": "/mo"
     },
     "empty": {
       "title": "No rental contracts found.",
-      "subtitle": "Try a different status filter or search term."
+      "subtitle": "Try a different status filter or search term.",
+      "selectContract": "Select a contract to view details"
+    },
+    "detail": {
+      "emptyTitle": "Select a contract to view details"
     },
     "pagination": {
-      "showing": "Showing {from}-{to} of {total}"
+      "showing": "Showing {from}-{to} of {total}",
+      "pageInfo": "Page {current} of {total}"
     },
     "loading": "Loading rental contracts...",
     "error": "Failed to load rental contracts. Please try again."

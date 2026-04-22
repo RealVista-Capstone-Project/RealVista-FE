@@ -6,31 +6,33 @@
       "tenants": "Người thuê",
       "rentalContracts": "Hợp đồng thuê",
       "property": "Bất động sản",
-      "manageAgent": "Quản lý đại lý",
+      "manageAgent": "Quản lý môi giới",
       "myEngagements": "Hợp tác của tôi",
       "messages": "Tin nhắn",
       "myContracts": "Hợp đồng của tôi",
-      "ownerProperties": "Bất động sản chủ nhà",
+      "propertyFeed": "Khám phá BĐS",
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
       "users": "Quản lý người dùng"
     },
     "pageTitle": {
       "default": "RealVista",
+      "dashboardManager": "Quản lý Dashboard",
       "dashboard": "Dashboard",
       "insight": "Thống kê",
       "managedListings": "Quản lý bài đăng",
-      "myEngagements": "Engagement của tôi",
+      "myEngagements": "Hợp tác của tôi",
       "tenants": "Người thuê",
       "rentalContracts": "Hợp đồng thuê",
       "myContracts": "Hợp đồng của tôi",
       "messages": "Tin nhắn",
       "manageProposals": "Hồ sơ cá nhân",
       "property": "Bất động sản",
-      "ownerProperties": "Bảng tin bất động sản",
+      "propertyFeed": "Khám phá BĐS",
       "agentSetting": "Hồ sơ & cài đặt môi giới",
       "appointments": "Lịch hẹn",
-      "manageUsers": "Quản lý người dùng"
+      "manageUsers": "Quản lý người dùng",
+      "manageAgent": "Quản lý môi giới"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
@@ -126,6 +128,7 @@
       "minPriceInvalid": "Giá thấp nhất phải là một số hợp lệ lớn hơn 0",
       "maxPriceRequired": "Giá cao nhất là bắt buộc",
       "maxPriceInvalid": "Giá cao nhất phải là một số hợp lệ lớn hơn 0",
+      "maxPriceLessThanMin": "Giá cao nhất phải lớn hơn hoặc bằng giá thấp nhất",
       "dateInvalid": "Vui lòng nhập ngày hợp lệ",
       "mediaRequired": "Cần ít nhất một ảnh hoặc video để tạo bài đăng"
     },
@@ -151,7 +154,46 @@
   "Common": {
     "title": "Xin chào common!",
     "about": "Về trang chủ",
-    "loading": "Đang tải..."
+    "loading": "Đang tải...",
+    "errors": {
+      "resourceNotFound": "Không tìm thấy dữ liệu yêu cầu.",
+      "authenticationError": "Xác thực thất bại. Vui lòng đăng nhập lại.",
+      "accessDenied": "Bạn không có quyền thực hiện thao tác này.",
+      "validationError": "Vui lòng kiểm tra lại thông tin nhập vào.",
+      "invalidRequestBody": "Yêu cầu không hợp lệ. Vui lòng kiểm tra lại.",
+      "fileSizeExceeded": "Kích thước tệp vượt quá giới hạn. Vui lòng tải lên tệp nhỏ hơn.",
+      "unsupportedMediaType": "Loại tệp không được hỗ trợ.",
+      "internalServerError": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau.",
+      "googleEmailMissing": "Google không cung cấp địa chỉ email. Vui lòng dùng phương thức khác.",
+      "googleAuthFailed": "Đăng nhập Google thất bại. Vui lòng thử lại.",
+      "accountDeleted": "Tài khoản này đã bị xóa.",
+      "emailAlreadyExists": "Đã tồn tại tài khoản với email này.",
+      "invalidCurrentPassword": "Mật khẩu hiện tại không đúng.",
+      "invalidOtp": "OTP không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu mã mới.",
+      "duplicateListingPublish": "Đã tồn tại tin đăng đã xuất bản loại này cho bất động sản này.",
+      "propertyNotAvailable": "Bất động sản liên kết không ở trạng thái hoạt động.",
+      "leasePropertyNotAvailable": "Bất động sản này không khả dụng để cho thuê.",
+      "leaseActiveExists": "Đã tồn tại hợp đồng thuê đang hoạt động cho bất động sản này.",
+      "leaseDocusignUnavailable": "DocuSign không khả dụng. Vui lòng thử lại sau.",
+      "leaseTerminateLandlordOnly": "Chỉ bên cho thuê mới có thể chấm dứt hợp đồng.",
+      "leaseAccessDenied": "Bạn không có quyền truy cập hợp đồng này.",
+      "profileOwnershipViolation": "Hồ sơ này không thuộc về bạn.",
+      "cannotDeleteActiveProfile": "Bạn không thể xóa hồ sơ đang được kích hoạt.",
+      "proposalTemplateNotOwned": "Bạn không sở hữu mẫu đề xuất này.",
+      "cannotProposeToSelf": "Bạn không thể gửi đề xuất cho bất động sản của chính mình.",
+      "proposalAlreadyActive": "Bạn đã có một đề xuất đang hoạt động cho bất động sản này.",
+      "subscriptionNotActive": "Gói dịch vụ này không còn hoạt động.",
+      "boostAlreadyActive": "Tin đăng này đã có boost loại này đang hoạt động.",
+      "boostPublishedOnly": "Boost chỉ có thể áp dụng cho tin đăng đã xuất bản.",
+      "engagementNotOwned": "Bạn không sở hữu giao dịch này.",
+      "cancellationReasonRequired": "Vui lòng cung cấp lý do khi hủy.",
+      "reviewAlreadyExists": "Đánh giá đã tồn tại cho giao dịch này.",
+      "businessConflict": "Khung giờ này đã được đặt. Vui lòng chọn thời gian khác."
+    },
+    "pagination": {
+      "showing": "Hiển thị {from} - {to} trong tổng số {total} kết quả",
+      "pageInfo": "Trang {current} của {total}"
+    }
   },
   "Chat": {
     "title": "Trò chuyện",
@@ -175,10 +217,11 @@
     "minimize": "Thu nhỏ",
     "expand": "Mở rộng",
     "close": "Đóng",
-    "startConversation": "Bắt đầu cuộc trò chuyện"
+    "startConversation": "Bắt đầu cuộc trò chuyện",
+    "selectConversation": "Chọn một cuộc trò chuyện để bắt đầu nhắn tin"
   },
   "Contact": {
-    "title": "Liên hệ đại lý",
+    "title": "Liên hệ môi giới",
     "description": "Gửi tin nhắn về bất động sản này",
     "descriptionWithAgent": "Gửi tin nhắn cho {agent} về bất động sản này",
     "suggestedInquiries": "Gợi ý cho bạn",
@@ -395,7 +438,7 @@
     "subscribe": "Gói dịch vụ & thanh toán",
     "appointments": "Lịch hẹn",
     "myContracts": "Hợp đồng",
-    "myEngagements": "Engagement của tôi",
+    "myEngagements": "Hợp tác của tôi",
     "login": "Đăng nhập",
     "signup": "Đăng ký",
     "switchPersona": "Chuyển Profile"
@@ -650,6 +693,21 @@
     "statusActive": "Hoạt động",
     "statusDraft": "Bản nháp",
     "statusArchived": "Đã lưu trữ",
+    "table": {
+      "title": "Tiêu đề",
+      "commission": "Hoa hồng",
+      "experience": "Kinh nghiệm",
+      "status": "Trạng thái",
+      "updatedAt": "Cập nhật"
+    },
+    "filterTitle": "Bộ lọc",
+    "filterReset": "Đặt lại",
+    "filterStatus": "Trạng thái",
+    "filter": {
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "paginationShowing": "Hiển thị {from}–{to} trong {total}",
+    "errorLoading": "Không thể tải hồ sơ. Vui lòng thử lại.",
     "metricExperience": "Kinh nghiệm",
     "metricCommission": "Hoa hồng",
     "metricStatus": "Trạng thái",

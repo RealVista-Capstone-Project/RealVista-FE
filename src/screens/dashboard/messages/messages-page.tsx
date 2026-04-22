@@ -97,7 +97,9 @@ export function MessagesPage() {
    * Passed to <MessageInput> which auto-opens the confirmation modal pre-selecting it.
    * Reset to null once the modal has consumed it.
    */
-  const [pendingContractListing, setPendingContractListing] = useState<ChatListingData | null>(null);
+  const [pendingContractListing, setPendingContractListing] = useState<ChatListingData | null>(
+    null
+  );
 
   const locale = useLocale();
 
@@ -242,14 +244,14 @@ export function MessagesPage() {
 
   if (isLoading) {
     return (
-      <div className='flex h-[calc(100vh-6rem)] items-center justify-center rounded-2xl border border-primary/20 bg-white shadow-sm'>
+      <div className='flex h-full items-center justify-center rounded-2xl border border-primary/20 bg-white shadow-sm'>
         <Loader2 className='h-6 w-6 animate-spin text-primary/60' />
       </div>
     );
   }
 
   return (
-    <div className='flex h-[calc(100vh-6rem)] overflow-hidden rounded-2xl border border-primary/20 bg-white shadow-sm'>
+    <div className='flex h-full overflow-hidden  border border-primary/20 bg-white shadow-sm'>
       {/* ── Left Sidebar ─────────────────────────────────────────────────── */}
       <ConversationSidebar
         conversations={conversations}

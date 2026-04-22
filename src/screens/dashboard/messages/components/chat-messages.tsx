@@ -180,15 +180,17 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
 
   // ── Messages ───────────────────────────────────────────────────────────────
   return (
-    <div className='flex-1 overflow-y-auto px-6 py-5'>
-      <div className='space-y-5'>
+    <div className='flex-1 overflow-y-auto bg-gradient-to-b from-slate-50/50 via-white to-slate-50/50 px-6 py-5'>
+      <div className='space-y-6'>
         {groups.map((group) => (
-          <div key={group.dateKey} className='space-y-5'>
-            {/* Date divider */}
-            <div className='flex items-center gap-3'>
-              <div className='h-px flex-1 bg-primary/15' />
-              <span className='text-xs font-medium text-muted-foreground/60'>{group.dateLabel}</span>
-              <div className='h-px flex-1 bg-primary/15' />
+          <div key={group.dateKey} className='space-y-4'>
+            {/* Date divider - sticky badge */}
+            <div className='sticky top-0 z-10 flex items-center py-2'>
+              <div className='h-px flex-1 bg-slate-200/60' />
+              <span className='mx-3 shrink-0 rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-[11px] font-medium text-slate-400 shadow-sm backdrop-blur-sm'>
+                {group.dateLabel}
+              </span>
+              <div className='h-px flex-1 bg-slate-200/60' />
             </div>
 
             {group.msgs.map((msg) => (
@@ -203,7 +205,7 @@ export function ChatMessages({ conversationId, onListingClick, onCreateContract,
           </div>
         ))}
       </div>
-      <div ref={bottomRef} />
+      <div ref={bottomRef} className='h-1' />
     </div>
   );
 }

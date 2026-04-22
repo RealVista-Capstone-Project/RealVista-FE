@@ -9,6 +9,7 @@ import { appointmentQueries, appointmentKeys, useBookTour } from '@/features/pri
 import { toast } from 'sonner';
 import { Clock, Calendar as CalendarIcon, Hourglass, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 import { DatePickerInput } from '@/shared/ui/realvista-input-date-picker';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 
@@ -20,6 +21,7 @@ interface BookTourModalProps {
 
 export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps) {
   const t = useTranslations('BookTour');
+  const tGlobal = useTranslations();
   const locale = useLocale();
   const dateLocale = locale === 'vi' ? vi : enUS;
   const [date, setDate] = useState<Date | undefined>(() => {
@@ -161,8 +163,7 @@ export function BookTourModal({ listingId, isOpen, onClose }: BookTourModalProps
           setStep('selection');
         },
         onError: (error) => {
-          console.error(error);
-          toast.error(t('bookingError'));
+          handleErrorApi({ error, t: tGlobal });
         },
       }
     );

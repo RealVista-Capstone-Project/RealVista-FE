@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Filter, X, ChevronDown, Plus, Lock } from 'lucide-react';
+import { Search, Filter, X, ChevronDown, Plus, Building2, Lock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -10,6 +10,8 @@ import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
+import { Spinner } from '@/shared/ui/spinner';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 import type { Listing } from '@/entities/listing';
 import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
@@ -52,7 +54,7 @@ export function ManagedListingsPage() {
   const { isLocked, isLoading: quotaLoading } = useListingQuota();
 
   const handleCreateListing = () => {
-    router.push(`/${locale}/dashboard/listing/create`);
+    router.push(`/${locale}/dashboard/listings/create`);
   };
 
   // Fetch summary counts for tabs
@@ -143,25 +145,6 @@ export function ManagedListingsPage() {
     }
   }, [listings, selectedListingId]);
 
-  if (isLoading) {
-    return (
-      <div className='flex h-full items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary' />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className='flex h-full items-center justify-center'>
-        <div className='text-center'>
-          <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
-          <p className='mt-2 text-sm text-muted-foreground'>{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
   const statusOptions: StatusFilter[] = [
     'ALL',
     ListingStatus.DRAFT,
@@ -189,8 +172,10 @@ export function ManagedListingsPage() {
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
                 <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
-                <div className='flex items-center justify-center rounded-lg bg-primary px-2 py-1'>
-                  <span className='text-sm font-bold text-white'>{listingCounts.all}</span>
+                <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
+                  <span className='text-sm font-bold text-white'>
+                    {formatNumber(listingCounts.all)}
+                  </span>
                 </div>
               </div>
 
@@ -198,7 +183,7 @@ export function ManagedListingsPage() {
               <button
                 type='button'
                 onClick={handleCreateListing}
-                className='flex items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-primary/90'
+                className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                 aria-label={t('createButton')}
               >
                 <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
@@ -236,7 +221,7 @@ export function ManagedListingsPage() {
                 type='button'
                 onClick={() => setActiveTab('ALL')}
                 className={cn(
-                  'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                   activeTab === 'ALL'
                     ? 'bg-primary text-white'
                     : 'bg-transparent text-foreground/70 hover:bg-primary/5'
@@ -249,14 +234,14 @@ export function ManagedListingsPage() {
                     activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
                   )}
                 >
-                  {listingCounts.all}
+                  {formatNumber(listingCounts.all)}
                 </span>
               </button>
               <button
                 type='button'
                 onClick={() => setActiveTab(ListingType.RENT)}
                 className={cn(
-                  'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                   activeTab === ListingType.RENT
                     ? 'bg-primary text-white'
                     : 'bg-transparent text-foreground/70 hover:bg-primary/5'
@@ -271,14 +256,14 @@ export function ManagedListingsPage() {
                       : 'bg-primary/15 text-foreground'
                   )}
                 >
-                  {listingCounts.rent}
+                  {formatNumber(listingCounts.rent)}
                 </span>
               </button>
               <button
                 type='button'
                 onClick={() => setActiveTab(ListingType.SALE)}
                 className={cn(
-                  'flex items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                   activeTab === ListingType.SALE
                     ? 'bg-primary text-white'
                     : 'bg-transparent text-foreground/70 hover:bg-primary/5'
@@ -293,7 +278,7 @@ export function ManagedListingsPage() {
                       : 'bg-primary/15 text-foreground'
                   )}
                 >
-                  {listingCounts.sale}
+                  {formatNumber(listingCounts.sale)}
                 </span>
               </button>
             </div>
@@ -311,7 +296,7 @@ export function ManagedListingsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('search.placeholder')}
-                  className='h-14 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
+                  className='h-12 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
                 />
               </div>
 
@@ -321,7 +306,7 @@ export function ManagedListingsPage() {
                   type='button'
                   onClick={() => setIsFilterOpen((prev) => !prev)}
                   className={cn(
-                    'flex h-14 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors',
+                    'flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                     hasActiveFilters
                       ? 'border-primary bg-primary/5 text-primary'
                       : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
@@ -348,7 +333,7 @@ export function ManagedListingsPage() {
                       <button
                         type='button'
                         onClick={resetFilters}
-                        className='text-xs font-medium text-primary hover:underline'
+                        className='cursor-pointer text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1'
                       >
                         {t('filterPanel.reset')}
                       </button>
@@ -372,7 +357,7 @@ export function ManagedListingsPage() {
                                 type='button'
                                 onClick={() => setStatusFilter(s)}
                                 className={cn(
-                                  'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                                  'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                                   statusFilter === s
                                     ? 'bg-primary/5 font-medium text-primary'
                                     : 'text-foreground hover:bg-primary/5'
@@ -404,7 +389,7 @@ export function ManagedListingsPage() {
                                 type='button'
                                 onClick={() => setSortBy(s)}
                                 className={cn(
-                                  'flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                                  'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                                   sortBy === s
                                     ? 'bg-primary/5 font-medium text-primary'
                                     : 'text-foreground hover:bg-primary/5'
@@ -425,10 +410,32 @@ export function ManagedListingsPage() {
           </div>
 
           {/* Properties List */}
-          <div className='flex-1 overflow-y-auto'>
-            {listings.length === 0 ? (
-              <div className='flex items-center justify-center p-8'>
+          <div className='flex-1 overflow-y-auto flex flex-col'>
+            {isLoading ? (
+              <div className='flex flex-1 items-center justify-center'>
+                <Spinner className='size-8 text-primary' />
+              </div>
+            ) : error ? (
+              <div className='flex flex-1 items-center justify-center'>
+                <div className='text-center'>
+                  <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
+                  <p className='mt-2 text-sm text-muted-foreground'>{error.message}</p>
+                </div>
+              </div>
+            ) : listings.length === 0 ? (
+              <div className='flex flex-col items-center justify-center gap-4 p-8 text-center flex-1'>
+                <div className='flex h-12 w-14 items-center justify-center rounded-full bg-primary/10'>
+                  <Building2 className='h-7 w-7 text-primary' strokeWidth={1.5} />
+                </div>
                 <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
+                <button
+                  type='button'
+                  onClick={handleCreateListing}
+                  className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                >
+                  <Plus className='h-4 w-4' strokeWidth={2.5} />
+                  <span>{t('createButton')}</span>
+                </button>
               </div>
             ) : (
               <div className='divide-y divide-border'>
@@ -472,7 +479,7 @@ export function ManagedListingsPage() {
         ) : (
           <div className='flex h-full items-center justify-center'>
             {isDetailLoading ? (
-              <div className='h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary' />
+              <Spinner className='size-8 text-primary' />
             ) : (
               <p className='text-sm text-muted-foreground'>{t('empty.selectProperty')}</p>
             )}

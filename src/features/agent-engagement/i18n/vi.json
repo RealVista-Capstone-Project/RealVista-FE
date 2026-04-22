@@ -1,7 +1,7 @@
 {
   "AgentEngagement": {
     "detailPanel": {
-      "title": "Chi tiết đại lý",
+      "title": "Chi tiết môi giới",
       "contactInfo": "Thông tin liên hệ",
       "email": "Email",
       "phone": "Điện thoại",
@@ -16,8 +16,13 @@
       "about": "Giới thiệu",
       "assignedProperty": "BĐS được giao",
       "addReview": "Thêm đánh giá",
-      "agent": "Đại lý",
-      "property": "Bất động sản"
+      "agent": "Môi giới",
+      "property": "Bất động sản",
+      "type": {
+        "agentProposal": "Đề xuất từ môi giới",
+        "ownerInvitation": "Lời mời từ chủ nhà",
+        "tenantApplication": "Đơn đăng ký thuê"
+      }
     },
     "listItem": {
       "noEmail": "Chưa có email"
@@ -29,7 +34,9 @@
       "cancelled": "Đã hủy",
       "accepted": "Đã chấp nhận",
       "rejected": "Từ chối",
-      "expired": "Hết hạn"
+      "expired": "Hết hạn",
+      "submitted": "Đã gửi",
+      "finished": "Hoàn thành"
     },
     "common": {
       "na": "N/A",
@@ -56,10 +63,10 @@
       "confirm": "Xác nhận hủy hợp đồng"
     },
     "reviewModal": {
-      "title": "Đánh giá đại lý",
+      "title": "Đánh giá môi giới",
       "description": "Trải nghiệm của bạn khi làm việc với {agentName} như thế nào?",
       "commentLabel": "Nhận xét của bạn",
-      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn khi làm việc với đại lý này...",
+      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn khi làm việc với môi giới này...",
       "optional": "tùy chọn",
       "skip": "Bỏ qua",
       "submit": "Gửi đánh giá"
@@ -83,16 +90,16 @@
       "propertyType": "Loại Bất động sản",
       "propertyLocation": "Khu vực",
       "listingsTitle": "Danh sách bất động sản",
-      "listingsSubtitle": "Các tin đăng đại lý tạo cho BĐS của bạn",
+      "listingsSubtitle": "Các tin đăng môi giới tạo cho BĐS của bạn",
       "listingsComingSoon": "Tính năng tin đăng sắp ra mắt",
-      "listingsComingSoonDesc": "Khi có mặt, bạn có thể xem tất cả tin đăng mà đại lý này tạo cho BĐS của bạn.",
+      "listingsComingSoonDesc": "Khi có mặt, bạn có thể xem tất cả tin đăng mà môi giới này tạo cho BĐS của bạn.",
       "listingStatus": "Trạng thái",
       "listingPrice": "Giá",
       "listingDate": "Ngày tạo",
       "noListings": "Chưa có tin đăng",
-      "noListingsDesc": "Đại lý này chưa tạo tin đăng nào cho BĐS của bạn.",
-      "soldListingsTitle": "Đã bán bởi đại lý",
-      "soldListingsSubtitle": "Bất động sản đã được bán thành công qua đại lý này",
+      "noListingsDesc": "Môi giới này chưa tạo tin đăng nào cho BĐS của bạn.",
+      "soldListingsTitle": "Đã bán bởi môi giới",
+      "soldListingsSubtitle": "Bất động sản đã được bán thành công qua môi giới này",
       "soldBadge": "Đã bán"
     }
   }

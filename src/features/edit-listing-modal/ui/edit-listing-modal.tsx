@@ -12,6 +12,7 @@ import type { EditListingPayload } from '../model/types';
 import type { Listing, ListingType } from '@/entities/listing';
 import { useContentVerification } from '@/shared/lib/hooks/use-content-verification';
 import { useMediaAnalysis } from '@/shared/lib/hooks/use-media-analysis';
+import { Spinner } from '@/shared/ui';
 import {
   ListingTypeSelector,
   ListingNameInput,
@@ -44,6 +45,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const [maxPrice, setMaxPrice] = React.useState(listing.max_price?.toString() || '');
   const [isNegotiable, setIsNegotiable] = React.useState(listing.is_negotiable);
   const [availableFrom, setAvailableFrom] = React.useState(listing.available_from || '');
+  const [securityDeposit, setSecurityDeposit] = React.useState(listing.security_deposit?.toString() ?? '');
 
   // ── Media State ──
   const initialMediaIds = new Set(listing.media?.map((m) => m.media_id) || []);
@@ -84,6 +86,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       setMaxPrice(listing.max_price?.toString() || '');
       setIsNegotiable(listing.is_negotiable);
       setAvailableFrom(listing.available_from || '');
+      setSecurityDeposit(listing.security_deposit?.toString() ?? '');
       setSelectedMediaIds(new Set(listing.media?.map((m) => m.media_id) || []));
       setPrimaryMediaId(listing.media?.find((m) => m.is_primary)?.media_id || null);
       setNewFiles([]);
@@ -235,6 +238,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       max_price: maxPrice.trim() ? Number(maxPrice) : null,
       is_negotiable: isNegotiable,
       available_from: availableFrom || null,
+      security_deposit: securityDeposit.trim() ? Number(securityDeposit) : null,
       media_ids: Array.from(selectedMediaIds),
       primary_media_id:
         primaryMediaId && !primaryMediaId.startsWith('new:') ? primaryMediaId : null,
@@ -314,9 +318,9 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className='fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0' />
-        <Dialog.Content className='fixed left-[50%] top-[50%] z-50 flex h-[90vh] w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden border border-primary/20 bg-primary/5 shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-2xl'>
+        <Dialog.Content className='fixed left-[50%] top-[50%] z-50 flex h-[90vh] w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden border border-primary/20 bg-background shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-2xl'>
           {/* Header */}
-          <div className='flex items-center justify-between border-b border-primary/20 bg-white px-6 py-4'>
+          <div className='flex items-center justify-between border-b border-primary/20 bg-background px-6 py-4'>
             <div>
               <Dialog.Title className='text-xl font-bold text-foreground'>
                 {t('editTitle')}
@@ -325,7 +329,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                 {t('editSubtitle')}
               </Dialog.Description>
             </div>
-            <Dialog.Close className='rounded-full p-2 transition-colors hover:bg-primary/5'>
+            <Dialog.Close className='cursor-pointer rounded-full p-2 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'>
               <X className='h-5 w-5 text-secondary' />
               <span className='sr-only'>Close</span>
             </Dialog.Close>
@@ -397,6 +401,8 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   onMaxPriceChange={setMaxPrice}
                   isNegotiable={isNegotiable}
                   onNegotiableChange={setIsNegotiable}
+                  securityDeposit={securityDeposit}
+                  onSecurityDepositChange={setSecurityDeposit}
                   errors={errors}
                   labels={priceLabels}
                 />
@@ -483,11 +489,11 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
           </div>
 
           {/* Footer Actions */}
-          <div className='flex items-center justify-end gap-3 border-t border-primary/20 bg-white px-6 py-4'>
+          <div className='flex items-center justify-end gap-3 border-t border-primary/20 bg-background px-6 py-4'>
             <button
               type='button'
               onClick={() => onOpenChange(false)}
-              className='rounded-xl px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-primary/5'
+              className='cursor-pointer rounded-xl px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
             >
               {t('cancel')}
             </button>
@@ -496,14 +502,14 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
               onClick={handleSubmit}
               disabled={updateMutation.isPending || !aiChecksPassed || !hasMediaSelected}
               className={cn(
-                'flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all',
+                'flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                 !updateMutation.isPending && aiChecksPassed && hasMediaSelected
                   ? 'bg-primary hover:bg-primary/90 hover:shadow-md'
                   : 'bg-primary/30 cursor-not-allowed'
               )}
             >
               {updateMutation.isPending ? (
-                <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white' />
+                <Spinner className='h-4 w-4 text-white' />
               ) : (
                 <Save className='h-4 w-4' />
               )}

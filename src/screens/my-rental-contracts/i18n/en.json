@@ -16,6 +16,13 @@
       "allStatuses": "All Statuses",
       "searchPlaceholder": "Search by property...",
       "searchAria": "Search contracts by property name",
+      "filterTitle": "Filters",
+      "reset": "Reset",
+      "statusLabel": "Status",
+      "pendingRenter": "Pending Renter",
+      "active": "Active",
+      "expired": "Expired",
+      "terminated": "Terminated",
       "tabs": {
         "all": "All",
         "active": "Active",

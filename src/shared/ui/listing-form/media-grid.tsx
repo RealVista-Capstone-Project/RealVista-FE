@@ -143,7 +143,7 @@ export function ExistingMediaGrid({
                   onSetPrimary(media.id);
                 }}
                 className={cn(
-                  'absolute left-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10',
+                  'absolute left-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors z-10 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                   media.roomName ? 'bottom-7' : 'bottom-1.5',
                   primaryId === media.id
                     ? 'bg-primary text-white'
@@ -192,6 +192,200 @@ interface NewFilesGridProps {
   };
 }
 
+/* ─── Internal hook: stable object URL with automatic revocation ─── */
+
+function useObjectURL(file: File | null | undefined): string | null {
+  const [url, setUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!file) {
+      setUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [file]);
+
+  return url;
+}
+
+/* ─── Internal card component so each file gets its own stable URL ─── */
+
+function NewFileCard({
+  file,
+  index,
+  isSelected,
+  isPrimary,
+  status,
+  qualityThreshold,
+  onToggle,
+  onRemove,
+  onSetPrimary,
+  labels,
+}: {
+  file: File;
+  index: number;
+  isSelected: boolean;
+  isPrimary: boolean;
+  status: MediaAnalysisEntry | undefined;
+  qualityThreshold: number;
+  onToggle: (i: number) => void;
+  onRemove: (i: number) => void;
+  onSetPrimary: (id: string, i: number) => void;
+  labels: NewFilesGridProps['labels'];
+}) {
+  const isImage = file.type.startsWith('image/');
+  const objectUrl = useObjectURL(isImage ? file : null);
+  const score = status?.result?.finalScore;
+  const isRejected = score !== undefined && score < qualityThreshold;
+  const feedback = status?.result?.analysis?.feedback;
+
+  return (
+    <div
+      role='button'
+      tabIndex={0}
+      onClick={() => onToggle(index)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onToggle(index);
+        }
+      }}
+      className={cn(
+        'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
+        isPrimary
+          ? 'border-primary shadow-[0px_0px_12px_0px_color-mix(in_oklch,var(--primary)_25%,transparent)]'
+          : isSelected
+            ? 'border-primary/60'
+            : isRejected
+              ? 'border-red-400'
+              : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
+      )}
+    >
+      {isImage && objectUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={objectUrl}
+          alt={file.name}
+          className={cn(
+            'h-full w-full object-cover',
+            isRejected && 'grayscale-[0.5] blur-[1px]',
+            !isSelected && 'opacity-40'
+          )}
+        />
+      ) : (
+        <div
+          className={cn(
+            'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-primary/5 transition-opacity',
+            !isSelected && 'opacity-40'
+          )}
+        >
+          <Play className='h-6 w-6 text-primary/60' />
+          <span className='truncate text-[10px] text-muted-foreground w-full text-center'>
+            {file.name}
+          </span>
+        </div>
+      )}
+
+      {/* AI Status Overlay */}
+      {status && (
+        <div className='absolute inset-x-0 top-0 z-20 flex flex-col gap-1 p-1'>
+          {status.isLoading ? (
+            <div className='flex items-center gap-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white'>
+              <Loader2 className='h-3 w-3 animate-spin' />
+              {labels.analyzing}
+            </div>
+          ) : status.error ? (
+            <div className='flex items-center gap-1 rounded bg-red-500/80 px-1.5 py-0.5 text-[10px] text-white'>
+              <AlertCircle className='h-3 w-3' />
+              {labels.error}
+            </div>
+          ) : isRejected ? (
+            <div className='flex flex-col gap-0.5 rounded bg-red-500/90 p-1.5 text-[10px] text-white'>
+              <div className='flex items-center gap-1 font-bold italic underline'>
+                <AlertCircle className='h-3 w-3' />
+                {labels.notAllowed}
+              </div>
+              {feedback && (
+                <div className='line-clamp-2 italic opacity-90'>{feedback}</div>
+              )}
+            </div>
+          ) : score !== undefined ? (
+            <div className='flex items-center gap-1 rounded bg-emerald-500/80 px-1.5 py-0.5 text-[10px] text-white'>
+              <CheckCircle2 className='h-3 w-3' />
+              {labels.passed.replace('{score}', String(score))}
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {/* Selected overlay */}
+      <div
+        className={cn(
+          'absolute inset-0 bg-primary/10 transition-opacity',
+          isSelected ? 'opacity-100' : 'opacity-0'
+        )}
+      />
+
+      {/* Checkmark */}
+      <div
+        className={cn(
+          'absolute right-1.5 top-1.5 transition-all z-20',
+          isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+        )}
+      >
+        <CheckCircle2 className='h-5 w-5 text-primary drop-shadow' fill='white' />
+      </div>
+
+      {/* Feedback Tooltip on Hover */}
+      {!status?.isLoading && feedback && !isRejected && (
+        <div className='absolute inset-x-0 bottom-8 z-20 px-1.5 opacity-0 transition-opacity group-hover:opacity-100'>
+          <div className='rounded bg-black/80 p-1.5 text-[10px] leading-tight text-white shadow-lg'>
+            <p className='font-bold text-primary/40'>{labels.feedbackLabel}</p>
+            <p className='mt-0.5 line-clamp-3 italic'>{feedback}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Remove button */}
+      <button
+        type='button'
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove(index);
+        }}
+        className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-30 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary'
+      >
+        <X className='h-3 w-3' />
+      </button>
+
+      {/* Primary badge/button */}
+      {!isRejected && (
+        <button
+          type='button'
+          onClick={(e) => {
+            e.stopPropagation();
+            onSetPrimary(`new:${index}`, index);
+          }}
+          className={cn(
+            'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+            isPrimary
+              ? 'bg-primary text-white'
+              : 'bg-black/40 text-white/80 hover:bg-primary/80 opacity-0 group-hover:opacity-100'
+          )}
+        >
+          {isPrimary
+            ? labels.primary
+            : `${labels.newUpload} - ${labels.makePrimary}`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function NewFilesGrid({
   files,
   selectedIndices,
@@ -207,157 +401,21 @@ export function NewFilesGrid({
 
   return (
     <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
-      {files.map((file, index) => {
-        const isSelected = selectedIndices.has(index);
-        const isPrimary = primaryId === `new:${index}`;
-        const status = analysisStatus[index];
-        const score = status?.result?.finalScore;
-        const isRejected = score !== undefined && score < qualityThreshold;
-        const feedback = status?.result?.analysis?.feedback;
-
-        return (
-          <div
-            key={`new-${index}`}
-            role='button'
-            tabIndex={0}
-            onClick={() => onToggle(index)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onToggle(index);
-              }
-            }}
-            className={cn(
-              'group relative aspect-video w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer text-left',
-              isPrimary
-                ? 'border-primary shadow-[0px_0px_12px_0px_color-mix(in_oklch,var(--primary)_25%,transparent)]'
-                : isSelected
-                  ? 'border-primary/60'
-                  : isRejected
-                    ? 'border-red-400'
-                    : 'border-primary/20 opacity-70 hover:opacity-100 hover:border-primary/40'
-            )}
-          >
-            {file.type.startsWith('image/') ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={URL.createObjectURL(file)}
-                alt={file.name}
-                className={cn(
-                  'h-full w-full object-cover',
-                  isRejected && 'grayscale-[0.5] blur-[1px]',
-                  !isSelected && 'opacity-40'
-                )}
-              />
-            ) : (
-              <div
-                className={cn(
-                  'flex h-full w-full flex-col items-center justify-center gap-1 px-2 bg-primary/5 transition-opacity',
-                  !isSelected && 'opacity-40'
-                )}
-              >
-                <Play className='h-6 w-6 text-primary/60' />
-                <span className='truncate text-[10px] text-muted-foreground w-full text-center'>
-                  {file.name}
-                </span>
-              </div>
-            )}
-
-            {/* AI Status Overlay */}
-            {status && (
-              <div className='absolute inset-x-0 top-0 z-20 flex flex-col gap-1 p-1'>
-                {status.isLoading ? (
-                  <div className='flex items-center gap-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white'>
-                    <Loader2 className='h-3 w-3 animate-spin' />
-                    {labels.analyzing}
-                  </div>
-                ) : status.error ? (
-                  <div className='flex items-center gap-1 rounded bg-red-500/80 px-1.5 py-0.5 text-[10px] text-white'>
-                    <AlertCircle className='h-3 w-3' />
-                    {labels.error}
-                  </div>
-                ) : isRejected ? (
-                  <div className='flex flex-col gap-0.5 rounded bg-red-500/90 p-1.5 text-[10px] text-white'>
-                    <div className='flex items-center gap-1 font-bold italic underline'>
-                      <AlertCircle className='h-3 w-3' />
-                      {labels.notAllowed}
-                    </div>
-                    {feedback && (
-                      <div className='line-clamp-2 italic opacity-90'>{feedback}</div>
-                    )}
-                  </div>
-                ) : score !== undefined ? (
-                  <div className='flex items-center gap-1 rounded bg-emerald-500/80 px-1.5 py-0.5 text-[10px] text-white'>
-                    <CheckCircle2 className='h-3 w-3' />
-                    {labels.passed.replace('{score}', String(score))}
-                  </div>
-                ) : null}
-              </div>
-            )}
-
-            {/* Selected overlay */}
-            <div
-              className={cn(
-                'absolute inset-0 bg-primary/10 transition-opacity',
-                isSelected ? 'opacity-100' : 'opacity-0'
-              )}
-            />
-
-            {/* Checkmark */}
-            <div
-              className={cn(
-                'absolute right-1.5 top-1.5 transition-all z-20',
-                isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-              )}
-            >
-              <CheckCircle2 className='h-5 w-5 text-primary drop-shadow' fill='white' />
-            </div>
-
-            {/* Feedback Tooltip on Hover */}
-            {!status?.isLoading && feedback && !isRejected && (
-              <div className='absolute inset-x-0 bottom-8 z-20 px-1.5 opacity-0 transition-opacity group-hover:opacity-100'>
-                <div className='rounded bg-black/80 p-1.5 text-[10px] leading-tight text-white shadow-lg'>
-                  <p className='font-bold text-primary/40'>{labels.feedbackLabel}</p>
-                  <p className='mt-0.5 line-clamp-3 italic'>{feedback}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Remove button */}
-            <button
-              type='button'
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove(index);
-              }}
-              className='absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100 z-30'
-            >
-              <X className='h-3 w-3' />
-            </button>
-
-            {/* Primary badge/button */}
-            {!isRejected && (
-              <button
-                type='button'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSetPrimary(`new:${index}`, index);
-                }}
-                className={cn(
-                  'absolute left-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all z-10',
-                  isPrimary
-                    ? 'bg-primary text-white'
-                    : 'bg-black/40 text-white/80 hover:bg-primary/80 opacity-0 group-hover:opacity-100'
-                )}
-              >
-                {isPrimary
-                  ? labels.primary
-                  : `${labels.newUpload} - ${labels.makePrimary}`}
-              </button>
-            )}
-          </div>
-        );
-      })}
+      {files.map((file, index) => (
+        <NewFileCard
+          key={`new-${index}`}
+          file={file}
+          index={index}
+          isSelected={selectedIndices.has(index)}
+          isPrimary={primaryId === `new:${index}`}
+          status={analysisStatus[index]}
+          qualityThreshold={qualityThreshold}
+          onToggle={onToggle}
+          onRemove={onRemove}
+          onSetPrimary={onSetPrimary}
+          labels={labels}
+        />
+      ))}
     </div>
   );
 }

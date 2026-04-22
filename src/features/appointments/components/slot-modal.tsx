@@ -91,7 +91,7 @@ export function SlotModal({
                 }`}
             >
               <button
-                className="w-full text-left focus:outline-none"
+                className="w-full text-left cursor-pointer rounded-md hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
                 onClick={() => setSelectedAptId(apt.appointment_id)}
               >
                 <div className="flex items-center justify-between">
@@ -100,8 +100,8 @@ export function SlotModal({
                     {t(apt.status.toLowerCase())}
                   </Badge>
                 </div>
-                <div className="mt-1 text-sm text-gray-500">{apt.listing_name}</div>
-                <div className="text-sm text-gray-500">{apt.listing_address}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{apt.listing_name}</div>
+                <div className="text-sm text-muted-foreground">{apt.listing_address}</div>
                 {apt.sender_notes && (
                   <div className="mt-2 text-sm">{apt.sender_notes}</div>
                 )}
@@ -149,14 +149,16 @@ export function SlotModal({
 
         {showReason && (
           <div className="mt-4 space-y-2">
-            <label>
+            <label htmlFor="reason-textarea">
               {selectedApt?.sender_id === currentUser?.user_id
                 ? t('cancelReason')
                 : t('rejectReason')}
             </label>
             <Textarea
+              id="reason-textarea"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
+              disabled={updateStatus.isPending}
               placeholder={
                 selectedApt?.sender_id === currentUser?.user_id
                   ? t('enterCancelReason')
@@ -179,7 +181,7 @@ export function SlotModal({
                 {t('submit')}
               </Button>
               <Button variant="outline" onClick={() => setShowReason(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
             </div>
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Bath,
@@ -14,12 +14,32 @@ import {
   Search,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { Badge, Button, Input } from '@/shared/ui';
+import { Button, Input } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 import { propertyQueries } from '@/entities/property/api/property.queries';
 import type { PropertySummaryResponse } from '@/entities/property/api/property-api.types';
-import { ListingMetaChip } from './shared';
+
+function useItemsPerPage(): number {
+  const [itemsPerPage, setItemsPerPage] = useState(6);
+
+  useEffect(() => {
+    function calculate() {
+      const viewportHeight = window.innerHeight;
+      const overhead = 620;
+      const available = viewportHeight - overhead;
+      const cardHeight = 124;
+      const count = Math.max(2, Math.floor(available / cardHeight));
+      setItemsPerPage(count);
+    }
+
+    calculate();
+    window.addEventListener('resize', calculate);
+    return () => window.removeEventListener('resize', calculate);
+  }, []);
+
+  return itemsPerPage;
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -45,10 +65,6 @@ export function getAttributeNumber(property: PropertySummaryResponse, code: stri
   return attr?.value_number ?? 0;
 }
 
-// ── Constants ──────────────────────────────────────────────────────────────────
-
-const ITEMS_PER_PAGE = 6;
-
 // ── Props ──────────────────────────────────────────────────────────────────────
 
 interface StepListingPickerProps {
@@ -65,73 +81,63 @@ export function StepListingPicker({
   t,
 }: StepListingPickerProps) {
   const [searchInput, setSearchInput] = useState('');
-  const [page, setPage] = useState(1); // 1-based UI page
+  const [page, setPage] = useState(1);
+  const itemsPerPage = useItemsPerPage();
 
-  // Debounce search so we don't fire on every keystroke
+  useEffect(() => {
+    setPage(1);
+  }, [itemsPerPage]);
+
   const debouncedSearch = useDebounce(searchInput, 400);
 
-  // Reset to page 1 whenever the search term changes
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
     setPage(1);
   };
 
-  // Query: uses propertyApi.getMyProperties → GET /api/v1/properties/me
   const { data, isLoading, isFetching } = useQuery(
     propertyQueries.myProperties({
       keyword: debouncedSearch || undefined,
-      page: page - 1, // API is 0-based
-      size: ITEMS_PER_PAGE,
+      status: 'AVAILABLE',
+      page: page - 1,
+      size: itemsPerPage,
     })
   );
 
   const pageData = data?.payload?.data;
   const properties: PropertySummaryResponse[] = pageData?.content ?? [];
-
-  // Handle both snake_case (total_pages) and camelCase (totalPages) responses
   const totalPages = pageData?.total_pages ?? pageData?.totalPages ?? 0;
-
   const loading = isLoading || isFetching;
 
   return (
-    <div className='space-y-4'>
-      {/* Search header */}
-      <div className='rounded-3xl border border-primary/20 bg-primary/5 p-4'>
-        <div className='flex flex-col gap-3 md:flex-row md:items-end md:justify-between'>
-          <div>
-            <p className='text-xs font-semibold uppercase tracking-[0.2em] text-primary/70'>
-              {t('listingPicker.eyebrow')}
-            </p>
-            <h3 className='mt-2 text-lg font-semibold text-foreground'>
-              {t('listingPicker.title')}
-            </h3>
-            <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>
-              {t('listingPicker.description')}
-            </p>
-          </div>
-          <div className='relative w-full md:max-w-xs'>
-            <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70' />
-            <Input
-              value={searchInput}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder={t('listingPicker.searchPlaceholder')}
-              className='h-11 rounded-2xl border-primary/25 bg-white pl-9'
-            />
-          </div>
+    <div className='rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
+      {/* Section header — title + search input */}
+      <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <h3 className='text-lg font-bold leading-snug tracking-tight text-foreground'>
+          {t('listingPicker.title')}
+        </h3>
+        <div className='relative w-full sm:max-w-[260px]'>
+          <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60' />
+          <Input
+            value={searchInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            placeholder={t('listingPicker.searchPlaceholder')}
+            className='h-10 rounded-xl border-[1.5px] border-primary/25 bg-white pl-9 placeholder:text-muted-foreground/40'
+          />
         </div>
       </div>
 
-      {/* Loading skeleton */}
+      {/* Loading spinner */}
       {loading && (
-        <div className='flex items-center justify-center rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-5 py-16'>
-          <Loader2 className='h-6 w-6 animate-spin text-primary/60' />
+        <div className='flex justify-center py-8'>
+          <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
         </div>
       )}
 
-      {/* Property cards */}
+      {/* Property list */}
       {!loading && (
         <>
-          <div className='grid gap-4'>
+          <div className='flex flex-col gap-3'>
             {properties.map((property) => {
               const isSelected = property.property_id === selectedPropertyId;
               const thumbnail = getPropertyThumbnail(property);
@@ -146,83 +152,77 @@ export function StepListingPicker({
                   type='button'
                   onClick={() => onSelectProperty(property)}
                   className={cn(
-                    'overflow-hidden rounded-3xl border bg-white text-left transition-all',
+                    'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
                     isSelected
-                      ? 'border-primary shadow-primary/20'
-                      : 'border-primary/20 shadow-primary/10 hover:-translate-y-0.5 hover:border-primary/40'
+                      ? 'border-primary bg-primary/5 shadow-[0px_0px_20px_0px_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+                      : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
                   )}
                 >
-                  <div className='grid gap-0 md:grid-cols-[220px_1fr]'>
-                    {/* Thumbnail */}
-                    <div className='relative min-h-[180px] bg-primary/10'>
-                      {thumbnail ? (
-                        <Image
-                          src={thumbnail}
-                          alt={property.street_address}
-                          fill
-                          className='object-cover'
-                        />
-                      ) : (
-                        <div className='flex h-full items-center justify-center text-secondary/30'>
-                          <Building2 className='h-12 w-12' />
-                        </div>
-                      )}
-                      <div className='absolute left-4 top-4'>
-                        <Badge className='rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-foreground shadow-sm'>
-                          {t(`listingPicker.status.${property.status}`)}
-                        </Badge>
+                  {/* Thumbnail */}
+                  <div className='relative h-[80px] w-[112px] shrink-0 overflow-hidden rounded-lg'>
+                    {thumbnail ? (
+                      <Image
+                        src={thumbnail}
+                        alt={property.street_address}
+                        fill
+                        className='object-cover'
+                        sizes='112px'
+                      />
+                    ) : (
+                      <div className='flex h-full w-full items-center justify-center bg-primary/5'>
+                        <Building2 className='h-6 w-6 text-muted-foreground/60' />
                       </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
+                    <div className='flex items-center gap-2'>
+                      <span className='truncate text-sm font-bold leading-tight text-foreground'>
+                        {property.street_address}
+                      </span>
+                      <span className='shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary/80'>
+                        {t(`listingPicker.status.${property.status}`)}
+                      </span>
                     </div>
 
-                    {/* Details */}
-                    <div className='flex flex-col justify-between p-5'>
-                      <div>
-                        <div className='flex flex-wrap items-start justify-between gap-3'>
-                          <div>
-                            <h4 className='mt-2 text-xl font-semibold tracking-[-0.03em] text-foreground'>
-                              {property.street_address}
-                            </h4>
-                          </div>
-                        </div>
+                    <div className='flex items-center gap-1 text-xs text-muted-foreground'>
+                      <MapPin className='h-3 w-3 shrink-0' />
+                      <span className='truncate'>{address}</span>
+                    </div>
 
-                        <div className='mt-4 flex items-start gap-2 text-sm text-muted-foreground'>
-                          <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-primary/70' />
-                          <span>{address}</span>
-                        </div>
-
-                        <div className='mt-4 flex flex-wrap gap-2'>
-                          {typeName && <ListingMetaChip icon={Building2} value={typeName} />}
-                          {bedrooms > 0 && (
-                            <ListingMetaChip
-                              icon={BedDouble}
-                              value={t('listingPicker.bedroomsValue', { count: bedrooms })}
-                            />
-                          )}
-                          {bathrooms > 0 && (
-                            <ListingMetaChip
-                              icon={Bath}
-                              value={t('listingPicker.bathroomsValue', { count: bathrooms })}
-                            />
-                          )}
-                        </div>
-                      </div>
-
-                        <div className='mt-5 flex items-center justify-end border-t border-primary/15 pt-4'>
-                        <span
-                          className={cn(
-                            'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
-                            isSelected
-                              ? 'bg-primary text-white'
-                              : 'bg-primary/10 text-primary'
-                          )}
-                        >
-                          {isSelected && <Check className='h-3.5 w-3.5' />}
-                          {isSelected
-                            ? t('listingPicker.selected')
-                            : t('listingPicker.selectAction')}
+                    <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+                      {typeName && (
+                        <span className='flex items-center gap-1'>
+                          <Building2 className='h-3 w-3' />
+                          {typeName}
                         </span>
-                      </div>
+                      )}
+                      {bedrooms > 0 && (
+                        <span className='flex items-center gap-1'>
+                          <BedDouble className='h-3 w-3' />
+                          {t('listingPicker.bedroomsValue', { count: bedrooms })}
+                        </span>
+                      )}
+                      {bathrooms > 0 && (
+                        <span className='flex items-center gap-1'>
+                          <Bath className='h-3 w-3' />
+                          {t('listingPicker.bathroomsValue', { count: bathrooms })}
+                        </span>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Radio selection indicator */}
+                  <div
+                    className={cn(
+                      'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+                      isSelected
+                        ? 'border-primary bg-primary'
+                        : 'border-primary/20 bg-white group-hover:border-primary/40'
+                    )}
+                  >
+                    {isSelected && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
                   </div>
                 </button>
               );
@@ -230,21 +230,17 @@ export function StepListingPicker({
 
             {/* Empty state */}
             {properties.length === 0 && (
-              <div className='rounded-3xl border border-dashed border-primary/30 bg-primary/5 px-5 py-10 text-center'>
-                <Building2 className='mx-auto mb-3 h-10 w-10 text-muted-foreground/40' />
-                <p className='text-sm font-semibold text-foreground'>
+              <div className='flex justify-center py-8'>
+                <span className='text-sm text-muted-foreground/70'>
                   {t('listingPicker.emptyTitle')}
-                </p>
-                <p className='mt-2 text-sm leading-6 text-muted-foreground/80'>
-                  {t('listingPicker.emptyDescription')}
-                </p>
+                </span>
               </div>
             )}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className='flex items-center justify-center gap-2 pt-2'>
+            <div className='mt-6 flex items-center justify-center gap-2'>
               <Button
                 type='button'
                 variant='outline'

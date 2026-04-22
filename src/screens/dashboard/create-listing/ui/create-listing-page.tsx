@@ -15,6 +15,7 @@ import { ListingInformationStep } from '@/features/create-listing-modal/ui/listi
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
   const t = useTranslations('CreateListingModal');
@@ -185,7 +186,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
                 step.number <= currentStep
                   ? 'bg-primary text-white'
-                  : 'bg-primary/5 text-foreground'
+                  : 'bg-muted text-muted-foreground'
               )}
             >
               {step.number}
@@ -193,7 +194,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground/70'
+                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
               {step.label}
@@ -206,19 +207,52 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   );
 }
 
-const ITEMS_PER_PAGE = 4;
+/**
+ * Calculates how many property cards fit in the viewport.
+ * Each card is ~112px tall + gap. We subtract estimated heights for
+ * header (~160px), step indicator (~56px), footer (~72px), card padding/border (~48px).
+ */
+function useItemsPerPage(): number {
+  const [itemsPerPage, setItemsPerPage] = React.useState(4);
+
+  React.useEffect(() => {
+    function calculate() {
+      const viewportHeight = window.innerHeight;
+      // estimated overhead: outer padding + card header + card padding + footer
+      const overhead = 520
+      const available = viewportHeight - overhead;
+      // each card is ~112px + 12px gap
+      const cardHeight = 124;
+      const count = Math.max(2, Math.floor(available / cardHeight));
+      setItemsPerPage(count);
+    }
+
+    calculate();
+    window.addEventListener('resize', calculate);
+    return () => window.removeEventListener('resize', calculate);
+  }, []);
+
+  return itemsPerPage;
+}
 
 export function CreateListingPage() {
   const t = useTranslations('CreateListingModal');
+  const tGlobal = useTranslations();
   const router = useRouter();
+  const itemsPerPage = useItemsPerPage();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
 
+  // Reset to page 1 when the number of items per page changes (e.g. on resize)
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
+
   const { data, isLoading } = useQuery({
     ...propertyQueries.myProperties({
       page: currentPage - 1,
-      size: ITEMS_PER_PAGE,
+      size: itemsPerPage,
       status: 'AVAILABLE',
     }),
     enabled: currentStep === 1,
@@ -379,8 +413,8 @@ export function CreateListingPage() {
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
       router.push('/dashboard/listings');
-    } catch {
-      toast.error(t('createError'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
     }
   };
 

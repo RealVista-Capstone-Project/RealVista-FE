@@ -5,6 +5,7 @@
       "title": "Quản lý hợp đồng thuê DocuSign với luồng ký rõ ràng",
       "subtitle": "Theo dõi hợp đồng thuê phía chủ nhà, giám sát từng cột mốc ký trên DocuSign và đưa từng hợp đồng qua vòng đời được quản lý ngay trong dashboard.",
       "createButton": "Tạo hợp đồng",
+      "shortTitle": "Hợp đồng thuê",
       "stats": {
         "totalContracts": "Số hợp đồng hiển thị",
         "activeSelection": "Mục đang chọn"
@@ -13,20 +14,39 @@
     },
     "filter": {
       "allStatuses": "Tất cả trạng thái",
-      "searchPlaceholder": "Tìm theo người thuê hoặc bất động sản..."
+      "searchPlaceholder": "Tìm theo người thuê hoặc bất động sản...",
+      "filterTitle": "Lọc theo trạng thái",
+      "reset": "Đặt lại",
+      "statusLabel": "Trạng thái",
+      "tabs": {
+        "pendingRenter": "Chờ người thuê",
+        "pendingLandlord": "Chờ chủ nhà",
+        "active": "Đang hoạt động",
+        "expired": "Hết hạn",
+        "terminated": "Đã chấm dứt"
+      }
     },
     "table": {
       "status": "Trạng thái",
       "tenant": "Người thuê",
+      "property": "Bất động sản",
       "monthlyRent": "Tiền thuê / tháng",
-      "createdDate": "Ngày tạo"
+      "leasePeriod": "Thời hạn thuê",
+      "createdDate": "Ngày tạo",
+      "actions": "Thao tác",
+      "perMonth": "/th"
     },
     "empty": {
       "title": "Không tìm thấy hợp đồng thuê nào.",
-      "subtitle": "Hãy thử bộ lọc trạng thái hoặc từ khóa khác."
+      "subtitle": "Hãy thử bộ lọc trạng thái hoặc từ khóa khác.",
+      "selectContract": "Chọn một hợp đồng để xem chi tiết"
+    },
+    "detail": {
+      "emptyTitle": "Chọn một hợp đồng để xem chi tiết"
     },
     "pagination": {
-      "showing": "Hiển thị {from}-{to} trên tổng số {total}"
+      "showing": "Hiển thị {from}-{to} trên tổng số {total}",
+      "pageInfo": "Trang {current} của {total}"
     },
     "loading": "Đang tải hợp đồng thuê...",
     "error": "Tải hợp đồng thuê thất bại. Vui lòng thử lại."

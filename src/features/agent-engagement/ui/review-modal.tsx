@@ -27,7 +27,7 @@ import { StarRatingInput } from './star-rating-input';
 import { Loader2, MessageSquarePlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
-import { getInitials } from '../lib/utils';
+import { getInitials, getEngagementTypeLabel } from '../lib/utils';
 
 const reviewSchema = z.object({
   rating: z
@@ -107,7 +107,7 @@ export function ReviewModal({
                 {agent.agent_full_name}
               </h3>
               <p className='text-xs text-gray-500 mt-0.5'>
-                {agent.engagement_type}
+                {getEngagementTypeLabel(agent.engagement_type, t)}
                 {agent.property_address && (
                   <> · <span className='truncate'>{agent.property_address}</span></>
                 )}

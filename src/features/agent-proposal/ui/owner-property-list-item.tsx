@@ -37,7 +37,7 @@ export function OwnerPropertyListItem({
   isSelected,
   onClick,
 }: OwnerPropertyListItemProps) {
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
 
   const location = [
     property.location_info?.ward_name,

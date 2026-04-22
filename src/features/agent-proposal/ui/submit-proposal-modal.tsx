@@ -59,7 +59,7 @@ export function SubmitProposalModal({
   onSubmit,
   isLoading = false,
 }: SubmitProposalModalProps) {
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
 
   const form = useForm<ProposalFormValues>({
     resolver: zodResolver(proposalSchema),

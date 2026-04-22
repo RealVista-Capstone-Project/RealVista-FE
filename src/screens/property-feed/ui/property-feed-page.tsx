@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  OwnerPropertiesProvider,
-  useOwnerPropertiesContext,
+  PropertyFeedProvider,
+  usePropertyFeedContext,
   type PriceFilter,
   type ListingType,
-} from '@/features/agent-proposal/model/owner-properties-context';
+} from '@/features/agent-proposal/model/property-feed-context';
 import { OwnerPropertyCard } from '@/features/agent-proposal/ui/owner-property-card';
 import { OwnerPropertyDetailPanel } from '@/features/agent-proposal/ui/owner-property-detail-panel';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
-import { Search, Home, Filter, X, DollarSign, Building, KeyRound } from 'lucide-react';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
+import { Search, Home, Filter, X, DollarSign, Building, ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
@@ -39,32 +40,55 @@ interface LocalPriceFilter {
 }
 
 function ListingTypeTabs() {
-  const t = useTranslations('OwnerProperties');
-  const { listingType, setListingType } = useOwnerPropertiesContext();
-
-  const tabs: { value: ListingType; label: string; icon: React.ReactNode }[] = [
-    { value: 'ALL', label: t('tabs.all'), icon: <Building className='h-[18px] w-[18px]' /> },
-    { value: 'SELL', label: t('tabs.sell'), icon: <KeyRound className='h-[18px] w-[18px]' /> },
-    { value: 'RENT', label: t('tabs.rent'), icon: <Building className='h-[18px] w-[18px]' /> },
-  ];
+  const t = useTranslations('PropertyFeed');
+  const { listingType, setListingType, totalElements } = usePropertyFeedContext();
 
   return (
-    <div className='flex gap-1.5 p-1.5 bg-primary/5 border border-primary/20'>
-      {tabs.map((tab) => (
-        <button
-          key={tab.value}
-          onClick={() => setListingType(tab.value)}
+    <div className='flex gap-1 min-w-max'>
+      <button
+        type='button'
+        onClick={() => setListingType('ALL')}
+        className={cn(
+          'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+          listingType === 'ALL'
+            ? 'bg-primary text-white'
+            : 'bg-transparent text-foreground/70 hover:bg-primary/5'
+        )}
+      >
+        {t('tabs.all')}
+        <span
           className={cn(
-            'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300',
-            listingType === tab.value
-              ? 'bg-white text-primary shadow-sm border border-primary/30 scale-[1.02]'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent'
+            'rounded-full px-2 py-0.5 text-xs font-bold',
+            listingType === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
           )}
         >
-          {tab.icon}
-          <span className='hidden sm:inline'>{tab.label}</span>
-        </button>
-      ))}
+          {formatNumber(totalElements)}
+        </span>
+      </button>
+      <button
+        type='button'
+        onClick={() => setListingType('SELL')}
+        className={cn(
+          'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+          listingType === 'SELL'
+            ? 'bg-primary text-white'
+            : 'bg-transparent text-foreground/70 hover:bg-primary/5'
+        )}
+      >
+        {t('tabs.sell')}
+      </button>
+      <button
+        type='button'
+        onClick={() => setListingType('RENT')}
+        className={cn(
+          'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+          listingType === 'RENT'
+            ? 'bg-primary text-white'
+            : 'bg-transparent text-foreground/70 hover:bg-primary/5'
+        )}
+      >
+        {t('tabs.rent')}
+      </button>
     </div>
   );
 }
@@ -75,7 +99,7 @@ interface FilterPanelProps {
 }
 
 function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
   const {
     priceFilter,
     setPriceFilter,
@@ -84,7 +108,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
     setPropertyTypeId,
     availablePropertyTypes,
     isLoadingPropertyTypes,
-  } = useOwnerPropertiesContext();
+  } = usePropertyFeedContext();
 
   const [localFilter, setLocalFilter] = useState<LocalPriceFilter>({
     minRentPrice: priceFilter.minRentPrice
@@ -318,7 +342,7 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
   );
 }
 
-function OwnerPropertiesContent() {
+function PropertyFeedContent() {
   const {
     properties,
     isLoading,
@@ -335,11 +359,12 @@ function OwnerPropertiesContent() {
     handlePropertyClick,
     priceFilter,
     propertyTypeId,
-  } = useOwnerPropertiesContext();
+  } = usePropertyFeedContext();
 
-  const t = useTranslations('OwnerProperties');
+  const t = useTranslations('PropertyFeed');
   const isMobile = useIsMobile();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
 
   // Count active filters for the badge
@@ -376,7 +401,7 @@ function OwnerPropertiesContent() {
 
   if (isLoading) {
     return (
-      <div className='flex h-full items-center justify-center'>
+      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
       </div>
     );
@@ -384,97 +409,99 @@ function OwnerPropertiesContent() {
 
   if (isError) {
     return (
-      <div className='flex h-full items-center justify-center'>
-        <div className='flex flex-col items-center gap-3 text-center'>
-          <div className='flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 shadow-sm'>
-            <Home className='h-8 w-8 text-red-400' />
+      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
+        <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
+          <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
+            <Home className='h-6 w-6 text-primary' />
           </div>
-          <p className='font-semibold text-gray-800'>{t('error')}</p>
+          <p className='font-semibold text-foreground'>{t('error')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='flex h-full flex-col overflow-hidden sm:flex-row'>
+    <div className='flex h-full overflow-hidden flex-col sm:flex-row'>
       {/* ── Left Sidebar ── */}
       <aside
         className={cn(
           'flex-col border-r border-primary/20 bg-white transition-all duration-300',
-          isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[55%]'
+          isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[460px]'
         )}
       >
         <div className='flex h-full flex-col'>
           {/* Header */}
-          <div className='border-b border-primary/20 p-4 sm:p-6 bg-white'>
-            <div className='flex items-center gap-3'>
-              <h2 className='text-2xl font-extrabold text-foreground tracking-tight'>
-                {t('pageTitle')}
-              </h2>
-              <div className='flex items-center justify-center rounded-full bg-primary/10 px-3 py-0.5 border border-primary/20 shadow-sm'>
-                <span className='text-sm font-bold text-primary'>{totalElements}</span>
+          <div className='border-b border-primary/20 p-4 sm:p-6'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                <h2 className='text-xl font-bold text-foreground'>{t('pageTitle')}</h2>
+                <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
+                  <span className='text-sm font-bold text-white'>{totalElements}</span>
+                </div>
               </div>
             </div>
-            <p className='mt-1.5 text-sm text-muted-foreground'>{t('pageSubtitle')}</p>
+          </div>
+
+          {/* Tabs */}
+          <div className='border-b border-primary/20 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
+            <ListingTypeTabs />
           </div>
 
           {/* Search bar + Filter button (same row) */}
-          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-primary/5'>
+          <div className='border-b border-primary/20 p-4 sm:p-6'>
             <div className='flex items-center gap-3'>
               {/* Search input */}
-              <div className='relative flex-1 group'>
-                <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 transition-colors duration-200 group-focus-within:text-primary'>
-                  <Search
-                    className='h-[18px] w-[18px] text-muted-foreground/50 group-focus-within:text-primary transition-colors'
-                    strokeWidth={2.5}
-                  />
+              <div className='relative flex-1'>
+                <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
+                  <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
                 </div>
                 <Input
                   type='text'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('filter.searchPlaceholder')}
-                  className='h-11 w-full rounded-xl border border-primary/20 bg-white pl-11 pr-4 text-sm font-medium text-foreground shadow-sm placeholder:text-muted-foreground/50 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300'
+                  className='h-12 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
                 />
               </div>
 
               {/* Filter icon button */}
-              <button
-                onClick={() => setFilterOpen((v) => !v)}
-                className={cn(
-                  'relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border transition-all duration-300 shadow-sm',
-                  filterOpen
-                    ? 'border-primary bg-primary/5 text-primary ring-4 ring-primary/10'
-                    : activeFilterCount > 0
+              <div ref={filterRef} className='relative shrink-0'>
+                <button
+                  onClick={() => setFilterOpen((v) => !v)}
+                  className={cn(
+                    'relative flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                    filterOpen
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-primary/20 bg-white text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-primary/5'
-                )}
-                aria-label={t('filter.title')}
-              >
-                <Filter className='h-5 w-5' />
-                {activeFilterCount > 0 && (
-                  <span className='absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm ring-2 ring-white'>
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
+                      : activeFilterCount > 0
+                        ? 'border-primary bg-primary/5 text-primary'
+                        : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
+                  )}
+                  aria-label={t('filter.title')}
+                >
+                  <Filter className='h-5 w-5' strokeWidth={2} />
+                  <ChevronDown
+                    className={cn('h-4 w-4 transition-transform', filterOpen && 'rotate-180')}
+                    strokeWidth={2}
+                  />
+                  {activeFilterCount > 0 && (
+                    <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Listing Type Tabs */}
-          <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-white'>
-            <ListingTypeTabs />
-          </div>
-
           {/* Scrollable content: Filter Panel + Properties List */}
-          <div className='flex-1 overflow-y-auto bg-gray-50/20'>
+          <div className='flex-1 overflow-y-auto'>
             {/* Collapsible Filter Panel — inside scroll area so price inputs are reachable */}
             {filterOpen && <FilterPanel isOpen={filterOpen} onClose={() => setFilterOpen(false)} />}
 
             {/* Properties List */}
             {properties.length === 0 ? (
-              <div className='flex flex-col items-center justify-center gap-4 p-12 text-center animate-in fade-in duration-500'>
-                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 border border-primary/10 shadow-sm'>
+              <div className='flex flex-col items-center justify-center gap-4 p-12 text-center'>
+                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border border-primary/10'>
                   <Home className='h-8 w-8 text-primary/60' strokeWidth={1.5} />
                 </div>
                 <div className='max-w-[280px]'>
@@ -534,7 +561,7 @@ function OwnerPropertiesContent() {
             onBack={() => setSelectedProperty(null)}
           />
         ) : (
-          <div className='flex h-full flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500'>
+          <div className='flex h-full flex-col items-center justify-center p-8 text-center'>
             <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20'>
               <Building className='h-10 w-10 text-primary/30' strokeWidth={1.5} />
             </div>
@@ -548,10 +575,10 @@ function OwnerPropertiesContent() {
   );
 }
 
-export function OwnerPropertiesPage() {
+export function PropertyFeedPage() {
   return (
-    <OwnerPropertiesProvider>
-      <OwnerPropertiesContent />
-    </OwnerPropertiesProvider>
+    <PropertyFeedProvider>
+      <PropertyFeedContent />
+    </PropertyFeedProvider>
   );
 }

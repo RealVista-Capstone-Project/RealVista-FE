@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { OwnerPropertiesPage } from '@/screens/owner-properties';
+import { PropertyFeedPage } from '@/screens/property-feed';
 
 export async function generateMetadata({
   params,
@@ -11,9 +11,9 @@ export async function generateMetadata({
   setRequestLocale(locale);
 
   const tLayout = await getTranslations('DashboardLayout');
-  const tPage = await getTranslations('OwnerProperties');
+  const tPage = await getTranslations('PropertyFeed');
 
-  const title = tLayout('pageTitle.ownerProperties');
+  const title = tLayout('pageTitle.propertyFeed');
 
   return {
     title: `${title} | RealVista`,
@@ -21,6 +21,6 @@ export async function generateMetadata({
   };
 }
 
-export default function OwnerPropertiesRoute() {
-  return <OwnerPropertiesPage />;
+export default function PropertyFeedRoute() {
+  return <PropertyFeedPage />;
 }

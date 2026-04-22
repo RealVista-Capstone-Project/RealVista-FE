@@ -32,44 +32,48 @@
     "table": {
       "status": "Trạng thái",
       "tenant": "Người thuê",
-      "monthlyRent": "Tiền thuê / tháng",
+      "monthlyRent": "Tiền thuê",
+      "property": "Bất động sản",
+      "leasePeriod": "Thời hạn",
       "createdDate": "Ngày tạo",
       "perMonth": "mỗi tháng"
     },
     "statusActions": {
       "updateStatus": "Cập nhật trạng thái",
-      "sendForSigning": "Gửi để ký",
+      "sendForSigning": "Gửi ký",
       "sendToLandlord": "Gửi cho chủ nhà ký",
       "sendToRenter": "Gửi cho người thuê ký",
-      "markActive": "Chuyển sang hiệu lực",
+      "markActive": "Đánh dấu hoạt động",
       "terminate": "Chấm dứt hợp đồng",
       "noAvailableAction": "Không có thao tác",
-      "signNow": "Ký ngay"
+      "signNow": "Ký ngay",
+      "sendToOwner": "Gửi chủ nhà ký",
+      "sentSuccess": "Đã gửi hợp đồng để ký"
     },
     "statusActionHints": {
-      "sendForSigning": "Tạo hoặc dùng lại phong bì DocuSign và gửi cho cả hai bên.",
-      "sendToLandlord": "Khởi tạo luồng ký DocuSign — bạn (chủ nhà) sẽ ký trước.",
-      "sendToRenter": "Chủ nhà đã ký. Bây giờ gửi hợp đồng cho người thuê để hoàn tất ký.",
-      "markActive": "Dùng khi DocuSign xác nhận cả hai bên đã hoàn tất ký.",
-      "terminate": "Kết thúc sớm hợp đồng đang hiệu lực và lưu lý do."
+      "sendForSigning": "Tạo hoặc sử dụng lại phong bì DocuSign và gửi cho cả hai bên.",
+      "sendToLandlord": "Bắt đầu quy trình ký DocuSign — bạn (chủ nhà) sẽ ký trước.",
+      "sendToRenter": "Chủ nhà đã ký. Bây giờ hãy gửi hợp đồng cho người thuê để hoàn tất việc ký kết.",
+      "markActive": "Sử dụng khi DocuSign báo cáo lễ ký kết đã hoàn tất.",
+      "terminate": "Kết thúc hợp đồng sớm và lưu lại lý do."
     },
     "statusDialog": {
       "sendTitle": "Gửi hợp đồng để ký",
-      "sendDescription": "Thao tác này sẽ gửi phong bì DocuSign tới {tenantName} và chuyển hợp đồng sang trạng thái chờ ký.",
-      "activateTitle": "Chuyển hợp đồng sang hiệu lực",
-      "activateDescription": "Dùng thao tác này sau khi DocuSign xác nhận cả hai bên đã ký xong hợp đồng của {tenantName}.",
+      "sendDescription": "Hành động này sẽ gửi phong bì DocuSign cho {tenantName} và chuyển hợp đồng sang trạng thái chờ ký.",
+      "activateTitle": "Đánh dấu hợp đồng đang hoạt động",
+      "activateDescription": "Sử dụng sau khi DocuSign xác nhận cả hai bên đã ký hợp đồng cho {tenantName}.",
       "terminateTitle": "Chấm dứt hợp đồng thuê",
-      "terminateDescription": "Thêm lý do ngắn gọn trước khi chấm dứt hợp đồng đang hiệu lực của {tenantName}.",
+      "terminateDescription": "Thêm lý do ngắn gọn trước khi chấm dứt hợp đồng đang hoạt động cho {tenantName}.",
       "reasonLabel": "Lý do",
-      "reasonPlaceholder": "Ghi chú rõ ràng cho lần cập nhật trạng thái này...",
-      "reasonHint": "Nhập ít nhất 10 ký tự để lịch sử cập nhật có ý nghĩa hơn.",
+      "reasonPlaceholder": "Viết ghi chú rõ ràng cho lần cập nhật trạng thái này...",
+      "reasonHint": "Sử dụng ít nhất 10 ký tự để lịch sử cập nhật có ích.",
       "updating": "Đang cập nhật..."
     },
     "toast": {
       "updateSuccess": "Cập nhật hợp đồng thuê thành công",
       "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại.",
       "signingUrlReady": "Đường dẫn ký đã sẵn sàng — đang mở DocuSign trong tab mới.",
-      "signingUnavailable": "Tính năng ký tạm thời không khả dụng. Vui lòng thử lại sau.",
+      "signingUnavailable": "Chức năng ký tạm thời không khả dụng. Vui lòng thử lại sau.",
       "signingError": "Không thể tải liên kết ký. Vui lòng thử lại."
     },
     "common": {

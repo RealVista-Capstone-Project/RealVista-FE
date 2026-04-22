@@ -15,6 +15,7 @@ import { useCreateListing } from '../api/use-create-listing';
 import { ListingInformationStep } from './listing-information-step';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
+import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 export interface CreateListingModalProps {
   open: boolean;
@@ -191,7 +192,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
                 step.number <= currentStep
                   ? 'bg-primary text-white'
-                  : 'bg-primary/5 text-foreground'
+                  : 'bg-muted text-muted-foreground'
               )}
             >
               {step.number}
@@ -199,7 +200,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             <span
               className={cn(
                 'text-sm md:text-base font-medium hidden sm:block',
-                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground/70'
+                step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
               {step.label}
@@ -216,6 +217,7 @@ const ITEMS_PER_PAGE = 4;
 
 export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }: CreateListingModalProps) {
   const t = useTranslations('CreateListingModal');
+  const tGlobal = useTranslations();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
@@ -364,6 +366,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
       is_negotiable: data.isNegotiable,
       available_from: data.availableFrom || null,
       content: data.content.trim() || null,
+      security_deposit: data.securityDeposit.trim() ? Number(data.securityDeposit) : null,
       media_ids: data.selectedMediaIds.length > 0 ? [...data.selectedMediaIds] : [],
       primary_media_id:
         data.primaryMediaId && !data.primaryMediaId.startsWith('new:') ? data.primaryMediaId : null,
@@ -406,8 +409,8 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
       await createListingMutation.mutateAsync(payload);
       toast.success(t('createSuccess'));
       onOpenChange(false);
-    } catch {
-      toast.error(t('createError'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
     }
   };
 

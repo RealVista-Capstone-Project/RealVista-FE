@@ -88,6 +88,7 @@ export interface CreateListingFormData {
   minPrice: string;
   maxPrice: string;
   isNegotiable: boolean;
+  securityDeposit: string;
   availableFrom: string;
   content: string;
   selectedMediaIds: string[];
@@ -113,6 +114,7 @@ export interface CreateListingPayload {
   media_ids?: string[];
   primary_media_id?: string | null;
   should_publish: boolean;
+  security_deposit?: number | null;
   new_medias?: Array<{
     url: string;
     type: string;

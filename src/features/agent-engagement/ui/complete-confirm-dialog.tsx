@@ -12,6 +12,7 @@ import {
 import { Button } from '@/shared/ui/button';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { getEngagementTypeLabel } from '../lib/utils';
 
 interface CompleteConfirmDialogProps {
   open: boolean;
@@ -66,7 +67,7 @@ export function CompleteConfirmDialog({
           )}
           <div className='flex justify-between text-sm'>
             <span className='text-gray-500'>{t('detailPanel.engagementType')}</span>
-            <span className='font-semibold text-gray-900'>{agent.engagement_type}</span>
+            <span className='font-semibold text-gray-900'>{getEngagementTypeLabel(agent.engagement_type, t)}</span>
           </div>
         </div>
 

@@ -1,12 +1,13 @@
 {
   "Engagement": {
     "page": {
-      "title": "Lời mời hợp tác",
+      "title": "Hợp tác của tôi",
       "subtitle": "Theo dõi trạng thái các yêu cầu hợp tác",
       "viewApplications": "Xem đơn đăng ký",
       "loading": "Đang tải dữ liệu...",
       "loadError": "Lỗi không tải được dữ liệu",
-      "createButton": "Mời hợp tác"
+      "createButton": "Mời hợp tác",
+      "shortTitle": "Hợp tác của tôi"
     },
     "tabs": {
       "sent": "Gửi từ tôi",
@@ -17,12 +18,24 @@
       "all": "Tất cả",
       "searchPlaceholder": "Tìm kiếm theo địa chỉ nhà hoặc tên đối tác...",
       "pickDate": "Chọn ngày",
-      "clearDate": "Xóa lọc ngày"
+      "clearDate": "Xóa lọc ngày",
+      "filterTitle": "Lọc theo trạng thái",
+      "reset": "Đặt lại",
+      "directionLabel": "Hướng",
+      "statusLabel": "Trạng thái"
     },
     "table": {
       "dateColumn": "Ngày gửi",
       "propertyColumn": "Nhà / Địa chỉ",
+      "counterpartyColumn": "Đối tác",
+      "typeColumn": "Loại",
+      "typeInvitation": "Lời mời",
+      "typeProposal": "Đề xuất",
+      "type": "Loại yêu cầu",
       "statusColumn": "Trạng thái",
+      "actionsColumn": "Thao tác",
+      "roleAgent": "Môi giới",
+      "roleOwner": "Chủ nhà",
       "empty": "Không tìm thấy engagement nào.",
       "clearDateFilter": "Xóa bộ lọc ngày"
     },
@@ -85,6 +98,22 @@
     },
     "detail": {
       "panelTitle": "Chi tiết yêu cầu thuê",
+      "panelTitleInvitation": "Chi tiết lời mời hợp tác",
+      "panelTitleProposal": "Chi tiết đề xuất từ môi giới",
+      "typeOwnerInvitation": "Lời mời từ chủ nhà",
+      "typeAgentProposal": "Đề xuất từ môi giới",
+      "typeTenantApplication": "Đơn đăng ký thuê",
+      "panelTitleApplication": "Chi tiết đơn đăng ký thuê",
+      "acceptedMessageProposal": "Chúc mừng! Đề xuất của bạn đã được chấp nhận.",
+      "acceptedMessageApplication": "Chúc mừng! Đơn đăng ký của bạn đã được chấp nhận.",
+      "commissionRate": "Tỷ lệ hoa hồng",
+      "experience": "Kinh nghiệm",
+      "years": "năm",
+      "specialty": "Chuyên môn",
+      "pitchContent": "Lời chào hàng",
+      "offeredCommission": "Hoa hồng đề xuất",
+      "ownerMessage": "Lời nhắn từ chủ nhà",
+      "acceptedMessageInvitation": "Chúc mừng! Lời mời của bạn đã được chấp nhận.",
       "noTitle": "Chưa có tiêu đề",
       "statusLabel": "Trạng thái",
       "submittedDate": "Ngày gửi",
@@ -105,6 +134,10 @@
       "statusRejected": "Từ chối",
       "statusCancelled": "Đã hủy",
       "statusFinished": "Hoàn thành"
+    },
+    "pagination": {
+      "showing": "Hiển thị {from} - {to} trong tổng số {total} kết quả",
+      "pageInfo": "Trang {current} của {total}"
     }
   }
 }

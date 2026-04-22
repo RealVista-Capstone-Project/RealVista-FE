@@ -57,8 +57,7 @@ describe('handleErrorApi', () => {
 
     handleErrorApi({ error });
 
-    expect(toastMock.error).toHaveBeenCalledWith('Error', {
-      description: 'Validation failed',
+    expect(toastMock.error).toHaveBeenCalledWith('Validation failed', {
       duration: 5000,
     });
   });
@@ -69,8 +68,7 @@ describe('handleErrorApi', () => {
 
     handleErrorApi({ error });
 
-    expect(toastMock.error).toHaveBeenCalledWith('Error', {
-      description: 'Something went wrong',
+    expect(toastMock.error).toHaveBeenCalledWith('Something went wrong', {
       duration: 5000,
     });
   });
@@ -81,8 +79,7 @@ describe('handleErrorApi', () => {
 
     handleErrorApi({ error });
 
-    expect(toastMock.error).toHaveBeenCalledWith('Error', {
-      description: 'Lỗi không xác định',
+    expect(toastMock.error).toHaveBeenCalledWith('Đã xảy ra lỗi. Vui lòng thử lại.', {
       duration: 5000,
     });
   });
@@ -92,8 +89,7 @@ describe('handleErrorApi', () => {
 
     handleErrorApi({ error });
 
-    expect(toastMock.error).toHaveBeenCalledWith('Error', {
-      description: 'Lỗi không xác định',
+    expect(toastMock.error).toHaveBeenCalledWith('Đã xảy ra lỗi. Vui lòng thử lại.', {
       duration: 5000,
     });
   });
@@ -104,8 +100,7 @@ describe('handleErrorApi', () => {
 
     handleErrorApi({ error, duration: 3000 });
 
-    expect(toastMock.error).toHaveBeenCalledWith('Error', {
-      description: 'Test message',
+    expect(toastMock.error).toHaveBeenCalledWith('Test message', {
       duration: 3000,
     });
   });

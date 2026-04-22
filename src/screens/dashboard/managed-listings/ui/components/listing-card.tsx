@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { formatVND } from '@/shared/lib/utils/format-currency';
+import { formatVND, formatNumber } from '@/shared/lib/utils/format-currency';
 import type { ManagedListing } from '../../types/managed-listing';
 import { LISTING_STATUS_CONFIG, ListingStatus } from '../../types/managed-listing';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui';
@@ -22,7 +22,7 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
     LISTING_STATUS_CONFIG[listing.status as ListingStatus] ??
     LISTING_STATUS_CONFIG[ListingStatus.DRAFT];
   const address = listing.full_address || t('noAddress');
-  const area = listing.property?.total_area ? `${listing.property.total_area} sq m` : '';
+  const area = listing.property?.total_area ? `${formatNumber(listing.property.total_area)} m²` : '';
   const formattedPrice = formatVND(listing.price);
 
   return (
@@ -30,12 +30,12 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
       type='button'
       onClick={onClick}
       className={cn(
-        'w-full border-b border-primary/20 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5',
+        'w-full cursor-pointer border-b border-primary/20 p-4 sm:p-6 text-left transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset',
         isSelected && 'bg-primary/5'
       )}
     >
       <div className='flex items-center gap-3 sm:gap-4'>
-        <div className='relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-primary/5'>
+        <div className='relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-primary/5'>
           {(() => {
             const thumbUrl = listing.primary_media_thumbnail_url || listing.thumbnail;
             const isVideoThumb = thumbUrl?.toLowerCase().endsWith('.mp4');

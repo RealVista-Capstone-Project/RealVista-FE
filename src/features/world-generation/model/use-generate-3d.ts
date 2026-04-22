@@ -231,7 +231,7 @@ export function useGenerate3d(propertyId: string, t?: (key: string, params?: Rec
         let errorMessage: string;
         if (error instanceof HttpError) {
           // Jackson serializes camelCase as snake_case (SNAKE_CASE naming strategy on BE)
-          const errorCode = (error.payload?.error_code ?? error.payload?.errorCode) as string | undefined;
+          const errorCode = error.payload?.error_code as string | undefined;
           if (errorCode === 'QUOTA_EXHAUSTED' || errorCode === 'ILLEGAL_STATE') {
             // ILLEGAL_STATE is the legacy code before InsufficientQuotaException was added
             errorMessage = t ? t('progressQuotaExhausted') : 'No remaining 3D room credits. Please upgrade your plan.';

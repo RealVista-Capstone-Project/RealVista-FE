@@ -25,7 +25,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { formatDate, getInitials, getStatusColor, toStringArray } from '../lib/utils';
+import { formatDate, getInitials, getStatusColor, toStringArray, getEngagementTypeLabel } from '../lib/utils';
 import { useTranslations, useLocale } from 'next-intl';
 import { useManageAgentContext } from '../model/manage-agent-context';
 import { CompleteConfirmDialog } from './complete-confirm-dialog';
@@ -72,7 +72,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
     try {
       await finishMutation.mutateAsync(agent.engagement_id);
       setCompleteDialogOpen(false);
-      setSelectedAgent({ ...agent, status: 'COMPLETED' });
+      setSelectedAgent({ ...agent, status: 'FINISHED' });
       toast.success(t('toast.completeSuccess'));
       openReviewAfterDelay();
     } catch {
@@ -80,17 +80,20 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
     }
   }, [agent, finishMutation, setSelectedAgent, t, openReviewAfterDelay]);
 
-  const handleCancel = useCallback(async (reason: string) => {
-    try {
-      await cancelMutation.mutateAsync({ engagementId: agent.engagement_id, reason });
-      setCancelDialogOpen(false);
-      setSelectedAgent({ ...agent, status: 'CANCELLED' });
-      toast.success(t('toast.cancelSuccess'));
-      openReviewAfterDelay();
-    } catch {
-      toast.error(t('toast.cancelError'));
-    }
-  }, [agent, cancelMutation, setSelectedAgent, t, openReviewAfterDelay]);
+  const handleCancel = useCallback(
+    async (reason: string) => {
+      try {
+        await cancelMutation.mutateAsync({ engagementId: agent.engagement_id, reason });
+        setCancelDialogOpen(false);
+        setSelectedAgent({ ...agent, status: 'CANCELLED' });
+        toast.success(t('toast.cancelSuccess'));
+        openReviewAfterDelay();
+      } catch {
+        toast.error(t('toast.cancelError'));
+      }
+    },
+    [agent, cancelMutation, setSelectedAgent, t, openReviewAfterDelay]
+  );
 
   const handleReviewSubmit = useCallback(
     async (payload: Omit<CreateReviewPayload, 'engagement_id'>) => {
@@ -151,7 +154,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       );
     }
 
-    if ((status === 'COMPLETED' || status === 'CANCELLED') && !hasReview) {
+    if ((status === 'FINISHED' || status === 'CANCELLED') && !hasReview) {
       return (
         <Button
           className='w-full bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl h-10 gap-2 shadow-sm shadow-primary/20'
@@ -163,7 +166,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       );
     }
 
-    if ((status === 'COMPLETED' || status === 'CANCELLED') && hasReview) {
+    if ((status === 'FINISHED' || status === 'CANCELLED') && hasReview) {
       return (
         <div className='flex items-center justify-center gap-2 py-2 text-sm text-gray-500 bg-green-50 rounded-xl border border-green-100'>
           <CheckCircle2 className='h-4 w-4 text-green-500' />
@@ -220,7 +223,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                       ? 'bg-emerald-400'
                       : status === 'PENDING'
                         ? 'bg-amber-400'
-                        : status === 'COMPLETED'
+                        : status === 'FINISHED'
                           ? 'bg-blue-400'
                           : 'bg-gray-300'
                   )}
@@ -292,9 +295,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                     <div className='text-[10px] text-gray-400 font-medium'>
                       {t('detailPanel.phone')}
                     </div>
-                    <div className='text-sm font-semibold text-gray-800'>
-                      {agent.agent_phone}
-                    </div>
+                    <div className='text-sm font-semibold text-gray-800'>{agent.agent_phone}</div>
                   </div>
                 </div>
               )}
@@ -333,8 +334,8 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                   <div className='font-bold text-gray-900 text-sm'>
                     {agent.agent_years_of_experience !== null
                       ? t('detailPanel.yearsUnit', {
-                        count: agent.agent_years_of_experience,
-                      })
+                          count: agent.agent_years_of_experience,
+                        })
                       : t('common.na')}
                   </div>
                 </div>
@@ -356,9 +357,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
                       {t('detailPanel.engagementType')}
                     </span>
                   </div>
-                  <div className='font-bold text-gray-900 text-sm'>
-                    {agent.engagement_type}
-                  </div>
+                  <div className='font-bold text-gray-900 text-sm'>{getEngagementTypeLabel(agent.engagement_type, t)}</div>
                 </div>
                 <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
                   <div className='flex items-center gap-1.5 text-[10px] text-gray-400 mb-1'>

@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Plus, X, FileText, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 import {
   useMyProposalsQuery,
   useCancelProposalMutation,
@@ -10,74 +11,228 @@ import {
   useApplyProposalMutation,
   useSaveProposalDraftMutation,
 } from '@/features/agent-proposal/hooks/use-agent-proposal';
-import { AgentProposal, ApplyAgentProposalPayload } from '@/entities/agent-proposal/model/types';
+import { AgentProposal, ApplyAgentProposalPayload, AgentProposalStatus } from '@/entities/agent-proposal/model/types';
 import { getAgentProposalSpecialtyCode } from '@/entities/agent-proposal/model/types';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
-import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { cn } from '@/shared/lib/utils';
-import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
+import { useDebounce } from '@/shared/lib/hooks';
+import { Spinner } from '@/shared/ui/spinner';
+import { DataTable } from '@/shared/ui/data-table';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
+import { Search, Filter, Plus, X, ChevronDown, FileText, FileSearch, Pencil, Trash2 } from 'lucide-react';
+import type { PaginationState } from '@tanstack/react-table';
+import { Badge } from '@/shared/ui/badge';
 
 // ─── Sub-components (split into own files) ───
-import { ProposalCard } from './components/proposal-card';
 import { ProposalDetailView } from './components/proposal-detail-view';
 import { ProposalFormDialog } from './components/proposal-form-dialog';
 import { DeleteProposalDialog } from './components/delete-proposal-dialog';
 
-/**
- * ManageAgentProposalsScreen
- *
- * Layout behaviour:
- * - No row selected → full-width list (table-like rows)
- * - Row selected → split 40% list / 60% detail panel
- * - Delete selected → deselect & close detail
- */
+// ─── Columns ────────────────────────────────────────────────────────────────
+
+function ProposalColumns({
+  onEdit,
+  onDelete,
+}: {
+  onEdit: (p: AgentProposal) => void;
+  onDelete: (id: string) => void;
+}) {
+  const t = useTranslations('ManageProposals');
+
+  const columns = React.useMemo(() => {
+    const cols: any[] = [
+      {
+        accessorKey: 'title',
+        header: t('table.title'),
+        cell: ({ row }: { row: { original: AgentProposal } }) => {
+          const p = row.original;
+          const specialtyCode = getAgentProposalSpecialtyCode(p);
+          const specialtyLabel = (() => {
+            if (!specialtyCode) return '';
+            for (const cat of PROPERTY_TYPES) {
+              const ty = cat.types.find((x) => x.code === specialtyCode);
+              if (ty) return ty.label;
+            }
+            return specialtyCode;
+          })();
+
+          return (
+            <div className='flex flex-col gap-1'>
+              <span className='font-medium text-foreground'>{p.title}</span>
+              {specialtyLabel && (
+                <span className='inline-flex items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-2 py-0.5 text-[10px] font-medium text-primary w-fit'>
+                  {specialtyLabel}
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'commission_rate',
+        header: t('table.commission'),
+        cell: ({ getValue }: { getValue: () => number }) => (
+          <span className='font-medium text-foreground'>{getValue()}%</span>
+        ),
+      },
+      {
+        accessorKey: 'experience_years',
+        header: t('table.experience'),
+        cell: ({ getValue }: { getValue: () => number }) => (
+          <span className='font-medium text-foreground'>{getValue()} năm</span>
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: t('table.status'),
+        cell: ({ row }: { row: { original: AgentProposal } }) => {
+          const p = row.original;
+          const isActive = p.status === AgentProposalStatus.ACTIVE;
+          return (
+            <Badge
+              variant={isActive ? 'default' : 'secondary'}
+              className={cn(
+                'gap-1.5 font-medium',
+                isActive
+                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border border-emerald-100'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-50 border border-amber-100'
+              )}
+            >
+              <span className={cn('size-1.5 rounded-full', isActive ? 'bg-emerald-500' : 'bg-amber-500')} />
+              {isActive ? t('statusActive') : t('statusDraft')}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: 'updated_at',
+        header: t('table.updatedAt'),
+        cell: ({ row }: { row: { original: AgentProposal } }) => {
+          const p = row.original;
+          const d = new Date(p.updated_at);
+          const label = Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('vi-VN');
+          return <span className='text-muted-foreground'>{label}</span>;
+        },
+      },
+      {
+        id: 'actions',
+        header: '',
+        cell: ({ row }: { row: { original: AgentProposal } }) => {
+          const p = row.original;
+          return (
+            <div className='flex items-center gap-1'>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5'
+                onClick={() => onEdit(p)}
+                title={t('btnEdit')}
+              >
+                <Pencil className='h-4 w-4' />
+              </Button>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5'
+                onClick={() => onDelete(p.agent_proposal_id)}
+                title={t('btnDelete')}
+              >
+                <Trash2 className='h-4 w-4' />
+              </Button>
+            </div>
+          );
+        },
+      },
+    ];
+    return cols;
+  }, [t, onEdit, onDelete]);
+
+  return columns;
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────
+
+type StatusFilter = 'all' | AgentProposalStatus;
+
 export function ManageAgentProposalsScreen() {
   const t = useTranslations('ManageProposals');
   const locale = useLocale();
-  const isMobile = useIsMobile();
+  const router = useRouter();
 
-  // ── State ──
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearch = useDebounce(searchQuery, 350);
   const [page, setPage] = React.useState(0);
   const PAGE_SIZE = 20;
+
+  const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
+  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
+  const filterRef = React.useRef<HTMLDivElement>(null);
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [formMode, setFormMode] = React.useState<'create' | 'edit'>('create');
   const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
   const [editTarget, setEditTarget] = React.useState<AgentProposal | null>(null);
+  const [selectedProposal, setSelectedProposal] = React.useState<AgentProposal | null>(null);
+
+  const [isSearchPending, setIsSearchPending] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsSearchPending(searchQuery !== debouncedSearch);
+  }, [searchQuery, debouncedSearch]);
+
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    }
+    if (isFilterOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFilterOpen]);
+
+  const hasActiveStatus = statusFilter !== 'all';
+  const activeFilterCount = hasActiveStatus ? 1 : 0;
+
+  const resetFilters = () => {
+    setStatusFilter('all');
+    setIsFilterOpen(false);
+  };
+
+  const filterStatusOptions = [
+    { value: 'all', labelKey: 'filter.allStatuses' },
+    { value: AgentProposalStatus.ACTIVE, labelKey: 'statusActive' },
+    { value: AgentProposalStatus.DRAFT, labelKey: 'statusDraft' },
+    { value: AgentProposalStatus.ARCHIVED, labelKey: 'statusArchived' },
+  ];
 
   // ── Data ──
-  const { data, isLoading } = useMyProposalsQuery(page, PAGE_SIZE);
+  const { data, isLoading, isError } = useMyProposalsQuery(page, PAGE_SIZE);
   const proposals = React.useMemo(() => data?.content ?? [], [data]);
+  const totalElements = data?.total_elements ?? 0;
+  const totalPages = data?.total_pages ?? 0;
 
-  const filtered = React.useMemo(() => {
-    if (!debouncedSearch.trim()) return proposals;
-    const q = debouncedSearch.toLowerCase();
-    return proposals.filter(
-      (p) => p.title.toLowerCase().includes(q) || p.pitch_content.toLowerCase().includes(q)
-    );
-  }, [proposals, debouncedSearch]);
-
-  const selected = React.useMemo(
-    () => proposals.find((p) => p.agent_proposal_id === selectedId) ?? null,
-    [proposals, selectedId]
-  );
-
-  const showDetail = !!selectedId;
+  const filteredProposals = React.useMemo(() => {
+    let result = proposals;
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
+      result = result.filter(
+        (p) => p.title.toLowerCase().includes(q) || p.pitch_content.toLowerCase().includes(q)
+      );
+    }
+    if (statusFilter !== 'all') {
+      result = result.filter((p) => p.status === statusFilter);
+    }
+    return result;
+  }, [proposals, debouncedSearch, statusFilter]);
 
   // ── Mutations ──
   const createMutation = useApplyProposalMutation(() => setIsFormOpen(false));
-
   const updateMutation = useUpdateProposalMutation(() => setIsFormOpen(false));
-
   const draftMutation = useSaveProposalDraftMutation(() => setIsFormOpen(false));
-
   const deleteMutation = useCancelProposalMutation(() => {
-    // If the deleted item was selected, clear the detail panel
-    if (selectedId === pendingDeleteId) setSelectedId(null);
     setIsDeleteOpen(false);
     setPendingDeleteId(null);
   });
@@ -106,156 +261,183 @@ export function ManageAgentProposalsScreen() {
     }
   };
 
+  const pagination: PaginationState = {
+    pageIndex: page,
+    pageSize: PAGE_SIZE,
+  };
+
+  const columns = ProposalColumns({ onEdit: openEdit, onDelete: openDelete });
+
+  const toolbar = (
+    <div className='flex flex-col gap-4 p-4 sm:p-5'>
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
+          <h2 className='text-xl font-bold text-foreground'>{t('pageTitle')}</h2>
+          <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
+            <span className='text-sm font-bold text-white'>{formatNumber(totalElements)}</span>
+          </div>
+        </div>
+
+        <button
+          type='button'
+          onClick={openCreate}
+          className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+        >
+          <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
+          {t('createNew')}
+        </button>
+      </div>
+
+      <div className='flex items-center gap-3'>
+        <div className='relative flex-1 max-w-md'>
+          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
+            <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
+          </div>
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('searchPlaceholder')}
+            className='h-11 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-10 text-base font-medium focus:border-primary focus:outline-none focus:ring-0'
+            aria-label={t('searchPlaceholder')}
+          />
+          {isSearchPending && (
+            <span className='pointer-events-none absolute inset-y-0 right-4 flex items-center'>
+              <Spinner className='size-4 text-primary' />
+            </span>
+          )}
+        </div>
+
+        <div ref={filterRef} className='relative shrink-0'>
+          <button
+            type='button'
+            onClick={() => setIsFilterOpen((prev) => !prev)}
+            className={cn(
+              'flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+              hasActiveStatus
+                ? 'border-primary bg-primary/5 text-primary'
+                : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
+            )}
+          >
+            <Filter className='h-5 w-5' strokeWidth={2} />
+            <ChevronDown
+              className={cn('h-4 w-4 transition-transform', isFilterOpen && 'rotate-180')}
+              strokeWidth={2}
+            />
+            {hasActiveStatus && (
+              <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+
+          {isFilterOpen && (
+            <div className='absolute right-0 top-full z-30 mt-2 w-56 rounded-xl border border-primary/20 bg-white shadow-lg'>
+              <div className='flex items-center justify-between border-b border-primary/20 px-4 py-3'>
+                <span className='text-sm font-semibold text-foreground'>{t('filterTitle')}</span>
+                <button
+                  type='button'
+                  onClick={resetFilters}
+                  className='cursor-pointer text-xs font-medium text-primary hover:underline'
+                >
+                  {t('filterReset')}
+                </button>
+              </div>
+              <div className='p-3'>
+                <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
+                  {t('filterStatus')}
+                </p>
+                <div className='flex flex-col gap-1'>
+                  {filterStatusOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type='button'
+                      onClick={() => {
+                        setStatusFilter(opt.value as StatusFilter);
+                        setIsFilterOpen(false);
+                      }}
+                      className={cn(
+                        'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                        statusFilter === opt.value
+                          ? 'bg-primary/5 font-medium text-primary'
+                          : 'text-foreground hover:bg-primary/5'
+                      )}
+                    >
+                      {t(opt.labelKey as Parameters<typeof t>[0])}
+                      {statusFilter === opt.value && <X className='h-3.5 w-3.5' strokeWidth={2.5} />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   // ── Render ──
   if (isLoading && page === 0) {
     return (
-      <div className='flex h-full items-center justify-center bg-slate-50/50'>
-        <div className='flex flex-col items-center gap-4 text-slate-400'>
-          <div className='relative flex size-12 items-center justify-center'>
-            <div className='absolute inset-0 animate-ping rounded-full bg-primary/10 opacity-75' />
-            <div className='relative size-8 animate-spin rounded-full border-2 border-slate-200 border-t-indigo-600' />
+      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
+        <Spinner className='size-8 text-primary' />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
+        <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
+          <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
+            <FileSearch className='h-6 w-6 text-primary' />
           </div>
-          <p className='text-sm font-bold text-slate-500 animate-pulse'>{t('loadingProposals')}</p>
+          <p className='font-semibold text-foreground'>{t('errorLoading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='flex h-full overflow-hidden bg-slate-50'>
-      {/* ── LEFT PANEL ── */}
-      <aside
-        className={cn(
-          'flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out overflow-hidden',
-          // Width: when detail open → 40% (split), when closed → 100%
-          showDetail && !isMobile ? 'w-[40%] min-w-[320px] max-w-[480px]' : 'w-full',
-          // Mobile: hide list when detail is shown
-          showDetail && isMobile ? 'hidden' : 'flex'
-        )}
-      >
-        {/* Panel Header */}
-        <div className='shrink-0 px-5 pt-5 pb-4 space-y-3 border-b border-slate-100'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-base font-bold text-slate-900'>{t('pageTitle')}</h1>
-              <p className='text-xs text-slate-400 mt-0.5'>
-                {t('pageSubtitle', { count: filtered.length })}
-              </p>
-            </div>
-            <button
-              onClick={openCreate}
-              className='flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 active:scale-95 transition-all'
-            >
-              <Plus size={15} strokeWidth={2.5} />
-              {t('createNew')}
-            </button>
-          </div>
+    <div className='p-4 sm:p-6 flex gap-4 items-start'>
+      <div className='flex-1 min-w-0'>
+        <DataTable
+          columns={columns}
+          data={filteredProposals}
+          isLoading={isLoading}
+          pageCount={totalPages}
+          pagination={pagination}
+          onPaginationChange={(updater) => {
+            const next = typeof updater === 'function' ? updater(pagination) : updater;
+            setPage(next.pageIndex);
+          }}
+          toolbar={toolbar}
+          emptyIcon={<FileText className='h-10 w-10 text-primary/40 mb-2' />}
+          emptyTitle={t('emptyTitle')}
+          pageInfoText={(current) => {
+            const from = (current - 1) * PAGE_SIZE + 1;
+            const to = Math.min(current * PAGE_SIZE, totalElements);
+            return t('paginationShowing', { from, to, total: totalElements });
+          }}
+        />
+      </div>
 
-          {/* Search */}
-          <div className='relative'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400' size={15} />
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setPage(0);
-              }}
-              placeholder={t('searchPlaceholder')}
-              className='h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-8 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all'
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Proposal List */}
-        <div className='flex-1 overflow-y-auto px-4 py-2'>
-          {filtered.length === 0 ? (
-            <EmptyState t={t} isFiltering={!!debouncedSearch.trim()} onCreateClick={openCreate} />
-          ) : (
-            <div
-              className={cn(
-                // When split view: compact cards; when full width: use table-style rows
-                showDetail && !isMobile ? 'space-y-2' : 'space-y-1'
-              )}
-            >
-              <div
-                className={cn(
-                  !showDetail &&
-                    'bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden shadow-sm'
-                )}
-              >
-                {filtered.map((p) =>
-                  showDetail && !isMobile ? (
-                    // Compact card mode in split view
-                    <ProposalCard
-                      key={p.agent_proposal_id}
-                      proposal={p}
-                      isSelected={p.agent_proposal_id === selectedId}
-                      inSplitView
-                      onClick={() => setSelectedId(p.agent_proposal_id)}
-                      onEdit={() => openEdit(p)}
-                      onDelete={() => openDelete(p.agent_proposal_id)}
-                    />
-                  ) : (
-                    // Full-width table row mode
-                    <TableRow
-                      key={p.agent_proposal_id}
-                      t={t}
-                      proposal={p}
-                      isSelected={p.agent_proposal_id === selectedId}
-                      onClick={() => setSelectedId(p.agent_proposal_id)}
-                      onEdit={() => openEdit(p)}
-                      onDelete={() => openDelete(p.agent_proposal_id)}
-                    />
-                  )
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Pagination */}
-        {(data?.total_pages ?? 0) > 1 && (
-          <div className='shrink-0 border-t border-slate-100 px-4 py-3 bg-white'>
-            <RealVistaPagination
-              currentPage={page + 1}
-              totalPages={data!.total_pages}
-              onPageChange={(p) => setPage(p - 1)}
-            />
-          </div>
-        )}
-      </aside>
-
-      {/* ── RIGHT PANEL (Detail) ── */}
-      {showDetail && (
-        <main
-          className={cn(
-            'flex-1 overflow-hidden bg-white shadow-2xl z-10 transition-all animate-in slide-in-from-right duration-300',
-            isMobile ? 'fixed inset-0 z-[60]' : 'relative'
-          )}
-        >
-          {selected ? (
-            <ProposalDetailView
-              proposal={selected}
-              locale={locale}
-              isMobile={isMobile}
-              onBack={() => setSelectedId(null)}
-              onEdit={() => openEdit(selected)}
-              onDelete={() => openDelete(selected.agent_proposal_id)}
-            />
-          ) : null}
-        </main>
+      {selectedProposal && (
+        <ProposalDetailView
+          proposal={selectedProposal}
+          locale={locale}
+          isMobile={false}
+          onBack={() => setSelectedProposal(null)}
+          onEdit={() => {
+            openEdit(selectedProposal);
+            setSelectedProposal(null);
+          }}
+          onDelete={() => {
+            openDelete(selectedProposal.agent_proposal_id);
+            setSelectedProposal(null);
+          }}
+        />
       )}
 
-      {/* ── DIALOGS ── */}
       <ProposalFormDialog
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
@@ -280,201 +462,6 @@ export function ManageAgentProposalsScreen() {
         }}
         onConfirm={() => pendingDeleteId && deleteMutation.mutate(pendingDeleteId)}
       />
-    </div>
-  );
-}
-
-/* ─────────── Full-Width Table Row (no selection state) ─────────── */
-function TableRow({
-  proposal,
-  isSelected,
-  onClick,
-  onEdit,
-  onDelete,
-  t,
-}: {
-  proposal: AgentProposal;
-  isSelected: boolean;
-  onClick: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  t: any;
-}) {
-  const isActive = proposal.status === 'ACTIVE';
-  const specialtyCode = getAgentProposalSpecialtyCode(proposal);
-  const updatedLabel = React.useMemo(() => {
-    const d = new Date(proposal.updated_at);
-    if (Number.isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('vi-VN');
-  }, [proposal.updated_at]);
-  const specialtyLabel = React.useMemo(() => {
-    if (!specialtyCode) return '';
-    for (const cat of PROPERTY_TYPES) {
-      const ty = cat.types.find((x) => x.code === specialtyCode);
-      if (ty) return ty.label;
-    }
-    return specialtyCode;
-  }, [specialtyCode]);
-
-  return (
-    <div
-      onClick={onClick}
-      className={cn(
-        'group flex items-center gap-4 px-6 py-4 cursor-pointer transition-all duration-150',
-        isSelected ? 'bg-indigo-50/80 shadow-inner' : 'hover:bg-slate-50'
-      )}
-    >
-      {/* Updated at */}
-      <div
-        className={cn(
-          'w-[98px] shrink-0 text-center',
-          isSelected ? 'text-primary' : 'text-slate-500'
-        )}
-      >
-        <p className='text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-0.5'>
-          {t('metricUpdated')}
-        </p>
-        <p className='text-sm font-bold text-slate-600 tabular-nums'>{updatedLabel}</p>
-      </div>
-
-      {/* Title + meta */}
-      <div className='flex-1 min-w-0'>
-        <p
-          className={cn(
-            'text-sm font-bold truncate transition-colors',
-            isSelected ? 'text-primary' : 'text-slate-800 group-hover:text-primary'
-          )}
-        >
-          {proposal.title}
-        </p>
-        <div className='mt-1 flex items-center gap-2 min-w-0'>
-          {specialtyLabel && (
-            <span className='inline-flex max-w-[45%] items-center gap-1 rounded-full border border-primary/10 bg-indigo-50/70 px-2.5 py-0.5 text-[10px] font-semibold text-primary'>
-              <Sparkles size={10} className='shrink-0 opacity-80' />
-              <span className='truncate'>{specialtyLabel}</span>
-            </span>
-          )}
-          <p className='text-xs text-slate-400 truncate line-clamp-1 italic min-w-0'>
-            &quot;{proposal.pitch_content}&quot;
-          </p>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className='hidden lg:flex items-center gap-8 shrink-0 mx-4'>
-        <div className='text-center'>
-          <p className='text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-0.5'>
-            {t('metricExperience')}
-          </p>
-          <p className='text-sm font-bold text-slate-600'>{proposal.experience_years} năm</p>
-        </div>
-        <div className='text-center'>
-          <p className='text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-0.5'>
-            {t('metricCommission')}
-          </p>
-          <p className='text-sm font-bold text-slate-600'>{proposal.commission_rate}%</p>
-        </div>
-        <div className='w-24 flex justify-end'>
-          <span
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm whitespace-nowrap',
-              isActive
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                : 'bg-amber-50 text-amber-700 border border-amber-100'
-            )}
-          >
-            <span
-              className={cn('size-1.5 rounded-full', isActive ? 'bg-emerald-500' : 'bg-amber-500')}
-            />
-            {isActive ? t('statusActive') : t('statusDraft')}
-          </span>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-2'>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit();
-          }}
-          className='rounded-lg p-2 text-slate-400 hover:text-primary hover:bg-white hover:shadow-sm transition-all active:scale-90 border border-transparent hover:border-slate-100'
-          title={t('btnEdit')}
-        >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='16'
-            height='16'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z' />
-            <path d='m15 5 4 4' />
-          </svg>
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className='rounded-lg p-2 text-slate-400 hover:text-red-500 hover:bg-white hover:shadow-sm transition-all active:scale-90 border border-transparent hover:border-slate-100'
-          title={t('btnDelete')}
-        >
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='16'
-            height='16'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <path d='M3 6h18' />
-            <path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6' />
-            <path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2' />
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────── Empty States ─────────── */
-function EmptyState({
-  t,
-  isFiltering,
-  onCreateClick,
-}: {
-  t: any;
-  isFiltering: boolean;
-  onCreateClick: () => void;
-}) {
-  return (
-    <div className='flex flex-col items-center justify-center py-20 px-4 text-center bg-white rounded-2xl border-2 border-dashed border-slate-200'>
-      <div className='mb-6 flex size-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-500 shadow-inner'>
-        <FileText size={36} strokeWidth={1.5} />
-      </div>
-      <h3 className='text-lg font-bold text-slate-800 mb-2'>
-        {isFiltering ? t('emptyFilterTitle') : t('emptyTitle')}
-      </h3>
-      <p className='text-sm text-slate-500 mb-8 max-w-[280px] leading-relaxed'>
-        {isFiltering ? t('emptyFilterDesc') : t('emptyDesc')}
-      </p>
-      {!isFiltering && (
-        <button
-          onClick={onCreateClick}
-          className='flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200'
-        >
-          <Plus size={18} strokeWidth={3} />
-          {t('btnCreateNow')}
-        </button>
-      )}
     </div>
   );
 }

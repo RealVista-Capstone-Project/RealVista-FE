@@ -81,6 +81,7 @@ export function ListingInformationStep({
   const [maxPrice, setMaxPrice] = React.useState('');
   const [isNegotiable, setIsNegotiable] = React.useState(false);
   const [availableFrom, setAvailableFrom] = React.useState('');
+  const [securityDeposit, setSecurityDeposit] = React.useState('');
 
   const { contentStatus, isContentValid } = useContentVerification(name, content);
 
@@ -224,6 +225,8 @@ export function ListingInformationStep({
     if (!maxPrice.trim()) errs.maxPrice = t('validation.maxPriceRequired');
     else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0)
       errs.maxPrice = t('validation.maxPriceInvalid');
+    else if (!errs.minPrice && Number(minPrice) > Number(maxPrice))
+      errs.maxPrice = t('validation.maxPriceLessThanMin', { fallback: 'Giá cao nhất phải lớn hơn hoặc bằng giá thấp nhất' });
 
     if (listingType === 'RENT' && availableFrom) {
       const d = new Date(availableFrom);
@@ -252,6 +255,7 @@ export function ListingInformationStep({
       maxPrice,
       isNegotiable,
       availableFrom,
+      securityDeposit,
       content,
       selectedMediaIds: Array.from(selectedMediaIds).filter(
         (id) => selectedProperty.media.find((m) => m.mediaId === id)?.isPropertyStandard
@@ -423,6 +427,8 @@ export function ListingInformationStep({
               onMaxPriceChange={setMaxPrice}
               isNegotiable={isNegotiable}
               onNegotiableChange={setIsNegotiable}
+              securityDeposit={securityDeposit}
+              onSecurityDepositChange={setSecurityDeposit}
               errors={errors}
               labels={priceLabels}
             />

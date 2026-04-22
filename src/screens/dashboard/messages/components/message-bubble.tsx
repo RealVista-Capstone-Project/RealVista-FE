@@ -49,15 +49,15 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
       )}
 
       <div className={cn('flex max-w-[65%] flex-col gap-1', isMe && 'items-end')}>
-        {!isMe && <span className='text-xs font-semibold text-foreground'>{msg.sender.name}</span>}
+        {!isMe && <span className='text-xs font-semibold text-slate-700'>{msg.sender.name}</span>}
 
         {msg.text && (
           <div
             className={cn(
-              'rounded-2xl px-4 py-3 text-sm leading-relaxed',
+              'rounded-2xl px-4 py-3 text-sm leading-relaxed transition-shadow hover:shadow-md',
               isMe
-                ? 'rounded-tr-sm bg-primary text-white'
-                : 'rounded-tl-sm bg-white text-foreground shadow-sm',
+                ? 'rounded-tr-sm bg-blue-500 text-white shadow-sm'
+                : 'rounded-tl-sm bg-white text-slate-800 shadow-sm border border-slate-100',
               msg.isLink && 'break-all'
             )}
           >
@@ -68,7 +68,7 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
                   href={`https://${msg.text.split('https://')[1]}`}
                   target='_blank'
                   rel='noreferrer'
-                  className='text-primary underline'
+                  className={cn('underline', isMe ? 'text-white/90' : 'text-blue-600')}
                 >
                   https://{msg.text.split('https://')[1]}
                 </a>
@@ -93,11 +93,14 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
         )}
 
         <div className={cn('flex items-center gap-2', isMe && 'flex-row-reverse')}>
-          <span className='text-xs text-muted-foreground/60'>{msg.time}</span>
+          <span className={cn('text-xs', isMe ? 'text-blue-200' : 'text-slate-400')}>{msg.time}</span>
           {msg.reactions?.map((r) => (
             <span
               key={r.emoji}
-              className='flex items-center gap-1 rounded-full bg-primary/5 px-2 py-0.5 text-xs'
+              className={cn(
+                'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-shadow hover:shadow-sm',
+                isMe ? 'bg-blue-400/30 text-white' : 'bg-slate-50 border border-slate-100 text-slate-600'
+              )}
             >
               {r.emoji} {r.count}
             </span>

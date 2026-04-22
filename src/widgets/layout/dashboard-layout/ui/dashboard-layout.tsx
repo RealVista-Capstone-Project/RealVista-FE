@@ -120,9 +120,9 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       icon: LayoutDashboard,
     },
     {
-      id: 'owner-properties',
-      label: t('menu.ownerProperties'),
-      href: ROUTES.dashboard.ownerProperties,
+      id: 'property-feed',
+      label: t('menu.propertyFeed'),
+      href: ROUTES.dashboard.propertyFeed,
       icon: Search,
     },
     {
@@ -248,10 +248,10 @@ export function DashboardLayout({
       return t('pageTitle.manageProposals');
     }
     if (
-      pathname === ROUTES.dashboard.ownerProperties ||
-      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+      pathname === ROUTES.dashboard.propertyFeed ||
+      pathname.startsWith(ROUTES.dashboard.propertyFeed)
     ) {
-      return t('pageTitle.ownerProperties');
+      return t('pageTitle.propertyFeed');
     }
     if (
       pathname === ROUTES.dashboard.agentSetting ||
@@ -281,10 +281,10 @@ export function DashboardLayout({
       return t('pageTitle.manageUsers');
     }
     if (
-      pathname === ROUTES.dashboard.ownerProperties ||
-      pathname.startsWith(ROUTES.dashboard.ownerProperties)
+      pathname === ROUTES.dashboard.propertyFeed ||
+      pathname.startsWith(ROUTES.dashboard.propertyFeed)
     ) {
-      return t('pageTitle.ownerProperties');
+      return t('pageTitle.propertyFeed');
     }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
@@ -295,7 +295,7 @@ export function DashboardLayout({
   const isItemActive = (href: string) => {
     if (pathname === href) return true;
     if (href === ROUTES.dashboard.root) return pathname === ROUTES.dashboard.root;
-    return pathname.startsWith(href);
+    return pathname.startsWith(href + '/');
   };
 
   const settingsHref = backendRoles.includes('AGENT')
@@ -368,10 +368,10 @@ export function DashboardLayout({
                 </div>
                 <div className='flex flex-col'>
                   <span className='text-base font-bold leading-tight text-foreground'>
-                    Estatery
+                    {t('pageTitle.default')}
                   </span>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground/40'>
-                    Property Manager
+                    {t('pageTitle.dashboardManager')}
                   </span>
                 </div>
               </Link>
