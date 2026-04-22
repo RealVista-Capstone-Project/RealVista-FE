@@ -3,7 +3,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { conversationQueries, useSendMessage } from '@/entities/conversation';
 import type { ConversationListItemResponse, MessageResponse } from '@/entities/conversation';
 import type { ChatListingData } from '@/entities/contact';
@@ -102,6 +102,7 @@ export function MessagesPage() {
   );
 
   const locale = useLocale();
+  const t = useTranslations('Messages');
 
   // ── Current user ──────────────────────────────────────────────────────────
   const { data: session } = useAuthSession();
@@ -296,7 +297,7 @@ export function MessagesPage() {
 
         {!activeConv && !isLoading && (
           <div className='flex flex-1 items-center justify-center text-sm text-muted-foreground/70'>
-            Select a conversation to start chatting
+            {t('selectConversation')}
           </div>
         )}
       </div>
