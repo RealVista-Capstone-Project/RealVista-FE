@@ -4,12 +4,13 @@ import * as React from 'react';
 import Image from 'next/image';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import { ChevronLeft, Send, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { ChevronLeft, RefreshCw, Send, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { AiChatMessageItem, TypingIndicator } from './ai-chat-message-item';
 import type { AiChatMessage } from './ai-chat-message-item';
 import type { AiQuotaStatus } from '../model/use-ai-chat';
+import { Button } from '@/shared/ui/button';
 
 interface AiChatWindowProps {
   messages: AiChatMessage[];
@@ -21,8 +22,8 @@ interface AiChatWindowProps {
   onSendMessage: (content: string) => void;
   onClose: () => void;
   onQuickAction: (text: string) => void;
-  /** @deprecated - reload button removed from header */
-  onNewChat?: () => void;
+  /** Clears conversation and resets history (reload / new chat). */
+  onNewChat?: () => void | Promise<void>;
   className?: string;
 }
 
@@ -41,10 +42,12 @@ export function AiChatWindow({
   onSendMessage,
   onClose,
   onQuickAction,
+  onNewChat,
   className,
 }: AiChatWindowProps) {
   const t = useTranslations('AiAssistant');
   const [input, setInput] = React.useState('');
+  const [refreshConfirmOpen, setRefreshConfirmOpen] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const isSubmittingRef = React.useRef(false);
@@ -96,6 +99,24 @@ export function AiChatWindow({
     }
   };
 
+  React.useEffect(() => {
+    if (!refreshConfirmOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isClearing) setRefreshConfirmOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [refreshConfirmOpen, isClearing]);
+
+  const handleConfirmRefresh = async () => {
+    if (!onNewChat) return;
+    try {
+      await onNewChat();
+    } finally {
+      setRefreshConfirmOpen(false);
+    }
+  };
+
   const quickActions = [
     { key: 'chipFindProperties', text: t('chipFindProperties') },
     { key: 'chipAverageRent', text: t('chipAverageRent') },
@@ -107,7 +128,7 @@ export function AiChatWindow({
   return (
     <div
       className={cn(
-        'fixed bottom-24 right-6 z-[70] flex h-[520px] w-[380px] flex-col overflow-hidden rounded-xl border border-border bg-white shadow-xl',
+        'fixed bottom-24 right-6 z-[90] flex h-[520px] w-[380px] flex-col overflow-hidden rounded-xl border border-border bg-white shadow-xl',
         'transition-all duration-200 ease-out',
         // Mobile: full-screen overlay
         'max-md:inset-0 max-md:bottom-0 max-md:right-0 max-md:h-full max-md:w-full max-md:rounded-none',
@@ -133,16 +154,36 @@ export function AiChatWindow({
             )}
           </p>
         </div>
+        {onNewChat && (
+          <button
+            type='button'
+            onClick={() => setRefreshConfirmOpen(true)}
+            disabled={isTyping || isClearing || isLoadingHistory}
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150',
+              'hover:bg-muted hover:text-foreground',
+              'disabled:pointer-events-none disabled:opacity-40'
+            )}
+            aria-label={t('refreshChat')}
+            title={t('refreshChat')}
+          >
+            {isClearing ? (
+              <Loader2 className='h-4 w-4 animate-spin' />
+            ) : (
+              <RefreshCw className='h-4 w-4' />
+            )}
+          </button>
+        )}
         {/* AI avatar - top right */}
-        <div className='relative'>
+        <div className='relative shrink-0'>
           <Image
-            src='/images/ai-avatar.png'
+            src='/assistant.jpg'
             alt='AI Assistant'
             width={32}
             height={32}
-            className='h-8 w-8 rounded-full object-cover ring-2 ring-white'
+            className='h-8 w-8 rounded-full object-contain p-0.5'
           />
-          <span className='absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white' />
+          <span className='absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500' />
         </div>
       </div>
 
@@ -206,6 +247,52 @@ export function AiChatWindow({
           </button>
         </div>
       </form>
+
+      {refreshConfirmOpen && onNewChat && (
+        <div
+          role='dialog'
+          aria-modal='true'
+          aria-labelledby='ai-chat-refresh-title'
+          className='absolute inset-0 z-[80] flex items-center justify-center bg-black/45 p-4'
+          onClick={() => !isClearing && setRefreshConfirmOpen(false)}
+        >
+          <div
+            className='w-full max-w-sm rounded-xl border border-border bg-white p-4 shadow-lg'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id='ai-chat-refresh-title' className='text-base font-semibold text-foreground'>
+              {t('confirmRefreshTitle')}
+            </h2>
+            <p className='mt-2 text-sm leading-relaxed text-muted-foreground'>
+              {t('confirmRefreshDescription')}
+            </p>
+            <div className='mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+              <Button
+                type='button'
+                variant='ghost'
+                disabled={isClearing}
+                onClick={() => setRefreshConfirmOpen(false)}
+              >
+                {t('confirmRefreshCancel')}
+              </Button>
+              <Button
+                type='button'
+                disabled={isClearing}
+                onClick={() => void handleConfirmRefresh()}
+              >
+                {isClearing ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    {t('confirmRefreshConfirm')}
+                  </>
+                ) : (
+                  t('confirmRefreshConfirm')
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -278,15 +365,6 @@ interface WelcomeStateProps {
 function WelcomeState({ welcomeMessage, quickActions, onQuickAction }: WelcomeStateProps) {
   return (
     <div className='flex h-full flex-col items-center justify-center gap-5 px-2'>
-      {/* AI avatar */}
-      <Image
-        src='/images/ai-avatar.png'
-        alt='AI Assistant'
-        width={56}
-        height={56}
-        className='h-14 w-14 rounded-full object-cover'
-      />
-
       <p className='text-center text-sm leading-relaxed text-muted-foreground'>{welcomeMessage}</p>
 
       {/* Quick-action chips */}

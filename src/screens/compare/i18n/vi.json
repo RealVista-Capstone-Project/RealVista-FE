@@ -1,0 +1,24 @@
+{
+  "Compare": {
+    "title": "So sánh tin đăng",
+    "invalid": "Hãy chọn đúng hai tin từ mục yêu thích để so sánh.",
+    "loading": "Đang tải tin…",
+    "error": "Không tải được một hoặc cả hai tin.",
+    "backToFavorites": "Về mục yêu thích",
+    "viewDetail": "Xem chi tiết",
+    "listingTypeSale": "Bán",
+    "listingTypeRent": "Cho thuê",
+    "yes": "Có",
+    "no": "Không",
+    "rowTitle": "Tiêu đề",
+    "rowAddress": "Địa chỉ",
+    "rowPrice": "Giá",
+    "rowListingType": "Loại tin",
+    "rowPropertyType": "Loại BĐS",
+    "rowUsableArea": "Diện tích sử dụng",
+    "rowLandSize": "Diện tích đất",
+    "rowStatus": "Trạng thái",
+    "rowNegotiable": "Giá thương lượng",
+    "rowPublished": "Ngày đăng"
+  }
+}
