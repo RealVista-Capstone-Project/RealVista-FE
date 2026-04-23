@@ -14,6 +14,7 @@ import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 import {
   useGetLandlordSigningUrlMutation,
+  useGetRenterSigningUrlMutation,
   useSendToLandlordMutation,
   useUpdateRentalContractStatusMutation,
 } from '../hooks/use-rental-contracts';
@@ -210,6 +211,79 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
   );
 }
 
+// ─── Tenant actions cell ──────────────────────────────────────────────────────
+
+function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
+  const t = useTranslations('RentalContract');
+
+  const getRenterSigningUrlMutation = useGetRenterSigningUrlMutation();
+
+  const [signingModal, setSigningModal] = useState<{
+    url: string;
+    role: 'landlord' | 'renter';
+  } | null>(null);
+
+  // Show "Sign Now" when PENDING_RENTER, tenant hasn't signed yet, envelope exists
+  const canSignNow =
+    contract.status === RentalContractStatus.PENDING_RENTER &&
+    !contract.tenantSignedAt &&
+    Boolean(contract.docusignEnvelopeId);
+
+  const handleSignNow = async () => {
+    try {
+      const returnUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=renter`
+          : undefined;
+      const data = await getRenterSigningUrlMutation.mutateAsync({
+        leaseId: contract.id,
+        returnUrl,
+      });
+      if (!data.signing_url) {
+        toast.error(t('toast.signingUnavailable'));
+        return;
+      }
+      setSigningModal({ url: data.signing_url, role: 'renter' });
+    } catch {
+      toast.error(t('toast.signingError'));
+    }
+  };
+
+  return (
+    <>
+      <div className='flex items-center gap-2'>
+        {canSignNow && (
+          <Button
+            type='button'
+            size='sm'
+            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
+            onClick={handleSignNow}
+            disabled={getRenterSigningUrlMutation.isPending}
+          >
+            {getRenterSigningUrlMutation.isPending ? (
+              <Loader2 className='h-3.5 w-3.5 animate-spin' />
+            ) : (
+              <>
+                <Pen className='h-3.5 w-3.5' />
+                {t('statusActions.signNow')}
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+
+      {signingModal && (
+        <DocuSignSigningModal
+          open={Boolean(signingModal)}
+          signingUrl={signingModal.url}
+          signerRole={signingModal.role}
+          onClose={() => setSigningModal(null)}
+        />
+      )}
+    </>
+  );
+}
+
 // ─── Column definitions ───────────────────────────────────────────────────────
 
 export function useContractColumns(): ColumnDef<RentalContract, unknown>[] {
@@ -329,5 +403,103 @@ export function useContractColumns(): ColumnDef<RentalContract, unknown>[] {
       },
     ],
     [t, tManage, locale]
+  );
+}
+
+export function useTenantContractColumns(): ColumnDef<RentalContract, unknown>[] {
+  const t = useTranslations('RentalContract');
+  const locale = useLocale();
+
+  return useMemo<ColumnDef<RentalContract, unknown>[]>(
+    () => [
+      {
+        id: 'property',
+        header: () => t('table.property'),
+        cell: ({ row }) => {
+          const { property } = row.original;
+          return (
+            <div className='min-w-0'>
+              <p className='truncate text-sm font-semibold text-foreground'>{property.title}</p>
+              <p className='truncate text-xs text-muted-foreground'>{property.address}</p>
+            </div>
+          );
+        },
+      },
+      {
+        id: 'monthlyRent',
+        header: () => t('table.monthlyRent'),
+        cell: ({ row }) => (
+          <span className='text-sm font-medium text-foreground'>
+            {formatContractCurrency(row.original.monthlyRent, locale === 'vi' ? 'vi-VN' : 'en-US')}
+          </span>
+        ),
+      },
+      {
+        id: 'leasePeriod',
+        header: () => t('table.leasePeriod'),
+        cell: ({ row }) => {
+          const { leaseStartDate, leaseEndDate } = row.original;
+          const start = new Date(leaseStartDate);
+          const end = new Date(leaseEndDate);
+          const now = new Date();
+          const total = end.getTime() - start.getTime();
+          const elapsed = Math.min(Math.max(now.getTime() - start.getTime(), 0), total);
+          const progress = total > 0 ? Math.round((elapsed / total) * 100) : 0;
+          return (
+            <div className='min-w-[180px] space-y-1.5'>
+              <div className='flex items-center gap-1 text-sm text-muted-foreground'>
+                <span>{formatContractDate(leaseStartDate, locale, 'dd/MM/yyyy')}</span>
+                <span className='mx-0.5'>→</span>
+                <span>{formatContractDate(leaseEndDate, locale, 'dd/MM/yyyy')}</span>
+              </div>
+              <div className='h-1.5 w-full overflow-hidden rounded-full bg-primary/10'>
+                <div
+                  className='h-full rounded-full bg-primary transition-all'
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: 'status',
+        header: () => t('table.status'),
+        cell: ({ row }) => {
+          const status = row.original.status;
+          const statusKey = `status.${status.toLowerCase()}` as const;
+          const statusLabel = t.has(statusKey) ? t(statusKey) : status;
+
+          const statusIconMap: Record<RentalContractStatus, React.ReactNode> = {
+            [RentalContractStatus.DRAFT]:            <Clock className='h-3.5 w-3.5' />,
+            [RentalContractStatus.PENDING_LANDLORD]: <Clock className='h-3.5 w-3.5' />,
+            [RentalContractStatus.PENDING_RENTER]:   <Clock className='h-3.5 w-3.5' />,
+            [RentalContractStatus.ACTIVE]:           <CheckCircle2 className='h-3.5 w-3.5' />,
+            [RentalContractStatus.EXPIRED]:          <XCircle className='h-3.5 w-3.5' />,
+            [RentalContractStatus.TERMINATED]:       <XCircle className='h-3.5 w-3.5' />,
+            [RentalContractStatus.REJECTED]:         <XCircle className='h-3.5 w-3.5' />,
+          };
+
+          return (
+            <Badge
+              variant='secondary'
+              className={cn(
+                'flex items-center gap-1 text-xs font-semibold px-2.5 py-1 border whitespace-nowrap w-fit',
+                getRentalContractStatusColor(status)
+              )}
+            >
+              {statusIconMap[status]}
+              {statusLabel}
+            </Badge>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        header: () => t('table.actions'),
+        cell: ({ row }) => <TenantContractActionsCell contract={row.original} />,
+      },
+    ],
+    [t, locale]
   );
 }

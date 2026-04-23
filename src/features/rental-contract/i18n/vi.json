@@ -36,7 +36,8 @@
       "property": "Bất động sản",
       "leasePeriod": "Thời hạn",
       "createdDate": "Ngày tạo",
-      "perMonth": "mỗi tháng"
+      "perMonth": "mỗi tháng",
+      "actions": "Thao tác"
     },
     "statusActions": {
       "updateStatus": "Cập nhật trạng thái",
