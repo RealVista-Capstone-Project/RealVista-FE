@@ -11,11 +11,19 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Spinner } from '@/shared/ui/spinner';
 import { cn } from '@/shared/lib/utils';
-import { ChevronDown, ChevronLeft, ChevronRight, FileSearch, Filter, Search, X } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  FileSearch,
+  Filter,
+  Search,
+  X,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { PaginationState } from '@tanstack/react-table';
 import { DataTable } from '@/shared/ui/data-table';
-import { useContractColumns } from '@/features/rental-contract/ui/contract-columns';
+import { useTenantContractColumns } from '@/features/rental-contract/ui/contract-columns';
 
 function MyRentalContractsContent() {
   const {
@@ -73,7 +81,7 @@ function MyRentalContractsContent() {
     { value: 'TERMINATED', labelKey: 'filter.terminated' },
   ];
 
-  const columns = useContractColumns();
+  const columns = useTenantContractColumns();
 
   const pagination: PaginationState = {
     pageIndex: currentPage - 1,
@@ -157,7 +165,9 @@ function MyRentalContractsContent() {
           {isFilterOpen && (
             <div className='absolute right-0 top-full z-30 mt-2 w-56 rounded-xl border border-primary/20 bg-white shadow-lg'>
               <div className='flex items-center justify-between border-b border-primary/20 px-4 py-3'>
-                <span className='text-sm font-semibold text-foreground'>{t('filter.filterTitle')}</span>
+                <span className='text-sm font-semibold text-foreground'>
+                  {t('filter.filterTitle')}
+                </span>
                 <button
                   type='button'
                   onClick={resetFilters}

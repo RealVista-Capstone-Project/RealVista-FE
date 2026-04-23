@@ -32,9 +32,12 @@
     "table": {
       "status": "Status",
       "tenant": "Tenant",
+      "property": "Property",
+      "leasePeriod": "Lease Period",
       "monthlyRent": "Monthly Rent",
       "createdDate": "Created Date",
-      "perMonth": "per month"
+      "perMonth": "per month",
+      "actions": "Actions"
     },
     "statusActions": {
       "updateStatus": "Update Status",
