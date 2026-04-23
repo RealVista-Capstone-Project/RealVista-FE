@@ -70,7 +70,15 @@ export function ListingInformationStep({
   );
 
   // ── AI Hooks ──
-  const { analysisStatus, analyzeFile, appendEntries, removeEntry, allImagesAnalyzed, allImagesPassed, QUALITY_THRESHOLD } = useMediaAnalysis();
+  const {
+    analysisStatus,
+    analyzeFile,
+    appendEntries,
+    removeEntry,
+    allImagesAnalyzed,
+    allImagesPassed,
+    QUALITY_THRESHOLD,
+  } = useMediaAnalysis();
 
   // ── Form State ──
   const [listingType, setListingType] = React.useState<ListingType>('RENT');
@@ -188,8 +196,7 @@ export function ListingInformationStep({
   const numericFeatures =
     selectedProperty.attributes?.filter(
       (attr) =>
-        attr.dataType !== 'BOOLEAN' &&
-        (attr.valueNumber !== null || attr.valueText !== null)
+        attr.dataType !== 'BOOLEAN' && (attr.valueNumber !== null || attr.valueText !== null)
     ) || [];
 
   const booleanFeatures =
@@ -226,7 +233,9 @@ export function ListingInformationStep({
     else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0)
       errs.maxPrice = t('validation.maxPriceInvalid');
     else if (!errs.minPrice && Number(minPrice) > Number(maxPrice))
-      errs.maxPrice = t('validation.maxPriceLessThanMin', { fallback: 'Giá cao nhất phải lớn hơn hoặc bằng giá thấp nhất' });
+      errs.maxPrice = t('validation.maxPriceLessThanMin', {
+        fallback: 'Giá cao nhất phải lớn hơn hoặc bằng giá thấp nhất',
+      });
 
     if (listingType === 'RENT' && availableFrom) {
       const d = new Date(availableFrom);
@@ -547,42 +556,42 @@ export function ListingInformationStep({
         </div>
 
         <div className='flex items-center justify-end gap-3 md:gap-4'>
-        <button
-          type='button'
-          onClick={onPrevious}
-          disabled={isSubmitting}
-          className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-primary/5 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-primary transition-colors hover:bg-primary/5 disabled:opacity-50'
-        >
-          {t('previous')}
-        </button>
+          <button
+            type='button'
+            onClick={onPrevious}
+            disabled={isSubmitting}
+            className='mr-auto flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg bg-primary/5 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-primary transition-colors hover:bg-primary/5 disabled:opacity-50'
+          >
+            {t('previous')}
+          </button>
 
-        <button
-          type='button'
-          onClick={() => handleSubmit(false)}
-          disabled={!isValid || isSubmitting}
-          className={cn(
-            'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg border-2 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold transition-all',
-            isValid && !isSubmitting
-              ? 'border-primary text-primary hover:bg-primary/5'
-              : 'border-primary/20 text-primary/20 cursor-not-allowed'
-          )}
-        >
-          {t('saveAsDraft', { fallback: 'Save as Draft' })}
-        </button>
+          <button
+            type='button'
+            onClick={() => handleSubmit(false)}
+            disabled={!isValid || isSubmitting}
+            className={cn(
+              'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg border-2 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold transition-all',
+              isValid && !isSubmitting
+                ? 'border-primary text-primary hover:bg-primary/5'
+                : 'border-primary/20 text-primary/20 cursor-not-allowed'
+            )}
+          >
+            {t('saveAsDraft', { fallback: 'Save as Draft' })}
+          </button>
 
-        <button
-          type='button'
-          onClick={() => handleSubmit(true)}
-          disabled={!isValid || isSubmitting || isLocked}
-          className={cn(
-            'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all',
-            isValid && !isSubmitting && !isLocked
-              ? 'bg-main-primary hover:bg-main-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
-              : 'bg-main-primary/30 cursor-not-allowed'
-          )}
-        >
-          {isSubmitting ? t('submitting') : t('submit')}
-        </button>
+          <button
+            type='button'
+            onClick={() => handleSubmit(true)}
+            disabled={!isValid || isSubmitting || isLocked}
+            className={cn(
+              'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all',
+              isValid && !isSubmitting && !isLocked
+                ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
+                : 'bg-primary/30 cursor-not-allowed'
+            )}
+          >
+            {isSubmitting ? t('submitting') : t('submit')}
+          </button>
         </div>
       </div>
     </>

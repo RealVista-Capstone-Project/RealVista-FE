@@ -9,7 +9,11 @@ import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { mediaApi } from '@/entities/media/api/media.api';
-import type { UserProperty, CreateListingFormData, CreateListingPayload } from '@/features/create-listing-modal/model/types';
+import type {
+  UserProperty,
+  CreateListingFormData,
+  CreateListingPayload,
+} from '@/features/create-listing-modal/model/types';
 import { useCreateListing } from '@/features/create-listing-modal/api/use-create-listing';
 import { ListingInformationStep } from '@/features/create-listing-modal/ui/listing-information-step';
 import { useRouter } from '@/shared/config/i18n/navigation';
@@ -200,7 +204,9 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
               {step.label}
             </span>
           </div>
-          {index < steps.length - 1 && <ChevronRight className='h-5 w-5 text-muted-foreground/70' />}
+          {index < steps.length - 1 && (
+            <ChevronRight className='h-5 w-5 text-muted-foreground/70' />
+          )}
         </React.Fragment>
       ))}
     </div>
@@ -219,7 +225,7 @@ function useItemsPerPage(): number {
     function calculate() {
       const viewportHeight = window.innerHeight;
       // estimated overhead: outer padding + card header + card padding + footer
-      const overhead = 520
+      const overhead = 520;
       const available = viewportHeight - overhead;
       // each card is ~112px + 12px gap
       const cardHeight = 124;
@@ -492,7 +498,7 @@ export function CreateListingPage() {
                 disabled={!selectedProperty}
                 onClick={handleNextStep}
                 className={cn(
-                  'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold text-white transition-all',
+                  'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold transition-all text-white',
                   selectedProperty
                     ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_color-mix(in_oklch,var(--primary)_30%,transparent)]'
                     : 'bg-primary/30 cursor-not-allowed'

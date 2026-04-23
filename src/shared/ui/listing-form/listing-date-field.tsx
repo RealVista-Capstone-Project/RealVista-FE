@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { vi } from 'date-fns/locale';
-import { format } from 'date-fns';
+import { format, startOfDay, addDays } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Calendar } from '@/shared/ui/calendar';
@@ -64,6 +64,7 @@ export function ListingDateField({ value, onChange, label, error }: ListingDateF
             onSelect={handleSelect}
             initialFocus
             locale={vi}
+            fromDate={addDays(startOfDay(new Date()), 1)}
           />
         </PopoverContent>
       </Popover>

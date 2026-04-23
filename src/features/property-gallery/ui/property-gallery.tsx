@@ -82,6 +82,14 @@ export function PropertyGallery({
             preload='metadata'
             className='h-full w-full object-cover rounded-xl'
           />
+        ) : mainImage.type === '3d-tour' ? (
+          <Image
+            src={mainImage.thumbnailUrl || mainImage.url}
+            alt={mainImage.alt}
+            fill
+            className='object-cover'
+            priority
+          />
         ) : (
           <Image src={mainImage.url} alt={mainImage.alt} fill className='object-cover' priority />
         )}
@@ -154,7 +162,8 @@ export function PropertyGallery({
       <div className='flex flex-row gap-3 mt-2 sm:mt-0 sm:flex-col sm:gap-3 sm:h-full'>
         {thumbnailImages.map((image) => {
           const isVideo = image.type === 'video';
-          const displayedUrl = isVideo ? image.thumbnailUrl : image.url;
+          const is3D = image.type === '3d-tour';
+          const displayedUrl = (isVideo || is3D) ? image.thumbnailUrl : image.url;
 
           return (
             <button

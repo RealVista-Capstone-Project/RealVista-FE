@@ -11,7 +11,7 @@ export function mapPropertyResponseToProperty(response: PropertyDetailResponse):
     url: m.media_url,
     thumbnailUrl: m.thumbnail_url || undefined,
     alt: `property-${response.property_id}-${m.media_id}`,
-    type: m.media_type === 'VIDEO' ? 'video' : m.media_type === 'VIRTUAL_TOUR' ? '3d-tour' : 'photo',
+    type: m.media_type === 'VIDEO' ? 'video' : (m.media_type === 'VIRTUAL_TOUR' || m.media_type === 'THREE_D') ? '3d-tour' : 'photo',
     isPrimary: m.is_primary,
   }));
 
