@@ -12,6 +12,7 @@ export const ROUTES = {
   buy: '/buy',
   sell: '/sell',
   favorited: '/favorited',
+  compare: '/compare',
   appointments: '/appointments',
   myContracts: '/my-contracts',
   dashboard: {

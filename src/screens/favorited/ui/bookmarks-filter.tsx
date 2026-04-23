@@ -18,7 +18,12 @@ interface BookmarksFilterProps {
   onListingTypeChange: (type: ListingTypeFilter) => void;
   propertyType: PropertyTypeFilter;
   onPropertyTypeChange: (types: PropertyTypeFilter) => void;
-  onCompare?: () => void;
+  compareSelectedCount: number;
+  isCompareEnabled: boolean;
+  onCompareClick?: () => void;
+  isCompareMode: boolean;
+  onStartCompareMode?: () => void;
+  onCancelCompareMode?: () => void;
 }
 
 export const allTypeCodes = PROPERTY_TYPES.flatMap((cat) => cat.types.map((t) => t.code));
@@ -49,7 +54,12 @@ export function BookmarksFilter({
   onListingTypeChange,
   propertyType,
   onPropertyTypeChange,
-  onCompare,
+  compareSelectedCount,
+  isCompareEnabled,
+  onCompareClick,
+  isCompareMode,
+  onStartCompareMode,
+  onCancelCompareMode,
 }: BookmarksFilterProps) {
   const t = useTranslations('Favorited');
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -121,7 +131,7 @@ export function BookmarksFilter({
   return (
     <section className='pt-10 px-6 sm:px-6 lg:px-8'>
       <div className='mx-auto max-w-7xl'>
-        <div className='flex items-center justify-between gap-4 rounded-lg bg-white px-6 py-4 shadow-sm'>
+        <div className='flex items-center justify-between gap-4 rounded-lg border border-primary/10 bg-primary/5 px-6 py-4 shadow-sm'>
           {/* Left: Tabs + Dropdowns */}
           <div className='flex items-center gap-4'>
             {/* Listing Type Tabs */}
@@ -274,13 +284,42 @@ export function BookmarksFilter({
             </div>
           </div>
 
-          {/* Right: Compare Button */}
-          <button
-            type='button'
-            className='rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90'
-          >
-            {t('compare')} (3)
-          </button>
+          {/* Right: compare mode — start / cancel + run compare */}
+          <div className='flex shrink-0 flex-wrap items-center justify-end gap-2'>
+            {!isCompareMode ? (
+              <button
+                type='button'
+                onClick={() => onStartCompareMode?.()}
+                className='rounded-lg border border-primary bg-white px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5'
+              >
+                {t('compareStart')}
+              </button>
+            ) : (
+              <>
+                <button
+                  type='button'
+                  onClick={() => onCancelCompareMode?.()}
+                  className='rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/5'
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  type='button'
+                  disabled={!isCompareEnabled}
+                  onClick={() => isCompareEnabled && onCompareClick?.()}
+                  className={cn(
+                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    isCompareEnabled
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'cursor-not-allowed bg-muted text-muted-foreground'
+                  )}
+                  aria-disabled={!isCompareEnabled}
+                >
+                  {t('compare')} ({compareSelectedCount}/2)
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </section>

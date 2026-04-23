@@ -20,7 +20,7 @@ export function AiChatFab({ isOpen, onClick, className }: AiChatFabProps) {
     <button
       onClick={onClick}
       className={cn(
-        'fixed bottom-6 right-6 z-[70] flex h-14 w-14 cursor-pointer items-center justify-center rounded-full shadow-lg',
+        'fixed bottom-6 right-6 z-[60] flex h-14 w-14 cursor-pointer items-center justify-center rounded-full shadow-lg',
         'transition-all duration-200 ease-out',
         'hover:shadow-xl active:scale-95',
         isOpen
@@ -42,11 +42,11 @@ export function AiChatFab({ isOpen, onClick, className }: AiChatFabProps) {
           <X className='h-5 w-5' />
         ) : (
           <Image
-            src='/images/ai-avatar.png'
+            src='/assistant.jpg'
             alt='AI Assistant'
             width={56}
             height={56}
-            className='h-full w-full rounded-full object-cover object-center scale-250'
+            className='h-full w-full rounded-full object-contain object-center p-1'
           />
         )}
       </div>

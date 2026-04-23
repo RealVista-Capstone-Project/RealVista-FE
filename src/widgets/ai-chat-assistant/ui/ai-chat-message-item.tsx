@@ -44,11 +44,11 @@ export function AiChatMessageItem({ message, className }: AiChatMessageItemProps
       {/* AI avatar */}
       {!isUser && (
         <Image
-          src='/images/ai-avatar.png'
+          src='/assistant.jpg'
           alt='AI'
           width={28}
           height={28}
-          className='h-7 w-7 shrink-0 rounded-full object-cover'
+          className='h-7 w-7 shrink-0 rounded-full object-contain p-px'
         />
       )}
 
@@ -102,11 +102,11 @@ export function TypingIndicator({ className }: TypingIndicatorProps) {
   return (
     <div className={cn('flex gap-2', className)}>
       <Image
-        src='/images/ai-avatar.png'
+        src='/assistant.jpg'
         alt='AI'
         width={28}
         height={28}
-        className='h-7 w-7 shrink-0 rounded-full object-cover'
+        className='h-7 w-7 shrink-0 rounded-full object-contain p-px'
       />
       <div className='flex items-center gap-1 rounded-2xl rounded-bl-md bg-gray-100 px-4 py-3'>
         <span className='h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:0ms]' />
