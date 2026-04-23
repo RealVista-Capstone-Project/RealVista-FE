@@ -13,25 +13,11 @@ import { useAgentProposalCtaForOwnerProperty } from '@/features/agent-proposal/h
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { formatNumber } from '@/shared/lib/utils/format-currency';
-import {
-  Search,
-  Home,
-  Filter,
-  X,
-  DollarSign,
-  ChevronDown,
-  SlidersHorizontal,
-} from 'lucide-react';
+import { Search, Home, Filter, X, DollarSign, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import type { OwnerPropertySummary } from '@/entities/property';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -118,8 +104,12 @@ function FilterContent({ onApply }: FilterContentProps) {
   } = usePropertyFeedContext();
 
   const [localFilter, setLocalFilter] = useState<LocalPriceFilter>({
-    minRentPrice: priceFilter.minRentPrice ? formatInputNumber(String(priceFilter.minRentPrice)) : '',
-    maxRentPrice: priceFilter.maxRentPrice ? formatInputNumber(String(priceFilter.maxRentPrice)) : '',
+    minRentPrice: priceFilter.minRentPrice
+      ? formatInputNumber(String(priceFilter.minRentPrice))
+      : '',
+    maxRentPrice: priceFilter.maxRentPrice
+      ? formatInputNumber(String(priceFilter.maxRentPrice))
+      : '',
     minBuyPrice: priceFilter.minBuyPrice ? formatInputNumber(String(priceFilter.minBuyPrice)) : '',
     maxBuyPrice: priceFilter.maxBuyPrice ? formatInputNumber(String(priceFilter.maxBuyPrice)) : '',
   });
@@ -189,7 +179,11 @@ function FilterContent({ onApply }: FilterContentProps) {
         {isLoadingPropertyTypes ? (
           <div className='flex flex-wrap gap-2'>
             {[80, 100, 70, 110, 90].map((w, i) => (
-              <div key={i} className='h-7 rounded-full bg-muted animate-pulse' style={{ width: w }} />
+              <div
+                key={i}
+                className='h-7 rounded-full bg-muted animate-pulse'
+                style={{ width: w }}
+              />
             ))}
           </div>
         ) : (
@@ -435,9 +429,7 @@ function PropertyCardWithProposal({
   return (
     <>
       <OwnerPropertyCard
-        property={
-          alreadyProposed ? { ...property, has_active_proposal: true } : property
-        }
+        property={alreadyProposed ? { ...property, has_active_proposal: true } : property}
         variant='grid'
         listingType={listingType}
         isAgent={isAgent}

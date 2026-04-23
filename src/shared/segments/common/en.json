@@ -129,6 +129,7 @@
       "maxPriceRequired": "Max price is required",
       "maxPriceInvalid": "Max price must be a valid number greater than 0",
       "maxPriceLessThanMin": "Maximum price must be greater than or equal to minimum price",
+      "maxPriceLessThanMin": "Maximum price must be greater than or equal to minimum price",
       "dateInvalid": "Please enter a valid date",
       "mediaRequired": "At least one media item is required to create a listing"
     },
@@ -194,6 +195,46 @@
       "showing": "Showing {from} - {to} of {total} results",
       "pageInfo": "Page {current} of {total}"
     }
+    "loading": "Loading...",
+    "errors": {
+      "resourceNotFound": "The requested resource was not found.",
+      "authenticationError": "Authentication failed. Please sign in again.",
+      "accessDenied": "You do not have permission to perform this action.",
+      "validationError": "Please check your input and try again.",
+      "invalidRequestBody": "Invalid request. Please check your input.",
+      "fileSizeExceeded": "File size exceeds the allowed limit. Please upload a smaller file.",
+      "unsupportedMediaType": "Unsupported file type.",
+      "internalServerError": "An unexpected error occurred. Please try again later.",
+      "googleEmailMissing": "Google did not provide an email address. Please use a different sign-in method.",
+      "googleAuthFailed": "Google sign-in failed. Please try again.",
+      "accountDeleted": "This account has been deleted.",
+      "emailAlreadyExists": "An account with this email already exists.",
+      "invalidCurrentPassword": "The current password you entered is incorrect.",
+      "invalidOtp": "The OTP is invalid or has expired. Please request a new one.",
+      "duplicateListingPublish": "A published listing of this type already exists for this property.",
+      "propertyNotAvailable": "The associated property is not in an active state.",
+      "leasePropertyNotAvailable": "This property is not available for leasing.",
+      "leaseActiveExists": "An active lease already exists for this property.",
+      "leaseDocusignUnavailable": "DocuSign is not available. Please try again later.",
+      "leaseTerminateLandlordOnly": "Only the landlord can terminate this lease.",
+      "leaseAccessDenied": "You do not have access to this lease.",
+      "profileOwnershipViolation": "This profile does not belong to you.",
+      "cannotDeleteActiveProfile": "You cannot delete your currently active profile.",
+      "proposalTemplateNotOwned": "You do not own this proposal template.",
+      "cannotProposeToSelf": "You cannot submit a proposal to your own property.",
+      "proposalAlreadyActive": "You already have an active proposal for this property.",
+      "subscriptionNotActive": "This subscription plan is no longer active.",
+      "boostAlreadyActive": "This listing already has an active boost of this type.",
+      "boostPublishedOnly": "Boosts can only be applied to published listings.",
+      "engagementNotOwned": "You do not own this engagement.",
+      "cancellationReasonRequired": "A reason is required when cancelling.",
+      "reviewAlreadyExists": "A review already exists for this engagement.",
+      "businessConflict": "This time slot is already booked. Please choose a different time."
+    },
+    "pagination": {
+      "showing": "Showing {from} - {to} of {total} results",
+      "pageInfo": "Page {current} of {total}"
+    }
   },
   "Chat": {
     "title": "Chat",
@@ -217,6 +258,8 @@
     "minimize": "Minimize",
     "expand": "Expand",
     "close": "Close",
+    "startConversation": "Start a conversation",
+    "selectConversation": "Select a conversation to start chatting"
     "startConversation": "Start a conversation",
     "selectConversation": "Select a conversation to start chatting"
   },
@@ -691,6 +734,21 @@
     "statusActive": "Active",
     "statusDraft": "Draft",
     "statusArchived": "Archived",
+    "table": {
+      "title": "Title",
+      "commission": "Commission",
+      "experience": "Experience",
+      "status": "Status",
+      "updatedAt": "Updated"
+    },
+    "filterTitle": "Filters",
+    "filterReset": "Reset",
+    "filterStatus": "Status",
+    "filter": {
+      "allStatuses": "All Statuses"
+    },
+    "paginationShowing": "Showing {from}–{to} of {total}",
+    "errorLoading": "Failed to load proposals. Please try again.",
     "table": {
       "title": "Title",
       "commission": "Commission",
