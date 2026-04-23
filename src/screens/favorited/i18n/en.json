@@ -32,6 +32,10 @@
     "browseListing": "Search properties",
     "selectedTypes": "{count} types selected",
     "allTypes": "All",
-    "compare": "Compare"
+    "compare": "Compare",
+    "compareStart": "Select to compare",
+    "compareAdd": "Add",
+    "compareSelected": "Selected",
+    "compareUnavailableSold": "Sold listing cannot be compared"
   }
 }

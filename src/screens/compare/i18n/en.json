@@ -1,0 +1,24 @@
+{
+  "Compare": {
+    "title": "Compare listings",
+    "invalid": "Select exactly two listings from your favorites to compare.",
+    "loading": "Loading listings…",
+    "error": "Could not load one or both listings.",
+    "backToFavorites": "Back to favorites",
+    "viewDetail": "View details",
+    "listingTypeSale": "For sale",
+    "listingTypeRent": "For rent",
+    "yes": "Yes",
+    "no": "No",
+    "rowTitle": "Title",
+    "rowAddress": "Address",
+    "rowPrice": "Price",
+    "rowListingType": "Listing type",
+    "rowPropertyType": "Property type",
+    "rowUsableArea": "Usable area",
+    "rowLandSize": "Land area",
+    "rowStatus": "Status",
+    "rowNegotiable": "Price negotiable",
+    "rowPublished": "Published"
+  }
+}

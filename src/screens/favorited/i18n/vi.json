@@ -32,6 +32,10 @@
     "browseListing": "Tìm kiếm bất động sản",
     "selectedTypes": "{count} loại đã chọn",
     "allTypes": "Tất cả",
-    "compare": "So sánh"
+    "compare": "So sánh",
+    "compareStart": "Chọn để so sánh",
+    "compareAdd": "Thêm",
+    "compareSelected": "Đã chọn",
+    "compareUnavailableSold": "Tin đã bán không thể chọn so sánh"
   }
 }

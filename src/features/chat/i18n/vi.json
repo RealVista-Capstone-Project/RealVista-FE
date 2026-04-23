@@ -12,6 +12,12 @@
     "testingNotes": "Ghi chú kiểm thử",
     "messages": "Tin nhắn",
     "noMessages": "Chưa có tin nhắn",
-    "viewAllMessages": "Xem tất cả tin nhắn"
+    "viewAllMessages": "Xem tất cả tin nhắn",
+    "typeMessage": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "minimize": "Thu nhỏ",
+    "expand": "Mở rộng",
+    "close": "Đóng",
+    "startConversation": "Bắt đầu cuộc trò chuyện"
   }
 }

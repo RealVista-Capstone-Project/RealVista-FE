@@ -115,7 +115,7 @@ export function FloatingChatWindow({
   return (
     <div
       className={cn(
-        'fixed bottom-0 z-[60] flex flex-col rounded-t-xl border border-b-0 border-border bg-white shadow-xl',
+        'fixed bottom-0 z-[80] flex flex-col rounded-t-xl border border-b-0 border-border bg-white shadow-xl',
         'transition-all duration-200',
         isMinimized ? 'h-12' : 'h-[420px]',
         'bottom-0 md:bottom-0 max-md:bottom-0',
@@ -222,13 +222,17 @@ export function FloatingChatWindow({
                 type='button'
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isSending}
-                className='flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white transition-colors hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground/50'
+                className={cn(
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors',
+                  'bg-primary/10 hover:bg-primary/15',
+                  !inputValue.trim() && !isSending && 'opacity-40'
+                )}
                 aria-label={t('send')}
               >
                 {isSending ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
+                  <Loader2 className='h-4 w-4 animate-spin text-primary' />
                 ) : (
-                  <Send className='h-4 w-4' />
+                  <Send className='h-4 w-4 text-primary' />
                 )}
               </button>
             </div>

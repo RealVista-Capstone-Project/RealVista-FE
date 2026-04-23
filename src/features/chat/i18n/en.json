@@ -12,6 +12,12 @@
     "testingNotes": "Testing Notes",
     "messages": "Messages",
     "noMessages": "No messages yet",
-    "viewAllMessages": "View all messages"
+    "viewAllMessages": "View all messages",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "minimize": "Minimize",
+    "expand": "Expand",
+    "close": "Close",
+    "startConversation": "Start a conversation"
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
@@ -26,6 +26,14 @@ import { ROUTES } from '@/shared/config/routes';
 
 const ITEMS_PER_PAGE = 12;
 
+function listingStatusIsSold(status: string | undefined) {
+  return status?.toUpperCase() === 'SOLD';
+}
+
+function listingStatusIsRented(status: string | undefined) {
+  return status?.toUpperCase() === 'RENTED';
+}
+
 /**
  * Transforms a bookmark listing DTO to card props format
  */
@@ -39,12 +47,11 @@ function mapBookmarkListingToCardProps(item: ListingSearchResponse) {
     price: item.price,
     listingType: item.listing_type,
     isFavorite: true,
-    statusTag:
-      item.status === 'SOLD'
-        ? ('SOLD' as const)
-        : item.status === 'RENTED'
-          ? ('RENTED' as const)
-          : undefined,
+    statusTag: listingStatusIsSold(item.status)
+      ? ('SOLD' as const)
+      : listingStatusIsRented(item.status)
+        ? ('RENTED' as const)
+        : undefined,
     attributes: item.attributes,
     boostTags: item.boost_packages,
     userType: item.user_type as any,
@@ -61,6 +68,8 @@ export function FavoritedPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [listingType, setListingType] = useState<ListingTypeFilter>('buy');
   const [propertyType, setPropertyType] = useState<PropertyTypeFilter>([...allTypeCodes]);
+  const [compareSelectedIds, setCompareSelectedIds] = useState<string[]>([]);
+  const [isCompareMode, setIsCompareMode] = useState(false);
 
   const isAllSelected = propertyType.length === allTypeCodes.length;
 
@@ -85,30 +94,70 @@ export function FavoritedPage() {
   const items = bookmarkPage?.content ?? [];
   const totalPages = bookmarkPage?.total_pages ?? 0;
 
+  useEffect(() => {
+    const soldIds = new Set(
+      items.filter((i) => listingStatusIsSold(i.status)).map((i) => i.listing_id)
+    );
+    if (soldIds.size === 0) return;
+    setCompareSelectedIds((prev) => {
+      const next = prev.filter((id) => !soldIds.has(id));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [items]);
+
   const resetPage = () => setCurrentPage(1);
 
+  const exitCompareMode = () => {
+    setCompareSelectedIds([]);
+    setIsCompareMode(false);
+  };
+
+  const handleStartCompareMode = () => setIsCompareMode(true);
+
+  const handleCompareSelectionChange = (id: string, selected: boolean) => {
+    const row = items.find((i) => i.listing_id === id);
+    if (row && listingStatusIsSold(row.status)) return;
+
+    setCompareSelectedIds((prev) => {
+      if (!selected) return prev.filter((x) => x !== id);
+      if (prev.includes(id)) return prev;
+      if (prev.length >= 2) return prev;
+      return [...prev, id];
+    });
+  };
+
+  const handleCompareNavigate = () => {
+    if (compareSelectedIds.length !== 2) return;
+    const q = compareSelectedIds.join(',');
+    router.push(`/${locale}${ROUTES.compare}?ids=${encodeURIComponent(q)}`);
+  };
+
   const handlePageChange = (page: number) => {
+    exitCompareMode();
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSortOrderChange = (sort: SortOrder) => {
+    exitCompareMode();
     setSortOrder(sort);
     resetPage();
   };
 
   const handleListingTypeChange = (type: ListingTypeFilter) => {
+    exitCompareMode();
     setListingType(type);
     resetPage();
   };
 
   const handlePropertyTypeChange = (types: PropertyTypeFilter) => {
+    exitCompareMode();
     setPropertyType(types);
     resetPage();
   };
 
   return (
-    <div className='min-h-screen bg-primary/5'>
+    <div className='min-h-screen bg-white'>
       {/* Filter Section */}
       <BookmarksFilter
         sortOrder={sortOrder}
@@ -117,6 +166,12 @@ export function FavoritedPage() {
         onListingTypeChange={handleListingTypeChange}
         propertyType={propertyType}
         onPropertyTypeChange={handlePropertyTypeChange}
+        compareSelectedCount={compareSelectedIds.length}
+        isCompareEnabled={compareSelectedIds.length === 2}
+        onCompareClick={handleCompareNavigate}
+        isCompareMode={isCompareMode}
+        onStartCompareMode={handleStartCompareMode}
+        onCancelCompareMode={exitCompareMode}
       />
 
       {/* Results Section */}
@@ -151,6 +206,14 @@ export function FavoritedPage() {
                     <BookmarkCardContainer
                       key={item.listing_id}
                       {...cardProps}
+                      isSelectionMode={isCompareMode}
+                      isSelected={compareSelectedIds.includes(item.listing_id)}
+                      compareUnavailable={listingStatusIsSold(item.status)}
+                      compareSelectDisabled={
+                        compareSelectedIds.length >= 2 &&
+                        !compareSelectedIds.includes(item.listing_id)
+                      }
+                      onSelectionChange={handleCompareSelectionChange}
                       onToggleFavorite={(id) => toggleBookmark(id)}
                       onClick={() => router.push(`/${locale}/listing/${cardProps.slug || cardProps.id}`)}
                     />
