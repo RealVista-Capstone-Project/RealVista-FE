@@ -3,16 +3,16 @@
     "loading": "Đang tải bất động sản...",
     "error": "Không thể tải dữ liệu. Vui lòng thử lại.",
     "pageTitle": "Khám phá BĐS",
-    "pageSubtitle": "Tìm kiếm bất động sản phù hợp và gửi đề xuất của bạn.",
+    "pageSubtitle": "Duyệt qua danh sách bất động sản và gửi đề xuất môi giới của bạn.",
     "tabs": {
       "all": "Tất cả",
       "sell": "Bán",
       "rent": "Cho thuê"
     },
     "filter": {
-      "title": "Bộ lọc",
+      "title": "Lọc BĐS",
       "searchPlaceholder": "Tìm theo địa chỉ, vị trí hoặc loại...",
-      "resultCount": "{count} bất động sản tìm thấy",
+      "resultCount": "{count} bất động sản",
       "rentPrice": "Giá thuê",
       "buyPrice": "Giá bán",
       "min": "Tối thiểu",
@@ -29,12 +29,13 @@
       "proposed": "Đã đề xuất",
       "priceFrom": "Giá từ",
       "rent": "Thuê",
-      "buy": "Mua"
+      "buy": "Mua",
+      "submitProposal": "Gửi đề xuất",
+      "alreadyProposed": "Đã gửi đề xuất"
     },
     "empty": {
       "title": "Không tìm thấy BĐS nào.",
       "subtitle": "Hãy thử thay đổi bộ lọc hoặc quay lại sau.",
-      "selectProperty": "Chọn BĐS để xem chi tiết",
       "endOfList": "Bạn đã xem hết danh sách"
     },
     "pagination": {
@@ -43,24 +44,6 @@
     "common": {
       "na": "N/A",
       "cancel": "Hủy"
-    },
-    "detailPanel": {
-      "title": "Chi tiết BĐS",
-      "propertyInfo": "Thông tin BĐS",
-      "type": "Loại",
-      "usableArea": "Diện tích sử dụng",
-      "landArea": "Diện tích đất",
-      "bedrooms": "Phòng ngủ",
-      "bathrooms": "Phòng tắm",
-      "floors": "Tầng",
-      "description": "Mô tả",
-      "ownerInfo": "Thông tin chủ nhà",
-      "ownerName": "Chủ sở hữu",
-      "phone": "Điện thoại",
-      "email": "Email",
-      "submitProposal": "Gửi đề xuất",
-      "alreadyProposed": "Đã gửi đề xuất",
-      "backToList": "Quay lại danh sách"
     },
     "proposalModal": {
       "title": "Gửi đề xuất",

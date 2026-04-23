@@ -8,23 +8,40 @@ import {
   type ListingType,
 } from '@/features/agent-proposal/model/property-feed-context';
 import { OwnerPropertyCard } from '@/features/agent-proposal/ui/owner-property-card';
-import { OwnerPropertyDetailPanel } from '@/features/agent-proposal/ui/owner-property-detail-panel';
+import { AgentApplyProposalModal } from '@/features/agent-proposal/ui/agent-apply-proposal-modal';
+import { useAgentProposalCtaForOwnerProperty } from '@/features/agent-proposal/hooks/use-agent-proposal-cta-for-owner-property';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { formatNumber } from '@/shared/lib/utils/format-currency';
-import { Search, Home, Filter, X, DollarSign, Building, ChevronDown } from 'lucide-react';
+import {
+  Search,
+  Home,
+  Filter,
+  X,
+  DollarSign,
+  ChevronDown,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from '@/shared/ui/sheet';
+import type { OwnerPropertySummary } from '@/entities/property';
 
-// Format a raw number as dot-separated thousands for display in inputs: 2500000 → "2.500.000"
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
 function formatInputNumber(value: string): string {
   const digits = value.replace(/[^0-9]/g, '');
   if (!digits) return '';
   return parseInt(digits, 10).toLocaleString('vi-VN');
 }
 
-// Parse a dot-separated input string back to a number: "2.500.000" → 2500000
 function parseInputNumber(value: string): number | undefined {
   const digits = value.replace(/[^0-9]/g, '');
   if (!digits) return undefined;
@@ -39,66 +56,56 @@ interface LocalPriceFilter {
   maxBuyPrice: string;
 }
 
+// ── Listing-type tabs ─────────────────────────────────────────────────────────
+
 function ListingTypeTabs() {
   const t = useTranslations('PropertyFeed');
   const { listingType, setListingType, totalElements } = usePropertyFeedContext();
 
+  const tabs: { key: ListingType; label: string; showCount?: boolean }[] = [
+    { key: 'ALL', label: t('tabs.all'), showCount: true },
+    { key: 'SELL', label: t('tabs.sell') },
+    { key: 'RENT', label: t('tabs.rent') },
+  ];
+
   return (
     <div className='flex gap-1 min-w-max'>
-      <button
-        type='button'
-        onClick={() => setListingType('ALL')}
-        className={cn(
-          'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-          listingType === 'ALL'
-            ? 'bg-primary text-white'
-            : 'bg-transparent text-foreground/70 hover:bg-primary/5'
-        )}
-      >
-        {t('tabs.all')}
-        <span
+      {tabs.map(({ key, label, showCount }) => (
+        <button
+          key={key}
+          type='button'
+          onClick={() => setListingType(key)}
           className={cn(
-            'rounded-full px-2 py-0.5 text-xs font-bold',
-            listingType === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
+            'flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+            listingType === key
+              ? 'bg-primary text-white shadow-sm'
+              : 'text-foreground/60 hover:bg-primary/5 hover:text-foreground'
           )}
         >
-          {formatNumber(totalElements)}
-        </span>
-      </button>
-      <button
-        type='button'
-        onClick={() => setListingType('SELL')}
-        className={cn(
-          'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-          listingType === 'SELL'
-            ? 'bg-primary text-white'
-            : 'bg-transparent text-foreground/70 hover:bg-primary/5'
-        )}
-      >
-        {t('tabs.sell')}
-      </button>
-      <button
-        type='button'
-        onClick={() => setListingType('RENT')}
-        className={cn(
-          'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-          listingType === 'RENT'
-            ? 'bg-primary text-white'
-            : 'bg-transparent text-foreground/70 hover:bg-primary/5'
-        )}
-      >
-        {t('tabs.rent')}
-      </button>
+          {label}
+          {showCount && (
+            <span
+              className={cn(
+                'rounded-full px-2 py-0.5 text-xs font-bold',
+                listingType === key ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'
+              )}
+            >
+              {formatNumber(totalElements)}
+            </span>
+          )}
+        </button>
+      ))}
     </div>
   );
 }
 
-interface FilterPanelProps {
-  isOpen: boolean;
-  onClose: () => void;
+// ── Filter panel (shared content) ─────────────────────────────────────────────
+
+interface FilterContentProps {
+  onApply?: () => void;
 }
 
-function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
+function FilterContent({ onApply }: FilterContentProps) {
   const t = useTranslations('PropertyFeed');
   const {
     priceFilter,
@@ -111,29 +118,24 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
   } = usePropertyFeedContext();
 
   const [localFilter, setLocalFilter] = useState<LocalPriceFilter>({
-    minRentPrice: priceFilter.minRentPrice
-      ? formatInputNumber(String(priceFilter.minRentPrice))
-      : '',
-    maxRentPrice: priceFilter.maxRentPrice
-      ? formatInputNumber(String(priceFilter.maxRentPrice))
-      : '',
+    minRentPrice: priceFilter.minRentPrice ? formatInputNumber(String(priceFilter.minRentPrice)) : '',
+    maxRentPrice: priceFilter.maxRentPrice ? formatInputNumber(String(priceFilter.maxRentPrice)) : '',
     minBuyPrice: priceFilter.minBuyPrice ? formatInputNumber(String(priceFilter.minBuyPrice)) : '',
     maxBuyPrice: priceFilter.maxBuyPrice ? formatInputNumber(String(priceFilter.maxBuyPrice)) : '',
   });
 
-  // Min > max validation errors
   const rentError =
     localFilter.minRentPrice &&
-      localFilter.maxRentPrice &&
-      (parseInputNumber(localFilter.minRentPrice) ?? 0) >=
+    localFilter.maxRentPrice &&
+    (parseInputNumber(localFilter.minRentPrice) ?? 0) >=
       (parseInputNumber(localFilter.maxRentPrice) ?? Infinity)
       ? t('filter.errorMinMax')
       : null;
 
   const buyError =
     localFilter.minBuyPrice &&
-      localFilter.maxBuyPrice &&
-      (parseInputNumber(localFilter.minBuyPrice) ?? 0) >=
+    localFilter.maxBuyPrice &&
+    (parseInputNumber(localFilter.minBuyPrice) ?? 0) >=
       (parseInputNumber(localFilter.maxBuyPrice) ?? Infinity)
       ? t('filter.errorMinMax')
       : null;
@@ -142,14 +144,13 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
 
   const handleApply = () => {
     if (hasError) return;
-    const numericFilter: PriceFilter = {
+    setPriceFilter({
       minRentPrice: parseInputNumber(localFilter.minRentPrice),
       maxRentPrice: parseInputNumber(localFilter.maxRentPrice),
       minBuyPrice: parseInputNumber(localFilter.minBuyPrice),
       maxBuyPrice: parseInputNumber(localFilter.maxBuyPrice),
-    };
-    setPriceFilter(numericFilter);
-    onClose();
+    });
+    onApply?.();
   };
 
   const handleReset = () => {
@@ -158,7 +159,6 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
     setPropertyTypeId(null);
   };
 
-  // Format digits on every keystroke
   const handlePriceChange = (key: keyof LocalPriceFilter, value: string) => {
     setLocalFilter((prev) => ({ ...prev, [key]: formatInputNumber(value) }));
   };
@@ -166,7 +166,6 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
   const showRentFilter = listingType === 'ALL' || listingType === 'RENT';
   const showBuyFilter = listingType === 'ALL' || listingType === 'SELL';
 
-  // Group types by category
   const typesByCategory = useMemo(() => {
     const map = new Map<string, { categoryName: string; types: typeof availablePropertyTypes }>();
     for (const type of availablePropertyTypes) {
@@ -180,59 +179,49 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
     return Array.from(map.values());
   }, [availablePropertyTypes]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className='border-b border-primary/20 bg-primary/5 px-4 sm:px-6 pb-6 pt-5 space-y-6 animate-in slide-in-from-top-2 duration-300 shadow-inner'>
-      {/* Property Type Pills — grouped by category */}
-      <div className='space-y-3.5'>
-        <label className='text-[13px] font-bold text-foreground uppercase tracking-wide opacity-90'>
+    <div className='flex flex-col gap-6 h-full'>
+      {/* Property type */}
+      <div className='space-y-3'>
+        <label className='text-[11px] font-bold text-muted-foreground uppercase tracking-wider'>
           {t('filter.propertyType')}
         </label>
-
         {isLoadingPropertyTypes ? (
-          /* Loading skeleton */
-          <div className='flex flex-wrap gap-2.5'>
+          <div className='flex flex-wrap gap-2'>
             {[80, 100, 70, 110, 90].map((w, i) => (
-              <div
-                key={i}
-                className='h-8 rounded-full bg-primary/10 animate-pulse'
-                style={{ width: w }}
-              />
+              <div key={i} className='h-7 rounded-full bg-muted animate-pulse' style={{ width: w }} />
             ))}
           </div>
         ) : (
-          <div className='space-y-4'>
-            {/* "All types" pill always first */}
-            <div className='flex flex-wrap gap-2.5'>
+          <div className='space-y-3'>
+            <div className='flex flex-wrap gap-2'>
               <button
                 onClick={() => setPropertyTypeId(null)}
                 className={cn(
-                  'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
+                  'px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-150',
                   propertyTypeId === null
-                    ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
-                    : 'bg-white text-muted-foreground border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground'
+                    ? 'bg-primary text-white border-primary shadow-sm'
+                    : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:bg-primary/5'
                 )}
               >
                 {t('filter.allTypes')}
               </button>
             </div>
-
             {typesByCategory.map((group) => (
-              <div key={group.categoryName} className='space-y-2'>
-                <span className='text-[11px] font-bold text-muted-foreground/50 uppercase tracking-widest'>
+              <div key={group.categoryName} className='space-y-1.5'>
+                <span className='text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest'>
                   {group.categoryName}
                 </span>
-                <div className='flex flex-wrap gap-2.5'>
+                <div className='flex flex-wrap gap-2'>
                   {group.types.map((type) => (
                     <button
                       key={type.id}
                       onClick={() => setPropertyTypeId(propertyTypeId === type.id ? null : type.id)}
                       className={cn(
-                        'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
+                        'px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-150',
                         propertyTypeId === type.id
-                          ? 'bg-primary text-white border-primary shadow-md shadow-primary/20 scale-105'
-                          : 'bg-white text-muted-foreground border-primary/20 hover:border-primary/40 hover:bg-primary/5 hover:text-foreground'
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:bg-primary/5'
                       )}
                     >
                       {type.name}
@@ -245,25 +234,22 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
         )}
       </div>
 
-      {/* Rent Price Range */}
+      {/* Rent price */}
       {showRentFilter && (
-        <div className='space-y-2.5'>
-          <label className='text-[13px] font-bold text-foreground uppercase tracking-wide flex items-center gap-1.5 opacity-90'>
-            <DollarSign className='h-4 w-4 text-emerald-500' />
+        <div className='space-y-2'>
+          <label className='text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1'>
+            <DollarSign className='h-3.5 w-3.5 text-emerald-500' />
             {t('filter.rentPrice')}
-            <span className='font-medium text-muted-foreground/50 normal-case tracking-normal'>
-              (đ)
-            </span>
           </label>
-          <div className='grid grid-cols-2 gap-3'>
+          <div className='grid grid-cols-2 gap-2'>
             <Input
               inputMode='numeric'
               placeholder={t('filter.min')}
               value={localFilter.minRentPrice}
               onChange={(e) => handlePriceChange('minRentPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
-                rentError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
+                'h-9 rounded-lg text-sm',
+                rentError && 'border-red-400 focus:border-red-400'
               )}
             />
             <Input
@@ -272,36 +258,31 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
               value={localFilter.maxRentPrice}
               onChange={(e) => handlePriceChange('maxRentPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
-                rentError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
+                'h-9 rounded-lg text-sm',
+                rentError && 'border-red-400 focus:border-red-400'
               )}
             />
           </div>
-          {rentError && (
-            <p className='text-xs font-medium text-red-500 animate-in fade-in'>{rentError}</p>
-          )}
+          {rentError && <p className='text-xs text-red-500'>{rentError}</p>}
         </div>
       )}
 
-      {/* Buy Price Range */}
+      {/* Buy price */}
       {showBuyFilter && (
-        <div className='space-y-2.5'>
-          <label className='text-[13px] font-bold text-foreground uppercase tracking-wide flex items-center gap-1.5 opacity-90'>
-            <DollarSign className='h-4 w-4 text-blue-500' />
+        <div className='space-y-2'>
+          <label className='text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1'>
+            <DollarSign className='h-3.5 w-3.5 text-blue-500' />
             {t('filter.buyPrice')}
-            <span className='font-medium text-muted-foreground/50 normal-case tracking-normal'>
-              (đ)
-            </span>
           </label>
-          <div className='grid grid-cols-2 gap-3'>
+          <div className='grid grid-cols-2 gap-2'>
             <Input
               inputMode='numeric'
               placeholder={t('filter.min')}
               value={localFilter.minBuyPrice}
               onChange={(e) => handlePriceChange('minBuyPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
-                buyError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
+                'h-9 rounded-lg text-sm',
+                buyError && 'border-red-400 focus:border-red-400'
               )}
             />
             <Input
@@ -310,37 +291,171 @@ function FilterPanel({ isOpen, onClose }: FilterPanelProps) {
               value={localFilter.maxBuyPrice}
               onChange={(e) => handlePriceChange('maxBuyPrice', e.target.value)}
               className={cn(
-                'h-10 rounded-xl border-primary/20 bg-white px-3 focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm shadow-sm transition-all duration-200',
-                buyError && 'border-red-400 focus:border-red-400 focus:ring-red-400/10'
+                'h-9 rounded-lg text-sm',
+                buyError && 'border-red-400 focus:border-red-400'
               )}
             />
           </div>
-          {buyError && (
-            <p className='text-xs font-medium text-red-500 animate-in fade-in'>{buyError}</p>
-          )}
+          {buyError && <p className='text-xs text-red-500'>{buyError}</p>}
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className='flex gap-3 pt-2'>
+      {/* Actions */}
+      <div className='flex gap-2 mt-auto pt-4 border-t border-border'>
         <Button
           onClick={handleApply}
           disabled={hasError}
-          className='flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-sm font-semibold shadow-md shadow-primary/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5'
+          className='flex-1 h-9 rounded-lg text-sm font-semibold'
         >
           {t('filter.apply')}
         </Button>
         <Button
           variant='outline'
           onClick={handleReset}
-          className='h-11 px-4 rounded-xl border-primary/20 bg-white hover:bg-primary/5 hover:text-foreground transition-all duration-200'
+          className='h-9 px-3 rounded-lg border-border'
+          title={t('filter.clearAll')}
         >
-          <X className='h-5 w-5' />
+          <X className='h-4 w-4' />
         </Button>
       </div>
     </div>
   );
 }
+
+// ── Filter sidebar (desktop always-visible) ───────────────────────────────────
+
+function FilterSidebar() {
+  const t = useTranslations('PropertyFeed');
+  const { priceFilter, propertyTypeId } = usePropertyFeedContext();
+
+  const activeFilterCount =
+    [
+      priceFilter.minRentPrice,
+      priceFilter.maxRentPrice,
+      priceFilter.minBuyPrice,
+      priceFilter.maxBuyPrice,
+    ].filter(Boolean).length + (propertyTypeId ? 1 : 0);
+
+  return (
+    <aside className='hidden lg:flex flex-col w-64 xl:w-72 flex-shrink-0 border-r border-border bg-background h-full'>
+      {/* Sidebar header */}
+      <div className='flex items-center justify-between px-5 py-4 border-b border-border'>
+        <div className='flex items-center gap-2'>
+          <SlidersHorizontal className='h-4 w-4 text-primary' />
+          <span className='text-sm font-bold text-foreground'>{t('filter.title')}</span>
+        </div>
+        {activeFilterCount > 0 && (
+          <span className='flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white'>
+            {activeFilterCount}
+          </span>
+        )}
+      </div>
+
+      {/* Scrollable filter content */}
+      <div className='flex-1 overflow-y-auto px-5 py-5'>
+        <FilterContent />
+      </div>
+    </aside>
+  );
+}
+
+// ── Mobile filter sheet (via Sheet component) ─────────────────────────────────
+
+function MobileFilterSheet() {
+  const t = useTranslations('PropertyFeed');
+  const { priceFilter, propertyTypeId } = usePropertyFeedContext();
+  const [open, setOpen] = useState(false);
+
+  const activeFilterCount =
+    [
+      priceFilter.minRentPrice,
+      priceFilter.maxRentPrice,
+      priceFilter.minBuyPrice,
+      priceFilter.maxBuyPrice,
+    ].filter(Boolean).length + (propertyTypeId ? 1 : 0);
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          className={cn(
+            'relative flex h-10 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors',
+            activeFilterCount > 0
+              ? 'border-primary bg-primary/5 text-primary'
+              : 'border-border bg-background text-foreground hover:bg-muted'
+          )}
+        >
+          <Filter className='h-4 w-4' />
+          <span className='hidden sm:inline'>{t('filter.title')}</span>
+          <ChevronDown className='h-3 w-3' />
+          {activeFilterCount > 0 && (
+            <span className='absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+      </SheetTrigger>
+      <SheetContent side='left' className='w-80 flex flex-col'>
+        <SheetHeader>
+          <SheetTitle className='flex items-center gap-2'>
+            <SlidersHorizontal className='h-4 w-4 text-primary' />
+            {t('filter.title')}
+          </SheetTitle>
+        </SheetHeader>
+        <div className='flex-1 overflow-y-auto py-4'>
+          <FilterContent onApply={() => setOpen(false)} />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+// ── Per-card proposal CTA wrapper ─────────────────────────────────────────────
+
+function PropertyCardWithProposal({
+  property,
+  listingType,
+}: {
+  property: OwnerPropertySummary;
+  listingType: ListingType;
+}) {
+  const {
+    isAgent,
+    isApplyModalOpen,
+    setIsApplyModalOpen,
+    cannotApplyProposal,
+    openApplyModal,
+    onApplySubmitSuccess,
+    propertyId,
+  } = useAgentProposalCtaForOwnerProperty(property);
+
+  // Merge backend "cannot apply" state with local property flag
+  const alreadyProposed = cannotApplyProposal || property.has_active_proposal;
+
+  return (
+    <>
+      <OwnerPropertyCard
+        property={
+          alreadyProposed ? { ...property, has_active_proposal: true } : property
+        }
+        variant='grid'
+        listingType={listingType}
+        isAgent={isAgent}
+        onPropose={openApplyModal}
+      />
+      {isAgent && (
+        <AgentApplyProposalModal
+          propertyId={propertyId}
+          isOpen={isApplyModalOpen}
+          onClose={() => setIsApplyModalOpen(false)}
+          onSubmitSuccess={onApplySubmitSuccess}
+        />
+      )}
+    </>
+  );
+}
+
+// ── Main content ──────────────────────────────────────────────────────────────
 
 function PropertyFeedContent() {
   const {
@@ -353,30 +468,13 @@ function PropertyFeedContent() {
     searchQuery,
     setSearchQuery,
     listingType,
-    selectedProperty,
-    setSelectedProperty,
     totalElements,
-    handlePropertyClick,
-    priceFilter,
-    propertyTypeId,
   } = usePropertyFeedContext();
 
   const t = useTranslations('PropertyFeed');
-  const isMobile = useIsMobile();
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
 
-  // Count active filters for the badge
-  const activeFilterCount =
-    [
-      priceFilter.minRentPrice,
-      priceFilter.maxRentPrice,
-      priceFilter.minBuyPrice,
-      priceFilter.maxBuyPrice,
-    ].filter(Boolean).length + (propertyTypeId ? 1 : 0);
-
-  // Trigger next page fetch when sentinel enters viewport
+  // Infinite scroll
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -392,188 +490,106 @@ function PropertyFeedContent() {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Auto-select first property on desktop if none selected
-  useEffect(() => {
-    if (!isMobile && !selectedProperty && properties.length > 0) {
-      setSelectedProperty(properties[0]);
-    }
-  }, [isMobile, properties, selectedProperty, setSelectedProperty]);
-
-  if (isLoading) {
-    return (
-      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
-        <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
-          <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
-            <Home className='h-6 w-6 text-primary' />
-          </div>
-          <p className='font-semibold text-foreground'>{t('error')}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className='flex h-full overflow-hidden flex-col sm:flex-row'>
-      {/* ── Left Sidebar ── */}
-      <aside
-        className={cn(
-          'flex-col border-r border-primary/20 bg-white transition-all duration-300',
-          isMobile ? (selectedProperty ? 'hidden' : 'flex w-full') : 'flex w-[460px]'
-        )}
-      >
-        <div className='flex h-full flex-col'>
-          {/* Header */}
-          <div className='border-b border-primary/20 p-4 sm:p-6'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-2'>
-                <h2 className='text-xl font-bold text-foreground'>{t('pageTitle')}</h2>
-                <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-                  <span className='text-sm font-bold text-white'>{totalElements}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className='flex h-full overflow-hidden'>
+      {/* ── Left filter sidebar (desktop) ── */}
+      <FilterSidebar />
 
-          {/* Tabs */}
-          <div className='border-b border-primary/20 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
+      {/* ── Right: search + grid ── */}
+      <div className='flex flex-1 flex-col min-w-0 overflow-hidden'>
+        {/* Top bar: tabs + search + mobile filter */}
+        <div className='flex-shrink-0 border-b border-border bg-background px-4 sm:px-6 py-3 space-y-3'>
+          {/* Row 1: tabs */}
+          <div className='overflow-x-auto no-scrollbar'>
             <ListingTypeTabs />
           </div>
 
-          {/* Search bar + Filter button (same row) */}
-          <div className='border-b border-primary/20 p-4 sm:p-6'>
-            <div className='flex items-center gap-3'>
-              {/* Search input */}
-              <div className='relative flex-1'>
-                <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-                  <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
-                </div>
-                <Input
-                  type='text'
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('filter.searchPlaceholder')}
-                  className='h-12 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
-                />
+          {/* Row 2: search + mobile filter button */}
+          <div className='flex items-center gap-3'>
+            <div className='relative flex-1'>
+              <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+                <Search className='h-4 w-4 text-muted-foreground/60' strokeWidth={2} />
               </div>
-
-              {/* Filter icon button */}
-              <div ref={filterRef} className='relative shrink-0'>
-                <button
-                  onClick={() => setFilterOpen((v) => !v)}
-                  className={cn(
-                    'relative flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                    filterOpen
-                      ? 'border-primary bg-primary/5 text-primary'
-                      : activeFilterCount > 0
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
-                  )}
-                  aria-label={t('filter.title')}
-                >
-                  <Filter className='h-5 w-5' strokeWidth={2} />
-                  <ChevronDown
-                    className={cn('h-4 w-4 transition-transform', filterOpen && 'rotate-180')}
-                    strokeWidth={2}
-                  />
-                  {activeFilterCount > 0 && (
-                    <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </button>
-              </div>
+              <Input
+                type='text'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('filter.searchPlaceholder')}
+                className='h-10 pl-10 rounded-lg border-border bg-muted/40 focus:bg-background text-sm'
+              />
             </div>
-          </div>
 
-          {/* Scrollable content: Filter Panel + Properties List */}
-          <div className='flex-1 overflow-y-auto'>
-            {/* Collapsible Filter Panel — inside scroll area so price inputs are reachable */}
-            {filterOpen && <FilterPanel isOpen={filterOpen} onClose={() => setFilterOpen(false)} />}
+            {/* Mobile filter trigger */}
+            <div className='lg:hidden'>
+              <MobileFilterSheet />
+            </div>
 
-            {/* Properties List */}
-            {properties.length === 0 ? (
-              <div className='flex flex-col items-center justify-center gap-4 p-12 text-center'>
-                <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border border-primary/10'>
-                  <Home className='h-8 w-8 text-primary/60' strokeWidth={1.5} />
-                </div>
-                <div className='max-w-[280px]'>
-                  <p className='text-base font-bold text-foreground'>{t('empty.title')}</p>
-                  <p className='mt-1.5 text-sm text-muted-foreground leading-relaxed'>
-                    {t('empty.subtitle')}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className='divide-y divide-primary/10'>
-                {properties.map((property) => (
-                  <div
-                    key={property.property_id}
-                    className='transition-colors hover:bg-primary/5'
-                  >
-                    <OwnerPropertyCard
-                      property={property}
-                      isSelected={selectedProperty?.property_id === property.property_id}
-                      onClick={handlePropertyClick}
-                      listingType={listingType}
-                    />
-                  </div>
-                ))}
-
-                {/* Infinite scroll sentinel */}
-                <div ref={sentinelRef} className='h-2' />
-
-                {isFetchingNextPage && (
-                  <div className='flex justify-center py-6'>
-                    <div className='h-6 w-6 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
-                  </div>
-                )}
-
-                {!hasNextPage && properties.length > 0 && (
-                  <div className='py-6 text-center text-xs font-medium text-muted-foreground/40 uppercase tracking-wider'>
-                    {t('empty.endOfList')}
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Result count */}
+            <span className='hidden md:block flex-shrink-0 text-xs text-muted-foreground font-medium whitespace-nowrap'>
+              {t('filter.resultCount', { count: formatNumber(totalElements) })}
+            </span>
           </div>
         </div>
-      </aside>
 
-      {/* ── Right Detail Panel ── */}
-      <main
-        className={cn(
-          'flex-1 overflow-y-auto bg-primary/5',
-          isMobile ? (selectedProperty ? 'block' : 'hidden') : 'block'
-        )}
-      >
-        {selectedProperty ? (
-          <OwnerPropertyDetailPanel
-            key={selectedProperty.property_id}
-            property={selectedProperty}
-            onBack={() => setSelectedProperty(null)}
-          />
-        ) : (
-          <div className='flex h-full flex-col items-center justify-center p-8 text-center'>
-            <div className='mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm border border-primary/20'>
-              <Building className='h-10 w-10 text-primary/30' strokeWidth={1.5} />
+        {/* Scrollable grid area */}
+        <div className='flex-1 overflow-y-auto'>
+          {isLoading ? (
+            <div className='flex h-64 items-center justify-center'>
+              <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
             </div>
-            <p className='text-base font-medium text-muted-foreground max-w-[250px]'>
-              {t('empty.selectProperty')}
-            </p>
-          </div>
-        )}
-      </main>
+          ) : isError ? (
+            <div className='flex h-64 flex-col items-center justify-center gap-3 text-center px-4'>
+              <div className='flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10'>
+                <Home className='h-6 w-6 text-destructive' />
+              </div>
+              <p className='font-semibold text-foreground'>{t('error')}</p>
+            </div>
+          ) : properties.length === 0 ? (
+            <div className='flex h-64 flex-col items-center justify-center gap-4 text-center px-4'>
+              <div className='flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 border border-primary/10'>
+                <Home className='h-8 w-8 text-primary/30' strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className='font-bold text-foreground'>{t('empty.title')}</p>
+                <p className='mt-1 text-sm text-muted-foreground'>{t('empty.subtitle')}</p>
+              </div>
+            </div>
+          ) : (
+            <div className='p-4 sm:p-6'>
+              {/* 3-column grid */}
+              <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+                {properties.map((property) => (
+                  <PropertyCardWithProposal
+                    key={property.property_id}
+                    property={property}
+                    listingType={listingType}
+                  />
+                ))}
+              </div>
+
+              {/* Infinite scroll sentinel */}
+              <div ref={sentinelRef} className='h-4 mt-2' />
+
+              {isFetchingNextPage && (
+                <div className='flex justify-center py-8'>
+                  <div className='h-6 w-6 animate-spin rounded-full border-4 border-primary/10 border-t-primary' />
+                </div>
+              )}
+
+              {!hasNextPage && properties.length > 0 && (
+                <p className='py-8 text-center text-xs font-medium text-muted-foreground/40 uppercase tracking-wider'>
+                  {t('empty.endOfList')}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
+// ── Page export ───────────────────────────────────────────────────────────────
 
 export function PropertyFeedPage() {
   return (

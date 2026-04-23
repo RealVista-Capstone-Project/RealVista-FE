@@ -10,7 +10,7 @@
       "myEngagements": "My Engagements",
       "messages": "Messages",
       "myContracts": "My Contracts",
-      "propertyFeed": "Discover Properties",
+      "propertyFeed": "Find Properties",
       "proposals": "My Proposals",
       "appointments": "Appointments",
       "users": "User Management"
@@ -28,7 +28,7 @@
       "messages": "Messages",
       "manageProposals": "Proposal Library",
       "property": "Property",
-      "propertyFeed": "Discover Properties",
+      "propertyFeed": "Find Properties to Propose",
       "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
       "manageUsers": "User Management",

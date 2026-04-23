@@ -2,8 +2,8 @@
   "PropertyFeed": {
     "loading": "Loading properties...",
     "error": "Failed to load properties. Please try again.",
-    "pageTitle": "Discover Properties",
-    "pageSubtitle": "Find properties near you and submit your proposal.",
+    "pageTitle": "Find Properties to Propose",
+    "pageSubtitle": "Browse available properties and submit your agent proposal.",
     "tabs": {
       "all": "All",
       "sell": "For Sale",
@@ -12,7 +12,7 @@
     "filter": {
       "title": "Filter",
       "searchPlaceholder": "Search by address, location, or type...",
-      "resultCount": "{count} properties found",
+      "resultCount": "{count} properties",
       "rentPrice": "Rental Price",
       "buyPrice": "Purchase Price",
       "min": "Min",
@@ -29,12 +29,13 @@
       "proposed": "Proposed",
       "priceFrom": "Price from",
       "rent": "Rent",
-      "buy": "Buy"
+      "buy": "Buy",
+      "submitProposal": "Submit Proposal",
+      "alreadyProposed": "Proposal Sent"
     },
     "empty": {
       "title": "No properties found.",
-      "subtitle": "Try adjusting your search or check back later.",
-      "selectProperty": "Pick a property to see full details",
+      "subtitle": "Try adjusting your filters or check back later.",
       "endOfList": "You've reached the end of the list"
     },
     "pagination": {
@@ -43,24 +44,6 @@
     "common": {
       "na": "N/A",
       "cancel": "Cancel"
-    },
-    "detailPanel": {
-      "title": "Property Details",
-      "propertyInfo": "Property Information",
-      "type": "Type",
-      "usableArea": "Usable Area",
-      "landArea": "Land Area",
-      "bedrooms": "Bedrooms",
-      "bathrooms": "Bathrooms",
-      "floors": "Floors",
-      "description": "Description",
-      "ownerInfo": "Owner Information",
-      "ownerName": "Owner",
-      "phone": "Phone",
-      "email": "Email",
-      "submitProposal": "Submit Proposal",
-      "alreadyProposed": "Proposal Already Sent",
-      "backToList": "Back to list"
     },
     "proposalModal": {
       "title": "Submit Proposal",
