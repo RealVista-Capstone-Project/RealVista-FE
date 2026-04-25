@@ -12,6 +12,7 @@ import {
   Users,
   Building2,
   Search,
+  ContactRound,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -136,6 +137,12 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       label: t('menu.appointments'),
       href: ROUTES.dashboard.appointments,
       icon: Calendar,
+    },
+    {
+      id: 'crm',
+      label: t('menu.crm'),
+      href: ROUTES.dashboard.crm,
+      icon: ContactRound,
     },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
@@ -288,6 +295,9 @@ export function DashboardLayout({
     }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
+    }
+    if (pathname === ROUTES.dashboard.crm || pathname.startsWith(ROUTES.dashboard.crm)) {
+      return t('pageTitle.crm');
     }
     return t('pageTitle.default');
   }, [pathname, t]);

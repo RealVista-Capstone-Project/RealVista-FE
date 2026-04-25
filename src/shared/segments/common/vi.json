@@ -13,7 +13,8 @@
       "propertyFeed": "Khám phá BĐS",
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
-      "users": "Quản lý người dùng"
+      "users": "Quản lý người dùng",
+      "crm": "CRM"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -32,7 +33,8 @@
       "agentSetting": "Hồ sơ & cài đặt môi giới",
       "appointments": "Lịch hẹn",
       "manageUsers": "Quản lý người dùng",
-      "manageAgent": "Quản lý môi giới"
+      "manageAgent": "Quản lý môi giới",
+      "crm": "Quản lý khách hàng"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

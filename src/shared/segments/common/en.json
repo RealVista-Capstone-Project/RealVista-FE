@@ -13,7 +13,8 @@
       "propertyFeed": "Find Properties",
       "proposals": "My Proposals",
       "appointments": "Appointments",
-      "users": "User Management"
+      "users": "User Management",
+      "crm": "CRM"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -32,7 +33,8 @@
       "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
       "manageUsers": "User Management",
-      "manageAgent": "Manage Agent"
+      "manageAgent": "Manage Agent",
+      "crm": "CRM Board"
     },
     "actionButton": {
       "addProperty": "Add a property",
