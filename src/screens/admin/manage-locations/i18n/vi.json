@@ -1,0 +1,69 @@
+{
+  "ManageLocations": {
+    "title": "Quản lý địa điểm",
+    "description": "Quản lý tỉnh/thành phố, quận/huyện và phường/xã trong hệ thống.",
+    "addLocation": "Thêm địa điểm",
+    "tabs": {
+      "ALL": "Tất cả",
+      "CITY": "Tỉnh/Thành phố",
+      "DISTRICT": "Quận/Huyện",
+      "WARD": "Phường/Xã"
+    },
+    "search": {
+      "placeholder": "Tìm kiếm theo tên hoặc mã..."
+    },
+    "filters": {
+      "allCities": "Tất cả tỉnh/thành phố",
+      "allDistricts": "Tất cả quận/huyện",
+      "selectCityFirst": "Chọn tỉnh/thành phố trước"
+    },
+    "table": {
+      "columns": {
+        "name": "Tên",
+        "code": "Mã",
+        "level": "Cấp",
+        "actions": "Thao tác"
+      },
+      "empty": {
+        "title": "Không tìm thấy địa điểm",
+        "description": "Thử điều chỉnh bộ lọc hoặc thêm địa điểm mới."
+      }
+    },
+    "levels": {
+      "CITY": "Tỉnh/Thành phố",
+      "DISTRICT": "Quận/Huyện",
+      "WARD": "Phường/Xã"
+    },
+    "form": {
+      "addTitle": "Thêm địa điểm",
+      "editTitle": "Chỉnh sửa địa điểm",
+      "level": "Cấp hành chính",
+      "selectLevel": "Chọn cấp",
+      "parentCity": "Tỉnh/Thành phố",
+      "selectCity": "Chọn tỉnh/thành phố",
+      "parentDistrict": "Quận/Huyện",
+      "selectDistrict": "Chọn quận/huyện",
+      "name": "Tên",
+      "namePlaceholder": "VD: Hà Nội",
+      "code": "Mã",
+      "codePlaceholder": "VD: HN",
+      "cancel": "Hủy",
+      "submit": "Thêm địa điểm",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu..."
+    },
+    "toast": {
+      "createSuccess": "Đã thêm địa điểm thành công",
+      "createError": "Không thể thêm địa điểm",
+      "updateSuccess": "Đã cập nhật địa điểm thành công",
+      "updateError": "Không thể cập nhật địa điểm"
+    },
+    "validation": {
+      "nameRequired": "Tên là bắt buộc",
+      "codeRequired": "Mã là bắt buộc",
+      "codeInvalid": "Mã chỉ được chứa chữ cái, số, _ hoặc -",
+      "cityRequired": "Vui lòng chọn tỉnh/thành phố",
+      "districtRequired": "Vui lòng chọn quận/huyện"
+    }
+  }
+}
