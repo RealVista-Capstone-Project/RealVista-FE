@@ -1,10 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuthSession } from '@/features/auth/model/use-auth-session';
+import { useTranslations } from 'next-intl';
 import { AiChatFab } from './ai-chat-fab';
 import { AiChatWindow } from './ai-chat-window';
 import { useAiChat } from '../model/use-ai-chat';
+import { useAiChatContext } from '../model/use-ai-chat-context';
 
 /**
  * AiChatRenderer - Top-level orchestrator for the AI chat assistant.
@@ -28,6 +30,25 @@ export function AiChatRenderer() {
     clearChat,
     loadHistory,
   } = useAiChat();
+  const { currentListing } = useAiChatContext();
+  const t = useTranslations('AiAssistant');
+
+  const analysisActions = useMemo(() => {
+    if (!currentListing) return undefined;
+    return [
+      { key: 'chipAnalyzeListing', text: t('chipAnalyzeListing') },
+      { key: 'chipListingProsCons', text: t('chipListingProsCons') },
+      { key: 'chipListingPriceForecast', text: t('chipListingPriceForecast') },
+      { key: 'chipCompareListing', text: t('chipCompareListing') },
+    ];
+  }, [currentListing, t]);
+
+  const handleSendMessageWithContext = useCallback(
+    (text: string) => {
+      sendMessage(text, currentListing?.listing_id);
+    },
+    [currentListing, sendMessage]
+  );
 
   // Track whether we've already loaded history to avoid re-fetching on every toggle
   const historyLoadedRef = useRef(false);
@@ -67,10 +88,11 @@ export function AiChatRenderer() {
           isClearing={isClearing}
           error={error}
           quota={quota}
-          onSendMessage={sendMessage}
+          onSendMessage={handleSendMessageWithContext}
           onClose={handleClose}
-          onQuickAction={sendMessage}
+          onQuickAction={handleSendMessageWithContext}
           onNewChat={handleNewChat}
+          quickActions={analysisActions}
         />
       )}
       <AiChatFab isOpen={isOpen} onClick={handleToggle} />
