@@ -94,6 +94,18 @@ function FieldRow({
   );
 }
 
+const vndNumberFormatter = new Intl.NumberFormat('vi-VN');
+
+function formatVndInput(value?: number) {
+  if (value === undefined || value === null || Number.isNaN(value)) return '';
+  return vndNumberFormatter.format(value);
+}
+
+function parseVndInput(value: string) {
+  const numericValue = value.replace(/\D/g, '');
+  return numericValue === '' ? undefined : Number(numericValue);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Subscription Form
 // ─────────────────────────────────────────────────────────────────────────────
@@ -341,21 +353,31 @@ function SubscriptionForm({
         hint={t('form.hints.priceFree')}
         error={errors.price?.message}
       >
-        <div className='relative'>
-          <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
-            VNĐ
-          </span>
-          <Input
-            type='number'
-            {...register('price', {
-              valueAsNumber: true,
-              required: { value: true, message: t('form.validation.priceNonNegative') },
-              min: { value: 0, message: t('form.validation.priceNonNegative') },
-            })}
-            placeholder={t('form.fields.pricePlaceholder')}
-            className={cn('h-10 pr-12', errors.price && 'border-destructive')}
-          />
-        </div>
+        <Controller
+          control={control}
+          name='price'
+          rules={{
+            validate: (v) =>
+              (typeof v === 'number' && !Number.isNaN(v) && v >= 0) ||
+              t('form.validation.priceNonNegative'),
+          }}
+          render={({ field }) => (
+            <div className='relative'>
+              <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
+                VNĐ
+              </span>
+              <Input
+                type='text'
+                inputMode='numeric'
+                value={formatVndInput(field.value)}
+                onChange={(e) => field.onChange(parseVndInput(e.target.value))}
+                onBlur={field.onBlur}
+                placeholder={t('form.fields.pricePlaceholder')}
+                className={cn('h-10 pr-12 font-medium tabular-nums', errors.price && 'border-destructive')}
+              />
+            </div>
+          )}
+        />
       </FieldRow>
 
       {/* Actions */}
@@ -578,21 +600,31 @@ function BoostForm({
         hint={t('form.hints.priceFree')}
         error={errors.price?.message}
       >
-        <div className='relative'>
-          <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
-            VNĐ
-          </span>
-          <Input
-            type='number'
-            {...register('price', {
-              valueAsNumber: true,
-              required: { value: true, message: t('form.validation.priceNonNegative') },
-              min: { value: 0, message: t('form.validation.priceNonNegative') },
-            })}
-            placeholder={t('form.fields.pricePlaceholder')}
-            className={cn('h-10 pr-12', errors.price && 'border-destructive')}
-          />
-        </div>
+        <Controller
+          control={control}
+          name='price'
+          rules={{
+            validate: (v) =>
+              (typeof v === 'number' && !Number.isNaN(v) && v >= 0) ||
+              t('form.validation.priceNonNegative'),
+          }}
+          render={({ field }) => (
+            <div className='relative'>
+              <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
+                VNĐ
+              </span>
+              <Input
+                type='text'
+                inputMode='numeric'
+                value={formatVndInput(field.value)}
+                onChange={(e) => field.onChange(parseVndInput(e.target.value))}
+                onBlur={field.onBlur}
+                placeholder={t('form.fields.pricePlaceholder')}
+                className={cn('h-10 pr-12 font-medium tabular-nums', errors.price && 'border-destructive')}
+              />
+            </div>
+          )}
+        />
       </FieldRow>
 
       {/* Actions */}

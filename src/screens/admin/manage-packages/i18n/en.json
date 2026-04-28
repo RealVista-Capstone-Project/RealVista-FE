@@ -137,7 +137,7 @@
         "durationDays": "Duration (days)",
         "durationPlaceholder": "e.g. 30 (use -1 for unlimited)",
         "price": "Price (VND)",
-        "pricePlaceholder": "e.g. 99000",
+        "pricePlaceholder": "e.g. 99.000",
         "featuredQuota": "Featured Quota",
         "featuredQuotaPlaceholder": "e.g. 5",
         "hotBadgeQuota": "Hot Badge Quota",
