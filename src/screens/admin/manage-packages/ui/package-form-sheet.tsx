@@ -288,15 +288,48 @@ function SubscriptionForm({
           hint={t('form.hints.durationNoExpiry')}
           error={errors.duration_days?.message}
         >
-          <Input
-            type='number'
-            {...register('duration_days', {
-              valueAsNumber: true,
+          <Controller
+            control={control}
+            name='duration_days'
+            rules={{
               required: t('form.validation.durationRequired'),
               validate: (v) => v >= 1 || v === -1 || t('form.validation.durationRequired'),
-            })}
-            placeholder={t('form.fields.durationPlaceholder')}
-            className={cn('h-10', errors.duration_days && 'border-destructive')}
+            }}
+            render={({ field }) => {
+              const isNoExpiry = field.value === -1;
+
+              return (
+                <div className='space-y-2'>
+                  <div className='flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2'>
+                    <span className='text-xs font-medium text-muted-foreground'>{t('duration.noExpiry')}</span>
+                    <Switch
+                      checked={isNoExpiry}
+                      onCheckedChange={(checked) => field.onChange(checked ? -1 : 30)}
+                      aria-label={t('duration.noExpiry')}
+                    />
+                  </div>
+
+                  {isNoExpiry ? (
+                    <div className='h-10 rounded-md border border-dashed border-border bg-muted/30 px-3 text-sm text-muted-foreground flex items-center'>
+                      {t('duration.noExpiry')}
+                    </div>
+                  ) : (
+                    <Input
+                      type='number'
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const rawValue = e.target.value;
+                        field.onChange(rawValue === '' ? undefined : Number(rawValue));
+                      }}
+                      onBlur={field.onBlur}
+                      placeholder={t('form.fields.durationPlaceholder')}
+                      className={cn('h-10', errors.duration_days && 'border-destructive')}
+                      min={1}
+                    />
+                  )}
+                </div>
+              );
+            }}
           />
         </FieldRow>
       </div>
@@ -367,6 +400,7 @@ function BoostForm({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<BoostFormValues>({
@@ -492,15 +526,48 @@ function BoostForm({
         hint={t('form.hints.durationNoExpiry')}
         error={errors.duration_days?.message}
       >
-        <Input
-          type='number'
-          {...register('duration_days', {
-            valueAsNumber: true,
+        <Controller
+          control={control}
+          name='duration_days'
+          rules={{
             required: t('form.validation.durationRequired'),
             validate: (v) => v >= 1 || v === -1 || t('form.validation.durationRequired'),
-          })}
-          placeholder='e.g. 30'
-          className='h-10'
+          }}
+          render={({ field }) => {
+            const isNoExpiry = field.value === -1;
+
+            return (
+              <div className='space-y-2'>
+                <div className='flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2'>
+                  <span className='text-xs font-medium text-muted-foreground'>{t('duration.noExpiry')}</span>
+                  <Switch
+                    checked={isNoExpiry}
+                    onCheckedChange={(checked) => field.onChange(checked ? -1 : 30)}
+                    aria-label={t('duration.noExpiry')}
+                  />
+                </div>
+
+                {isNoExpiry ? (
+                  <div className='h-10 rounded-md border border-dashed border-border bg-muted/30 px-3 text-sm text-muted-foreground flex items-center'>
+                    {t('duration.noExpiry')}
+                  </div>
+                ) : (
+                  <Input
+                    type='number'
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const rawValue = e.target.value;
+                      field.onChange(rawValue === '' ? undefined : Number(rawValue));
+                    }}
+                    onBlur={field.onBlur}
+                    placeholder='e.g. 30'
+                    className='h-10'
+                    min={1}
+                  />
+                )}
+              </div>
+            );
+          }}
         />
       </FieldRow>
 

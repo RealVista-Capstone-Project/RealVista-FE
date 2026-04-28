@@ -146,7 +146,7 @@
       "hints": {
         "code": "Mã định danh duy nhất (Vd: LISTING_10)",
         "quotaUnlimited": "Bật công tắc Không giới hạn để bỏ giới hạn quota",
-        "durationNoExpiry": "-1 = không hết hạn",
+        "durationNoExpiry": "Bật công tắc Không hết hạn để không giới hạn thời gian",
         "priceFree": "0 = gói miễn phí"
       },
       "validation": {

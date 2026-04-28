@@ -146,7 +146,7 @@
       "hints": {
         "code": "Unique identifier used internally",
         "quotaUnlimited": "Use the Unlimited switch to remove quota limits",
-        "durationNoExpiry": "-1 = no expiry",
+        "durationNoExpiry": "Use the No expiry switch for unlimited duration",
         "priceFree": "0 = free package"
       },
       "validation": {
