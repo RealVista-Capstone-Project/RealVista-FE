@@ -158,7 +158,7 @@ function SubscriptionForm({
         });
       }
       toast.success(t('form.saveSuccess'));
-      void queryClient.invalidateQueries({ queryKey: billingKeys.adminFeaturePackages() });
+      void queryClient.invalidateQueries({ queryKey: [...billingKeys.all, 'admin-feature-packages'] });
       reset();
       onClose();
     } catch {
@@ -374,7 +374,7 @@ function BoostForm({
         });
       }
       toast.success(t('form.saveSuccess'));
-      void queryClient.invalidateQueries({ queryKey: billingKeys.adminBoostPackages() });
+      void queryClient.invalidateQueries({ queryKey: [...billingKeys.all, 'admin-boost-packages'] });
       reset();
       onClose();
     } catch {

@@ -277,16 +277,16 @@ export function DashboardLayout({
       return t('pageTitle.manageAgent');
     }
     if (
-      pathname === ROUTES.dashboard.manageUsers ||
-      pathname.startsWith(ROUTES.dashboard.manageUsers)
-    ) {
-      return t('pageTitle.manageUsers');
-    }
-    if (
       pathname === ROUTES.dashboard.managePackages ||
       pathname.startsWith(ROUTES.dashboard.managePackages)
     ) {
       return t('pageTitle.managePackages');
+    }
+    if (
+      pathname === ROUTES.dashboard.manageUsers ||
+      pathname.startsWith(ROUTES.dashboard.manageUsers)
+    ) {
+      return t('pageTitle.manageUsers');
     }
     if (
       pathname === ROUTES.dashboard.propertyFeed ||
@@ -303,6 +303,7 @@ export function DashboardLayout({
   const isItemActive = (href: string) => {
     if (pathname === href) return true;
     if (href === ROUTES.dashboard.root) return pathname === ROUTES.dashboard.root;
+    if (href === ROUTES.dashboard.manageUsers) return pathname === ROUTES.dashboard.manageUsers;
     return pathname.startsWith(href + '/');
   };
 
