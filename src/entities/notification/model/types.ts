@@ -89,6 +89,7 @@ export const NotificationEventType = {
   NEW_AGENT_PROPOSAL: 'NEW_AGENT_PROPOSAL',
   AGENT_PROPOSAL_ACCEPTED: 'AGENT_PROPOSAL_ACCEPTED',
   AGENT_PROPOSAL_REJECTED: 'AGENT_PROPOSAL_REJECTED',
+  OWNER_ENGAGEMENT_REVIEW_REMINDER: 'OWNER_ENGAGEMENT_REVIEW_REMINDER',
 } as const;
 
 export type NotificationEventTypeValue = typeof NotificationEventType[keyof typeof NotificationEventType];
