@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { billingApi } from './billing.api';
+import { adminBillingApi, billingApi } from './billing.api';
 import { billingKeys } from './keys';
 
 export const billingQueries = {
@@ -64,6 +64,26 @@ export const billingQueries = {
       queryKey: billingKeys.myTransactions(),
       queryFn: async () => {
         const res = await billingApi.getTransactions();
+        return res.payload.data;
+      },
+      staleTime: 5 * 60 * 1000,
+    }),
+
+  adminFeaturePackages: (includeInactive = true) =>
+    queryOptions({
+      queryKey: billingKeys.adminFeaturePackages(includeInactive),
+      queryFn: async () => {
+        const res = await adminBillingApi.getFeaturePackages(includeInactive);
+        return res.payload.data;
+      },
+      staleTime: 5 * 60 * 1000,
+    }),
+
+  adminBoostPackages: (includeInactive = true) =>
+    queryOptions({
+      queryKey: billingKeys.adminBoostPackages(includeInactive),
+      queryFn: async () => {
+        const res = await adminBillingApi.getBoostPackages(includeInactive);
         return res.payload.data;
       },
       staleTime: 5 * 60 * 1000,

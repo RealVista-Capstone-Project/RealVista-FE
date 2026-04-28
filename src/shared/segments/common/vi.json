@@ -13,7 +13,8 @@
       "propertyFeed": "Khám phá BĐS",
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
-      "users": "Quản lý người dùng"
+      "users": "Quản lý người dùng",
+      "packages": "Quản lý gói dịch vụ"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -32,6 +33,7 @@
       "agentSetting": "Hồ sơ & cài đặt môi giới",
       "appointments": "Lịch hẹn",
       "manageUsers": "Quản lý người dùng",
+      "managePackages": "Quản lý gói dịch vụ",
       "manageAgent": "Quản lý môi giới"
     },
     "actionButton": {

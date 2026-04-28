@@ -1,0 +1,719 @@
+'use client';
+
+import * as React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { Loader2, Package, Rocket, Info } from 'lucide-react';
+
+import {
+  adminBillingApi,
+  billingKeys,
+  type FeaturePackage,
+  type BoostPackage,
+} from '@/entities/billing';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/shared/ui/sheet/sheet';
+import { Input } from '@/shared/ui/input';
+import { Button } from '@/shared/ui/button';
+import { Label } from '@/shared/ui/label';
+import { Separator } from '@/shared/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Switch } from '@/shared/ui/switch/switch';
+import { cn } from '@/shared/lib/utils';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface SubscriptionFormValues {
+  code: string;
+  name: string;
+  description: string;
+  feature_type: FeaturePackage['feature_type'];
+  quota: number;
+  duration_days: number;
+  price: number;
+}
+
+interface BoostFormValues {
+  code: string;
+  name: string;
+  description: string;
+  featured_quota: number;
+  hot_badge_quota: number;
+  duration_days: number;
+  price: number;
+}
+
+interface PackageFormSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  type: 'subscription' | 'boost';
+  editingPackage?: FeaturePackage | null;
+  editingBoostPackage?: BoostPackage | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Field Row helper
+// ─────────────────────────────────────────────────────────────────────────────
+
+function FieldRow({
+  label,
+  hint,
+  error,
+  required,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className='flex flex-col gap-1.5'>
+      <Label className='text-sm font-semibold text-foreground flex items-center gap-1'>
+        {label}
+        {required && <span className='text-destructive'>*</span>}
+      </Label>
+      {children}
+      {hint && !error && (
+        <p className='flex items-center gap-1 text-[11px] text-muted-foreground'>
+          <Info className='h-3 w-3 shrink-0' /> {hint}
+        </p>
+      )}
+      {error && <p className='text-[11px] text-destructive font-medium'>{error}</p>}
+    </div>
+  );
+}
+
+const vndNumberFormatter = new Intl.NumberFormat('vi-VN');
+
+function formatVndInput(value?: number) {
+  if (value === undefined || value === null || Number.isNaN(value)) return '';
+  return vndNumberFormatter.format(value);
+}
+
+function parseVndInput(value: string) {
+  const numericValue = value.replace(/\D/g, '');
+  return numericValue === '' ? undefined : Number(numericValue);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Subscription Form
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SubscriptionForm({
+  editing,
+  onClose,
+}: {
+  editing: FeaturePackage | null;
+  onClose: () => void;
+}) {
+  const t = useTranslations('ManagePackages');
+  const queryClient = useQueryClient();
+  const isEdit = !!editing;
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<SubscriptionFormValues>({
+    defaultValues: editing
+      ? {
+          code: editing.code,
+          name: editing.name,
+          description: editing.description ?? '',
+          feature_type: editing.feature_type,
+          quota: editing.quota,
+          duration_days: editing.duration_days,
+          price: editing.price,
+        }
+      : {
+          code: '',
+          name: '',
+          description: '',
+          feature_type: 'LISTING',
+          quota: 10,
+          duration_days: 30,
+          price: 0,
+        },
+  });
+
+  const onSubmit = async (data: SubscriptionFormValues) => {
+    try {
+      if (isEdit && editing) {
+        await adminBillingApi.updateFeaturePackage(editing.id, {
+          name: data.name,
+          description: data.description || undefined,
+          quota: data.quota,
+          duration_days: data.duration_days,
+          price: data.price,
+        });
+      } else {
+        await adminBillingApi.createFeaturePackage({
+          code: data.code,
+          name: data.name,
+          description: data.description || undefined,
+          feature_type: data.feature_type,
+          quota: data.quota,
+          duration_days: data.duration_days,
+          price: data.price,
+        });
+      }
+      toast.success(t('form.saveSuccess'));
+      void queryClient.invalidateQueries({ queryKey: [...billingKeys.all, 'admin-feature-packages'] });
+      reset();
+      onClose();
+    } catch {
+      toast.error(t('form.saveError'));
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5 pb-8'>
+      {/* Code */}
+      <FieldRow
+        label={t('form.fields.code')}
+        required
+        hint={t('form.hints.code')}
+        error={errors.code?.message}
+      >
+        <Input
+          {...register('code', { required: t('form.validation.codeRequired') })}
+          placeholder={t('form.fields.codePlaceholder')}
+          disabled={isEdit}
+          className={cn(
+            'font-mono h-10',
+            isEdit && 'bg-muted/50 text-muted-foreground cursor-not-allowed',
+            errors.code && 'border-destructive focus:ring-destructive/20'
+          )}
+        />
+      </FieldRow>
+
+      {/* Name */}
+      <FieldRow label={t('form.fields.name')} required error={errors.name?.message}>
+        <Input
+          {...register('name', { required: t('form.validation.nameRequired') })}
+          placeholder={t('form.fields.namePlaceholder')}
+          className={cn('h-10', errors.name && 'border-destructive focus:ring-destructive/20')}
+        />
+      </FieldRow>
+
+      {/* Description */}
+      <FieldRow label={t('form.fields.description')}>
+        <textarea
+          {...register('description')}
+          placeholder={t('form.fields.descriptionPlaceholder')}
+          rows={3}
+          className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-all resize-none'
+        />
+      </FieldRow>
+
+      {/* Feature type — read-only on edit since the API doesn't accept it */}
+      <FieldRow label={t('form.fields.featureType')} required>
+        <Controller
+          control={control}
+          name='feature_type'
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange} disabled={isEdit}>
+              <SelectTrigger className={cn('h-10', isEdit && 'bg-muted/50 cursor-not-allowed')}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='LISTING'>{t('featureType.LISTING')}</SelectItem>
+                <SelectItem value='3D_TOUR'>{t('featureType.3D_TOUR')}</SelectItem>
+                <SelectItem value='AI_REQUEST'>{t('featureType.AI_REQUEST')}</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </FieldRow>
+
+      <Separator />
+
+      {/* Quota & Duration side by side */}
+      <div className='grid grid-cols-2 gap-4'>
+        <FieldRow
+          label={t('form.fields.quota')}
+          required
+          hint={t('form.hints.quotaUnlimited')}
+          error={errors.quota?.message}
+        >
+          <Controller
+            control={control}
+            name='quota'
+            rules={{
+              required: t('form.validation.quotaPositive'),
+              validate: (v) => v >= 1 || v === -1 || t('form.validation.quotaPositive'),
+            }}
+            render={({ field }) => {
+              const isUnlimited = field.value === -1;
+
+              return (
+                <div className='space-y-2'>
+                  <div className='flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2'>
+                    <span className='text-xs font-medium text-muted-foreground'>{t('flags.unlimited')}</span>
+                    <Switch
+                      checked={isUnlimited}
+                      onCheckedChange={(checked) => field.onChange(checked ? -1 : 1)}
+                      aria-label={t('flags.unlimited')}
+                    />
+                  </div>
+
+                  {isUnlimited ? (
+                    <div className='h-10 rounded-md border border-dashed border-border bg-muted/30 px-3 text-sm text-muted-foreground flex items-center'>
+                      {t('flags.unlimited')}
+                    </div>
+                  ) : (
+                    <Input
+                      type='number'
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const rawValue = e.target.value;
+                        field.onChange(rawValue === '' ? undefined : Number(rawValue));
+                      }}
+                      onBlur={field.onBlur}
+                      placeholder={t('form.fields.quotaPlaceholder')}
+                      className={cn('h-10', errors.quota && 'border-destructive')}
+                      min={1}
+                    />
+                  )}
+                </div>
+              );
+            }}
+          />
+        </FieldRow>
+
+        <FieldRow
+          label={t('form.fields.durationDays')}
+          required
+          hint={t('form.hints.durationNoExpiry')}
+          error={errors.duration_days?.message}
+        >
+          <Controller
+            control={control}
+            name='duration_days'
+            rules={{
+              required: t('form.validation.durationRequired'),
+              validate: (v) => v >= 1 || v === -1 || t('form.validation.durationRequired'),
+            }}
+            render={({ field }) => {
+              const isNoExpiry = field.value === -1;
+
+              return (
+                <div className='space-y-2'>
+                  <div className='flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2'>
+                    <span className='text-xs font-medium text-muted-foreground'>{t('duration.noExpiry')}</span>
+                    <Switch
+                      checked={isNoExpiry}
+                      onCheckedChange={(checked) => field.onChange(checked ? -1 : 30)}
+                      aria-label={t('duration.noExpiry')}
+                    />
+                  </div>
+
+                  {isNoExpiry ? (
+                    <div className='h-10 rounded-md border border-dashed border-border bg-muted/30 px-3 text-sm text-muted-foreground flex items-center'>
+                      {t('duration.noExpiry')}
+                    </div>
+                  ) : (
+                    <Input
+                      type='number'
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const rawValue = e.target.value;
+                        field.onChange(rawValue === '' ? undefined : Number(rawValue));
+                      }}
+                      onBlur={field.onBlur}
+                      placeholder={t('form.fields.durationPlaceholder')}
+                      className={cn('h-10', errors.duration_days && 'border-destructive')}
+                      min={1}
+                    />
+                  )}
+                </div>
+              );
+            }}
+          />
+        </FieldRow>
+      </div>
+
+      {/* Price */}
+      <FieldRow
+        label={t('form.fields.price')}
+        required
+        hint={t('form.hints.priceFree')}
+        error={errors.price?.message}
+      >
+        <Controller
+          control={control}
+          name='price'
+          rules={{
+            validate: (v) =>
+              (typeof v === 'number' && !Number.isNaN(v) && v >= 0) ||
+              t('form.validation.priceNonNegative'),
+          }}
+          render={({ field }) => (
+            <div className='relative'>
+              <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
+                VNĐ
+              </span>
+              <Input
+                type='text'
+                inputMode='numeric'
+                value={formatVndInput(field.value)}
+                onChange={(e) => field.onChange(parseVndInput(e.target.value))}
+                onBlur={field.onBlur}
+                placeholder={t('form.fields.pricePlaceholder')}
+                className={cn('h-10 pr-12 font-medium tabular-nums', errors.price && 'border-destructive')}
+              />
+            </div>
+          )}
+        />
+      </FieldRow>
+
+      {/* Actions */}
+      <div className='flex items-center justify-end gap-3 pt-2'>
+        <Button type='button' variant='ghost' onClick={onClose}>
+          {t('actions.cancel')}
+        </Button>
+        <Button
+          type='submit'
+          disabled={isSubmitting}
+          className='bg-primary text-primary-foreground hover:bg-primary/90 gap-2 min-w-[120px]'
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className='h-4 w-4 animate-spin' />
+              {t('form.saving')}
+            </>
+          ) : (
+            t('form.save')
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Boost Form
+// ─────────────────────────────────────────────────────────────────────────────
+
+function BoostForm({
+  editing,
+  onClose,
+}: {
+  editing: BoostPackage | null;
+  onClose: () => void;
+}) {
+  const t = useTranslations('ManagePackages');
+  const queryClient = useQueryClient();
+  const isEdit = !!editing;
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<BoostFormValues>({
+    defaultValues: editing
+      ? {
+          code: editing.code,
+          name: editing.name,
+          description: editing.description ?? '',
+          featured_quota: editing.featured_quota,
+          hot_badge_quota: editing.hot_badge_quota,
+          duration_days: editing.duration_days,
+          price: editing.price,
+        }
+      : {
+          code: '',
+          name: '',
+          description: '',
+          featured_quota: 5,
+          hot_badge_quota: 3,
+          duration_days: 30,
+          price: 99000,
+        },
+  });
+
+  const onSubmit = async (data: BoostFormValues) => {
+    try {
+      if (isEdit && editing) {
+        await adminBillingApi.updateBoostPackage(editing.id, {
+          name: data.name,
+          description: data.description || undefined,
+          featured_quota: data.featured_quota,
+          hot_badge_quota: data.hot_badge_quota,
+          duration_days: data.duration_days,
+          price: data.price,
+        });
+      } else {
+        await adminBillingApi.createBoostPackage({
+          code: data.code,
+          name: data.name,
+          description: data.description || undefined,
+          featured_quota: data.featured_quota,
+          hot_badge_quota: data.hot_badge_quota,
+          duration_days: data.duration_days,
+          price: data.price,
+        });
+      }
+      toast.success(t('form.saveSuccess'));
+      void queryClient.invalidateQueries({ queryKey: [...billingKeys.all, 'admin-boost-packages'] });
+      reset();
+      onClose();
+    } catch {
+      toast.error(t('form.saveError'));
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5 pb-8'>
+      {/* Code */}
+      <FieldRow label={t('form.fields.code')} required hint={t('form.hints.code')} error={errors.code?.message}>
+        <Input
+          {...register('code', { required: t('form.validation.codeRequired') })}
+          placeholder='e.g. BOOST_PREMIUM'
+          disabled={isEdit}
+          className={cn(
+            'font-mono h-10',
+            isEdit && 'bg-muted/50 text-muted-foreground cursor-not-allowed'
+          )}
+        />
+      </FieldRow>
+
+      {/* Name */}
+      <FieldRow label={t('form.fields.name')} required error={errors.name?.message}>
+        <Input
+          {...register('name', { required: t('form.validation.nameRequired') })}
+          placeholder='e.g. Premium Boost Pack'
+          className='h-10'
+        />
+      </FieldRow>
+
+      {/* Description */}
+      <FieldRow label={t('form.fields.description')}>
+        <textarea
+          {...register('description')}
+          placeholder={t('form.fields.descriptionPlaceholder')}
+          rows={3}
+          className='w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary transition-all resize-none'
+        />
+      </FieldRow>
+
+      <Separator />
+
+      {/* Quotas side by side */}
+      <div className='grid grid-cols-2 gap-4'>
+        <FieldRow label={t('form.fields.featuredQuota')} required error={errors.featured_quota?.message}>
+          <Input
+            type='number'
+            {...register('featured_quota', {
+              valueAsNumber: true,
+              min: { value: 0, message: t('form.validation.quotaPositive') },
+            })}
+            placeholder={t('form.fields.featuredQuotaPlaceholder')}
+            className='h-10'
+          />
+        </FieldRow>
+
+        <FieldRow label={t('form.fields.hotBadgeQuota')} required error={errors.hot_badge_quota?.message}>
+          <Input
+            type='number'
+            {...register('hot_badge_quota', {
+              valueAsNumber: true,
+              min: { value: 0, message: t('form.validation.quotaPositive') },
+            })}
+            placeholder={t('form.fields.hotBadgePlaceholder')}
+            className='h-10'
+          />
+        </FieldRow>
+      </div>
+
+      {/* Duration */}
+      <FieldRow
+        label={t('form.fields.durationDays')}
+        required
+        hint={t('form.hints.durationNoExpiry')}
+        error={errors.duration_days?.message}
+      >
+        <Controller
+          control={control}
+          name='duration_days'
+          rules={{
+            required: t('form.validation.durationRequired'),
+            validate: (v) => v >= 1 || v === -1 || t('form.validation.durationRequired'),
+          }}
+          render={({ field }) => {
+            const isNoExpiry = field.value === -1;
+
+            return (
+              <div className='space-y-2'>
+                <div className='flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2'>
+                  <span className='text-xs font-medium text-muted-foreground'>{t('duration.noExpiry')}</span>
+                  <Switch
+                    checked={isNoExpiry}
+                    onCheckedChange={(checked) => field.onChange(checked ? -1 : 30)}
+                    aria-label={t('duration.noExpiry')}
+                  />
+                </div>
+
+                {isNoExpiry ? (
+                  <div className='h-10 rounded-md border border-dashed border-border bg-muted/30 px-3 text-sm text-muted-foreground flex items-center'>
+                    {t('duration.noExpiry')}
+                  </div>
+                ) : (
+                  <Input
+                    type='number'
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const rawValue = e.target.value;
+                      field.onChange(rawValue === '' ? undefined : Number(rawValue));
+                    }}
+                    onBlur={field.onBlur}
+                    placeholder='e.g. 30'
+                    className='h-10'
+                    min={1}
+                  />
+                )}
+              </div>
+            );
+          }}
+        />
+      </FieldRow>
+
+      {/* Price */}
+      <FieldRow
+        label={t('form.fields.price')}
+        required
+        hint={t('form.hints.priceFree')}
+        error={errors.price?.message}
+      >
+        <Controller
+          control={control}
+          name='price'
+          rules={{
+            validate: (v) =>
+              (typeof v === 'number' && !Number.isNaN(v) && v >= 0) ||
+              t('form.validation.priceNonNegative'),
+          }}
+          render={({ field }) => (
+            <div className='relative'>
+              <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
+                VNĐ
+              </span>
+              <Input
+                type='text'
+                inputMode='numeric'
+                value={formatVndInput(field.value)}
+                onChange={(e) => field.onChange(parseVndInput(e.target.value))}
+                onBlur={field.onBlur}
+                placeholder={t('form.fields.pricePlaceholder')}
+                className={cn('h-10 pr-12 font-medium tabular-nums', errors.price && 'border-destructive')}
+              />
+            </div>
+          )}
+        />
+      </FieldRow>
+
+      {/* Actions */}
+      <div className='flex items-center justify-end gap-3 pt-2'>
+        <Button type='button' variant='ghost' onClick={onClose}>
+          {t('actions.cancel')}
+        </Button>
+        <Button
+          type='submit'
+          disabled={isSubmitting}
+          className='bg-primary text-primary-foreground hover:bg-primary/90 gap-2 min-w-[120px]'
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className='h-4 w-4 animate-spin' />
+              {t('form.saving')}
+            </>
+          ) : (
+            t('form.save')
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Export
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function PackageFormSheet({
+  open,
+  onOpenChange,
+  type,
+  editingPackage,
+  editingBoostPackage,
+}: PackageFormSheetProps) {
+  const t = useTranslations('ManagePackages');
+  const isEdit = type === 'subscription' ? !!editingPackage : !!editingBoostPackage;
+
+  const titleKey =
+    type === 'subscription'
+      ? isEdit
+        ? 'form.editSubscriptionTitle'
+        : 'form.addSubscriptionTitle'
+      : isEdit
+        ? 'form.editBoostTitle'
+        : 'form.addBoostTitle';
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side='right'
+        className='w-full max-w-md sm:max-w-lg flex flex-col gap-0 p-0 overflow-y-auto'
+      >
+        <SheetHeader className='px-6 py-5 border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent shrink-0'>
+          <div className='flex items-center gap-3'>
+            <div className='p-2 bg-primary/10 rounded-lg border border-primary/20'>
+              {type === 'subscription' ? (
+                <Package className='h-5 w-5 text-primary' />
+              ) : (
+                <Rocket className='h-5 w-5 text-primary' />
+              )}
+            </div>
+            <div>
+              <SheetTitle className='text-base font-bold'>{t(titleKey as any)}</SheetTitle>
+              <SheetDescription className='text-xs mt-0.5'>
+                {isEdit
+                  ? 'Update existing package details'
+                  : 'Fill in the details for the new package'}
+              </SheetDescription>
+            </div>
+          </div>
+        </SheetHeader>
+
+        <div className='flex-1 px-6 py-5'>
+          {type === 'subscription' ? (
+            <SubscriptionForm
+              editing={editingPackage ?? null}
+              onClose={() => onOpenChange(false)}
+            />
+          ) : (
+            <BoostForm
+              editing={editingBoostPackage ?? null}
+              onClose={() => onOpenChange(false)}
+            />
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

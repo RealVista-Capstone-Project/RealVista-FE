@@ -13,7 +13,8 @@
       "propertyFeed": "Find Properties",
       "proposals": "My Proposals",
       "appointments": "Appointments",
-      "users": "User Management"
+      "users": "User Management",
+      "packages": "Package Management"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -32,6 +33,7 @@
       "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
       "manageUsers": "User Management",
+      "managePackages": "Package Management",
       "manageAgent": "Manage Agent"
     },
     "actionButton": {

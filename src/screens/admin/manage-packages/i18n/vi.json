@@ -1,0 +1,177 @@
+{
+  "ManagePackages": {
+    "title": "Quản lý Gói Dịch vụ",
+    "description": "Tạo, chỉnh sửa và quản lý tất cả các gói đăng ký và gói đẩy tin trong hệ thống.",
+    "tabs": {
+      "subscription": "Tính năng",
+      "subscriptionFull": "Gói Tính năng",
+      "boost": "Đẩy tin",
+      "boostFull": "Gói Đẩy tin"
+    },
+    "header": {
+      "addSubscription": "Thêm gói tính năng",
+      "addBoost": "Thêm gói đẩy tin"
+    },
+    "stats": {
+      "totalPackages": "Tổng số gói",
+      "totalSubscription": "Tổng gói tính năng",
+      "totalBoost": "Tổng gói đẩy tin",
+      "freePackages": "Gói miễn phí",
+      "paidPackages": "Gói trả phí",
+      "activeNow": "Đang hoạt động",
+      "totalFeaturedSlots": "Tổng lượt nổi bật",
+      "totalHotBadgeSlots": "Tổng huy hiệu HOT",
+      "activePackages": "Gói đang hoạt động",
+      "inactiveCount": "{count} ngừng hoạt động"
+    },
+    "search": {
+      "placeholder": "Tìm theo tên, mã gói..."
+    },
+    "filters": {
+      "featureType": "Loại tính năng",
+      "allTypes": "Tất cả",
+      "LISTING": "Tin đăng",
+      "3D_TOUR": "Tour 3D",
+      "AI_REQUEST": "AI Assistant",
+      "showInactive": "Hiện gói không hoạt động",
+      "inactive": "Không hoạt động",
+      "clearFilters": "Xoá bộ lọc",
+      "clear": "Xoá"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Ngừng hoạt động",
+      "clickToActivate": "Nhấn để kích hoạt",
+      "clickToDeactivate": "Nhấn để ngừng hoạt động"
+    },
+    "table": {
+      "columns": {
+        "package": "Gói",
+        "code": "Mã gói",
+        "featureType": "Loại",
+        "entitlement": "Hạn mức",
+        "quotas": "Quota",
+        "quota": "Quota",
+        "duration": "Thời hạn",
+        "price": "Giá",
+        "flags": "Phân loại",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "boost": {
+        "featuredQuota": "Lượt nổi bật",
+        "hotBadgeQuota": "Huy hiệu HOT",
+        "featured": "nổi bật",
+        "hotBadge": "huy hiệu HOT"
+      },
+      "units": "lượt",
+      "empty": {
+        "title": "Không tìm thấy gói nào",
+        "description": "Thử điều chỉnh bộ lọc hoặc thêm gói mới.",
+        "adjustFilters": "Thử điều chỉnh bộ lọc",
+        "createFirst": "Tạo gói đầu tiên để bắt đầu",
+        "noBoostPackages": "Không tìm thấy gói đẩy tin",
+        "addFirstBoost": "Thêm gói đẩy tin đầu tiên",
+        "adjustSearch": "Thử điều chỉnh từ khoá tìm kiếm"
+      }
+    },
+    "flags": {
+      "free": "Miễn phí",
+      "unlimited": "Không giới hạn",
+      "paid": "Trả phí"
+    },
+    "featureType": {
+      "LISTING": "Tin đăng",
+      "3D_TOUR": "Tour 3D",
+      "AI_REQUEST": "AI Assistant"
+    },
+    "duration": {
+      "noExpiry": "Không hết hạn",
+      "unlimited": "Không giới hạn",
+      "oneDay": "1 ngày",
+      "days": "{days} ngày",
+      "oneMonth": "1 tháng",
+      "months": "{months} tháng",
+      "month": "30 ngày (≈ 1 tháng)"
+    },
+    "price": {
+      "free": "Miễn phí"
+    },
+    "actions": {
+      "add": "Thêm gói",
+      "edit": "Chỉnh sửa",
+      "delete": "Xoá",
+      "activate": "Kích hoạt",
+      "deactivate": "Ngừng hoạt động",
+      "copyCode": "Sao chép mã",
+      "copyCodeSuccess": "Đã sao chép mã gói!",
+      "viewDetails": "Xem chi tiết",
+      "deleteConfirmTitle": "Xoá gói dịch vụ",
+      "deleteConfirmDescription": "Thao tác này sẽ xoá vĩnh viễn <strong>{name}</strong>. Người dùng đang có đăng ký hoạt động có thể bị ảnh hưởng.",
+      "deleteWarning": "Hành động này không thể hoàn tác.",
+      "deleteSuccess": "Đã xoá gói",
+      "deleteError": "Không thể xoá gói",
+      "deleting": "Đang xoá…",
+      "confirmDelete": "Xoá",
+      "cancel": "Huỷ",
+      "activateSuccess": "Đã kích hoạt gói",
+      "deactivateSuccess": "Đã ngừng hoạt động gói",
+      "activateError": "Không thể kích hoạt gói",
+      "deactivateError": "Không thể ngừng hoạt động gói"
+    },
+    "form": {
+      "addSubscriptionTitle": "Thêm gói tính năng",
+      "editSubscriptionTitle": "Chỉnh sửa gói tính năng",
+      "addBoostTitle": "Thêm gói đẩy tin",
+      "editBoostTitle": "Chỉnh sửa gói đẩy tin",
+      "fields": {
+        "code": "Mã gói",
+        "codePlaceholder": "Vd: LISTING_10",
+        "name": "Tên hiển thị",
+        "namePlaceholder": "Vd: Basic Listing Pack",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Mô tả ngắn về gói...",
+        "featureType": "Loại tính năng",
+        "quota": "Quota",
+        "quotaPlaceholder": "Vd: 10",
+        "durationDays": "Thời hạn (ngày)",
+        "durationPlaceholder": "Vd: 30 (dùng -1 cho không giới hạn)",
+        "price": "Giá (VND)",
+        "pricePlaceholder": "Vd: 99.000",
+        "featuredQuota": "Lượt đẩy nổi bật",
+        "featuredQuotaPlaceholder": "Vd: 5",
+        "hotBadgeQuota": "Huy hiệu HOT",
+        "hotBadgePlaceholder": "Vd: 3"
+      },
+      "hints": {
+        "code": "Mã định danh duy nhất (Vd: LISTING_10)",
+        "quotaUnlimited": "Bật công tắc Không giới hạn để bỏ giới hạn quota",
+        "durationNoExpiry": "Bật công tắc Không hết hạn để không giới hạn thời gian",
+        "priceFree": "0 = gói miễn phí"
+      },
+      "validation": {
+        "codeRequired": "Mã gói là bắt buộc",
+        "nameRequired": "Tên gói là bắt buộc",
+        "quotaPositive": "Quota phải là số dương",
+        "durationRequired": "Thời hạn là bắt buộc",
+        "priceNonNegative": "Giá phải >= 0 (nhập 0 cho gói miễn phí)"
+      },
+      "save": "Lưu gói",
+      "saving": "Đang lưu...",
+      "saveSuccess": "Đã lưu gói thành công",
+      "saveError": "Không thể lưu gói"
+    },
+    "detail": {
+      "title": "Chi tiết gói",
+      "overview": "Tổng quan",
+      "quotaInfo": "Thông tin Quota",
+      "pricing": "Giá",
+      "packageCode": "Mã gói",
+      "createdBy": "Hệ thống",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Cập nhật lần cuối",
+      "close": "Đóng"
+    }
+  }
+}
