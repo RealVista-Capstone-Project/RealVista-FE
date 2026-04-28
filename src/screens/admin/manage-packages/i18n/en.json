@@ -1,0 +1,137 @@
+{
+  "ManagePackages": {
+    "title": "Package Management",
+    "description": "Create, edit, and manage all subscription and boost packages available in the system.",
+    "tabs": {
+      "subscription": "Subscription Packages",
+      "boost": "Boost Packages"
+    },
+    "stats": {
+      "totalSubscription": "Total Subscription Packages",
+      "totalBoost": "Total Boost Packages",
+      "freePackages": "Free Packages",
+      "paidPackages": "Paid Packages",
+      "activePackages": "Active Packages"
+    },
+    "search": {
+      "placeholder": "Search by name, code..."
+    },
+    "filters": {
+      "featureType": "Feature Type",
+      "allTypes": "All Types",
+      "LISTING": "Listing",
+      "3D_TOUR": "3D Tour",
+      "AI_REQUEST": "AI Assistant",
+      "showInactive": "Show Inactive"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "columns": {
+        "package": "Package",
+        "code": "Code",
+        "featureType": "Feature Type",
+        "quota": "Quota",
+        "duration": "Duration",
+        "price": "Price",
+        "flags": "Flags",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "boost": {
+        "featuredQuota": "Featured Quota",
+        "hotBadgeQuota": "Hot Badge"
+      },
+      "empty": {
+        "title": "No packages found",
+        "description": "Try adjusting your search or add a new package."
+      }
+    },
+    "flags": {
+      "free": "Free",
+      "unlimited": "Unlimited",
+      "paid": "Paid"
+    },
+    "featureType": {
+      "LISTING": "Listing",
+      "3D_TOUR": "3D Tour",
+      "AI_REQUEST": "AI Assistant"
+    },
+    "duration": {
+      "unlimited": "Unlimited",
+      "days": "{days} days",
+      "month": "30 days (≈ 1 month)"
+    },
+    "actions": {
+      "add": "Add Package",
+      "edit": "Edit",
+      "delete": "Delete",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "copyCode": "Copy Code",
+      "copyCodeSuccess": "Package code copied!",
+      "viewDetails": "View Details",
+      "deleteConfirmTitle": "Delete Package",
+      "deleteConfirmDescription": "Are you sure you want to delete the package \"{name}\"? This action cannot be undone and may affect users who have active subscriptions.",
+      "deleteSuccess": "Package deleted successfully",
+      "deleteError": "Failed to delete package",
+      "deleting": "Deleting...",
+      "confirmDelete": "Delete Package",
+      "cancel": "Cancel",
+      "activateSuccess": "Package activated successfully",
+      "deactivateSuccess": "Package deactivated successfully",
+      "activateError": "Failed to activate package",
+      "deactivateError": "Failed to deactivate package"
+    },
+    "form": {
+      "addSubscriptionTitle": "Add Subscription Package",
+      "editSubscriptionTitle": "Edit Subscription Package",
+      "addBoostTitle": "Add Boost Package",
+      "editBoostTitle": "Edit Boost Package",
+      "fields": {
+        "code": "Package Code",
+        "codePlaceholder": "e.g. LISTING_10",
+        "name": "Display Name",
+        "namePlaceholder": "e.g. Basic Listing Pack",
+        "description": "Description",
+        "descriptionPlaceholder": "Short description of the package...",
+        "featureType": "Feature Type",
+        "quota": "Quota",
+        "quotaPlaceholder": "e.g. 10",
+        "durationDays": "Duration (days)",
+        "durationPlaceholder": "e.g. 30 (use -1 for unlimited)",
+        "price": "Price (VND)",
+        "pricePlaceholder": "e.g. 99000",
+        "featuredQuota": "Featured Quota",
+        "featuredQuotaPlaceholder": "e.g. 5",
+        "hotBadgeQuota": "Hot Badge Quota",
+        "hotBadgePlaceholder": "e.g. 3"
+      },
+      "validation": {
+        "codeRequired": "Package code is required",
+        "nameRequired": "Package name is required",
+        "quotaPositive": "Quota must be a positive number",
+        "durationRequired": "Duration is required",
+        "priceNonNegative": "Price must be 0 or greater"
+      },
+      "save": "Save Package",
+      "saving": "Saving...",
+      "saveSuccess": "Package saved successfully",
+      "saveError": "Failed to save package"
+    },
+    "detail": {
+      "title": "Package Details",
+      "overview": "Overview",
+      "quotaInfo": "Quota Information",
+      "pricing": "Pricing",
+      "packageCode": "Package Code",
+      "createdBy": "System",
+      "status": "Status",
+      "createdAt": "Created At",
+      "updatedAt": "Last Updated",
+      "close": "Close"
+    }
+  }
+}

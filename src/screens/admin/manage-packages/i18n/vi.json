@@ -1,0 +1,137 @@
+{
+  "ManagePackages": {
+    "title": "Quản lý Gói Dịch vụ",
+    "description": "Tạo, chỉnh sửa và quản lý tất cả các gói đăng ký và gói đẩy tin trong hệ thống.",
+    "tabs": {
+      "subscription": "Gói Tính năng",
+      "boost": "Gói Đẩy tin"
+    },
+    "stats": {
+      "totalSubscription": "Tổng gói tính năng",
+      "totalBoost": "Tổng gói đẩy tin",
+      "freePackages": "Gói miễn phí",
+      "paidPackages": "Gói trả phí",
+      "activePackages": "Gói đang hoạt động"
+    },
+    "search": {
+      "placeholder": "Tìm theo tên, mã gói..."
+    },
+    "filters": {
+      "featureType": "Loại tính năng",
+      "allTypes": "Tất cả",
+      "LISTING": "Tin đăng",
+      "3D_TOUR": "Tour 3D",
+      "AI_REQUEST": "AI Assistant",
+      "showInactive": "Hiện gói không hoạt động"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Ngừng hoạt động"
+    },
+    "table": {
+      "columns": {
+        "package": "Gói",
+        "code": "Mã gói",
+        "featureType": "Loại",
+        "quota": "Quota",
+        "duration": "Thời hạn",
+        "price": "Giá",
+        "flags": "Phân loại",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "boost": {
+        "featuredQuota": "Lượt nổi bật",
+        "hotBadgeQuota": "Huy hiệu HOT"
+      },
+      "empty": {
+        "title": "Không tìm thấy gói nào",
+        "description": "Thử điều chỉnh bộ lọc hoặc thêm gói mới."
+      }
+    },
+    "flags": {
+      "free": "Miễn phí",
+      "unlimited": "Không giới hạn",
+      "paid": "Trả phí"
+    },
+    "featureType": {
+      "LISTING": "Tin đăng",
+      "3D_TOUR": "Tour 3D",
+      "AI_REQUEST": "AI Assistant"
+    },
+    "duration": {
+      "unlimited": "Không giới hạn",
+      "days": "{days} ngày",
+      "month": "30 ngày (≈ 1 tháng)"
+    },
+    "actions": {
+      "add": "Thêm gói",
+      "edit": "Chỉnh sửa",
+      "delete": "Xoá",
+      "activate": "Kích hoạt",
+      "deactivate": "Ngừng hoạt động",
+      "copyCode": "Sao chép mã",
+      "copyCodeSuccess": "Đã sao chép mã gói!",
+      "viewDetails": "Xem chi tiết",
+      "deleteConfirmTitle": "Xoá gói dịch vụ",
+      "deleteConfirmDescription": "Bạn có chắc muốn xoá gói \"{name}\"? Hành động này không thể hoàn tác và có thể ảnh hưởng đến người dùng đang có đăng ký hoạt động.",
+      "deleteSuccess": "Đã xoá gói thành công",
+      "deleteError": "Không thể xoá gói",
+      "deleting": "Đang xoá...",
+      "confirmDelete": "Xoá gói",
+      "cancel": "Huỷ",
+      "activateSuccess": "Đã kích hoạt gói thành công",
+      "deactivateSuccess": "Đã ngừng hoạt động gói thành công",
+      "activateError": "Không thể kích hoạt gói",
+      "deactivateError": "Không thể ngừng hoạt động gói"
+    },
+    "form": {
+      "addSubscriptionTitle": "Thêm gói tính năng",
+      "editSubscriptionTitle": "Chỉnh sửa gói tính năng",
+      "addBoostTitle": "Thêm gói đẩy tin",
+      "editBoostTitle": "Chỉnh sửa gói đẩy tin",
+      "fields": {
+        "code": "Mã gói",
+        "codePlaceholder": "Vd: LISTING_10",
+        "name": "Tên hiển thị",
+        "namePlaceholder": "Vd: Basic Listing Pack",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Mô tả ngắn về gói...",
+        "featureType": "Loại tính năng",
+        "quota": "Quota",
+        "quotaPlaceholder": "Vd: 10",
+        "durationDays": "Thời hạn (ngày)",
+        "durationPlaceholder": "Vd: 30 (dùng -1 cho không giới hạn)",
+        "price": "Giá (VND)",
+        "pricePlaceholder": "Vd: 99000",
+        "featuredQuota": "Lượt đẩy nổi bật",
+        "featuredQuotaPlaceholder": "Vd: 5",
+        "hotBadgeQuota": "Huy hiệu HOT",
+        "hotBadgePlaceholder": "Vd: 3"
+      },
+      "validation": {
+        "codeRequired": "Mã gói là bắt buộc",
+        "nameRequired": "Tên gói là bắt buộc",
+        "quotaPositive": "Quota phải là số dương",
+        "durationRequired": "Thời hạn là bắt buộc",
+        "priceNonNegative": "Giá phải >= 0"
+      },
+      "save": "Lưu gói",
+      "saving": "Đang lưu...",
+      "saveSuccess": "Đã lưu gói thành công",
+      "saveError": "Không thể lưu gói"
+    },
+    "detail": {
+      "title": "Chi tiết gói",
+      "overview": "Tổng quan",
+      "quotaInfo": "Thông tin Quota",
+      "pricing": "Giá",
+      "packageCode": "Mã gói",
+      "createdBy": "Hệ thống",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Cập nhật lần cuối",
+      "close": "Đóng"
+    }
+  }
+}
