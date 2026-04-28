@@ -126,15 +126,19 @@ export function useAiChat() {
 
   /**
    * Send a user message and stream the AI response.
+   * @param text The message to display in the UI.
+   * @param prompt (Optional) The actual prompt to send to the AI backend. If omitted, `text` is used.
    */
-  const sendMessage = useCallback((text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || isStreaming) return;
+  const sendMessage = useCallback((text: string, prompt?: string) => {
+    const trimmedText = text.trim();
+    if (!trimmedText || isStreaming) return;
+
+    const actualPrompt = (prompt || trimmedText).trim();
 
     // Abort any in-flight stream
     abortRef.current?.abort();
 
-    const userMsg = createMessage(trimmed, 'user');
+    const userMsg = createMessage(trimmedText, 'user');
     const assistantMsg = createMessage('', 'assistant');
 
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
@@ -148,7 +152,7 @@ export function useAiChat() {
 
     sseFetch({
       url: AI_CHAT_ENDPOINT,
-      body: { message: trimmed },
+      body: { message: actualPrompt },
       signal: controller.signal,
       onData: (chunk) => {
         // Token event — append text to the assistant message

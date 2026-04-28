@@ -77,7 +77,7 @@ export function AiChatRenderer() {
       if (currentListing) {
         const contextPrefix = formatListingContext(currentListing);
         const fullPrompt = `${contextPrefix}\n\nCâu hỏi: ${text}`;
-        sendMessage(fullPrompt);
+        sendMessage(text, fullPrompt);
       } else {
         sendMessage(text);
       }
