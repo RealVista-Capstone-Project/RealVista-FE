@@ -143,12 +143,18 @@
         "hotBadgeQuota": "Hot Badge Quota",
         "hotBadgePlaceholder": "e.g. 3"
       },
+      "hints": {
+        "code": "Unique identifier used internally",
+        "quotaUnlimited": "Use the Unlimited switch to remove quota limits",
+        "durationNoExpiry": "-1 = no expiry",
+        "priceFree": "0 = free package"
+      },
       "validation": {
         "codeRequired": "Package code is required",
         "nameRequired": "Package name is required",
         "quotaPositive": "Quota must be a positive number",
         "durationRequired": "Duration is required",
-        "priceNonNegative": "Price must be 0 or greater"
+        "priceNonNegative": "Price must be 0 or greater (use 0 for free packages)"
       },
       "save": "Save Package",
       "saving": "Saving...",

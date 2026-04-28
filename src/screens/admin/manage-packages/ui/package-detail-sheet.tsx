@@ -36,7 +36,7 @@ import { cn } from '@/shared/lib/utils';
 
 function formatPrice(price: number): string {
   if (price === 0) return 'Free';
-  return price.toLocaleString('vi-VN') + ' ₫';
+  return price.toLocaleString('vi-VN') + ' VNĐ';
 }
 
 function formatDuration(days: number): string {

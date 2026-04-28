@@ -143,12 +143,18 @@
         "hotBadgeQuota": "Huy hiệu HOT",
         "hotBadgePlaceholder": "Vd: 3"
       },
+      "hints": {
+        "code": "Mã định danh duy nhất (Vd: LISTING_10)",
+        "quotaUnlimited": "Bật công tắc Không giới hạn để bỏ giới hạn quota",
+        "durationNoExpiry": "-1 = không hết hạn",
+        "priceFree": "0 = gói miễn phí"
+      },
       "validation": {
         "codeRequired": "Mã gói là bắt buộc",
         "nameRequired": "Tên gói là bắt buộc",
         "quotaPositive": "Quota phải là số dương",
         "durationRequired": "Thời hạn là bắt buộc",
-        "priceNonNegative": "Giá phải >= 0"
+        "priceNonNegative": "Giá phải >= 0 (nhập 0 cho gói miễn phí)"
       },
       "save": "Lưu gói",
       "saving": "Đang lưu...",

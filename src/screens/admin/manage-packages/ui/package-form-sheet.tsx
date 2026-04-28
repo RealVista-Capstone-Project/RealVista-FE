@@ -25,6 +25,7 @@ import { Button } from '@/shared/ui/button';
 import { Label } from '@/shared/ui/label';
 import { Separator } from '@/shared/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Switch } from '@/shared/ui/switch/switch';
 import { cn } from '@/shared/lib/utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -172,7 +173,7 @@ function SubscriptionForm({
       <FieldRow
         label={t('form.fields.code')}
         required
-        hint='Unique identifier used internally (e.g. LISTING_10)'
+        hint={t('form.hints.code')}
         error={errors.code?.message}
       >
         <Input
@@ -233,25 +234,58 @@ function SubscriptionForm({
         <FieldRow
           label={t('form.fields.quota')}
           required
-          hint='-1 = unlimited'
+          hint={t('form.hints.quotaUnlimited')}
           error={errors.quota?.message}
         >
-          <Input
-            type='number'
-            {...register('quota', {
-              valueAsNumber: true,
+          <Controller
+            control={control}
+            name='quota'
+            rules={{
               required: t('form.validation.quotaPositive'),
               validate: (v) => v >= 1 || v === -1 || t('form.validation.quotaPositive'),
-            })}
-            placeholder={t('form.fields.quotaPlaceholder')}
-            className={cn('h-10', errors.quota && 'border-destructive')}
+            }}
+            render={({ field }) => {
+              const isUnlimited = field.value === -1;
+
+              return (
+                <div className='space-y-2'>
+                  <div className='flex items-center justify-between rounded-md border border-border/60 bg-muted/20 px-3 py-2'>
+                    <span className='text-xs font-medium text-muted-foreground'>{t('flags.unlimited')}</span>
+                    <Switch
+                      checked={isUnlimited}
+                      onCheckedChange={(checked) => field.onChange(checked ? -1 : 1)}
+                      aria-label={t('flags.unlimited')}
+                    />
+                  </div>
+
+                  {isUnlimited ? (
+                    <div className='h-10 rounded-md border border-dashed border-border bg-muted/30 px-3 text-sm text-muted-foreground flex items-center'>
+                      {t('flags.unlimited')}
+                    </div>
+                  ) : (
+                    <Input
+                      type='number'
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const rawValue = e.target.value;
+                        field.onChange(rawValue === '' ? undefined : Number(rawValue));
+                      }}
+                      onBlur={field.onBlur}
+                      placeholder={t('form.fields.quotaPlaceholder')}
+                      className={cn('h-10', errors.quota && 'border-destructive')}
+                      min={1}
+                    />
+                  )}
+                </div>
+              );
+            }}
           />
         </FieldRow>
 
         <FieldRow
           label={t('form.fields.durationDays')}
           required
-          hint='-1 = no expiry'
+          hint={t('form.hints.durationNoExpiry')}
           error={errors.duration_days?.message}
         >
           <Input
@@ -268,19 +302,25 @@ function SubscriptionForm({
       </div>
 
       {/* Price */}
-      <FieldRow label={t('form.fields.price')} required error={errors.price?.message}>
+      <FieldRow
+        label={t('form.fields.price')}
+        required
+        hint={t('form.hints.priceFree')}
+        error={errors.price?.message}
+      >
         <div className='relative'>
-          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium'>
-            ₫
+          <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
+            VNĐ
           </span>
           <Input
             type='number'
             {...register('price', {
               valueAsNumber: true,
+              required: { value: true, message: t('form.validation.priceNonNegative') },
               min: { value: 0, message: t('form.validation.priceNonNegative') },
             })}
             placeholder={t('form.fields.pricePlaceholder')}
-            className={cn('h-10 pl-7', errors.price && 'border-destructive')}
+            className={cn('h-10 pr-12', errors.price && 'border-destructive')}
           />
         </div>
       </FieldRow>
@@ -385,7 +425,7 @@ function BoostForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5 pb-8'>
       {/* Code */}
-      <FieldRow label={t('form.fields.code')} required hint='e.g. BOOST_PREMIUM' error={errors.code?.message}>
+      <FieldRow label={t('form.fields.code')} required hint={t('form.hints.code')} error={errors.code?.message}>
         <Input
           {...register('code', { required: t('form.validation.codeRequired') })}
           placeholder='e.g. BOOST_PREMIUM'
@@ -449,7 +489,7 @@ function BoostForm({
       <FieldRow
         label={t('form.fields.durationDays')}
         required
-        hint='-1 = no expiry'
+        hint={t('form.hints.durationNoExpiry')}
         error={errors.duration_days?.message}
       >
         <Input
@@ -465,19 +505,25 @@ function BoostForm({
       </FieldRow>
 
       {/* Price */}
-      <FieldRow label={t('form.fields.price')} required error={errors.price?.message}>
+      <FieldRow
+        label={t('form.fields.price')}
+        required
+        hint={t('form.hints.priceFree')}
+        error={errors.price?.message}
+      >
         <div className='relative'>
-          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium'>
-            ₫
+          <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none'>
+            VNĐ
           </span>
           <Input
             type='number'
             {...register('price', {
               valueAsNumber: true,
+              required: { value: true, message: t('form.validation.priceNonNegative') },
               min: { value: 0, message: t('form.validation.priceNonNegative') },
             })}
             placeholder={t('form.fields.pricePlaceholder')}
-            className={cn('h-10 pl-7', errors.price && 'border-destructive')}
+            className={cn('h-10 pr-12', errors.price && 'border-destructive')}
           />
         </div>
       </FieldRow>

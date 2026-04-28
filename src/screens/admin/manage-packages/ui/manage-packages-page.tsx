@@ -79,10 +79,9 @@ import { PackageDetailSheet } from './package-detail-sheet';
 function formatPrice(price: number, freeLabel: string): string {
   if (price === 0) return freeLabel;
   return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+    style: 'decimal',
     maximumFractionDigits: 0,
-  }).format(price);
+  }).format(price) + ' VNĐ';
 }
 
 function formatDuration(
