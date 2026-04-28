@@ -50,10 +50,15 @@ import {
   KanbanItemHandle,
   KanbanOverlay,
 } from '@/shared/ui/kanban';
-import { MOCK_LEADS } from '../data/mock-leads';
+import {
+  useLeads,
+  useCreateLead,
+  useUpdateLeadStatus,
+  useAddLeadNote,
+} from '../api/lead.queries';
+import type { CreateLeadRequest } from '../types/api';
 import {
   Lead,
-  LeadNote,
   LeadStatus,
   LEAD_STATUS_LABELS,
   LEAD_STATUS_COLORS,
@@ -87,10 +92,10 @@ function formatRelative(iso: string) {
 }
 
 const SOURCE_LABELS: Record<Lead['source'], string> = {
-  chat: 'Chat',
-  tour: 'Đặt lịch xem',
-  call: 'Cuộc gọi',
-  manual: 'Thêm thủ công',
+  CHAT: 'Chat',
+  TOUR: 'Đặt lịch xem',
+  CALL: 'Cuộc gọi',
+  MANUAL: 'Thêm thủ công',
 };
 
 const ALL_STATUSES = Object.values(LeadStatus);
@@ -376,10 +381,11 @@ interface AddLeadModalProps {
   onClose: () => void;
   prefillLead?: Lead | null;
   leads: Lead[];
-  onSave: (updatedLeads: Lead[]) => void;
+  onCreateLead: (data: CreateLeadRequest) => void;
+  onAddNote: (leadId: string, content: string) => void;
 }
 
-function AddLeadModal({ open, onClose, prefillLead, leads, onSave }: AddLeadModalProps) {
+function AddLeadModal({ open, onClose, prefillLead, leads, onCreateLead, onAddNote }: AddLeadModalProps) {
   const isNote = !!prefillLead;
 
   const [customerName, setCustomerName] = React.useState('');
@@ -410,40 +416,18 @@ function AddLeadModal({ open, onClose, prefillLead, leads, onSave }: AddLeadModa
 
   function handleSave() {
     if (isNote) {
-      const newNote: LeadNote = {
-        id: `note-${Date.now()}`,
-        content: note,
-        createdAt: new Date().toISOString(),
-        status,
-      };
-      const updated = leads.map((l) => {
-        if (l.id !== selectedLeadId) return l;
-        return {
-          ...l,
-          status,
-          lastNote: note || l.lastNote,
-          notes: [...l.notes, newNote],
-          updatedAt: new Date().toISOString(),
-        };
-      });
-      onSave(updated);
+      const targetId = selectedLeadId || prefillLead?.id;
+      if (!targetId || !note.trim()) return;
+      onAddNote(targetId, note.trim());
     } else {
-      const newLead: Lead = {
-        id: `lead-${Date.now()}`,
-        customerName,
+      if (!customerName.trim()) return;
+      onCreateLead({
+        fullName: customerName.trim(),
         phone: phone || undefined,
         email: email || undefined,
-        propertyInterest: propertyInterest || undefined,
-        status,
-        lastNote: note || undefined,
-        notes: note
-          ? [{ id: `note-${Date.now()}`, content: note, createdAt: new Date().toISOString(), status }]
-          : [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        source: 'manual',
-      };
-      onSave([...leads, newLead]);
+        source: 'MANUAL',
+        note: note || undefined,
+      });
     }
     onClose();
   }
@@ -700,6 +684,31 @@ function LeadDetailModal({ lead, onClose, onAddNote, onStatusChange }: LeadDetai
   );
 }
 
+// ─── Map BE response → FE Lead shape ─────────────────────────────────────────
+
+import type { LeadResponse } from '../types/api';
+
+function mapLead(r: LeadResponse): Lead {
+  const lastNote = r.notes.length > 0 ? r.notes[r.notes.length - 1].content : undefined;
+  return {
+    id: r.listingLeadId,
+    customerName: r.fullName,
+    phone: r.phone ?? undefined,
+    email: r.email ?? undefined,
+    status: r.status,
+    source: r.source,
+    lastNote,
+    notes: r.notes.map((n) => ({
+      id: n.leadNoteId,
+      content: n.content,
+      createdAt: n.createdAt,
+      status: n.statusAtTime,
+    })),
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  };
+}
+
 // ─── Main CRM Page ────────────────────────────────────────────────────────────
 
 type ViewMode = 'kanban' | 'table';
@@ -711,7 +720,16 @@ const STATUS_TABS: { value: TabValue; label: string }[] = [
 ];
 
 export function CrmPage() {
-  const [leads, setLeads] = React.useState<Lead[]>(MOCK_LEADS);
+  const { data: pageData, isLoading } = useLeads();
+  const createLead = useCreateLead();
+  const updateStatus = useUpdateLeadStatus();
+  const addNote = useAddLeadNote();
+
+  const leads: Lead[] = React.useMemo(
+    () => (pageData?.content ?? []).map(mapLead),
+    [pageData]
+  );
+
   const [view, setView] = React.useState<ViewMode>('kanban');
   const [tab, setTab] = React.useState<TabValue>('all');
   const [search, setSearch] = React.useState('');
@@ -719,6 +737,15 @@ export function CrmPage() {
   const [addLeadOpen, setAddLeadOpen] = React.useState(false);
   const [addNoteTarget, setAddNoteTarget] = React.useState<Lead | null>(null);
   const [detailLead, setDetailLead] = React.useState<Lead | null>(null);
+
+  // Keep detailLead in sync when leads refresh
+  React.useEffect(() => {
+    if (detailLead) {
+      const updated = leads.find((l) => l.id === detailLead.id);
+      if (updated) setDetailLead(updated);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leads]);
 
   const filteredLeads = React.useMemo(() => {
     let result = leads;
@@ -755,24 +782,13 @@ export function CrmPage() {
 
   function handleColumnChange(newCols: Record<string, Lead[]>) {
     setColumns(newCols);
-    // Persist reordering back to leads state
-    const updatedLeads: Lead[] = [];
+    // Optimistically persist status changes from drag-and-drop
     for (const [status, colLeads] of Object.entries(newCols)) {
       for (const lead of colLeads) {
-        updatedLeads.push({ ...lead, status: status as LeadStatus });
+        if (lead.status !== status) {
+          updateStatus.mutate({ leadId: lead.id, data: { status: status as LeadStatus } });
+        }
       }
-    }
-    // Keep leads that are not in current view (filtered-out leads) untouched
-    const visibleIds = new Set(updatedLeads.map((l) => l.id));
-    const unchanged = leads.filter((l) => !visibleIds.has(l.id));
-    setLeads([...unchanged, ...updatedLeads]);
-  }
-
-  function handleSaveLeads(updated: Lead[]) {
-    setLeads(updated);
-    if (detailLead) {
-      const found = updated.find((l) => l.id === detailLead.id);
-      if (found) setDetailLead(found);
     }
   }
 
@@ -782,9 +798,8 @@ export function CrmPage() {
   }
 
   function handleStatusChange(leadId: string, status: LeadStatus) {
-    handleSaveLeads(
-      leads.map((l) => (l.id === leadId ? { ...l, status, updatedAt: new Date().toISOString() } : l))
-    );
+    updateStatus.mutate({ leadId, data: { status } });
+    if (detailLead?.id === leadId) setDetailLead((prev) => prev && { ...prev, status });
   }
 
   const totalLeads = leads.length;
@@ -795,6 +810,13 @@ export function CrmPage() {
 
   return (
     <div className='flex flex-col h-full p-6 gap-5'>
+      {isLoading && (
+        <div className='flex items-center justify-center flex-1 py-20 text-sm text-muted-foreground'>
+          Đang tải dữ liệu...
+        </div>
+      )}
+      {!isLoading && (
+      <>
       {/* Header */}
       <div className='flex items-start justify-between gap-4 flex-wrap'>
         <div>
@@ -1012,7 +1034,8 @@ export function CrmPage() {
         onClose={() => { setAddLeadOpen(false); setAddNoteTarget(null); }}
         prefillLead={addNoteTarget}
         leads={leads}
-        onSave={handleSaveLeads}
+        onCreateLead={(data) => createLead.mutate(data)}
+        onAddNote={(leadId, content) => addNote.mutate({ leadId, data: { content } })}
       />
 
       {/* Detail modal */}
@@ -1022,6 +1045,8 @@ export function CrmPage() {
         onAddNote={handleOpenAddNote}
         onStatusChange={handleStatusChange}
       />
+      </>
+      )}
     </div>
   );
 }

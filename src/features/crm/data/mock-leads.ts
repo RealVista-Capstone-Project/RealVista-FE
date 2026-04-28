@@ -32,7 +32,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-08T08:00:00Z',
     updatedAt: '2026-04-22T10:00:00Z',
-    source: 'call',
+    source: 'CALL',
   },
   {
     id: 'lead-002',
@@ -59,7 +59,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-17T10:00:00Z',
     updatedAt: '2026-04-23T09:15:00Z',
-    source: 'chat',
+    source: 'CHAT',
   },
   {
     id: 'lead-003',
@@ -85,7 +85,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-20T08:00:00Z',
     updatedAt: '2026-04-24T16:00:00Z',
-    source: 'tour',
+    source: 'TOUR',
   },
   {
     id: 'lead-004',
@@ -112,7 +112,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-14T09:00:00Z',
     updatedAt: '2026-04-21T15:30:00Z',
-    source: 'call',
+    source: 'CALL',
   },
   {
     id: 'lead-005',
@@ -132,7 +132,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-24T20:00:00Z',
     updatedAt: '2026-04-24T20:00:00Z',
-    source: 'manual',
+    source: 'MANUAL',
   },
   {
     id: 'lead-006',
@@ -159,7 +159,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-15T11:00:00Z',
     updatedAt: '2026-04-19T17:00:00Z',
-    source: 'tour',
+    source: 'TOUR',
   },
   {
     id: 'lead-007',
@@ -185,7 +185,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-01T09:00:00Z',
     updatedAt: '2026-04-12T14:00:00Z',
-    source: 'chat',
+    source: 'CHAT',
   },
   {
     id: 'lead-008',
@@ -206,6 +206,6 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-25T08:30:00Z',
     updatedAt: '2026-04-25T08:30:00Z',
-    source: 'manual',
+    source: 'MANUAL',
   },
 ];

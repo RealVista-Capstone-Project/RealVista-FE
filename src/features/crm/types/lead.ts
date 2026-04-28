@@ -89,6 +89,6 @@ export interface Lead {
   /** ISO date string */
   createdAt: string;
   updatedAt: string;
-  /** source: chat, tour, call, manual */
-  source: 'chat' | 'tour' | 'call' | 'manual';
+  /** source: CHAT, TOUR, CALL, MANUAL */
+  source: 'CHAT' | 'TOUR' | 'CALL' | 'MANUAL';
 }
