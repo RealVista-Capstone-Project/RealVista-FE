@@ -3,15 +3,26 @@
     "title": "Quản lý Gói Dịch vụ",
     "description": "Tạo, chỉnh sửa và quản lý tất cả các gói đăng ký và gói đẩy tin trong hệ thống.",
     "tabs": {
-      "subscription": "Gói Tính năng",
-      "boost": "Gói Đẩy tin"
+      "subscription": "Tính năng",
+      "subscriptionFull": "Gói Tính năng",
+      "boost": "Đẩy tin",
+      "boostFull": "Gói Đẩy tin"
+    },
+    "header": {
+      "addSubscription": "Thêm gói tính năng",
+      "addBoost": "Thêm gói đẩy tin"
     },
     "stats": {
+      "totalPackages": "Tổng số gói",
       "totalSubscription": "Tổng gói tính năng",
       "totalBoost": "Tổng gói đẩy tin",
       "freePackages": "Gói miễn phí",
       "paidPackages": "Gói trả phí",
-      "activePackages": "Gói đang hoạt động"
+      "activeNow": "Đang hoạt động",
+      "totalFeaturedSlots": "Tổng lượt nổi bật",
+      "totalHotBadgeSlots": "Tổng huy hiệu HOT",
+      "activePackages": "Gói đang hoạt động",
+      "inactiveCount": "{count} ngừng hoạt động"
     },
     "search": {
       "placeholder": "Tìm theo tên, mã gói..."
@@ -22,17 +33,24 @@
       "LISTING": "Tin đăng",
       "3D_TOUR": "Tour 3D",
       "AI_REQUEST": "AI Assistant",
-      "showInactive": "Hiện gói không hoạt động"
+      "showInactive": "Hiện gói không hoạt động",
+      "inactive": "Không hoạt động",
+      "clearFilters": "Xoá bộ lọc",
+      "clear": "Xoá"
     },
     "status": {
       "active": "Hoạt động",
-      "inactive": "Ngừng hoạt động"
+      "inactive": "Ngừng hoạt động",
+      "clickToActivate": "Nhấn để kích hoạt",
+      "clickToDeactivate": "Nhấn để ngừng hoạt động"
     },
     "table": {
       "columns": {
         "package": "Gói",
         "code": "Mã gói",
         "featureType": "Loại",
+        "entitlement": "Hạn mức",
+        "quotas": "Quota",
         "quota": "Quota",
         "duration": "Thời hạn",
         "price": "Giá",
@@ -42,11 +60,19 @@
       },
       "boost": {
         "featuredQuota": "Lượt nổi bật",
-        "hotBadgeQuota": "Huy hiệu HOT"
+        "hotBadgeQuota": "Huy hiệu HOT",
+        "featured": "nổi bật",
+        "hotBadge": "huy hiệu HOT"
       },
+      "units": "lượt",
       "empty": {
         "title": "Không tìm thấy gói nào",
-        "description": "Thử điều chỉnh bộ lọc hoặc thêm gói mới."
+        "description": "Thử điều chỉnh bộ lọc hoặc thêm gói mới.",
+        "adjustFilters": "Thử điều chỉnh bộ lọc",
+        "createFirst": "Tạo gói đầu tiên để bắt đầu",
+        "noBoostPackages": "Không tìm thấy gói đẩy tin",
+        "addFirstBoost": "Thêm gói đẩy tin đầu tiên",
+        "adjustSearch": "Thử điều chỉnh từ khoá tìm kiếm"
       }
     },
     "flags": {
@@ -60,9 +86,16 @@
       "AI_REQUEST": "AI Assistant"
     },
     "duration": {
+      "noExpiry": "Không hết hạn",
       "unlimited": "Không giới hạn",
+      "oneDay": "1 ngày",
       "days": "{days} ngày",
+      "oneMonth": "1 tháng",
+      "months": "{months} tháng",
       "month": "30 ngày (≈ 1 tháng)"
+    },
+    "price": {
+      "free": "Miễn phí"
     },
     "actions": {
       "add": "Thêm gói",
@@ -74,14 +107,15 @@
       "copyCodeSuccess": "Đã sao chép mã gói!",
       "viewDetails": "Xem chi tiết",
       "deleteConfirmTitle": "Xoá gói dịch vụ",
-      "deleteConfirmDescription": "Bạn có chắc muốn xoá gói \"{name}\"? Hành động này không thể hoàn tác và có thể ảnh hưởng đến người dùng đang có đăng ký hoạt động.",
-      "deleteSuccess": "Đã xoá gói thành công",
+      "deleteConfirmDescription": "Thao tác này sẽ xoá vĩnh viễn <strong>{name}</strong>. Người dùng đang có đăng ký hoạt động có thể bị ảnh hưởng.",
+      "deleteWarning": "Hành động này không thể hoàn tác.",
+      "deleteSuccess": "Đã xoá gói",
       "deleteError": "Không thể xoá gói",
-      "deleting": "Đang xoá...",
-      "confirmDelete": "Xoá gói",
+      "deleting": "Đang xoá…",
+      "confirmDelete": "Xoá",
       "cancel": "Huỷ",
-      "activateSuccess": "Đã kích hoạt gói thành công",
-      "deactivateSuccess": "Đã ngừng hoạt động gói thành công",
+      "activateSuccess": "Đã kích hoạt gói",
+      "deactivateSuccess": "Đã ngừng hoạt động gói",
       "activateError": "Không thể kích hoạt gói",
       "deactivateError": "Không thể ngừng hoạt động gói"
     },

@@ -3,36 +3,54 @@
     "title": "Package Management",
     "description": "Create, edit, and manage all subscription and boost packages available in the system.",
     "tabs": {
-      "subscription": "Subscription Packages",
-      "boost": "Boost Packages"
+      "subscription": "Subscription",
+      "subscriptionFull": "Subscription Packages",
+      "boost": "Boost",
+      "boostFull": "Boost Packages"
+    },
+    "header": {
+      "addSubscription": "Add Subscription Package",
+      "addBoost": "Add Boost Package"
     },
     "stats": {
+      "totalPackages": "Total packages",
       "totalSubscription": "Total Subscription Packages",
-      "totalBoost": "Total Boost Packages",
-      "freePackages": "Free Packages",
-      "paidPackages": "Paid Packages",
-      "activePackages": "Active Packages"
+      "totalBoost": "Total boost packs",
+      "freePackages": "Free packages",
+      "paidPackages": "Paid packages",
+      "activeNow": "Active now",
+      "totalFeaturedSlots": "Total featured slots",
+      "totalHotBadgeSlots": "Total hot badge slots",
+      "activePackages": "Active Packages",
+      "inactiveCount": "{count} inactive"
     },
     "search": {
-      "placeholder": "Search by name, code..."
+      "placeholder": "Search name, code..."
     },
     "filters": {
       "featureType": "Feature Type",
-      "allTypes": "All Types",
+      "allTypes": "All types",
       "LISTING": "Listing",
       "3D_TOUR": "3D Tour",
       "AI_REQUEST": "AI Assistant",
-      "showInactive": "Show Inactive"
+      "showInactive": "Show Inactive",
+      "inactive": "Inactive",
+      "clearFilters": "Clear filters",
+      "clear": "Clear"
     },
     "status": {
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "clickToActivate": "Click to activate",
+      "clickToDeactivate": "Click to deactivate"
     },
     "table": {
       "columns": {
         "package": "Package",
         "code": "Code",
-        "featureType": "Feature Type",
+        "featureType": "Type",
+        "entitlement": "Entitlement",
+        "quotas": "Quotas",
         "quota": "Quota",
         "duration": "Duration",
         "price": "Price",
@@ -42,11 +60,19 @@
       },
       "boost": {
         "featuredQuota": "Featured Quota",
-        "hotBadgeQuota": "Hot Badge"
+        "hotBadgeQuota": "Hot Badge",
+        "featured": "featured",
+        "hotBadge": "hot badge"
       },
+      "units": "units",
       "empty": {
         "title": "No packages found",
-        "description": "Try adjusting your search or add a new package."
+        "description": "Try adjusting your search or add a new package.",
+        "adjustFilters": "Try adjusting your filters",
+        "createFirst": "Create your first package to get started",
+        "noBoostPackages": "No boost packages found",
+        "addFirstBoost": "Add your first boost package",
+        "adjustSearch": "Try adjusting your search"
       }
     },
     "flags": {
@@ -60,9 +86,16 @@
       "AI_REQUEST": "AI Assistant"
     },
     "duration": {
+      "noExpiry": "No expiry",
       "unlimited": "Unlimited",
+      "oneDay": "1 day",
       "days": "{days} days",
+      "oneMonth": "1 month",
+      "months": "{months} months",
       "month": "30 days (≈ 1 month)"
+    },
+    "price": {
+      "free": "Free"
     },
     "actions": {
       "add": "Add Package",
@@ -70,18 +103,19 @@
       "delete": "Delete",
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "copyCode": "Copy Code",
-      "copyCodeSuccess": "Package code copied!",
-      "viewDetails": "View Details",
+      "copyCode": "Copy code",
+      "copyCodeSuccess": "Code copied!",
+      "viewDetails": "View details",
       "deleteConfirmTitle": "Delete Package",
-      "deleteConfirmDescription": "Are you sure you want to delete the package \"{name}\"? This action cannot be undone and may affect users who have active subscriptions.",
-      "deleteSuccess": "Package deleted successfully",
+      "deleteConfirmDescription": "This will permanently delete <strong>{name}</strong>. Users with active subscriptions may be affected.",
+      "deleteWarning": "This action cannot be undone.",
+      "deleteSuccess": "Package deleted",
       "deleteError": "Failed to delete package",
-      "deleting": "Deleting...",
-      "confirmDelete": "Delete Package",
+      "deleting": "Deleting…",
+      "confirmDelete": "Delete",
       "cancel": "Cancel",
-      "activateSuccess": "Package activated successfully",
-      "deactivateSuccess": "Package deactivated successfully",
+      "activateSuccess": "Package activated",
+      "deactivateSuccess": "Package deactivated",
       "activateError": "Failed to activate package",
       "deactivateError": "Failed to deactivate package"
     },
