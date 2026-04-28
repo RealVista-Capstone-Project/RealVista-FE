@@ -124,10 +124,17 @@ const FEATURE_TYPE_CONFIG = {
   },
 } as const;
 
-function getFeatureTypeConfig(featureType: string) {
-  const key = String(featureType ?? '')
+/** Normalise raw API value → canonical key, e.g. "_3D_TOUR" → "3D_TOUR" */
+function normalizeFeatureType(featureType: string): string {
+  return String(featureType ?? '')
     .toUpperCase()
-    .replace(/[^A-Z0-9_]/g, '_') as keyof typeof FEATURE_TYPE_CONFIG;
+    .replace(/[^A-Z0-9_]/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function getFeatureTypeConfig(featureType: string) {
+  // Strip leading/trailing underscores so "_3D_TOUR" normalises to "3D_TOUR"
+  const key = normalizeFeatureType(featureType) as keyof typeof FEATURE_TYPE_CONFIG;
   return FEATURE_TYPE_CONFIG[key] ?? FEATURE_TYPE_CONFIG['LISTING'];
 }
 
@@ -191,7 +198,11 @@ function ActiveToggle({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className='flex items-center gap-2'>
+        {/* stopPropagation prevents the row's onRowClick from firing when the toggle is clicked */}
+        <div
+          className='flex items-center gap-2'
+          onClick={(e) => e.stopPropagation()}
+        >
           <Switch
             checked={isActive}
             disabled={disabled}
@@ -288,8 +299,9 @@ function SubscriptionPackagesTab({ onAddClick }: { onAddClick: () => void }) {
     billingQueries.adminFeaturePackages(includeInactive)
   );
 
+  // Invalidate ALL admin-feature-packages queries regardless of includeInactive param
   const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: billingKeys.adminFeaturePackages() });
+    queryClient.invalidateQueries({ queryKey: [...billingKeys.all, 'admin-feature-packages'] });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminBillingApi.deleteFeaturePackage(id),
@@ -303,20 +315,16 @@ function SubscriptionPackagesTab({ onAddClick }: { onAddClick: () => void }) {
   });
 
   const activateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      setTogglingId(id);
-      return adminBillingApi.activateFeaturePackage(id);
-    },
+    mutationFn: (id: string) => adminBillingApi.activateFeaturePackage(id),
+    onMutate: (id) => setTogglingId(id),
     onSuccess: () => { toast.success(t('actions.activateSuccess')); void invalidate(); },
     onError: () => toast.error(t('actions.activateError')),
     onSettled: () => setTogglingId(null),
   });
 
   const deactivateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      setTogglingId(id);
-      return adminBillingApi.deactivateFeaturePackage(id);
-    },
+    mutationFn: (id: string) => adminBillingApi.deactivateFeaturePackage(id),
+    onMutate: (id) => setTogglingId(id),
     onSuccess: () => { toast.success(t('actions.deactivateSuccess')); void invalidate(); },
     onError: () => toast.error(t('actions.deactivateError')),
     onSettled: () => setTogglingId(null),
@@ -330,7 +338,7 @@ function SubscriptionPackagesTab({ onAddClick }: { onAddClick: () => void }) {
         p.name.toLowerCase().includes(q) ||
         p.code.toLowerCase().includes(q) ||
         (p.description?.toLowerCase().includes(q) ?? false);
-      const matchesType = featureTypeFilter === 'ALL' || p.feature_type === featureTypeFilter;
+      const matchesType = featureTypeFilter === 'ALL' || normalizeFeatureType(p.feature_type) === featureTypeFilter;
       return matchesSearch && matchesType;
     });
 
@@ -802,7 +810,7 @@ function BoostPackagesTab({ onAddClick }: { onAddClick: () => void }) {
   );
 
   const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: billingKeys.adminBoostPackages() });
+    queryClient.invalidateQueries({ queryKey: [...billingKeys.all, 'admin-boost-packages'] });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminBillingApi.deleteBoostPackage(id),
@@ -816,20 +824,16 @@ function BoostPackagesTab({ onAddClick }: { onAddClick: () => void }) {
   });
 
   const activateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      setTogglingId(id);
-      return adminBillingApi.activateBoostPackage(id);
-    },
+    mutationFn: (id: string) => adminBillingApi.activateBoostPackage(id),
+    onMutate: (id) => setTogglingId(id),
     onSuccess: () => { toast.success(t('actions.activateSuccess')); void invalidate(); },
     onError: () => toast.error(t('actions.activateError')),
     onSettled: () => setTogglingId(null),
   });
 
   const deactivateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      setTogglingId(id);
-      return adminBillingApi.deactivateBoostPackage(id);
-    },
+    mutationFn: (id: string) => adminBillingApi.deactivateBoostPackage(id),
+    onMutate: (id) => setTogglingId(id),
     onSuccess: () => { toast.success(t('actions.deactivateSuccess')); void invalidate(); },
     onError: () => toast.error(t('actions.deactivateError')),
     onSettled: () => setTogglingId(null),
