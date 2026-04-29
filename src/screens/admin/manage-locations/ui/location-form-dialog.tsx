@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
@@ -27,6 +28,7 @@ import { useCities, useChildrenLocations } from '@/entities/location/api/use-loc
 import { useCreateLocation } from '@/entities/location/api/use-create-location';
 import { useUpdateLocation } from '@/entities/location/api/use-update-location';
 import type { LocationResponse, LocationLevel } from '@/entities/location/api/location-api.types';
+import { HttpError } from '@/shared/lib/http/http';
 
 const buildSchema = (t: (key: string) => string, isEdit: boolean) =>
   z
@@ -41,19 +43,20 @@ const buildSchema = (t: (key: string) => string, isEdit: boolean) =>
       parent_district_id: z.string().optional(),
     })
     .superRefine((data, ctx) => {
-      if (isEdit) return; // parent fields are not editable — skip validation
-      if (data.level === 'DISTRICT' && !data.parent_city_id) {
-        ctx.addIssue({ code: 'custom', path: ['parent_city_id'], message: t('validation.cityRequired') });
-      }
-      if (data.level === 'WARD' && !data.parent_city_id) {
-        ctx.addIssue({ code: 'custom', path: ['parent_city_id'], message: t('validation.cityRequired') });
-      }
-      if (data.level === 'WARD' && !data.parent_district_id) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['parent_district_id'],
-          message: t('validation.districtRequired'),
-        });
+      if (!isEdit) {
+        if (data.level === 'DISTRICT' && !data.parent_city_id) {
+          ctx.addIssue({ code: 'custom', path: ['parent_city_id'], message: t('validation.cityRequired') });
+        }
+        if (data.level === 'WARD' && !data.parent_city_id) {
+          ctx.addIssue({ code: 'custom', path: ['parent_city_id'], message: t('validation.cityRequired') });
+        }
+        if (data.level === 'WARD' && !data.parent_district_id) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['parent_district_id'],
+            message: t('validation.districtRequired'),
+          });
+        }
       }
     });
 
@@ -126,24 +129,39 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
 
     if (isEdit) {
       updateLocation.mutate(
-        { id: location.location_id, req: { name: values.name, code: values.code } },
+        {
+          id: location.location_id,
+          req: {
+            name: values.name,
+            code: values.code,
+          },
+        },
         {
           onSuccess: () => {
             toast.success(t('toast.updateSuccess'));
             onOpenChange(false);
           },
-          onError: () => toast.error(t('toast.updateError')),
+          onError: (err) =>
+              toast.error(err instanceof HttpError ? err.payload?.message : undefined
+                ?? t('toast.updateError')),
         }
       );
     } else {
       createLocation.mutate(
-        { level: values.level, name: values.name, code: values.code, parent_id: parentId },
+        {
+          level: values.level,
+          name: values.name,
+          code: values.code,
+          parent_id: parentId,
+        },
         {
           onSuccess: () => {
             toast.success(t('toast.createSuccess'));
             onOpenChange(false);
           },
-          onError: () => toast.error(t('toast.createError')),
+          onError: (err) =>
+              toast.error(err instanceof HttpError ? err.payload?.message : undefined
+                ?? t('toast.createError')),
         }
       );
     }
@@ -154,6 +172,9 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>{isEdit ? t('form.editTitle') : t('form.addTitle')}</DialogTitle>
+          <DialogDescription>
+            {isEdit ? t('form.editDescription') : t('form.addDescription')}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 py-2'>
@@ -177,6 +198,9 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
               )}
             />
             {errors.level && <p className='text-xs text-destructive'>{errors.level.message}</p>}
+            {isEdit && (
+              <p className='text-xs text-muted-foreground'>{t('form.levelLockedHint')}</p>
+            )}
           </div>
 
           {/* Parent City (District & Ward) */}
@@ -244,6 +268,9 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
               {errors.parent_district_id && (
                 <p className='text-xs text-destructive'>{errors.parent_district_id.message}</p>
               )}
+              {!selectedCityId && !isEdit && (
+                <p className='text-xs text-muted-foreground'>{t('form.selectCityFirstHint')}</p>
+              )}
             </div>
           )}
 
@@ -257,8 +284,17 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
           {/* Code */}
           <div className='space-y-1.5'>
             <Label htmlFor='code'>{t('form.code')}</Label>
-            <Input id='code' placeholder={t('form.codePlaceholder')} {...register('code')} />
-            {errors.code && <p className='text-xs text-destructive'>{errors.code.message}</p>}
+            <Input
+              id='code'
+              placeholder={t('form.codePlaceholder')}
+              className='font-mono'
+              {...register('code')}
+            />
+            {errors.code ? (
+              <p className='text-xs text-destructive'>{errors.code.message}</p>
+            ) : (
+              <p className='text-xs text-muted-foreground'>{t('form.codeHint')}</p>
+            )}
           </div>
 
           <DialogFooter className='pt-2'>
