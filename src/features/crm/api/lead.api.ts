@@ -18,6 +18,7 @@ export const leadApi = {
     if (params.status) searchParams.set('status', params.status);
     if (params.from) searchParams.set('from', params.from);
     if (params.to) searchParams.set('to', params.to);
+    if (params.listingId) searchParams.set('listingId', params.listingId);
     if (params.q) searchParams.set('q', params.q);
     if (params.page !== undefined) searchParams.set('page', String(params.page));
     if (params.size !== undefined) searchParams.set('size', String(params.size));
@@ -33,6 +34,7 @@ export const leadApi = {
     const searchParams = new URLSearchParams();
     if (params.from) searchParams.set('from', params.from);
     if (params.to) searchParams.set('to', params.to);
+    if (params.listingId) searchParams.set('listingId', params.listingId);
     if (params.q) searchParams.set('q', params.q);
 
     const qs = searchParams.toString();

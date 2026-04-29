@@ -72,6 +72,7 @@ interface LeadDetailModalProps {
   onStatusChange: (leadId: string, status: LeadStatus) => void;
   onPriorityChange: (lead: Lead, priority: NonNullable<Lead['priority']>) => void;
   onOpenChat: (lead: Lead) => void;
+  onViewCalendar: (lead: Lead) => void;
 }
 
 export const LeadDetailModal = React.memo(function LeadDetailModal({
@@ -81,6 +82,7 @@ export const LeadDetailModal = React.memo(function LeadDetailModal({
   onStatusChange,
   onPriorityChange,
   onOpenChat,
+  onViewCalendar,
 }: LeadDetailModalProps) {
   if (!lead) return null;
   const canChat = !!lead.buyerId;
@@ -194,7 +196,12 @@ export const LeadDetailModal = React.memo(function LeadDetailModal({
               </Button>
             )}
             {canChat && (
-              <Button variant='outline' size='sm' className='flex-1 gap-1.5'>
+              <Button
+                variant='outline'
+                size='sm'
+                className='flex-1 gap-1.5'
+                onClick={() => onViewCalendar(lead)}
+              >
                 <CalendarIcon className='size-3.5' />
                 Đặt lịch
               </Button>

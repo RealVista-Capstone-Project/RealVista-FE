@@ -56,12 +56,13 @@ import {
   useAddLeadNote,
 } from '../api/lead.queries';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DataTable } from '@/shared/ui/data-table';
 import type { CreateLeadRequest, LeadResponse, LeadSummaryResponse } from '../types/api';
 import { Lead, LeadStatus, LEAD_STATUS_LABELS, LEAD_STATUS_COLORS } from '../types/lead';
 import { conversationApi } from '@/entities/conversation/api';
 import { conversationKeys } from '@/entities/conversation/api/keys';
+import { listingQueries } from '@/entities/listing/api';
 import { ROUTES } from '@/shared/config/routes';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -266,18 +267,20 @@ const LeadsBySourceCard = React.memo(function LeadsBySourceCard({
                   data={chartData}
                   dataKey='count'
                   nameKey='source'
-                  innerRadius={38}
+                  innerRadius={44}
                   outerRadius={56}
                   strokeWidth={3}
                 />
               </PieChart>
             </ChartContainer>
-            <div className='absolute inset-0 flex flex-col items-center justify-center text-center'>
+            <div className='absolute inset-0 flex items-center justify-center text-center'>
               <p className='text-2xl font-bold tabular-nums text-foreground'>{total}</p>
-              <p className='text-[11px] font-medium text-muted-foreground'>{t('metrics.leads')}</p>
             </div>
           </div>
           <div className='w-full space-y-2.5 sm:flex-1'>
+            <div className='rounded-lg bg-muted/40 px-3 py-2 text-sm font-medium text-foreground'>
+              Tổng: <span className='font-bold tabular-nums'>{total}</span> khách hàng tiềm năng
+            </div>
             {rows.map((row) => (
               <div key={row.source} className='flex items-center justify-between gap-4'>
                 <div className='flex items-center gap-2'>
@@ -308,9 +311,16 @@ interface LeadCardProps {
   onAddNote: (lead: Lead) => void;
   onViewDetail: (lead: Lead) => void;
   onOpenChat: (lead: Lead) => void;
+  onViewCalendar: (lead: Lead) => void;
 }
 
-const LeadCard = React.memo(function LeadCard({ lead, onAddNote, onViewDetail, onOpenChat }: LeadCardProps) {
+const LeadCard = React.memo(function LeadCard({
+  lead,
+  onAddNote,
+  onViewDetail,
+  onOpenChat,
+  onViewCalendar,
+}: LeadCardProps) {
   const nextFollowUp = formatShortDate(lead.nextFollowUpAt);
   const canChat = !!lead.buyerId;
   const priority = lead.priority ?? 'MEDIUM';
@@ -413,6 +423,7 @@ const LeadCard = React.memo(function LeadCard({ lead, onAddNote, onViewDetail, o
                       variant='ghost'
                       size='icon'
                       className='size-6 text-muted-foreground hover:text-primary'
+                      onClick={() => onViewCalendar(lead)}
                     >
                       <CalendarIcon className='size-3.5' />
                     </Button>
@@ -499,7 +510,8 @@ const KanbanColHeader = React.memo(function KanbanColHeader({
 function makeLeadColumns(
   onAddNote: (lead: Lead) => void,
   onViewDetail: (lead: Lead) => void,
-  onOpenChat: (lead: Lead) => void
+  onOpenChat: (lead: Lead) => void,
+  onViewCalendar: (lead: Lead) => void
 ): ColumnDef<Lead>[] {
   return [
     {
@@ -606,6 +618,7 @@ function makeLeadColumns(
                       variant='ghost'
                       size='icon'
                       className='size-7 text-muted-foreground hover:text-primary'
+                      onClick={() => onViewCalendar(lead)}
                     >
                       <CalendarIcon className='size-3.5' />
                     </Button>
@@ -704,16 +717,19 @@ const STATUS_TABS: { value: TabValue; label: string }[] = [
 
 export function CrmPage() {
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations('CRM');
+  const locale = useLocale();
   const queryClient = useQueryClient();
 
   const [view, setView] = React.useState<ViewMode>('kanban');
   const [tab, setTab] = React.useState<TabValue>('all');
   const [search, setSearch] = React.useState('');
+  const [listingFilter, setListingFilter] = React.useState('all');
   const deferredSearch = React.useDeferredValue(search.trim());
   const [dateRange, setDateRange] = React.useState<DateRange>(() => getInitialDateRange());
   const [tablePagination, setTablePagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+  const { data: managedListingsPage } = useQuery(listingQueries.managed({ page: 0, size: 100 }));
+  const managedListings = managedListingsPage?.content ?? [];
 
   const from = formatApiDate(dateRange.from);
   const to = formatApiDate(dateRange.to);
@@ -723,15 +739,21 @@ export function CrmPage() {
       status,
       from,
       to,
+      listingId: listingFilter === 'all' ? undefined : listingFilter,
       q: deferredSearch || undefined,
       page: view === 'table' ? tablePagination.pageIndex : 0,
       size: view === 'table' ? tablePagination.pageSize : 100,
     }),
-    [deferredSearch, from, status, tablePagination.pageIndex, tablePagination.pageSize, to, view]
+    [deferredSearch, from, listingFilter, status, tablePagination.pageIndex, tablePagination.pageSize, to, view]
   );
   const summaryFilters = React.useMemo(
-    () => ({ from, to, q: deferredSearch || undefined }),
-    [deferredSearch, from, to]
+    () => ({
+      from,
+      to,
+      listingId: listingFilter === 'all' ? undefined : listingFilter,
+      q: deferredSearch || undefined,
+    }),
+    [deferredSearch, from, listingFilter, to]
   );
 
   const { data: pageData, isLoading, isFetching } = useLeads(leadFilters);
@@ -781,7 +803,7 @@ export function CrmPage() {
 
   React.useEffect(() => {
     setTablePagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
-  }, [deferredSearch, from, status, to]);
+  }, [deferredSearch, from, listingFilter, status, to]);
 
   const handleOpenChat = React.useCallback(
     async (lead: Lead) => {
@@ -836,6 +858,18 @@ export function CrmPage() {
       }
     },
     [locale, queryClient, router]
+  );
+
+  const handleViewCalendar = React.useCallback(
+    (lead: Lead) => {
+      if (!lead.buyerId) return;
+
+      const params = new URLSearchParams({ user: lead.buyerId });
+      if (lead.listingId) params.set('listing', lead.listingId);
+
+      router.push(`/${locale}${ROUTES.dashboard.appointments}?${params.toString()}`);
+    },
+    [locale, router]
   );
 
   // Keep detailLead in sync when leads refresh
@@ -973,22 +1007,8 @@ export function CrmPage() {
   const handleCreateLead = React.useCallback(
     (data: CreateLeadRequest) => {
       createLead.mutate(data, {
-        onSuccess: async (createdLead) => {
+        onSuccess: () => {
           toast.success('Thêm khách hàng thành công');
-          if (pendingCreateStatus && pendingCreateStatus !== LeadStatus.NEW) {
-            const createdId =
-              ((createdLead as unknown as Record<string, unknown>).listing_lead_id as
-                | string
-                | undefined) ?? createdLead.listingLeadId;
-            try {
-              await updateStatus.mutateAsync({
-                leadId: createdId,
-                data: { status: pendingCreateStatus },
-              });
-            } catch (err: any) {
-              toast.error(err?.payload?.message ?? 'Tạo lead thành công nhưng đổi trạng thái thất bại');
-            }
-          }
           setAddLeadOpen(false);
           setPendingCreateStatus(null);
         },
@@ -1003,7 +1023,7 @@ export function CrmPage() {
         },
       });
     },
-    [createLead, pendingCreateStatus, updateStatus]
+    [createLead]
   );
 
   const handleAddNote = React.useCallback(
@@ -1025,8 +1045,8 @@ export function CrmPage() {
   );
 
   const leadColumns = React.useMemo(
-    () => makeLeadColumns(handleOpenAddNote, handleViewDetail, handleOpenChat),
-    [handleOpenAddNote, handleOpenChat, handleViewDetail]
+    () => makeLeadColumns(handleOpenAddNote, handleViewDetail, handleOpenChat, handleViewCalendar),
+    [handleOpenAddNote, handleOpenChat, handleViewCalendar, handleViewDetail]
   );
 
   const totalLeadsIcon = React.useMemo(() => <Users className='size-4' />, []);
@@ -1082,6 +1102,24 @@ export function CrmPage() {
           <div className='flex items-center gap-3 flex-wrap'>
             <CrmSearchInput value={search} onChange={handleSearchChange} />
 
+            {managedListings.length > 0 && (
+              <Select value={listingFilter} onValueChange={setListingFilter}>
+                <SelectTrigger className='w-full sm:w-[230px] bg-background/90 shadow-sm'>
+                  <SelectValue placeholder={t('filters.listing')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value='all'>{t('filters.allListings')}</SelectItem>
+                    {managedListings.map((listing) => (
+                      <SelectItem key={listing.listing_id} value={listing.listing_id}>
+                        {listing.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+
             <Select value={tab} onValueChange={handleTabChange}>
               <SelectTrigger className='w-full sm:w-[230px] bg-background/90 shadow-sm'>
                 <SelectValue placeholder='Lọc theo trạng thái' />
@@ -1115,7 +1153,7 @@ export function CrmPage() {
                 <div>
                   <p className='font-semibold'>Chưa có khách hàng nào</p>
                   <p className='mt-1 text-sm text-muted-foreground'>
-                    Thêm lead đầu tiên để bắt đầu theo dõi pipeline khách hàng.
+                    Thêm khách hàng đầu tiên để bắt đầu theo dõi.
                   </p>
                 </div>
                 <Button
@@ -1123,7 +1161,7 @@ export function CrmPage() {
                   onClick={() => handleOpenAddLead()}
                 >
                   <Plus className='size-4' data-icon='inline-start' />
-                  Thêm lead đầu tiên
+                  Thêm khách hàng đầu tiên
                 </Button>
               </CardContent>
             </Card>
@@ -1172,6 +1210,7 @@ export function CrmPage() {
                                       onAddNote={handleOpenAddNote}
                                       onViewDetail={handleViewDetail}
                                       onOpenChat={handleOpenChat}
+                                      onViewCalendar={handleViewCalendar}
                                     />
                                   </KanbanItemHandle>
                                 </KanbanItem>
@@ -1194,6 +1233,7 @@ export function CrmPage() {
                             onAddNote={() => {}}
                             onViewDetail={() => {}}
                             onOpenChat={() => {}}
+                            onViewCalendar={() => {}}
                           />
                         );
                       }
@@ -1229,6 +1269,7 @@ export function CrmPage() {
             open={addLeadOpen}
             onClose={handleCloseAddLead}
             prefillLead={addNoteTarget}
+            pendingStatus={pendingCreateStatus}
             leads={leads}
             onCreateLead={handleCreateLead}
             onAddNote={handleAddNote}
@@ -1242,6 +1283,7 @@ export function CrmPage() {
             onStatusChange={handleStatusChange}
             onPriorityChange={handlePriorityChange}
             onOpenChat={handleOpenChat}
+            onViewCalendar={handleViewCalendar}
           />
         </>
       )}

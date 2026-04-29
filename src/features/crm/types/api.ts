@@ -55,6 +55,7 @@ export interface CreateLeadRequest {
   buyer_id?: string;
   budget?: number;
   priority?: LeadPriority;
+  status?: LeadStatus;
   note?: string;
 }
 

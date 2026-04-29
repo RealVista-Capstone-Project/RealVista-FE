@@ -212,7 +212,7 @@ export function CrmHeader({
 
         <Button className='gap-1.5' onClick={onAddLead}>
           <Plus className='size-4' data-icon='inline-start' />
-          Thêm lead
+          Thêm khách hàng
         </Button>
       </div>
     </div>

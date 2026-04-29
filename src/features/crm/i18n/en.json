@@ -14,6 +14,10 @@
       "chat": "Chat",
       "tour": "Tour booking"
     },
+    "filters": {
+      "listing": "Filter by listing",
+      "allListings": "All listings"
+    },
     "dateRange": {
       "select": "Select date range",
       "presets": {

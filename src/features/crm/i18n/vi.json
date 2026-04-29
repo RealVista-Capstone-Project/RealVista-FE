@@ -1,18 +1,27 @@
 {
   "CRM": {
-    "title": "Bảng điều khiển CRM",
+    "title": "Quản lý khách hàng",
     "metrics": {
-      "leadsBySource": "Lead theo nguồn",
+      "leadsBySource": "Khách hàng tiềm năng theo nguồn",
       "filteredByDateAndSearch": "Lọc theo thời gian và tìm kiếm hiện tại",
-      "leads": "Lead",
+      "leads": "Khách hàng tiềm năng",
       "totalCustomers": "Tổng khách hàng",
       "totalDeals": "Tổng giao dịch",
       "fromPreviousPeriod": "so với kỳ trước"
+    },
+    "emptyState": {
+      "title": "Chưa có khách hàng nào",
+      "description": "Thêm khách hàng đầu tiên để bắt đầu theo dõi.",
+      "action": "Thêm khách hàng đầu tiên"
     },
     "sources": {
       "manual": "Thêm thủ công",
       "chat": "Chat",
       "tour": "Đặt lịch xem"
+    },
+    "filters": {
+      "listing": "Lọc theo tin đăng",
+      "allListings": "Tất cả tin đăng"
     },
     "dateRange": {
       "select": "Chọn khoảng thời gian",

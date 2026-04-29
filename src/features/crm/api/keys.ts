@@ -4,6 +4,7 @@ export interface LeadListFilters {
   status?: LeadStatus;
   from?: string;
   to?: string;
+  listingId?: string;
   q?: string;
   page?: number;
   size?: number;
@@ -12,6 +13,7 @@ export interface LeadListFilters {
 export interface LeadSummaryFilters {
   from?: string;
   to?: string;
+  listingId?: string;
   q?: string;
 }
 

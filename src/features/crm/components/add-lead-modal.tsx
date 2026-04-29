@@ -55,6 +55,7 @@ interface AddLeadModalProps {
   open: boolean;
   onClose: () => void;
   prefillLead?: Lead | null;
+  pendingStatus?: Lead['status'] | null;
   leads: Lead[];
   onCreateLead: (data: CreateLeadRequest) => void;
   onAddNote: (leadId: string, content: string) => void;
@@ -77,6 +78,7 @@ export const AddLeadModal = React.memo(function AddLeadModal({
   open,
   onClose,
   prefillLead,
+  pendingStatus,
   leads,
   onCreateLead,
   onAddNote,
@@ -153,6 +155,7 @@ export const AddLeadModal = React.memo(function AddLeadModal({
       listing_id: values.listingId,
       buyer_id: matchedBuyer?.user_id,
       priority: values.priority,
+      status: pendingStatus ?? undefined,
       note: values.note?.trim() || undefined,
     });
   }
@@ -167,7 +170,7 @@ export const AddLeadModal = React.memo(function AddLeadModal({
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <StickyNote className='size-4 text-primary' />
-            {isNote ? 'Thêm ghi chú lead' : 'Thêm khách hàng mới'}
+            {isNote ? 'Thêm ghi chú khách hàng' : 'Thêm khách hàng mới'}
           </DialogTitle>
         </DialogHeader>
 
