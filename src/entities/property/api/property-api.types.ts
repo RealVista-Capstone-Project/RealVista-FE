@@ -1,5 +1,6 @@
 export interface PropertySummaryResponse {
   property_id: string;
+  owner_id: string;
   property_type_id: string;
   street_address: string;
   status:
@@ -21,12 +22,17 @@ export interface PropertySummaryResponse {
   location_info: LocationInfo | null;
   attributes: PropertyAttributeItem[] | null;
   media: PropertyMediaItem[] | null;
+  thumbnail_url: string | null;
   amenities: PropertyAmenityItem[] | null;
-  owner_id?: string;
-  owner_name?: string;
-  owner_phone?: string;
-  has_3d?: boolean;
-  price_range?: PropertyPriceRange | null;
+  owner_name: string | null;
+  owner_phone: string | null;
+  has_3d: boolean;
+  price_range: PropertyPriceRange | null;
+  sold_by_user_id: string | null;
+  sold_by_name: string | null;
+  sold_by_phone: string | null;
+  sold_by_role: 'OWNER' | 'AGENT' | null;
+  sold_at: string | null;
 }
 export interface PropertySearchRequest {
   north_lat: number;
@@ -141,6 +147,7 @@ export interface PropertyAttributeDefinition {
 
 export interface PropertySummaryResponse {
   property_id: string;
+  owner_id: string;
   property_type_id: string;
   street_address: string;
   status:
@@ -162,10 +169,17 @@ export interface PropertySummaryResponse {
   location_info: LocationInfo | null;
   attributes: PropertyAttributeItem[] | null;
   media: PropertyMediaItem[] | null;
+  thumbnail_url: string | null;
   amenities: PropertyAmenityItem[] | null;
-  owner_id?: string;
-  owner_name?: string;
-  owner_phone?: string;
+  owner_name: string | null;
+  owner_phone: string | null;
+  has_3d: boolean;
+  price_range: PropertyPriceRange | null;
+  sold_by_user_id: string | null;
+  sold_by_name: string | null;
+  sold_by_phone: string | null;
+  sold_by_role: 'OWNER' | 'AGENT' | null;
+  sold_at: string | null;
 }
 
 export interface PageResponse<T> {
@@ -365,6 +379,8 @@ export interface LocationInfo {
   longitude: number | null;
 }
 
+export type PropertyAttributeRangeDTO = Record<string, any>;
+
 export interface PropertyAttributeItem {
   attribute_id: string;
   attribute_code: string;
@@ -372,20 +388,23 @@ export interface PropertyAttributeItem {
   data_type: string;
   icon: string | null;
   unit: string | null;
+  priority?: number | null;
   value_number: number | null;
   value_text: string | null;
   value_boolean: boolean | null;
+  ranges?: PropertyAttributeRangeDTO[] | null;
   display_value?: string | null;
 }
 
 export interface PropertyMediaItem {
-  media_id: string;
-  media_type: string;
-  media_url: string;
+  media_id: string | null;
+  media_type: 'VIDEO' | 'IMAGE' | 'THREE_D' | null;
+  media_url: string | null;
   thumbnail_url: string | null;
-  is_primary: boolean;
-  is_property_standard: boolean;
-  display_order: number;
+  is_primary: boolean | null;
+  is_property_standard: boolean | null;
+  display_order: number | null;
+  metadata?: Record<string, any> | null;
 }
 
 export interface PropertyAmenityItem {

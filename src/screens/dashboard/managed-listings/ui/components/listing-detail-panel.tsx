@@ -16,6 +16,7 @@ import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 import { ListingLifetimeCard } from './listing-lifetime-card';
 import { ListingBoostSection } from './listing-boost-section';
 import { Link } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import {
@@ -128,7 +129,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
       if (conversationId) {
         if (isMobile) {
           const locale = params?.locale || 'vi';
-          router.push(`/${locale}/messages/${conversationId}`);
+          router.push(`/${locale}${ROUTES.dashboard.messages}/${conversationId}`);
         } else {
           openWindow(conversationId, {
             id: listing.agent!.user_id,

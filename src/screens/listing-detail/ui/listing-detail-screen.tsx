@@ -31,6 +31,7 @@ import { formatVND } from '@/shared/lib/utils/format-currency';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { behaviorTracker } from '@/shared/lib/analytics';
+import { ROUTES } from '@/shared/config/routes';
 import {
   Dialog,
   DialogContent,
@@ -140,7 +141,7 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
       if (conversationId) {
         if (isMobile) {
           const locale = params?.locale || 'vi';
-          router.push(`/${locale}/messages/${conversationId}`);
+          router.push(`/${locale}${ROUTES.dashboard.messages}/${conversationId}`);
         } else {
           openWindow(conversationId, {
             id: listing.agent!.user_id,

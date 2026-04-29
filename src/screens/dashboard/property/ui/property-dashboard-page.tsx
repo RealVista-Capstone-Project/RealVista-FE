@@ -101,6 +101,7 @@ function PropertyListCard({
 }) {
   const t = useTranslations('PropertyDashboard');
   const thumbnailUrl =
+    property.thumbnail_url ??
     property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
     property.media?.[0]?.media_url;
 
@@ -665,6 +666,14 @@ function PropertyDetailPanel({
     .join(', ');
 
   const currentImageUrl = images[imgIndex]?.media_url;
+  const soldByText =
+    property.status !== 'SOLD'
+      ? null
+      : property.sold_by_role === 'OWNER'
+        ? 'Được bán bởi bạn'
+        : property.sold_by_role === 'AGENT'
+          ? `Được bán bởi agent${property.sold_by_name ? ` ... ${property.sold_by_name}` : ''}`
+          : null;
 
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
@@ -816,15 +825,20 @@ function PropertyDetailPanel({
           if (!canChange) {
             // Static badge — final / system status
             return (
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border',
-                  getStatusStyle(property.status)
+              <div className='inline-flex items-center gap-2'>
+                <span
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border',
+                    getStatusStyle(property.status)
+                  )}
+                >
+                  {currentOpt?.icon}
+                  {t(`status${property.status}` as Parameters<typeof t>[0])}
+                </span>
+                {soldByText && (
+                  <span className='text-xs font-medium text-muted-foreground'>{soldByText}</span>
                 )}
-              >
-                {currentOpt?.icon}
-                {t(`status${property.status}` as Parameters<typeof t>[0])}
-              </span>
+              </div>
             );
           }
 

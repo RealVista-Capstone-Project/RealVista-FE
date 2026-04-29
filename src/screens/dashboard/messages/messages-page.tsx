@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -87,10 +87,15 @@ function stringToAvatarBg(str: string): string {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 
-export function MessagesPage() {
+interface MessagesPageProps {
+  conversationId?: string;
+}
+
+export function MessagesPage({ conversationId }: MessagesPageProps = {}) {
   const [messageInput, setMessageInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDetail, setShowDetail] = useState(false);
+  const [hasResolvedUrlConversation, setHasResolvedUrlConversation] = useState(!conversationId);
 
   /**
    * Listing that was clicked via the per-card "Create Contract" button.
@@ -130,9 +135,25 @@ export function MessagesPage() {
   }, [convData]);
 
   // Default to the most recent conversation (first in list — sorted by BE)
-  const [activeConvId, setActiveConvId] = useState<string>('');
-  const effectiveActiveId = activeConvId || conversations[0]?.id || '';
-  const activeConv = conversations.find((c) => c.id === effectiveActiveId) ?? conversations[0];
+  const [activeConvId, setActiveConvId] = useState<string>(conversationId ?? '');
+  const effectiveActiveId = activeConvId || (hasResolvedUrlConversation ? conversations[0]?.id ?? '' : '');
+  const activeConv = conversations.find((c) => c.id === effectiveActiveId);
+
+  useEffect(() => {
+    if (conversationId) setActiveConvId(conversationId);
+  }, [conversationId]);
+
+  useEffect(() => {
+    if (!conversationId) return;
+    if (conversations.some((c) => c.id === conversationId)) {
+      setHasResolvedUrlConversation(true);
+      return;
+    }
+
+    if (!isLoading) {
+      setHasResolvedUrlConversation(true);
+    }
+  }, [conversationId, conversations, isLoading]);
 
   // ── Extract ALL unique listings from active conversation messages ─────────
   //    Use useQuery (same key as ChatMessages) so this re-computes reactively
