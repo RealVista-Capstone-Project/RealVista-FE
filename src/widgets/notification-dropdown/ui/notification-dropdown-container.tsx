@@ -17,6 +17,7 @@ import {
   type NotificationResponse,
   type NotificationPageResponse,
 } from '@/entities/notification';
+import { ROUTES } from '@/shared/config/routes';
 import { useNotificationWebSocket } from '../hooks/use-notification-websocket';
 import { NotificationDropdown } from './notification-dropdown';
 
@@ -97,6 +98,8 @@ export function NotificationDropdownContainer() {
       if (n.entityId) {
         navigateTo3d(n.entityId, n.metadata);
       }
+    } else if (n.eventType === NotificationEventType.OWNER_ENGAGEMENT_REVIEW_REMINDER) {
+      router.push(`/${locale}${ROUTES.dashboard.manageAgent}`);
     } else if (n.eventType.includes('TOUR')) {
       router.push(`/${locale}/appointments`);
     } else if (n.metadata?.listing_id) {

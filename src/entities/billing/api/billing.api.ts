@@ -8,6 +8,10 @@ import type {
   FeaturePackage,
   TransactionStatusResponse,
   TransactionResponse,
+  CreateFeaturePackageRequest,
+  UpdateFeaturePackageRequest,
+  CreateBoostPackageRequest,
+  UpdateBoostPackageRequest,
 } from '../model/billing.types';
 
 interface ApiResponse<T> {
@@ -57,6 +61,66 @@ export const billingApi = {
   saveTransaction: (transactionId: string) =>
     http.post<ApiResponse<TransactionResponse>>(
       `/billing/transactions/${transactionId}/save`,
+      {}
+    ),
+};
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Admin Billing API
+// ───────────────────────────────────────────────────────────────────────────────
+
+export const adminBillingApi = {
+  // ── Feature Packages ──────────────────────────────────────────────────────────
+  getFeaturePackages: (includeInactive = true) =>
+    http.get<ApiResponse<FeaturePackage[]>>(
+      `/admin/billing/feature-packages?include_inactive=${includeInactive}`
+    ),
+
+  createFeaturePackage: (body: CreateFeaturePackageRequest) =>
+    http.post<ApiResponse<FeaturePackage>>(`/admin/billing/feature-packages`, body),
+
+  updateFeaturePackage: (id: string, body: UpdateFeaturePackageRequest) =>
+    http.put<ApiResponse<FeaturePackage>>(`/admin/billing/feature-packages/${id}`, body),
+
+  deleteFeaturePackage: (id: string) =>
+    http.delete<ApiResponse<null>>(`/admin/billing/feature-packages/${id}`),
+
+  activateFeaturePackage: (id: string) =>
+    http.patch<ApiResponse<FeaturePackage>>(
+      `/admin/billing/feature-packages/${id}/activate`,
+      {}
+    ),
+
+  deactivateFeaturePackage: (id: string) =>
+    http.patch<ApiResponse<FeaturePackage>>(
+      `/admin/billing/feature-packages/${id}/deactivate`,
+      {}
+    ),
+
+  // ── Boost Packages ────────────────────────────────────────────────────────────
+  getBoostPackages: (includeInactive = true) =>
+    http.get<ApiResponse<BoostPackage[]>>(
+      `/admin/billing/boost-packages?include_inactive=${includeInactive}`
+    ),
+
+  createBoostPackage: (body: CreateBoostPackageRequest) =>
+    http.post<ApiResponse<BoostPackage>>(`/admin/billing/boost-packages`, body),
+
+  updateBoostPackage: (id: string, body: UpdateBoostPackageRequest) =>
+    http.put<ApiResponse<BoostPackage>>(`/admin/billing/boost-packages/${id}`, body),
+
+  deleteBoostPackage: (id: string) =>
+    http.delete<ApiResponse<null>>(`/admin/billing/boost-packages/${id}`),
+
+  activateBoostPackage: (id: string) =>
+    http.patch<ApiResponse<BoostPackage>>(
+      `/admin/billing/boost-packages/${id}/activate`,
+      {}
+    ),
+
+  deactivateBoostPackage: (id: string) =>
+    http.patch<ApiResponse<BoostPackage>>(
+      `/admin/billing/boost-packages/${id}/deactivate`,
       {}
     ),
 };

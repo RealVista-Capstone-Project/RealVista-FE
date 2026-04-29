@@ -7,8 +7,14 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
-  const enCommon = (await import(`@/shared/segments/common/en.json`)).default as Record<string, unknown>;
-  const localeCommon = (await import(`@/shared/segments/common/${locale}.json`)).default as Record<string, unknown>;
+  const enCommon = (await import(`@/shared/segments/common/en.json`)).default as Record<
+    string,
+    unknown
+  >;
+  const localeCommon = (await import(`@/shared/segments/common/${locale}.json`)).default as Record<
+    string,
+    unknown
+  >;
 
   const commonMessages: Record<string, unknown> =
     locale === 'en'
@@ -57,6 +63,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/screens/dashboard/messages/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/admin/manage-users/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/admin/manage-locations/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/admin/manage-packages/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/delegate-agent/i18n/${locale}.json`)).default,
       ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
