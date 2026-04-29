@@ -1,0 +1,34 @@
+{
+  "CRM": {
+    "title": "Bảng điều khiển CRM",
+    "metrics": {
+      "leadsBySource": "Lead theo nguồn",
+      "filteredByDateAndSearch": "Lọc theo thời gian và tìm kiếm hiện tại",
+      "leads": "Lead",
+      "totalCustomers": "Tổng khách hàng",
+      "totalDeals": "Tổng giao dịch",
+      "fromPreviousPeriod": "so với kỳ trước"
+    },
+    "sources": {
+      "manual": "Thêm thủ công",
+      "chat": "Chat",
+      "tour": "Đặt lịch xem"
+    },
+    "dateRange": {
+      "select": "Chọn khoảng thời gian",
+      "presets": {
+        "today": "Hôm nay",
+        "yesterday": "Hôm qua",
+        "thisWeek": "Tuần này",
+        "last7Days": "7 ngày qua",
+        "last28Days": "28 ngày qua",
+        "thisMonth": "Tháng này",
+        "lastMonth": "Tháng trước",
+        "thisYear": "Năm nay"
+      }
+    },
+    "pagination": {
+      "pageInfo": "Trang {current} / {total}"
+    }
+  }
+}

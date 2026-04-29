@@ -76,19 +76,24 @@ export interface LeadNote {
 
 export interface Lead {
   id: string;
+  listingId?: string;
   customerName: string;
   avatarUrl?: string;
+  buyerId?: string;
   phone?: string;
   email?: string;
   /** property or listing the customer is interested in */
   propertyInterest?: string;
   status: LeadStatus;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  lastContactedAt?: string;
+  nextFollowUpAt?: string;
   /** last note content (shortcut display) */
   lastNote?: string;
   notes: LeadNote[];
   /** ISO date string */
   createdAt: string;
   updatedAt: string;
-  /** source: CHAT, TOUR, CALL, MANUAL */
-  source: 'CHAT' | 'TOUR' | 'CALL' | 'MANUAL';
+  /** source: CHAT, TOUR, MANUAL */
+  source: 'CHAT' | 'TOUR' | 'MANUAL';
 }

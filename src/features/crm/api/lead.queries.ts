@@ -1,7 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { leadApi } from './lead.api';
-import { leadKeys } from './keys';
-import { LeadStatus } from '../types/lead';
+import { leadKeys, type LeadListFilters, type LeadSummaryFilters } from './keys';
 import type {
   CreateLeadRequest,
   UpdateLeadRequest,
@@ -9,10 +8,20 @@ import type {
   AddLeadNoteRequest,
 } from '../types/api';
 
-export function useLeads(status?: LeadStatus) {
+export function useLeads(filters: LeadListFilters = {}) {
   return useQuery({
-    queryKey: leadKeys.list(status),
-    queryFn: () => leadApi.getLeads({ status, size: 100 }),
+    queryKey: leadKeys.list(filters),
+    queryFn: () => leadApi.getLeads({ size: 100, ...filters }),
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useLeadSummary(filters: LeadSummaryFilters = {}) {
+  return useQuery({
+    queryKey: leadKeys.summary(filters),
+    queryFn: () => leadApi.getSummary(filters),
+    placeholderData: keepPreviousData,
     staleTime: 30 * 1000,
   });
 }

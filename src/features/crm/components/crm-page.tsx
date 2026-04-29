@@ -1,31 +1,30 @@
 'use client';
 
 import * as React from 'react';
+import { toast } from 'sonner';
 import {
   Users,
-  LayoutGrid,
-  List,
   Plus,
   Phone,
   MessageCircle,
-  Calendar,
+  Calendar as CalendarIcon,
   StickyNote,
   Building2,
-  Search,
   GripVertical,
+  Briefcase,
 } from 'lucide-react';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
+import { Pie, PieChart } from 'recharts';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import { Input } from '@/shared/ui/input';
-import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/shared/ui/dialog';
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/shared/ui/chart';
 import {
   Select,
   SelectContent,
@@ -34,11 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { Textarea } from '@/shared/ui/textarea';
-import { Label } from '@/shared/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
-import { Card, CardContent, CardHeader } from '@/shared/ui/card';
-import { Separator } from '@/shared/ui/separator';
+import { Card, CardContent } from '@/shared/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/ui/tooltip';
 import {
   Kanban,
@@ -49,27 +45,44 @@ import {
   KanbanItem,
   KanbanItemHandle,
   KanbanOverlay,
+  type KanbanMoveEvent,
 } from '@/shared/ui/kanban';
 import {
   useLeads,
+  useLeadSummary,
   useCreateLead,
+  useUpdateLead,
   useUpdateLeadStatus,
   useAddLeadNote,
 } from '../api/lead.queries';
-import type { CreateLeadRequest } from '../types/api';
-import {
-  Lead,
-  LeadStatus,
-  LEAD_STATUS_LABELS,
-  LEAD_STATUS_COLORS,
-} from '../types/lead';
+import type { ColumnDef } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
+import { DataTable } from '@/shared/ui/data-table';
+import type { CreateLeadRequest, LeadResponse, LeadSummaryResponse } from '../types/api';
+import { Lead, LeadStatus, LEAD_STATUS_LABELS, LEAD_STATUS_COLORS } from '../types/lead';
+import { conversationApi } from '@/entities/conversation/api';
+import { conversationKeys } from '@/entities/conversation/api/keys';
+import { ROUTES } from '@/shared/config/routes';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { CrmContentSkeleton } from './crm-content-skeleton';
+import { CrmHeader, getInitialDateRange } from './crm-header';
+import { CrmSearchInput } from './crm-search-input';
+import { AddLeadModal } from './add-lead-modal';
+import { LeadDetailModal } from './lead-detail-modal';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function getInitials(name: string) {
-  return name
-    .split(' ')
+type TranslationFn = ReturnType<typeof useTranslations>;
+
+function getInitials(name?: string | null) {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) return '?';
+
+  return parts
     .map((n) => n[0])
+    .filter(Boolean)
     .slice(0, 2)
     .join('')
     .toUpperCase();
@@ -84,18 +97,68 @@ function formatDate(iso: string) {
 }
 
 function formatRelative(iso: string) {
+  if (!iso) return 'Chưa cập nhật';
   const diff = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(diff)) return 'Chưa cập nhật';
   const days = Math.floor(diff / 86400000);
   if (days === 0) return 'Hôm nay';
   if (days === 1) return 'Hôm qua';
   return `${days} ngày trước`;
 }
 
+function formatShortDate(iso?: string) {
+  if (!iso) return undefined;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+}
+
+function formatApiDate(date?: Date) {
+  return date ? format(date, 'yyyy-MM-dd') : undefined;
+}
+
+function getPercentChange(current: number, previous: number) {
+  if (previous === 0) return current === 0 ? 0 : 100;
+  return ((current - previous) / previous) * 100;
+}
+
+function getPageCount(pageData: unknown) {
+  const page = pageData as { total_pages?: number; totalPages?: number } | undefined;
+  return page?.total_pages ?? page?.totalPages ?? 0;
+}
+
+const SOURCE_LABEL_KEYS: Record<Lead['source'], string> = {
+  CHAT: 'sources.chat',
+  TOUR: 'sources.tour',
+  MANUAL: 'sources.manual',
+};
+
 const SOURCE_LABELS: Record<Lead['source'], string> = {
   CHAT: 'Chat',
   TOUR: 'Đặt lịch xem',
-  CALL: 'Cuộc gọi',
   MANUAL: 'Thêm thủ công',
+};
+
+const SOURCE_COLORS: Record<Lead['source'], string> = {
+  MANUAL: 'var(--primary)',
+  CHAT: 'var(--chart-2)',
+  TOUR: 'var(--chart-3)',
+};
+
+const SOURCE_ORDER: Lead['source'][] = ['MANUAL', 'CHAT', 'TOUR'];
+
+const PRIORITY_LABELS: Record<NonNullable<Lead['priority']>, string> = {
+  LOW: 'Thấp',
+  MEDIUM: 'Trung bình',
+  HIGH: 'Cao',
+  URGENT: 'Khẩn cấp',
+};
+
+const PRIORITY_COLORS: Record<NonNullable<Lead['priority']>, string> = {
+  LOW: 'bg-slate-100 text-slate-700 border-slate-300 shadow-slate-200/70',
+  MEDIUM: 'bg-blue-100 text-blue-800 border-blue-300 shadow-blue-200/70',
+  HIGH: 'bg-amber-100 text-amber-800 border-amber-300 shadow-amber-200/70',
+  URGENT: 'bg-red-100 text-red-800 border-red-300 shadow-red-200/70',
 };
 
 const ALL_STATUSES = Object.values(LeadStatus);
@@ -103,22 +166,140 @@ const ALL_STATUSES = Object.values(LeadStatus);
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: LeadStatus }) {
-  const c = LEAD_STATUS_COLORS[status];
+  const resolvedStatus = LEAD_STATUS_COLORS[status] ? status : LeadStatus.NEW;
+  const c = LEAD_STATUS_COLORS[resolvedStatus];
   return (
-    <Badge
-      variant="outline"
-      className={cn(
-        'gap-1.5 font-medium border',
-        c.bg,
-        c.text,
-        c.border
-      )}
-    >
+    <Badge variant='outline' className={cn('gap-1.5 font-medium border', c.bg, c.text, c.border)}>
       <span className={cn('size-1.5 rounded-full', c.dot)} />
-      {LEAD_STATUS_LABELS[status]}
+      {LEAD_STATUS_LABELS[resolvedStatus]}
     </Badge>
   );
 }
+
+const MetricCard = React.memo(function MetricCard({
+  title,
+  value,
+  previousValue,
+  icon,
+  comparisonLabel,
+}: {
+  title: string;
+  value: number;
+  previousValue: number;
+  icon: React.ReactNode;
+  comparisonLabel: string;
+}) {
+  const change = getPercentChange(value, previousValue);
+  const isNegative = change < 0;
+
+  return (
+    <Card className='h-[92px] rounded-2xl border-border/80 bg-card py-0 shadow-sm'>
+      <CardContent className='flex h-full items-center justify-between gap-4 px-4 py-3'>
+        <div className='space-y-1'>
+          <p className='text-sm font-medium text-muted-foreground'>{title}</p>
+          <p className='text-2xl font-bold tracking-tight text-foreground tabular-nums'>{value}</p>
+          <p className='text-xs text-muted-foreground'>
+            <span className={cn('font-semibold', isNegative ? 'text-red-500' : 'text-emerald-500')}>
+              {change > 0 ? '+' : ''}
+              {change.toFixed(1)}%
+            </span>{' '}
+            {comparisonLabel}
+          </p>
+        </div>
+        <div className='flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primary'>
+          {icon}
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+const LeadsBySourceCard = React.memo(function LeadsBySourceCard({
+  summary,
+  t,
+}: {
+  summary?: LeadSummaryResponse;
+  t: TranslationFn;
+}) {
+  const rawRows = summary?.bySource ?? [];
+  const rows = SOURCE_ORDER.map((source) => ({
+    source,
+    count: rawRows.find((row) => row.source === source)?.count ?? 0,
+  }));
+  const total = summary?.totalLeads ?? rows.reduce((sum, row) => sum + row.count, 0);
+  const chartData = rows.map((row) => ({
+    source: row.source.toLowerCase(),
+    count: row.count,
+    fill: `var(--color-${row.source.toLowerCase()})`,
+  }));
+  const chartConfig = {
+    manual: {
+      label: t(SOURCE_LABEL_KEYS.MANUAL),
+      color: SOURCE_COLORS.MANUAL,
+    },
+    chat: {
+      label: t(SOURCE_LABEL_KEYS.CHAT),
+      color: SOURCE_COLORS.CHAT,
+    },
+    tour: {
+      label: t(SOURCE_LABEL_KEYS.TOUR),
+      color: SOURCE_COLORS.TOUR,
+    },
+  } satisfies ChartConfig;
+
+  return (
+    <Card className='h-[196px] rounded-2xl border-border/80 bg-card py-0 shadow-sm'>
+      <CardContent className='flex h-full flex-col gap-1 px-4 py-3'>
+        <div>
+          <p className='text-sm font-semibold text-foreground'>{t('metrics.leadsBySource')}</p>
+          <p className='text-xs text-muted-foreground'>{t('metrics.filteredByDateAndSearch')}</p>
+        </div>
+        <div className='flex flex-1 flex-col items-center justify-center gap-4 sm:flex-row sm:items-center'>
+          <div className='relative size-32 shrink-0'>
+            <ChartContainer config={chartConfig} className='aspect-square size-full min-h-[128px]'>
+              <PieChart accessibilityLayer>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel nameKey='source' />}
+                />
+                <Pie
+                  data={chartData}
+                  dataKey='count'
+                  nameKey='source'
+                  innerRadius={38}
+                  outerRadius={56}
+                  strokeWidth={3}
+                />
+              </PieChart>
+            </ChartContainer>
+            <div className='absolute inset-0 flex flex-col items-center justify-center text-center'>
+              <p className='text-2xl font-bold tabular-nums text-foreground'>{total}</p>
+              <p className='text-[11px] font-medium text-muted-foreground'>{t('metrics.leads')}</p>
+            </div>
+          </div>
+          <div className='w-full space-y-2.5 sm:flex-1'>
+            {rows.map((row) => (
+              <div key={row.source} className='flex items-center justify-between gap-4'>
+                <div className='flex items-center gap-2'>
+                  <span
+                    className='size-2.5 rounded-full'
+                    style={{ backgroundColor: SOURCE_COLORS[row.source] }}
+                  />
+                  <span className='text-sm font-medium text-muted-foreground'>
+                    {t(SOURCE_LABEL_KEYS[row.source])}
+                  </span>
+                </div>
+                <span className='text-sm font-semibold tabular-nums text-foreground'>
+                  {row.count}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
 
 // ─── Lead Card (Kanban) ───────────────────────────────────────────────────────
 
@@ -126,60 +307,267 @@ interface LeadCardProps {
   lead: Lead;
   onAddNote: (lead: Lead) => void;
   onViewDetail: (lead: Lead) => void;
+  onOpenChat: (lead: Lead) => void;
 }
 
-function LeadCard({ lead, onAddNote, onViewDetail }: LeadCardProps) {
+const LeadCard = React.memo(function LeadCard({ lead, onAddNote, onViewDetail, onOpenChat }: LeadCardProps) {
+  const nextFollowUp = formatShortDate(lead.nextFollowUpAt);
+  const canChat = !!lead.buyerId;
+  const priority = lead.priority ?? 'MEDIUM';
+
   return (
     <Card
-      className='border-border/60 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group'
+      className='border-border/60 py-0 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group'
       onClick={() => onViewDetail(lead)}
     >
-      <CardContent className='p-4 flex flex-col gap-3'>
+      <CardContent className='p-2 flex flex-col gap-1.5'>
         {/* Header row */}
         <div className='flex items-start justify-between gap-2'>
-          <div className='flex items-center gap-2.5 min-w-0'>
+          <div className='flex items-center gap-2 min-w-0'>
+            <Avatar className='size-7 shrink-0'>
+              <AvatarImage src={lead.avatarUrl} alt={lead.customerName || 'Khách hàng'} />
+              <AvatarFallback className='text-xs bg-primary/10 text-primary font-semibold'>
+                {getInitials(lead.customerName)}
+              </AvatarFallback>
+            </Avatar>
+            <div className='min-w-0'>
+              <p className='text-sm font-semibold truncate'>{lead.customerName || 'Khách hàng'}</p>
+              <p className='text-[11px] text-muted-foreground/60 truncate'>
+                {lead.phone || lead.email || 'Chưa có liên hệ'}
+              </p>
+            </div>
+          </div>
+          <Badge
+            variant='outline'
+            className={cn(
+              'h-5 shrink-0 px-1.5 text-[10px] font-bold shadow-sm',
+              PRIORITY_COLORS[priority]
+            )}
+          >
+            {PRIORITY_LABELS[priority]}
+          </Badge>
+        </div>
+
+        {/* Property interest */}
+        {lead.propertyInterest && (
+          <div className='flex items-center gap-1.5'>
+            <Building2 className='size-3.5 shrink-0 text-muted-foreground' />
+            <p className='text-xs text-muted-foreground truncate'>{lead.propertyInterest}</p>
+          </div>
+        )}
+
+        <div className='rounded-md border border-primary/10 bg-primary/[0.035] px-2 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]'>
+          <div className='mb-0.5 flex items-center gap-2'>
+            <p className='text-[11px] font-medium text-muted-foreground'>Ghi chú</p>
+          </div>
+          <p className='text-xs text-foreground/80 line-clamp-2'>
+            {lead.lastNote ||
+              (nextFollowUp ? `Follow-up ngày ${nextFollowUp}` : 'Chưa có ghi chú tiếp theo')}
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className='flex items-center justify-between gap-2 pt-0.5'>
+          <span className='text-[11px] text-muted-foreground'>
+            {nextFollowUp ? `Follow-up ${nextFollowUp}` : formatRelative(lead.updatedAt)}
+          </span>
+          <div
+            className='flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <TooltipProvider delayDuration={300}>
+              {lead.phone && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='size-6 text-muted-foreground hover:text-primary'
+                      onClick={() => window.open(`tel:${lead.phone}`)}
+                    >
+                      <Phone className='size-3.5' />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Gọi điện</TooltipContent>
+                </Tooltip>
+              )}
+              {canChat && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='size-6 text-muted-foreground hover:text-primary'
+                      onClick={() => onOpenChat(lead)}
+                    >
+                      <MessageCircle className='size-3.5' />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Chat</TooltipContent>
+                </Tooltip>
+              )}
+              {canChat && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='size-6 text-muted-foreground hover:text-primary'
+                    >
+                      <CalendarIcon className='size-3.5' />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Đặt lịch xem</TooltipContent>
+                </Tooltip>
+              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='size-6 text-muted-foreground hover:text-amber-600'
+                    onClick={() => onAddNote(lead)}
+                  >
+                    <StickyNote className='size-3.5' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Thêm ghi chú</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
+
+// ─── Kanban Column Header ─────────────────────────────────────────────────────
+
+interface KanbanColHeaderProps {
+  status: LeadStatus;
+  count: number;
+  onAddLead: () => void;
+}
+
+const KanbanColHeader = React.memo(function KanbanColHeader({
+  status,
+  count,
+  onAddLead,
+}: KanbanColHeaderProps) {
+  const c = LEAD_STATUS_COLORS[status];
+  return (
+    <div
+      className={cn(
+        'group/header flex items-center justify-between rounded-lg px-3 py-2.5 mb-3 border',
+        c.bg,
+        c.border
+      )}
+    >
+      <div className='flex items-center gap-2'>
+        <KanbanColumnHandle className='opacity-100'>
+          <GripVertical className='size-3.5 text-muted-foreground/50' />
+        </KanbanColumnHandle>
+        <span className={cn('h-2 w-2 rounded-full', c.dot)} />
+        <span className={cn('text-sm font-semibold', c.text)}>{LEAD_STATUS_LABELS[status]}</span>
+      </div>
+      <div className='flex items-center gap-1.5'>
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
+          className='size-6 opacity-0 transition-opacity group-hover/header:opacity-100'
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddLead();
+          }}
+        >
+          <Plus className='size-3.5' />
+        </Button>
+        <Badge
+          variant='secondary'
+          className={cn('text-xs font-bold', c.text, c.bg, 'border', c.border)}
+        >
+          {count}
+        </Badge>
+      </div>
+    </div>
+  );
+});
+
+// ─── Table Columns ────────────────────────────────────────────────────────────
+
+function makeLeadColumns(
+  onAddNote: (lead: Lead) => void,
+  onViewDetail: (lead: Lead) => void,
+  onOpenChat: (lead: Lead) => void
+): ColumnDef<Lead>[] {
+  return [
+    {
+      accessorKey: 'customerName',
+      header: 'Khách hàng',
+      cell: ({ row }) => {
+        const lead = row.original;
+        return (
+          <div className='flex items-center gap-3'>
             <Avatar className='size-8 shrink-0'>
               <AvatarImage src={lead.avatarUrl} alt={lead.customerName} />
               <AvatarFallback className='text-xs bg-primary/10 text-primary font-semibold'>
                 {getInitials(lead.customerName)}
               </AvatarFallback>
             </Avatar>
-            <div className='min-w-0'>
-              <p className='text-sm font-semibold truncate'>{lead.customerName}</p>
-              {lead.phone && (
-                <p className='text-xs text-muted-foreground truncate'>{lead.phone}</p>
-              )}
+            <div>
+              <p className='text-sm font-medium'>{lead.customerName}</p>
+              {lead.email && <p className='text-xs text-muted-foreground'>{lead.email}</p>}
             </div>
           </div>
-          <StatusBadge status={lead.status} />
-        </div>
-
-        {/* Property interest */}
-        {lead.propertyInterest && (
-          <div className='flex items-center gap-1.5'>
-            <Building2 className='size-3.5 shrink-0 text-muted-foreground/60' />
-            <p className='text-xs text-muted-foreground truncate'>{lead.propertyInterest}</p>
-          </div>
-        )}
-
-        {/* Last note preview */}
-        {lead.lastNote && (
-          <div className='rounded-md bg-muted/60 px-3 py-2'>
-            <p className='text-xs text-muted-foreground line-clamp-2 italic'>&quot;{lead.lastNote}&quot;</p>
-          </div>
-        )}
-
-        <Separator className='opacity-50' />
-
-        {/* Footer */}
-        <div className='flex items-center justify-between gap-2'>
-          <span className='text-[10px] text-muted-foreground/60'>
-            {formatRelative(lead.updatedAt)}
-          </span>
-          <div
-            className='flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity'
-            onClick={(e) => e.stopPropagation()}
-          >
+        );
+      },
+    },
+    {
+      accessorKey: 'phone',
+      header: 'Điện thoại',
+      cell: ({ row }) => (
+        <span className='text-sm text-muted-foreground'>{row.original.phone ?? '—'}</span>
+      ),
+    },
+    {
+      accessorKey: 'propertyInterest',
+      header: 'BĐS quan tâm',
+      cell: ({ row }) => (
+        <span className='text-sm text-muted-foreground truncate max-w-[200px] block'>
+          {row.original.propertyInterest ?? '—'}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: 'Trạng thái',
+      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+    },
+    {
+      accessorKey: 'source',
+      header: 'Nguồn',
+      cell: ({ row }) => (
+        <Badge variant='outline' className='text-xs font-normal'>
+          {SOURCE_LABELS[row.original.source]}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: 'updatedAt',
+      header: 'Cập nhật',
+      cell: ({ row }) => (
+        <span className='text-xs text-muted-foreground'>{formatDate(row.original.updatedAt)}</span>
+      ),
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => {
+        const lead = row.original;
+        const canChat = !!lead.buyerId;
+        return (
+          <div className='flex items-center justify-end gap-1' onClick={(e) => e.stopPropagation()}>
             <TooltipProvider delayDuration={300}>
               {lead.phone && (
                 <Tooltip>
@@ -196,30 +584,35 @@ function LeadCard({ lead, onAddNote, onViewDetail }: LeadCardProps) {
                   <TooltipContent>Gọi điện</TooltipContent>
                 </Tooltip>
               )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='size-7 text-muted-foreground hover:text-primary'
-                  >
-                    <MessageCircle className='size-3.5' />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Chat</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='size-7 text-muted-foreground hover:text-primary'
-                  >
-                    <Calendar className='size-3.5' />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Đặt lịch xem</TooltipContent>
-              </Tooltip>
+              {canChat && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='size-7 text-muted-foreground hover:text-primary'
+                      onClick={() => onOpenChat(lead)}
+                    >
+                      <MessageCircle className='size-3.5' />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Chat</TooltipContent>
+                </Tooltip>
+              )}
+              {canChat && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='size-7 text-muted-foreground hover:text-primary'
+                    >
+                      <CalendarIcon className='size-3.5' />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Đặt lịch xem</TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -235,477 +628,67 @@ function LeadCard({ lead, onAddNote, onViewDetail }: LeadCardProps) {
               </Tooltip>
             </TooltipProvider>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ─── Kanban Column Header ─────────────────────────────────────────────────────
-
-interface KanbanColHeaderProps {
-  status: LeadStatus;
-  count: number;
-}
-
-function KanbanColHeader({ status, count }: KanbanColHeaderProps) {
-  const c = LEAD_STATUS_COLORS[status];
-  return (
-    <div
-      className={cn(
-        'flex items-center justify-between rounded-lg px-3 py-2.5 mb-3 border',
-        c.bg,
-        c.border
-      )}
-    >
-      <div className='flex items-center gap-2'>
-        <KanbanColumnHandle className='opacity-100'>
-          <GripVertical className='size-3.5 text-muted-foreground/50' />
-        </KanbanColumnHandle>
-        <span className={cn('h-2 w-2 rounded-full', c.dot)} />
-        <span className={cn('text-sm font-semibold', c.text)}>
-          {LEAD_STATUS_LABELS[status]}
-        </span>
-      </div>
-      <Badge variant='secondary' className={cn('text-xs font-bold', c.text, c.bg, 'border', c.border)}>
-        {count}
-      </Badge>
-    </div>
-  );
-}
-
-// ─── Table Row ────────────────────────────────────────────────────────────────
-
-interface TableRowProps {
-  lead: Lead;
-  onAddNote: (lead: Lead) => void;
-  onViewDetail: (lead: Lead) => void;
-}
-
-function LeadTableRow({ lead, onAddNote, onViewDetail }: TableRowProps) {
-  return (
-    <tr
-      className='border-b border-border/50 hover:bg-muted/40 transition-colors cursor-pointer group'
-      onClick={() => onViewDetail(lead)}
-    >
-      <td className='px-4 py-3'>
-        <div className='flex items-center gap-3'>
-          <Avatar className='size-8 shrink-0'>
-            <AvatarImage src={lead.avatarUrl} alt={lead.customerName} />
-            <AvatarFallback className='text-xs bg-primary/10 text-primary font-semibold'>
-              {getInitials(lead.customerName)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className='text-sm font-medium'>{lead.customerName}</p>
-            {lead.email && <p className='text-xs text-muted-foreground'>{lead.email}</p>}
-          </div>
-        </div>
-      </td>
-      <td className='px-4 py-3'>
-        <span className='text-sm text-muted-foreground'>{lead.phone ?? '—'}</span>
-      </td>
-      <td className='px-4 py-3'>
-        <span className='text-sm text-muted-foreground truncate max-w-[200px] block'>
-          {lead.propertyInterest ?? '—'}
-        </span>
-      </td>
-      <td className='px-4 py-3'>
-        <StatusBadge status={lead.status} />
-      </td>
-      <td className='px-4 py-3'>
-        <Badge variant='outline' className='text-xs font-normal'>
-          {SOURCE_LABELS[lead.source]}
-        </Badge>
-      </td>
-      <td className='px-4 py-3'>
-        <span className='text-xs text-muted-foreground'>{formatDate(lead.updatedAt)}</span>
-      </td>
-      <td className='px-4 py-3'>
-        <div
-          className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity'
-          onClick={(e) => e.stopPropagation()}
-        >
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='size-7 text-muted-foreground hover:text-amber-600'
-                  onClick={() => onAddNote(lead)}
-                >
-                  <StickyNote className='size-3.5' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Thêm ghi chú</TooltipContent>
-            </Tooltip>
-            {lead.phone && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='size-7 text-muted-foreground hover:text-primary'
-                    onClick={() => window.open(`tel:${lead.phone}`)}
-                  >
-                    <Phone className='size-3.5' />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Gọi điện</TooltipContent>
-              </Tooltip>
-            )}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='size-7 text-muted-foreground hover:text-primary'
-                >
-                  <MessageCircle className='size-3.5' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Chat</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-// ─── Add Lead / Add Note Modal ────────────────────────────────────────────────
-
-interface AddLeadModalProps {
-  open: boolean;
-  onClose: () => void;
-  prefillLead?: Lead | null;
-  leads: Lead[];
-  onCreateLead: (data: CreateLeadRequest) => void;
-  onAddNote: (leadId: string, content: string) => void;
-}
-
-function AddLeadModal({ open, onClose, prefillLead, leads, onCreateLead, onAddNote }: AddLeadModalProps) {
-  const isNote = !!prefillLead;
-
-  const [customerName, setCustomerName] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [propertyInterest, setPropertyInterest] = React.useState('');
-  const [status, setStatus] = React.useState<LeadStatus>(LeadStatus.NEW);
-  const [note, setNote] = React.useState('');
-  const [selectedLeadId, setSelectedLeadId] = React.useState<string>('');
-
-  React.useEffect(() => {
-    if (open) {
-      if (prefillLead) {
-        setSelectedLeadId(prefillLead.id);
-        setStatus(prefillLead.status);
-        setNote('');
-      } else {
-        setCustomerName('');
-        setPhone('');
-        setEmail('');
-        setPropertyInterest('');
-        setStatus(LeadStatus.NEW);
-        setNote('');
-        setSelectedLeadId('');
-      }
-    }
-  }, [open, prefillLead]);
-
-  function handleSave() {
-    if (isNote) {
-      const targetId = selectedLeadId || prefillLead?.id;
-      if (!targetId || !note.trim()) return;
-      onAddNote(targetId, note.trim());
-    } else {
-      if (!customerName.trim()) return;
-      onCreateLead({
-        fullName: customerName.trim(),
-        phone: phone || undefined,
-        email: email || undefined,
-        source: 'MANUAL',
-        note: note || undefined,
-      });
-    }
-    onClose();
-  }
-
-  const canSave = isNote ? !!selectedLeadId && !!note.trim() : !!customerName.trim();
-
-  return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className='sm:max-w-md'>
-        <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            <StickyNote className='size-4 text-primary' />
-            {isNote ? 'Thêm ghi chú lead' : 'Thêm khách hàng mới'}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className='flex flex-col gap-4 py-2'>
-          {!isNote ? (
-            <>
-              <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='crm-name'>Tên khách hàng *</Label>
-                <Input
-                  id='crm-name'
-                  placeholder='Nguyễn Văn A'
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                />
-              </div>
-              <div className='grid grid-cols-2 gap-3'>
-                <div className='flex flex-col gap-1.5'>
-                  <Label htmlFor='crm-phone'>Số điện thoại</Label>
-                  <Input
-                    id='crm-phone'
-                    placeholder='0901 234 567'
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-                <div className='flex flex-col gap-1.5'>
-                  <Label htmlFor='crm-email'>Email</Label>
-                  <Input
-                    id='crm-email'
-                    type='email'
-                    placeholder='email@example.com'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='crm-property'>Bất động sản quan tâm</Label>
-                <Input
-                  id='crm-property'
-                  placeholder='Căn hộ Vinhomes Q9...'
-                  value={propertyInterest}
-                  onChange={(e) => setPropertyInterest(e.target.value)}
-                />
-              </div>
-            </>
-          ) : (
-            <div className='flex flex-col gap-1.5'>
-              <Label>Khách hàng *</Label>
-              <Select value={selectedLeadId} onValueChange={setSelectedLeadId}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Chọn khách hàng' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {leads.map((l) => (
-                      <SelectItem key={l.id} value={l.id}>
-                        {l.customerName}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className='flex flex-col gap-1.5'>
-            <Label>Trạng thái lead *</Label>
-            <Select value={status} onValueChange={(v) => setStatus(v as LeadStatus)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {ALL_STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {LEAD_STATUS_LABELS[s]}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='flex flex-col gap-1.5'>
-            <Label htmlFor='crm-note'>Ghi chú {isNote ? '*' : ''}</Label>
-            <Textarea
-              id='crm-note'
-              placeholder={
-                isNote ? 'Khách kêu T3 đi xem, hẹn 9h sáng...' : 'Ghi chú ban đầu...'
-              }
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={3}
-              className='resize-none'
-            />
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant='outline' onClick={onClose}>Hủy</Button>
-          <Button onClick={handleSave} disabled={!canSave}>
-            {isNote ? 'Lưu ghi chú' : 'Thêm khách hàng'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ─── Lead Detail Modal ────────────────────────────────────────────────────────
-
-interface LeadDetailModalProps {
-  lead: Lead | null;
-  onClose: () => void;
-  onAddNote: (lead: Lead) => void;
-  onStatusChange: (leadId: string, status: LeadStatus) => void;
-}
-
-function LeadDetailModal({ lead, onClose, onAddNote, onStatusChange }: LeadDetailModalProps) {
-  if (!lead) return null;
-  return (
-    <Dialog open={!!lead} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className='sm:max-w-lg'>
-        <DialogHeader>
-          <div className='flex items-center gap-3'>
-            <Avatar className='size-10'>
-              <AvatarImage src={lead.avatarUrl} alt={lead.customerName} />
-              <AvatarFallback className='bg-primary/10 text-primary font-bold'>
-                {getInitials(lead.customerName)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <DialogTitle>{lead.customerName}</DialogTitle>
-              {lead.phone && (
-                <p className='text-sm text-muted-foreground'>{lead.phone}</p>
-              )}
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className='flex flex-col gap-4'>
-          {/* Quick info */}
-          <div className='grid grid-cols-2 gap-3 text-sm'>
-            {lead.email && (
-              <div>
-                <p className='text-xs text-muted-foreground mb-0.5'>Email</p>
-                <p className='font-medium truncate'>{lead.email}</p>
-              </div>
-            )}
-            {lead.propertyInterest && (
-              <div>
-                <p className='text-xs text-muted-foreground mb-0.5'>BĐS quan tâm</p>
-                <p className='font-medium truncate'>{lead.propertyInterest}</p>
-              </div>
-            )}
-            <div>
-              <p className='text-xs text-muted-foreground mb-0.5'>Nguồn</p>
-              <p className='font-medium'>{SOURCE_LABELS[lead.source]}</p>
-            </div>
-            <div>
-              <p className='text-xs text-muted-foreground mb-0.5'>Ngày thêm</p>
-              <p className='font-medium'>{formatDate(lead.createdAt)}</p>
-            </div>
-          </div>
-
-          {/* Status select */}
-          <div className='flex flex-col gap-1.5'>
-            <p className='text-xs text-muted-foreground'>Trạng thái</p>
-            <Select
-              value={lead.status}
-              onValueChange={(v) => onStatusChange(lead.id, v as LeadStatus)}
-            >
-              <SelectTrigger className='w-full'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {ALL_STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {LEAD_STATUS_LABELS[s]}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Action buttons */}
-          <div className='flex gap-2'>
-            {lead.phone && (
-              <Button variant='outline' size='sm' className='flex-1 gap-1.5' onClick={() => window.open(`tel:${lead.phone}`)}>
-                <Phone className='size-3.5' />
-                Gọi điện
-              </Button>
-            )}
-            <Button variant='outline' size='sm' className='flex-1 gap-1.5'>
-              <MessageCircle className='size-3.5' />
-              Chat
-            </Button>
-            <Button variant='outline' size='sm' className='flex-1 gap-1.5'>
-              <Calendar className='size-3.5' />
-              Đặt lịch
-            </Button>
-            <Button
-              size='sm'
-              className='flex-1 gap-1.5'
-              onClick={() => { onClose(); onAddNote(lead); }}
-            >
-              <StickyNote className='size-3.5' />
-              Ghi chú
-            </Button>
-          </div>
-
-          <Separator />
-
-          {/* Notes timeline */}
-          <div>
-            <p className='text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide'>
-              Lịch sử ghi chú ({lead.notes.length})
-            </p>
-            <div className='max-h-[220px] overflow-y-auto flex flex-col gap-3 pr-1'>
-              {lead.notes.length === 0 ? (
-                <p className='text-xs text-muted-foreground text-center py-4'>Chưa có ghi chú nào</p>
-              ) : (
-                [...lead.notes].reverse().map((n) => (
-                  <div key={n.id} className='rounded-lg border border-border/50 bg-muted/40 px-3 py-2.5'>
-                    <div className='flex items-center justify-between gap-2 mb-1'>
-                      <StatusBadge status={n.status} />
-                      <span className='text-[10px] text-muted-foreground'>{formatDate(n.createdAt)}</span>
-                    </div>
-                    <p className='text-sm'>{n.content}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+        );
+      },
+    },
+  ];
 }
 
 // ─── Map BE response → FE Lead shape ─────────────────────────────────────────
 
-import type { LeadResponse } from '../types/api';
-
 function mapLead(r: LeadResponse): Lead {
-  const lastNote = r.notes.length > 0 ? r.notes[r.notes.length - 1].content : undefined;
+  const raw = r as unknown as Record<string, unknown>;
+  const rawNotes = (raw.notes as Record<string, unknown>[] | undefined) ?? [];
+  const notes = rawNotes.map((n) => ({
+    id: (n.lead_note_id as string | undefined) ?? (n.leadNoteId as string | undefined) ?? '',
+    content: (n.content as string | undefined) ?? '',
+    createdAt: (n.created_at as string | undefined) ?? (n.createdAt as string | undefined) ?? '',
+    status: (n.status_at_time as LeadStatus | undefined) ?? (n.statusAtTime as LeadStatus),
+  }));
+  const lastNote = notes.length > 0 ? notes[notes.length - 1].content : undefined;
   return {
-    id: r.listingLeadId,
-    customerName: r.fullName,
-    phone: r.phone ?? undefined,
-    email: r.email ?? undefined,
-    status: r.status,
-    source: r.source,
+    id: (raw.listing_lead_id as string | undefined) ?? r.listingLeadId,
+    listingId: (raw.listing_id as string | undefined) ?? r.listingId ?? undefined,
+    customerName: (raw.full_name as string | undefined) ?? r.fullName,
+    avatarUrl: (raw.buyer_avatar_url as string | undefined) ?? r.buyerAvatarUrl ?? undefined,
+    phone: (raw.phone as string | undefined) ?? r.phone ?? undefined,
+    email: (raw.email as string | undefined) ?? r.email ?? undefined,
+    buyerId: (raw.buyer_id as string | undefined) ?? r.buyerId ?? undefined,
+    propertyInterest: (raw.listing_name as string | undefined) ?? r.listingName ?? undefined,
+    status: (raw.status as LeadStatus | undefined) ?? r.status,
+    priority: (raw.priority as Lead['priority'] | undefined) ?? r.priority ?? undefined,
+    lastContactedAt:
+      (raw.last_contacted_at as string | undefined) ?? r.lastContactedAt ?? undefined,
+    nextFollowUpAt: (raw.next_follow_up_at as string | undefined) ?? r.nextFollowUpAt ?? undefined,
+    source: (raw.source as Lead['source'] | undefined) ?? r.source,
     lastNote,
-    notes: r.notes.map((n) => ({
-      id: n.leadNoteId,
-      content: n.content,
-      createdAt: n.createdAt,
-      status: n.statusAtTime,
-    })),
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    notes,
+    createdAt: (raw.created_at as string | undefined) ?? r.createdAt,
+    updatedAt: (raw.updated_at as string | undefined) ?? r.updatedAt,
+  };
+}
+
+function normalizeSummary(summary?: LeadSummaryResponse): LeadSummaryResponse | undefined {
+  if (!summary) return undefined;
+  const raw = summary as unknown as Record<string, unknown>;
+  return {
+    totalLeads: (raw.total_leads as number | undefined) ?? summary.totalLeads ?? 0,
+    closedLeads: (raw.closed_leads as number | undefined) ?? summary.closedLeads ?? 0,
+    previousTotalLeads:
+      (raw.previous_total_leads as number | undefined) ?? summary.previousTotalLeads ?? 0,
+    previousClosedLeads:
+      (raw.previous_closed_leads as number | undefined) ?? summary.previousClosedLeads ?? 0,
+    bySource: (
+      (raw.by_source as LeadSummaryResponse['bySource'] | undefined) ??
+      summary.bySource ??
+      []
+    ).map((row) => {
+      const rawRow = row as unknown as Record<string, unknown>;
+      return {
+        source: row.source,
+        count: (rawRow.count as number | undefined) ?? row.count ?? 0,
+      };
+    }),
   };
 }
 
@@ -720,23 +703,140 @@ const STATUS_TABS: { value: TabValue; label: string }[] = [
 ];
 
 export function CrmPage() {
-  const { data: pageData, isLoading } = useLeads();
-  const createLead = useCreateLead();
-  const updateStatus = useUpdateLeadStatus();
-  const addNote = useAddLeadNote();
-
-  const leads: Lead[] = React.useMemo(
-    () => (pageData?.content ?? []).map(mapLead),
-    [pageData]
-  );
+  const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('CRM');
+  const queryClient = useQueryClient();
 
   const [view, setView] = React.useState<ViewMode>('kanban');
   const [tab, setTab] = React.useState<TabValue>('all');
   const [search, setSearch] = React.useState('');
+  const deferredSearch = React.useDeferredValue(search.trim());
+  const [dateRange, setDateRange] = React.useState<DateRange>(() => getInitialDateRange());
+  const [tablePagination, setTablePagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+
+  const from = formatApiDate(dateRange.from);
+  const to = formatApiDate(dateRange.to);
+  const status = tab === 'all' ? undefined : tab;
+  const leadFilters = React.useMemo(
+    () => ({
+      status,
+      from,
+      to,
+      q: deferredSearch || undefined,
+      page: view === 'table' ? tablePagination.pageIndex : 0,
+      size: view === 'table' ? tablePagination.pageSize : 100,
+    }),
+    [deferredSearch, from, status, tablePagination.pageIndex, tablePagination.pageSize, to, view]
+  );
+  const summaryFilters = React.useMemo(
+    () => ({ from, to, q: deferredSearch || undefined }),
+    [deferredSearch, from, to]
+  );
+
+  const { data: pageData, isLoading, isFetching } = useLeads(leadFilters);
+  const { data: summaryData, isFetching: isSummaryFetching } = useLeadSummary(summaryFilters);
+  const createLead = useCreateLead();
+  const updateLead = useUpdateLead();
+  const updateStatus = useUpdateLeadStatus();
+  const addNote = useAddLeadNote();
+
+  const leads: Lead[] = React.useMemo(() => (pageData?.content ?? []).map(mapLead), [pageData]);
 
   const [addLeadOpen, setAddLeadOpen] = React.useState(false);
+  const [pendingCreateStatus, setPendingCreateStatus] = React.useState<LeadStatus | null>(null);
   const [addNoteTarget, setAddNoteTarget] = React.useState<Lead | null>(null);
   const [detailLead, setDetailLead] = React.useState<Lead | null>(null);
+  const kanbanScrollRef = React.useRef<HTMLDivElement>(null);
+  const [kanbanFades, setKanbanFades] = React.useState({ left: false, right: false });
+
+  const handleSearchChange = React.useCallback((value: string) => {
+    React.startTransition(() => {
+      setSearch(value);
+    });
+  }, []);
+
+  const handleTabChange = React.useCallback((value: string) => {
+    setTab(value as TabValue);
+  }, []);
+
+  const handleViewDetail = React.useCallback((lead: Lead) => {
+    setDetailLead(lead);
+  }, []);
+
+  const handleOpenAddLead = React.useCallback((status?: LeadStatus) => {
+    setAddNoteTarget(null);
+    setPendingCreateStatus(status ?? null);
+    setAddLeadOpen(true);
+  }, []);
+
+  const handleCloseAddLead = React.useCallback(() => {
+    setAddLeadOpen(false);
+    setPendingCreateStatus(null);
+  }, []);
+
+  const handleCloseDetail = React.useCallback(() => {
+    setDetailLead(null);
+  }, []);
+
+  React.useEffect(() => {
+    setTablePagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
+  }, [deferredSearch, from, status, to]);
+
+  const handleOpenChat = React.useCallback(
+    async (lead: Lead) => {
+      if (!lead.buyerId) return;
+      const response = await conversationApi.createOrGetConversation(lead.buyerId);
+      const conversation = response.payload.data;
+      const conversationId = conversation.conversation_id;
+      if (conversationId) {
+        queryClient.setQueryData(conversationKeys.list(), (current: any) => {
+          const existing = current?.payload?.data ?? current?.data ?? [];
+          const items = Array.isArray(existing) ? existing : [];
+          const nextItem = {
+            conversation_id: conversation.conversation_id,
+            other_user: {
+              user_id: conversation.other_user_id,
+              name: conversation.other_user_name,
+              avatar_url: conversation.other_user_avatar_url,
+            },
+            last_message: undefined,
+            last_message_type: undefined,
+            last_message_time: undefined,
+            unread_count: 0,
+            created_at: conversation.created_at,
+          };
+
+          if (current?.payload?.data) {
+            return {
+              ...current,
+              payload: {
+                ...current.payload,
+                data: [
+                  nextItem,
+                  ...items.filter((item: any) => item.conversation_id !== nextItem.conversation_id),
+                ],
+              },
+            };
+          }
+
+          if (current?.data) {
+            return {
+              ...current,
+              data: [
+                nextItem,
+                ...items.filter((item: any) => item.conversation_id !== nextItem.conversation_id),
+              ],
+            };
+          }
+
+          return { payload: { data: [nextItem] } };
+        });
+        router.push(`/${locale}${ROUTES.dashboard.messages}/${conversationId}`);
+      }
+    },
+    [locale, queryClient, router]
+  );
 
   // Keep detailLead in sync when leads refresh
   React.useEffect(() => {
@@ -748,20 +848,8 @@ export function CrmPage() {
   }, [leads]);
 
   const filteredLeads = React.useMemo(() => {
-    let result = leads;
-    if (tab !== 'all') result = result.filter((l) => l.status === tab);
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (l) =>
-          l.customerName.toLowerCase().includes(q) ||
-          l.phone?.includes(q) ||
-          l.email?.toLowerCase().includes(q) ||
-          l.propertyInterest?.toLowerCase().includes(q)
-      );
-    }
-    return result;
-  }, [leads, tab, search]);
+    return leads;
+  }, [leads]);
 
   // Kanban state: columns keyed by status, values are lead arrays
   const kanbanColumns = React.useMemo(() => {
@@ -780,272 +868,382 @@ export function CrmPage() {
     setColumns(kanbanColumns);
   }, [kanbanColumns]);
 
-  function handleColumnChange(newCols: Record<string, Lead[]>) {
+  const getLeadId = React.useCallback((item: Lead) => item.id, []);
+
+  const updateKanbanFades = React.useCallback(() => {
+    const el = kanbanScrollRef.current;
+    if (!el) return;
+
+    const next = {
+      left: el.scrollLeft > 1,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1,
+    };
+
+    setKanbanFades((prev) => (prev.left === next.left && prev.right === next.right ? prev : next));
+  }, []);
+
+  React.useEffect(() => {
+    if (view !== 'kanban') return;
+
+    const frame = window.requestAnimationFrame(updateKanbanFades);
+    window.addEventListener('resize', updateKanbanFades);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('resize', updateKanbanFades);
+    };
+  }, [columns, tab, view, updateKanbanFades]);
+
+  const handleColumnChange = React.useCallback((newCols: Record<string, Lead[]>) => {
     setColumns(newCols);
-    // Optimistically persist status changes from drag-and-drop
-    for (const [status, colLeads] of Object.entries(newCols)) {
-      for (const lead of colLeads) {
-        if (lead.status !== status) {
-          updateStatus.mutate({ leadId: lead.id, data: { status: status as LeadStatus } });
-        }
+  }, []);
+
+  const handleLeadMove = React.useCallback(
+    ({ activeContainer, activeIndex, overContainer, overIndex }: KanbanMoveEvent) => {
+      const activeItems = columns[activeContainer] ?? [];
+      const movedLead = activeItems[activeIndex];
+      if (!movedLead) return;
+
+      const nextColumns: Record<string, Lead[]> = { ...columns };
+
+      if (activeContainer === overContainer) {
+        const reorderedItems = [...activeItems];
+        reorderedItems.splice(activeIndex, 1);
+        reorderedItems.splice(overIndex, 0, movedLead);
+        nextColumns[activeContainer] = reorderedItems;
+        setColumns(nextColumns);
+        return;
       }
-    }
-  }
 
-  function handleOpenAddNote(lead: Lead) {
+      const nextActiveItems = [...activeItems];
+      const nextOverItems = [...(columns[overContainer] ?? [])];
+      nextActiveItems.splice(activeIndex, 1);
+      nextOverItems.splice(overIndex, 0, movedLead);
+      nextColumns[activeContainer] = nextActiveItems;
+      nextColumns[overContainer] = nextOverItems;
+      setColumns(nextColumns);
+
+      if (movedLead.id && movedLead.status !== overContainer) {
+        updateStatus.mutate({ leadId: movedLead.id, data: { status: overContainer as LeadStatus } });
+      }
+    },
+    [columns, updateStatus]
+  );
+
+  const handleOpenAddNote = React.useCallback((lead: Lead) => {
     setAddNoteTarget(lead);
-    setAddLeadOpen(false);
-  }
+    setAddLeadOpen(true);
+  }, []);
 
-  function handleStatusChange(leadId: string, status: LeadStatus) {
-    updateStatus.mutate({ leadId, data: { status } });
-    if (detailLead?.id === leadId) setDetailLead((prev) => prev && { ...prev, status });
-  }
+  const handleStatusChange = React.useCallback(
+    (leadId: string, status: LeadStatus) => {
+      updateStatus.mutate({ leadId, data: { status } });
+      setDetailLead((prev) => (prev?.id === leadId ? { ...prev, status } : prev));
+    },
+    [updateStatus]
+  );
 
-  const totalLeads = leads.length;
-  const closedLeads = leads.filter((l) => l.status === LeadStatus.CLOSED).length;
-  const activeLeads = leads.filter(
-    (l) => l.status !== LeadStatus.CLOSED && l.status !== LeadStatus.NOT_POTENTIAL
-  ).length;
+  const handlePriorityChange = React.useCallback(
+    (lead: Lead, priority: NonNullable<Lead['priority']>) => {
+      updateLead.mutate(
+        {
+          leadId: lead.id,
+          data: {
+            full_name: lead.customerName,
+            email: lead.email,
+            phone: lead.phone,
+            source: lead.source,
+            listing_id: lead.listingId,
+            priority,
+          },
+        },
+        {
+          onSuccess: () => {
+            setDetailLead((prev) => (prev?.id === lead.id ? { ...prev, priority } : prev));
+          },
+          onError: (err: any) => {
+            toast.error(err?.payload?.message ?? 'Cập nhật mức ưu tiên thất bại');
+          },
+        }
+      );
+    },
+    [updateLead]
+  );
+
+  const handleCreateLead = React.useCallback(
+    (data: CreateLeadRequest) => {
+      createLead.mutate(data, {
+        onSuccess: async (createdLead) => {
+          toast.success('Thêm khách hàng thành công');
+          if (pendingCreateStatus && pendingCreateStatus !== LeadStatus.NEW) {
+            const createdId =
+              ((createdLead as unknown as Record<string, unknown>).listing_lead_id as
+                | string
+                | undefined) ?? createdLead.listingLeadId;
+            try {
+              await updateStatus.mutateAsync({
+                leadId: createdId,
+                data: { status: pendingCreateStatus },
+              });
+            } catch (err: any) {
+              toast.error(err?.payload?.message ?? 'Tạo lead thành công nhưng đổi trạng thái thất bại');
+            }
+          }
+          setAddLeadOpen(false);
+          setPendingCreateStatus(null);
+        },
+        onError: (err: any) => {
+          const payload = err?.payload;
+          const fieldErrors: { field: string; message: string }[] = payload?.errors ?? [];
+          if (fieldErrors.length > 0) {
+            fieldErrors.forEach((e) => toast.error(`${e.field}: ${e.message}`));
+          } else {
+            toast.error(payload?.message ?? 'Thêm khách hàng thất bại');
+          }
+        },
+      });
+    },
+    [createLead, pendingCreateStatus, updateStatus]
+  );
+
+  const handleAddNote = React.useCallback(
+    (leadId: string, content: string) => {
+      addNote.mutate(
+        { leadId, data: { content } },
+        {
+          onSuccess: () => {
+            toast.success('Thêm ghi chú thành công');
+            setAddLeadOpen(false);
+          },
+          onError: (err: any) => {
+            toast.error(err?.payload?.message ?? 'Thêm ghi chú thất bại');
+          },
+        }
+      );
+    },
+    [addNote]
+  );
+
+  const leadColumns = React.useMemo(
+    () => makeLeadColumns(handleOpenAddNote, handleViewDetail, handleOpenChat),
+    [handleOpenAddNote, handleOpenChat, handleViewDetail]
+  );
+
+  const totalLeadsIcon = React.useMemo(() => <Users className='size-4' />, []);
+  const closedLeadsIcon = React.useMemo(() => <Briefcase className='size-4' />, []);
+
+  const summary = React.useMemo(() => normalizeSummary(summaryData), [summaryData]);
+  const totalLeads = summary?.totalLeads ?? 0;
+  const closedLeads = summary?.closedLeads ?? 0;
+  const tablePageCount = getPageCount(pageData);
+  const showInitialLoading = isLoading && !pageData;
+  const showRefreshSkeleton = !showInitialLoading && (isFetching || isSummaryFetching);
 
   return (
-    <div className='flex flex-col h-full p-6 gap-5'>
-      {isLoading && (
+    <div className='min-h-full flex flex-col p-6 gap-5 bg-background'>
+      {showInitialLoading && (
         <div className='flex items-center justify-center flex-1 py-20 text-sm text-muted-foreground'>
           Đang tải dữ liệu...
         </div>
       )}
-      {!isLoading && (
-      <>
-      {/* Header */}
-      <div className='flex items-start justify-between gap-4 flex-wrap'>
-        <div>
-          <h1 className='text-xl font-bold flex items-center gap-2'>
-            <Users className='size-5 text-primary' />
-            CRM – Quản lý khách hàng
-          </h1>
-          <p className='text-sm text-muted-foreground mt-0.5'>
-            Theo dõi pipeline từ lead đến chốt deal
-          </p>
-        </div>
-        <div className='flex items-center gap-2'>
-          {/* View toggle */}
-          <div className='flex items-center rounded-lg border border-border bg-background p-1 gap-1'>
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className={cn('size-7', view === 'kanban' && 'bg-primary/10 text-primary')}
-                    onClick={() => setView('kanban')}
-                  >
-                    <LayoutGrid className='size-4' />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Kanban</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className={cn('size-7', view === 'table' && 'bg-primary/10 text-primary')}
-                    onClick={() => setView('table')}
-                  >
-                    <List className='size-4' />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Bảng</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+      {!showInitialLoading && (
+        <>
+          <CrmHeader
+            title={t('title')}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            view={view}
+            onViewChange={setView}
+            onAddLead={handleOpenAddLead}
+            t={t}
+          />
+
+          {/* Metrics */}
+          <div className='grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]'>
+            <LeadsBySourceCard summary={summary} t={t} />
+            <div className='flex flex-col gap-2'>
+              <MetricCard
+                title={t('metrics.totalCustomers')}
+                value={totalLeads}
+                previousValue={summary?.previousTotalLeads ?? 0}
+                comparisonLabel={t('metrics.fromPreviousPeriod')}
+                icon={totalLeadsIcon}
+              />
+              <MetricCard
+                title={t('metrics.totalDeals')}
+                value={closedLeads}
+                previousValue={summary?.previousClosedLeads ?? 0}
+                comparisonLabel={t('metrics.fromPreviousPeriod')}
+                icon={closedLeadsIcon}
+              />
+            </div>
           </div>
 
-          <Button
-            className='gap-1.5'
-            onClick={() => { setAddNoteTarget(null); setAddLeadOpen(true); }}
-          >
-            <Plus className='size-4' data-icon='inline-start' />
-            Thêm lead
-          </Button>
-        </div>
-      </div>
+          <div className='flex items-center gap-3 flex-wrap'>
+            <CrmSearchInput value={search} onChange={handleSearchChange} />
 
-      {/* Stats row */}
-      <div className='grid grid-cols-3 gap-4'>
-        {[
-          { label: 'Tổng khách hàng', value: totalLeads, colorClass: 'text-primary', bgClass: 'bg-primary/5 border-primary/15' },
-          { label: 'Đang hoạt động', value: activeLeads, colorClass: 'text-amber-700', bgClass: 'bg-amber-50 border-amber-100' },
-          { label: 'Đã chốt deal', value: closedLeads, colorClass: 'text-green-700', bgClass: 'bg-green-50 border-green-100' },
-        ].map((stat) => (
-          <Card key={stat.label} className={cn('shadow-sm border', stat.bgClass)}>
-            <CardContent className='p-4'>
-              <p className='text-xs text-muted-foreground mb-1'>{stat.label}</p>
-              <p className={cn('text-2xl font-bold', stat.colorClass)}>{stat.value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            <Select value={tab} onValueChange={handleTabChange}>
+              <SelectTrigger className='w-full sm:w-[230px] bg-background/90 shadow-sm'>
+                <SelectValue placeholder='Lọc theo trạng thái' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {STATUS_TABS.map((t) => {
+                    const count =
+                      t.value === 'all'
+                        ? leads.length
+                        : leads.filter((l) => l.status === t.value).length;
+                    return (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label} ({count})
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* Search + Tabs */}
-      <div className='flex items-center gap-3 flex-wrap'>
-        <div className='relative flex-1 min-w-[200px] max-w-[320px]'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/50' />
-          <Input
-            placeholder='Tìm theo tên, SĐT, BĐS...'
-            className='pl-9'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        <div className='overflow-x-auto'>
-          <Tabs value={tab} onValueChange={(v) => setTab(v as TabValue)}>
-            <TabsList className='h-9 gap-1 p-1'>
-              {STATUS_TABS.map((t) => {
-                const count =
-                  t.value === 'all'
-                    ? leads.length
-                    : leads.filter((l) => l.status === t.value).length;
-                return (
-                  <TabsTrigger
-                    key={t.value}
-                    value={t.value}
-                    className='text-xs px-3 h-7 whitespace-nowrap'
-                  >
-                    {t.label}
-                    {count > 0 && (
-                      <Badge variant='secondary' className='ml-1.5 px-1.5 py-0 text-[10px] font-bold h-4 min-w-4'>
-                        {count}
-                      </Badge>
-                    )}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </Tabs>
-        </div>
-      </div>
-
-      {/* Content */}
-      {view === 'kanban' ? (
-        <Kanban
-          value={columns}
-          onValueChange={handleColumnChange}
-          getItemValue={(item: Lead) => item.id}
-          className='flex-1'
-        >
-          <KanbanBoard className='flex gap-4 overflow-x-auto pb-4 !grid-cols-none auto-rows-auto items-start'>
-            {Object.entries(columns).map(([statusKey, colLeads]) => (
-              <KanbanColumn
-                key={statusKey}
-                value={statusKey}
-                className='min-w-[270px] max-w-[290px] flex-shrink-0'
-              >
-                <KanbanColHeader status={statusKey as LeadStatus} count={colLeads.length} />
-                <KanbanColumnContent
-                  value={statusKey}
-                  className='flex flex-col gap-3 overflow-y-auto'
-                  style={{ maxHeight: 'calc(100vh - 340px)' } as React.CSSProperties}
+          {showRefreshSkeleton ? (
+            <CrmContentSkeleton view={view} />
+          ) : leads.length === 0 ? (
+            <Card className='border-dashed shadow-sm'>
+              <CardContent className='flex flex-col items-center justify-center gap-3 px-6 py-12 text-center'>
+                <div className='flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                  <Users className='size-6' />
+                </div>
+                <div>
+                  <p className='font-semibold'>Chưa có khách hàng nào</p>
+                  <p className='mt-1 text-sm text-muted-foreground'>
+                    Thêm lead đầu tiên để bắt đầu theo dõi pipeline khách hàng.
+                  </p>
+                </div>
+                <Button
+                  className='gap-1.5'
+                  onClick={() => handleOpenAddLead()}
                 >
-                  {colLeads.length === 0 ? (
-                    <div className='rounded-xl border-2 border-dashed border-muted-foreground/20 p-6 text-center'>
-                      <p className='text-xs text-muted-foreground/50'>Không có khách hàng</p>
-                    </div>
-                  ) : (
-                    colLeads.map((lead) => (
-                      <KanbanItem key={lead.id} value={lead.id}>
-                        <KanbanItemHandle>
+                  <Plus className='size-4' data-icon='inline-start' />
+                  Thêm lead đầu tiên
+                </Button>
+              </CardContent>
+            </Card>
+          ) : view === 'kanban' ? (
+            <div className='relative overflow-hidden'>
+              <Kanban
+                value={columns}
+                onValueChange={handleColumnChange}
+                getItemValue={getLeadId}
+                onMove={handleLeadMove}
+                className='flex-1'
+              >
+                <div
+                  ref={kanbanScrollRef}
+                  className='overflow-x-auto pb-3 pr-8 scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border'
+                  onScroll={updateKanbanFades}
+                >
+                  <KanbanBoard className='flex gap-3 !grid-cols-none auto-rows-auto items-start'>
+                    {Object.entries(columns).map(([statusKey, colLeads]) => (
+                      <KanbanColumn
+                        key={statusKey}
+                        value={statusKey}
+                        className='min-w-[236px] max-w-[244px] flex-shrink-0'
+                      >
+                        <KanbanColHeader
+                          status={statusKey as LeadStatus}
+                          count={colLeads.length}
+                          onAddLead={() => handleOpenAddLead(statusKey as LeadStatus)}
+                        />
+                        <KanbanColumnContent
+                          value={statusKey}
+                          className='flex flex-col gap-3 overflow-y-auto'
+                          style={{ maxHeight: 'calc(100vh - 360px)' } as React.CSSProperties}
+                        >
+                          {colLeads.length === 0 ? (
+                            <div className='h-12 rounded-lg border border-dashed border-muted-foreground/20 bg-muted/20' />
+                          ) : (
+                            colLeads.map((lead, index) => {
+                              const itemId = lead.id || `${statusKey}-${index}`;
+
+                              return (
+                                <KanbanItem key={itemId} value={itemId}>
+                                  <KanbanItemHandle>
+                                    <LeadCard
+                                      lead={lead}
+                                      onAddNote={handleOpenAddNote}
+                                      onViewDetail={handleViewDetail}
+                                      onOpenChat={handleOpenChat}
+                                    />
+                                  </KanbanItemHandle>
+                                </KanbanItem>
+                              );
+                            })
+                          )}
+                        </KanbanColumnContent>
+                      </KanbanColumn>
+                    ))}
+                  </KanbanBoard>
+                </div>
+                <KanbanOverlay>
+                  {({ value, variant }) => {
+                    if (variant === 'item') {
+                      const lead = leads.find((l) => l.id === value);
+                      if (lead) {
+                        return (
                           <LeadCard
                             lead={lead}
-                            onAddNote={handleOpenAddNote}
-                            onViewDetail={(l) => setDetailLead(l)}
+                            onAddNote={() => {}}
+                            onViewDetail={() => {}}
+                            onOpenChat={() => {}}
                           />
-                        </KanbanItemHandle>
-                      </KanbanItem>
-                    ))
-                  )}
-                </KanbanColumnContent>
-              </KanbanColumn>
-            ))}
-          </KanbanBoard>
-          <KanbanOverlay>
-            {({ value, variant }) => {
-              if (variant === 'item') {
-                const lead = leads.find((l) => l.id === value);
-                if (lead) {
-                  return (
-                    <LeadCard
-                      lead={lead}
-                      onAddNote={() => {}}
-                      onViewDetail={() => {}}
-                    />
-                  );
-                }
-              }
-              return <div className='bg-muted size-full rounded-xl opacity-80' />;
-            }}
-          </KanbanOverlay>
-        </Kanban>
-      ) : (
-        <Card className='border-border/60 shadow-sm flex-1 overflow-hidden'>
-          <CardHeader className='p-0'>
-            <div className='overflow-x-auto'>
-              <table className='w-full text-left'>
-                <thead>
-                  <tr className='border-b border-border/50 bg-muted/30'>
-                    {['Khách hàng', 'Điện thoại', 'BĐS quan tâm', 'Trạng thái', 'Nguồn', 'Cập nhật', ''].map((h) => (
-                      <th
-                        key={h}
-                        className='px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap'
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredLeads.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className='px-4 py-12 text-center text-sm text-muted-foreground'>
-                        Không tìm thấy khách hàng nào
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredLeads.map((lead) => (
-                      <LeadTableRow
-                        key={lead.id}
-                        lead={lead}
-                        onAddNote={handleOpenAddNote}
-                        onViewDetail={(l) => setDetailLead(l)}
-                      />
-                    ))
-                  )}
-                </tbody>
-              </table>
+                        );
+                      }
+                    }
+                    return <div className='bg-muted size-full rounded-xl opacity-80' />;
+                  }}
+                </KanbanOverlay>
+              </Kanban>
+              {kanbanFades.left && (
+                <div className='pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-card to-transparent' />
+              )}
+              {kanbanFades.right && (
+                <div className='pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent' />
+              )}
             </div>
-          </CardHeader>
-        </Card>
-      )}
+          ) : (
+            <DataTable
+              columns={leadColumns}
+              data={leads}
+              isLoading={isLoading}
+              pageCount={tablePageCount}
+              pagination={tablePagination}
+              onPaginationChange={setTablePagination}
+              pageInfoText={(current, total) => t('pagination.pageInfo', { current, total })}
+              emptyTitle='Không tìm thấy khách hàng nào'
+              onRowClick={handleViewDetail}
+              className='self-start w-full'
+            />
+          )}
 
-      {/* Add Lead / Add Note modal */}
-      <AddLeadModal
-        open={addLeadOpen || !!addNoteTarget}
-        onClose={() => { setAddLeadOpen(false); setAddNoteTarget(null); }}
-        prefillLead={addNoteTarget}
-        leads={leads}
-        onCreateLead={(data) => createLead.mutate(data)}
-        onAddNote={(leadId, content) => addNote.mutate({ leadId, data: { content } })}
-      />
+          {/* Add Lead / Add Note modal */}
+          <AddLeadModal
+            open={addLeadOpen}
+            onClose={handleCloseAddLead}
+            prefillLead={addNoteTarget}
+            leads={leads}
+            onCreateLead={handleCreateLead}
+            onAddNote={handleAddNote}
+          />
 
-      {/* Detail modal */}
-      <LeadDetailModal
-        lead={detailLead}
-        onClose={() => setDetailLead(null)}
-        onAddNote={handleOpenAddNote}
-        onStatusChange={handleStatusChange}
-      />
-      </>
+          {/* Detail modal */}
+          <LeadDetailModal
+            lead={detailLead}
+            onClose={handleCloseDetail}
+            onAddNote={handleOpenAddNote}
+            onStatusChange={handleStatusChange}
+            onPriorityChange={handlePriorityChange}
+            onOpenChat={handleOpenChat}
+          />
+        </>
       )}
     </div>
   );

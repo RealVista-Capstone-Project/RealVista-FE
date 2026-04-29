@@ -32,7 +32,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-08T08:00:00Z',
     updatedAt: '2026-04-22T10:00:00Z',
-    source: 'CALL',
+    source: 'MANUAL',
   },
   {
     id: 'lead-002',
@@ -112,7 +112,7 @@ export const MOCK_LEADS: Lead[] = [
     ],
     createdAt: '2026-04-14T09:00:00Z',
     updatedAt: '2026-04-21T15:30:00Z',
-    source: 'CALL',
+    source: 'MANUAL',
   },
   {
     id: 'lead-005',
