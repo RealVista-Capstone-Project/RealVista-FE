@@ -14,6 +14,7 @@
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
       "users": "Quản lý người dùng",
+      "locations": "Quản lý địa điểm",
       "crm": "CRM",
       "packages": "Quản lý gói dịch vụ"
     },
@@ -36,7 +37,8 @@
       "manageUsers": "Quản lý người dùng",
       "manageAgent": "Quản lý môi giới",
       "crm": "Quản lý khách hàng",
-      "managePackages": "Quản lý gói dịch vụ"
+      "managePackages": "Quản lý gói dịch vụ",
+      "locations": "Quản lý địa điểm"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",
