@@ -1,0 +1,177 @@
+{
+  "ManagePackages": {
+    "title": "Package Management",
+    "description": "Create, edit, and manage all subscription and boost packages available in the system.",
+    "tabs": {
+      "subscription": "Subscription",
+      "subscriptionFull": "Subscription Packages",
+      "boost": "Boost",
+      "boostFull": "Boost Packages"
+    },
+    "header": {
+      "addSubscription": "Add Subscription Package",
+      "addBoost": "Add Boost Package"
+    },
+    "stats": {
+      "totalPackages": "Total packages",
+      "totalSubscription": "Total Subscription Packages",
+      "totalBoost": "Total boost packs",
+      "freePackages": "Free packages",
+      "paidPackages": "Paid packages",
+      "activeNow": "Active now",
+      "totalFeaturedSlots": "Total featured slots",
+      "totalHotBadgeSlots": "Total hot badge slots",
+      "activePackages": "Active Packages",
+      "inactiveCount": "{count} inactive"
+    },
+    "search": {
+      "placeholder": "Search name, code..."
+    },
+    "filters": {
+      "featureType": "Feature Type",
+      "allTypes": "All types",
+      "LISTING": "Listing",
+      "3D_TOUR": "3D Tour",
+      "AI_REQUEST": "AI Assistant",
+      "showInactive": "Show Inactive",
+      "inactive": "Inactive",
+      "clearFilters": "Clear filters",
+      "clear": "Clear"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "clickToActivate": "Click to activate",
+      "clickToDeactivate": "Click to deactivate"
+    },
+    "table": {
+      "columns": {
+        "package": "Package",
+        "code": "Code",
+        "featureType": "Type",
+        "entitlement": "Entitlement",
+        "quotas": "Quotas",
+        "quota": "Quota",
+        "duration": "Duration",
+        "price": "Price",
+        "flags": "Flags",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "boost": {
+        "featuredQuota": "Featured Quota",
+        "hotBadgeQuota": "Hot Badge",
+        "featured": "featured",
+        "hotBadge": "hot badge"
+      },
+      "units": "units",
+      "empty": {
+        "title": "No packages found",
+        "description": "Try adjusting your search or add a new package.",
+        "adjustFilters": "Try adjusting your filters",
+        "createFirst": "Create your first package to get started",
+        "noBoostPackages": "No boost packages found",
+        "addFirstBoost": "Add your first boost package",
+        "adjustSearch": "Try adjusting your search"
+      }
+    },
+    "flags": {
+      "free": "Free",
+      "unlimited": "Unlimited",
+      "paid": "Paid"
+    },
+    "featureType": {
+      "LISTING": "Listing",
+      "3D_TOUR": "3D Tour",
+      "AI_REQUEST": "AI Assistant"
+    },
+    "duration": {
+      "noExpiry": "No expiry",
+      "unlimited": "Unlimited",
+      "oneDay": "1 day",
+      "days": "{days} days",
+      "oneMonth": "1 month",
+      "months": "{months} months",
+      "month": "30 days (≈ 1 month)"
+    },
+    "price": {
+      "free": "Free"
+    },
+    "actions": {
+      "add": "Add Package",
+      "edit": "Edit",
+      "delete": "Delete",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "copyCode": "Copy code",
+      "copyCodeSuccess": "Code copied!",
+      "viewDetails": "View details",
+      "deleteConfirmTitle": "Delete Package",
+      "deleteConfirmDescription": "This will permanently delete <strong>{name}</strong>. Users with active subscriptions may be affected.",
+      "deleteWarning": "This action cannot be undone.",
+      "deleteSuccess": "Package deleted",
+      "deleteError": "Failed to delete package",
+      "deleting": "Deleting…",
+      "confirmDelete": "Delete",
+      "cancel": "Cancel",
+      "activateSuccess": "Package activated",
+      "deactivateSuccess": "Package deactivated",
+      "activateError": "Failed to activate package",
+      "deactivateError": "Failed to deactivate package"
+    },
+    "form": {
+      "addSubscriptionTitle": "Add Subscription Package",
+      "editSubscriptionTitle": "Edit Subscription Package",
+      "addBoostTitle": "Add Boost Package",
+      "editBoostTitle": "Edit Boost Package",
+      "fields": {
+        "code": "Package Code",
+        "codePlaceholder": "e.g. LISTING_10",
+        "name": "Display Name",
+        "namePlaceholder": "e.g. Basic Listing Pack",
+        "description": "Description",
+        "descriptionPlaceholder": "Short description of the package...",
+        "featureType": "Feature Type",
+        "quota": "Quota",
+        "quotaPlaceholder": "e.g. 10",
+        "durationDays": "Duration (days)",
+        "durationPlaceholder": "e.g. 30 (use -1 for unlimited)",
+        "price": "Price (VND)",
+        "pricePlaceholder": "e.g. 99.000",
+        "featuredQuota": "Featured Quota",
+        "featuredQuotaPlaceholder": "e.g. 5",
+        "hotBadgeQuota": "Hot Badge Quota",
+        "hotBadgePlaceholder": "e.g. 3"
+      },
+      "hints": {
+        "code": "Unique identifier used internally",
+        "quotaUnlimited": "Use the Unlimited switch to remove quota limits",
+        "durationNoExpiry": "Use the No expiry switch for unlimited duration",
+        "priceFree": "0 = free package"
+      },
+      "validation": {
+        "codeRequired": "Package code is required",
+        "nameRequired": "Package name is required",
+        "quotaPositive": "Quota must be a positive number",
+        "durationRequired": "Duration is required",
+        "priceNonNegative": "Price must be 0 or greater (use 0 for free packages)"
+      },
+      "save": "Save Package",
+      "saving": "Saving...",
+      "saveSuccess": "Package saved successfully",
+      "saveError": "Failed to save package"
+    },
+    "detail": {
+      "title": "Package Details",
+      "overview": "Overview",
+      "quotaInfo": "Quota Information",
+      "pricing": "Pricing",
+      "packageCode": "Package Code",
+      "createdBy": "System",
+      "status": "Status",
+      "createdAt": "Created At",
+      "updatedAt": "Last Updated",
+      "close": "Close"
+    }
+  }
+}
