@@ -142,8 +142,10 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
             onOpenChange(false);
           },
           onError: (err) =>
-              toast.error(err instanceof HttpError ? err.payload?.message : undefined
-                ?? t('toast.updateError')),
+            toast.error(
+              (err instanceof HttpError ? err.payload?.message : undefined) ??
+                t('toast.updateError')
+            ),
         }
       );
     } else {
@@ -160,8 +162,10 @@ export function LocationFormDialog({ open, onOpenChange, location }: LocationFor
             onOpenChange(false);
           },
           onError: (err) =>
-              toast.error(err instanceof HttpError ? err.payload?.message : undefined
-                ?? t('toast.createError')),
+            toast.error(
+              (err instanceof HttpError ? err.payload?.message : undefined) ??
+                t('toast.createError')
+            ),
         }
       );
     }
