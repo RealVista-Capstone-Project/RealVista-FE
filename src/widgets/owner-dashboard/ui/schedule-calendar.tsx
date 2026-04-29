@@ -1,12 +1,12 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Calendar } from '@/shared/ui/calendar';
 import { MapPin, User, Clock } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-
-type ScheduleTab = 'All' | 'Assigned' | 'My Schedule';
+type ScheduleType = 'my schedule' | 'assigned';
 
 const scheduleItems = [
   {
@@ -15,7 +15,7 @@ const scheduleItems = [
     address: '742 Oak Street, Denver, CO 80220',
     date: 'Jun 2, 2025',
     time: '10:00 AM',
-    type: 'my schedule' as const,
+    type: 'my schedule' as ScheduleType,
     color: 'border-l-indigo-500',
   },
   {
@@ -24,7 +24,7 @@ const scheduleItems = [
     address: '1256 Maple Ave, Austin, TX 78704',
     date: 'Jun 2, 2025',
     time: '2:00 PM',
-    type: 'my schedule' as const,
+    type: 'my schedule' as ScheduleType,
     color: 'border-l-emerald-500',
   },
   {
@@ -33,7 +33,7 @@ const scheduleItems = [
     address: 'aaliyah123@listify.com | (512) 555-0398',
     date: 'Jun 2, 2025',
     time: '4:30 PM',
-    type: 'assigned' as const,
+    type: 'assigned' as ScheduleType,
     color: 'border-l-amber-500',
   },
   {
@@ -42,26 +42,35 @@ const scheduleItems = [
     address: 'New York, Albany',
     date: 'Jun 5, 2025',
     time: '9:00 AM',
-    type: 'assigned' as const,
+    type: 'assigned' as ScheduleType,
     color: 'border-l-rose-500',
   },
 ];
 
-const tabs: ScheduleTab[] = ['All', 'Assigned', 'My Schedule'];
+type TabKey = 'all' | 'assigned' | 'mySchedule';
 
 export function ScheduleCalendar() {
+  const t = useTranslations('OwnerDashboard.schedule');
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [activeTab, setActiveTab] = useState<ScheduleTab>('All');
+  const [activeTab, setActiveTab] = useState<TabKey>('all');
+
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: 'all', label: t('tabs.all') },
+    { key: 'assigned', label: t('tabs.assigned') },
+    { key: 'mySchedule', label: t('tabs.mySchedule') },
+  ];
 
   const filtered = scheduleItems.filter((item) => {
-    if (activeTab === 'All') return true;
-    if (activeTab === 'Assigned') return item.type === 'assigned';
-    if (activeTab === 'My Schedule') return item.type === 'my schedule';
+    if (activeTab === 'all') return true;
+    if (activeTab === 'assigned') return item.type === 'assigned';
+    if (activeTab === 'mySchedule') return item.type === 'my schedule';
     return true;
   });
 
   return (
     <div className='flex flex-col gap-5 rounded-2xl border bg-card p-5 shadow-sm'>
+      <h3 className='text-base font-semibold'>{t('title')}</h3>
+
       {/* Calendar */}
       <div className='flex justify-center'>
         <Calendar
@@ -76,16 +85,16 @@ export function ScheduleCalendar() {
       <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
         {tabs.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
             className={cn(
               'flex-1 rounded-lg py-1.5 text-xs font-medium transition-all',
-              activeTab === tab
+              activeTab === tab.key
                 ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            {tab}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -112,7 +121,11 @@ export function ScheduleCalendar() {
               </div>
               <div className='flex items-center gap-1'>
                 <User className='h-3 w-3' />
-                <span className='capitalize'>{item.type}</span>
+                <span>
+                  {item.type === 'my schedule'
+                    ? t('myScheduleLabel')
+                    : t('assignedLabel')}
+                </span>
               </div>
               <span className='ml-auto text-primary font-medium'>{item.date}</span>
             </div>

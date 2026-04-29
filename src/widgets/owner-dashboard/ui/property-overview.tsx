@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Progress } from '@/shared/ui/progress';
 import { Building2, Home } from 'lucide-react';
 
@@ -49,6 +50,8 @@ const activeListings = [
 ];
 
 export function PropertyOverview() {
+  const t = useTranslations('OwnerDashboard.propertyOverview');
+
   const total = 1323;
   const listed = 823;
   const sold = 409;
@@ -58,26 +61,26 @@ export function PropertyOverview() {
   return (
     <div className='flex flex-col gap-5 rounded-2xl border bg-card p-5 shadow-sm'>
       <div className='flex items-center justify-between'>
-        <h3 className='text-base font-semibold'>Property Overview</h3>
-        <button className='text-xs font-medium text-primary hover:underline'>View all</button>
+        <h3 className='text-base font-semibold'>{t('title')}</h3>
+        <button className='text-xs font-medium text-primary hover:underline'>{t('viewAll')}</button>
       </div>
 
       {/* Stats */}
       <div className='grid grid-cols-3 gap-4 rounded-xl bg-muted/40 p-4'>
         <div className='text-center'>
           <p className='text-xl font-bold'>{total.toLocaleString()}</p>
-          <p className='text-xs text-muted-foreground'>Total Property</p>
+          <p className='text-xs text-muted-foreground'>{t('totalProperty')}</p>
         </div>
         <div className='text-center border-x border-border'>
           <p className='text-xl font-bold text-indigo-600 dark:text-indigo-400'>{listed}</p>
-          <p className='text-xs text-muted-foreground'>Listed Property</p>
+          <p className='text-xs text-muted-foreground'>{t('listedProperty')}</p>
           <div className='mt-1.5 px-2'>
             <Progress value={listedPercent} className='h-1.5' />
           </div>
         </div>
         <div className='text-center'>
           <p className='text-xl font-bold text-emerald-600 dark:text-emerald-400'>{sold}</p>
-          <p className='text-xs text-muted-foreground'>Property Sold</p>
+          <p className='text-xs text-muted-foreground'>{t('propertySold')}</p>
           <div className='mt-1.5 px-2'>
             <Progress value={soldPercent} className='h-1.5 [&>div]:bg-emerald-500' />
           </div>
@@ -87,7 +90,7 @@ export function PropertyOverview() {
       {/* Active Listings label */}
       <div className='flex items-center gap-2'>
         <Building2 className='h-4 w-4 text-muted-foreground' />
-        <p className='text-sm font-medium'>Active Listing</p>
+        <p className='text-sm font-medium'>{t('activeListing')}</p>
       </div>
 
       {/* Listings grid */}

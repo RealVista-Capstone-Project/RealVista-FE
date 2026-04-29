@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import {
   AreaChart,
@@ -28,7 +29,7 @@ const revenueData = [
 ];
 
 type ViewMode = 'W' | 'M' | 'Y';
-type MetricType = 'Revenue' | 'Visit';
+type MetricKey = 'revenue' | 'visit';
 
 function formatRevenue(value: number) {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
@@ -40,19 +41,19 @@ const CustomTooltip = ({
   active,
   payload,
   label,
-  metric,
+  isRevenue,
 }: {
   active?: boolean;
   payload?: Array<{ value: number }>;
   label?: string;
-  metric: MetricType;
+  isRevenue: boolean;
 }) => {
   if (active && payload && payload.length) {
     return (
       <div className='rounded-xl border bg-card px-3 py-2 shadow-lg'>
         <p className='text-xs text-muted-foreground'>{label}</p>
         <p className='text-sm font-semibold'>
-          {metric === 'Revenue' ? formatRevenue(payload[0].value) : payload[0].value}
+          {isRevenue ? formatRevenue(payload[0].value) : payload[0].value}
         </p>
       </div>
     );
@@ -61,11 +62,12 @@ const CustomTooltip = ({
 };
 
 export function PerformanceChart() {
-  const [metric, setMetric] = useState<MetricType>('Revenue');
+  const t = useTranslations('OwnerDashboard.performance');
+  const [metricKey, setMetricKey] = useState<MetricKey>('revenue');
   const [view, setView] = useState<ViewMode>('Y');
 
-  const dataKey = metric === 'Revenue' ? 'revenue' : 'visits';
-  const color = metric === 'Revenue' ? '#6366f1' : '#22c55e';
+  const isRevenue = metricKey === 'revenue';
+  const color = isRevenue ? '#6366f1' : '#22c55e';
 
   const slicedData =
     view === 'W'
@@ -74,43 +76,54 @@ export function PerformanceChart() {
         ? revenueData.slice(-4)
         : revenueData;
 
+  const metrics: { key: MetricKey; label: string }[] = [
+    { key: 'revenue', label: t('revenue') },
+    { key: 'visit', label: t('visit') },
+  ];
+
+  const views: { key: ViewMode; label: string }[] = [
+    { key: 'W', label: t('week') },
+    { key: 'M', label: t('month') },
+    { key: 'Y', label: t('year') },
+  ];
+
   return (
     <div className='flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm'>
       {/* Header */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-        <h3 className='text-base font-semibold'>Performance</h3>
+        <h3 className='text-base font-semibold'>{t('title')}</h3>
         <div className='flex items-center gap-3'>
           {/* Metric Toggle */}
           <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
-            {(['Revenue', 'Visit'] as MetricType[]).map((m) => (
+            {metrics.map((m) => (
               <button
-                key={m}
-                onClick={() => setMetric(m)}
+                key={m.key}
+                onClick={() => setMetricKey(m.key)}
                 className={cn(
                   'rounded-lg px-3 py-1 text-xs font-medium transition-all',
-                  metric === m
+                  metricKey === m.key
                     ? 'bg-background shadow-sm text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {m}
+                {m.label}
               </button>
             ))}
           </div>
           {/* View Toggle */}
           <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
-            {(['W', 'M', 'Y'] as ViewMode[]).map((v) => (
+            {views.map((v) => (
               <button
-                key={v}
-                onClick={() => setView(v)}
+                key={v.key}
+                onClick={() => setView(v.key)}
                 className={cn(
                   'rounded-lg px-3 py-1 text-xs font-medium transition-all',
-                  view === v
+                  view === v.key
                     ? 'bg-background shadow-sm text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {v}
+                {v.label}
               </button>
             ))}
           </div>
@@ -139,12 +152,12 @@ export function PerformanceChart() {
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-              tickFormatter={metric === 'Revenue' ? (v) => formatRevenue(v) : undefined}
+              tickFormatter={isRevenue ? (v) => formatRevenue(v) : undefined}
             />
-            <Tooltip content={<CustomTooltip metric={metric} />} />
+            <Tooltip content={<CustomTooltip isRevenue={isRevenue} />} />
             <Area
               type='monotone'
-              dataKey={dataKey}
+              dataKey={metricKey}
               stroke={color}
               strokeWidth={2.5}
               fill='url(#colorGradient)'
@@ -162,15 +175,15 @@ export function PerformanceChart() {
             <span className='text-lg'>🏡</span>
           </div>
           <div>
-            <p className='text-sm font-semibold'>The Somerset</p>
-            <p className='text-xs text-muted-foreground'>House</p>
+            <p className='text-sm font-semibold'>{t('featuredProperty')}</p>
+            <p className='text-xs text-muted-foreground'>{t('featuredType')}</p>
           </div>
         </div>
         <div className='flex gap-4 text-center'>
           {[
-            { label: 'Sold', value: '175' },
-            { label: 'Rented', value: '125' },
-            { label: 'Views', value: '2K+' },
+            { label: t('sold'), value: '175' },
+            { label: t('rented'), value: '125' },
+            { label: t('views'), value: '2K+' },
           ].map((item) => (
             <div key={item.label}>
               <p className='text-sm font-bold'>{item.value}</p>
@@ -179,16 +192,16 @@ export function PerformanceChart() {
           ))}
         </div>
         <div className='hidden flex-col gap-1 sm:flex'>
-          <p className='text-xs text-muted-foreground'>Recommended to 14 Leads</p>
+          <p className='text-xs text-muted-foreground'>{t('recommendedTo')}</p>
           <div className='flex items-center gap-1'>
             <span className='h-2 w-2 rounded-full bg-emerald-500' />
             <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
-              42 Closed Deals
+              42 {t('closedDeals')}
             </p>
           </div>
         </div>
         <div className='rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'>
-          On Progress
+          {t('onProgress')}
         </div>
       </div>
     </div>

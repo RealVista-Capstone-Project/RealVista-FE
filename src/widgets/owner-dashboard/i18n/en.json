@@ -1,0 +1,116 @@
+{
+  "OwnerDashboard": {
+    "header": {
+      "welcomeBack": "Welcome back,",
+      "wave": "👋",
+      "notification": "Notifications",
+      "addListing": "Add Listing",
+      "title": "Owner Dashboard"
+    },
+    "stats": {
+      "activeLeads": "Active Leads",
+      "totalRevenue": "Total Revenue",
+      "activeListing": "Active Listing",
+      "totalClosed": "Total Closed"
+    },
+    "pipeline": {
+      "title": "Deal Pipeline",
+      "subtitle": "On Progress",
+      "activeLeads": "Active Leads",
+      "onProgress": "On Progress",
+      "closedDeals": "Closed Deals",
+      "viewPipeline": "View Pipeline"
+    },
+    "performance": {
+      "title": "Performance",
+      "revenue": "Revenue",
+      "visit": "Visit",
+      "week": "W",
+      "month": "M",
+      "year": "Y",
+      "featuredProperty": "The Somerset",
+      "featuredType": "House",
+      "sold": "Sold",
+      "rented": "Rented",
+      "views": "Views",
+      "recommendedTo": "Recommended to 14 Leads",
+      "closedDeals": "Closed Deals",
+      "onProgress": "On Progress"
+    },
+    "reminder": {
+      "title": "Reminder",
+      "viewAll": "View all",
+      "items": {
+        "followUp": {
+          "title": "Follow up with client",
+          "description": "Follow up with Mr. Aditya about payment status."
+        },
+        "uploadPhotos": {
+          "title": "Upload new photos",
+          "description": "Upload new listing photos for the new villa launch."
+        },
+        "reviewContract": {
+          "title": "Review sales contract",
+          "description": "Review and sign contract draft for The Somerset sale."
+        }
+      }
+    },
+    "leads": {
+      "title": "Leads Contact",
+      "viewAll": "View all",
+      "badges": {
+        "new": "New",
+        "hot": "Hot",
+        "warm": "Warm"
+      }
+    },
+    "salesAnalytics": {
+      "title": "Sales Analytics",
+      "thisMonth": "This Month",
+      "total": "Total",
+      "channels": {
+        "marketing": "Marketing Sale",
+        "online": "Online Sale",
+        "offline": "Offline Sale",
+        "agent": "Agent Sale"
+      }
+    },
+    "propertyOverview": {
+      "title": "Property Overview",
+      "viewAll": "View all",
+      "totalProperty": "Total Property",
+      "listedProperty": "Listed Property",
+      "propertySold": "Property Sold",
+      "activeListing": "Active Listing"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "tabs": {
+        "all": "All",
+        "assigned": "Assigned",
+        "mySchedule": "My Schedule"
+      },
+      "myScheduleLabel": "my schedule",
+      "assignedLabel": "assigned"
+    },
+    "propertyTable": {
+      "title": "Active Listing",
+      "properties": "{count} properties",
+      "searchPlaceholder": "Search property...",
+      "allStatus": "All Status",
+      "columns": {
+        "property": "Property",
+        "type": "Type",
+        "cost": "Cost",
+        "activeLeads": "Active Leads",
+        "views": "Views",
+        "status": "Status"
+      },
+      "status": {
+        "available": "Available",
+        "occupied": "Occupied",
+        "soldOut": "Sold Out"
+      }
+    }
+  }
+}
