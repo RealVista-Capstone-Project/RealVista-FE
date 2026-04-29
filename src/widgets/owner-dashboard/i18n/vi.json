@@ -54,9 +54,9 @@
           "description": "Xem xét và ký bản nháp hợp đồng bán The Somerset."
         }
       }
-    },
+    }, 
     "leads": {
-      "title": "Danh sách khách hàng",
+      "title": "Danh sách môi giới",
       "viewAll": "Xem tất cả",
       "badges": {
         "new": "Mới",

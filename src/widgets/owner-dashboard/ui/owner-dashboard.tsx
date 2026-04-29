@@ -54,8 +54,6 @@ export function OwnerDashboard() {
         />
       </div>
 
-      {/* ── Deal Pipeline Banner ── */}
-
       {/* ── Main Grid ── */}
       <div className='grid grid-cols-1 gap-5 xl:grid-cols-3'>
         {/* Left: Performance Chart (2/3) */}
