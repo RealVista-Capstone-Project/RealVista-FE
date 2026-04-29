@@ -12,21 +12,20 @@ import {
   useAgentPerformanceMetrics,
   useAgentPlanSnapshot,
 } from '../api/use-agent-dashboard';
-import { ArrowUpRight, CalendarDays, CircleAlert, TrendingDown, TrendingUp, Zap } from 'lucide-react';
+import {
+  ArrowUpRight,
+  CalendarDays,
+  CircleAlert,
+  TrendingDown,
+  TrendingUp,
+  Zap,
+} from 'lucide-react';
 import type { User } from 'next-auth';
+import { useLocale, useTranslations } from 'next-intl';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
-const performanceChartConfig = {
-  views: { label: 'Views', color: 'var(--chart-1)' },
-  inquiries: { label: 'Inquiries', color: 'var(--chart-2)' },
-} as const;
-
-const channelChartConfig = {
-  leads: { label: 'Leads', color: 'var(--chart-4)' },
-} as const;
-
-function formatDashboardDate(value: string) {
-  return new Date(value).toLocaleDateString('en-US', {
+function formatDashboardDate(value: string, locale: string) {
+  return new Date(value).toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
@@ -40,10 +39,22 @@ function deriveRatio(numerator: number, denominator: number) {
 }
 
 export function AgentDashboardView({ user }: { user?: User }) {
+  const t = useTranslations('AgentDashboard');
+  const locale = useLocale();
   const metricsQuery = useAgentDashboardMetrics();
   const performanceQuery = useAgentPerformanceMetrics();
   const appointmentsQuery = useAgentAppointmentsSnapshot();
   const planQuery = useAgentPlanSnapshot();
+  const name = user?.name || user?.email?.split('@')[0] || 'Agent';
+
+  const performanceChartConfig = {
+    views: { label: t('charts.views'), color: 'var(--chart-1)' },
+    inquiries: { label: t('charts.inquiries'), color: 'var(--chart-2)' },
+  } as const;
+
+  const channelChartConfig = {
+    leads: { label: t('charts.leads'), color: 'var(--chart-4)' },
+  } as const;
 
   const loading =
     metricsQuery.isLoading ||
@@ -77,11 +88,9 @@ export function AgentDashboardView({ user }: { user?: User }) {
         <CardHeader>
           <CardTitle className='flex items-center gap-2 text-destructive'>
             <CircleAlert className='h-5 w-5' />
-            Agent dashboard is unavailable
+            {t('error.title')}
           </CardTitle>
-          <CardDescription>
-            We could not load dashboard insights right now. Please refresh and try again.
-          </CardDescription>
+          <CardDescription>{t('error.description')}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -93,19 +102,20 @@ export function AgentDashboardView({ user }: { user?: User }) {
         <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'>
-              Agent Dashboard
+              {t('header.title')}
             </h1>
-            <p className='mt-1 text-sm text-muted-foreground'>
-              Welcome back, {user?.name || user?.email?.split('@')[0]}. Here is your latest business
-              snapshot.
-            </p>
+            <p className='mt-1 text-sm text-muted-foreground'>{t('header.subtitle', { name })}</p>
           </div>
           <div className='flex gap-2'>
             <Button variant='outline' size='sm' asChild>
-              <Link href={ROUTES.dashboard.appointments}>View Appointments</Link>
+              <Link href={ROUTES.dashboard.appointments}>
+                {t('header.actions.viewAppointments')}
+              </Link>
             </Button>
             <Button size='sm' asChild>
-              <Link href={ROUTES.dashboard.propertyFeed}>Explore Properties</Link>
+              <Link href={ROUTES.dashboard.propertyFeed}>
+                {t('header.actions.exploreProperties')}
+              </Link>
             </Button>
           </div>
         </div>
@@ -117,7 +127,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
           return (
             <Card key={kpi.id} className='border-border/70 bg-card shadow-sm'>
               <CardHeader className='pb-3'>
-                <CardDescription>{kpi.label}</CardDescription>
+                <CardDescription>{t(`kpi.${kpi.id}`)}</CardDescription>
                 <CardTitle className='text-3xl font-semibold'>
                   {kpi.value.toLocaleString()}
                   {kpi.unit ? ` ${kpi.unit}` : ''}
@@ -130,7 +140,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                   <TrendingDown className='h-4 w-4 text-amber-500' />
                 )}
                 <span className={trendUp ? 'text-emerald-600' : 'text-amber-600'}>
-                  {kpi.deltaPercent}% vs last month
+                  {t('kpi.vsLastMonth', { value: kpi.deltaPercent })}
                 </span>
               </CardContent>
             </Card>
@@ -141,8 +151,8 @@ export function AgentDashboardView({ user }: { user?: User }) {
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         <Card className='xl:col-span-2'>
           <CardHeader>
-            <CardTitle>Listings Performance</CardTitle>
-            <CardDescription>Views and inquiries trend across recent months.</CardDescription>
+            <CardTitle>{t('sections.performance.title')}</CardTitle>
+            <CardDescription>{t('sections.performance.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer className='h-[280px] w-full' config={performanceChartConfig}>
@@ -174,8 +184,8 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Lead Channels</CardTitle>
-            <CardDescription>CRM lead volume by acquisition source.</CardDescription>
+            <CardTitle>{t('sections.channels.title')}</CardTitle>
+            <CardDescription>{t('sections.channels.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer className='h-[280px] w-full' config={channelChartConfig}>
@@ -188,6 +198,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                   tickLine={false}
                   axisLine={false}
                   width={70}
+                  tickFormatter={(value: string) => t(`channels.${value}`)}
                 />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                 <Bar dataKey='leads' radius={8} fill='var(--color-leads)' />
@@ -200,8 +211,8 @@ export function AgentDashboardView({ user }: { user?: User }) {
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         <Card className='xl:col-span-2'>
           <CardHeader>
-            <CardTitle>Appointments & Reminders</CardTitle>
-            <CardDescription>Upcoming tours, meetings, and follow-ups.</CardDescription>
+            <CardTitle>{t('sections.appointments.title')}</CardTitle>
+            <CardDescription>{t('sections.appointments.description')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-3'>
             {appointments.map((appointment) => (
@@ -216,10 +227,10 @@ export function AgentDashboardView({ user }: { user?: User }) {
                 <div className='flex items-center gap-3 text-xs'>
                   <span className='inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-1 text-primary'>
                     <CalendarDays className='h-3.5 w-3.5' />
-                    {formatDashboardDate(appointment.startsAt)}
+                    {formatDashboardDate(appointment.startsAt, locale)}
                   </span>
                   <span className='rounded-full border border-border px-2.5 py-1 uppercase tracking-wide text-muted-foreground'>
-                    {appointment.status}
+                    {t(`status.${appointment.status}`)}
                   </span>
                 </div>
               </div>
@@ -231,22 +242,24 @@ export function AgentDashboardView({ user }: { user?: User }) {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <Zap className='h-4 w-4 text-primary' />
-              Plan & Boosting
+              {t('sections.plan.title')}
             </CardTitle>
-            <CardDescription>Usage snapshot for subscription and boosts.</CardDescription>
+            <CardDescription>{t('sections.plan.description')}</CardDescription>
           </CardHeader>
           {plan && (
             <CardContent className='space-y-4'>
               <div className='rounded-xl border border-primary/20 bg-primary/5 p-3'>
                 <p className='text-sm font-medium text-foreground'>{plan.planName}</p>
                 <p className='text-xs text-muted-foreground'>
-                  Renews on {new Date(plan.renewsAt).toLocaleDateString()}
+                  {t('sections.plan.renewsOn', {
+                    date: new Date(plan.renewsAt).toLocaleDateString(locale),
+                  })}
                 </p>
               </div>
 
               <div className='space-y-2'>
                 <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                  <span>Listing quota</span>
+                  <span>{t('sections.plan.listingQuota')}</span>
                   <span>
                     {plan.listingQuotaUsed}/{plan.listingQuotaTotal}
                   </span>
@@ -256,7 +269,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
               <div className='space-y-2'>
                 <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                  <span>Boost credits</span>
+                  <span>{t('sections.plan.boostCredits')}</span>
                   <span>
                     {plan.boostsUsed}/{plan.boostsTotal}
                   </span>
@@ -270,10 +283,10 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
       <section className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4'>
         {[
-          { label: 'Property Feed', href: ROUTES.dashboard.propertyFeed },
-          { label: 'Manage Proposals', href: ROUTES.dashboard.manageProposals },
-          { label: 'CRM Workspace', href: ROUTES.dashboard.crm },
-          { label: 'My Engagements', href: ROUTES.dashboard.myEngagements },
+          { label: t('quickActions.propertyFeed'), href: ROUTES.dashboard.propertyFeed },
+          { label: t('quickActions.manageProposals'), href: ROUTES.dashboard.manageProposals },
+          { label: t('quickActions.crmWorkspace'), href: ROUTES.dashboard.crm },
+          { label: t('quickActions.myEngagements'), href: ROUTES.dashboard.myEngagements },
         ].map((item) => (
           <Card key={item.label} className='group'>
             <CardContent className='flex items-center justify-between p-4'>

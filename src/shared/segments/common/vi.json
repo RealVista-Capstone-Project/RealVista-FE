@@ -830,6 +830,70 @@
     "error": "Lưu tìm kiếm thất bại. Vui lòng thử lại sau.",
     "buttonLabel": "Lưu tìm kiếm"
   },
+  "AgentDashboard": {
+    "error": {
+      "title": "Không thể tải dashboard môi giới",
+      "description": "Hiện không thể tải dữ liệu tổng quan. Vui lòng làm mới trang và thử lại."
+    },
+    "header": {
+      "title": "Bảng điều khiển môi giới",
+      "subtitle": "Chào mừng quay lại, {name}. Đây là bức tranh kinh doanh mới nhất của bạn.",
+      "actions": {
+        "viewAppointments": "Xem lịch hẹn",
+        "exploreProperties": "Khám phá bất động sản"
+      }
+    },
+    "kpi": {
+      "active-listings": "Tin đăng đang hoạt động",
+      "delegated-properties": "Bất động sản được ủy quyền",
+      "open-appointments": "Lịch hẹn đang mở",
+      "crm-leads": "Khách hàng tiềm năng CRM",
+      "vsLastMonth": "{value}% so với tháng trước"
+    },
+    "sections": {
+      "performance": {
+        "title": "Hiệu suất tin đăng",
+        "description": "Xu hướng lượt xem và lượt quan tâm trong các tháng gần đây."
+      },
+      "channels": {
+        "title": "Kênh khách hàng",
+        "description": "Số lượng lead CRM theo nguồn tiếp cận."
+      },
+      "appointments": {
+        "title": "Lịch hẹn & nhắc việc",
+        "description": "Các cuộc hẹn tham quan, họp và theo dõi sắp tới."
+      },
+      "plan": {
+        "title": "Gói dịch vụ & boost",
+        "description": "Tổng quan mức sử dụng gói và lượt boost.",
+        "renewsOn": "Gia hạn vào {date}",
+        "listingQuota": "Hạn mức tin đăng",
+        "boostCredits": "Lượt boost còn lại"
+      }
+    },
+    "charts": {
+      "views": "Lượt xem",
+      "inquiries": "Lượt quan tâm",
+      "leads": "Khách hàng tiềm năng"
+    },
+    "channels": {
+      "Website": "Website",
+      "Social": "Mạng xã hội",
+      "Referrals": "Giới thiệu",
+      "Walk-in": "Khách trực tiếp"
+    },
+    "status": {
+      "confirmed": "Đã xác nhận",
+      "pending": "Đang chờ",
+      "completed": "Hoàn tất"
+    },
+    "quickActions": {
+      "propertyFeed": "Khám phá BĐS",
+      "manageProposals": "Quản lý đề xuất",
+      "crmWorkspace": "Không gian CRM",
+      "myEngagements": "Hợp tác của tôi"
+    }
+  },
   "HeroSearch": {
     "heroTitle": "Tìm Ngôi Nhà Mơ Ước Của Bạn",
     "heroWith": "Cùng RealVista",

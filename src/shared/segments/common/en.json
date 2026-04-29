@@ -828,6 +828,70 @@
     "error": "Failed to save search. Please try again later.",
     "buttonLabel": "Save search"
   },
+  "AgentDashboard": {
+    "error": {
+      "title": "Agent dashboard is unavailable",
+      "description": "We could not load dashboard insights right now. Please refresh and try again."
+    },
+    "header": {
+      "title": "Agent Dashboard",
+      "subtitle": "Welcome back, {name}. Here is your latest business snapshot.",
+      "actions": {
+        "viewAppointments": "View Appointments",
+        "exploreProperties": "Explore Properties"
+      }
+    },
+    "kpi": {
+      "active-listings": "Active Listings",
+      "delegated-properties": "Delegated Properties",
+      "open-appointments": "Open Appointments",
+      "crm-leads": "CRM Leads",
+      "vsLastMonth": "{value}% vs last month"
+    },
+    "sections": {
+      "performance": {
+        "title": "Listings Performance",
+        "description": "Views and inquiries trend across recent months."
+      },
+      "channels": {
+        "title": "Lead Channels",
+        "description": "CRM lead volume by acquisition source."
+      },
+      "appointments": {
+        "title": "Appointments & Reminders",
+        "description": "Upcoming tours, meetings, and follow-ups."
+      },
+      "plan": {
+        "title": "Plan & Boosting",
+        "description": "Usage snapshot for subscription and boosts.",
+        "renewsOn": "Renews on {date}",
+        "listingQuota": "Listing quota",
+        "boostCredits": "Boost credits"
+      }
+    },
+    "charts": {
+      "views": "Views",
+      "inquiries": "Inquiries",
+      "leads": "Leads"
+    },
+    "channels": {
+      "Website": "Website",
+      "Social": "Social",
+      "Referrals": "Referrals",
+      "Walk-in": "Walk-in"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "completed": "Completed"
+    },
+    "quickActions": {
+      "propertyFeed": "Property Feed",
+      "manageProposals": "Manage Proposals",
+      "crmWorkspace": "CRM Workspace",
+      "myEngagements": "My Engagements"
+    }
+  },
   "HeroSearch": {
     "heroTitle": "Find Your Dream Home",
     "heroWith": "With RealVista",
