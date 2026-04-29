@@ -2,9 +2,11 @@
 
 import { UserProfileHeader } from '@/widgets/user-profile-header';
 import { DashboardStats } from '@/widgets/dashboard-stats';
+import { AgentDashboardView } from '@/features/dashboard-agent';
 import { LogoutButtonNextAuth } from '@/features/auth/ui';
 import { useAuthSession } from '@/features/auth/model';
 import { useFCMToken } from '@/features/auth/hooks/use-fcm-token';
+import type { User } from 'next-auth';
 
 /**
  * Dashboard Page
@@ -39,7 +41,25 @@ export function DashboardPage() {
   }
 
   const user = session.user;
+  const backendRoles: string[] = user?.backendRoles ?? [];
+  const isAgent = user?.role === 'AGENT' || backendRoles.includes('AGENT');
 
+  if (isAgent) {
+    return <AgentDashboardView user={user} />;
+  }
+
+  return <LegacyDashboardContent user={user} token={token} error={error} />;
+}
+
+function LegacyDashboardContent({
+  user,
+  token,
+  error,
+}: {
+  user?: User;
+  token: string | null;
+  error: string | null;
+}) {
   return (
     <div className='space-y-6'>
       {/* Header */}
