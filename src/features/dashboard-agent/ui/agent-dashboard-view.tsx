@@ -24,6 +24,12 @@ import type { User } from 'next-auth';
 import { useLocale, useTranslations } from 'next-intl';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
+const CHANNEL_LABELS: Record<string, string> = {
+  chat: 'Chat',
+  tour: 'Tour',
+  manual: 'Manual',
+};
+
 function formatDashboardDate(value: string, locale: string) {
   return new Date(value).toLocaleDateString(locale, {
     month: 'short',
@@ -36,6 +42,12 @@ function formatDashboardDate(value: string, locale: string) {
 function deriveRatio(numerator: number, denominator: number) {
   if (!denominator) return 0;
   return Math.round((numerator / denominator) * 100);
+}
+
+function toAppointmentStatus(status: string): 'confirmed' | 'pending' | 'completed' {
+  if (status === 'ACCEPTED') return 'confirmed';
+  if (status === 'COMPLETED') return 'completed';
+  return 'pending';
 }
 
 export function AgentDashboardView({ user }: { user?: User }) {
@@ -68,9 +80,42 @@ export function AgentDashboardView({ user }: { user?: User }) {
     appointmentsQuery.isError ||
     planQuery.isError;
 
-  const kpis = metricsQuery.data?.data.kpis ?? [];
+  const metrics = metricsQuery.data?.data;
+  const kpis = [
+    {
+      id: 'active-listings',
+      value: metrics?.listingSummary.all ?? 0,
+      trend: 'up' as const,
+      deltaPercent: 0,
+      unit: undefined,
+    },
+    {
+      id: 'delegated-properties',
+      value: metrics?.propertySummary.totalProperties ?? 0,
+      trend: 'up' as const,
+      deltaPercent: 0,
+      unit: undefined,
+    },
+    {
+      id: 'open-appointments',
+      value: metrics?.appointmentSummary.upcomingAppointments ?? 0,
+      trend: 'up' as const,
+      deltaPercent: 0,
+      unit: undefined,
+    },
+    {
+      id: 'crm-leads',
+      value: metrics?.crmSummary.totalLeads ?? 0,
+      trend: 'up' as const,
+      deltaPercent: 0,
+      unit: undefined,
+    },
+  ];
   const trendData = performanceQuery.data?.data.trend ?? [];
-  const channelData = performanceQuery.data?.data.channels ?? [];
+  const channelData = (performanceQuery.data?.data.channels ?? []).map((channel) => ({
+    ...channel,
+    channel: channel.channel.toLowerCase(),
+  }));
   const appointments = appointmentsQuery.data?.data.appointments ?? [];
   const plan = planQuery.data?.data;
 
@@ -198,7 +243,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                   tickLine={false}
                   axisLine={false}
                   width={70}
-                  tickFormatter={(value: string) => t(`channels.${value}`)}
+                  tickFormatter={(value: string) => CHANNEL_LABELS[value] ?? value}
                 />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                 <Bar dataKey='leads' radius={8} fill='var(--color-leads)' />
@@ -217,20 +262,20 @@ export function AgentDashboardView({ user }: { user?: User }) {
           <CardContent className='space-y-3'>
             {appointments.map((appointment) => (
               <div
-                key={appointment.id}
+                key={appointment.appointmentId}
                 className='flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 p-3 md:flex-row md:items-center md:justify-between'
               >
                 <div>
-                  <p className='font-medium text-foreground'>{appointment.title}</p>
-                  <p className='text-xs text-muted-foreground'>{appointment.location}</p>
+                  <p className='font-medium text-foreground'>{appointment.listingName || 'Listing'}</p>
+                  <p className='text-xs text-muted-foreground'>{appointment.listingAddress || '-'}</p>
                 </div>
                 <div className='flex items-center gap-3 text-xs'>
                   <span className='inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-1 text-primary'>
                     <CalendarDays className='h-3.5 w-3.5' />
-                    {formatDashboardDate(appointment.startsAt, locale)}
+                    {formatDashboardDate(appointment.startTime, locale)}
                   </span>
                   <span className='rounded-full border border-border px-2.5 py-1 uppercase tracking-wide text-muted-foreground'>
-                    {t(`status.${appointment.status}`)}
+                    {t(`status.${toAppointmentStatus(appointment.status)}`)}
                   </span>
                 </div>
               </div>

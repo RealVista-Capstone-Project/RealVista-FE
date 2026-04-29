@@ -1,16 +1,5 @@
 import type { ApiResponse } from '@/shared/types/api-response';
 
-export type TrendDirection = 'up' | 'down';
-
-export interface AgentKpiItem {
-  id: string;
-  label: string;
-  value: number;
-  unit?: string;
-  deltaPercent: number;
-  trend: TrendDirection;
-}
-
 export interface AgentPerformancePoint {
   month: string;
   views: number;
@@ -24,12 +13,54 @@ export interface AgentChannelPerformanceItem {
   conversionRate: number;
 }
 
-export interface AgentAppointmentItem {
-  id: string;
-  title: string;
-  location: string;
-  startsAt: string;
-  status: 'confirmed' | 'pending' | 'completed';
+export interface ManagedListingSummary {
+  all: number;
+  rent: number;
+  sale: number;
+}
+
+export interface PropertySummaryMetrics {
+  totalProperties: number;
+  availableProperties: number;
+  reservedProperties: number;
+  soldProperties: number;
+  rentedProperties: number;
+  draftProperties: number;
+  pendingProperties: number;
+  verifiedProperties: number;
+  rejectedProperties: number;
+}
+
+export interface AppointmentSummaryMetrics {
+  totalAppointments: number;
+  pendingAppointments: number;
+  acceptedAppointments: number;
+  rejectedAppointments: number;
+  canceledAppointments: number;
+  completedAppointments: number;
+  upcomingAppointments: number;
+}
+
+export interface LeadSourceSummary {
+  source: string;
+  count: number;
+}
+
+export interface LeadSummaryMetrics {
+  totalLeads: number;
+  closedLeads: number;
+  previousTotalLeads: number;
+  previousClosedLeads: number;
+  bySource: LeadSourceSummary[];
+}
+
+export interface AppointmentItem {
+  appointmentId: string;
+  listingId: string;
+  listingName: string;
+  listingAddress: string;
+  startTime: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED' | 'COMPLETED';
 }
 
 export interface AgentPlanSnapshot {
@@ -42,7 +73,10 @@ export interface AgentPlanSnapshot {
 }
 
 export interface AgentDashboardMetrics {
-  kpis: AgentKpiItem[];
+  listingSummary: ManagedListingSummary;
+  propertySummary: PropertySummaryMetrics;
+  appointmentSummary: AppointmentSummaryMetrics;
+  crmSummary: LeadSummaryMetrics;
 }
 
 export interface AgentPerformanceMetrics {
@@ -51,7 +85,7 @@ export interface AgentPerformanceMetrics {
 }
 
 export interface AgentAppointmentsSnapshot {
-  appointments: AgentAppointmentItem[];
+  appointments: AppointmentItem[];
 }
 
 export type AgentDashboardMetricsResponse = ApiResponse<AgentDashboardMetrics>;
