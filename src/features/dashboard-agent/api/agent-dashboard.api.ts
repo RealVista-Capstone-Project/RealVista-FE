@@ -24,19 +24,65 @@ const DEFAULT_PLAN_SNAPSHOT: AgentPlanSnapshotResponse = {
   },
 };
 
+const DEFAULT_METRICS_PAYLOAD: AgentDashboardMetrics = {
+  listingSummary: { all: 0, rent: 0, sale: 0 },
+  propertySummary: {
+    totalProperties: 0,
+    availableProperties: 0,
+    reservedProperties: 0,
+    soldProperties: 0,
+    rentedProperties: 0,
+    draftProperties: 0,
+    pendingProperties: 0,
+    verifiedProperties: 0,
+    rejectedProperties: 0,
+  },
+  appointmentSummary: {
+    totalAppointments: 0,
+    pendingAppointments: 0,
+    acceptedAppointments: 0,
+    rejectedAppointments: 0,
+    canceledAppointments: 0,
+    completedAppointments: 0,
+    upcomingAppointments: 0,
+  },
+  crmSummary: {
+    totalLeads: 0,
+    closedLeads: 0,
+    previousTotalLeads: 0,
+    previousClosedLeads: 0,
+    bySource: [],
+  },
+};
+
+async function safeGet<T>(path: string, fallback: T): Promise<T> {
+  try {
+    const response = await http.get<ApiResponse<T>>(path);
+    const data = response.payload?.data;
+    if (data === null || data === undefined) {
+      console.warn(`[agent-dashboard] Empty payload for ${path}, using fallback.`);
+      return fallback;
+    }
+    return data;
+  } catch (error) {
+    console.error(`[agent-dashboard] Failed to load ${path}`, error);
+    return fallback;
+  }
+}
+
 async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
   const [listingSummary, propertySummary, appointmentSummary, crmSummary] = await Promise.all([
-    http.get<ApiResponse<AgentDashboardMetrics['listingSummary']>>('/listings/managed-listings/summary'),
-    http.get<ApiResponse<AgentDashboardMetrics['propertySummary']>>('/properties/me/summary'),
-    http.get<ApiResponse<AgentDashboardMetrics['appointmentSummary']>>('/appointments/summary'),
-    http.get<ApiResponse<AgentDashboardMetrics['crmSummary']>>('/crm/leads/summary'),
+    safeGet('/listings/managed-listings/summary', DEFAULT_METRICS_PAYLOAD.listingSummary),
+    safeGet('/properties/me/summary', DEFAULT_METRICS_PAYLOAD.propertySummary),
+    safeGet('/appointments/summary', DEFAULT_METRICS_PAYLOAD.appointmentSummary),
+    safeGet('/crm/leads/summary', DEFAULT_METRICS_PAYLOAD.crmSummary),
   ]);
 
   return {
-    listingSummary: listingSummary.payload.data,
-    propertySummary: propertySummary.payload.data,
-    appointmentSummary: appointmentSummary.payload.data,
-    crmSummary: crmSummary.payload.data,
+    listingSummary,
+    propertySummary,
+    appointmentSummary,
+    crmSummary,
   };
 }
 
@@ -52,22 +98,26 @@ export const agentDashboardApi = {
   },
   getPerformance: async (): Promise<AgentPerformanceMetricsResponse> => {
     const payload = await getMetricsPayload();
-    const currentViews = payload.listingSummary.all;
-    const previousViews = payload.propertySummary.totalProperties;
-    const currentInquiries = payload.crmSummary.totalLeads;
-    const previousInquiries = payload.crmSummary.previousTotalLeads;
+    const listingSummary = payload.listingSummary ?? DEFAULT_METRICS_PAYLOAD.listingSummary;
+    const propertySummary = payload.propertySummary ?? DEFAULT_METRICS_PAYLOAD.propertySummary;
+    const crmSummary = payload.crmSummary ?? DEFAULT_METRICS_PAYLOAD.crmSummary;
+    const sourceItems = Array.isArray(crmSummary.bySource) ? crmSummary.bySource : [];
+    const currentViews = Number(listingSummary.all ?? 0);
+    const previousViews = Number(propertySummary.totalProperties ?? 0);
+    const currentInquiries = Number(crmSummary.totalLeads ?? 0);
+    const previousInquiries = Number(crmSummary.previousTotalLeads ?? 0);
 
     const performance: AgentPerformanceMetrics = {
       trend: [
         { month: 'Previous', views: previousViews, inquiries: previousInquiries, closedDeals: 0 },
         { month: 'Current', views: currentViews, inquiries: currentInquiries, closedDeals: 0 },
       ],
-      channels: payload.crmSummary.bySource.map((item) => ({
-        channel: item.source.toLowerCase(),
-        leads: item.count,
+      channels: sourceItems.map((item) => ({
+        channel: String(item?.source ?? 'unknown').toLowerCase(),
+        leads: Number(item?.count ?? 0),
         conversionRate:
-          payload.crmSummary.totalLeads > 0
-            ? Math.round((item.count / payload.crmSummary.totalLeads) * 100)
+          currentInquiries > 0
+            ? Math.round((Number(item?.count ?? 0) / currentInquiries) * 100)
             : 0,
       })),
     };
@@ -80,12 +130,13 @@ export const agentDashboardApi = {
     };
   },
   getAppointmentsSnapshot: async (): Promise<AgentAppointmentsSnapshotResponse> => {
-    const response = await http.get<ApiResponse<AgentAppointmentsSnapshot['appointments']>>('/appointments');
+    const appointmentsRaw = await safeGet<AgentAppointmentsSnapshot['appointments']>('/appointments', []);
+    const appointments = Array.isArray(appointmentsRaw) ? appointmentsRaw : [];
     return {
       success: true,
-      message: 'Agent appointments fetched successfully.',
+      message: 'Agent appointments fetched.',
       timestamp: new Date().toISOString(),
-      data: { appointments: response.payload.data },
+      data: { appointments },
     };
   },
   getPlanSnapshot: async (): Promise<AgentPlanSnapshotResponse> => {

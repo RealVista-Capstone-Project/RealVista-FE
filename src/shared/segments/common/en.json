@@ -831,7 +831,9 @@
   "AgentDashboard": {
     "error": {
       "title": "Agent dashboard is unavailable",
-      "description": "We could not load dashboard insights right now. Please refresh and try again."
+      "description": "We could not load dashboard insights right now. Please refresh and try again.",
+      "partialTitle": "Some dashboard data is temporarily unavailable",
+      "partialDescription": "You are seeing partial data. We are still loading available insights."
     },
     "header": {
       "title": "Agent Dashboard",

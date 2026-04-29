@@ -527,7 +527,7 @@
     "agentApplyDescription": "Gửi hồ sơ cá nhân (Proposal) của bạn cho chủ sở hữu để bắt đầu quản lý tài sản này.",
     "applyProposal": "Nộp Proposal",
     "marketActivity": "Hoạt động thị trường",
-    "activeListingsCount": "Tin đăng đang hoạt động",
+    "activeListingsCount": "Tin đăng đang được rao",
     "viewListing": "Xem tin",
     "noActiveListings": "Hiện chưa có tin đăng nào cho bất động sản này.",
     "legalDisclaimer": "Bạn đồng ý với Điều khoản sử dụng và Chính sách bảo mật của Estatery. Bằng cách chọn liên hệ với bất động sản, bạn cũng đồng ý rằng Tập đoàn Estatery, chủ nhà và người quản lý bất động sản có thể gọi điện hoặc nhắn tin cho bạn về bất kỳ yêu cầu nào bạn gửi thông qua dịch vụ của chúng tôi, có thể liên quan đến việc sử dụng phương tiện tự động và giọng nói được ghi sẵn/nhân tạo. Bạn không cần phải đồng ý như một điều kiện để thuê bất kỳ bất động sản nào hoặc mua bất kỳ hàng hóa hoặc dịch vụ nào khác. Có thể áp dụng phí tin nhắn/dữ liệu."
@@ -833,7 +833,9 @@
   "AgentDashboard": {
     "error": {
       "title": "Không thể tải dashboard môi giới",
-      "description": "Hiện không thể tải dữ liệu tổng quan. Vui lòng làm mới trang và thử lại."
+      "description": "Hiện không thể tải dữ liệu tổng quan. Vui lòng làm mới trang và thử lại.",
+      "partialTitle": "Một phần dữ liệu dashboard tạm thời chưa khả dụng",
+      "partialDescription": "Bạn đang xem dữ liệu một phần. Hệ thống vẫn tiếp tục tải các thông tin còn lại."
     },
     "header": {
       "title": "Bảng điều khiển môi giới",
@@ -844,7 +846,7 @@
       }
     },
     "kpi": {
-      "active-listings": "Tin đăng đang hoạt động",
+      "active-listings": "Tin đăng đang được rao",
       "delegated-properties": "Bất động sản được ủy quyền",
       "open-appointments": "Lịch hẹn đang mở",
       "crm-leads": "Khách hàng tiềm năng CRM",

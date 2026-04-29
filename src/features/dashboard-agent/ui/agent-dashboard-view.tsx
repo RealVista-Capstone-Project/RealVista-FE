@@ -75,10 +75,13 @@ export function AgentDashboardView({ user }: { user?: User }) {
     planQuery.isLoading;
 
   const hasError =
-    metricsQuery.isError ||
-    performanceQuery.isError ||
-    appointmentsQuery.isError ||
-    planQuery.isError;
+    (metricsQuery.isError && !metricsQuery.data) &&
+    (performanceQuery.isError && !performanceQuery.data) &&
+    (appointmentsQuery.isError && !appointmentsQuery.data) &&
+    (planQuery.isError && !planQuery.data);
+
+  const hasPartialError =
+    metricsQuery.isError || performanceQuery.isError || appointmentsQuery.isError || planQuery.isError;
 
   const metrics = metricsQuery.data?.data;
   const kpis = [
@@ -165,6 +168,17 @@ export function AgentDashboardView({ user }: { user?: User }) {
           </div>
         </div>
       </section>
+      {hasPartialError && !hasError && (
+        <Card className='border-amber-400/40 bg-amber-50/40 dark:bg-amber-900/10'>
+          <CardHeader className='py-4'>
+            <CardTitle className='flex items-center gap-2 text-amber-700 dark:text-amber-300'>
+              <CircleAlert className='h-4 w-4' />
+              {t('error.partialTitle')}
+            </CardTitle>
+            <CardDescription>{t('error.partialDescription')}</CardDescription>
+          </CardHeader>
+        </Card>
+      )}
 
       <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
         {kpis.map((kpi) => {
