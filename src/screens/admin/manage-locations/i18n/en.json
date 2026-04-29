@@ -1,0 +1,69 @@
+{
+  "ManageLocations": {
+    "title": "Manage Locations",
+    "description": "Manage cities, districts, and wards in the system.",
+    "addLocation": "Add Location",
+    "tabs": {
+      "ALL": "All",
+      "CITY": "Cities",
+      "DISTRICT": "Districts",
+      "WARD": "Wards"
+    },
+    "search": {
+      "placeholder": "Search by name or code..."
+    },
+    "filters": {
+      "allCities": "All cities",
+      "allDistricts": "All districts",
+      "selectCityFirst": "Select a city first"
+    },
+    "table": {
+      "columns": {
+        "name": "Name",
+        "code": "Code",
+        "level": "Level",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No locations found",
+        "description": "Try adjusting your filters or add a new location."
+      }
+    },
+    "levels": {
+      "CITY": "City",
+      "DISTRICT": "District",
+      "WARD": "Ward"
+    },
+    "form": {
+      "addTitle": "Add Location",
+      "editTitle": "Edit Location",
+      "level": "Level",
+      "selectLevel": "Select level",
+      "parentCity": "City",
+      "selectCity": "Select city",
+      "parentDistrict": "District",
+      "selectDistrict": "Select district",
+      "name": "Name",
+      "namePlaceholder": "e.g. Hà Nội",
+      "code": "Code",
+      "codePlaceholder": "e.g. HN",
+      "cancel": "Cancel",
+      "submit": "Add location",
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "toast": {
+      "createSuccess": "Location created successfully",
+      "createError": "Failed to create location",
+      "updateSuccess": "Location updated successfully",
+      "updateError": "Failed to update location"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "codeRequired": "Code is required",
+      "codeInvalid": "Code must be alphanumeric (letters, numbers, _ or -)",
+      "cityRequired": "City is required",
+      "districtRequired": "District is required"
+    }
+  }
+}

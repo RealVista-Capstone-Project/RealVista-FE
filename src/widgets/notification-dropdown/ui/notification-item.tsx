@@ -15,7 +15,9 @@ const DEFAULT_ICON_ENTRY = { Icon: Bell as LucideIcon, bg: 'bg-muted-foreground/
 
 function getNotificationIcon(eventType: Notification['eventType']): { Icon: LucideIcon; bg: string } {
   if (eventType.includes('TOUR')) return { Icon: Calendar, bg: 'bg-emerald-500' };
-  if (eventType.includes('APPLICATION')) return { Icon: UserCheck, bg: 'bg-orange-400' };
+  if (eventType.includes('APPLICATION') || eventType.includes('ENGAGEMENT')) {
+    return { Icon: UserCheck, bg: 'bg-orange-400' };
+  }
   if (eventType.includes('DRAFT') || eventType.includes('LISTING')) {
     return { Icon: Home, bg: 'bg-primary' };
   }

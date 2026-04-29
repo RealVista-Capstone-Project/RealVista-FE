@@ -46,6 +46,7 @@ export function AppointmentsPage() {
   const searchParams = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [listingFilter, setListingFilter] = useState<string>(() => searchParams.get('listing') ?? 'ALL');
+  const [userFilter, setUserFilter] = useState<string>(() => searchParams.get('user') ?? 'ALL');
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -53,6 +54,11 @@ export function AppointmentsPage() {
   // Fetch agent's managed listings for the filter dropdown
   const { data: managedListingsPage } = useQuery(listingQueries.managed({ page: 0, size: 100 }));
   const managedListings = managedListingsPage?.content ?? [];
+
+  useEffect(() => {
+    setListingFilter(searchParams.get('listing') ?? 'ALL');
+    setUserFilter(searchParams.get('user') ?? 'ALL');
+  }, [searchParams]);
 
   const [isEditingBlocks, setIsEditingBlocks] = useState(false);
   const [editableBlocks, setEditableBlocks] = useState<TimeSpan<AppointmentWithListing>[]>([]);
@@ -92,9 +98,13 @@ export function AppointmentsPage() {
       // Listing filter
       const matchesListing = listingFilter === 'ALL' || apt.listing_id === listingFilter;
 
-      return matchesStatus && matchesListing;
+      // User filter from CRM lead detail redirect
+      const matchesUser =
+        userFilter === 'ALL' || apt.sender_id === userFilter || apt.receiver_id === userFilter;
+
+      return matchesStatus && matchesListing && matchesUser;
     });
-  }, [appointments, statusFilter, listingFilter]);
+  }, [appointments, statusFilter, listingFilter, userFilter]);
 
   const [selectedSlot, setSelectedSlot] = useState<{
     date: string;

@@ -1,0 +1,38 @@
+{
+  "CRM": {
+    "title": "CRM Dashboard",
+    "metrics": {
+      "leadsBySource": "Leads by Source",
+      "filteredByDateAndSearch": "Filtered by current date and search",
+      "leads": "Leads",
+      "totalCustomers": "Total Customers",
+      "totalDeals": "Total Deals",
+      "fromPreviousPeriod": "from previous period"
+    },
+    "sources": {
+      "manual": "Manual",
+      "chat": "Chat",
+      "tour": "Tour booking"
+    },
+    "filters": {
+      "listing": "Filter by listing",
+      "allListings": "All listings"
+    },
+    "dateRange": {
+      "select": "Select date range",
+      "presets": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This Week",
+        "last7Days": "Last 7 Days",
+        "last28Days": "Last 28 Days",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "thisYear": "This Year"
+      }
+    },
+    "pagination": {
+      "pageInfo": "Page {current} of {total}"
+    }
+  }
+}

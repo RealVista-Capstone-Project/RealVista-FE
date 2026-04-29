@@ -7,6 +7,7 @@ import type { Conversation } from '@/entities/contact';
 import { ChatDropdown } from './chat-dropdown';
 import { useChatWindowStore } from '@/entities/contact';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
+import { ROUTES } from '@/shared/config/routes';
 import { useRouter, useParams } from 'next/navigation';
 
 /**
@@ -63,7 +64,7 @@ export function ChatDropdownContainer() {
       onConversationClick={(conversation) => {
         if (isMobile && params) {
           const locale = params.locale;
-          router.push(`/${locale}/messages/${conversation.id}`);
+          router.push(`/${locale}${ROUTES.dashboard.messages}/${conversation.id}`);
         } else if (!isMobile) {
           openWindow(conversation.id, conversation.participant);
         }
