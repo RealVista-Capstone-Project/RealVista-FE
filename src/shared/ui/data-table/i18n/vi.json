@@ -1,0 +1,9 @@
+{
+  "DataTable": {
+    "pagination": {
+      "pageInfo": "Trang {current} / {total}",
+      "previousPage": "Trang trước",
+      "nextPage": "Trang sau"
+    }
+  }
+}

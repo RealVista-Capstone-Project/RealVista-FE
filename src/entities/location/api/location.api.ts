@@ -37,6 +37,7 @@ export const locationApi = {
   adminList: (params?: AdminLocationListParams) => {
     const query = new URLSearchParams();
     if (params?.level) query.append('level', params.level);
+    if (params?.status) query.append('status', params.status);
     if (params?.parent_id) query.append('parentId', params.parent_id);
     if (params?.search) query.append('search', params.search);
     if (params?.page !== undefined) query.append('page', params.page.toString());
@@ -56,6 +57,18 @@ export const locationApi = {
 
   updateLocation: (id: string, req: UpdateLocationRequest) => {
     return http.put<ApiResponse<LocationResponse>>(`admin/locations/${id}`, req, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  activateLocation: (id: string) => {
+    return http.patch<ApiResponse<LocationResponse>>(`admin/locations/${id}/activate`, undefined, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  archiveLocation: (id: string) => {
+    return http.patch<ApiResponse<LocationResponse>>(`admin/locations/${id}/archive`, undefined, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
