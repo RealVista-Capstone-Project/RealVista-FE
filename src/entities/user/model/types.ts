@@ -81,4 +81,5 @@ export interface UserSearchResponse {
   full_name: string;
   masked_phone: string;
   phone: string;
+  avatar_url?: string;
 }
