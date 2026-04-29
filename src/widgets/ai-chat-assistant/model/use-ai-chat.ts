@@ -126,15 +126,17 @@ export function useAiChat() {
 
   /**
    * Send a user message and stream the AI response.
+   * @param text The message to display in the UI and to persist as the user message.
+   * @param listingId Optional listing UUID when on a listing detail page; the backend enriches the AI prompt.
    */
-  const sendMessage = useCallback((text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || isStreaming) return;
+  const sendMessage = useCallback((text: string, listingId?: string) => {
+    const trimmedText = text.trim();
+    if (!trimmedText || isStreaming) return;
 
     // Abort any in-flight stream
     abortRef.current?.abort();
 
-    const userMsg = createMessage(trimmed, 'user');
+    const userMsg = createMessage(trimmedText, 'user');
     const assistantMsg = createMessage('', 'assistant');
 
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
@@ -146,9 +148,14 @@ export function useAiChat() {
 
     const assistantId = assistantMsg.id;
 
+    const body: { message: string; listing_id?: string } = { message: trimmedText };
+    if (listingId) {
+      body.listing_id = listingId;
+    }
+
     sseFetch({
       url: AI_CHAT_ENDPOINT,
-      body: { message: trimmed },
+      body,
       signal: controller.signal,
       onData: (chunk) => {
         // Token event — append text to the assistant message

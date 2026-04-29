@@ -14,12 +14,17 @@ export interface FeaturePackage {
   price: number;
   unlimited: boolean;
   free: boolean;
+  /** Admin-only fields — present when fetched via /admin/billing/feature-packages */
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 /** @deprecated Use FeaturePackage — alias for older naming */
 export type SubscriptionPlan = FeaturePackage;
 
 export interface BoostPackage {
+  id: string;
   code: string;
   name: string;
   description: string;
@@ -27,6 +32,10 @@ export interface BoostPackage {
   hot_badge_quota: number;
   duration_days: number;
   price: number;
+  /** Admin-only fields — present when fetched via /admin/billing/boost-packages */
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ActiveBoostPackageResponse {
@@ -42,6 +51,45 @@ export interface ActiveBoostPackageResponse {
   remaining_featured_quota: number | null;
   remaining_hot_badge_quota: number | null;
   status: string;
+}
+
+// ─── Admin request bodies ────────────────────────────────────────────────────
+
+export interface CreateFeaturePackageRequest {
+  code: string;
+  name: string;
+  description?: string;
+  feature_type: 'LISTING' | '3D_TOUR' | 'AI_REQUEST';
+  quota: number;
+  duration_days: number;
+  price: number;
+}
+
+export interface UpdateFeaturePackageRequest {
+  name?: string;
+  description?: string;
+  quota?: number;
+  duration_days?: number;
+  price?: number;
+}
+
+export interface CreateBoostPackageRequest {
+  code: string;
+  name: string;
+  description?: string;
+  featured_quota: number;
+  hot_badge_quota: number;
+  duration_days: number;
+  price: number;
+}
+
+export interface UpdateBoostPackageRequest {
+  name?: string;
+  description?: string;
+  featured_quota?: number;
+  hot_badge_quota?: number;
+  duration_days?: number;
+  price?: number;
 }
 
 export interface CheckoutRequest {

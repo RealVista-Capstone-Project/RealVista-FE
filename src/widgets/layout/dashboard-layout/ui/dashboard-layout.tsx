@@ -13,6 +13,7 @@ import {
   Building2,
   Search,
   ContactRound,
+  Package,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -182,6 +183,12 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
     },
     { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
     {
+      id: 'packages',
+      label: t('menu.packages'),
+      href: ROUTES.dashboard.managePackages,
+      icon: Package,
+    },
+    {
       id: 'listings',
       label: t('menu.listings'),
       href: ROUTES.dashboard.managedListings,
@@ -282,6 +289,12 @@ export function DashboardLayout({
       return t('pageTitle.manageAgent');
     }
     if (
+      pathname === ROUTES.dashboard.managePackages ||
+      pathname.startsWith(ROUTES.dashboard.managePackages)
+    ) {
+      return t('pageTitle.managePackages');
+    }
+    if (
       pathname === ROUTES.dashboard.manageUsers ||
       pathname.startsWith(ROUTES.dashboard.manageUsers)
     ) {
@@ -305,6 +318,7 @@ export function DashboardLayout({
   const isItemActive = (href: string) => {
     if (pathname === href) return true;
     if (href === ROUTES.dashboard.root) return pathname === ROUTES.dashboard.root;
+    if (href === ROUTES.dashboard.manageUsers) return pathname === ROUTES.dashboard.manageUsers;
     return pathname.startsWith(href + '/');
   };
 

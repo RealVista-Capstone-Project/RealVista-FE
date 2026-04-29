@@ -14,7 +14,8 @@
       "proposals": "My Proposals",
       "appointments": "Appointments",
       "users": "User Management",
-      "crm": "CRM"
+      "crm": "CRM",
+      "packages": "Package Management"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -34,7 +35,8 @@
       "appointments": "Appointments",
       "manageUsers": "User Management",
       "manageAgent": "Manage Agent",
-      "crm": "CRM Board"
+      "crm": "CRM Board",
+      "managePackages": "Package Management"
     },
     "actionButton": {
       "addProperty": "Add a property",

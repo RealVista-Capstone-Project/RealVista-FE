@@ -14,7 +14,8 @@
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
       "users": "Quản lý người dùng",
-      "crm": "CRM"
+      "crm": "CRM",
+      "packages": "Quản lý gói dịch vụ"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -34,7 +35,8 @@
       "appointments": "Lịch hẹn",
       "manageUsers": "Quản lý người dùng",
       "manageAgent": "Quản lý môi giới",
-      "crm": "Quản lý khách hàng"
+      "crm": "Quản lý khách hàng",
+      "managePackages": "Quản lý gói dịch vụ"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

@@ -22,6 +22,8 @@ interface AiChatWindowProps {
   onSendMessage: (content: string) => void;
   onClose: () => void;
   onQuickAction: (text: string) => void;
+  /** Custom quick actions to display in welcome state. */
+  quickActions?: { key: string; text: string }[];
   /** Clears conversation and resets history (reload / new chat). */
   onNewChat?: () => void | Promise<void>;
   className?: string;
@@ -43,6 +45,7 @@ export function AiChatWindow({
   onClose,
   onQuickAction,
   onNewChat,
+  quickActions: propQuickActions,
   className,
 }: AiChatWindowProps) {
   const t = useTranslations('AiAssistant');
@@ -117,7 +120,7 @@ export function AiChatWindow({
     }
   };
 
-  const quickActions = [
+  const quickActions = propQuickActions || [
     { key: 'chipFindProperties', text: t('chipFindProperties') },
     { key: 'chipAverageRent', text: t('chipAverageRent') },
     { key: 'chipCompareListings', text: t('chipCompareListings') },

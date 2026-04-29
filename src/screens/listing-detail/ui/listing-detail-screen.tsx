@@ -41,6 +41,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/shared/ui/dialog/dialog';
+import { useAiChatContext } from '@/widgets/ai-chat-assistant/model/use-ai-chat-context';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -71,6 +72,8 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUnfavoriteConfirm, setShowUnfavoriteConfirm] = useState(false);
 
+  const { setCurrentListing } = useAiChatContext();
+
   // Track listing view on mount
   useEffect(() => {
     behaviorTracker.trackView(listing.listing_id, {
@@ -79,7 +82,11 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
       price: listing.price,
       source_page: 'detail',
     });
-  }, [listing.listing_id, listing.listing_type, listing.property_type.property_type_name, listing.price]);
+
+    // Set listing context for AI chat assistant
+    setCurrentListing(listing);
+    return () => setCurrentListing(null);
+  }, [listing, setCurrentListing]);
 
   const handleFavorite = () => {
     if (!session?.user) {
