@@ -12,6 +12,7 @@ import {
   Users,
   Building2,
   Search,
+  ContactRound,
   Package,
   type LucideIcon,
 } from 'lucide-react';
@@ -138,6 +139,12 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       href: ROUTES.dashboard.appointments,
       icon: Calendar,
     },
+    {
+      id: 'crm',
+      label: t('menu.crm'),
+      href: ROUTES.dashboard.crm,
+      icon: ContactRound,
+    },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
       id: 'proposals',
@@ -175,7 +182,12 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
       icon: LayoutDashboard,
     },
     { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
-    { id: 'packages', label: t('menu.packages'), href: ROUTES.dashboard.managePackages, icon: Package },
+    {
+      id: 'packages',
+      label: t('menu.packages'),
+      href: ROUTES.dashboard.managePackages,
+      icon: Package,
+    },
     {
       id: 'listings',
       label: t('menu.listings'),
@@ -296,6 +308,9 @@ export function DashboardLayout({
     }
     if (pathname === ROUTES.dashboard.root) {
       return t('pageTitle.dashboard');
+    }
+    if (pathname === ROUTES.dashboard.crm || pathname.startsWith(ROUTES.dashboard.crm)) {
+      return t('pageTitle.crm');
     }
     return t('pageTitle.default');
   }, [pathname, t]);

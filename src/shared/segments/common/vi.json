@@ -14,6 +14,7 @@
       "proposals": "Đề xuất của tôi",
       "appointments": "Lịch hẹn",
       "users": "Quản lý người dùng",
+      "crm": "CRM",
       "packages": "Quản lý gói dịch vụ"
     },
     "pageTitle": {
@@ -33,8 +34,9 @@
       "agentSetting": "Hồ sơ & cài đặt môi giới",
       "appointments": "Lịch hẹn",
       "manageUsers": "Quản lý người dùng",
-      "managePackages": "Quản lý gói dịch vụ",
-      "manageAgent": "Quản lý môi giới"
+      "manageAgent": "Quản lý môi giới",
+      "crm": "Quản lý khách hàng",
+      "managePackages": "Quản lý gói dịch vụ"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

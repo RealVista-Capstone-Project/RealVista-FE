@@ -14,6 +14,7 @@
       "proposals": "My Proposals",
       "appointments": "Appointments",
       "users": "User Management",
+      "crm": "CRM",
       "packages": "Package Management"
     },
     "pageTitle": {
@@ -33,8 +34,9 @@
       "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
       "manageUsers": "User Management",
-      "managePackages": "Package Management",
-      "manageAgent": "Manage Agent"
+      "manageAgent": "Manage Agent",
+      "crm": "CRM Board",
+      "managePackages": "Package Management"
     },
     "actionButton": {
       "addProperty": "Add a property",

@@ -36,6 +36,8 @@ export const ROUTES = {
     propertyFeed: '/dashboard/property-feed',
     /** Agent-only dashboard profile & account settings */
     agentSetting: '/dashboard/setting',
+    /** Agent CRM board */
+    crm: '/dashboard/crm',
   },
   leases: {
     signingComplete: '/leases/signing-complete',
