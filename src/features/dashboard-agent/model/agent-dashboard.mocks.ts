@@ -74,6 +74,15 @@ export const mockAgentAppointmentsSnapshot: AgentAppointmentsSnapshotResponse = 
   message: 'Agent appointments fetched.',
   timestamp: nowIso,
   data: {
+    range: {
+      startDate: '2026-05-01',
+      endDate: '2026-05-30',
+      timezone: 'UTC',
+    },
+    calendarDays: [
+      { date: '2026-05-02', total: 2, tourCount: 2, blockCount: 0, hasItems: true },
+      { date: '2026-05-03', total: 1, tourCount: 0, blockCount: 1, hasItems: true },
+    ],
     appointments: [
       {
         appointmentId: 'app-1',
@@ -81,7 +90,9 @@ export const mockAgentAppointmentsSnapshot: AgentAppointmentsSnapshotResponse = 
         listingName: 'Property tour with Michael Reynolds',
         listingAddress: '742 Oak Street, Denver',
         startTime: '2026-05-02T09:00:00.000Z',
+        endTime: '2026-05-02T10:00:00.000Z',
         status: 'ACCEPTED',
+        appointmentType: 'TOUR',
       },
       {
         appointmentId: 'app-2',
@@ -89,7 +100,9 @@ export const mockAgentAppointmentsSnapshot: AgentAppointmentsSnapshotResponse = 
         listingName: 'Follow-up call with Olivia Chen',
         listingAddress: 'Online meeting',
         startTime: '2026-05-02T13:30:00.000Z',
+        endTime: '2026-05-02T14:30:00.000Z',
         status: 'PENDING',
+        appointmentType: 'TOUR',
       },
       {
         appointmentId: 'app-3',
@@ -97,7 +110,9 @@ export const mockAgentAppointmentsSnapshot: AgentAppointmentsSnapshotResponse = 
         listingName: 'Open-house prep for Somerset',
         listingAddress: 'The Somerset, New York',
         startTime: '2026-05-03T08:00:00.000Z',
+        endTime: '2026-05-03T11:00:00.000Z',
         status: 'COMPLETED',
+        appointmentType: 'BLOCK',
       },
     ],
   },

@@ -62,7 +62,31 @@ export interface AppointmentItem {
   listingName: string;
   listingAddress: string;
   startTime: string;
+  endTime: string;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED' | 'COMPLETED';
+  appointmentType: 'TOUR' | 'BLOCK';
+}
+
+export interface AgentAppointmentCalendarDay {
+  date: string;
+  total: number;
+  tourCount: number;
+  blockCount: number;
+  hasItems: boolean;
+}
+
+export interface AgentAppointmentCalendarRange {
+  startDate: string;
+  endDate: string;
+  timezone: string;
+}
+
+export type AgentAppointmentTabFilter = 'all' | 'tour' | 'block';
+
+export interface AgentAppointmentsSnapshot {
+  range: AgentAppointmentCalendarRange;
+  calendarDays: AgentAppointmentCalendarDay[];
+  appointments: AppointmentItem[];
 }
 
 export interface AgentPlanSnapshot {
@@ -85,10 +109,6 @@ export interface AgentPerformanceMetrics {
   period?: AgentPerformancePeriod;
   trend: AgentPerformancePoint[];
   channels: AgentChannelPerformanceItem[];
-}
-
-export interface AgentAppointmentsSnapshot {
-  appointments: AppointmentItem[];
 }
 
 export type AgentDashboardMetricsResponse = ApiResponse<AgentDashboardMetrics>;

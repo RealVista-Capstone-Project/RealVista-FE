@@ -71,6 +71,35 @@ async function safeGet<T>(path: string, fallback: T): Promise<T> {
   }
 }
 
+function toIsoDate(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getFallbackAppointmentsSnapshot(): AgentAppointmentsSnapshot {
+  const now = new Date();
+  const startDate = new Date(now);
+  const endDate = new Date(now);
+  endDate.setDate(endDate.getDate() + 29);
+
+  return {
+    range: {
+      startDate: toIsoDate(startDate),
+      endDate: toIsoDate(endDate),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+    },
+    calendarDays: [],
+    appointments: [],
+  };
+}
+
+function normalizeAppointmentsSnapshot(snapshot: AgentAppointmentsSnapshot): AgentAppointmentsSnapshot {
+  return {
+    range: snapshot?.range ?? getFallbackAppointmentsSnapshot().range,
+    calendarDays: Array.isArray(snapshot?.calendarDays) ? snapshot.calendarDays : [],
+    appointments: Array.isArray(snapshot?.appointments) ? snapshot.appointments : [],
+  };
+}
+
 async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
   const [listingSummary, propertySummary, appointmentSummary, crmSummary] = await Promise.all([
     safeGet('/listings/managed-listings/summary', DEFAULT_METRICS_PAYLOAD.listingSummary),
@@ -111,13 +140,22 @@ export const agentDashboardApi = {
     };
   },
   getAppointmentsSnapshot: async (): Promise<AgentAppointmentsSnapshotResponse> => {
-    const appointmentsRaw = await safeGet<AgentAppointmentsSnapshot['appointments']>('/appointments', []);
-    const appointments = Array.isArray(appointmentsRaw) ? appointmentsRaw : [];
+    const fallback = getFallbackAppointmentsSnapshot();
+    const query = new URLSearchParams({
+      start_date: fallback.range.startDate,
+      end_date: fallback.range.endDate,
+    });
+    const raw = await safeGet<AgentAppointmentsSnapshot>(
+      `/appointments/dashboard-snapshot?${query.toString()}`,
+      fallback
+    );
+    const snapshot = normalizeAppointmentsSnapshot(raw);
+
     return {
       success: true,
       message: 'Agent appointments fetched.',
       timestamp: new Date().toISOString(),
-      data: { appointments },
+      data: snapshot,
     };
   },
   getPlanSnapshot: async (): Promise<AgentPlanSnapshotResponse> => {

@@ -2,7 +2,9 @@
 
 import { Link } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
+import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
+import { Calendar, CalendarDayButton } from '@/shared/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import {
   ChartContainer,
@@ -11,7 +13,11 @@ import {
   type ChartConfig,
 } from '@/shared/ui/chart';
 import { Progress } from '@/shared/ui/progress';
-import type { AgentPerformancePeriod } from '../model/agent-dashboard.types';
+import type {
+  AgentAppointmentTabFilter,
+  AppointmentItem,
+  AgentPerformancePeriod,
+} from '../model/agent-dashboard.types';
 import {
   useAgentAppointmentsSnapshot,
   useAgentDashboardMetrics,
@@ -20,7 +26,6 @@ import {
 } from '../api/use-agent-dashboard';
 import {
   ArrowUpRight,
-  CalendarDays,
   CircleAlert,
   TrendingDown,
   TrendingUp,
@@ -28,7 +33,7 @@ import {
 } from 'lucide-react';
 import type { User } from 'next-auth';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from 'recharts';
 
 /** Order matches CRM so legend and slice semantics stay consistent. */
@@ -54,10 +59,42 @@ function deriveRatio(numerator: number, denominator: number) {
   return Math.round((numerator / denominator) * 100);
 }
 
-function toAppointmentStatus(status: string): 'confirmed' | 'pending' | 'completed' {
+function toAppointmentStatus(
+  status: string
+): 'confirmed' | 'pending' | 'completed' | 'rejected' | 'canceled' {
   if (status === 'ACCEPTED') return 'confirmed';
   if (status === 'COMPLETED') return 'completed';
+  if (status === 'REJECTED') return 'rejected';
+  if (status === 'CANCELED') return 'canceled';
   return 'pending';
+}
+
+function toDateKey(value: Date, timezone: string) {
+  if (Number.isNaN(value.getTime())) return '';
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(value);
+}
+
+function toIsoDateKey(value: string, timezone: string) {
+  if (!value) return '';
+  return toDateKey(new Date(value), timezone);
+}
+
+function toSafeDate(value: string) {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function formatCalendarHeaderDate(value: Date, locale: string) {
+  return value.toLocaleDateString(locale, {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 export function AgentDashboardView({ user }: { user?: User }) {
@@ -145,18 +182,93 @@ export function AgentDashboardView({ user }: { user?: User }) {
     ...channel,
     channel: channel.channel.toLowerCase(),
   }));
-  const totalChannelLeads = channelData.reduce(
-    (sum, row) => sum + Number(row.leads ?? 0),
-    0,
-  );
+  const totalChannelLeads = channelData.reduce((sum, row) => sum + Number(row.leads ?? 0), 0);
   const channelPieData = channelData.map((row) => ({
     ...row,
     channel: row.channel,
     leads: Number(row.leads ?? 0),
     fill: `var(--color-${row.channel})`,
   }));
-  const appointments = appointmentsQuery.data?.data.appointments ?? [];
+  const appointmentSnapshot = appointmentsQuery.data?.data;
+  const appointments = useMemo(
+    () => appointmentSnapshot?.appointments ?? [],
+    [appointmentSnapshot?.appointments]
+  );
+  const calendarDays = useMemo(
+    () => appointmentSnapshot?.calendarDays ?? [],
+    [appointmentSnapshot?.calendarDays]
+  );
+  const [appointmentFilter, setAppointmentFilter] = useState<AgentAppointmentTabFilter>('all');
+  const [selectedAppointmentDay, setSelectedAppointmentDay] = useState<Date | undefined>(new Date());
+  const [visibleCalendarMonth, setVisibleCalendarMonth] = useState<Date>(new Date());
   const plan = planQuery.data?.data;
+  const snapshotTimezone = appointmentSnapshot?.range.timezone || 'UTC';
+
+  const calendarDayMap = useMemo(() => {
+    const map = new Map<string, (typeof calendarDays)[number]>();
+    calendarDays.forEach((day) => {
+      map.set(day.date, day);
+    });
+    return map;
+  }, [calendarDays]);
+
+  useEffect(() => {
+    if (!calendarDays.length) {
+      const now = new Date();
+      setSelectedAppointmentDay(now);
+      setVisibleCalendarMonth(now);
+      return;
+    }
+
+    const todayKey = toDateKey(new Date(), snapshotTimezone);
+    const todayMatch = calendarDayMap.get(todayKey);
+    if (todayMatch?.hasItems) {
+      const day = toSafeDate(todayMatch.date);
+      if (day) {
+        setSelectedAppointmentDay(day);
+        setVisibleCalendarMonth(day);
+        return;
+      }
+    }
+
+    const firstWithItems = calendarDays.find((day) => day.hasItems);
+    if (firstWithItems) {
+      const day = toSafeDate(firstWithItems.date);
+      if (day) {
+        setSelectedAppointmentDay(day);
+        setVisibleCalendarMonth(day);
+        return;
+      }
+    }
+
+    const firstDay = toSafeDate(calendarDays[0].date);
+    if (firstDay) {
+      setSelectedAppointmentDay(firstDay);
+      setVisibleCalendarMonth(firstDay);
+    }
+  }, [calendarDayMap, calendarDays, snapshotTimezone]);
+
+  const selectedDayKey = selectedAppointmentDay ? toDateKey(selectedAppointmentDay, snapshotTimezone) : '';
+  const selectedDayAppointments = useMemo(() => {
+    return appointments
+      .filter((appointment) => {
+        if (toIsoDateKey(appointment.startTime, snapshotTimezone) !== selectedDayKey) return false;
+        if (appointmentFilter === 'tour') return appointment.appointmentType === 'TOUR';
+        if (appointmentFilter === 'block') return appointment.appointmentType === 'BLOCK';
+        return true;
+      })
+      .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  }, [appointmentFilter, appointments, selectedDayKey, snapshotTimezone]);
+
+  const tourCount = selectedDayAppointments.filter((item) => item.appointmentType === 'TOUR').length;
+  const blockCount = selectedDayAppointments.filter((item) => item.appointmentType === 'BLOCK').length;
+  const statusPillClass = (status: AppointmentItem['status']) => {
+    if (status === 'ACCEPTED') return 'text-emerald-700 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300';
+    if (status === 'COMPLETED') return 'text-sky-700 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-300';
+    if (status === 'REJECTED') return 'text-rose-700 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-300';
+    if (status === 'CANCELED') return 'text-zinc-700 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300';
+    return 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300';
+  };
 
   if (loading) {
     return (
@@ -340,14 +452,9 @@ export function AgentDashboardView({ user }: { user?: User }) {
                     const row = channelData.find((c) => c.channel === source);
                     const count = row ? Number(row.leads ?? 0) : 0;
                     const pct =
-                      totalChannelLeads > 0
-                        ? Math.round((count / totalChannelLeads) * 100)
-                        : 0;
+                      totalChannelLeads > 0 ? Math.round((count / totalChannelLeads) * 100) : 0;
                     return (
-                      <div
-                        key={source}
-                        className='flex items-center justify-between gap-2 text-sm'
-                      >
+                      <div key={source} className='flex items-center justify-between gap-2 text-sm'>
                         <div className='flex min-w-0 items-center gap-2'>
                           <span
                             className='size-2.5 shrink-0 rounded-full'
@@ -372,36 +479,162 @@ export function AgentDashboardView({ user }: { user?: User }) {
       </section>
 
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
+        {/* Appointments Card */}
         <Card className='xl:col-span-2'>
           <CardHeader>
             <CardTitle>{t('sections.appointments.title')}</CardTitle>
             <CardDescription>{t('sections.appointments.description')}</CardDescription>
           </CardHeader>
-          <CardContent className='space-y-3'>
-            {appointments.map((appointment) => (
-              <div
-                key={appointment.appointmentId}
-                className='flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 p-3 md:flex-row md:items-center md:justify-between'
-              >
-                <div>
-                  <p className='font-medium text-foreground'>
-                    {appointment.listingName || 'Listing'}
-                  </p>
-                  <p className='text-xs text-muted-foreground'>
-                    {appointment.listingAddress || '-'}
-                  </p>
-                </div>
-                <div className='flex items-center gap-3 text-xs'>
-                  <span className='inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-1 text-primary'>
-                    <CalendarDays className='h-3.5 w-3.5' />
-                    {formatDashboardDate(appointment.startTime, locale)}
-                  </span>
-                  <span className='rounded-full border border-border px-2.5 py-1 uppercase tracking-wide text-muted-foreground'>
-                    {t(`status.${toAppointmentStatus(appointment.status)}`)}
-                  </span>
+          <CardContent className='space-y-4'>
+            <div className='overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm'>
+              <div className='bg-muted/15 p-4 sm:p-5'>
+                <Calendar
+                  mode='single'
+                  selected={selectedAppointmentDay}
+                  onSelect={(day) => {
+                    setSelectedAppointmentDay(day);
+                    if (day) setVisibleCalendarMonth(day);
+                  }}
+                  month={visibleCalendarMonth}
+                  onMonthChange={setVisibleCalendarMonth}
+                  className='w-full'
+                  classNames={{
+                    root: 'w-full p-0',
+                    month: 'w-full gap-4',
+                    table: 'w-full',
+                    weekdays: 'mb-1.5',
+                    weekday:
+                      'text-center text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground',
+                  }}
+                  components={{
+                    DayButton: ({ day, className, ...props }) => {
+                      const key = toDateKey(day.date, snapshotTimezone);
+                      const dayStats = calendarDayMap.get(key);
+                      const isTourDay = Boolean(dayStats && dayStats.tourCount > 0);
+                      const isBlockDay = Boolean(dayStats && dayStats.blockCount > 0);
+
+                      return (
+                        <CalendarDayButton
+                          day={day}
+                          className={cn(
+                            className,
+                            'relative h-10 w-full min-w-0 rounded-xl pb-2 text-sm font-medium transition data-[selected-single=true]:shadow-sm md:h-11'
+                          )}
+                          {...props}
+                        >
+                          <span className='relative z-10 leading-none'>{props.children}</span>
+                          {(isTourDay || isBlockDay) && (
+                            <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1'>
+                              {isTourDay && (
+                                <span className='h-1.5 w-1.5 rounded-full bg-primary/90 ring-1 ring-background' />
+                              )}
+                              {isBlockDay && (
+                                <span className='h-1.5 w-1.5 rounded-full bg-amber-500/90 ring-1 ring-background' />
+                              )}
+                            </span>
+                          )}
+                        </CalendarDayButton>
+                      );
+                    },
+                  }}
+                />
+              </div>
+
+              <div className='border-t border-border/70 bg-card/80 px-4 py-3 sm:px-5 sm:py-4'>
+                <div className='inline-flex w-full rounded-xl border border-border/70 bg-muted/50 p-1'>
+                  {(['all', 'tour', 'block'] as const).map((tab) => (
+                    <Button
+                      key={tab}
+                      size='sm'
+                      variant='ghost'
+                      className={cn(
+                        'h-9 flex-1 rounded-lg text-sm font-medium text-muted-foreground transition-colors',
+                        appointmentFilter === tab &&
+                          'bg-background text-foreground shadow-sm hover:bg-background'
+                      )}
+                      onClick={() => setAppointmentFilter(tab)}
+                    >
+                      {t(`sections.appointments.tabs.${tab}`)}
+                    </Button>
+                  ))}
                 </div>
               </div>
-            ))}
+
+              <div className='border-t border-border/70 bg-card'>
+                <div className='flex flex-wrap items-center justify-between gap-2 bg-muted/25 px-4 py-3 sm:px-5'>
+                  <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+                    {selectedAppointmentDay
+                      ? t('sections.appointments.selectedDate', {
+                          date: formatCalendarHeaderDate(selectedAppointmentDay, locale),
+                        })
+                      : t('sections.appointments.noDateSelected')}
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {t('sections.appointments.summary', {
+                      total: selectedDayAppointments.length,
+                      tour: tourCount,
+                      block: blockCount,
+                    })}
+                  </p>
+                </div>
+
+                <div className='max-h-[336px] space-y-0 overflow-y-auto'>
+                  {selectedAppointmentDay ? null : (
+                    <div className='px-4 pb-4 sm:px-5'>
+                      <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
+                        {t('sections.appointments.noDateSelected')}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedAppointmentDay &&
+                    (selectedDayAppointments.length === 0 ? (
+                      <div className='px-4 pb-4 sm:px-5'>
+                        <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
+                          {t('sections.appointments.emptyForFilter')}
+                        </div>
+                      </div>
+                    ) : (
+                      selectedDayAppointments.map((appointment: AppointmentItem) => (
+                        <div
+                          key={appointment.appointmentId}
+                          className='flex items-start justify-between gap-3 border-t border-border/60 px-4 py-3.5 first:border-t-0 sm:px-5'
+                        >
+                          <div className='min-w-0'>
+                            <p className='truncate text-lg font-semibold leading-6 text-foreground'>
+                              {appointment.listingName || 'Listing'}
+                            </p>
+                            <p className='mt-1 truncate text-sm text-muted-foreground'>
+                              {appointment.listingAddress || '-'}
+                            </p>
+                            <p className='mt-1 text-xs font-medium text-muted-foreground'>
+                              {formatDashboardDate(appointment.startTime, locale)}
+                            </p>
+                          </div>
+                          <div className='flex shrink-0 flex-col items-end gap-1.5'>
+                            <span
+                              className={
+                                appointment.appointmentType === 'BLOCK'
+                                  ? 'rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                  : 'rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'
+                              }
+                            >
+                              {appointment.appointmentType === 'BLOCK'
+                                ? t('sections.appointments.types.block')
+                                : t('sections.appointments.types.tour')}
+                            </span>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusPillClass(appointment.status)}`}
+                            >
+                              {t(`status.${toAppointmentStatus(appointment.status)}`)}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

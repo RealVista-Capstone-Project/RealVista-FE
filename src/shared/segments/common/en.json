@@ -861,7 +861,20 @@
       },
       "appointments": {
         "title": "Appointments & Reminders",
-        "description": "Upcoming tours, meetings, and follow-ups."
+        "description": "Upcoming tours, meetings, and follow-ups.",
+        "tabs": {
+          "all": "All",
+          "tour": "Tour",
+          "block": "Busy Blocks"
+        },
+        "types": {
+          "tour": "Tour",
+          "block": "Busy Block"
+        },
+        "selectedDate": "{date}",
+        "summary": "{total} items • {tour} tours • {block} busy blocks",
+        "noDateSelected": "No date selected",
+        "emptyForFilter": "No appointments match this filter on the selected day."
       },
       "plan": {
         "title": "Plan & Boosting",
@@ -891,7 +904,9 @@
     "status": {
       "confirmed": "Confirmed",
       "pending": "Pending",
-      "completed": "Completed"
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "canceled": "Canceled"
     },
     "quickActions": {
       "propertyFeed": "Property Feed",

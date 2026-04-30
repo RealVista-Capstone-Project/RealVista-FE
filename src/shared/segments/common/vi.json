@@ -863,7 +863,20 @@
       },
       "appointments": {
         "title": "Lịch hẹn & nhắc việc",
-        "description": "Các cuộc hẹn tham quan, họp và theo dõi sắp tới."
+        "description": "Các cuộc hẹn tham quan, họp và theo dõi sắp tới.",
+        "tabs": {
+          "all": "Tất cả",
+          "tour": "Lịch tham quan",
+          "block": "Khung bận"
+        },
+        "types": {
+          "tour": "Tham quan",
+          "block": "Khung bận"
+        },
+        "selectedDate": "{date}",
+        "summary": "{total} mục • {tour} lịch tham quan • {block} khung bận",
+        "noDateSelected": "Chưa chọn ngày",
+        "emptyForFilter": "Không có lịch hẹn phù hợp với bộ lọc trong ngày đã chọn."
       },
       "plan": {
         "title": "Gói dịch vụ & boost",
@@ -893,7 +906,9 @@
     "status": {
       "confirmed": "Đã xác nhận",
       "pending": "Đang chờ",
-      "completed": "Hoàn tất"
+      "completed": "Hoàn tất",
+      "rejected": "Từ chối",
+      "canceled": "Đã hủy"
     },
     "quickActions": {
       "propertyFeed": "Khám phá BĐS",
