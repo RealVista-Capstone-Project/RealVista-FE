@@ -5,6 +5,7 @@ import type {
   AgentAppointmentsSnapshotResponse,
   AgentDashboardMetrics,
   AgentDashboardMetricsResponse,
+  AgentPerformancePeriod,
   AgentPerformanceMetrics,
   AgentPerformanceMetricsResponse,
   AgentPlanSnapshotResponse,
@@ -96,31 +97,11 @@ export const agentDashboardApi = {
       data: payload,
     };
   },
-  getPerformance: async (): Promise<AgentPerformanceMetricsResponse> => {
-    const payload = await getMetricsPayload();
-    const listingSummary = payload.listingSummary ?? DEFAULT_METRICS_PAYLOAD.listingSummary;
-    const propertySummary = payload.propertySummary ?? DEFAULT_METRICS_PAYLOAD.propertySummary;
-    const crmSummary = payload.crmSummary ?? DEFAULT_METRICS_PAYLOAD.crmSummary;
-    const sourceItems = Array.isArray(crmSummary.bySource) ? crmSummary.bySource : [];
-    const currentViews = Number(listingSummary.all ?? 0);
-    const previousViews = Number(propertySummary.totalProperties ?? 0);
-    const currentInquiries = Number(crmSummary.totalLeads ?? 0);
-    const previousInquiries = Number(crmSummary.previousTotalLeads ?? 0);
-
-    const performance: AgentPerformanceMetrics = {
-      trend: [
-        { month: 'Previous', views: previousViews, inquiries: previousInquiries, closedDeals: 0 },
-        { month: 'Current', views: currentViews, inquiries: currentInquiries, closedDeals: 0 },
-      ],
-      channels: sourceItems.map((item) => ({
-        channel: String(item?.source ?? 'unknown').toLowerCase(),
-        leads: Number(item?.count ?? 0),
-        conversionRate:
-          currentInquiries > 0
-            ? Math.round((Number(item?.count ?? 0) / currentInquiries) * 100)
-            : 0,
-      })),
-    };
+  getPerformance: async (period: AgentPerformancePeriod = 'M'): Promise<AgentPerformanceMetricsResponse> => {
+    const performance = await safeGet<AgentPerformanceMetrics>(
+      `/listings/analytics/agent-performance?period=${period}`,
+      { period, trend: [], channels: [] },
+    );
 
     return {
       success: true,

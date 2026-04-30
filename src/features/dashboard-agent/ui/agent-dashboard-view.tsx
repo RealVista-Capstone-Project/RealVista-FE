@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shared/ui/chart';
 import { Progress } from '@/shared/ui/progress';
+import type { AgentPerformancePeriod } from '../model/agent-dashboard.types';
 import {
   useAgentAppointmentsSnapshot,
   useAgentDashboardMetrics,
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 import type { User } from 'next-auth';
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 const CHANNEL_LABELS: Record<string, string> = {
@@ -53,8 +55,9 @@ function toAppointmentStatus(status: string): 'confirmed' | 'pending' | 'complet
 export function AgentDashboardView({ user }: { user?: User }) {
   const t = useTranslations('AgentDashboard');
   const locale = useLocale();
+  const [selectedPeriod, setSelectedPeriod] = useState<AgentPerformancePeriod>('M');
   const metricsQuery = useAgentDashboardMetrics();
-  const performanceQuery = useAgentPerformanceMetrics();
+  const performanceQuery = useAgentPerformanceMetrics(selectedPeriod);
   const appointmentsQuery = useAgentAppointmentsSnapshot();
   const planQuery = useAgentPlanSnapshot();
   const name = user?.name || user?.email?.split('@')[0] || 'Agent';
@@ -180,6 +183,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
         </Card>
       )}
 
+      {/* Metrics Session */}
       <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
         {kpis.map((kpi) => {
           const trendUp = kpi.trend === 'up';
@@ -207,10 +211,26 @@ export function AgentDashboardView({ user }: { user?: User }) {
         })}
       </section>
 
+      {/* Performance Chart */}
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         <Card className='xl:col-span-2'>
           <CardHeader>
-            <CardTitle>{t('sections.performance.title')}</CardTitle>
+            <div className='flex flex-wrap items-center justify-between gap-3'>
+              <CardTitle>{t('sections.performance.title')}</CardTitle>
+              <div className='inline-flex rounded-lg border border-border/70 p-1'>
+                {(['W', 'M', 'Y'] as const).map((period) => (
+                  <Button
+                    key={period}
+                    size='sm'
+                    variant={selectedPeriod === period ? 'default' : 'ghost'}
+                    className='h-7 px-2 text-xs'
+                    onClick={() => setSelectedPeriod(period)}
+                  >
+                    {period}
+                  </Button>
+                ))}
+              </div>
+            </div>
             <CardDescription>{t('sections.performance.description')}</CardDescription>
           </CardHeader>
           <CardContent>

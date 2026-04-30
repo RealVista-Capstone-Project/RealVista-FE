@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { agentDashboardApi } from './agent-dashboard.api';
+import type { AgentPerformancePeriod } from '../model/agent-dashboard.types';
 
 const agentDashboardKeys = {
   all: ['agent-dashboard'] as const,
   metrics: () => [...agentDashboardKeys.all, 'metrics'] as const,
-  performance: () => [...agentDashboardKeys.all, 'performance'] as const,
+  performance: (period: AgentPerformancePeriod) => [...agentDashboardKeys.all, 'performance', period] as const,
   appointments: () => [...agentDashboardKeys.all, 'appointments'] as const,
   plan: () => [...agentDashboardKeys.all, 'plan'] as const,
 };
@@ -17,10 +18,10 @@ export function useAgentDashboardMetrics() {
   });
 }
 
-export function useAgentPerformanceMetrics() {
+export function useAgentPerformanceMetrics(period: AgentPerformancePeriod) {
   return useQuery({
-    queryKey: agentDashboardKeys.performance(),
-    queryFn: agentDashboardApi.getPerformance,
+    queryKey: agentDashboardKeys.performance(period),
+    queryFn: () => agentDashboardApi.getPerformance(period),
     staleTime: 60 * 1000,
   });
 }

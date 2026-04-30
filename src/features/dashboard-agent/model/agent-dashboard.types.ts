@@ -1,5 +1,7 @@
 import type { ApiResponse } from '@/shared/types/api-response';
 
+export type AgentPerformancePeriod = 'W' | 'M' | 'Y';
+
 export interface AgentPerformancePoint {
   month: string;
   views: number;
@@ -80,6 +82,7 @@ export interface AgentDashboardMetrics {
 }
 
 export interface AgentPerformanceMetrics {
+  period?: AgentPerformancePeriod;
   trend: AgentPerformancePoint[];
   channels: AgentChannelPerformanceItem[];
 }
