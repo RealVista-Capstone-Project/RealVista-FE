@@ -876,7 +876,13 @@
     "charts": {
       "views": "Lượt xem",
       "inquiries": "Lượt quan tâm",
-      "leads": "Khách hàng tiềm năng"
+      "leads": "Khách hàng tiềm năng",
+      "source": {
+        "manual": "Thêm thủ công",
+        "chat": "Chat",
+        "tour": "Đặt lịch xem"
+      },
+      "channelsEmpty": "Chưa có dữ liệu lead trong kỳ này."
     },
     "channels": {
       "Website": "Website",

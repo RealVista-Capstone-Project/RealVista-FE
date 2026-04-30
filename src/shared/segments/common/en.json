@@ -874,7 +874,13 @@
     "charts": {
       "views": "Views",
       "inquiries": "Inquiries",
-      "leads": "Leads"
+      "leads": "Leads",
+      "source": {
+        "manual": "Manual",
+        "chat": "Chat",
+        "tour": "Scheduled tour"
+      },
+      "channelsEmpty": "No leads in this period."
     },
     "channels": {
       "Website": "Website",

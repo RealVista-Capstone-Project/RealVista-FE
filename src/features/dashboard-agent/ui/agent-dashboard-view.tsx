@@ -4,7 +4,12 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shared/ui/chart';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/shared/ui/chart';
 import { Progress } from '@/shared/ui/progress';
 import type { AgentPerformancePeriod } from '../model/agent-dashboard.types';
 import {
@@ -24,12 +29,15 @@ import {
 import type { User } from 'next-auth';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from 'recharts';
 
-const CHANNEL_LABELS: Record<string, string> = {
-  chat: 'Chat',
-  tour: 'Tour',
-  manual: 'Manual',
+/** Order matches CRM so legend and slice semantics stay consistent. */
+const LEAD_SOURCE_ORDER = ['manual', 'chat', 'tour'] as const;
+
+const SOURCE_DOT_STYLES: Record<(typeof LEAD_SOURCE_ORDER)[number], { background: string }> = {
+  manual: { background: 'var(--primary)' },
+  chat: { background: 'var(--chart-2)' },
+  tour: { background: 'var(--chart-3)' },
 };
 
 function formatDashboardDate(value: string, locale: string) {
@@ -68,7 +76,15 @@ export function AgentDashboardView({ user }: { user?: User }) {
   } as const;
 
   const channelChartConfig = {
-    leads: { label: t('charts.leads'), color: 'var(--chart-4)' },
+    manual: { label: t('charts.source.manual'), color: 'var(--primary)' },
+    chat: { label: t('charts.source.chat'), color: 'var(--chart-2)' },
+    tour: { label: t('charts.source.tour'), color: 'var(--chart-3)' },
+  } satisfies ChartConfig;
+
+  const leadSourceLabel = {
+    manual: t('charts.source.manual'),
+    chat: t('charts.source.chat'),
+    tour: t('charts.source.tour'),
   } as const;
 
   const loading =
@@ -78,13 +94,20 @@ export function AgentDashboardView({ user }: { user?: User }) {
     planQuery.isLoading;
 
   const hasError =
-    (metricsQuery.isError && !metricsQuery.data) &&
-    (performanceQuery.isError && !performanceQuery.data) &&
-    (appointmentsQuery.isError && !appointmentsQuery.data) &&
-    (planQuery.isError && !planQuery.data);
+    metricsQuery.isError &&
+    !metricsQuery.data &&
+    performanceQuery.isError &&
+    !performanceQuery.data &&
+    appointmentsQuery.isError &&
+    !appointmentsQuery.data &&
+    planQuery.isError &&
+    !planQuery.data;
 
   const hasPartialError =
-    metricsQuery.isError || performanceQuery.isError || appointmentsQuery.isError || planQuery.isError;
+    metricsQuery.isError ||
+    performanceQuery.isError ||
+    appointmentsQuery.isError ||
+    planQuery.isError;
 
   const metrics = metricsQuery.data?.data;
   const kpis = [
@@ -121,6 +144,16 @@ export function AgentDashboardView({ user }: { user?: User }) {
   const channelData = (performanceQuery.data?.data.channels ?? []).map((channel) => ({
     ...channel,
     channel: channel.channel.toLowerCase(),
+  }));
+  const totalChannelLeads = channelData.reduce(
+    (sum, row) => sum + Number(row.leads ?? 0),
+    0,
+  );
+  const channelPieData = channelData.map((row) => ({
+    ...row,
+    channel: row.channel,
+    leads: Number(row.leads ?? 0),
+    fill: `var(--color-${row.channel})`,
   }));
   const appointments = appointmentsQuery.data?.data.appointments ?? [];
   const plan = planQuery.data?.data;
@@ -213,6 +246,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
       {/* Performance Chart */}
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
+        {/* Performance Chart Card */}
         <Card className='xl:col-span-2'>
           <CardHeader>
             <div className='flex flex-wrap items-center justify-between gap-3'>
@@ -261,28 +295,78 @@ export function AgentDashboardView({ user }: { user?: User }) {
           </CardContent>
         </Card>
 
+        {/* Lead Channels Chart Card */}
         <Card>
           <CardHeader>
             <CardTitle>{t('sections.channels.title')}</CardTitle>
             <CardDescription>{t('sections.channels.description')}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ChartContainer className='h-[280px] w-full' config={channelChartConfig}>
-              <BarChart data={channelData} layout='vertical' margin={{ left: 4, right: 8 }}>
-                <CartesianGrid horizontal={false} strokeDasharray='3 3' />
-                <XAxis type='number' hide />
-                <YAxis
-                  type='category'
-                  dataKey='channel'
-                  tickLine={false}
-                  axisLine={false}
-                  width={70}
-                  tickFormatter={(value: string) => CHANNEL_LABELS[value] ?? value}
-                />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                <Bar dataKey='leads' radius={8} fill='var(--color-leads)' />
-              </BarChart>
-            </ChartContainer>
+          <CardContent className='min-h-[280px]'>
+            {totalChannelLeads === 0 ? (
+              <div className='flex h-[240px] items-center justify-center text-center text-sm text-muted-foreground'>
+                {t('charts.channelsEmpty')}
+              </div>
+            ) : (
+              <div className='flex min-h-[240px] flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-3'>
+                <div className='relative mx-auto size-44 shrink-0 sm:mx-0 sm:size-40'>
+                  <ChartContainer
+                    config={channelChartConfig}
+                    className='aspect-square size-full min-h-[11rem] [&>div]:justify-center'
+                  >
+                    <PieChart accessibilityLayer>
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent hideLabel nameKey='channel' />}
+                      />
+                      <Pie
+                        data={channelPieData}
+                        dataKey='leads'
+                        nameKey='channel'
+                        innerRadius={52}
+                        outerRadius={72}
+                        strokeWidth={3}
+                      />
+                    </PieChart>
+                  </ChartContainer>
+                  <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
+                    <p className='text-2xl font-bold tabular-nums text-foreground'>
+                      {totalChannelLeads.toLocaleString()}
+                    </p>
+                    <p className='text-[10px] text-muted-foreground'>{t('charts.leads')}</p>
+                  </div>
+                </div>
+                <div className='w-full min-w-0 space-y-2.5 sm:flex-1'>
+                  {LEAD_SOURCE_ORDER.map((source) => {
+                    const row = channelData.find((c) => c.channel === source);
+                    const count = row ? Number(row.leads ?? 0) : 0;
+                    const pct =
+                      totalChannelLeads > 0
+                        ? Math.round((count / totalChannelLeads) * 100)
+                        : 0;
+                    return (
+                      <div
+                        key={source}
+                        className='flex items-center justify-between gap-2 text-sm'
+                      >
+                        <div className='flex min-w-0 items-center gap-2'>
+                          <span
+                            className='size-2.5 shrink-0 rounded-full'
+                            style={SOURCE_DOT_STYLES[source]}
+                          />
+                          <span className='truncate text-muted-foreground'>
+                            {leadSourceLabel[source]}
+                          </span>
+                        </div>
+                        <div className='flex shrink-0 items-baseline gap-1.5 tabular-nums'>
+                          <span className='font-semibold text-foreground'>{count}</span>
+                          <span className='text-xs text-muted-foreground'>({pct}%)</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </section>
@@ -300,8 +384,12 @@ export function AgentDashboardView({ user }: { user?: User }) {
                 className='flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 p-3 md:flex-row md:items-center md:justify-between'
               >
                 <div>
-                  <p className='font-medium text-foreground'>{appointment.listingName || 'Listing'}</p>
-                  <p className='text-xs text-muted-foreground'>{appointment.listingAddress || '-'}</p>
+                  <p className='font-medium text-foreground'>
+                    {appointment.listingName || 'Listing'}
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {appointment.listingAddress || '-'}
+                  </p>
                 </div>
                 <div className='flex items-center gap-3 text-xs'>
                   <span className='inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-1 text-primary'>
