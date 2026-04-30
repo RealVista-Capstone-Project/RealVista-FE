@@ -45,6 +45,12 @@ const SOURCE_DOT_STYLES: Record<(typeof LEAD_SOURCE_ORDER)[number], { background
   tour: { background: 'var(--chart-3)' },
 };
 
+const FEATURE_TYPE_VI_LABELS: Record<string, string> = {
+  LISTING: 'Tin đăng',
+  '3D_TOUR': 'Tour 3D',
+  AI_REQUEST: 'AI Chat bot',
+};
+
 function formatDashboardDate(value: string, locale: string) {
   return new Date(value).toLocaleDateString(locale, {
     month: 'short',
@@ -82,6 +88,10 @@ function toDateKey(value: Date, timezone: string) {
 function toIsoDateKey(value: string, timezone: string) {
   if (!value) return '';
   return toDateKey(new Date(value), timezone);
+}
+
+function getFeatureTypeViLabel(featureType: string) {
+  return FEATURE_TYPE_VI_LABELS[featureType] ?? featureType;
 }
 
 function toSafeDate(value: string) {
@@ -705,7 +715,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                       <p className='text-sm font-medium text-foreground'>{subscription.package_name}</p>
                       <div className='space-y-0.5 text-xs text-muted-foreground'>
                         <p>
-                          {t('sections.plan.feature')}: {subscription.feature_type}
+                          {t('sections.plan.feature')}: {getFeatureTypeViLabel(subscription.feature_type)}
                         </p>
                         <p>
                           {t('sections.plan.status')}: {subscription.status}
