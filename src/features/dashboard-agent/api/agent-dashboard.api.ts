@@ -1,6 +1,8 @@
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api-response';
 import type {
+  AgentAppointmentCalendarDay,
+  AgentAppointmentCalendarRange,
   AgentAppointmentsSnapshot,
   AgentAppointmentsSnapshotResponse,
   AgentDashboardMetrics,
@@ -9,6 +11,7 @@ import type {
   AgentPerformanceMetrics,
   AgentPerformanceMetricsResponse,
   AgentPlanSnapshotResponse,
+  AppointmentItem,
 } from '../model/agent-dashboard.types';
 
 const DEFAULT_PLAN_SNAPSHOT: AgentPlanSnapshotResponse = {
@@ -92,11 +95,79 @@ function getFallbackAppointmentsSnapshot(): AgentAppointmentsSnapshot {
   };
 }
 
-function normalizeAppointmentsSnapshot(snapshot: AgentAppointmentsSnapshot): AgentAppointmentsSnapshot {
+type LooseRecord = Record<string, unknown>;
+
+function readStr(v: unknown): string {
+  return typeof v === 'string' ? v : '';
+}
+
+function readNum(v: unknown): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function readBool(v: unknown): boolean {
+  return typeof v === 'boolean' ? v : false;
+}
+
+function mapCalendarDayRow(row: unknown): AgentAppointmentCalendarDay | null {
+  if (!row || typeof row !== 'object') return null;
+  const o = row as LooseRecord;
+  const date = readStr(o.date);
+  if (!date) return null;
+  const tourCount = readNum(o.tourCount ?? o.tour_count);
+  const blockCount = readNum(o.blockCount ?? o.block_count);
+  const total = readNum(o.total);
+  const hasItems =
+    readBool(o.hasItems ?? o.has_items) || total > 0 || tourCount > 0 || blockCount > 0;
+  return { date, total, tourCount, blockCount, hasItems };
+}
+
+function mapRangeRow(row: unknown, fallback: AgentAppointmentCalendarRange): AgentAppointmentCalendarRange {
+  if (!row || typeof row !== 'object') return fallback;
+  const o = row as LooseRecord;
+  const startDate = readStr(o.startDate ?? o.start_date) || fallback.startDate;
+  const endDate = readStr(o.endDate ?? o.end_date) || fallback.endDate;
+  const timezone = readStr(o.timezone) || fallback.timezone;
+  return { startDate, endDate, timezone };
+}
+
+function mapAppointmentRow(row: unknown): AppointmentItem | null {
+  if (!row || typeof row !== 'object') return null;
+  const o = row as LooseRecord;
+  const appointmentId = readStr(o.appointmentId ?? o.appointment_id);
+  if (!appointmentId) return null;
   return {
-    range: snapshot?.range ?? getFallbackAppointmentsSnapshot().range,
-    calendarDays: Array.isArray(snapshot?.calendarDays) ? snapshot.calendarDays : [],
-    appointments: Array.isArray(snapshot?.appointments) ? snapshot.appointments : [],
+    appointmentId,
+    listingId: readStr(o.listingId ?? o.listing_id),
+    listingName: readStr(o.listingName ?? o.listing_name),
+    listingAddress: readStr(o.listingAddress ?? o.listing_address),
+    startTime: readStr(o.startTime ?? o.start_time),
+    endTime: readStr(o.endTime ?? o.end_time),
+    status: readStr(o.status) as AppointmentItem['status'],
+    appointmentType: readStr(o.appointmentType ?? o.appointment_type) as AppointmentItem['appointmentType'],
+  };
+}
+
+/** Accepts camelCase or Jackson SNAKE_CASE wire payloads from `/appointments/dashboard-snapshot`. */
+function normalizeAppointmentsSnapshot(snapshot: unknown): AgentAppointmentsSnapshot {
+  const fallback = getFallbackAppointmentsSnapshot();
+  if (!snapshot || typeof snapshot !== 'object') {
+    return fallback;
+  }
+  const s = snapshot as LooseRecord;
+  const rawDays = s.calendarDays ?? s.calendar_days;
+  const calendarDays: AgentAppointmentCalendarDay[] = Array.isArray(rawDays)
+    ? rawDays.map(mapCalendarDayRow).filter((d): d is AgentAppointmentCalendarDay => d !== null)
+    : [];
+  const rawAppointments = s.appointments;
+  const appointments: AppointmentItem[] = Array.isArray(rawAppointments)
+    ? rawAppointments.map(mapAppointmentRow).filter((a): a is AppointmentItem => a !== null)
+    : [];
+  return {
+    range: mapRangeRow(s.range, fallback.range),
+    calendarDays,
+    appointments,
   };
 }
 

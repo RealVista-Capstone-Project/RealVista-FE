@@ -510,7 +510,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                       'col-start-1 row-start-1 justify-self-start h-8 w-8 rounded-full border-0 bg-transparent p-0 text-foreground shadow-none hover:bg-muted/40',
                     button_next:
                       'col-start-3 row-start-1 justify-self-end h-8 w-8 rounded-full border-0 bg-transparent p-0 text-foreground shadow-none hover:bg-muted/40',
-                    caption_label: 'text-[32px] font-semibold tracking-tight',
+                    caption_label: 'text-[28px] font-semibold tracking-tight',
                     table: 'w-full table-fixed border-separate border-spacing-y-2',
                     month_grid: 'col-span-3 row-start-2 w-full',
                     week: 'mt-0 flex w-full',
@@ -525,28 +525,39 @@ export function AgentDashboardView({ user }: { user?: User }) {
                     DayButton: ({ day, className, ...props }) => {
                       const key = toDateKey(day.date, snapshotTimezone);
                       const dayStats = calendarDayMap.get(key);
-                      const isTourDay = Boolean(dayStats && dayStats.tourCount > 0);
-                      const isBlockDay = Boolean(dayStats && dayStats.blockCount > 0);
+                      const tour = dayStats?.tourCount ?? 0;
+                      const block = dayStats?.blockCount ?? 0;
+                      const total = dayStats?.total ?? 0;
+                      const hasItemsDay = Boolean(
+                        dayStats &&
+                          (dayStats.hasItems || total > 0 || tour > 0 || block > 0)
+                      );
+                      const isTourDay = Boolean(dayStats && tour > 0);
+                      const isBlockDay = Boolean(dayStats && block > 0);
+                      const showNeutralDot = hasItemsDay && !isTourDay && !isBlockDay;
 
                       return (
                         <CalendarDayButton
                           day={day}
                           className={cn(
                             className,
-                            'relative h-12 w-full min-w-0 rounded-xl border-0 bg-transparent pb-2 text-foreground transition-colors duration-150 hover:bg-muted/25 data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:[&_.dot-indicator]:bg-primary-foreground/85 md:h-14'
+                            'relative h-12 w-full min-w-0 rounded-xl border-0 bg-transparent pb-2 text-foreground transition-colors duration-150 hover:bg-muted/25 data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:[&_.dot-indicator]:!bg-primary-foreground/90 md:h-14'
                           )}
                           {...props}
                         >
                           <span className='relative z-10 text-[2rem] leading-none font-normal opacity-100'>
                             {props.children}
                           </span>
-                          {(isTourDay || isBlockDay) && (
+                          {(isTourDay || isBlockDay || showNeutralDot) && (
                             <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1'>
                               {isTourDay && (
-                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-foreground' />
+                                <span className='dot-indicator h-2 w-2 shrink-0 rounded-full bg-foreground ring-1 ring-foreground/25' />
                               )}
                               {isBlockDay && (
-                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-muted-foreground' />
+                                <span className='dot-indicator h-2 w-2 shrink-0 rounded-full bg-muted-foreground ring-1 ring-muted-foreground/30' />
+                              )}
+                              {showNeutralDot && (
+                                <span className='dot-indicator h-2 w-2 shrink-0 rounded-full bg-primary ring-1 ring-primary/30' />
                               )}
                             </span>
                           )}
