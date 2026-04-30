@@ -28,6 +28,11 @@ export interface AgentListItem {
   rating: number | null;
   years_of_experience: number | null;
   properties_sold: number | null;
+  status?: string | null;
+  user_status?: string | null;
+  deleted?: boolean | null;
+  is_deleted?: boolean | null;
+  deleted_at?: string | null;
   engagement_status: string | null;
   engagement_id: string | null;
   engagement_type: string | null;
