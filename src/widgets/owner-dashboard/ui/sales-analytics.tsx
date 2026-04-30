@@ -2,15 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useSalesAnalytics } from '../api';
+import { formatVND } from '@/shared/lib/utils';
 
-const salesData = [
-  { key: 'marketing', value: 5120, color: '#6366f1' },
-  { key: 'online', value: 3425, color: '#22c55e' },
-  { key: 'offline', value: 3120, color: '#f59e0b' },
-  { key: 'agent', value: 2472, color: '#ec4899' },
-] as const;
-
-type SalesKey = (typeof salesData)[number]['key'];
+const chartColors = {
+  direct: '#6366f1',
+  agent: '#22c55e',
+} as const;
 
 const CustomTooltip = ({
   active,
@@ -23,7 +21,7 @@ const CustomTooltip = ({
     return (
       <div className='rounded-xl border bg-card px-3 py-2 shadow-lg'>
         <p className='text-xs text-muted-foreground'>{payload[0].name}</p>
-        <p className='text-sm font-semibold'>${payload[0].value.toLocaleString()}</p>
+        <p className='text-sm font-semibold'>{formatVND(payload[0].value)}</p>
       </div>
     );
   }
@@ -32,16 +30,23 @@ const CustomTooltip = ({
 
 export function SalesAnalytics() {
   const t = useTranslations('OwnerDashboard.salesAnalytics');
+  const { data } = useSalesAnalytics('month');
 
-  const total = salesData.reduce((sum, d) => sum + d.value, 0);
+  const directValue = data?.direct.value ?? 0;
+  const agentValue = data?.agent.value ?? 0;
+  const total = data?.total.value ?? 0;
 
-  const namedData = salesData.map((d) => ({
-    ...d,
-    name: t(`channels.${d.key}` as `channels.${SalesKey}`),
-  }));
+  const namedData = [
+    { key: 'direct', value: directValue, color: chartColors.direct, name: t('channels.direct') },
+    { key: 'agent', value: agentValue, color: chartColors.agent, name: t('channels.agent') },
+  ];
+
+  const directPercent = total > 0 ? Math.round((directValue / total) * 100) : 0;
+  const agentPercent = total > 0 ? 100 - directPercent : 0;
 
   return (
     <div className='flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm'>
+      {/* Header */}
       <div className='flex items-center justify-between'>
         <h3 className='text-base font-semibold'>{t('title')}</h3>
         <span className='rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground'>
@@ -49,8 +54,9 @@ export function SalesAnalytics() {
         </span>
       </div>
 
-      <div className='flex items-center gap-4'>
-        {/* Pie Chart */}
+      {/* Chart + Legend */}
+      <div className='flex items-center gap-5'>
+        {/* Donut */}
         <div className='relative h-28 w-28 shrink-0'>
           <ResponsiveContainer width='100%' height='100%'>
             <PieChart>
@@ -60,7 +66,7 @@ export function SalesAnalytics() {
                 cy='50%'
                 innerRadius={34}
                 outerRadius={50}
-                paddingAngle={3}
+                paddingAngle={4}
                 dataKey='value'
                 strokeWidth={0}
               >
@@ -71,27 +77,42 @@ export function SalesAnalytics() {
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
-          {/* Center label */}
+          {/* Center total */}
           <div className='absolute inset-0 flex flex-col items-center justify-center'>
-            <p className='text-xs text-muted-foreground'>{t('total')}</p>
-            <p className='text-sm font-bold'>${(total / 1000).toFixed(1)}K</p>
+            <p className='text-[10px] text-muted-foreground'>{t('total')}</p>
+            <p className='text-sm font-bold'>{formatVND(total)}</p>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className='flex flex-1 flex-col gap-2.5'>
-          {namedData.map((item) => (
-            <div key={item.key} className='flex items-center justify-between gap-2'>
-              <div className='flex items-center gap-2 min-w-0'>
-                <span
-                  className='h-2.5 w-2.5 shrink-0 rounded-full'
-                  style={{ background: item.color }}
-                />
-                <span className='truncate text-xs text-muted-foreground'>{item.name}</span>
+        {/* Legend + bars */}
+        <div className='flex flex-1 flex-col gap-4'>
+          {namedData.map((item, i) => {
+            const pct = i === 0 ? directPercent : agentPercent;
+            return (
+              <div key={item.key} className='flex flex-col gap-1.5'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <span
+                      className='h-2.5 w-2.5 shrink-0 rounded-full'
+                      style={{ background: item.color }}
+                    />
+                    <span className='text-xs font-medium'>{item.name}</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-xs font-bold'>{formatVND(item.value)}</span>
+                    <span className='text-[10px] text-muted-foreground'>({pct}%)</span>
+                  </div>
+                </div>
+                {/* Progress bar */}
+                <div className='h-1.5 w-full rounded-full bg-muted'>
+                  <div
+                    className='h-1.5 rounded-full transition-all'
+                    style={{ width: `${pct}%`, background: item.color }}
+                  />
+                </div>
               </div>
-              <span className='shrink-0 text-xs font-semibold'>${item.value.toLocaleString()}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

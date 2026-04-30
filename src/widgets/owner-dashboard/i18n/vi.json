@@ -54,24 +54,18 @@
           "description": "Xem xét và ký bản nháp hợp đồng bán The Somerset."
         }
       }
-    }, 
-    "leads": {
+    },
+    "agentContact": {
       "title": "Danh sách môi giới",
       "viewAll": "Xem tất cả",
-      "badges": {
-        "new": "Mới",
-        "hot": "Nóng",
-        "warm": "Tiềm năng"
-      }
+      "activeLeads": "{count} khách tiềm năng"
     },
     "salesAnalytics": {
       "title": "Phân tích doanh số",
       "thisMonth": "Tháng này",
       "total": "Tổng",
       "channels": {
-        "marketing": "Qua Marketing",
-        "online": "Bán online",
-        "offline": "Bán trực tiếp",
+        "direct": "Bán trực tiếp",
         "agent": "Qua môi giới"
       }
     },
@@ -95,11 +89,11 @@
     },
     "propertyTable": {
       "title": "Tin đang đăng",
-      "properties": "{count} bất động sản",
+      "properties": "{count} tin đăng",
       "searchPlaceholder": "Tìm bất động sản...",
       "allStatus": "Tất cả trạng thái",
       "columns": {
-        "property": "Bất động sản",
+        "property": "Tin đăng",
         "type": "Loại",
         "cost": "Giá",
         "activeLeads": "Khách tiềm năng",

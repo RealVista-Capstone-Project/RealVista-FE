@@ -55,23 +55,17 @@
         }
       }
     },
-    "leads": {
-      "title": "Leads Contact",
+    "agentContact": {
+      "title": "Agent Contact",
       "viewAll": "View all",
-      "badges": {
-        "new": "New",
-        "hot": "Hot",
-        "warm": "Warm"
-      }
+      "activeLeads": "{count} active leads"
     },
     "salesAnalytics": {
       "title": "Sales Analytics",
       "thisMonth": "This Month",
       "total": "Total",
       "channels": {
-        "marketing": "Marketing Sale",
-        "online": "Online Sale",
-        "offline": "Offline Sale",
+        "direct": "Direct Sale",
         "agent": "Agent Sale"
       }
     },
@@ -95,11 +89,11 @@
     },
     "propertyTable": {
       "title": "Active Listing",
-      "properties": "{count} properties",
-      "searchPlaceholder": "Search property...",
+      "properties": "{count} listings",
+      "searchPlaceholder": "Search listing...",
       "allStatus": "All Status",
       "columns": {
-        "property": "Property",
+        "property": "Listing",
         "type": "Type",
         "cost": "Cost",
         "activeLeads": "Active Leads",

@@ -3,60 +3,26 @@
 import { useTranslations } from 'next-intl';
 import { Progress } from '@/shared/ui/progress';
 import { Building2, Home } from 'lucide-react';
+import { usePropertyOverview } from '../api';
 
-const activeListings = [
-  {
-    id: 1,
-    name: 'Summer House',
-    address: 'Jl. Mencari Cinta Sejati, Jakarta',
-    avatarCount: 9,
-    badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
-  },
-  {
-    id: 2,
-    name: 'Cheery Castle',
-    address: 'Jl. Pantai Kuta, Bali',
-    avatarCount: 52,
-    badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-  },
-  {
-    id: 3,
-    name: 'Lazy Shore Palace',
-    address: 'Jl. Sudirman, Jakarta',
-    avatarCount: 6,
-    badgeColor: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-  },
-  {
-    id: 4,
-    name: 'Green Hangout Place',
-    address: 'Jl. Gatot Subroto, Jakarta',
-    avatarCount: 33,
-    badgeColor: 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400',
-  },
-  {
-    id: 5,
-    name: 'Maison Sterling',
-    address: 'New York, Albany',
-    avatarCount: 32,
-    badgeColor: 'bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400',
-  },
-  {
-    id: 6,
-    name: 'The Orchid',
-    address: 'Ohio, Columbus',
-    avatarCount: 15,
-    badgeColor: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
-  },
+const badgeColors = [
+  'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
+  'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
+  'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+  'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400',
+  'bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400',
+  'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
 ];
 
 export function PropertyOverview() {
   const t = useTranslations('OwnerDashboard.propertyOverview');
+  const { data } = usePropertyOverview();
 
-  const total = 1323;
-  const listed = 823;
-  const sold = 409;
-  const listedPercent = Math.round((listed / total) * 100);
-  const soldPercent = Math.round((sold / total) * 100);
+  const total = data?.total ?? 0;
+  const listed = data?.listed ?? 0;
+  const sold = data?.sold ?? 0;
+  const listedPercent = data?.listedPercent ?? 0;
+  const soldPercent = data?.soldPercent ?? 0;
 
   return (
     <div className='flex flex-col gap-5 rounded-2xl border bg-card p-5 shadow-sm'>
@@ -95,9 +61,9 @@ export function PropertyOverview() {
 
       {/* Listings grid */}
       <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-        {activeListings.map((listing) => (
+        {(data?.activeListings ?? []).map((listing, index) => (
           <div
-            key={listing.id}
+            key={listing.listingId}
             className='flex items-center gap-3 rounded-xl border bg-muted/20 p-3 hover:bg-muted/40 transition-colors cursor-pointer'
           >
             <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted'>
@@ -108,9 +74,9 @@ export function PropertyOverview() {
               <p className='text-xs text-muted-foreground truncate'>{listing.address}</p>
             </div>
             <span
-              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${listing.badgeColor}`}
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${badgeColors[index % badgeColors.length]}`}
             >
-              +{listing.avatarCount}
+              +{listing.leadCount}
             </span>
           </div>
         ))}

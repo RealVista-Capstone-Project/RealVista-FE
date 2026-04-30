@@ -11,30 +11,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { cn } from '@/shared/lib/utils';
+import { cn, formatVND } from '@/shared/lib/utils';
+import { useDashboardPerformance, useFeaturedProperty } from '../api';
+import type { PerformanceMetric, PerformancePeriod } from '../api';
 
-const revenueData = [
-  { month: 'Jan', revenue: 420000, visits: 320 },
-  { month: 'Feb', revenue: 580000, visits: 480 },
-  { month: 'Mar', revenue: 510000, visits: 410 },
-  { month: 'Apr', revenue: 720000, visits: 590 },
-  { month: 'May', revenue: 680000, visits: 540 },
-  { month: 'Jun', revenue: 890000, visits: 720 },
-  { month: 'Jul', revenue: 830000, visits: 670 },
-  { month: 'Aug', revenue: 960000, visits: 810 },
-  { month: 'Sep', revenue: 740000, visits: 620 },
-  { month: 'Oct', revenue: 1050000, visits: 880 },
-  { month: 'Nov', revenue: 980000, visits: 840 },
-  { month: 'Dec', revenue: 1200000, visits: 960 },
-];
-
-type ViewMode = 'W' | 'M' | 'Y';
-type MetricKey = 'revenue' | 'visit';
-
-function formatRevenue(value: number) {
-  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
-  return `$${value}`;
+function formatViews(value: number) {
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+  return `${value}`;
 }
 
 const CustomTooltip = ({
@@ -53,7 +36,7 @@ const CustomTooltip = ({
       <div className='rounded-xl border bg-card px-3 py-2 shadow-lg'>
         <p className='text-xs text-muted-foreground'>{label}</p>
         <p className='text-sm font-semibold'>
-          {isRevenue ? formatRevenue(payload[0].value) : payload[0].value}
+          {isRevenue ? formatVND(payload[0].value) : formatViews(payload[0].value)}
         </p>
       </div>
     );
@@ -63,29 +46,34 @@ const CustomTooltip = ({
 
 export function PerformanceChart() {
   const t = useTranslations('OwnerDashboard.performance');
-  const [metricKey, setMetricKey] = useState<MetricKey>('revenue');
-  const [view, setView] = useState<ViewMode>('Y');
+  const [metricKey, setMetricKey] = useState<PerformanceMetric>('revenue');
+  const [view, setView] = useState<PerformancePeriod>('M');
+
+  const { data: performance } = useDashboardPerformance(view, metricKey);
+  const { data: featured } = useFeaturedProperty();
 
   const isRevenue = metricKey === 'revenue';
   const color = isRevenue ? '#6366f1' : '#22c55e';
 
-  const slicedData =
-    view === 'W'
-      ? revenueData.slice(-7)
-      : view === 'M'
-        ? revenueData.slice(-4)
-        : revenueData;
+  const chartData = performance?.data ?? [];
 
-  const metrics: { key: MetricKey; label: string }[] = [
+  const metrics: { key: PerformanceMetric; label: string }[] = [
     { key: 'revenue', label: t('revenue') },
     { key: 'visit', label: t('visit') },
   ];
 
-  const views: { key: ViewMode; label: string }[] = [
+  const views: { key: PerformancePeriod; label: string }[] = [
     { key: 'W', label: t('week') },
     { key: 'M', label: t('month') },
     { key: 'Y', label: t('year') },
   ];
+
+  const featuredStatusLabel =
+    featured?.status === 'SOLD'
+      ? t('sold')
+      : featured?.status === 'RENTED'
+        ? t('rented')
+        : t('onProgress');
 
   return (
     <div className='flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm'>
@@ -133,7 +121,7 @@ export function PerformanceChart() {
       {/* Chart */}
       <div className='h-52'>
         <ResponsiveContainer width='100%' height='100%'>
-          <AreaChart data={slicedData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id='colorGradient' x1='0' y1='0' x2='0' y2='1'>
                 <stop offset='5%' stopColor={color} stopOpacity={0.2} />
@@ -142,7 +130,7 @@ export function PerformanceChart() {
             </defs>
             <CartesianGrid strokeDasharray='3 3' stroke='var(--border)' vertical={false} />
             <XAxis
-              dataKey='month'
+              dataKey='label'
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
@@ -152,12 +140,12 @@ export function PerformanceChart() {
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-              tickFormatter={isRevenue ? (v) => formatRevenue(v) : undefined}
+              tickFormatter={(v) => (isRevenue ? formatVND(v) : formatViews(v))}
             />
             <Tooltip content={<CustomTooltip isRevenue={isRevenue} />} />
             <Area
               type='monotone'
-              dataKey={metricKey}
+              dataKey='value'
               stroke={color}
               strokeWidth={2.5}
               fill='url(#colorGradient)'
@@ -175,15 +163,15 @@ export function PerformanceChart() {
             <span className='text-lg'>🏡</span>
           </div>
           <div>
-            <p className='text-sm font-semibold'>{t('featuredProperty')}</p>
-            <p className='text-xs text-muted-foreground'>{t('featuredType')}</p>
+            <p className='text-sm font-semibold'>{featured?.name ?? t('featuredProperty')}</p>
+            <p className='text-xs text-muted-foreground'>{featured?.type ?? t('featuredType')}</p>
           </div>
         </div>
         <div className='flex gap-4 text-center'>
           {[
-            { label: t('sold'), value: '175' },
-            { label: t('rented'), value: '125' },
-            { label: t('views'), value: '2K+' },
+            { label: t('sold'), value: featured?.sold?.toLocaleString() ?? '--' },
+            { label: t('rented'), value: featured?.rented?.toLocaleString() ?? '--' },
+            { label: t('views'), value: featured?.views ? formatViews(featured.views) : '--' },
           ].map((item) => (
             <div key={item.label}>
               <p className='text-sm font-bold'>{item.value}</p>
@@ -191,17 +179,9 @@ export function PerformanceChart() {
             </div>
           ))}
         </div>
-        <div className='hidden flex-col gap-1 sm:flex'>
-          <p className='text-xs text-muted-foreground'>{t('recommendedTo')}</p>
-          <div className='flex items-center gap-1'>
-            <span className='h-2 w-2 rounded-full bg-emerald-500' />
-            <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
-              42 {t('closedDeals')}
-            </p>
-          </div>
-        </div>
+
         <div className='rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'>
-          {t('onProgress')}
+          {featuredStatusLabel}
         </div>
       </div>
     </div>
