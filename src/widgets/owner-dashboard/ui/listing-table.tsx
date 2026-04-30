@@ -58,7 +58,7 @@ export function ListingTable() {
         <div>
           <h3 className='text-base font-semibold'>{t('title')}</h3>
           <p className='text-xs text-muted-foreground'>
-            {t('properties', { count: propertiesPage?.totalElements ?? 0 })}
+            {t('properties', { count: propertiesPage?.total_elements ?? 0 })}
           </p>
         </div>
         <div className='flex items-center gap-2'>
@@ -129,7 +129,7 @@ export function ListingTable() {
 
               return (
                 <tr
-                  key={property.listingId}
+                  key={property.listing_id}
                   className='border-b last:border-0 hover:bg-muted/30 transition-colors'
                 >
                   <td className='px-5 py-3.5 max-w-[200px]'>

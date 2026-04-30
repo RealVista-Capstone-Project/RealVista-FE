@@ -6,16 +6,16 @@ export type DashboardApiResponse<T> = {
 };
 
 export interface DashboardStatsResponse {
-  totalRevenue: number;
-  totalRevenueTrend: number;
-  activeListing: number;
-  activeListingTrend: number;
-  totalClosed: number;
-  totalClosedTrend: number;
-  activeLeads: number;
-  activeLeadsTrend: number;
-  onProgress: number;
-  closedDeals: number;
+  total_revenue: number;
+  total_revenue_trend: number;
+  active_listing: number;
+  active_listing_trend: number;
+  total_closed: number;
+  total_closed_trend: number;
+  active_leads: number;
+  active_leads_trend: number;
+  on_progress: number;
+  closed_deals: number;
 }
 
 export type PerformancePeriod = 'W' | 'M' | 'Y';
@@ -33,7 +33,7 @@ export interface PerformanceResponse {
 }
 
 export interface FeaturedPropertyDTO {
-  listingId: string;
+  listing_id: string;
   name: string;
   type: string;
   sold: number;
@@ -57,18 +57,18 @@ export interface SalesAnalyticsResponse {
 }
 
 export interface DashboardAgentDTO {
-  userId: string;
-  fullName: string;
-  avatarUrl?: string;
+  user_id: string;
+  full_name: string;
+  avatar_url?: string;
   phone?: string;
-  activeLeads: number;
-  leadBadge?: 'new' | 'warm' | 'hot';
+  active_leads: number;
+  lead_badge?: 'new' | 'warm' | 'hot';
 }
 
 export type ScheduleType = 'all' | 'mySchedule' | 'assigned';
 
 export interface DashboardScheduleItem {
-  appointmentId: string;
+  appointment_id: string;
   title: string;
   address: string;
   date: string;
@@ -84,40 +84,40 @@ export interface DashboardScheduleResponse {
 }
 
 export interface ActiveListingOverview {
-  listingId: string;
+  listing_id: string;
   name: string;
   address: string;
-  leadCount: number;
+  lead_count: number;
 }
 
 export interface PropertyOverviewResponse {
   total: number;
   listed: number;
-  listedPercent: number;
+  listed_percent: number;
   sold: number;
-  soldPercent: number;
-  activeListings: ActiveListingOverview[];
+  sold_percent: number;
+  active_listings: ActiveListingOverview[];
 }
 
 export type PropertyFilterStatus = 'All' | 'Available' | 'Occupied' | 'Sold Out';
 
 export interface DashboardPropertyItemDTO {
-  listingId: string;
+  listing_id: string;
   name: string;
   type: string;
   cost: number;
-  activeLeads: number;
+  active_leads: number;
   views: number;
   status: 'PUBLISHED' | 'RENTED' | 'SOLD' | string;
-  listingType: 'SALE' | 'RENT' | string;
+  listing_type: 'SALE' | 'RENT' | string;
 }
 
 export interface PageResponse<T> {
   content: T[];
   page: number;
   size: number;
-  totalElements: number;
-  totalPages: number;
+  total_elements: number;
+  total_pages: number;
   first: boolean;
   last: boolean;
 }

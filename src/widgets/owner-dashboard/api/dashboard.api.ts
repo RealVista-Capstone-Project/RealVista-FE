@@ -41,24 +41,8 @@ export function mapBackendStatusToUiStatus(status: string): Exclude<PropertyFilt
 
 export const ownerDashboardApi = {
   async getStats() {
-    const response = await http.get<DashboardApiResponse<any>>(`${DASHBOARD_BASE}/stats`);
-    const data = response.payload.data;
-
-    if (!data) return data;
-
-    // The backend uses Jackson SNAKE_CASE strategy, so we map snake_case to camelCase
-    return {
-      totalRevenue: data.totalRevenue ?? data.total_revenue,
-      totalRevenueTrend: data.totalRevenueTrend ?? data.total_revenue_trend,
-      activeListing: data.activeListing ?? data.active_listing,
-      activeListingTrend: data.activeListingTrend ?? data.active_listing_trend,
-      totalClosed: data.totalClosed ?? data.total_closed,
-      totalClosedTrend: data.totalClosedTrend ?? data.total_closed_trend,
-      activeLeads: data.activeLeads ?? data.active_leads,
-      activeLeadsTrend: data.activeLeadsTrend ?? data.active_leads_trend,
-      onProgress: data.onProgress ?? data.on_progress,
-      closedDeals: data.closedDeals ?? data.closed_deals,
-    } as DashboardStatsResponse;
+    const response = await http.get<DashboardApiResponse<DashboardStatsResponse>>(`${DASHBOARD_BASE}/stats`);
+    return response.payload.data;
   },
 
   async getPerformance(params?: { period?: PerformancePeriod; metric?: PerformanceMetric }) {
@@ -73,21 +57,10 @@ export const ownerDashboardApi = {
   },
 
   async getFeaturedProperty() {
-    const response = await http.get<DashboardApiResponse<any>>(
+    const response = await http.get<DashboardApiResponse<FeaturedPropertyDTO>>(
       `${DASHBOARD_BASE}/featured-property`,
     );
-    const data = response.payload.data;
-    if (!data) return data;
-
-    return {
-      listingId: data.listingId ?? data.listing_id,
-      name: data.name,
-      type: data.type,
-      sold: data.sold,
-      rented: data.rented,
-      views: data.views,
-      status: data.status,
-    } as FeaturedPropertyDTO;
+    return response.payload.data;
   },
 
   async getSalesAnalytics(period: SalesAnalyticsPeriod = 'month') {
@@ -98,20 +71,10 @@ export const ownerDashboardApi = {
   },
 
   async getAgents(limit: number = 4) {
-    const response = await http.get<DashboardApiResponse<any>>(
+    const response = await http.get<DashboardApiResponse<DashboardAgentDTO[]>>(
       `${DASHBOARD_BASE}/agents?limit=${limit}`,
     );
-    const data = response.payload.data;
-    if (!Array.isArray(data)) return data;
-
-    return data.map((a: any) => ({
-      userId: a.userId ?? a.user_id,
-      fullName: a.fullName ?? a.full_name,
-      avatarUrl: a.avatarUrl ?? a.avatar_url,
-      phone: a.phone,
-      activeLeads: a.activeLeads ?? a.active_leads,
-      leadBadge: a.leadBadge ?? a.lead_badge,
-    })) as DashboardAgentDTO[];
+    return response.payload.data;
   },
 
   async getSchedules(params?: { date?: string; type?: ScheduleType }) {
@@ -126,25 +89,10 @@ export const ownerDashboardApi = {
   },
 
   async getPropertyOverview() {
-    const response = await http.get<DashboardApiResponse<any>>(
+    const response = await http.get<DashboardApiResponse<PropertyOverviewResponse>>(
       `${DASHBOARD_BASE}/properties/overview`,
     );
-    const data = response.payload.data;
-    if (!data) return data;
-
-    return {
-      total: data.total,
-      listed: data.listed,
-      listedPercent: data.listedPercent ?? data.listed_percent,
-      sold: data.sold,
-      soldPercent: data.soldPercent ?? data.sold_percent,
-      activeListings: (data.activeListings ?? data.active_listings ?? []).map((l: any) => ({
-        listingId: l.listingId ?? l.listing_id,
-        name: l.name,
-        address: l.address,
-        leadCount: l.leadCount ?? l.lead_count,
-      })),
-    } as PropertyOverviewResponse;
+    return response.payload.data;
   },
 
   async getProperties(query?: DashboardPropertiesQuery) {

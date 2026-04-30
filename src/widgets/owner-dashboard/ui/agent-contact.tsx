@@ -29,19 +29,19 @@ export function AgentContact() {
 
       <div className='flex flex-col divide-y divide-border'>
         {agents.map((agent, index) => (
-          <div key={agent.userId} className='flex items-center gap-3 py-3 first:pt-0 last:pb-0'>
+          <div key={agent.user_id} className='flex items-center gap-3 py-3 first:pt-0 last:pb-0'>
             <Avatar className='h-10 w-10 shrink-0'>
-              <AvatarImage src={agent.avatarUrl} alt={agent.fullName} />
+              <AvatarImage src={agent.avatar_url} alt={agent.full_name} />
               <AvatarFallback className={`text-sm font-bold ${avatarStyles[index % avatarStyles.length]}`}>
-                {getInitial(agent.fullName)}
+                {getInitial(agent.full_name)}
               </AvatarFallback>
             </Avatar>
 
             <div className='flex-1 min-w-0'>
-              <p className='text-sm font-semibold truncate'>{agent.fullName}</p>
+              <p className='text-sm font-semibold truncate'>{agent.full_name}</p>
               <div className='mt-0.5 flex items-center gap-1 text-xs text-muted-foreground'>
                 <Users className='h-3 w-3 shrink-0' />
-                <span className='truncate'>{t('activeLeads', { count: agent.activeLeads })}</span>
+                <span className='truncate'>{t('activeLeads', { count: agent.active_leads })}</span>
               </div>
             </div>
 

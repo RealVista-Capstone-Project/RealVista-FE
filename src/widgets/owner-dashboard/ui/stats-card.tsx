@@ -29,7 +29,6 @@ export function StatsCard({ title, value, trend, isPositive, icon, iconBg, isLoa
         ) : (
           <p className='text-2xl font-bold tracking-tight'>{value}</p>
         )}
-
         {isLoading ? (
           <Skeleton className='h-5 w-12 rounded-full' />
         ) : (

@@ -21,8 +21,8 @@ export function PropertyOverview() {
   const total = data?.total ?? 0;
   const listed = data?.listed ?? 0;
   const sold = data?.sold ?? 0;
-  const listedPercent = data?.listedPercent ?? 0;
-  const soldPercent = data?.soldPercent ?? 0;
+  const listedPercent = data?.listed_percent ?? 0;
+  const soldPercent = data?.sold_percent ?? 0;
 
   return (
     <div className='flex flex-col gap-5 rounded-2xl border bg-card p-5 shadow-sm'>
@@ -61,9 +61,9 @@ export function PropertyOverview() {
 
       {/* Listings grid */}
       <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-        {(data?.activeListings ?? []).map((listing, index) => (
+        {(data?.active_listings ?? []).map((listing, index) => (
           <div
-            key={listing.listingId}
+            key={listing.listing_id}
             className='flex items-center gap-3 rounded-xl border bg-muted/20 p-3 hover:bg-muted/40 transition-colors cursor-pointer'
           >
             <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted'>
@@ -76,7 +76,7 @@ export function PropertyOverview() {
             <span
               className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${badgeColors[index % badgeColors.length]}`}
             >
-              +{listing.leadCount}
+              +{listing.lead_count}
             </span>
           </div>
         ))}

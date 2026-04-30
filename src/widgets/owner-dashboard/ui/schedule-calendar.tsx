@@ -73,7 +73,7 @@ export function ScheduleCalendar() {
       <div className='flex flex-col gap-3'>
         {(schedules?.items ?? []).map((item, index) => (
           <div
-            key={item.appointmentId}
+            key={item.appointment_id}
             className={cn(
               'flex flex-col gap-1.5 rounded-xl border bg-muted/20 px-4 py-3 border-l-4',
               index % 2 === 0 ? 'border-l-indigo-500' : 'border-l-emerald-500',

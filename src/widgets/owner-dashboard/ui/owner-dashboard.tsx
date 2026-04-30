@@ -33,27 +33,27 @@ export function OwnerDashboard() {
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <StatsCard
           title={t('stats.totalRevenue')}
-          value={formatCompactCurrency(stats?.totalRevenue)}
-          trend={formatTrend(stats?.totalRevenueTrend)}
-          isPositive={(stats?.totalRevenueTrend ?? 0) >= 0}
+          value={formatCompactCurrency(stats?.total_revenue)}
+          trend={formatTrend(stats?.total_revenue_trend)}
+          isPositive={(stats?.total_revenue_trend ?? 0) >= 0}
           iconBg='bg-emerald-100 dark:bg-emerald-500/20'
           icon={<DollarSign className='h-4 w-4 text-emerald-600 dark:text-emerald-400' />}
           isLoading={isLoading}
         />
         <StatsCard
           title={t('stats.activeListing')}
-          value={stats?.activeListing?.toLocaleString() ?? '--'}
-          trend={formatTrend(stats?.activeListingTrend)}
-          isPositive={(stats?.activeListingTrend ?? 0) >= 0}
+          value={stats?.active_listing?.toLocaleString() ?? '--'}
+          trend={formatTrend(stats?.active_listing_trend)}
+          isPositive={(stats?.active_listing_trend ?? 0) >= 0}
           iconBg='bg-amber-100 dark:bg-amber-500/20'
           icon={<Building2 className='h-4 w-4 text-amber-600 dark:text-amber-400' />}
           isLoading={isLoading}
         />
         <StatsCard
           title={t('stats.totalClosed')}
-          value={stats?.totalClosed?.toLocaleString() ?? '--'}
-          trend={formatTrend(stats?.totalClosedTrend)}
-          isPositive={(stats?.totalClosedTrend ?? 0) >= 0}
+          value={stats?.total_closed?.toLocaleString() ?? '--'}
+          trend={formatTrend(stats?.total_closed_trend)}
+          isPositive={(stats?.total_closed_trend ?? 0) >= 0}
           iconBg='bg-rose-100 dark:bg-rose-500/20'
           icon={<CheckCircle2 className='h-4 w-4 text-rose-600 dark:text-rose-400' />}
           isLoading={isLoading}
