@@ -6,11 +6,11 @@ import { StatsCard } from './stats-card';
 import { PerformanceChart } from './performance-chart';
 import { AgentContact } from './agent-contact';
 import { SalesAnalytics } from './sales-analytics';
-import { PropertyOverview } from './property-overview';
 import { ScheduleCalendar } from './schedule-calendar';
 import { ListingTable } from './listing-table';
 import { useDashboardStats } from '../api';
 import { formatVND } from '@/shared/lib/utils';
+import { CurrentPlanSubscription } from './current-plan-subscription';
 
 function formatCompactCurrency(value?: number) {
   if (value === undefined) return '--';
@@ -78,8 +78,8 @@ export function OwnerDashboard() {
 
         {/* Right sidebar (1/3) */}
         <div className='flex flex-col gap-5'>
+          <CurrentPlanSubscription />
           <ScheduleCalendar />
-          <PropertyOverview />
         </div>
       </div>
     </div>

@@ -51,23 +51,6 @@ export function ScheduleCalendar() {
         />
       </div>
 
-      {/* Tabs */}
-      <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              'flex-1 rounded-lg py-1.5 text-xs font-medium transition-all',
-              activeTab === tab.key
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
 
       {/* Schedule Items */}
       <div className='flex flex-col gap-3'>

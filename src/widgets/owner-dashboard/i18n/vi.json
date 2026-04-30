@@ -85,7 +85,22 @@
         "mySchedule": "Của tôi"
       },
       "myScheduleLabel": "của tôi",
-      "assignedLabel": "được giao"
+      "assignedLabel": "được giao",
+      "currentPlan": {
+        "title": "Gói hiện tại",
+        "loading": "Đang tải gói...",
+        "empty": "Bạn chưa có gói đăng ký đang hoạt động.",
+        "expireAt": "Hết hạn: {date}",
+        "unlimitedQuota": "Không giới hạn quota",
+        "usedQuota": "Đã dùng {used}/{total}",
+        "remaining": "còn lại",
+        "viewAll": "Xem tất cả",
+        "featureType": {
+          "listing": "Tin đăng",
+          "tour3d": "3D Tour",
+          "aiRequest": "AI"
+        }
+      }
     },
     "propertyTable": {
       "title": "Tin đang đăng",

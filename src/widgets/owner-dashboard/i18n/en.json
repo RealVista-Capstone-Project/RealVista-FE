@@ -85,7 +85,22 @@
         "mySchedule": "My Schedule"
       },
       "myScheduleLabel": "my schedule",
-      "assignedLabel": "assigned"
+      "assignedLabel": "assigned",
+      "currentPlan": {
+        "title": "Current plan",
+        "loading": "Loading current plan...",
+        "empty": "You do not have any active subscription plan.",
+        "expireAt": "Expires: {date}",
+        "unlimitedQuota": "Unlimited quota",
+        "usedQuota": "Used {used}/{total}",
+        "remaining": "left",
+        "viewAll": "View all",
+        "featureType": {
+          "listing": "Listing",
+          "tour3d": "3D Tour",
+          "aiRequest": "AI"
+        }
+      }
     },
     "propertyTable": {
       "title": "Active Listing",
