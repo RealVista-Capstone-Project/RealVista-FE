@@ -486,8 +486,8 @@ export function AgentDashboardView({ user }: { user?: User }) {
             <CardDescription>{t('sections.appointments.description')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <div className='overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-b from-card to-muted/10 shadow-sm'>
-              <div className='bg-muted/10 px-3 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4'>
+            <div className='overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm'>
+              <div className='bg-muted/5 px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5'>
                 <Calendar
                   mode='single'
                   selected={selectedAppointmentDay}
@@ -501,16 +501,23 @@ export function AgentDashboardView({ user }: { user?: User }) {
                   classNames={{
                     root: 'w-full p-0',
                     months: 'w-full',
-                    month: 'w-full gap-3',
-                    month_caption: 'mb-1',
-                    nav: 'top-0',
-                    table: 'w-full table-fixed border-separate border-spacing-y-1.5',
+                    month: 'w-full gap-4',
+                    month_caption: 'mb-3',
+                    nav: 'top-1.5',
+                    button_previous:
+                      'h-8 w-8 rounded-full border-0 bg-transparent text-foreground shadow-none hover:bg-muted/40',
+                    button_next:
+                      'h-8 w-8 rounded-full border-0 bg-transparent text-foreground shadow-none hover:bg-muted/40',
+                    caption_label: 'text-[32px] font-semibold tracking-tight',
+                    table: 'w-full table-fixed border-separate border-spacing-y-2',
                     month_grid: 'w-full',
                     week: 'mt-0 flex w-full',
-                    weekdays: 'mb-1.5 flex w-full',
+                    weekdays: 'mb-1 flex w-full',
                     weekday:
-                      'w-1/7 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/90',
-                    day: 'w-1/7',
+                      'w-1/7 text-center text-[18px] font-medium normal-case tracking-normal text-muted-foreground',
+                    day: 'w-1/7 py-0.5',
+                    outside: 'text-muted-foreground/45 aria-selected:text-muted-foreground/45',
+                    today: 'bg-transparent text-foreground',
                   }}
                   components={{
                     DayButton: ({ day, className, ...props }) => {
@@ -524,18 +531,20 @@ export function AgentDashboardView({ user }: { user?: User }) {
                           day={day}
                           className={cn(
                             className,
-                            'relative h-10 w-full min-w-0 rounded-xl border border-transparent bg-background/70 pb-2 text-sm font-medium transition-all duration-150 hover:border-border/70 hover:bg-background data-[selected-single=true]:border-primary/30 data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:shadow-sm md:h-11'
+                            'relative h-12 w-full min-w-0 rounded-xl border-0 bg-transparent pb-2 text-foreground transition-colors duration-150 hover:bg-muted/25 data-[selected-single=true]:bg-zinc-950 data-[selected-single=true]:text-white data-[selected-single=true]:shadow-none data-[selected-single=true]:[&_.dot-indicator]:bg-white/85 md:h-14'
                           )}
                           {...props}
                         >
-                          <span className='relative z-10 leading-none'>{props.children}</span>
+                          <span className='relative z-10 text-[2rem] leading-none font-normal opacity-100'>
+                            {props.children}
+                          </span>
                           {(isTourDay || isBlockDay) && (
-                            <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1.5'>
+                            <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1'>
                               {isTourDay && (
-                                <span className='h-1.5 w-1.5 rounded-full bg-primary ring-1 ring-background shadow-[0_0_0_1px_rgba(59,130,246,0.18)]' />
+                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-zinc-900' />
                               )}
                               {isBlockDay && (
-                                <span className='h-1.5 w-1.5 rounded-full bg-amber-500 ring-1 ring-background shadow-[0_0_0_1px_rgba(245,158,11,0.2)]' />
+                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-zinc-500' />
                               )}
                             </span>
                           )}
