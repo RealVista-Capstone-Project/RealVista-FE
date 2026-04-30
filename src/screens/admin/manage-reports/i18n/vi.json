@@ -1,0 +1,87 @@
+{
+  "ManageReports": {
+    "title": "Quản lý báo cáo",
+    "description": "Xem xét và xử lý các báo cáo vi phạm chính sách từ người dùng.",
+    "header": {
+      "liveSystem": "Hệ thống Trực tiếp",
+      "incoming": "Mới nhận",
+      "unresolved": "Chưa giải quyết"
+    },
+    "stats": {
+      "total": "Tổng số báo cáo",
+      "pending": "Chờ xử lý",
+      "reviewing": "Đang xem xét",
+      "resolved": "Đã giải quyết",
+      "dismissed": "Đã bác bỏ"
+    },
+    "filters": {
+      "allReports": "Tất cả báo cáo",
+      "searchPlaceholder": "Tìm kiếm theo tên, ID hoặc lý do..."
+    },
+    "table": {
+      "columns": {
+        "reporter": "Người báo cáo",
+        "target": "Đối tượng",
+        "reason": "Lý do",
+        "status": "Trạng thái",
+        "date": "Ngày gửi",
+        "actions": "Hành động",
+        "slaBreach": "Vi phạm SLA {hours}H"
+      },
+      "pagination": {
+        "records": "Bản ghi {from} - {to} trên {total}",
+        "page": "Trang {page}",
+        "previous": "Trước",
+        "next": "Tiếp theo"
+      }
+    },
+    "detail": {
+      "title": "Chi tiết báo cáo",
+      "reporterInfo": "Thông tin người báo cáo",
+      "reportedTarget": "Đối tượng bị báo cáo",
+      "evidence": "Bằng chứng & Chi tiết",
+      "adminAction": "Hành động admin",
+      "moderationActions": "Hành động kiểm duyệt",
+      "reviewFullReport": "Xem toàn bộ báo cáo",
+      "resolution": "Giải quyết",
+      "highPriority": "Ưu tiên cao",
+      "displayName": "Tên hiển thị",
+      "emailAddress": "Địa chỉ Email",
+      "submittedOn": "Gửi lúc",
+      "primaryReason": "Lý do chính",
+      "noDescription": "Người báo cáo không cung cấp mô tả.",
+      "resolutionNotes": "Ghi chú giải quyết hồ sơ",
+      "characters": "{count} ký tự",
+      "finalized": "Trường hợp này đã được hoàn tất và khóa.",
+      "reasons": {
+        "SCAM": "Lừa đảo / Scam",
+        "FAKE_INFO": "Thông tin giả mạo",
+        "DUPLICATE": "Trùng lặp",
+        "HARASSMENT": "Quấy rối / Lăng mạ",
+        "OTHER": "Lý do khác"
+      },
+      "actions": {
+        "startReview": "Bắt đầu xem xét",
+        "resolve": "Giải quyết",
+        "dismiss": "Bác bỏ",
+        "suspendTarget": "Đình chỉ đối tượng",
+        "viewTarget": "Xem đối tượng"
+      },
+      "confirm": {
+        "resolveTitle": "Giải quyết báo cáo",
+        "resolveDesc": "Cung cấp ghi chú nội bộ về cách báo cáo này được giải quyết.",
+        "dismissTitle": "Bác bỏ báo cáo",
+        "dismissDesc": "Cung cấp lý do tại sao báo cáo này bị bác bỏ.",
+        "placeholder": "Nhập ghi chú admin..."
+      }
+    },
+    "toast": {
+      "startedReview": "Đã bắt đầu xem xét báo cáo",
+      "resolved": "Đã giải quyết báo cáo",
+      "dismissed": "Đã bác bỏ báo cáo"
+    },
+    "form": {
+      "cancel": "Đóng"
+    }
+  }
+}

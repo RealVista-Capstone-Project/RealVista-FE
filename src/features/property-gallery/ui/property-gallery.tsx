@@ -37,7 +37,8 @@ export function PropertyGallery({
   const tourCount = safeImages.filter((img) => img.type === '3d-tour').length;
   const videoCount = safeImages.filter((img) => img.type === 'video').length;
 
-  const handleOpenPhotos = () => {
+  const handleOpenPhotos = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (onViewAllPhotos) {
       onViewAllPhotos();
     }
@@ -45,7 +46,8 @@ export function PropertyGallery({
     setMediaViewerOpen(true);
   };
 
-  const handleOpen3DTour = () => {
+  const handleOpen3DTour = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (on3DTour) {
       on3DTour();
     }
@@ -53,7 +55,8 @@ export function PropertyGallery({
     setMediaViewerOpen(true);
   };
 
-  const handleOpenVideo = () => {
+  const handleOpenVideo = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (onVideo) {
       onVideo();
     }
@@ -231,6 +234,7 @@ export function PropertyGallery({
         media={safeImages}
         defaultTab={mediaViewerTab}
         onFavorite={onFavorite}
+        initialMediaId={mainImage?.id}
       />
     </div>
   );

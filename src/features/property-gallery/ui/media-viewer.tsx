@@ -23,6 +23,7 @@ export interface MediaViewerProps {
   defaultTab?: MediaType;
   onFavorite?: () => void;
   onRequestTour?: () => void;
+  initialMediaId?: string;
 }
 
 const MediaViewerContent = React.forwardRef<
@@ -60,6 +61,7 @@ export function MediaViewer({
   defaultTab = 'photos',
   onFavorite,
   onRequestTour,
+  initialMediaId,
 }: MediaViewerProps) {
   const t = useTranslations('PropertyGallery');
 
@@ -84,10 +86,22 @@ export function MediaViewer({
     { id: 'video', label: t('videoTab'), count: videos.length },
   ];
 
-  // Reset index when tab changes
+  // Handle index synchronization when opening or switching tabs
   React.useEffect(() => {
+    if (!open) return;
+    
+    // Attempt to find the initial media if it exists
+    if (initialMediaId) {
+      const index = currentMediaItems.findIndex((m) => m.id === initialMediaId);
+      if (index >= 0) {
+        setCurrentIndex(index);
+        return;
+      }
+    }
+    
+    // Default to the first item
     setCurrentIndex(0);
-  }, [activeTab]);
+  }, [activeTab, open, initialMediaId, currentMediaItems]);
 
   const handlePrevious = () => {
     if (currentMediaItems.length > 0) {
@@ -234,6 +248,7 @@ export function MediaViewer({
                     )}
                     <SparkViewer
                       metadata={currentMedia.metadata}
+                      spzUrl={currentMedia.url}
                       className='w-full h-full'
                     />
                   </div>

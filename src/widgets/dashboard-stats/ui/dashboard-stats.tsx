@@ -1,112 +1,147 @@
 'use client';
 
-import { Clock, Folder, Database } from 'lucide-react';
+import * as React from 'react';
+import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
+import { 
+  Users, 
+  Home, 
+  AlertOctagon, 
+  Activity, 
+  TrendingUp, 
+  TrendingDown,
+  LucideIcon
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 
-/**
- * DashboardStats Widget
- *
- * Displays key metrics and statistics in an elegant card layout.
- * Features:
- * - Animated stat cards
- * - Icon-based visual hierarchy
- * - Hover effects
- * - Trend indicators
- */
+import { adminApi } from '@/entities/admin/api';
+import { cn } from '@/shared/lib/utils';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   trend?: {
     value: string;
     isPositive: boolean;
   };
-  description: string;
-  delay: number;
+  description?: string;
+  delay?: number;
 }
 
-function StatCard({ title, value, icon: Icon, trend, description, delay }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, trend, description, delay = 0 }: StatCardProps) {
   return (
-    <div
-      className='group relative overflow-hidden rounded-2xl border border-slate-200/50 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-slate-300/50 hover:shadow-lg dark:border-slate-700/50 dark:bg-slate-900/80 dark:hover:border-slate-600/50'
-      style={{
-        animation: `fadeInUp 0.6s ease-out ${delay}s both`,
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay }}
+      className='group relative bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-500 overflow-hidden'
     >
-      {/* Decorative gradient background on hover */}
-      <div className='absolute inset-0 bg-gradient-to-br from-slate-50/0 to-slate-100/0 transition-opacity duration-300 group-hover:from-slate-50/50 group-hover:to-slate-100/50 dark:from-slate-800/0 dark:to-slate-700/0 dark:group-hover:from-slate-800/30 dark:group-hover:to-slate-700/30' />
-
-      <div className='relative z-10'>
-        {/* Header */}
-        <div className='mb-4 flex items-start justify-between'>
-          <div className='rounded-xl bg-slate-100 p-2.5 transition-colors duration-200 group-hover:bg-slate-200 dark:bg-slate-800 dark:group-hover:bg-slate-700'>
-            <Icon className='h-5 w-5 text-slate-600 dark:text-slate-400' />
+      <div className='absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors' />
+      
+      <div className='relative flex flex-col gap-4'>
+        <div className='flex items-center justify-between'>
+          <div className='p-4 bg-slate-50 rounded-2xl group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-500'>
+            <Icon className='h-6 w-6 text-slate-600 group-hover:text-primary transition-colors' />
           </div>
           {trend && (
-            <div
-              className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${
-                trend.isPositive
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
-                  : 'bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400'
-              }`}
-            >
-              {trend.isPositive ? (
-                <svg className='h-3 w-3' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 10l7-7m0 0l7 7m-7-7v18' />
-                </svg>
-              ) : (
-                <svg className='h-3 w-3' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 14l-7 7m0 0l-7-7m7 7V3' />
-                </svg>
-              )}
+            <div className={cn(
+              'flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider',
+              trend.isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+            )}>
+              {trend.isPositive ? <TrendingUp className='h-3 w-3' /> : <TrendingDown className='h-3 w-3' />}
               {trend.value}
             </div>
           )}
         </div>
 
-        {/* Value */}
-        <div className='mb-1'>
-          <h3 className='text-3xl font-semibold text-slate-900 dark:text-slate-50'>{value}</h3>
-        </div>
-
-        {/* Title and Description */}
         <div>
-          <p className='text-sm font-medium text-slate-700 dark:text-slate-300'>{title}</p>
-          <p className='mt-1 text-xs text-slate-500 dark:text-slate-500'>{description}</p>
+          <p className='text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2'>
+            {title}
+          </p>
+          <h3 className='text-3xl font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors'>
+            {value}
+          </h3>
+          {description && (
+            <p className='mt-2 text-xs font-bold text-slate-500'>
+              {description}
+            </p>
+          )}
         </div>
       </div>
-    </div>
+    </motion.div>
+  );
+}
+
+function StatsSkeleton() {
+  return (
+    <>
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className='bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-4'>
+          <div className='flex justify-between items-center'>
+            <Skeleton className='h-12 w-12 rounded-2xl' />
+            <Skeleton className='h-6 w-16 rounded-full' />
+          </div>
+          <div className='space-y-2'>
+            <Skeleton className='h-4 w-24' />
+            <Skeleton className='h-10 w-32' />
+          </div>
+        </div>
+      ))}
+    </>
   );
 }
 
 export function DashboardStats() {
+  const t = useTranslations('AdminDashboard');
+  
+  const { data: overview, isLoading } = useQuery({
+    queryKey: ['admin', 'overview'],
+    queryFn: () => adminApi.getOverview(),
+  });
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+  };
+
+  if (isLoading) return <StatsSkeleton />;
+
   return (
     <>
       <StatCard
-        title='Total Sessions'
-        value='128'
-        icon={Clock}
-        trend={{ value: '12%', isPositive: true }}
-        description='Active sessions this month'
+        title={t('totalActiveUsers')}
+        value={overview?.total_users ?? 0}
+        icon={Users}
+        trend={{ value: '+12.5%', isPositive: true }}
+        description={t('platformGrowth')}
         delay={0}
       />
 
       <StatCard
-        title='Projects'
-        value='24'
-        icon={Folder}
-        trend={{ value: '8%', isPositive: true }}
-        description='Active projects'
+        title={t('newestPendingListings')}
+        value={overview?.pending_listings ?? 0}
+        icon={Home}
+        description={t('awaitingModeration')}
         delay={0.1}
       />
 
       <StatCard
-        title='Storage Used'
-        value='2.4 GB'
-        icon={Database}
-        trend={{ value: '3%', isPositive: false }}
-        description='of 10 GB total storage'
+        title={t('topUrgentReports')}
+        value={overview?.unresolved_reports ?? 0}
+        icon={AlertOctagon}
+        trend={{ value: t('highPriority'), isPositive: false }}
+        description={t('requiresImmediateResolution')}
         delay={0.2}
+      />
+
+      <StatCard
+        title={t('totalRevenue')}
+        value={formatCurrency(overview?.total_revenue ?? 0)}
+        icon={Activity}
+        trend={{ value: '+5.4%', isPositive: true }}
+        description={t('revenueGrowth')}
+        delay={0.3}
       />
     </>
   );

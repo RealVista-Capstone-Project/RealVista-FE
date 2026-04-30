@@ -1,0 +1,106 @@
+{
+  "ManageTemplates": {
+    "title": "Quản lý mẫu thông báo",
+    "description": "Quản lý mẫu thông báo email và ứng dụng trên toàn hệ thống.",
+    "createNew": "Tạo mẫu mới",
+    "templateEngine": "Hệ thống Mẫu",
+    "stats": {
+      "total": "Tổng số mẫu",
+      "email": "Email",
+      "inApp": "Thông báo (Toast)",
+      "languages": "Ngôn ngữ"
+    },
+    "search": {
+      "placeholder": "Tìm kiếm mẫu theo khóa hoặc tên..."
+    },
+    "filters": {
+      "all": "Tất cả",
+      "email": "Email",
+      "inApp": "Ứng dụng"
+    },
+    "table": {
+      "columns": {
+        "key": "Khóa mẫu",
+        "type": "Loại",
+        "language": "Ngôn ngữ",
+        "updatedAt": "Cập nhật cuối",
+        "actions": "Thao tác"
+      },
+      "noResults": "Không tìm thấy kết quả"
+    },
+    "databaseScale": "Quy mô dữ liệu",
+    "entries": "Bản ghi",
+    "emptyState": {
+      "title": "Chưa có mẫu nào được đồng bộ",
+      "description": "Kho mẫu của bạn hiện đang trống. Khởi tạo các thông báo hệ thống bằng nút bên dưới.",
+      "button": "Khởi tạo mẫu"
+    },
+    "form": {
+      "createTitle": "Tạo mẫu thông báo mới",
+      "editTitle": "Chỉnh sửa mẫu thông báo",
+      "templateKey": "Khóa hệ thống (Dành cho kỹ thuật)",
+      "templateKeyPlaceholder": "VD: EMAIL_OTP",
+      "name": "Tên mẫu (Dành cho quản lý)",
+      "namePlaceholder": "VD: Xác minh Email OTP",
+      "type": "Loại thông báo",
+      "typeOptions": {
+        "email": "Gửi qua Email",
+        "notification": "Thông báo ứng dụng"
+      },
+      "language": "Ngôn ngữ",
+      "title": "Tiêu đề / Chủ đề",
+      "titlePlaceholder": "Chủ đề email hoặc tiêu đề thông báo",
+      "contentBody": "Nội dung thân bài",
+      "contentStructure": "Cấu trúc nội dung",
+      "placeholdersHint": "Sử dụng các thẻ biến để thay thế dữ liệu động.",
+      "htmlSupported": "HỖ TRỢ HTML",
+      "richTextOnly": "CHỈ VĂN BẢN THUẦN",
+      "variableLibrary": "Thư viện dữ liệu động",
+      "variableLibraryTooltip": "Click vào các biến dưới đây để chèn tự động vào vị trí con trỏ chuột trong trình soạn thảo. Các biến bắt buộc được đánh dấu *.",
+      "variableLibraryEmpty": "Không có biến nào được định nghĩa cho schema này.",
+      "livePreview": "Xem trước thực tế",
+      "appPreview": "Xem trước ứng dụng",
+      "syncing": "Đang đồng bộ...",
+      "save": "Lưu mẫu",
+      "saving": "Đang lưu...",
+      "cancel": "Hủy bỏ",
+      "templateKeyLabel": "Khóa hệ thống",
+      "systemBadge": "Hệ thống",
+      "sections": {
+        "config": "Cấu hình mẫu",
+        "content": "Nội dung thông báo",
+        "livePreview": "Xem trước thực tế",
+        "syncing": "Đang đồng bộ...",
+        "synced": "ĐÃ ĐỒNG BỘ"
+      },
+      "test": {
+        "button": "Gửi thử",
+        "loading": "Đang biên dịch mẫu trên máy chủ...",
+        "success": "Đã gửi Email thử nghiệm bằng dữ liệu giả định!",
+        "error": "Lỗi cú pháp mẫu email!"
+      }
+    },
+    "actions": {
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "confirm": "Xác nhận",
+      "createSuccess": "Đã tạo mẫu thành công!",
+      "updateSuccess": "Đã cập nhật mẫu thành công!",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa mẫu này không?",
+      "deleteConfirmTitle": "Xác nhận xóa mẫu thông báo",
+      "deleteSuccess": "Đã xóa mẫu thành công!"
+    },
+    "errors": {
+      "keyExists": "Khóa mẫu này đã tồn tại cho ngôn ngữ đã chọn. Vui lòng sử dụng một Khóa duy nhất.",
+      "default": "Đã xảy ra lỗi khi lưu mẫu. Vui lòng thử lại sau.",
+      "missingRequired": "Thiếu các biến bắt buộc: {vars}",
+      "invalidUsed": "Biến không hợp lệ: {vars}"
+    },
+    "dialog": {
+      "unsavedTitle": "Thay đổi chưa được lưu",
+      "unsavedDesc": "Bạn có các thay đổi chưa được lưu. Nếu đóng cửa sổ này, mọi tiến trình sẽ bị mất. Bạn có chắc chắn muốn thoát?",
+      "continueEditing": "Tiếp tục chỉnh sửa",
+      "discardChanges": "Thoát và Hủy"
+    }
+  }
+}

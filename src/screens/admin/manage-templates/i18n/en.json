@@ -1,0 +1,106 @@
+{
+  "ManageTemplates": {
+    "title": "Notification Template Management",
+    "description": "Manage system-wide email and in-app notification templates.",
+    "createNew": "Create New Template",
+    "templateEngine": "Template Engine",
+    "stats": {
+      "total": "Total Templates",
+      "email": "Email",
+      "inApp": "Toast Notifications",
+      "languages": "Languages"
+    },
+    "search": {
+      "placeholder": "Search by key or name..."
+    },
+    "filters": {
+      "all": "All",
+      "email": "Email",
+      "inApp": "In-App"
+    },
+    "table": {
+      "columns": {
+        "key": "Template Key",
+        "type": "Type",
+        "language": "Language",
+        "updatedAt": "Last Updated",
+        "actions": "Actions"
+      },
+      "noResults": "No templates found"
+    },
+    "databaseScale": "Database Scale",
+    "entries": "Entries",
+    "emptyState": {
+      "title": "No Templates Synchronized",
+      "description": "Your template repository is currently empty. Initialize your system notifications using the button below.",
+      "button": "Initialize Template"
+    },
+    "form": {
+      "createTitle": "Create New Notification Template",
+      "editTitle": "Edit Notification Template",
+      "templateKey": "System Key (Technical)",
+      "templateKeyPlaceholder": "e.g. EMAIL_OTP",
+      "name": "Template Name (Internal)",
+      "namePlaceholder": "e.g. Email OTP Verification",
+      "type": "Notification Type",
+      "typeOptions": {
+        "email": "Send via Email",
+        "notification": "In-App Notification"
+      },
+      "language": "Language",
+      "title": "Title / Subject",
+      "titlePlaceholder": "Email subject or notification title",
+      "contentBody": "Content Body",
+      "contentStructure": "Content Structure",
+      "placeholdersHint": "Use variable tags for dynamic data.",
+      "htmlSupported": "HTML SUPPORTED",
+      "richTextOnly": "RICH TEXT ONLY",
+      "variableLibrary": "Dynamic Variables Library",
+      "variableLibraryTooltip": "Click on the variables below to insert them automatically at the cursor position in the editor. Required variables are marked with *.",
+      "variableLibraryEmpty": "No variables defined for this schema.",
+      "livePreview": "Live Preview",
+      "appPreview": "App Preview",
+      "syncing": "Syncing...",
+      "save": "Save Template",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "templateKeyLabel": "System Key",
+      "systemBadge": "System",
+      "sections": {
+        "config": "Template Configuration",
+        "content": "Notification Content",
+        "livePreview": "Real-time Preview",
+        "syncing": "Syncing...",
+        "synced": "SYNCED"
+      },
+      "test": {
+        "button": "Send Test",
+        "loading": "Compiling Template on Backend Server...",
+        "success": "Test Email sent using Mock Data!",
+        "error": "Email template syntax error!"
+      }
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirm": "Confirm",
+      "createSuccess": "Template created successfully!",
+      "updateSuccess": "Template updated successfully!",
+      "deleteConfirm": "Are you sure you want to delete this template?",
+      "deleteConfirmTitle": "Confirm Delete Template",
+      "deleteSuccess": "Template deleted successfully!"
+    },
+    "errors": {
+      "keyExists": "This template key already exists for the selected language. Please use a unique Key.",
+      "default": "An error occurred while saving the template. Please try again later.",
+      "missingRequired": "Missing required variables: {vars}",
+      "invalidUsed": "Invalid variables used: {vars}"
+    },
+    "dialog": {
+      "unsavedTitle": "Unsaved Changes",
+      "unsavedDesc": "You have unsaved changes. If you close this window, all progress will be lost. Are you sure you want to exit?",
+      "continueEditing": "Continue Editing",
+      "discardChanges": "Exit and Discard"
+    }
+  }
+}
