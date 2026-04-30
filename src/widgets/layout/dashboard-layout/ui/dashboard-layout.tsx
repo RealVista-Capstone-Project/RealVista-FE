@@ -203,6 +203,12 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
     },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
+      id: 'manage-properties',
+      label: t('menu.manageProperties'),
+      href: ROUTES.dashboard.manageProperties,
+      icon: Building2,
+    },
+    {
       id: 'messages',
       label: t('menu.messages'),
       href: ROUTES.dashboard.messages,
@@ -300,6 +306,12 @@ export function DashboardLayout({
       pathname.startsWith(ROUTES.dashboard.managePackages)
     ) {
       return t('pageTitle.managePackages');
+    }
+    if (
+      pathname === ROUTES.dashboard.manageProperties ||
+      pathname.startsWith(ROUTES.dashboard.manageProperties)
+    ) {
+      return t('pageTitle.manageProperties');
     }
     if (
       pathname === ROUTES.dashboard.manageUsers ||

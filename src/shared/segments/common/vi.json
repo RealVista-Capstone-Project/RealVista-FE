@@ -16,7 +16,8 @@
       "users": "Quản lý người dùng",
       "locations": "Quản lý địa điểm",
       "crm": "CRM",
-      "packages": "Quản lý gói dịch vụ"
+      "packages": "Quản lý gói dịch vụ",
+      "manageProperties": "Quản lý bất động sản"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -38,7 +39,8 @@
       "manageAgent": "Quản lý môi giới",
       "crm": "Quản lý khách hàng",
       "managePackages": "Quản lý gói dịch vụ",
-      "locations": "Quản lý địa điểm"
+      "locations": "Quản lý địa điểm",
+      "manageProperties": "Quản lý bất động sản"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

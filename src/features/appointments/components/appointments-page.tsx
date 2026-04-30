@@ -348,7 +348,7 @@ export function AppointmentsPage() {
     return (
       <div
         className="flex h-full flex-col p-1 text-inherit overflow-hidden"
-        title={`${apt.listing_name || apt.appointment_type || 'Appointment'}${apt.rejection_reason ? `\n${t('rejectReason')}: ${apt.rejection_reason}` : ''}${apt.cancellation_reason ? `\n${t('cancelReason')}: ${apt.cancellation_reason}` : ''}`}
+        title={`${apt.listing_name || apt.appointment_type || 'Appointment'}${apt.rejection_reason ? `\n${t('rejectReason')}: ${t.has(`reasons.${apt.rejection_reason}`) ? t(`reasons.${apt.rejection_reason}` as Parameters<typeof t>[0]) : apt.rejection_reason}` : ''}${apt.cancellation_reason ? `\n${t('cancelReason')}: ${t.has(`reasons.${apt.cancellation_reason}`) ? t(`reasons.${apt.cancellation_reason}` as Parameters<typeof t>[0]) : apt.cancellation_reason}` : ''}`}
       >
         <div className={`font-semibold text-xs leading-none truncate`} title={apt.listing_name || apt.appointment_type || 'Appointment'}>
           {apt.listing_name || (apt.appointment_type === 'BLOCK' ? t('block') : t('tour') || 'Appointment')}
@@ -360,7 +360,10 @@ export function AppointmentsPage() {
 
         {(apt.rejection_reason || apt.cancellation_reason) && (
           <div className="mt-1 text-[10px] leading-tight text-red-600 dark:text-red-400 line-clamp-1 italic">
-            {apt.rejection_reason || apt.cancellation_reason}
+            {(() => {
+              const raw = apt.rejection_reason || apt.cancellation_reason || '';
+              return t.has(`reasons.${raw}`) ? t(`reasons.${raw}` as Parameters<typeof t>[0]) : raw;
+            })()}
           </div>
         )}
 
