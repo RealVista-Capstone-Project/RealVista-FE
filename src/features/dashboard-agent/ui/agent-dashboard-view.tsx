@@ -486,8 +486,8 @@ export function AgentDashboardView({ user }: { user?: User }) {
             <CardDescription>{t('sections.appointments.description')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <div className='overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm'>
-              <div className='bg-muted/15 p-4 sm:p-5'>
+            <div className='overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-b from-card to-muted/10 shadow-sm'>
+              <div className='bg-muted/10 px-3 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4'>
                 <Calendar
                   mode='single'
                   selected={selectedAppointmentDay}
@@ -497,14 +497,20 @@ export function AgentDashboardView({ user }: { user?: User }) {
                   }}
                   month={visibleCalendarMonth}
                   onMonthChange={setVisibleCalendarMonth}
-                  className='w-full'
+                  className='w-full !p-0'
                   classNames={{
                     root: 'w-full p-0',
-                    month: 'w-full gap-4',
-                    table: 'w-full',
-                    weekdays: 'mb-1.5',
+                    months: 'w-full',
+                    month: 'w-full gap-3',
+                    month_caption: 'mb-1',
+                    nav: 'top-0',
+                    table: 'w-full table-fixed border-separate border-spacing-y-1.5',
+                    month_grid: 'w-full',
+                    week: 'mt-0 flex w-full',
+                    weekdays: 'mb-1.5 flex w-full',
                     weekday:
-                      'text-center text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground',
+                      'w-1/7 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/90',
+                    day: 'w-1/7',
                   }}
                   components={{
                     DayButton: ({ day, className, ...props }) => {
@@ -518,18 +524,18 @@ export function AgentDashboardView({ user }: { user?: User }) {
                           day={day}
                           className={cn(
                             className,
-                            'relative h-10 w-full min-w-0 rounded-xl pb-2 text-sm font-medium transition data-[selected-single=true]:shadow-sm md:h-11'
+                            'relative h-10 w-full min-w-0 rounded-xl border border-transparent bg-background/70 pb-2 text-sm font-medium transition-all duration-150 hover:border-border/70 hover:bg-background data-[selected-single=true]:border-primary/30 data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:shadow-sm md:h-11'
                           )}
                           {...props}
                         >
                           <span className='relative z-10 leading-none'>{props.children}</span>
                           {(isTourDay || isBlockDay) && (
-                            <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1'>
+                            <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1.5'>
                               {isTourDay && (
-                                <span className='h-1.5 w-1.5 rounded-full bg-primary/90 ring-1 ring-background' />
+                                <span className='h-1.5 w-1.5 rounded-full bg-primary ring-1 ring-background shadow-[0_0_0_1px_rgba(59,130,246,0.18)]' />
                               )}
                               {isBlockDay && (
-                                <span className='h-1.5 w-1.5 rounded-full bg-amber-500/90 ring-1 ring-background' />
+                                <span className='h-1.5 w-1.5 rounded-full bg-amber-500 ring-1 ring-background shadow-[0_0_0_1px_rgba(245,158,11,0.2)]' />
                               )}
                             </span>
                           )}
@@ -541,14 +547,14 @@ export function AgentDashboardView({ user }: { user?: User }) {
               </div>
 
               <div className='border-t border-border/70 bg-card/80 px-4 py-3 sm:px-5 sm:py-4'>
-                <div className='inline-flex w-full rounded-xl border border-border/70 bg-muted/50 p-1'>
+                <div className='inline-flex w-full rounded-xl border border-border/70 bg-muted/40 p-1'>
                   {(['all', 'tour', 'block'] as const).map((tab) => (
                     <Button
                       key={tab}
                       size='sm'
                       variant='ghost'
                       className={cn(
-                        'h-9 flex-1 rounded-lg text-sm font-medium text-muted-foreground transition-colors',
+                        'h-9 flex-1 rounded-lg text-sm font-medium text-muted-foreground transition-all hover:text-foreground',
                         appointmentFilter === tab &&
                           'bg-background text-foreground shadow-sm hover:bg-background'
                       )}
@@ -561,15 +567,15 @@ export function AgentDashboardView({ user }: { user?: User }) {
               </div>
 
               <div className='border-t border-border/70 bg-card'>
-                <div className='flex flex-wrap items-center justify-between gap-2 bg-muted/25 px-4 py-3 sm:px-5'>
-                  <p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+                <div className='flex flex-wrap items-center justify-between gap-2 bg-muted/30 px-4 py-3 sm:px-5'>
+                  <p className='text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                     {selectedAppointmentDay
                       ? t('sections.appointments.selectedDate', {
                           date: formatCalendarHeaderDate(selectedAppointmentDay, locale),
                         })
                       : t('sections.appointments.noDateSelected')}
                   </p>
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='rounded-full bg-background/80 px-2.5 py-1 text-xs font-medium text-muted-foreground'>
                     {t('sections.appointments.summary', {
                       total: selectedDayAppointments.length,
                       tour: tourCount,
@@ -598,7 +604,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                       selectedDayAppointments.map((appointment: AppointmentItem) => (
                         <div
                           key={appointment.appointmentId}
-                          className='flex items-start justify-between gap-3 border-t border-border/60 px-4 py-3.5 first:border-t-0 sm:px-5'
+                          className='flex items-start justify-between gap-3 border-t border-border/60 px-4 py-3.5 transition-colors first:border-t-0 hover:bg-muted/20 sm:px-5'
                         >
                           <div className='min-w-0'>
                             <p className='truncate text-lg font-semibold leading-6 text-foreground'>
