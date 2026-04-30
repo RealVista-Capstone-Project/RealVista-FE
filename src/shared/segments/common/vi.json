@@ -881,9 +881,12 @@
       "plan": {
         "title": "Gói dịch vụ & boost",
         "description": "Tổng quan mức sử dụng gói và lượt boost.",
-        "renewsOn": "Gia hạn vào {date}",
-        "listingQuota": "Hạn mức tin đăng",
-        "boostCredits": "Lượt boost còn lại"
+        "feature": "Tính năng",
+        "status": "Trạng thái",
+        "startedOn": "Bắt đầu từ {date}",
+        "quota": "Hạn mức",
+        "unlimited": "Không giới hạn",
+        "empty": "Chưa có gói đăng ký đang hoạt động."
       }
     },
     "charts": {

@@ -10,7 +10,9 @@ import type {
   AgentPerformancePeriod,
   AgentPerformanceMetrics,
   AgentPerformanceMetricsResponse,
+  AgentPlanSnapshot,
   AgentPlanSnapshotResponse,
+  AgentPlanSubscriptionRow,
   AppointmentItem,
 } from '../model/agent-dashboard.types';
 
@@ -19,12 +21,7 @@ const DEFAULT_PLAN_SNAPSHOT: AgentPlanSnapshotResponse = {
   message: 'Plan snapshot is not integrated yet.',
   timestamp: new Date().toISOString(),
   data: {
-    planName: 'Agent',
-    renewsAt: new Date().toISOString(),
-    listingQuotaUsed: 0,
-    listingQuotaTotal: 0,
-    boostsUsed: 0,
-    boostsTotal: 0,
+    subscriptions: [],
   },
 };
 
@@ -110,6 +107,12 @@ function readBool(v: unknown): boolean {
   return typeof v === 'boolean' ? v : false;
 }
 
+function readNullableNum(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
 function mapCalendarDayRow(row: unknown): AgentAppointmentCalendarDay | null {
   if (!row || typeof row !== 'object') return null;
   const o = row as LooseRecord;
@@ -171,6 +174,49 @@ function normalizeAppointmentsSnapshot(snapshot: unknown): AgentAppointmentsSnap
   };
 }
 
+function mapPlanSubscriptionRow(row: unknown): AgentPlanSubscriptionRow | null {
+  if (!row || typeof row !== 'object') return null;
+  const o = row as LooseRecord;
+  const subscriptionId = readStr(o.subscription_id ?? o.subscriptionId);
+  const packageCode = readStr(o.package_code ?? o.packageCode);
+  const packageName = readStr(o.package_name ?? o.packageName);
+  const featureType = readStr(o.feature_type ?? o.featureType);
+  const startDate = readStr(o.start_date ?? o.startDate);
+  const status = readStr(o.status);
+  if (!subscriptionId || !featureType || !status) return null;
+
+  return {
+    subscription_id: subscriptionId,
+    package_code: packageCode,
+    package_name: packageName,
+    feature_type: featureType,
+    quota_limit: readNullableNum(o.quota_limit ?? o.quotaLimit),
+    remaining_quota: readNullableNum(o.remaining_quota ?? o.remainingQuota),
+    unlimited: readBool(o.unlimited),
+    tier_level: readNum(o.tier_level ?? o.tierLevel),
+    start_date: startDate,
+    end_date: readStr(o.end_date ?? o.endDate) || null,
+    status,
+  };
+}
+
+function normalizePlanSnapshot(rows: unknown): AgentPlanSnapshot {
+  const fallback = DEFAULT_PLAN_SNAPSHOT.data;
+  if (!Array.isArray(rows) || rows.length === 0) return fallback;
+
+  const subscriptions = rows
+    .map(mapPlanSubscriptionRow)
+    .filter((row): row is AgentPlanSubscriptionRow => row !== null)
+    .sort((a, b) => {
+      const aActive = a.status.toUpperCase() === 'ACTIVE' ? 0 : 1;
+      const bActive = b.status.toUpperCase() === 'ACTIVE' ? 0 : 1;
+      if (aActive !== bActive) return aActive - bActive;
+      return (a.package_name || '').localeCompare(b.package_name || '');
+    });
+
+  return { subscriptions };
+}
+
 async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
   const [listingSummary, propertySummary, appointmentSummary, crmSummary] = await Promise.all([
     safeGet('/listings/managed-listings/summary', DEFAULT_METRICS_PAYLOAD.listingSummary),
@@ -230,6 +276,14 @@ export const agentDashboardApi = {
     };
   },
   getPlanSnapshot: async (): Promise<AgentPlanSnapshotResponse> => {
-    return DEFAULT_PLAN_SNAPSHOT;
+    const rows = await safeGet<AgentPlanSubscriptionRow[]>('/billing/subscriptions/me', []);
+    const data = normalizePlanSnapshot(rows);
+
+    return {
+      success: true,
+      message: 'Agent plan snapshot fetched.',
+      timestamp: new Date().toISOString(),
+      data,
+    };
   },
 };

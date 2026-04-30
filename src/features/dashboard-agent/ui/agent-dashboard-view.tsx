@@ -202,6 +202,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
   const [selectedAppointmentDay, setSelectedAppointmentDay] = useState<Date | undefined>(new Date());
   const [visibleCalendarMonth, setVisibleCalendarMonth] = useState<Date>(new Date());
   const plan = planQuery.data?.data;
+  const subscriptions = plan?.subscriptions ?? [];
   const snapshotTimezone = appointmentSnapshot?.range.timezone || 'UTC';
 
   const calendarDayMap = useMemo(() => {
@@ -666,6 +667,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
           </CardContent>
         </Card>
 
+        {/* Plan Card */}
         <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
@@ -674,38 +676,58 @@ export function AgentDashboardView({ user }: { user?: User }) {
             </CardTitle>
             <CardDescription>{t('sections.plan.description')}</CardDescription>
           </CardHeader>
-          {plan && (
-            <CardContent className='space-y-4'>
-              <div className='rounded-xl border border-primary/20 bg-primary/5 p-3'>
-                <p className='text-sm font-medium text-foreground'>{plan.planName}</p>
-                <p className='text-xs text-muted-foreground'>
-                  {t('sections.plan.renewsOn', {
-                    date: new Date(plan.renewsAt).toLocaleDateString(locale),
-                  })}
-                </p>
+          <CardContent className='space-y-3'>
+            {subscriptions.length === 0 ? (
+              <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
+                {t('sections.plan.empty')}
               </div>
+            ) : (
+              subscriptions.map((subscription) => {
+                const quotaLimit = Number(subscription.quota_limit ?? 0);
+                const remainingQuota = Number(subscription.remaining_quota ?? 0);
+                const usedQuota = Math.max(0, quotaLimit - remainingQuota);
+                const hasFiniteQuota = !subscription.unlimited && quotaLimit > 0;
+                const startedDate = subscription.start_date
+                  ? new Date(subscription.start_date).toLocaleDateString(locale)
+                  : '-';
+                const quotaLabel = subscription.unlimited
+                  ? t('sections.plan.unlimited')
+                  : subscription.quota_limit === null || subscription.remaining_quota === null
+                    ? '-'
+                    : `${remainingQuota}/${quotaLimit}`;
 
-              <div className='space-y-2'>
-                <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                  <span>{t('sections.plan.listingQuota')}</span>
-                  <span>
-                    {plan.listingQuotaUsed}/{plan.listingQuotaTotal}
-                  </span>
-                </div>
-                <Progress value={deriveRatio(plan.listingQuotaUsed, plan.listingQuotaTotal)} />
-              </div>
+                return (
+                  <div
+                    key={subscription.subscription_id}
+                    className='space-y-3 rounded-xl border border-primary/20 bg-primary/5 p-3'
+                  >
+                    <div className='space-y-1'>
+                      <p className='text-sm font-medium text-foreground'>{subscription.package_name}</p>
+                      <div className='space-y-0.5 text-xs text-muted-foreground'>
+                        <p>
+                          {t('sections.plan.feature')}: {subscription.feature_type}
+                        </p>
+                        <p>
+                          {t('sections.plan.status')}: {subscription.status}
+                        </p>
+                        <p>
+                          {t('sections.plan.startedOn', { date: startedDate })}
+                        </p>
+                      </div>
+                    </div>
 
-              <div className='space-y-2'>
-                <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                  <span>{t('sections.plan.boostCredits')}</span>
-                  <span>
-                    {plan.boostsUsed}/{plan.boostsTotal}
-                  </span>
-                </div>
-                <Progress value={deriveRatio(plan.boostsUsed, plan.boostsTotal)} />
-              </div>
-            </CardContent>
-          )}
+                    <div className='space-y-2'>
+                      <div className='flex items-center justify-between text-xs text-muted-foreground'>
+                        <span>{t('sections.plan.quota')}</span>
+                        <span>{quotaLabel}</span>
+                      </div>
+                      {hasFiniteQuota && <Progress value={deriveRatio(usedQuota, quotaLimit)} />}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </CardContent>
         </Card>
       </section>
 

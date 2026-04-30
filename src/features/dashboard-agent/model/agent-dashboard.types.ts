@@ -90,12 +90,21 @@ export interface AgentAppointmentsSnapshot {
 }
 
 export interface AgentPlanSnapshot {
-  planName: string;
-  renewsAt: string;
-  listingQuotaUsed: number;
-  listingQuotaTotal: number;
-  boostsUsed: number;
-  boostsTotal: number;
+  subscriptions: AgentPlanSubscriptionRow[];
+}
+
+export interface AgentPlanSubscriptionRow {
+  subscription_id: string;
+  package_code: string;
+  package_name: string;
+  feature_type: string;
+  quota_limit?: number | null;
+  remaining_quota: number | null;
+  unlimited: boolean;
+  tier_level?: number;
+  start_date: string;
+  end_date?: string | null;
+  status: string;
 }
 
 export interface AgentDashboardMetrics {

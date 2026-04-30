@@ -879,9 +879,12 @@
       "plan": {
         "title": "Plan & Boosting",
         "description": "Usage snapshot for subscription and boosts.",
-        "renewsOn": "Renews on {date}",
-        "listingQuota": "Listing quota",
-        "boostCredits": "Boost credits"
+        "feature": "Feature",
+        "status": "Status",
+        "startedOn": "Started on {date}",
+        "quota": "Quota",
+        "unlimited": "Unlimited",
+        "empty": "No active subscriptions found."
       }
     },
     "charts": {
