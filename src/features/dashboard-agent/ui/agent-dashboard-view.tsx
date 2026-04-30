@@ -490,6 +490,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
               <div className='bg-muted/5 px-4 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5'>
                 <Calendar
                   mode='single'
+                  navLayout='around'
                   selected={selectedAppointmentDay}
                   onSelect={(day) => {
                     setSelectedAppointmentDay(day);
@@ -501,16 +502,17 @@ export function AgentDashboardView({ user }: { user?: User }) {
                   classNames={{
                     root: 'w-full p-0',
                     months: 'w-full',
-                    month: 'w-full gap-4',
-                    month_caption: 'mb-3',
-                    nav: 'top-1.5',
+                    month:
+                      'grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-4',
+                    month_caption:
+                      'col-start-2 row-start-1 flex w-full items-center justify-center self-center',
                     button_previous:
-                      'h-8 w-8 rounded-full border-0 bg-transparent text-foreground shadow-none hover:bg-muted/40',
+                      'col-start-1 row-start-1 justify-self-start h-8 w-8 rounded-full border-0 bg-transparent p-0 text-foreground shadow-none hover:bg-muted/40',
                     button_next:
-                      'h-8 w-8 rounded-full border-0 bg-transparent text-foreground shadow-none hover:bg-muted/40',
+                      'col-start-3 row-start-1 justify-self-end h-8 w-8 rounded-full border-0 bg-transparent p-0 text-foreground shadow-none hover:bg-muted/40',
                     caption_label: 'text-[32px] font-semibold tracking-tight',
                     table: 'w-full table-fixed border-separate border-spacing-y-2',
-                    month_grid: 'w-full',
+                    month_grid: 'col-span-3 row-start-2 w-full',
                     week: 'mt-0 flex w-full',
                     weekdays: 'mb-1 flex w-full',
                     weekday:
@@ -531,7 +533,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                           day={day}
                           className={cn(
                             className,
-                            'relative h-12 w-full min-w-0 rounded-xl border-0 bg-transparent pb-2 text-foreground transition-colors duration-150 hover:bg-muted/25 data-[selected-single=true]:bg-zinc-950 data-[selected-single=true]:text-white data-[selected-single=true]:shadow-none data-[selected-single=true]:[&_.dot-indicator]:bg-white/85 md:h-14'
+                            'relative h-12 w-full min-w-0 rounded-xl border-0 bg-transparent pb-2 text-foreground transition-colors duration-150 hover:bg-muted/25 data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:shadow-none data-[selected-single=true]:[&_.dot-indicator]:bg-primary-foreground/85 md:h-14'
                           )}
                           {...props}
                         >
@@ -541,10 +543,10 @@ export function AgentDashboardView({ user }: { user?: User }) {
                           {(isTourDay || isBlockDay) && (
                             <span className='pointer-events-none absolute inset-x-0 bottom-1.5 flex items-center justify-center gap-1'>
                               {isTourDay && (
-                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-zinc-900' />
+                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-foreground' />
                               )}
                               {isBlockDay && (
-                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-zinc-500' />
+                                <span className='dot-indicator h-1.5 w-1.5 rounded-full bg-muted-foreground' />
                               )}
                             </span>
                           )}
