@@ -12,6 +12,8 @@ import { useDashboardStats } from '../api';
 import { formatVND } from '@/shared/lib/utils';
 import { CurrentPlanSubscription } from './current-plan-subscription';
 
+import { useAuthSession } from '@/features/auth/model';
+
 function formatCompactCurrency(value?: number) {
   if (value === undefined) return '--';
   return formatVND(value);
@@ -26,6 +28,18 @@ function formatTrend(value?: number) {
 export function OwnerDashboard() {
   const t = useTranslations('OwnerDashboard');
   const { data: stats, isLoading } = useDashboardStats();
+  const { data: session } = useAuthSession();
+
+  const isOwner =
+    session?.user?.role === 'owner' || (session?.user?.backendRoles ?? []).includes('OWNER');
+
+  if (!isOwner) {
+    return (
+      <div className='flex h-full min-h-[50vh] items-center justify-center p-5 text-muted-foreground'>
+        current not working
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col gap-6 p-5 pb-10'>
