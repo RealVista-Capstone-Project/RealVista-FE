@@ -36,6 +36,7 @@ export interface FeaturedPropertyDTO {
   listing_id: string;
   name: string;
   type: string;
+  image_url?: string | null;
   sold: number;
   rented: number;
   views: number;

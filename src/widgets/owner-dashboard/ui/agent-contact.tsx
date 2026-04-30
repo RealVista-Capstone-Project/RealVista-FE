@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Phone, Mail, ChevronRight, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
@@ -24,7 +25,9 @@ export function AgentContact() {
     <div className='flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm'>
       <div className='flex items-center justify-between'>
         <h3 className='text-base font-semibold'>{t('title')}</h3>
-        <button className='text-xs font-medium text-primary hover:underline'>{t('viewAll')}</button>
+        <Link href='/dashboard/manage-agent' className='text-xs font-medium text-primary hover:underline'>
+          {t('viewAll')}
+        </Link>
       </div>
 
       <div className='flex flex-col divide-y divide-border'>

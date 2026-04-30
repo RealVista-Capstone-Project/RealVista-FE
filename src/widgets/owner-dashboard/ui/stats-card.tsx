@@ -12,9 +12,19 @@ interface StatsCardProps {
   icon: React.ReactNode;
   iconBg: string;
   isLoading?: boolean;
+  showTrend?: boolean;
 }
 
-export function StatsCard({ title, value, trend, isPositive, icon, iconBg, isLoading }: StatsCardProps) {
+export function StatsCard({
+  title,
+  value,
+  trend,
+  isPositive,
+  icon,
+  iconBg,
+  isLoading,
+  showTrend = true,
+}: StatsCardProps) {
   return (
     <div className='flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm'>
       <div className='flex items-center justify-between'>
@@ -29,21 +39,22 @@ export function StatsCard({ title, value, trend, isPositive, icon, iconBg, isLoa
         ) : (
           <p className='text-2xl font-bold tracking-tight'>{value}</p>
         )}
-        {isLoading ? (
-          <Skeleton className='h-5 w-12 rounded-full' />
-        ) : (
-          <div
-            className={cn(
-              'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
-              isPositive
-                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
-                : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400',
-            )}
-          >
-            {isPositive ? <TrendingUp className='h-3 w-3' /> : <TrendingDown className='h-3 w-3' />}
-            {trend}
-          </div>
-        )}
+        {showTrend &&
+          (isLoading ? (
+            <Skeleton className='h-5 w-12 rounded-full' />
+          ) : (
+            <div
+              className={cn(
+                'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
+                isPositive
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                  : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400',
+              )}
+            >
+              {isPositive ? <TrendingUp className='h-3 w-3' /> : <TrendingDown className='h-3 w-3' />}
+              {trend}
+            </div>
+          ))}
       </div>
     </div>
   );

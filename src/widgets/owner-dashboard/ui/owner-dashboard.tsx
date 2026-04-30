@@ -57,6 +57,7 @@ export function OwnerDashboard() {
           iconBg='bg-rose-100 dark:bg-rose-500/20'
           icon={<CheckCircle2 className='h-4 w-4 text-rose-600 dark:text-rose-400' />}
           isLoading={isLoading}
+          showTrend={false}
         />
       </div>
 

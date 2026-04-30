@@ -159,8 +159,18 @@ export function PerformanceChart() {
       {/* Featured Property */}
       <div className='mt-1 flex items-center justify-between rounded-xl bg-muted/40 px-4 py-3'>
         <div className='flex items-center gap-3'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-500/20'>
-            <span className='text-lg'>🏡</span>
+          <div className='h-10 w-10 overflow-hidden rounded-xl bg-indigo-100 dark:bg-indigo-500/20'>
+            {featured?.image_url ? (
+              <img
+                src={featured.image_url}
+                alt={featured?.name ?? t('featuredProperty')}
+                className='h-full w-full object-cover'
+              />
+            ) : (
+              <div className='flex h-full w-full items-center justify-center'>
+                <span className='text-lg'>🏡</span>
+              </div>
+            )}
           </div>
           <div>
             <p className='text-sm font-semibold'>{featured?.name ?? t('featuredProperty')}</p>
