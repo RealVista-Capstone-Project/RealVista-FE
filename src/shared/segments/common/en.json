@@ -14,6 +14,7 @@
       "proposals": "My Proposals",
       "appointments": "Appointments",
       "users": "User Management",
+      "locations": "Locations",
       "crm": "CRM",
       "packages": "Package Management"
     },
@@ -36,7 +37,8 @@
       "manageUsers": "User Management",
       "manageAgent": "Manage Agent",
       "crm": "CRM Board",
-      "managePackages": "Package Management"
+      "managePackages": "Package Management",
+      "locations": "Locations"
     },
     "actionButton": {
       "addProperty": "Add a property",
