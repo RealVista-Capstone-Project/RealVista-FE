@@ -23,10 +23,10 @@ export interface Report {
 }
 
 export const reportApi = {
-  getPaged: (params: { 
-    page: number; 
-    size: number; 
-    status?: string; 
+  getPaged: (params: {
+    page: number;
+    size: number;
+    status?: string;
     search?: string;
   }) => {
     const query = new URLSearchParams({
@@ -40,9 +40,9 @@ export const reportApi = {
 
   startReview: (id: string) => http.post<ApiResponse<void>>(`/admin/reports/${id}/review`, {}),
 
-  resolve: (id: string, note: string) => 
+  resolve: (id: string, note: string) =>
     http.post<ApiResponse<void>>(`/admin/reports/${id}/resolve`, { admin_note: note }),
 
-  dismiss: (id: string, note: string) => 
+  dismiss: (id: string, note: string) =>
     http.post<ApiResponse<void>>(`/admin/reports/${id}/dismiss`, { admin_note: note }),
 };

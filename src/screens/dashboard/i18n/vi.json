@@ -32,17 +32,6 @@
     "signInRequired": "Vui lòng đăng nhập để truy cập trang quản trị",
     "totalRevenue": "Tổng doanh thu",
     "revenueGrowth": "Tăng trưởng doanh thu",
-    "ManageTemplates": {
-      "description": "Quản lý mẫu thông báo email và ứng dụng trên toàn hệ thống.",
-      "createNew": "Tạo mẫu mới",
-      "stats": {
-        "total": "Tổng số mẫu",
-        "email": "Email",
-        "inApp": "Thông báo (Toast)",
-        "languages": "Ngôn ngữ"
-      },
-      "table": {}
-    },
     "listingDistribution": "Phân bổ bất động sản",
     "growth": "Tăng trưởng",
     "resolved": "Đã xử lý",
@@ -59,6 +48,42 @@
     "SOLD": "Đã bán",
     "NEW": "Mới",
     "SUCCESS": "Thành công",
-    "PENDING": "Chờ duyệt"
+    "PENDING": "Chờ duyệt",
+    "COMPLETED": "Hoàn thành",
+    "ACTIVE": "Hoạt động",
+    "VERIFIED": "Đã xác minh",
+    "SUSPENDED": "Đang tạm khóa",
+    "BANNED": "Đã bị cấm",
+    "REVIEWING": "Đang xem xét",
+    "RESOLVED": "Đã giải quyết",
+    "DISMISSED": "Đã bác bỏ",
+    "FAILED": "Thất bại",
+    "REFUNDED": "Đã hoàn tiền",
+    "cpuUsage": "Sử dụng CPU",
+
+
+    "memoryUsage": "Sử dụng RAM",
+    "diskSpace": "Dung lượng đĩa",
+    "uptime": "Thời gian hoạt động",
+    "moderationPerformance": "Hiệu suất kiểm duyệt",
+    "approvalRate": "Tỉ lệ phê duyệt",
+    "avgResolutionTime": "Th.gian xử lý TB (giờ)",
+    "moderatorEfficiency": "Hiệu suất kiểm duyệt viên",
+    "activeModerators": "Kiểm duyệt viên đang hoạt động",
+    "RENTED": "Đã cho thuê",
+    "EXPIRED": "Đã hết hạn"
+  },
+
+
+  "AdminDashboard": {
+    "totalActiveUsers": "Người dùng hoạt động",
+    "platformGrowth": "Tăng trưởng hệ thống",
+    "newestPendingListings": "BĐS chờ duyệt",
+    "awaitingModeration": "Đang chờ kiểm duyệt",
+    "topUrgentReports": "Báo cáo khẩn cấp",
+    "highPriority": "Ưu tiên cao",
+    "requiresImmediateResolution": "Cần xử lý ngay",
+    "totalRevenue": "Tổng doanh thu",
+    "revenueGrowth": "Tăng trưởng doanh thu"
   }
 }

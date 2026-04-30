@@ -89,7 +89,7 @@ export function MediaViewer({
   // Handle index synchronization when opening or switching tabs
   React.useEffect(() => {
     if (!open) return;
-    
+
     // Attempt to find the initial media if it exists
     if (initialMediaId) {
       const index = currentMediaItems.findIndex((m) => m.id === initialMediaId);
@@ -98,7 +98,7 @@ export function MediaViewer({
         return;
       }
     }
-    
+
     // Default to the first item
     setCurrentIndex(0);
   }, [activeTab, open, initialMediaId, currentMediaItems]);

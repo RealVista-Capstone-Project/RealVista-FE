@@ -48,6 +48,48 @@
     "SOLD": "Sold",
     "NEW": "New",
     "SUCCESS": "Success",
-    "PENDING": "Pending"
+    "PENDING": "Pending",
+    "COMPLETED": "Completed",
+    "ACTIVE": "Active",
+    "VERIFIED": "Verified",
+    "SUSPENDED": "Suspended",
+    "BANNED": "Banned",
+    "REVIEWING": "Reviewing",
+    "RESOLVED": "Resolved",
+    "DISMISSED": "Dismissed",
+    "FAILED": "Failed",
+    "REFUNDED": "Refunded",
+    "cpuUsage": "CPU Usage",
+
+
+    "memoryUsage": "Memory Usage",
+    "diskSpace": "Disk Space",
+    "uptime": "Uptime",
+    "moderationPerformance": "Moderation Performance",
+    "approvalRate": "Approval Rate",
+    "avgResolutionTime": "Avg. Resolution Time (h)",
+    "moderatorEfficiency": "Moderator Efficiency",
+    "activeModerators": "Active Moderators",
+    "RENTED": "Rented",
+    "EXPIRED": "Expired"
+  },
+
+
+  "AdminDashboard": {
+    "totalActiveUsers": "Active Users",
+    "platformGrowth": "Platform Growth",
+    "newestPendingListings": "Pending Listings",
+    "awaitingModeration": "Awaiting moderation",
+    "topUrgentReports": "Urgent Reports",
+    "highPriority": "High Priority",
+    "requiresImmediateResolution": "Requires immediate resolution",
+    "moderationPerformance": "Moderation Performance",
+    "approvalRate": "Approval Rate",
+    "avgResolutionTime": "Avg. Resolution Time (h)",
+    "moderatorEfficiency": "Moderator Efficiency",
+    "activeModerators": "Active Moderators",
+    "totalRevenue": "Total Revenue",
+
+    "revenueGrowth": "Revenue Growth"
   }
 }

@@ -12,16 +12,12 @@ import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
 import { TemplatePreview } from './template-preview';
 import Editor from '@monaco-editor/react';
-import { Monitor, Smartphone, Eye, FileText } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
-import { Separator } from '@/shared/ui/separator';
 
 // SRP Components
 import { EditorHeader } from './editor-header';
 import { ConfigSection } from './config-section';
-import { VariableLibrary } from './variable-library';
 
 interface TemplateEditorSheetProps {
   template: NotificationTemplate | null;
@@ -35,7 +31,6 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
   const editorRef = React.useRef<any>(null);
   const monacoRef = React.useRef<any>(null);
   const decorationsRef = React.useRef<any>(null);
-  const [previewDevice, setPreviewDevice] = React.useState<'desktop' | 'mobile'>('mobile');
   const [showUnsavedDialog, setShowUnsavedDialog] = React.useState(false);
 
   const [formData, setFormData] = React.useState<Partial<NotificationTemplate>>({
@@ -61,10 +56,6 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
       });
     }
   }, [template, open]);
-
-  React.useEffect(() => {
-    setPreviewDevice(formData.type === 'EMAIL' ? 'desktop' : 'mobile');
-  }, [formData.type]);
 
   const { data: schemaData } = useQuery({
     queryKey: ['admin', 'templates', 'schema', formData.template_key],
@@ -132,27 +123,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
     onOpenChange(openStatus);
   };
 
-  const handleInsertVariable = (variable: string) => {
-    if (editorRef.current) {
-      const editor = editorRef.current;
-      const selection = editor.getSelection();
-      const variableText = `\${${variable}}`;
-
-      editor.executeEdits('insert-variable', [
-        {
-          range: selection,
-          text: variableText,
-          forceMoveMarkers: true,
-        }
-      ]);
-      editor.focus();
-      const newContent = editor.getValue();
-      setFormData({ ...formData, content_body: newContent });
-      updateDecorations(newContent);
-    }
-  };
-
-  const handleSubmit = () => {
+  const handleSubmit = React.useCallback(() => {
     // 1. Extract variables from content using Regex
     const content = formData.content_body || '';
     const title = formData.title || '';
@@ -189,7 +160,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
     }
 
     mutation.mutate(formData);
-  };
+  }, [formData, mutation, schemaData, t]);
 
   // Keyboard Shortcuts for Power Users
   React.useEffect(() => {
@@ -205,7 +176,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, formData, schemaData]); // Rebind when dependencies change
+  }, [open, handleSubmit]); // Rebind when dependencies change
 
   // Monaco Variable Highlighting Logic
   const updateDecorations = React.useCallback((content: string) => {
@@ -276,7 +247,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
                 setFormData={setFormData}
                 isEdit={!!template}
               />
-              
+
               <div className='space-y-4'>
                 <Label htmlFor='title' className='text-sm font-bold text-slate-700 uppercase tracking-tight'>
                   {t('form.title')}
@@ -304,6 +275,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
                       height="450px"
                       language="html"
                       theme="light"
+                      onMount={handleEditorDidMount}
                       value={formData.content_body || ''}
                       onChange={handleContentChange}
                       options={{
@@ -338,7 +310,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
               <h3 className='font-black text-slate-400 text-[10px] uppercase tracking-[0.2em]'>
                  {t('form.livePreview')}
               </h3>
-              
+
               {formData.type === 'EMAIL' && (
                 <Button
                   variant="ghost"

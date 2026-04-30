@@ -7,13 +7,7 @@ import { toast } from 'sonner';
 import {
   Calendar,
   ExternalLink,
-  AlertTriangle,
-  UserX,
-  ClipboardList,
-  X,
-  Flag,
-  User,
-  Eye
+  Flag
 } from 'lucide-react';
 
 import {
@@ -176,7 +170,7 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
                   disabled={isResolved || isDismissed}
                   className='min-h-[100px] rounded-lg border-slate-200 bg-slate-50/30 focus-visible:bg-white text-sm p-3'
                 />
-                
+
                 {isPending && (
                   <Button
                     className='w-full h-10 rounded-lg bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all text-sm'

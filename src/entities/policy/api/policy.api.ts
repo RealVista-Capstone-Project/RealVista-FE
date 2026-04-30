@@ -14,16 +14,15 @@ export interface Policy {
 
 export const policyApi = {
   getAllPolicies: () => http.get<ApiResponse<Policy[]>>('/admin/policies'),
-  
+
   getPolicyById: (id: string) => http.get<ApiResponse<Policy>>(`/admin/policies/${id}`),
-  
+
   createPolicy: (data: Partial<Policy>) => http.post<ApiResponse<Policy>>('/admin/policies', data),
-  
+
   updatePolicy: (id: string, data: Partial<Policy>) => http.put<ApiResponse<Policy>>(`/admin/policies/${id}`, data),
-  
+
   deletePolicy: (id: string) => http.delete<ApiResponse<void>>(`/admin/policies/${id}`),
-  
-  activatePolicy: (id: string) => http.post<ApiResponse<void>>(`/admin/policies/${id}/activate`, {}),
-  
-  deactivatePolicy: (id: string) => http.post<ApiResponse<void>>(`/admin/policies/${id}/deactivate`, {}),
+
+  activatePolicy: (id: string) => http.post<ApiResponse<Policy>>(`/admin/policies/${id}/toggle-status`, {}),
+  deactivatePolicy: (id: string) => http.post<ApiResponse<Policy>>(`/admin/policies/${id}/toggle-status`, {}),
 };

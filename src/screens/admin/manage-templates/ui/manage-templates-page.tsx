@@ -10,32 +10,20 @@ import {
   Search,
   Plus,
   Mail,
-  MessageSquare,
   Bell,
-  CheckCircle2,
-  AlertCircle as AlertIcon,
-  LayoutGrid,
   ChevronRight,
   Database,
   Edit,
   Trash2,
-  Calendar,
-  Filter
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import { templateApi, NotificationTemplate } from '@/shared/api/template.api';
 import { DataTable } from '@/shared/ui/data-table';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/ui/dialog';
 import { useDebounce } from '@/shared/lib/hooks';
 import { cn } from '@/shared/lib/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
@@ -196,29 +184,29 @@ export function ManageTemplatesPage() {
 
       {/* Stats Cards */}
       <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8'>
-        <StatsCard 
-          label={t('stats.total')} 
-          value={templates.length} 
-          icon={FileText} 
-          color='blue' 
+        <StatsCard
+          label={t('stats.total')}
+          value={templates.length}
+          icon={FileText}
+          color='blue'
         />
-        <StatsCard 
-          label={t('stats.email')} 
-          value={emailTemplatesCount} 
-          icon={Mail} 
-          color='blue' 
+        <StatsCard
+          label={t('stats.email')}
+          value={emailTemplatesCount}
+          icon={Mail}
+          color='blue'
         />
-        <StatsCard 
-          label={t('stats.inApp')} 
-          value={inAppNotificationsCount} 
-          icon={Bell} 
-          color='purple' 
+        <StatsCard
+          label={t('stats.inApp')}
+          value={inAppNotificationsCount}
+          icon={Bell}
+          color='purple'
         />
-        <StatsCard 
-          label={t('stats.languages')} 
-          value={languagesCount} 
-          icon={Database} 
-          color='purple' 
+        <StatsCard
+          label={t('stats.languages')}
+          value={languagesCount}
+          icon={Database}
+          color='purple'
         />
       </div>
 

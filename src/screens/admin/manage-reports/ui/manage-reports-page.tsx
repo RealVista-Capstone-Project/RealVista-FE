@@ -114,7 +114,9 @@ export function ManageReportsPage() {
       accessorKey: 'status',
       header: t('table.columns.status'),
       cell: ({ row }: any) => {
-        const s = statusMap[row.original.status];
+        const status = row.original.status || 'PENDING';
+        const s = statusMap[status] || { label: status, color: 'bg-slate-50 text-slate-600 border-slate-100' };
+
         return (
           <Badge variant='outline' className={cn('font-bold text-[10px] px-2 py-0 h-5 rounded-md border shadow-none uppercase', s.color)}>
             {s.label}

@@ -3,12 +3,12 @@
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Users, 
-  Home, 
-  AlertOctagon, 
-  Activity, 
-  TrendingUp, 
+import {
+  Users,
+  Home,
+  AlertOctagon,
+  Activity,
+  TrendingUp,
   TrendingDown,
   LucideIcon
 } from 'lucide-react';
@@ -39,7 +39,7 @@ function StatCard({ title, value, icon: Icon, trend, description, delay = 0 }: S
       className='group relative bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-500 overflow-hidden'
     >
       <div className='absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors' />
-      
+
       <div className='relative flex flex-col gap-4'>
         <div className='flex items-center justify-between'>
           <div className='p-4 bg-slate-50 rounded-2xl group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-500'>
@@ -95,7 +95,7 @@ function StatsSkeleton() {
 
 export function DashboardStats() {
   const t = useTranslations('AdminDashboard');
-  
+
   const { data: overview, isLoading } = useQuery({
     queryKey: ['admin', 'overview'],
     queryFn: () => adminApi.getOverview(),

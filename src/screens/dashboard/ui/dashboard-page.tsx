@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminQueries } from '@/entities/admin/api';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { ShieldAlert, User as UserIcon, Clock, CheckCircle2, TrendingUp, AlertTriangle, Home, DollarSign } from 'lucide-react';
+import { ShieldAlert, User as UserIcon, Clock, CheckCircle2, TrendingUp, Home, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 import { formatCurrency } from '@/features/tenant-application/lib/utils';
 
@@ -49,6 +49,7 @@ export function DashboardPage() {
   }
 
   const recentActivities = stats?.recent_activities ?? [];
+  const topUrgentReports = stats?.top_urgent_reports ?? [];
   const userGrowth = stats?.user_growth ?? [];
   const listingStatus = stats?.listing_status ?? [];
   const revenueTrend = stats?.revenue_trend ?? [];
@@ -84,17 +85,17 @@ export function DashboardPage() {
           <div className='h-[300px] w-full'>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={userGrowth}>
-                <XAxis 
-                  dataKey="label" 
-                  stroke="#94a3b8" 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <XAxis
+                  dataKey="label"
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                   tickFormatter={formatChartDate}
                 />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(241, 245, 249, 0.5)' }} 
+                <Tooltip
+                  cursor={{ fill: 'rgba(241, 245, 249, 0.5)' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                   formatter={(value) => [value, t('userRegistrations')]}
                   labelFormatter={formatChartDate}
@@ -122,22 +123,24 @@ export function DashboardPage() {
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis 
-                  dataKey="label" 
-                  stroke="#94a3b8" 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <XAxis
+                  dataKey="label"
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                   tickFormatter={formatChartDate}
                 />
-                <YAxis 
-                  stroke="#94a3b8" 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                   tickFormatter={formatRevenueAxis}
+                  width={80}
                 />
-                <Tooltip 
+
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                   formatter={(value) => [formatCurrency(Number(value)), t('totalRevenue')]}
                   labelFormatter={formatChartDate}
@@ -177,7 +180,7 @@ export function DashboardPage() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                     formatter={(value, name) => [value, t(name as string)]}
                   />
@@ -237,19 +240,22 @@ export function DashboardPage() {
                   <div className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm dark:bg-slate-800 ${
                     activity.type === 'REPORT' ? 'border-rose-200 text-rose-600' :
                     activity.type === 'LISTING' ? 'border-amber-200 text-amber-600' :
-                    'border-slate-200 text-slate-600'
+                    activity.type === 'TRANSACTION' ? 'border-emerald-200 text-emerald-600' :
+                    'border-blue-200 text-blue-600'
                   }`}>
                     {activity.type === 'REPORT' ? <ShieldAlert className='h-4 w-4' /> :
                      activity.type === 'LISTING' ? <Home className='h-4 w-4' /> :
+                     activity.type === 'TRANSACTION' ? <DollarSign className='h-4 w-4' /> :
                      <UserIcon className='h-4 w-4' />}
                   </div>
+
                   <div className='h-full w-px bg-slate-100 dark:bg-slate-800 group-last:hidden' />
                 </div>
                 <div className='flex flex-col gap-1 pb-2'>
                   <p className='text-sm font-semibold text-slate-900 dark:text-slate-100'>
                     {activity.description
-                      .replace('New user registered:', 'Người dùng mới đăng ký:')
-                      .replace('Listing updated:', 'Tin đăng được cập nhật:')
+                      .replace('Người dùng mới đăng ký:', 'Người dùng mới đăng ký:')
+                      .replace('Tin đăng được cập nhật:', 'Tin đăng được cập nhật:')
                       .replace('New report:', 'Báo cáo mới:')
                     }
                   </p>
@@ -276,8 +282,9 @@ export function DashboardPage() {
       <div className='rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
         <h3 className='text-lg font-bold mb-6 flex items-center gap-2'>
           <ShieldAlert className='h-5 w-5 text-emerald-600' />
-          {t('systemHealth')}
+          {t('moderationPerformance')}
         </h3>
+
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
           {Object.entries(systemHealth).map(([key, value]) => (
             <div key={key} className='space-y-3'>
@@ -286,7 +293,7 @@ export function DashboardPage() {
                 <span className='font-bold text-slate-900 dark:text-slate-100'>{value as any}</span>
               </div>
               <div className='h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden'>
-                <motion.div 
+                <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(100, (Number(value) / 100) * 100)}%` }}
                   className='h-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
@@ -306,12 +313,10 @@ export function DashboardPage() {
           </h3>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
-           {recentActivities.filter((a: any) => a.type === 'REPORT' && a.status === 'PENDING').slice(0, 4).map((report: any) => (
+           {topUrgentReports.map((report: any) => (
               <div key={report.id} className='group rounded-xl border border-white bg-white/80 p-4 transition-all hover:border-rose-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900'>
                 <p className='text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2 mb-2'>
                   {report.description
-                    .replace('New user registered:', 'Người dùng mới đăng ký:')
-                    .replace('Listing updated:', 'Tin đăng được cập nhật:')
                     .replace('New report:', 'Báo cáo mới:')
                   }
                 </p>
@@ -319,8 +324,8 @@ export function DashboardPage() {
                   <span className='text-[10px] text-slate-500'>
                     {report.timestamp ? formatDistanceToNow(new Date(report.timestamp), { addSuffix: true, locale: vi }) : 'Vừa xong'}
                   </span>
-                  <Link 
-                    href={`/dashboard/admin/manage-reports?id=${report.target_id}`}
+                  <Link
+                    href={`/admin/manage-reports?id=${report.target_id}`}
                     className='text-[10px] font-bold text-rose-600 hover:underline'
                   >
                     {t('resolve')}
@@ -328,7 +333,7 @@ export function DashboardPage() {
                 </div>
               </div>
             ))}
-            {recentActivities.filter((a: any) => a.type === 'REPORT' && a.status === 'PENDING').length === 0 && (
+            {topUrgentReports.length === 0 && (
                <div className='col-span-4 py-8 text-center text-slate-500 italic'>
                   {t('noUrgentIssues')}
                </div>

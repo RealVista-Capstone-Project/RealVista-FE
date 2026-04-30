@@ -50,6 +50,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/crm/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/listing-detail/i18n/${locale}.json`)).default,
       // Screen segments
+      ...(await import(`@/screens/dashboard/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/property/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/property-3d-management/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/favorited/i18n/${locale}.json`)).default,
@@ -66,6 +67,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/screens/admin/manage-users/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/admin/manage-locations/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/admin/manage-packages/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/admin/manage-policy/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/admin/manage-reports/i18n/${locale}.json`)).default,
+      ...(await import(`@/screens/admin/manage-templates/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/delegate-agent/i18n/${locale}.json`)).default,
       ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
