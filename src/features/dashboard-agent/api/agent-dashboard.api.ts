@@ -113,6 +113,99 @@ function readNullableNum(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function normalizeListingSummary(payload: unknown): AgentDashboardMetrics['listingSummary'] {
+  const fallback = DEFAULT_METRICS_PAYLOAD.listingSummary;
+  if (!payload || typeof payload !== 'object') return fallback;
+  const o = payload as LooseRecord;
+  return {
+    all: readNum(o.all ?? o.total ?? fallback.all),
+    rent: readNum(o.rent ?? fallback.rent),
+    sale: readNum(o.sale ?? fallback.sale),
+  };
+}
+
+function normalizePropertySummary(payload: unknown): AgentDashboardMetrics['propertySummary'] {
+  const fallback = DEFAULT_METRICS_PAYLOAD.propertySummary;
+  if (!payload || typeof payload !== 'object') return fallback;
+  const o = payload as LooseRecord;
+  return {
+    totalProperties: readNum(o.totalProperties ?? o.total_properties ?? fallback.totalProperties),
+    availableProperties: readNum(
+      o.availableProperties ?? o.available_properties ?? fallback.availableProperties
+    ),
+    reservedProperties: readNum(o.reservedProperties ?? o.reserved_properties ?? fallback.reservedProperties),
+    soldProperties: readNum(o.soldProperties ?? o.sold_properties ?? fallback.soldProperties),
+    rentedProperties: readNum(o.rentedProperties ?? o.rented_properties ?? fallback.rentedProperties),
+    draftProperties: readNum(o.draftProperties ?? o.draft_properties ?? fallback.draftProperties),
+    pendingProperties: readNum(o.pendingProperties ?? o.pending_properties ?? fallback.pendingProperties),
+    verifiedProperties: readNum(
+      o.verifiedProperties ?? o.verified_properties ?? fallback.verifiedProperties
+    ),
+    rejectedProperties: readNum(
+      o.rejectedProperties ?? o.rejected_properties ?? fallback.rejectedProperties
+    ),
+  };
+}
+
+function normalizeAppointmentSummary(payload: unknown): AgentDashboardMetrics['appointmentSummary'] {
+  const fallback = DEFAULT_METRICS_PAYLOAD.appointmentSummary;
+  if (!payload || typeof payload !== 'object') return fallback;
+  const o = payload as LooseRecord;
+  return {
+    totalAppointments: readNum(o.totalAppointments ?? o.total_appointments ?? fallback.totalAppointments),
+    pendingAppointments: readNum(
+      o.pendingAppointments ?? o.pending_appointments ?? fallback.pendingAppointments
+    ),
+    acceptedAppointments: readNum(
+      o.acceptedAppointments ?? o.accepted_appointments ?? fallback.acceptedAppointments
+    ),
+    rejectedAppointments: readNum(
+      o.rejectedAppointments ?? o.rejected_appointments ?? fallback.rejectedAppointments
+    ),
+    canceledAppointments: readNum(
+      o.canceledAppointments ?? o.canceled_appointments ?? fallback.canceledAppointments
+    ),
+    completedAppointments: readNum(
+      o.completedAppointments ?? o.completed_appointments ?? fallback.completedAppointments
+    ),
+    upcomingAppointments: readNum(
+      o.upcomingAppointments ?? o.upcoming_appointments ?? fallback.upcomingAppointments
+    ),
+  };
+}
+
+function normalizeLeadSummary(payload: unknown): AgentDashboardMetrics['crmSummary'] {
+  const fallback = DEFAULT_METRICS_PAYLOAD.crmSummary;
+  if (!payload || typeof payload !== 'object') return fallback;
+  const o = payload as LooseRecord;
+  const rawBySource = o.bySource ?? o.by_source;
+  const bySource = Array.isArray(rawBySource)
+    ? rawBySource
+        .map((entry) => {
+          if (!entry || typeof entry !== 'object') return null;
+          const e = entry as LooseRecord;
+          const source = readStr(e.source);
+          if (!source) return null;
+          return {
+            source,
+            count: readNum(e.count),
+          };
+        })
+        .filter((entry): entry is AgentDashboardMetrics['crmSummary']['bySource'][number] => entry !== null)
+    : fallback.bySource;
+  return {
+    totalLeads: readNum(o.totalLeads ?? o.total_leads ?? fallback.totalLeads),
+    closedLeads: readNum(o.closedLeads ?? o.closed_leads ?? fallback.closedLeads),
+    previousTotalLeads: readNum(
+      o.previousTotalLeads ?? o.previous_total_leads ?? fallback.previousTotalLeads
+    ),
+    previousClosedLeads: readNum(
+      o.previousClosedLeads ?? o.previous_closed_leads ?? fallback.previousClosedLeads
+    ),
+    bySource,
+  };
+}
+
 function mapCalendarDayRow(row: unknown): AgentAppointmentCalendarDay | null {
   if (!row || typeof row !== 'object') return null;
   const o = row as LooseRecord;
@@ -226,10 +319,10 @@ async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
   ]);
 
   return {
-    listingSummary,
-    propertySummary,
-    appointmentSummary,
-    crmSummary,
+    listingSummary: normalizeListingSummary(listingSummary),
+    propertySummary: normalizePropertySummary(propertySummary),
+    appointmentSummary: normalizeAppointmentSummary(appointmentSummary),
+    crmSummary: normalizeLeadSummary(crmSummary),
   };
 }
 
