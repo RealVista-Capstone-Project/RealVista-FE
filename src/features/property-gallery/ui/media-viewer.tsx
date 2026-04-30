@@ -88,6 +88,12 @@ export function MediaViewer({
 
   // Handle index synchronization when opening or switching tabs
   React.useEffect(() => {
+    if (open) {
+      setActiveTab(defaultTab);
+    }
+  }, [open, defaultTab]);
+
+  React.useEffect(() => {
     if (!open) return;
 
     // Attempt to find the initial media if it exists
