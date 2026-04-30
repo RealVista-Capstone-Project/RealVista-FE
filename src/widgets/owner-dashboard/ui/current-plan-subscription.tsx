@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Infinity,
 } from 'lucide-react';
+import { Link } from '@/shared/config/i18n/navigation';
 import { billingQueries } from '@/entities/billing';
 import type { ActiveSubscriptionResponse } from '@/entities/billing';
 import { Progress } from '@/shared/ui/progress';
@@ -226,10 +227,10 @@ export function CurrentPlanSubscription() {
         </div>
 
         {activePlans.length > 0 && (
-          <button className='flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground'>
+          <Link href='/subscribe' className='flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground'>
             {t('currentPlan.viewAll')}
             <ArrowRight className='h-3 w-3' />
-          </button>
+          </Link>
         )}
       </div>
 

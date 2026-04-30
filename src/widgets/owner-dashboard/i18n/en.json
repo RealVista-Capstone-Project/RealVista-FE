@@ -9,9 +9,10 @@
     },
     "stats": {
       "activeLeads": "Active Leads",
-      "totalRevenue": "Total Revenue",
+      "totalViews": "Total Views",
       "activeListing": "Active Listing",
-      "totalClosed": "Total Closed"
+      "conversionRate": "Conversion Rate",
+      "totalClosed": "Successful Deals"
     },
     "pipeline": {
       "title": "Deal Pipeline",

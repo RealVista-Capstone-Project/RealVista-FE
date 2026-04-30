@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { DollarSign, Building2, CheckCircle2 } from 'lucide-react';
+import { Eye, Building2, TrendingUp } from 'lucide-react';
 import { StatsCard } from './stats-card';
 import { PerformanceChart } from './performance-chart';
 import { AgentContact } from './agent-contact';
@@ -9,14 +9,13 @@ import { SalesAnalytics } from './sales-analytics';
 import { ScheduleCalendar } from './schedule-calendar';
 import { ListingTable } from './listing-table';
 import { useDashboardStats } from '../api';
-import { formatVND } from '@/shared/lib/utils';
 import { CurrentPlanSubscription } from './current-plan-subscription';
 
 import { useAuthSession } from '@/features/auth/model';
 
-function formatCompactCurrency(value?: number) {
+function formatViews(value?: number) {
   if (value === undefined) return '--';
-  return formatVND(value);
+  return value.toLocaleString();
 }
 
 function formatTrend(value?: number) {
@@ -46,12 +45,12 @@ export function OwnerDashboard() {
       {/* ── Stats Row ── */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <StatsCard
-          title={t('stats.totalRevenue')}
-          value={formatCompactCurrency(stats?.total_revenue)}
-          trend={formatTrend(stats?.total_revenue_trend)}
-          isPositive={(stats?.total_revenue_trend ?? 0) >= 0}
+          title={t('stats.totalViews')}
+          value={formatViews(stats?.total_views)}
+          trend={formatTrend(stats?.total_views_trend)}
+          isPositive={(stats?.total_views_trend ?? 0) >= 0}
           iconBg='bg-emerald-100 dark:bg-emerald-500/20'
-          icon={<DollarSign className='h-4 w-4 text-emerald-600 dark:text-emerald-400' />}
+          icon={<Eye className='h-4 w-4 text-emerald-600 dark:text-emerald-400' />}
           isLoading={isLoading}
         />
         <StatsCard
@@ -65,11 +64,11 @@ export function OwnerDashboard() {
         />
         <StatsCard
           title={t('stats.totalClosed')}
-          value={stats?.total_closed?.toLocaleString() ?? '--'}
+          value={formatViews(stats?.total_closed)}
           trend={formatTrend(stats?.total_closed_trend)}
           isPositive={(stats?.total_closed_trend ?? 0) >= 0}
           iconBg='bg-rose-100 dark:bg-rose-500/20'
-          icon={<CheckCircle2 className='h-4 w-4 text-rose-600 dark:text-rose-400' />}
+          icon={<TrendingUp className='h-4 w-4 text-rose-600 dark:text-rose-400' />}
           isLoading={isLoading}
           showTrend={false}
         />

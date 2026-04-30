@@ -55,9 +55,9 @@ export function SalesAnalytics() {
       </div>
 
       {/* Chart + Legend */}
-      <div className='flex items-center gap-5'>
+      <div className='items-center gap-5'>
         {/* Donut */}
-        <div className='relative h-28 w-28 shrink-0'>
+        <div className='relative h-28 w-28 shrink-0 mx-auto'>
           <ResponsiveContainer width='100%' height='100%'>
             <PieChart>
               <Pie

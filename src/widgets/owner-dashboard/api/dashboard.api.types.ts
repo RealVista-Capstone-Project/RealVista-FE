@@ -6,8 +6,8 @@ export type DashboardApiResponse<T> = {
 };
 
 export interface DashboardStatsResponse {
-  total_revenue: number;
-  total_revenue_trend: number;
+  total_views: number;
+  total_views_trend: number;
   active_listing: number;
   active_listing_trend: number;
   total_closed: number;

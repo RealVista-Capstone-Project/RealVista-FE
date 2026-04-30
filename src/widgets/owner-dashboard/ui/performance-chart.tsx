@@ -58,7 +58,7 @@ export function PerformanceChart() {
   const chartData = performance?.data ?? [];
 
   const metrics: { key: PerformanceMetric; label: string }[] = [
-    { key: 'revenue', label: t('revenue') },
+    // { key: 'revenue', label: t('revenue') },
     { key: 'visit', label: t('visit') },
   ];
 
