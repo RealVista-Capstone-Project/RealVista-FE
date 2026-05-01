@@ -13,6 +13,7 @@ import {
   type ChartConfig,
 } from '@/shared/ui/chart';
 import { Progress } from '@/shared/ui/progress';
+import { Skeleton } from '@/shared/ui/skeleton';
 import type {
   AgentAppointmentTabFilter,
   AppointmentItem,
@@ -32,9 +33,30 @@ import {
   Zap,
 } from 'lucide-react';
 import type { User } from 'next-auth';
+import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
-import { Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from 'recharts';
+import { Pie, PieChart } from 'recharts';
+
+const AgentDashboardPerformanceChart = dynamic(
+  () =>
+    import('./agent-dashboard-performance-chart').then((m) => ({
+      default: m.AgentDashboardPerformanceChart,
+    })),
+  {
+    loading: () => (
+      <Card className='xl:col-span-2'>
+        <CardHeader>
+          <Skeleton className='h-6 w-48 max-w-full' />
+          <Skeleton className='mt-2 h-4 w-full max-w-lg' />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className='h-52 w-full' />
+        </CardContent>
+      </Card>
+    ),
+  },
+);
 
 /** Order matches CRM so legend and slice semantics stay consistent. */
 const LEAD_SOURCE_ORDER = ['manual', 'chat', 'tour'] as const;
@@ -116,11 +138,6 @@ export function AgentDashboardView({ user }: { user?: User }) {
   const appointmentsQuery = useAgentAppointmentsSnapshot();
   const planQuery = useAgentPlanSnapshot();
   const name = user?.name || user?.email?.split('@')[0] || 'Agent';
-
-  const performanceChartConfig = {
-    views: { label: t('charts.views'), color: 'var(--chart-1)' },
-    inquiries: { label: t('charts.inquiries'), color: 'var(--chart-2)' },
-  } as const;
 
   const channelChartConfig = {
     manual: { label: t('charts.source.manual'), color: 'var(--primary)' },
@@ -369,54 +386,11 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
       {/* Performance Chart */}
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
-        {/* Performance Chart Card */}
-        <Card className='xl:col-span-2'>
-          <CardHeader>
-            <div className='flex flex-wrap items-center justify-between gap-3'>
-              <CardTitle>{t('sections.performance.title')}</CardTitle>
-              <div className='inline-flex rounded-lg border border-border/70 p-1'>
-                {(['W', 'M', 'Y'] as const).map((period) => (
-                  <Button
-                    key={period}
-                    size='sm'
-                    variant={selectedPeriod === period ? 'default' : 'ghost'}
-                    className='h-7 px-2 text-xs'
-                    onClick={() => setSelectedPeriod(period)}
-                  >
-                    {period}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <CardDescription>{t('sections.performance.description')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer className='h-[280px] w-full' config={performanceChartConfig}>
-              <AreaChart data={trendData} margin={{ left: 4, right: 12 }}>
-                <CartesianGrid vertical={false} strokeDasharray='3 3' />
-                <XAxis dataKey='month' tickLine={false} axisLine={false} />
-                <YAxis tickLine={false} axisLine={false} width={36} />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator='line' />} />
-                <Area
-                  type='monotone'
-                  dataKey='views'
-                  stroke='var(--color-views)'
-                  fill='var(--color-views)'
-                  fillOpacity={0.15}
-                  strokeWidth={2}
-                />
-                <Area
-                  type='monotone'
-                  dataKey='inquiries'
-                  stroke='var(--color-inquiries)'
-                  fill='var(--color-inquiries)'
-                  fillOpacity={0.18}
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <AgentDashboardPerformanceChart
+          trendData={trendData}
+          selectedPeriod={selectedPeriod}
+          onPeriodChange={setSelectedPeriod}
+        />
 
         {/* Lead Channels Chart Card */}
         <Card>
