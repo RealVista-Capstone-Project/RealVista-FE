@@ -37,6 +37,7 @@ export const reportApi = {
     }).toString();
     return http.get<ApiResponse<PagedResponse<Report>>>(`/admin/reports?${query}`);
   },
+  getById: (id: string) => http.get<ApiResponse<Report>>(`/admin/reports/${id}`),
 
   startReview: (id: string) => http.post<ApiResponse<void>>(`/admin/reports/${id}/review`, {}),
 

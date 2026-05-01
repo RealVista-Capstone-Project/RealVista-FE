@@ -45,6 +45,7 @@ export interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarItems?: SidebarMenuItem[];
   className?: string;
+  pageTitle?: string;
 }
 
 type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
@@ -246,6 +247,7 @@ export function DashboardLayout({
   children,
   sidebarItems,
   className,
+  pageTitle: overridePageTitle,
 }: DashboardLayoutProps) {
   const { data: session } = useAuthSession();
   const backendRoles: string[] = React.useMemo(() => session?.user?.backendRoles ?? [], [session?.user?.backendRoles]);
@@ -278,6 +280,8 @@ export function DashboardLayout({
 
 
   const pageTitle = React.useMemo(() => {
+    if (overridePageTitle) return overridePageTitle;
+
     if (
       pathname === ROUTES.dashboard.managedListings ||
       pathname.startsWith(ROUTES.dashboard.managedListings)
@@ -368,7 +372,7 @@ export function DashboardLayout({
       return t('pageTitle.crm');
     }
     return t('pageTitle.default');
-  }, [pathname, t]);
+  }, [pathname, t, overridePageTitle]);
 
   const isItemActive = (href: string) => {
     if (pathname === href) return true;

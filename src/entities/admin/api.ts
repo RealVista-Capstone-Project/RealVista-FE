@@ -7,25 +7,36 @@ export interface AdminOverview {
   pending_listings: number;
   unresolved_reports: number;
   total_listings: number;
+  total_boosts: number;
+  listings_created_today: number;
 }
 
 
 export interface AdminStats {
   user_growth: { label: string; value: number }[];
   listing_status: { label: string; value: number }[];
-  revenue_trend: { label: string; value: number }[];
-  top_agents: { label: string; value: number }[];
+  revenue_trend: { label: string; value: number; extra?: Record<string, number> }[];
+  top_listings: {
+    id: string;
+    title: string;
+    thumbnail_url?: string;
+    views: number;
+    interactions: number;
+    revenue: number;
+    trend: string;
+  }[];
+  package_insights: { id: string; label: string; value: number; extra?: Record<string, number> }[];
+  top_agents: {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string;
+    listing_count: number;
+    revenue_generated: number;
+  }[];
   recent_activities: {
     id: string;
     type: 'USER' | 'LISTING' | 'REPORT' | 'TRANSACTION';
-    description: string;
-    status: string;
-    timestamp: string;
-    target_id: string;
-  }[];
-  top_urgent_reports: {
-    id: string;
-    type: 'REPORT';
     description: string;
     status: string;
     timestamp: string;
@@ -35,17 +46,31 @@ export interface AdminStats {
 }
 
 export const adminApi = {
-  getOverview: () => http.get<ApiResponse<AdminOverview>>('/admin/overview').then((res) => res.payload.data),
-  getStats: () => http.get<ApiResponse<AdminStats>>('/admin/stats').then((res) => res.payload.data),
+  getOverview: (startDate?: string, endDate?: string) => {
+    let url = '/admin/overview';
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    if (params.toString()) url += `?${params.toString()}`;
+    return http.get<ApiResponse<AdminOverview>>(url).then((res) => res.payload.data);
+  },
+  getStats: (startDate?: string, endDate?: string) => {
+    let url = '/admin/stats';
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    if (params.toString()) url += `?${params.toString()}`;
+    return http.get<ApiResponse<AdminStats>>(url).then((res) => res.payload.data);
+  },
 };
 
 export const adminQueries = {
-  overview: () => ({
-    queryKey: ['admin', 'overview'],
-    queryFn: () => adminApi.getOverview(),
+  overview: (startDate?: string, endDate?: string) => ({
+    queryKey: ['admin', 'overview', startDate, endDate],
+    queryFn: () => adminApi.getOverview(startDate, endDate),
   }),
-  stats: () => ({
-    queryKey: ['admin', 'stats'],
-    queryFn: () => adminApi.getStats(),
+  stats: (startDate?: string, endDate?: string) => ({
+    queryKey: ['admin', 'stats', startDate, endDate],
+    queryFn: () => adminApi.getStats(startDate, endDate),
   }),
 };

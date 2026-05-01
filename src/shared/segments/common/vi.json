@@ -16,7 +16,7 @@
       "users": "Quản lý người dùng",
       "policies": "Quản lý chính sách",
       "reports": "Quản lý báo cáo",
-      "templates": "Quản lý template",
+      "templates": "Quản lý mẫu thông báo",
       "locations": "Quản lý địa điểm",
       "crm": "CRM",
       "packages": "Quản lý gói dịch vụ"
@@ -40,11 +40,16 @@
       "manageUsers": "Quản lý người dùng",
       "managePolicies": "Quản lý chính sách",
       "manageReports": "Quản lý báo cáo",
-      "manageTemplates": "Quản lý template",
+      "manageTemplates": "Quản lý mẫu thông báo",
       "manageAgent": "Quản lý môi giới",
       "crm": "Quản lý khách hàng",
       "managePackages": "Quản lý gói dịch vụ",
-      "locations": "Quản lý địa điểm"
+      "locations": "Quản lý địa điểm",
+      "reports": "Quản lý báo cáo",
+      "policies": "Quản lý chính sách",
+      "templates": "Quản lý mẫu thông báo",
+      "listings": "Quản lý bài đăng",
+      "property": "Quản lý bất động sản"
     },
     "actionButton": {
       "addProperty": "Thêm bất động sản",

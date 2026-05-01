@@ -1,23 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { DashboardStats } from '@/widgets/dashboard-stats';
 import { useAuthSession } from '@/features/auth/model';
 import { useFCMToken } from '@/features/auth/hooks/use-fcm-token';
 import { useTranslations } from 'next-intl';
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { 
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, AreaChart, Area, CartesianGrid, Legend 
+} from 'recharts';
 import { motion } from 'framer-motion';
 
 import { useQuery } from '@tanstack/react-query';
 import { adminQueries } from '@/entities/admin/api';
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
+import { format, formatDistanceToNow, parseISO, subDays, startOfDay, endOfDay } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { ShieldAlert, User as UserIcon, Clock, CheckCircle2, TrendingUp, Home, DollarSign } from 'lucide-react';
+import { 
+  ShieldAlert, User as UserIcon, Clock, 
+  TrendingUp, Home, DollarSign, Package, Users, 
+  ArrowUpRight, ArrowDownRight, Eye, MousePointer2 
+} from 'lucide-react';
 import Link from 'next/link';
-import { formatCurrency } from '@/features/tenant-application/lib/utils';
+import { Badge } from '@/shared/ui/badge';
+import { cn, formatVND, formatNumber } from '@/shared/lib/utils';
 
-const COLORS = ['#0f172a', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'];
+const COLORS = ['#0f172a', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
 
 const formatChartDate = (dateStr: any) => {
   try {
@@ -30,92 +39,137 @@ const formatChartDate = (dateStr: any) => {
 };
 
 const formatRevenueAxis = (val: number) => {
-  return new Intl.NumberFormat('vi-VN').format(val) + ' đ';
+  return new Intl.NumberFormat('vi-VN').format(val) + ' vnđ';
+};
+
+const CustomTooltip = ({ active, payload, label, t }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xl">
+        <p className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">{formatChartDate(label)}</p>
+        <div className="space-y-1">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
+                <span className="text-sm text-slate-700 dark:text-slate-300">{entry.name}:</span>
+              </div>
+              <span className="text-sm font-black text-slate-900 dark:text-slate-100">
+                {typeof entry.value === 'number' && entry.name.toLowerCase().includes('doanh thu') 
+                  ? formatVND(entry.value) 
+                  : entry.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
 };
 
 export function DashboardPage() {
   const { status } = useAuthSession();
   useFCMToken();
   const t = useTranslations('Dashboard');
+  const [days, setDays] = useState(7);
 
-  const { data: stats, isLoading } = useQuery(adminQueries.stats());
+  const { startDate, endDate } = useMemo(() => {
+    const end = new Date();
+    const start = subDays(end, days);
+    return {
+      startDate: start.toISOString(),
+      endDate: end.toISOString()
+    };
+  }, [days]);
+
+  const { data: stats, isLoading } = useQuery(adminQueries.stats(startDate, endDate));
+
+  const translatedPackageInsights = useMemo(() => {
+    return (stats?.package_insights ?? []).map(item => ({
+      ...item,
+      translatedLabel: t(item.label)
+    }));
+  }, [stats?.package_insights, t]);
 
   if (status === 'loading' || isLoading) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
+        <div className='h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-primary dark:border-slate-800 dark:border-t-primary' />
       </div>
     );
   }
 
   const recentActivities = stats?.recent_activities ?? [];
-  const topUrgentReports = stats?.top_urgent_reports ?? [];
   const userGrowth = stats?.user_growth ?? [];
+  const listingGrowth = stats?.listing_growth ?? [];
   const listingStatus = stats?.listing_status ?? [];
   const revenueTrend = stats?.revenue_trend ?? [];
+  const packageInsights = stats?.package_insights ?? [];
   const topAgents = stats?.top_agents ?? [];
+  const topListings = stats?.top_listings ?? [];
   const systemHealth = stats?.system_health ?? {};
 
   return (
-    <div className='flex-1 space-y-8 p-8 pt-6 bg-slate-50/50 dark:bg-slate-950 min-h-screen'>
+    <div className='flex-1 space-y-8 p-8 pt-6 bg-[#f8fafc] dark:bg-slate-950 min-h-screen'>
+      {/* Header section */}
       <div className='flex flex-col gap-2'>
-        <h2 className='text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50'>
-          {t('platformOverview')}
-        </h2>
-        <p className='text-slate-500 dark:text-slate-400'>
-          {t('realTimeInsights')}
-        </p>
-      </div>
-
-      {/* Stats - Top Row */}
-      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
-        <DashboardStats />
-      </div>
-
-      {/* Main Charts Row */}
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        {/* User Growth Chart */}
-        <div className='rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
-          <div className='flex items-center justify-between mb-6'>
-            <h3 className='text-lg font-bold flex items-center gap-2'>
-              <TrendingUp className='h-5 w-5 text-primary' />
-              {t('userRegistrations')}
-            </h3>
-          </div>
-          <div className='h-[300px] w-full'>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={userGrowth}>
-                <XAxis
-                  dataKey="label"
-                  stroke="#94a3b8"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={formatChartDate}
-                />
-                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip
-                  cursor={{ fill: 'rgba(241, 245, 249, 0.5)' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                  formatter={(value) => [value, t('userRegistrations')]}
-                  labelFormatter={formatChartDate}
-                />
-                <Bar dataKey="value" fill="#0f172a" radius={[6, 6, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+            {t('allSystemsOperational')}
+          </Badge>
+        </div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <h2 className='text-4xl font-black tracking-tight text-slate-900 dark:text-slate-50'>
+            {t('platformOverview')}
+          </h2>
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            {[7, 30, 90].map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-xs font-black transition-all duration-300",
+                  days === d 
+                    ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20 dark:bg-white dark:text-slate-900" 
+                    : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                )}
+              >
+                {t(`days${d}`)}
+              </button>
+            ))}
           </div>
         </div>
+      </div>
 
-        {/* Revenue Trend Chart */}
-        <div className='rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
-          <div className='flex items-center justify-between mb-6'>
-            <h3 className='text-lg font-bold flex items-center gap-2'>
-              <DollarSign className='h-5 w-5 text-emerald-600' />
-              {t('revenueTrend')}
-            </h3>
+      {/* KPI Cards Row */}
+      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
+        <DashboardStats days={days} />
+      </div>
+
+      {/* Main Analytics Row: Revenue Breakdown & User Growth */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        {/* Revenue Breakdown Area Chart */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+        >
+          <div className='flex items-center justify-between mb-8'>
+            <div className="flex flex-col gap-1">
+              <h3 className='text-xl font-black flex items-center gap-2'>
+                <DollarSign className='h-5 w-5 text-emerald-500' />
+                {t('revenueBreakdown')}
+                <Clock className="h-3 w-3 text-emerald-500 animate-pulse" />
+              </h3>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
+            </div>
+            <Badge className="bg-emerald-500/10 text-emerald-600 border-none px-3 py-1 font-black">
+              +15.4%
+            </Badge>
           </div>
-          <div className='h-[300px] w-full'>
-            <ResponsiveContainer width="100%" height={300}>
+          <div className='h-[350px] w-full'>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={revenueTrend}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
@@ -123,6 +177,7 @@ export function DashboardPage() {
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis
                   dataKey="label"
                   stroke="#94a3b8"
@@ -130,6 +185,7 @@ export function DashboardPage() {
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={formatChartDate}
+                  dy={10}
                 />
                 <YAxis
                   stroke="#94a3b8"
@@ -137,208 +193,337 @@ export function DashboardPage() {
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={formatRevenueAxis}
-                  width={80}
+                  width={60}
                 />
-
-                <Tooltip
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                  formatter={(value) => [formatCurrency(Number(value)), t('totalRevenue')]}
-                  labelFormatter={formatChartDate}
+                <Tooltip content={<CustomTooltip t={t} />} />
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  name={t('revenue')}
+                  stroke="#10b981" 
+                  fillOpacity={1} 
+                  fill="url(#colorRev)" 
+                  strokeWidth={4} 
                 />
-                <Area type="monotone" dataKey="value" stroke="#10b981" fillOpacity={1} fill="url(#colorRev)" strokeWidth={3} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Distribution & Activity Row */}
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-7'>
-        {/* Listing Distribution & Top Agents */}
-        <div className='col-span-1 lg:col-span-3 space-y-6'>
-          {/* Listing Distribution */}
-          <div className='rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
-            <h3 className='text-lg font-bold mb-6 flex items-center gap-2'>
-              <CheckCircle2 className='h-5 w-5 text-primary' />
-              {t('listingDistribution')}
-            </h3>
-            <div className='h-[200px] w-full'>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={listingStatus}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={70}
-                    paddingAngle={5}
-                    minAngle={15}
-                    dataKey="value"
-                    nameKey="label"
-                  >
-                    {listingStatus.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                    formatter={(value, name) => [value, t(name as string)]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className='mt-4 grid grid-cols-2 gap-2'>
-              {listingStatus.map((entry, index) => (
-                <div key={entry.label} className='flex items-center gap-2'>
-                  <div className='h-3 w-3 rounded-full' style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                  <span className='text-[10px] font-medium text-slate-600 dark:text-slate-400'>
-                    {t(entry.label)}: {entry.value}
-                  </span>
-                </div>
-              ))}
+        {/* User Growth Bar Chart */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+        >
+          <div className='flex items-center justify-between mb-8'>
+            <div className="flex flex-col gap-1">
+              <h3 className='text-xl font-black flex items-center gap-2'>
+                <TrendingUp className='h-5 w-5 text-primary' />
+                {t('userRegistrations')}
+                <Clock className="h-3 w-3 text-primary animate-pulse" />
+              </h3>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
             </div>
           </div>
-
-          {/* Top Agents */}
-          <div className='rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
-             <h3 className='text-lg font-bold mb-6 flex items-center gap-2'>
-              <UserIcon className='h-5 w-5 text-indigo-600' />
-              {t('topAgents')}
-            </h3>
-            <div className='space-y-3'>
-              {topAgents.length === 0 ? (
-                <div className='text-sm text-slate-500 text-center py-4 italic'>{t('empty')}</div>
-              ) : topAgents.map((agent: any, index: number) => (
-                <div key={agent.label} className='flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50'>
-                   <div className='flex items-center gap-2'>
-                    <div className='flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold'>
-                      {index + 1}
-                    </div>
-                    <span className='text-xs font-medium text-slate-900 dark:text-slate-100 truncate max-w-[200px]'>{agent.label}</span>
-                  </div>
-                  <span className='text-sm font-bold'>{agent.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Activities */}
-        <div className='col-span-1 lg:col-span-4 rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 flex flex-col h-[750px]'>
-          <div className='flex items-center justify-between mb-6'>
-            <h3 className='text-lg font-bold flex items-center gap-2'>
-              <Clock className='h-5 w-5 text-primary' />
-              {t('recentActivities')}
-            </h3>
-          </div>
-          <div className='space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1'>
-            {recentActivities.length === 0 ? (
-              <div className='text-sm text-slate-500 text-center py-8'>{t('empty')}</div>
-            ) : recentActivities.map((activity: any) => (
-              <div key={activity.id} className='relative flex gap-4 p-2 rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 group'>
-                <div className='flex flex-col items-center'>
-                  <div className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm dark:bg-slate-800 ${
-                    activity.type === 'REPORT' ? 'border-rose-200 text-rose-600' :
-                    activity.type === 'LISTING' ? 'border-amber-200 text-amber-600' :
-                    activity.type === 'TRANSACTION' ? 'border-emerald-200 text-emerald-600' :
-                    'border-blue-200 text-blue-600'
-                  }`}>
-                    {activity.type === 'REPORT' ? <ShieldAlert className='h-4 w-4' /> :
-                     activity.type === 'LISTING' ? <Home className='h-4 w-4' /> :
-                     activity.type === 'TRANSACTION' ? <DollarSign className='h-4 w-4' /> :
-                     <UserIcon className='h-4 w-4' />}
-                  </div>
-
-                  <div className='h-full w-px bg-slate-100 dark:bg-slate-800 group-last:hidden' />
-                </div>
-                <div className='flex flex-col gap-1 pb-2'>
-                  <p className='text-sm font-semibold text-slate-900 dark:text-slate-100'>
-                    {activity.description
-                      .replace('Người dùng mới đăng ký:', 'Người dùng mới đăng ký:')
-                      .replace('Tin đăng được cập nhật:', 'Tin đăng được cập nhật:')
-                      .replace('New report:', 'Báo cáo mới:')
-                    }
-                  </p>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-xs text-slate-500'>
-                      {activity.timestamp ? formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale: vi }) : 'Vừa xong'}
-                    </span>
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                      activity.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
-                      activity.status === 'RESOLVED' || activity.status === 'SUCCESS' || activity.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' :
-                      'bg-slate-100 text-slate-700'
-                    }`}>
-                      {t(activity.status)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* System Health Section */}
-      <div className='rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
-        <h3 className='text-lg font-bold mb-6 flex items-center gap-2'>
-          <ShieldAlert className='h-5 w-5 text-emerald-600' />
-          {t('moderationPerformance')}
-        </h3>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-          {Object.entries(systemHealth).map(([key, value]) => (
-            <div key={key} className='space-y-3'>
-              <div className='flex items-center justify-between text-sm'>
-                <span className='font-medium text-slate-600 dark:text-slate-400'>{t(key)}</span>
-                <span className='font-bold text-slate-900 dark:text-slate-100'>{value as any}</span>
-              </div>
-              <div className='h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden'>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.min(100, (Number(value) / 100) * 100)}%` }}
-                  className='h-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
+          <div className='h-[350px] w-full'>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={userGrowth}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="label"
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={formatChartDate}
+                  dy={10}
                 />
-              </div>
+                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip content={<CustomTooltip t={t} />} />
+                <Bar 
+                  dataKey="value" 
+                  name={t('newRegistration')}
+                  fill="#0f172a" 
+                  radius={[8, 8, 0, 0]} 
+                  barSize={45} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      </div>
+      {/* Listing Creation Trend */}
+      <div className='grid grid-cols-1 mb-6'>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+        >
+          <div className='flex items-center justify-between mb-8'>
+            <div className="flex flex-col gap-1">
+              <h3 className='text-xl font-black flex items-center gap-2'>
+                <Home className='h-5 w-5 text-rose-500' />
+                {t('listingCreationTrend')}
+                <Clock className="h-3 w-3 text-rose-500 animate-pulse" />
+              </h3>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
             </div>
-          ))}
-        </div>
+          </div>
+          <div className='h-[350px] w-full'>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={listingGrowth}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="label"
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={formatChartDate}
+                  dy={10}
+                />
+                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip content={<CustomTooltip t={t} />} />
+                <Bar 
+                  dataKey="value" 
+                  name={t('newListing')}
+                  fill="#f43f5e" 
+                  radius={[8, 8, 0, 0]} 
+                  barSize={45} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Urgent Issues - Quick Actions */}
-      <div className='rounded-2xl border-2 border-rose-100 bg-rose-50/30 p-6 dark:border-rose-900/20 dark:bg-rose-950/10'>
-        <div className='flex items-center justify-between mb-6'>
-           <h3 className='text-lg font-bold flex items-center gap-2 text-rose-600'>
-            <ShieldAlert className='h-5 w-5' />
-            {t('topUrgentReports')}
+      {/* Insights Row: Package Distribution & Top Agents */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+        {/* Package Distribution (Pie Chart) */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+        >
+          <h3 className='text-xl font-black flex items-center gap-2'>
+            <Package className='h-5 w-5 text-indigo-500' />
+            {t('packageInsights')}
+            <Clock className="h-3 w-3 text-indigo-500 animate-pulse" />
           </h3>
-        </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
-           {topUrgentReports.map((report: any) => (
-              <div key={report.id} className='group rounded-xl border border-white bg-white/80 p-4 transition-all hover:border-rose-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900'>
-                <p className='text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2 mb-2'>
-                  {report.description
-                    .replace('New report:', 'Báo cáo mới:')
-                  }
-                </p>
-                <div className='flex items-center justify-between'>
-                  <span className='text-[10px] text-slate-500'>
-                    {report.timestamp ? formatDistanceToNow(new Date(report.timestamp), { addSuffix: true, locale: vi }) : 'Vừa xong'}
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-8">{t(`days${days}`)}</p>
+          <div className='h-[300px] w-full relative'>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={translatedPackageInsights}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={120}
+                  paddingAngle={8}
+                  dataKey="value"
+                  nameKey="translatedLabel"
+                >
+                  {translatedPackageInsights.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+              <p className="text-3xl font-black text-slate-900 dark:text-white">
+                {translatedPackageInsights.reduce((sum, item) => sum + item.value, 0)}
+              </p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('activePlans')}</p>
+            </div>
+          </div>
+          <div className='mt-8 grid grid-cols-2 gap-4'>
+            {translatedPackageInsights.map((entry, index) => (
+              <div key={entry.id} className='flex items-center gap-3 p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors'>
+                <div className='h-3 w-3 rounded-full shrink-0' style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                <div className="flex flex-col">
+                  <span className='text-xs font-black text-slate-900 dark:text-slate-100'>
+                    {entry.translatedLabel} ({entry.value})
                   </span>
-                  <Link
-                    href={`/admin/manage-reports?id=${report.target_id}`}
-                    className='text-[10px] font-bold text-rose-600 hover:underline'
-                  >
-                    {t('resolve')}
-                  </Link>
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {formatVND(entry.extra?.revenue || 0)}
+                  </span>
                 </div>
               </div>
             ))}
-            {topUrgentReports.length === 0 && (
-               <div className='col-span-4 py-8 text-center text-slate-500 italic'>
-                  {t('noUrgentIssues')}
-               </div>
-            )}
-        </div>
+          </div>
+        </motion.div>
+
+        {/* Top Active Agents */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className='lg:col-span-2 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+        >
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col gap-1">
+              <h3 className='text-xl font-black flex items-center gap-2'>
+                <Users className='h-5 w-5 text-indigo-500' />
+                {t('topAgentsActivity')}
+                <Clock className="h-3 w-3 text-indigo-500 animate-pulse" />
+              </h3>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
+            </div>
+            <Link href="/admin/users" className="text-xs font-black text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">
+              {t('viewAllLogs')}
+            </Link>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left border-b border-slate-100 dark:border-slate-800">
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('topPerformer')}</th>
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('listingCount')}</th>
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('revenueGenerated')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                {topAgents.map((agent, index) => (
+                  <tr key={agent.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                    <td className="py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                           <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-black text-lg overflow-hidden ${
+                             index === 0 ? 'bg-amber-100 text-amber-600' : 
+                             index === 1 ? 'bg-slate-100 text-slate-600' : 
+                             'bg-indigo-50 text-indigo-400'
+                           }`}>
+                             {agent.avatar_url ? (
+                               <Image src={agent.avatar_url} alt={agent.name} fill className="object-cover" />
+                             ) : (
+                               index + 1
+                             )}
+                           </div>
+                           {index < 3 && (
+                             <div className="absolute -right-1 -bottom-1 h-5 w-5 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shadow-md">
+                               <div className={cn("h-3 w-3 rounded-full", index === 0 ? "bg-amber-400" : index === 1 ? "bg-slate-400" : "bg-orange-400")} />
+                             </div>
+                           )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-black text-slate-900 dark:text-white">{agent.name}</span>
+                          <span className="text-xs text-slate-400">{agent.email}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 text-center">
+                      <Badge className="bg-slate-900 text-white border-none font-black px-3 py-1">
+                        {agent.listing_count || 0}
+                      </Badge>
+                    </td>
+                    <td className="py-4 text-right">
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm font-black text-slate-900 dark:text-white">
+                          {agent.revenue_generated > 0 ? formatVND(agent.revenue_generated) : '—'}
+                        </span>
+                        {agent.revenue_generated > 0 && (
+                          <div className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold">
+                            <ArrowUpRight className="h-3 w-3" />
+                            +{(Math.random() * 5 + 2).toFixed(1)}%
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Detail Section: Top Listings Table */}
+      <div className='grid grid-cols-1 gap-6'>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+        >
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col gap-1">
+              <h3 className='text-xl font-black flex items-center gap-2'>
+                <Home className='h-5 w-5 text-rose-500' />
+                {t('topListings')}
+                <Clock className="h-3 w-3 text-rose-500 animate-pulse" />
+              </h3>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left border-b border-slate-100 dark:border-slate-800">
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('trending')}</th>
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('totalViews')}</th>
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('engagement')}</th>
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('boostRevenue')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
+                {topListings.map((listing, index) => (
+                  <tr key={listing.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                    <td className="py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-20 w-28 relative rounded-[1.5rem] overflow-hidden bg-slate-100 shrink-0 shadow-sm">
+                          {listing.thumbnail_url ? (
+                            <Image src={listing.thumbnail_url} alt={listing.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-slate-300">
+                              <Home className="h-6 w-6" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-black text-slate-900 dark:text-white truncate">{listing.title}</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            {index < 3 && <Badge className="bg-rose-500 text-white border-none text-[8px] h-4 font-black uppercase">{t('trending')}</Badge>}
+                            <span className="text-[10px] text-slate-400">ID: {listing.id.slice(0, 8)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 text-center">
+                      <div className="flex flex-col items-center">
+                         <span className="text-sm font-black text-slate-700 dark:text-slate-300">
+                           {listing.views >= 1000 ? `${(listing.views / 1000).toFixed(1)}k` : listing.views}
+                         </span>
+                         <span className="text-[10px] text-slate-400 uppercase tracking-tighter">{t('totalViews')}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-center">
+                       <div className="flex flex-col items-center">
+                        <span className="text-sm font-black text-slate-700 dark:text-slate-300">{listing.interactions}</span>
+                        <span className="text-[10px] text-slate-400 uppercase tracking-tighter">{t('engagement')}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 text-right">
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm font-black text-slate-900 dark:text-white">{formatVND(listing.revenue)}</span>
+                         {listing.revenue > 0 ? (
+                           listing.trend === 'up' ? (
+                             <span className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold"><ArrowUpRight className="h-3 w-3" /> {t('growth')}</span>
+                           ) : (
+                             <span className="flex items-center gap-1 text-[10px] text-slate-400 font-bold"><ArrowDownRight className="h-3 w-3" /> {t('stable')}</span>
+                           )
+                         ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

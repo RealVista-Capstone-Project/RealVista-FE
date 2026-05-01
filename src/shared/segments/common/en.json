@@ -16,7 +16,7 @@
       "users": "User Management",
       "policies": "Policies",
       "reports": "Reports",
-      "templates": "Templates",
+      "templates": "Notification Templates",
       "locations": "Locations",
       "crm": "CRM",
       "packages": "Package Management"
@@ -40,11 +40,16 @@
       "manageUsers": "User Management",
       "managePolicies": "Policy Management",
       "manageReports": "Report Management",
-      "manageTemplates": "Template Management",
+      "manageTemplates": "Notification Template Management",
       "manageAgent": "Manage Agent",
       "crm": "CRM Board",
       "managePackages": "Package Management",
-      "locations": "Locations"
+      "locations": "Location Management",
+      "reports": "Report Management",
+      "policies": "Policy Management",
+      "templates": "Notification Template Management",
+      "listings": "Listing Management",
+      "property": "Property Management"
     },
     "actionButton": {
       "addProperty": "Add a property",

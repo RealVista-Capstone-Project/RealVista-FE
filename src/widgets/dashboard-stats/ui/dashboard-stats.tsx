@@ -5,17 +5,18 @@ import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import {
   Users,
-  Home,
   AlertOctagon,
-  Activity,
   TrendingUp,
   TrendingDown,
+  Zap,
+  Rocket,
+  DollarSign,
   LucideIcon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { adminApi } from '@/entities/admin/api';
-import { cn } from '@/shared/lib/utils';
+import { adminApi, adminQueries } from '@/entities/admin/api';
+import { cn, formatVND, formatNumber } from '@/shared/lib/utils';
 import { Skeleton } from '@/shared/ui/skeleton';
 
 interface StatCardProps {
@@ -93,54 +94,58 @@ function StatsSkeleton() {
   );
 }
 
-export function DashboardStats() {
+export function DashboardStats({ days = 7 }: { days?: number }) {
   const t = useTranslations('AdminDashboard');
 
-  const { data: overview, isLoading } = useQuery({
-    queryKey: ['admin', 'overview'],
-    queryFn: () => adminApi.getOverview(),
-  });
+  const { startDate, endDate } = React.useMemo(() => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - days);
+    return {
+      startDate: start.toISOString(),
+      endDate: end.toISOString()
+    };
+  }, [days]);
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-  };
+  const { data: overview, isLoading } = useQuery(adminQueries.overview(startDate, endDate));
 
   if (isLoading) return <StatsSkeleton />;
 
   return (
     <>
       <StatCard
-        title={t('totalActiveUsers')}
-        value={overview?.total_users ?? 0}
-        icon={Users}
-        trend={{ value: '+12.5%', isPositive: true }}
-        description={t('platformGrowth')}
+        title={t('revenueInPeriod')}
+        value={formatVND(overview?.revenue_in_period ?? 0)}
+        icon={DollarSign}
+        trend={{ value: '+15.4%', isPositive: true }}
+        description={t(`days${days}`)}
         delay={0}
       />
 
       <StatCard
-        title={t('newestPendingListings')}
-        value={overview?.pending_listings ?? 0}
-        icon={Home}
-        description={t('awaitingModeration')}
+        title={t('listingsCreated')}
+        value={formatNumber(overview?.listings_in_period ?? 0)}
+        icon={Rocket}
+        trend={{ value: t('new'), isPositive: true }}
+        description={t(`days${days}`)}
         delay={0.1}
       />
 
       <StatCard
-        title={t('topUrgentReports')}
-        value={overview?.unresolved_reports ?? 0}
-        icon={AlertOctagon}
-        trend={{ value: t('highPriority'), isPositive: false }}
-        description={t('requiresImmediateResolution')}
+        title={t('newUsers')}
+        value={formatNumber(overview?.new_users_in_period ?? 0)}
+        icon={Users}
+        trend={{ value: t('active'), isPositive: true }}
+        description={t(`days${days}`)}
         delay={0.2}
       />
 
       <StatCard
-        title={t('totalRevenue')}
-        value={formatCurrency(overview?.total_revenue ?? 0)}
-        icon={Activity}
-        trend={{ value: '+5.4%', isPositive: true }}
-        description={t('revenueGrowth')}
+        title={t('unresolvedReports')}
+        value={overview?.unresolved_reports ?? 0}
+        icon={AlertOctagon}
+        trend={{ value: t('highPriority'), isPositive: false }}
+        description={t('requiresImmediateResolution')}
         delay={0.3}
       />
     </>

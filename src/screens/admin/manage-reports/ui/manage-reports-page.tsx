@@ -16,7 +16,8 @@ import {
   LayoutGrid,
   Calendar,
   ChevronRight,
-  ClipboardList
+  ClipboardList,
+  ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -83,11 +84,26 @@ export function ManageReportsPage() {
                <span className='w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse' title={t('detail.highPriority')} />
             )}
           </div>
-          <span className='text-sm font-semibold text-slate-900 truncate max-w-[200px]'>
-            {row.original.report_target_type === 'LISTING'
-              ? row.original.reported_listing_name
-              : row.original.reported_user_name}
-          </span>
+          <div className='flex items-center gap-2'>
+            <span className='text-sm font-semibold text-slate-900 truncate max-w-[200px]'>
+              {row.original.report_target_type === 'LISTING'
+                ? row.original.reported_listing_name
+                : row.original.reported_user_name}
+            </span>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                const url = row.original.report_target_type === 'LISTING' 
+                  ? `/buy/${row.original.report_target_id}`
+                  : `/admin?search=${row.original.report_target_id}`;
+                window.open(url, '_blank');
+              }}
+              className='p-1 rounded-md hover:bg-slate-100 text-primary transition-colors'
+              title={t('detail.actions.viewTarget')}
+            >
+              <ExternalLink className='h-3 w-3' />
+            </button>
+          </div>
         </div>
       )
     },
