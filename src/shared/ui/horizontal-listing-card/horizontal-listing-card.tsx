@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Flame, MapPin } from 'lucide-react';
+import { Heart, Flame, MapPin, Box } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
@@ -30,6 +30,7 @@ export interface HorizontalListingCardProps {
   boostTags?: string[];
   userType?: 'AGENT' | 'OWNER';
   listingType?: 'RENT' | 'SALE';
+  has3D?: boolean;
   onToggleFavorite?: (id: string) => void;
   onClick?: (id: string) => void;
   className?: string;
@@ -47,6 +48,7 @@ export function HorizontalListingCard({
   boostTags,
   userType,
   listingType = 'RENT',
+  has3D = false,
   onToggleFavorite,
   onClick,
   className,
@@ -164,6 +166,19 @@ export function HorizontalListingCard({
                   </svg>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* 3D Badge - Bottom right corner */}
+          {has3D && !isUnavailable && (
+            <div
+              className='absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1.5 shadow-lg backdrop-blur-md border border-white/50'
+              title='3D Virtual Tour available'
+            >
+              <Box className='h-3.5 w-3.5 text-gray-700' strokeWidth={2} />
+              <span className='text-xs font-bold uppercase leading-3 tracking-[0.5px] text-gray-700'>
+                3D
+              </span>
             </div>
           )}
         </div>
