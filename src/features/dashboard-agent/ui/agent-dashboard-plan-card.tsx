@@ -1,7 +1,7 @@
 'use client';
 
 import { useAgentPlanSnapshot } from '../api/use-agent-dashboard';
-import type { AgentPlanSubscriptionRow } from '../model/agent-dashboard.types';
+import type { AgentPlanBoostRow, AgentPlanSubscriptionRow } from '../model/agent-dashboard.types';
 import { cn } from '@/shared/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Progress } from '@/shared/ui/progress';
@@ -208,6 +208,115 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
   );
 }
 
+interface PlanBoostRowProps {
+  boost: AgentPlanBoostRow;
+  t: ReturnType<typeof useTranslations>;
+  locale: string;
+}
+
+function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
+  const daysLeft = getDaysRemaining(boost.end_date);
+  const startDate = boost.start_date ? new Date(boost.start_date).toLocaleDateString(locale) : '-';
+  const featuredQuota = boost.featured_quota ?? 0;
+  const hotBadgeQuota = boost.hot_badge_quota ?? 0;
+  const remainingFeatured = Math.max(0, boost.remaining_featured_quota ?? 0);
+  const remainingHotBadge = Math.max(0, boost.remaining_hot_badge_quota ?? 0);
+  const usedFeatured = Math.max(0, featuredQuota - remainingFeatured);
+  const usedHotBadge = Math.max(0, hotBadgeQuota - remainingHotBadge);
+  const featuredPercent = featuredQuota > 0 ? Math.round((usedFeatured / featuredQuota) * 100) : 0;
+  const hotBadgePercent = hotBadgeQuota > 0 ? Math.round((usedHotBadge / hotBadgeQuota) * 100) : 0;
+  const isFeaturedLow = featuredQuota > 0 && featuredPercent >= 80;
+  const isHotBadgeLow = hotBadgeQuota > 0 && hotBadgePercent >= 80;
+
+  return (
+    <div className='relative flex flex-col gap-3 overflow-hidden rounded-xl border border-l-4 border-l-rose-500 bg-card p-4 shadow-sm'>
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-rose-500/10 to-amber-500/5 opacity-60' />
+
+      <div className='relative flex items-start justify-between gap-2'>
+        <div className='flex items-center gap-2.5'>
+          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400'>
+            <Zap className='h-4 w-4' />
+          </div>
+          <div className='flex flex-col'>
+            <p className='line-clamp-1 text-sm font-semibold leading-tight'>{boost.name}</p>
+            <span className='mt-0.5 w-fit rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'>
+              {t('sections.plan.boost')}
+            </span>
+          </div>
+        </div>
+
+        {daysLeft !== null && (
+          <div
+            className={cn(
+              'shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold',
+              daysLeft <= 7
+                ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400'
+                : 'bg-muted text-muted-foreground',
+            )}
+          >
+            {daysLeft}d
+          </div>
+        )}
+      </div>
+
+      <div className='relative space-y-0.5 text-xs text-muted-foreground'>
+        <p>
+          {t('sections.plan.status')}: {boost.status}
+        </p>
+        <p>{t('sections.plan.startedOn', { date: startDate })}</p>
+      </div>
+
+      <div className='relative space-y-2 text-xs'>
+        <div className='space-y-1.5'>
+          <div className='flex items-center justify-between gap-2'>
+            <span className='text-muted-foreground'>
+              {t('sections.plan.boostFeaturedQuota', { used: usedFeatured, total: featuredQuota })}
+            </span>
+            <span className={cn('font-semibold', isFeaturedLow ? 'text-rose-500' : 'text-foreground')}>
+              {remainingFeatured} {t('sections.plan.remaining')}
+            </span>
+          </div>
+          <Progress
+            value={featuredPercent}
+            className={cn(
+              'h-1.5',
+              isFeaturedLow
+                ? '[&_[data-slot=progress-indicator]]:bg-rose-500'
+                : '[&_[data-slot=progress-indicator]]:bg-amber-500',
+            )}
+          />
+        </div>
+        <div className='space-y-1.5'>
+          <div className='flex items-center justify-between gap-2'>
+            <span className='text-muted-foreground'>
+              {t('sections.plan.boostHotBadgeQuota', { used: usedHotBadge, total: hotBadgeQuota })}
+            </span>
+            <span className={cn('font-semibold', isHotBadgeLow ? 'text-rose-500' : 'text-foreground')}>
+              {remainingHotBadge} {t('sections.plan.remaining')}
+            </span>
+          </div>
+          <Progress
+            value={hotBadgePercent}
+            className={cn(
+              'h-1.5',
+              isHotBadgeLow
+                ? '[&_[data-slot=progress-indicator]]:bg-rose-500'
+                : '[&_[data-slot=progress-indicator]]:bg-sky-500',
+            )}
+          />
+        </div>
+      </div>
+
+      {boost.end_date ? (
+        <div className='relative flex items-center gap-1.5 text-xs text-muted-foreground'>
+          <CalendarDays className='h-3.5 w-3.5 shrink-0' />
+          <span>{t('sections.plan.expireAt', { date: formatDate(boost.end_date, locale) })}</span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
   const t = useTranslations('AgentDashboard');
   const locale = useLocale();
@@ -216,6 +325,10 @@ export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
   const activePlans = useMemo(() => {
     const subscriptions = planQuery.data?.data.subscriptions ?? [];
     return subscriptions.filter((sub) => sub.status === 'ACTIVE');
+  }, [planQuery.data]);
+  const activeBoosts = useMemo(() => {
+    const boosts = planQuery.data?.data.boosts ?? [];
+    return boosts.filter((boost) => boost.status === 'ACTIVE');
   }, [planQuery.data]);
 
   const isLoading = planQuery.isLoading && !planQuery.data;
@@ -235,14 +348,33 @@ export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
             <Loader2 className='h-4 w-4 animate-spin text-primary' />
             <span>{t('sections.plan.loading')}</span>
           </div>
-        ) : activePlans.length === 0 ? (
+        ) : activePlans.length === 0 && activeBoosts.length === 0 ? (
           <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
             {t('sections.plan.empty')}
           </div>
         ) : (
-          activePlans.map((sub) => (
-            <PlanSubscriptionRow key={sub.subscription_id} sub={sub} t={t} locale={locale} />
-          ))
+          <>
+            {activePlans.length > 0 ? (
+              <div className='space-y-3'>
+                <p className='text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
+                  {t('sections.plan.subscriptions')}
+                </p>
+                {activePlans.map((sub) => (
+                  <PlanSubscriptionRow key={sub.subscription_id} sub={sub} t={t} locale={locale} />
+                ))}
+              </div>
+            ) : null}
+            {activeBoosts.length > 0 ? (
+              <div className='space-y-3'>
+                <p className='text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
+                  {t('sections.plan.boosts')}
+                </p>
+                {activeBoosts.map((boost) => (
+                  <PlanBoostRow key={boost.boost_package_id} boost={boost} t={t} locale={locale} />
+                ))}
+              </div>
+            ) : null}
+          </>
         )}
       </CardContent>
     </Card>

@@ -897,6 +897,9 @@
       "plan": {
         "title": "Plan & Boosting",
         "description": "Usage snapshot for subscription and boosts.",
+        "subscriptions": "Subscriptions",
+        "boosts": "Boost Packages",
+        "boost": "Boost",
         "feature": "Feature",
         "status": "Status",
         "startedOn": "Started on {date}",
@@ -907,6 +910,8 @@
         "expireAt": "Expires: {date}",
         "unlimitedQuota": "Unlimited quota",
         "usedQuota": "Used {used}/{total}",
+        "boostFeaturedQuota": "Featured boost {used}/{total}",
+        "boostHotBadgeQuota": "Hot badge boost {used}/{total}",
         "remaining": "left",
         "featureType": {
           "listing": "Listing",

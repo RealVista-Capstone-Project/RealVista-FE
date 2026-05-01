@@ -14,6 +14,7 @@ import type {
   AgentPerformanceMetrics,
   AgentPerformanceMetricsResponse,
   AgentPlanSnapshot,
+  AgentPlanBoostRow,
   AgentPlanSnapshotResponse,
   AgentPlanSubscriptionRow,
   AgentTopListingsResponse,
@@ -26,6 +27,7 @@ const DEFAULT_PLAN_SNAPSHOT: AgentPlanSnapshotResponse = {
   timestamp: new Date().toISOString(),
   data: {
     subscriptions: [],
+    boosts: [],
   },
 };
 
@@ -422,9 +424,8 @@ function mapPlanSubscriptionRow(row: unknown): AgentPlanSubscriptionRow | null {
 
 function normalizePlanSnapshot(rows: unknown): AgentPlanSnapshot {
   const fallback = DEFAULT_PLAN_SNAPSHOT.data;
-  if (!Array.isArray(rows) || rows.length === 0) return fallback;
-
-  const subscriptions = rows
+  const subscriptions = Array.isArray(rows)
+    ? rows
     .map(mapPlanSubscriptionRow)
     .filter((row): row is AgentPlanSubscriptionRow => row !== null)
     .sort((a, b) => {
@@ -432,9 +433,52 @@ function normalizePlanSnapshot(rows: unknown): AgentPlanSnapshot {
       const bActive = b.status.toUpperCase() === 'ACTIVE' ? 0 : 1;
       if (aActive !== bActive) return aActive - bActive;
       return (a.package_name || '').localeCompare(b.package_name || '');
-    });
+      })
+    : fallback.subscriptions;
+  return { subscriptions, boosts: fallback.boosts };
+}
 
-  return { subscriptions };
+function mapPlanBoostRow(row: unknown): AgentPlanBoostRow | null {
+  if (!row || typeof row !== 'object') return null;
+  const o = row as LooseRecord;
+  const boostPackageId = readStr(o.boost_package_id ?? o.boostPackageId);
+  const code = readStr(o.code);
+  const name = readStr(o.name);
+  const status = readStr(o.status);
+  const startDate = readStr(o.start_date ?? o.startDate);
+  if (!boostPackageId || !code || !name || !status) return null;
+
+  return {
+    boost_package_id: boostPackageId,
+    code,
+    name,
+    description: readStr(o.description),
+    featured_quota: readNum(o.featured_quota ?? o.featuredQuota),
+    hot_badge_quota: readNum(o.hot_badge_quota ?? o.hotBadgeQuota),
+    duration_days: readNum(o.duration_days ?? o.durationDays),
+    start_date: startDate,
+    end_date: readNullableStr(o.end_date ?? o.endDate),
+    remaining_featured_quota: readNullableNum(
+      o.remaining_featured_quota ?? o.remainingFeaturedQuota
+    ),
+    remaining_hot_badge_quota: readNullableNum(
+      o.remaining_hot_badge_quota ?? o.remainingHotBadgeQuota
+    ),
+    status,
+  };
+}
+
+function normalizePlanBoosts(rows: unknown): AgentPlanBoostRow[] {
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+  return rows
+    .map(mapPlanBoostRow)
+    .filter((row): row is AgentPlanBoostRow => row !== null)
+    .sort((a, b) => {
+      const aActive = a.status.toUpperCase() === 'ACTIVE' ? 0 : 1;
+      const bActive = b.status.toUpperCase() === 'ACTIVE' ? 0 : 1;
+      if (aActive !== bActive) return aActive - bActive;
+      return (a.name || '').localeCompare(b.name || '');
+    });
 }
 
 function withDateRange(path: string, range?: AgentDateRange): string {
@@ -529,8 +573,16 @@ export const agentDashboardApi = {
     };
   },
   getPlanSnapshot: async (): Promise<AgentPlanSnapshotResponse> => {
-    const rows = await safeGet<AgentPlanSubscriptionRow[]>('/billing/subscriptions/me', []);
-    const data = normalizePlanSnapshot(rows);
+    const [subscriptionRows, boostRows] = await Promise.all([
+      safeGet<AgentPlanSubscriptionRow[]>('/billing/subscriptions/me', []),
+      safeGet<AgentPlanBoostRow[]>('/billing/boosts/me', []),
+    ]);
+    const planData = normalizePlanSnapshot(subscriptionRows);
+    const boosts = normalizePlanBoosts(boostRows);
+    const data: AgentPlanSnapshot = {
+      subscriptions: planData.subscriptions,
+      boosts,
+    };
 
     return {
       success: true,

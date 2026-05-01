@@ -899,6 +899,9 @@
       "plan": {
         "title": "Gói dịch vụ & boost",
         "description": "Tổng quan mức sử dụng gói và lượt boost.",
+        "subscriptions": "Gói đăng ký",
+        "boosts": "Gói boost",
+        "boost": "Boost",
         "feature": "Tính năng",
         "status": "Trạng thái",
         "startedOn": "Bắt đầu từ {date}",
@@ -909,6 +912,8 @@
         "expireAt": "Hết hạn: {date}",
         "unlimitedQuota": "Không giới hạn quota",
         "usedQuota": "Đã dùng {used}/{total}",
+        "boostFeaturedQuota": "Đẩy nổi bật {used}/{total}",
+        "boostHotBadgeQuota": "Huy hiệu HOT {used}/{total}",
         "remaining": "còn lại",
         "featureType": {
           "listing": "Tin đăng",

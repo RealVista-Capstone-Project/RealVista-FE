@@ -117,6 +117,7 @@ export interface AgentAppointmentsSnapshot {
 
 export interface AgentPlanSnapshot {
   subscriptions: AgentPlanSubscriptionRow[];
+  boosts: AgentPlanBoostRow[];
 }
 
 export interface AgentPlanSubscriptionRow {
@@ -130,6 +131,21 @@ export interface AgentPlanSubscriptionRow {
   tier_level?: number;
   start_date: string;
   end_date?: string | null;
+  status: string;
+}
+
+export interface AgentPlanBoostRow {
+  boost_package_id: string;
+  code: string;
+  name: string;
+  description: string;
+  featured_quota: number;
+  hot_badge_quota: number;
+  duration_days: number;
+  start_date: string;
+  end_date: string | null;
+  remaining_featured_quota: number | null;
+  remaining_hot_badge_quota: number | null;
   status: string;
 }
 
