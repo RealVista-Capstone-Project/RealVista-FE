@@ -35,7 +35,7 @@ import {
 import type { User } from 'next-auth';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Pie, PieChart } from 'recharts';
 
 const AgentDashboardPerformanceChart = dynamic(
@@ -129,15 +129,16 @@ function formatCalendarHeaderDate(value: Date, locale: string) {
   });
 }
 
-export function AgentDashboardView({ user }: { user?: User }) {
-  const t = useTranslations('AgentDashboard');
-  const locale = useLocale();
+function AgentPerformanceChartSection() {
   const [selectedPeriod, setSelectedPeriod] = useState<AgentPerformancePeriod>('M');
-  const metricsQuery = useAgentDashboardMetrics();
   const performanceQuery = useAgentPerformanceMetrics(selectedPeriod);
-  const appointmentsQuery = useAgentAppointmentsSnapshot();
-  const planQuery = useAgentPlanSnapshot();
-  const name = user?.name || user?.email?.split('@')[0] || 'Agent';
+  const trendData = performanceQuery.data?.data.trend ?? [];
+  return <AgentDashboardPerformanceChart trendData={trendData} selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />;
+}
+
+const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
+  const t = useTranslations('AgentDashboard');
+  const performanceQuery = useAgentPerformanceMetrics('M');
 
   const channelChartConfig = {
     manual: { label: t('charts.source.manual'), color: 'var(--primary)' },
@@ -151,17 +152,123 @@ export function AgentDashboardView({ user }: { user?: User }) {
     tour: t('charts.source.tour'),
   } as const;
 
+  const channelData = (performanceQuery.data?.data.channels ?? []).map((channel) => ({
+    ...channel,
+    channel: channel.channel.toLowerCase(),
+  }));
+  const totalChannelLeads = channelData.reduce((sum, row) => sum + Number(row.leads ?? 0), 0);
+  const channelPieData = channelData.map((row) => ({
+    ...row,
+    channel: row.channel,
+    leads: Number(row.leads ?? 0),
+    fill: `var(--color-${row.channel})`,
+  }));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('sections.channels.title')}</CardTitle>
+        <CardDescription>{t('sections.channels.description')}</CardDescription>
+      </CardHeader>
+      <CardContent className='min-h-[280px]'>
+        {performanceQuery.isError && !performanceQuery.data ? (
+          <div className='flex h-[240px] items-center justify-center text-center text-sm text-muted-foreground'>
+            {t('error.partialDescription')}
+          </div>
+        ) : performanceQuery.isLoading && !performanceQuery.data ? (
+          <div className='space-y-3'>
+            <Skeleton className='mx-auto h-44 w-44 rounded-full' />
+            <Skeleton className='h-4 w-full' />
+            <Skeleton className='h-4 w-4/5' />
+            <Skeleton className='h-4 w-3/5' />
+          </div>
+        ) : totalChannelLeads === 0 ? (
+          <div className='flex h-[240px] items-center justify-center text-center text-sm text-muted-foreground'>
+            {t('charts.channelsEmpty')}
+          </div>
+        ) : (
+          <div className='flex min-h-[240px] flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-3'>
+            <div className='relative mx-auto size-44 shrink-0 sm:mx-0 sm:size-40'>
+              <ChartContainer
+                config={channelChartConfig}
+                className='aspect-square size-full min-h-[11rem] [&>div]:justify-center'
+              >
+                <PieChart accessibilityLayer>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel nameKey='channel' />}
+                  />
+                  <Pie
+                    data={channelPieData}
+                    dataKey='leads'
+                    nameKey='channel'
+                    innerRadius={52}
+                    outerRadius={72}
+                    strokeWidth={3}
+                  />
+                </PieChart>
+              </ChartContainer>
+              <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
+                <p className='text-2xl font-bold tabular-nums text-foreground'>
+                  {totalChannelLeads.toLocaleString()}
+                </p>
+                <p className='text-[10px] text-muted-foreground'>{t('charts.leads')}</p>
+              </div>
+            </div>
+            <div className='w-full min-w-0 space-y-2.5 sm:flex-1'>
+              {LEAD_SOURCE_ORDER.map((source) => {
+                const row = channelData.find((c) => c.channel === source);
+                const count = row ? Number(row.leads ?? 0) : 0;
+                const pct = totalChannelLeads > 0 ? Math.round((count / totalChannelLeads) * 100) : 0;
+                return (
+                  <div key={source} className='flex items-center justify-between gap-2 text-sm'>
+                    <div className='flex min-w-0 items-center gap-2'>
+                      <span
+                        className='size-2.5 shrink-0 rounded-full'
+                        style={SOURCE_DOT_STYLES[source]}
+                      />
+                      <span className='truncate text-muted-foreground'>{leadSourceLabel[source]}</span>
+                    </div>
+                    <div className='flex shrink-0 items-baseline gap-1.5 tabular-nums'>
+                      <span className='font-semibold text-foreground'>{count}</span>
+                      <span className='text-xs text-muted-foreground'>({pct}%)</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+});
+
+function AgentDashboardPerformanceSection() {
+  return (
+    <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
+      <AgentPerformanceChartSection />
+      <AgentLeadChannelsCard />
+    </section>
+  );
+}
+
+export function AgentDashboardView({ user }: { user?: User }) {
+  const t = useTranslations('AgentDashboard');
+  const locale = useLocale();
+  const metricsQuery = useAgentDashboardMetrics();
+  const appointmentsQuery = useAgentAppointmentsSnapshot();
+  const planQuery = useAgentPlanSnapshot();
+  const name = user?.name || user?.email?.split('@')[0] || 'Agent';
+
   const loading =
     metricsQuery.isLoading ||
-    performanceQuery.isLoading ||
     appointmentsQuery.isLoading ||
     planQuery.isLoading;
 
   const hasError =
     metricsQuery.isError &&
     !metricsQuery.data &&
-    performanceQuery.isError &&
-    !performanceQuery.data &&
     appointmentsQuery.isError &&
     !appointmentsQuery.data &&
     planQuery.isError &&
@@ -169,7 +276,6 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
   const hasPartialError =
     metricsQuery.isError ||
-    performanceQuery.isError ||
     appointmentsQuery.isError ||
     planQuery.isError;
 
@@ -204,18 +310,6 @@ export function AgentDashboardView({ user }: { user?: User }) {
       unit: undefined,
     },
   ];
-  const trendData = performanceQuery.data?.data.trend ?? [];
-  const channelData = (performanceQuery.data?.data.channels ?? []).map((channel) => ({
-    ...channel,
-    channel: channel.channel.toLowerCase(),
-  }));
-  const totalChannelLeads = channelData.reduce((sum, row) => sum + Number(row.leads ?? 0), 0);
-  const channelPieData = channelData.map((row) => ({
-    ...row,
-    channel: row.channel,
-    leads: Number(row.leads ?? 0),
-    fill: `var(--color-${row.channel})`,
-  }));
   const appointmentSnapshot = appointmentsQuery.data?.data;
   const appointments = useMemo(
     () => appointmentSnapshot?.appointments ?? [],
@@ -384,84 +478,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
         })}
       </section>
 
-      {/* Performance Chart */}
-      <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
-        <AgentDashboardPerformanceChart
-          trendData={trendData}
-          selectedPeriod={selectedPeriod}
-          onPeriodChange={setSelectedPeriod}
-        />
-
-        {/* Lead Channels Chart Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('sections.channels.title')}</CardTitle>
-            <CardDescription>{t('sections.channels.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className='min-h-[280px]'>
-            {totalChannelLeads === 0 ? (
-              <div className='flex h-[240px] items-center justify-center text-center text-sm text-muted-foreground'>
-                {t('charts.channelsEmpty')}
-              </div>
-            ) : (
-              <div className='flex min-h-[240px] flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-3'>
-                <div className='relative mx-auto size-44 shrink-0 sm:mx-0 sm:size-40'>
-                  <ChartContainer
-                    config={channelChartConfig}
-                    className='aspect-square size-full min-h-[11rem] [&>div]:justify-center'
-                  >
-                    <PieChart accessibilityLayer>
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel nameKey='channel' />}
-                      />
-                      <Pie
-                        data={channelPieData}
-                        dataKey='leads'
-                        nameKey='channel'
-                        innerRadius={52}
-                        outerRadius={72}
-                        strokeWidth={3}
-                      />
-                    </PieChart>
-                  </ChartContainer>
-                  <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
-                    <p className='text-2xl font-bold tabular-nums text-foreground'>
-                      {totalChannelLeads.toLocaleString()}
-                    </p>
-                    <p className='text-[10px] text-muted-foreground'>{t('charts.leads')}</p>
-                  </div>
-                </div>
-                <div className='w-full min-w-0 space-y-2.5 sm:flex-1'>
-                  {LEAD_SOURCE_ORDER.map((source) => {
-                    const row = channelData.find((c) => c.channel === source);
-                    const count = row ? Number(row.leads ?? 0) : 0;
-                    const pct =
-                      totalChannelLeads > 0 ? Math.round((count / totalChannelLeads) * 100) : 0;
-                    return (
-                      <div key={source} className='flex items-center justify-between gap-2 text-sm'>
-                        <div className='flex min-w-0 items-center gap-2'>
-                          <span
-                            className='size-2.5 shrink-0 rounded-full'
-                            style={SOURCE_DOT_STYLES[source]}
-                          />
-                          <span className='truncate text-muted-foreground'>
-                            {leadSourceLabel[source]}
-                          </span>
-                        </div>
-                        <div className='flex shrink-0 items-baseline gap-1.5 tabular-nums'>
-                          <span className='font-semibold text-foreground'>{count}</span>
-                          <span className='text-xs text-muted-foreground'>({pct}%)</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </section>
+      <AgentDashboardPerformanceSection />
 
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         {/* Appointments Card */}
