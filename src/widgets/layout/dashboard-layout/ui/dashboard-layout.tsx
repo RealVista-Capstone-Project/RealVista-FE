@@ -13,6 +13,7 @@ import {
   Building2,
   Search,
   ContactRound,
+  MapPin,
   Package,
   type LucideIcon,
 } from 'lucide-react';
@@ -183,6 +184,12 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
     },
     { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
     {
+      id: 'locations',
+      label: t('menu.locations'),
+      href: ROUTES.dashboard.locations,
+      icon: MapPin,
+    },
+    {
       id: 'packages',
       label: t('menu.packages'),
       href: ROUTES.dashboard.managePackages,
@@ -299,6 +306,12 @@ export function DashboardLayout({
       pathname.startsWith(ROUTES.dashboard.manageUsers)
     ) {
       return t('pageTitle.manageUsers');
+    }
+    if (
+      pathname === ROUTES.dashboard.locations ||
+      pathname.startsWith(ROUTES.dashboard.locations)
+    ) {
+      return t('pageTitle.locations');
     }
     if (
       pathname === ROUTES.dashboard.propertyFeed ||

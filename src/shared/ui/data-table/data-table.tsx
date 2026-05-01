@@ -10,6 +10,7 @@ import {
   type PaginationState,
 } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/utils';
@@ -50,6 +51,7 @@ export function DataTable<TData>({
   isRowSelected,
   className,
 }: DataTableProps<TData>) {
+  const t = useTranslations('DataTable');
   const table = useReactTable({
     data,
     columns,
@@ -66,7 +68,7 @@ export function DataTable<TData>({
   return (
     <div
       className={cn(
-        'px-2 py-2 space-y-2 bg-white dark:bg-background rounded-2xl shadow-sm border border-border',
+        'px-2 py-2 space-y-2 bg-background rounded-2xl shadow-sm border border-border',
         className
       )}
     >
@@ -144,7 +146,10 @@ export function DataTable<TData>({
           <p className='text-sm text-muted-foreground'>
             {pageInfoText
               ? pageInfoText((pagination?.pageIndex ?? 0) + 1, pageCount!)
-              : `Page ${(pagination?.pageIndex ?? 0) + 1} of ${pageCount}`}
+              : t('pagination.pageInfo', {
+                  current: (pagination?.pageIndex ?? 0) + 1,
+                  total: pageCount,
+                })}
           </p>
           <div className='flex items-center gap-2'>
             <Button
@@ -152,7 +157,7 @@ export function DataTable<TData>({
               size='icon'
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              aria-label='Previous page'
+              aria-label={t('pagination.previousPage')}
             >
               <ChevronLeft className='h-4 w-4' />
             </Button>
@@ -185,7 +190,7 @@ export function DataTable<TData>({
               size='icon'
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              aria-label='Next page'
+              aria-label={t('pagination.nextPage')}
             >
               <ChevronRight className='h-4 w-4' />
             </Button>

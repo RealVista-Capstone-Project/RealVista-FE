@@ -32,6 +32,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale,
     messages: {
       ...commonMessages,
+      ...(await import(`@/shared/ui/data-table/i18n/${locale}.json`)).default,
       ...(await import(`@/shared/ui/profile-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/shared/ui/login-required-modal/i18n/${locale}.json`)).default,
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
@@ -80,6 +81,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/widgets/spark-viewer/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/notification-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/widgets/billing/i18n/${locale}.json`)).default,
+      ...(await import(`@/widgets/owner-dashboard/i18n/${locale}.json`)).default,
       ...(await import(`@/features/chat/i18n/${locale}.json`)).default,
     },
   };
