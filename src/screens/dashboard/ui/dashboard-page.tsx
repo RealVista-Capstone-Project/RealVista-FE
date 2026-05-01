@@ -38,7 +38,7 @@ export function DashboardPage() {
     return <OwnerDashboard />;
   }
   if (isAgent) {
-    return <AgentDashboardView user={user} />;
+    return <AgentDashboardView />;
   }
   // TODO: Tri return cho role admin o day
   // if (isAdmin) {
