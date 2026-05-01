@@ -94,6 +94,7 @@ function PropertyCard({
   ]
     .filter(Boolean)
     .join(', ');
+  const isRented = property.status === 'RENTED';
 
   return (
     <button
@@ -155,6 +156,14 @@ function PropertyCard({
             </span>
           )}
         </div>
+
+        {isRented && (
+          <p className='rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs leading-5 text-teal-800'>
+            {property.allowRentListingWhenRented
+              ? t('rentedPropertyRentAllowed')
+              : t('rentedPropertySaleOnly')}
+          </p>
+        )}
       </div>
 
       {/* Selection indicator */}
@@ -259,7 +268,7 @@ export function CreateListingPage() {
     ...propertyQueries.myProperties({
       page: currentPage - 1,
       size: itemsPerPage,
-      status: 'AVAILABLE',
+      statuses: ['AVAILABLE', 'RENTED'],
     }),
     enabled: currentStep === 1,
   });
@@ -283,6 +292,7 @@ export function CreateListingPage() {
       areaSqft: p.area_sqft,
       description: p.description,
       status: p.status,
+      allowRentListingWhenRented: Boolean(p.allow_rent_listing_when_rented),
       thumbnailUrl: primaryMedia?.thumbnail_url ?? primaryMedia?.media_url ?? null,
       location: {
         locationId: p.location_info?.location_id ?? '',
@@ -347,25 +357,46 @@ export function CreateListingPage() {
 
   const enrichedProperty: UserProperty | null = React.useMemo(() => {
     if (!selectedProperty) return null;
-    if (!propertyDetail?.attributes) return selectedProperty;
+    if (!propertyDetail) return selectedProperty;
     return {
       ...selectedProperty,
-      attributes: propertyDetail.attributes.map((attr) => ({
-        attributeId: attr.attribute_id,
-        attributeCode: attr.attribute_code,
-        attributeName: attr.attribute_name,
-        dataType: attr.data_type,
-        icon: attr.icon,
-        unit: attr.unit,
-        valueNumber: attr.value_number,
-        valueText: attr.value_text,
-        valueBoolean: attr.value_boolean,
-        displayValue: null,
-      })),
+      allowRentListingWhenRented: Boolean(
+        propertyDetail.allow_rent_listing_when_rented ?? selectedProperty.allowRentListingWhenRented
+      ),
+      attributes: propertyDetail.attributes
+        ? propertyDetail.attributes.map((attr) => ({
+            attributeId: attr.attribute_id,
+            attributeCode: attr.attribute_code,
+            attributeName: attr.attribute_name,
+            dataType: attr.data_type,
+            icon: attr.icon,
+            unit: attr.unit,
+            valueNumber: attr.value_number,
+            valueText: attr.value_text,
+            valueBoolean: attr.value_boolean,
+            displayValue: null,
+          }))
+        : selectedProperty.attributes,
     };
   }, [selectedProperty, propertyDetail]);
 
   const handleSubmit = async (data: CreateListingFormData) => {
+    const property = enrichedProperty ?? selectedProperty;
+    if (
+      property?.status === 'RENTED' &&
+      data.shouldPublish &&
+      data.listingType === 'RENT'
+    ) {
+      if (!property.allowRentListingWhenRented) {
+        toast.error(t('rentedPropertyRentDisabledError'));
+        return;
+      }
+      if (!data.availableFrom) {
+        toast.error(t('rentedPropertyAvailableFromRequired'));
+        return;
+      }
+    }
+
     // Backend uses snake_case JSON naming (Jackson PropertyNamingStrategies.SNAKE_CASE)
     const payload: CreateListingPayload = {
       property_id: data.propertyId,

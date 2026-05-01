@@ -10,6 +10,14 @@ import { Check, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui';
+import {
   createPropertyFormSchema,
   PropertyFormValues,
   UploadedMediaItem,
@@ -36,6 +44,7 @@ interface PropertyFormProps {
   initialData?: Partial<PropertyFormValues>;
   propertyId?: string;
   isEditMode?: boolean;
+  propertyStatus?: string;
 }
 
 const DRAFT_KEY = 'property-form-draft';
@@ -57,7 +66,12 @@ function hasErrors(obj: unknown): boolean {
   return Object.values(o).some(hasErrors);
 }
 
-export function PropertyForm({ initialData, propertyId, isEditMode = false }: PropertyFormProps) {
+export function PropertyForm({
+  initialData,
+  propertyId,
+  isEditMode = false,
+  propertyStatus,
+}: PropertyFormProps) {
   const t = useTranslations('PropertyManagement');
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -76,6 +90,8 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [createdPropertyId, setCreatedPropertyId] = useState<string | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<'DRAFT' | 'AVAILABLE'>('AVAILABLE');
+  const [pendingSubmitData, setPendingSubmitData] = useState<PropertyFormValues | null>(null);
+  const [isDisableRentListingsConfirmOpen, setIsDisableRentListingsConfirmOpen] = useState(false);
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
@@ -115,6 +131,7 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
         width: undefined,
         length: undefined,
         propertyType: '',
+        allowRentListingWhenRented: false,
         dynamicAttributes: {},
       },
       media: {
@@ -272,7 +289,8 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       width_m: data.info.width != null ? data.info.width : undefined,
       length_m: data.info.length != null ? data.info.length : undefined,
       amenity_ids: data.info.amenityIds || [],
-      status,
+      ...(status && !isEditMode ? { status } : {}),
+      allow_rent_listing_when_rented: Boolean(data.info.allowRentListingWhenRented),
       price_range: data.info.priceRange
         ? {
             rent: data.info.priceRange.rent?.min != null || data.info.priceRange.rent?.max != null
@@ -314,7 +332,16 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const onSubmit = async (data: PropertyFormValues) => {
+  const shouldConfirmDisableRentListings = (data: PropertyFormValues) => {
+    return Boolean(
+      isEditMode &&
+      propertyStatus === 'RENTED' &&
+      initialData?.info?.allowRentListingWhenRented === true &&
+      data.info.allowRentListingWhenRented !== true
+    );
+  };
+
+  const submitProperty = async (data: PropertyFormValues) => {
     console.log('Form Submit Data:', data);
 
     try {
@@ -415,6 +442,24 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       toast.error(t('uploadError') || 'Error uploading media');
       setIsUploadingMedia(false);
     }
+  };
+
+  const onSubmit = async (data: PropertyFormValues) => {
+    if (shouldConfirmDisableRentListings(data)) {
+      setPendingSubmitData(data);
+      setIsDisableRentListingsConfirmOpen(true);
+      return;
+    }
+
+    await submitProperty(data);
+  };
+
+  const handleConfirmDisableRentListings = async () => {
+    if (!pendingSubmitData) return;
+    setIsDisableRentListingsConfirmOpen(false);
+    const data = pendingSubmitData;
+    setPendingSubmitData(null);
+    await submitProperty(data);
   };
 
   return (
@@ -524,8 +569,8 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
                       isPending ||
                       !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
                     }
-                    onClick={() => setSubmissionStatus('AVAILABLE')}
-                    className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 border-none shadow-none'
+                    onClick={!isEditMode ? () => setSubmissionStatus('AVAILABLE') : undefined}
+                    className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 border-none shadow-none disabled:opacity-50'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}
                   </Button>
@@ -548,6 +593,44 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
           ownerPhone={methods.getValues('role.ownerPhone') ?? ''}
         />
       )}
+
+      <Dialog
+        open={isDisableRentListingsConfirmOpen}
+        onOpenChange={(open) => {
+          setIsDisableRentListingsConfirmOpen(open);
+          if (!open) setPendingSubmitData(null);
+        }}
+      >
+        <DialogContent className='sm:max-w-[520px]'>
+          <DialogHeader>
+            <DialogTitle>{t('disableRentListingsConfirmTitle')}</DialogTitle>
+            <DialogDescription className='leading-6'>
+              {t('disableRentListingsConfirmDescription')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900'>
+            {t('disableRentListingsConfirmWarning')}
+          </div>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='ghost'
+              onClick={() => setIsDisableRentListingsConfirmOpen(false)}
+              disabled={isPending}
+            >
+              {t('keepRentListingsEnabled')}
+            </Button>
+            <Button
+              type='button'
+              onClick={handleConfirmDisableRentListings}
+              disabled={isPending}
+              className='bg-amber-600 text-white hover:bg-amber-700'
+            >
+              {t('disableAndMoveRentListingsToDraft')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
