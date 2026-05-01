@@ -8,10 +8,7 @@ import { enUS, vi as viLocale } from 'date-fns/locale';
 import { useLocale, useTranslations } from 'next-intl';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useAgentAppointmentsSnapshot } from '../api/use-agent-dashboard';
-import type {
-  AgentAppointmentTabFilter,
-  AppointmentItem,
-} from '../model/agent-dashboard.types';
+import type { AgentAppointmentTabFilter, AppointmentItem } from '../model/agent-dashboard.types';
 
 function formatDashboardDate(value: string, locale: string) {
   return new Date(value).toLocaleDateString(locale, {
@@ -63,12 +60,10 @@ function formatCalendarHeaderDate(value: Date, locale: string) {
 function statusPillClass(status: AppointmentItem['status']) {
   if (status === 'ACCEPTED')
     return 'text-emerald-700 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300';
-  if (status === 'COMPLETED')
-    return 'text-sky-700 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-300';
+  if (status === 'COMPLETED') return 'text-sky-700 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-300';
   if (status === 'REJECTED')
     return 'text-rose-700 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-300';
-  if (status === 'CANCELED')
-    return 'text-zinc-700 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300';
+  if (status === 'CANCELED') return 'text-zinc-700 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300';
   return 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300';
 }
 
@@ -196,8 +191,7 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
                 month_grid: 'col-span-3 row-start-2 w-full',
                 table: 'w-full border-collapse',
                 weekdays: 'flex w-full',
-                weekday:
-                  'flex-1 text-center text-xs font-medium text-muted-foreground select-none',
+                weekday: 'flex-1 text-center text-xs font-medium text-muted-foreground select-none',
                 week: 'mt-1 flex w-full',
                 day: 'flex-1 p-0.5',
                 outside: 'text-muted-foreground/50 aria-selected:text-muted-foreground/50',

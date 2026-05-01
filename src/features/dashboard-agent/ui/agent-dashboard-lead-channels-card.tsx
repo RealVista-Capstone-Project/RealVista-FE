@@ -257,8 +257,8 @@ export const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
             {t('charts.channelsEmpty')}
           </div>
         ) : (
-          <div className='flex min-h-[240px] flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-3'>
-            <div className='relative mx-auto size-44 shrink-0 sm:mx-0 sm:size-40'>
+          <div className='flex min-h-[240px] flex-col items-stretch justify-center gap-4'>
+            <div className='relative mx-auto size-44 shrink-0 md:size-40'>
               <ChartContainer
                 config={channelChartConfig}
                 className='aspect-square size-full min-h-[11rem] [&>div]:justify-center'
@@ -319,7 +319,7 @@ export const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
                 </div>
               ) : null}
             </div>
-            <div className='w-full min-w-0 space-y-2.5 sm:flex-1'>
+            <div className='w-full min-w-0 space-y-2.5'>
               {LEAD_STATUS_ORDER.map((status) => {
                 const row = channelData.find((c) => c.channel === status);
                 const count = row ? Number(row.leads ?? 0) : 0;

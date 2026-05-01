@@ -36,7 +36,10 @@ interface FeatureMeta {
   accentBorder: string;
 }
 
-function getFeatureMeta(featureType: FeatureType, t: ReturnType<typeof useTranslations>): FeatureMeta {
+function getFeatureMeta(
+  featureType: FeatureType,
+  t: ReturnType<typeof useTranslations>
+): FeatureMeta {
   switch (featureType) {
     case 'LISTING':
       return {
@@ -134,19 +137,24 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
     <div
       className={cn(
         'relative flex flex-col gap-3 overflow-hidden rounded-xl border border-l-4 bg-card p-4 shadow-sm',
-        meta.accentBorder,
+        meta.accentBorder
       )}
     >
       <div
         className={cn(
           'pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60',
-          meta.gradient,
+          meta.gradient
         )}
       />
 
       <div className='relative flex items-start justify-between gap-2'>
         <div className='flex items-center gap-2.5'>
-          <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', meta.iconBg)}>
+          <div
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+              meta.iconBg
+            )}
+          >
             {meta.icon}
           </div>
           <div className='flex flex-col'>
@@ -155,7 +163,7 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
               className={cn(
                 'mt-0.5 w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold',
                 meta.badgeBg,
-                meta.badgeText,
+                meta.badgeText
               )}
             >
               {meta.label}
@@ -169,7 +177,7 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
               'shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold',
               daysLeft <= 7
                 ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400'
-                : 'bg-muted text-muted-foreground',
+                : 'bg-muted text-muted-foreground'
             )}
           >
             {t('sections.plan.daysLeft', { days: daysLeft })}
@@ -204,9 +212,7 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
               value={usagePercent}
               className={cn(
                 'h-1.5',
-                isLow
-                  ? '[&_[data-slot=progress-indicator]]:bg-rose-500'
-                  : meta.progressColor,
+                isLow ? '[&_[data-slot=progress-indicator]]:bg-rose-500' : meta.progressColor
               )}
             />
           </>
@@ -266,7 +272,7 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
               'shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold',
               daysLeft <= 7
                 ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400'
-                : 'bg-muted text-muted-foreground',
+                : 'bg-muted text-muted-foreground'
             )}
           >
             {t('sections.plan.daysLeft', { days: daysLeft })}
@@ -287,7 +293,9 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
             <span className='text-muted-foreground'>
               {t('sections.plan.boostFeaturedQuota', { used: usedFeatured, total: featuredQuota })}
             </span>
-            <span className={cn('font-semibold', isFeaturedLow ? 'text-rose-500' : 'text-foreground')}>
+            <span
+              className={cn('font-semibold', isFeaturedLow ? 'text-rose-500' : 'text-foreground')}
+            >
               {remainingFeatured} {t('sections.plan.remaining')}
             </span>
           </div>
@@ -297,7 +305,7 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
               'h-1.5',
               isFeaturedLow
                 ? '[&_[data-slot=progress-indicator]]:bg-rose-500'
-                : '[&_[data-slot=progress-indicator]]:bg-amber-500',
+                : '[&_[data-slot=progress-indicator]]:bg-amber-500'
             )}
           />
         </div>
@@ -306,7 +314,9 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
             <span className='text-muted-foreground'>
               {t('sections.plan.boostHotBadgeQuota', { used: usedHotBadge, total: hotBadgeQuota })}
             </span>
-            <span className={cn('font-semibold', isHotBadgeLow ? 'text-rose-500' : 'text-foreground')}>
+            <span
+              className={cn('font-semibold', isHotBadgeLow ? 'text-rose-500' : 'text-foreground')}
+            >
               {remainingHotBadge} {t('sections.plan.remaining')}
             </span>
           </div>
@@ -316,7 +326,7 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
               'h-1.5',
               isHotBadgeLow
                 ? '[&_[data-slot=progress-indicator]]:bg-rose-500'
-                : '[&_[data-slot=progress-indicator]]:bg-sky-500',
+                : '[&_[data-slot=progress-indicator]]:bg-sky-500'
             )}
           />
         </div>
