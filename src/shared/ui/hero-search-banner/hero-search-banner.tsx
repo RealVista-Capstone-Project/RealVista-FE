@@ -257,7 +257,7 @@ export function HeroSearchBanner({
             <button
               type='button'
               onClick={onOpenFilters}
-              className='mr-1.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-500 hover:bg-blue-200 transition-colors cursor-pointer'
+              className='mr-1.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer'
               title={t('filters')}
             >
               <SlidersHorizontal className='h-4 w-4' />

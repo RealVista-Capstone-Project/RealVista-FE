@@ -18,7 +18,7 @@ export function RealVistaPagination({
 }: RealVistaPaginationProps) {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-    const maxVisible = 5; // Maximum number of page buttons to show
+    const maxVisible = 7; // Maximum number of page buttons to show
 
     if (totalPages <= maxVisible) {
       // Show all pages if total is small
@@ -29,19 +29,19 @@ export function RealVistaPagination({
       // Always show first page
       pages.push(1);
 
-      if (currentPage > 3) {
+      if (currentPage > 4) {
         pages.push('...');
       }
 
       // Show pages around current page
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
+      const start = Math.max(2, currentPage - 2);
+      const end = Math.min(totalPages - 1, currentPage + 2);
 
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
 
-      if (currentPage < totalPages - 2) {
+      if (currentPage < totalPages - 3) {
         pages.push('...');
       }
 
@@ -63,10 +63,10 @@ export function RealVistaPagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
+        className='flex h-8 w-8 items-center justify-center rounded-full bg-white text-foreground opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
         aria-label='Previous page'
       >
-        <ChevronLeft className='h-5 w-5' strokeWidth={2} />
+        <ChevronLeft className='h-4 w-4' strokeWidth={2} />
       </button>
 
       {/* Page Numbers */}
@@ -75,7 +75,7 @@ export function RealVistaPagination({
           return (
             <span
               key={`ellipsis-${index}`}
-              className='flex h-10 w-10 items-center justify-center text-lg font-bold text-muted-foreground/60'
+              className='flex h-8 w-8 items-center justify-center text-sm font-bold text-muted-foreground/60'
             >
               ...
             </span>
@@ -90,7 +90,7 @@ export function RealVistaPagination({
             key={pageNum}
             onClick={() => onPageChange(pageNum)}
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold transition-all cursor-pointer',
+              'flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all cursor-pointer',
               isActive
                 ? 'bg-primary text-white'
                 : 'bg-white text-muted-foreground opacity-50 hover:opacity-100'
@@ -107,10 +107,10 @@ export function RealVistaPagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className='flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
+        className='flex h-8 w-8 items-center justify-center rounded-full bg-white text-foreground opacity-50 transition-all hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer'
         aria-label='Next page'
       >
-        <ChevronRight className='h-5 w-5' strokeWidth={2} />
+        <ChevronRight className='h-4 w-4' strokeWidth={2} />
       </button>
     </nav>
   );

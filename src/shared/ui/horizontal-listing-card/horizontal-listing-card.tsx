@@ -196,7 +196,7 @@ export function HorizontalListingCard({
                 <span className='text-xl font-bold tracking-tight text-primary'>
                   {formatVND(price)}
                 </span>
-                <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
+                <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
                 {listingType === 'RENT' && (
                   <span className='text-sm text-muted-foreground'>
                     {t('perMonth')}
@@ -211,7 +211,7 @@ export function HorizontalListingCard({
                 size='icon'
               >
                 <Heart
-                  className={cn('h-4 w-4', isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground')}
+                  className={cn('h-4 w-4', isFavorite ? 'fill-red-500 text-red-500' : 'text-primary')}
                   strokeWidth={2}
                 />
               </Button>
@@ -245,8 +245,8 @@ export function HorizontalListingCard({
                     {attr.value_boolean === true
                       ? attr.attribute_name
                       : attr.value_text !== null && attr.value_text !== undefined
-                        ? attr.value_text
-                        : [attr.value_number, attr.attribute_name].filter(Boolean).join(' ')}
+                        ? `${attr.attribute_name}: ${attr.value_text}`
+                        : [attr.attribute_name, attr.value_number].filter(Boolean).join(' ')}
                   </span>
                 </div>
               ))}

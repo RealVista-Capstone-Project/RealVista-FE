@@ -167,8 +167,8 @@ export function RealVistaListingCard({
                 {attr.value_boolean === true
                   ? attr.attribute_name
                   : attr.value_text !== null && attr.value_text !== undefined
-                    ? attr.value_text
-                    : [attr.value_number, attr.attribute_name].filter(Boolean).join(' ')}
+                    ? `${attr.value_text}`
+                    : [attr.attribute_name, attr.value_number].filter(Boolean).join(' ')}
               </span>
             </div>
           ))}
@@ -380,7 +380,7 @@ export function RealVistaListingCard({
                     <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-primary'>
                       {formatVND(price)}
                     </span>
-                    <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
+                    <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
                     {listingType === 'RENT' && (
                       <span className='text-sm font-normal leading-[1.5] text-muted-foreground'>
                         {t('perMonth')}
@@ -462,7 +462,7 @@ export function RealVistaListingCard({
                 <span className={cn('font-bold tracking-[-0.5px] text-primary', compact ? 'text-base leading-[1.4]' : 'text-2xl leading-[1.5] tracking-[-1px]')}>
                   {formatVND(price)}
                 </span>
-                <span className={cn('font-semibold text-muted-foreground', compact ? 'text-[11px]' : 'text-sm')}>VNĐ</span>
+                <span className={cn('font-semibold text-muted-foreground/60', compact ? 'text-[11px]' : 'text-sm')}>VNĐ</span>
                 {listingType === 'RENT' && (
                   <span className={cn('font-normal leading-[1.5] text-muted-foreground', compact ? 'text-xs' : 'text-base')}>
                     {t('perMonth')}
