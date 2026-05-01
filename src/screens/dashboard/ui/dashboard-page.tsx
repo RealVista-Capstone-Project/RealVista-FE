@@ -1,10 +1,14 @@
 'use client';
 
 import * as React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { useAuthSession } from '@/features/auth/model';
 import { useFCMToken } from '@/features/auth/hooks/use-fcm-token';
 import { AdminDashboard } from '@/widgets/admin-dashboard';
 import { OwnerDashboard } from '@/widgets/owner-dashboard';
+import { AgentDashboardView } from '@/features/dashboard-agent';
 
 /**
  * Unified Dashboard Page
@@ -12,7 +16,26 @@ import { OwnerDashboard } from '@/widgets/owner-dashboard';
  */
 export function DashboardPage() {
   const { data: session, status } = useAuthSession();
+  const router = useRouter();
+  const locale = useLocale();
+
+  // Initialize Firebase Cloud Messaging token
   useFCMToken();
+
+  const user = session?.user;
+  const backendRoles: string[] = user?.backendRoles ?? [];
+  const isAgent = user?.role === 'AGENT' || backendRoles.includes('AGENT');
+  const isOwner = user?.role === 'owner' || backendRoles.includes('OWNER');
+  const isAdmin = user?.role === 'admin' || backendRoles.includes('ADMIN');
+
+  useEffect(() => {
+    if (status === 'loading' || !session) return;
+
+    // Redirect if user has no authorized roles for dashboard
+    if (!isOwner && !isAgent && !isAdmin) {
+      router.replace(`/${locale}/buy`);
+    }
+  }, [isAdmin, isAgent, isOwner, locale, router, session, status]);
 
   if (status === 'loading') {
     return (
@@ -22,14 +45,28 @@ export function DashboardPage() {
     );
   }
 
-  // Determine which dashboard to show based on role
-  const role = session?.user?.role;
+  if (!session) {
+    return (
+      <div className='flex h-full min-h-screen items-center justify-center'>
+        <p className='text-lg text-slate-600 dark:text-slate-400'>
+          Please sign in to access the dashboard
+        </p>
+      </div>
+    );
+  }
 
-  if (role === 'admin' || role === 'moderator') {
+  // Render dashboard based on prioritized role
+  if (isAdmin) {
     return <AdminDashboard />;
   }
 
-  // Default to OwnerDashboard for owners or others who should see the main dashboard
-  // This maintains the logic from the develop branch
-  return <OwnerDashboard />;
+  if (isAgent) {
+    return <AgentDashboardView />;
+  }
+
+  if (isOwner) {
+    return <OwnerDashboard />;
+  }
+
+  return null;
 }
