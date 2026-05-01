@@ -897,13 +897,14 @@
         "emptyForFilter": "Không có lịch hẹn phù hợp với bộ lọc trong ngày đã chọn."
       },
       "plan": {
-        "title": "Gói dịch vụ & boost",
-        "description": "Tổng quan mức sử dụng gói và lượt boost.",
+        "title": "Gói dịch vụ & đẩy tin",
+        "description": "Tổng quan mức sử dụng gói và lượt đẩy tin.",
         "subscriptions": "Gói đăng ký",
-        "boosts": "Gói boost",
-        "boost": "Boost",
+        "boosts": "Gói đẩy tin",
+        "boost": "Đẩy tin",
         "feature": "Tính năng",
         "status": "Trạng thái",
+        "daysLeft": "{days} ngày",
         "startedOn": "Bắt đầu từ {date}",
         "quota": "Hạn mức",
         "unlimited": "Không giới hạn",
@@ -915,6 +916,15 @@
         "boostFeaturedQuota": "Đẩy nổi bật {used}/{total}",
         "boostHotBadgeQuota": "Huy hiệu HOT {used}/{total}",
         "remaining": "còn lại",
+        "statusValue": {
+          "active": "Đang hoạt động",
+          "expired": "Đã hết hạn",
+          "canceled": "Đã hủy",
+          "pending": "Đang chờ",
+          "paused": "Tạm dừng",
+          "completed": "Hoàn tất",
+          "unknown": "Không xác định"
+        },
         "featureType": {
           "listing": "Tin đăng",
           "tour3d": "3D Tour",

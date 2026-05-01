@@ -98,6 +98,21 @@ function getDaysRemaining(endDate: string | null | undefined): number | null {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
+function translatePlanStatus(status: string, t: ReturnType<typeof useTranslations>): string {
+  const normalized = status.trim().toLowerCase();
+  const statusKeyMap: Record<string, string> = {
+    active: 'active',
+    expired: 'expired',
+    canceled: 'canceled',
+    cancelled: 'canceled',
+    pending: 'pending',
+    paused: 'paused',
+    completed: 'completed',
+  };
+  const statusKey = statusKeyMap[normalized] ?? 'unknown';
+  return t(`sections.plan.statusValue.${statusKey}`);
+}
+
 interface PlanSubscriptionRowProps {
   sub: AgentPlanSubscriptionRow;
   t: ReturnType<typeof useTranslations>;
@@ -157,14 +172,14 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            {daysLeft}d
+            {t('sections.plan.daysLeft', { days: daysLeft })}
           </div>
         )}
       </div>
 
       <div className='relative space-y-0.5 text-xs text-muted-foreground'>
         <p>
-          {t('sections.plan.status')}: {sub.status}
+          {t('sections.plan.status')}: {translatePlanStatus(sub.status, t)}
         </p>
         <p>{t('sections.plan.startedOn', { date: startedDate })}</p>
       </div>
@@ -254,14 +269,14 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            {daysLeft}d
+            {t('sections.plan.daysLeft', { days: daysLeft })}
           </div>
         )}
       </div>
 
       <div className='relative space-y-0.5 text-xs text-muted-foreground'>
         <p>
-          {t('sections.plan.status')}: {boost.status}
+          {t('sections.plan.status')}: {translatePlanStatus(boost.status, t)}
         </p>
         <p>{t('sections.plan.startedOn', { date: startDate })}</p>
       </div>

@@ -902,6 +902,7 @@
         "boost": "Boost",
         "feature": "Feature",
         "status": "Status",
+        "daysLeft": "{days}d",
         "startedOn": "Started on {date}",
         "quota": "Quota",
         "unlimited": "Unlimited",
@@ -913,6 +914,15 @@
         "boostFeaturedQuota": "Featured boost {used}/{total}",
         "boostHotBadgeQuota": "Hot badge boost {used}/{total}",
         "remaining": "left",
+        "statusValue": {
+          "active": "Active",
+          "expired": "Expired",
+          "canceled": "Canceled",
+          "pending": "Pending",
+          "paused": "Paused",
+          "completed": "Completed",
+          "unknown": "Unknown"
+        },
         "featureType": {
           "listing": "Listing",
           "tour3d": "3D Tour",
