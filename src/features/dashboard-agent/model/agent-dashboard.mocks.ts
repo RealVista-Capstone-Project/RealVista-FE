@@ -151,5 +151,6 @@ export const mockAgentPlanSnapshot: AgentPlanSnapshotResponse = {
   timestamp: nowIso,
   data: {
     subscriptions: [],
+    boosts: [],
   },
 };
