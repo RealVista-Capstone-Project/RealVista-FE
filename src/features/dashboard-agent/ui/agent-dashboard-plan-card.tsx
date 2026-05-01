@@ -221,7 +221,7 @@ export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
   const isLoading = planQuery.isLoading && !planQuery.data;
 
   return (
-    <Card>
+    <Card className='xl:col-span-3'>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <Zap className='h-4 w-4 text-primary' />

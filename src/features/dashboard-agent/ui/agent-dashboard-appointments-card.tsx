@@ -159,7 +159,7 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
   ).length;
 
   return (
-    <Card className='xl:col-span-2'>
+    <Card className='xl:col-span-5'>
       <CardHeader>
         <CardTitle>{t('sections.appointments.title')}</CardTitle>
         <CardDescription>{t('sections.appointments.description')}</CardDescription>

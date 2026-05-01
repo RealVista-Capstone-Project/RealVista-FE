@@ -9,11 +9,10 @@ import {
   type ChartConfig,
 } from '@/shared/ui/chart';
 import { Skeleton } from '@/shared/ui/skeleton';
-import type { AgentDateRange, AgentPerformancePeriod } from '../model/agent-dashboard.types';
+import type { AgentDateRange } from '../model/agent-dashboard.types';
 import {
   useAgentAppointmentsSnapshot,
   useAgentDashboardMetrics,
-  useAgentPerformanceMetrics,
   useAgentPlanSnapshot,
 } from '../api/use-agent-dashboard';
 import {
@@ -30,20 +29,47 @@ import { useLocale, useTranslations } from 'next-intl';
 import { memo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts';
 
-const AgentDashboardPerformanceChart = dynamic(
+const AgentDashboardInsightsCard = dynamic(
   () =>
-    import('./agent-dashboard-performance-chart').then((m) => ({
-      default: m.AgentDashboardPerformanceChart,
+    import('./agent-dashboard-insights-card').then((m) => ({
+      default: m.AgentDashboardInsightsCard,
     })),
   {
     loading: () => (
-      <Card className='xl:col-span-8'>
-        <CardHeader>
-          <Skeleton className='h-6 w-48 max-w-full' />
-          <Skeleton className='mt-2 h-4 w-full max-w-lg' />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className='h-52 w-full' />
+      <Card className='border-border/70 bg-card shadow-sm'>
+        <CardContent className='space-y-6 pt-6'>
+          <div className='space-y-4'>
+            <div className='space-y-2'>
+              <div className='flex flex-wrap items-center justify-between gap-3'>
+                <Skeleton className='h-6 w-48 max-w-full' />
+                <Skeleton className='h-8 w-28 rounded-xl' />
+              </div>
+              <Skeleton className='h-4 w-full max-w-lg' />
+            </div>
+            <Skeleton className='h-52 w-full' />
+          </div>
+          <div className='border-t border-border/60 pt-6'>
+            <div className='space-y-4'>
+              <div className='flex flex-wrap items-center justify-between gap-3'>
+                <div className='space-y-2'>
+                  <Skeleton className='h-6 w-56 max-w-full' />
+                  <Skeleton className='h-4 w-full max-w-md' />
+                </div>
+                <Skeleton className='h-8 w-40 rounded-xl' />
+              </div>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className='flex gap-3'>
+                  <Skeleton className='h-8 w-8 shrink-0 rounded-full' />
+                  <Skeleton className='h-12 w-12 shrink-0 rounded-lg' />
+                  <div className='min-w-0 flex-1 space-y-2'>
+                    <Skeleton className='h-4 w-2/3' />
+                    <Skeleton className='h-2 w-full' />
+                    <Skeleton className='h-3 w-4/5' />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
     ),
@@ -57,7 +83,7 @@ const AgentDashboardAppointmentsCard = dynamic(
     })),
   {
     loading: () => (
-      <Card className='xl:col-span-2'>
+      <Card className='xl:col-span-5'>
         <CardHeader>
           <Skeleton className='h-6 w-48 max-w-full' />
           <Skeleton className='mt-2 h-4 w-72 max-w-full' />
@@ -77,43 +103,13 @@ const AgentDashboardPlanCard = dynamic(
     })),
   {
     loading: () => (
-      <Card>
+      <Card className='xl:col-span-3'>
         <CardHeader>
           <Skeleton className='h-6 w-48 max-w-full' />
           <Skeleton className='mt-2 h-4 w-full max-w-md' />
         </CardHeader>
         <CardContent className='space-y-3'>
           <Skeleton className='h-36 w-full rounded-xl' />
-        </CardContent>
-      </Card>
-    ),
-  }
-);
-
-const AgentDashboardTopListingsCard = dynamic(
-  () =>
-    import('./agent-dashboard-top-listings-card').then((m) => ({
-      default: m.AgentDashboardTopListingsCard,
-    })),
-  {
-    loading: () => (
-      <Card className='border-border/70 bg-card shadow-sm'>
-        <CardHeader>
-          <Skeleton className='h-6 w-56 max-w-full' />
-          <Skeleton className='mt-2 h-4 w-full max-w-lg' />
-        </CardHeader>
-        <CardContent className='space-y-4'>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className='flex gap-3'>
-              <Skeleton className='h-8 w-8 shrink-0 rounded-full' />
-              <Skeleton className='h-12 w-12 shrink-0 rounded-lg' />
-              <div className='min-w-0 flex-1 space-y-2'>
-                <Skeleton className='h-4 w-2/3' />
-                <Skeleton className='h-2 w-full' />
-                <Skeleton className='h-3 w-4/5' />
-              </div>
-            </div>
-          ))}
         </CardContent>
       </Card>
     ),
@@ -190,19 +186,6 @@ function buildThisMonthRange(): AgentDateRange {
     from: toInputDateValue(firstDay),
     to: toInputDateValue(now),
   };
-}
-
-function AgentPerformanceChartSection() {
-  const [selectedPeriod, setSelectedPeriod] = useState<AgentPerformancePeriod>('M');
-  const performanceQuery = useAgentPerformanceMetrics(selectedPeriod);
-  const trendData = performanceQuery.data?.data.trend ?? [];
-  return (
-    <AgentDashboardPerformanceChart
-      trendData={trendData}
-      selectedPeriod={selectedPeriod}
-      onPeriodChange={setSelectedPeriod}
-    />
-  );
 }
 
 const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
@@ -480,15 +463,6 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
   );
 });
 
-function AgentDashboardPerformanceSection() {
-  return (
-    <section className='grid grid-cols-1 gap-4 xl:grid-cols-12'>
-      <AgentPerformanceChartSection />
-      <AgentLeadChannelsCard />
-    </section>
-  );
-}
-
 export function AgentDashboardView() {
   const t = useTranslations('AgentDashboard');
   const metricsQuery = useAgentDashboardMetrics();
@@ -637,11 +611,11 @@ export function AgentDashboardView() {
         })}
       </section>
 
-      <AgentDashboardPerformanceSection />
+      <AgentDashboardInsightsCard />
 
-      <AgentDashboardTopListingsCard />
+      <section className='grid grid-cols-1 gap-4 xl:grid-cols-12'>
+        <AgentLeadChannelsCard />
 
-      <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         <AgentDashboardAppointmentsCard />
 
         <AgentDashboardPlanCard />

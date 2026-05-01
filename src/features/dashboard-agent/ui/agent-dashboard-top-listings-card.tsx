@@ -17,7 +17,14 @@ function metricForSort(row: AgentListingAnalyticsRow, sort: AgentListingAnalytic
   return row.totalViews;
 }
 
-export function AgentDashboardTopListingsCard() {
+export interface AgentDashboardTopListingsContentProps {
+  /** `standalone` uses CardHeader/CardContent for use inside a wrapping Card; `embedded` uses plain divs for nesting inside another card. */
+  variant?: 'standalone' | 'embedded';
+}
+
+export function AgentDashboardTopListingsContent({
+  variant = 'embedded',
+}: AgentDashboardTopListingsContentProps = {}) {
   const t = useTranslations('AgentDashboard');
   const [sortBy, setSortBy] = useState<AgentListingAnalyticsSort>('views');
   const query = useAgentTopListings(sortBy);
@@ -25,75 +32,96 @@ export function AgentDashboardTopListingsCard() {
   const rows = query.data?.data ?? [];
   const isLoading = query.isLoading && !query.data;
   const maxMetric = useMemo(() => {
-    if (rows.length === 0) return 0;
-    return Math.max(...rows.map((r) => metricForSort(r, sortBy)), 0);
-  }, [rows, sortBy]);
+    const list = query.data?.data ?? [];
+    if (list.length === 0) return 0;
+    return Math.max(...list.map((r) => metricForSort(r, sortBy)), 0);
+  }, [query.data, sortBy]);
+
+  const headerSection = (
+    <div className='flex flex-wrap items-center justify-between gap-3'>
+      <div className='space-y-1'>
+        <CardTitle>{t('sections.topListings.title')}</CardTitle>
+        <CardDescription>{t('sections.topListings.description')}</CardDescription>
+      </div>
+      <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
+        {SORT_OPTIONS.map((key) => (
+          <button
+            key={key}
+            type='button'
+            onClick={() => setSortBy(key)}
+            className={cn(
+              'rounded-lg px-3 py-1 text-xs font-medium transition-all',
+              sortBy === key
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {t(`sections.topListings.sort.${key}`)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const listSection =
+    query.isError && !query.data ? (
+      <div className='flex min-h-[120px] items-center justify-center text-center text-sm text-muted-foreground'>
+        {t('error.partialDescription')}
+      </div>
+    ) : isLoading ? (
+      <div className='space-y-4'>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className='flex gap-3'>
+            <Skeleton className='h-8 w-8 shrink-0 rounded-full' />
+            <Skeleton className='h-12 w-12 shrink-0 rounded-lg' />
+            <div className='min-w-0 flex-1 space-y-2'>
+              <Skeleton className='h-4 w-3/5 max-w-xs' />
+              <Skeleton className='h-2 w-full max-w-md' />
+              <Skeleton className='h-3 w-full max-w-lg' />
+            </div>
+            <Skeleton className='hidden h-10 w-52 shrink-0 sm:block' />
+          </div>
+        ))}
+      </div>
+    ) : rows.length === 0 ? (
+      <div className='flex min-h-[120px] items-center justify-center text-center text-sm text-muted-foreground'>
+        {t('sections.topListings.empty')}
+      </div>
+    ) : (
+      <ul className='space-y-5'>
+        {rows.map((row, index) => (
+          <TopListingRow
+            key={row.listingId}
+            rank={index + 1}
+            row={row}
+            sortBy={sortBy}
+            maxMetric={maxMetric}
+          />
+        ))}
+      </ul>
+    );
+
+  if (variant === 'standalone') {
+    return (
+      <>
+        <CardHeader>{headerSection}</CardHeader>
+        <CardContent className='pointer-events-none'>{listSection}</CardContent>
+      </>
+    );
+  }
 
   return (
+    <div className='space-y-4'>
+      {headerSection}
+      <div className='pointer-events-none'>{listSection}</div>
+    </div>
+  );
+}
+
+export function AgentDashboardTopListingsCard() {
+  return (
     <Card className='border-border/70 bg-card shadow-sm'>
-      <CardHeader>
-        <div className='flex flex-wrap items-center justify-between gap-3'>
-          <div className='space-y-1'>
-            <CardTitle>{t('sections.topListings.title')}</CardTitle>
-            <CardDescription>{t('sections.topListings.description')}</CardDescription>
-          </div>
-          <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
-            {SORT_OPTIONS.map((key) => (
-              <button
-                key={key}
-                type='button'
-                onClick={() => setSortBy(key)}
-                className={cn(
-                  'rounded-lg px-3 py-1 text-xs font-medium transition-all',
-                  sortBy === key
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {t(`sections.topListings.sort.${key}`)}
-              </button>
-            ))}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className='pointer-events-none'>
-        {query.isError && !query.data ? (
-          <div className='flex min-h-[120px] items-center justify-center text-center text-sm text-muted-foreground'>
-            {t('error.partialDescription')}
-          </div>
-        ) : isLoading ? (
-          <div className='space-y-4'>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className='flex gap-3'>
-                <Skeleton className='h-8 w-8 shrink-0 rounded-full' />
-                <Skeleton className='h-12 w-12 shrink-0 rounded-lg' />
-                <div className='min-w-0 flex-1 space-y-2'>
-                  <Skeleton className='h-4 w-3/5 max-w-xs' />
-                  <Skeleton className='h-2 w-full max-w-md' />
-                  <Skeleton className='h-3 w-full max-w-lg' />
-                </div>
-                <Skeleton className='hidden h-10 w-52 shrink-0 sm:block' />
-              </div>
-            ))}
-          </div>
-        ) : rows.length === 0 ? (
-          <div className='flex min-h-[120px] items-center justify-center text-center text-sm text-muted-foreground'>
-            {t('sections.topListings.empty')}
-          </div>
-        ) : (
-          <ul className='space-y-5'>
-            {rows.map((row, index) => (
-              <TopListingRow
-                key={row.listingId}
-                rank={index + 1}
-                row={row}
-                sortBy={sortBy}
-                maxMetric={maxMetric}
-              />
-            ))}
-          </ul>
-        )}
-      </CardContent>
+      <AgentDashboardTopListingsContent variant='standalone' />
     </Card>
   );
 }
