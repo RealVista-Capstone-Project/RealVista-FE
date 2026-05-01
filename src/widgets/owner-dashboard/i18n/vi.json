@@ -1,0 +1,125 @@
+{
+  "OwnerDashboard": {
+    "header": {
+      "welcomeBack": "Chào mừng trở lại,",
+      "wave": "👋",
+      "notification": "Thông báo",
+      "addListing": "Thêm tin đăng",
+      "title": "Trang chủ chủ nhà"
+    },
+    "stats": {
+      "activeLeads": "Khách hàng tiềm năng",
+      "totalViews": "Lượt xem",
+      "activeListing": "Tin đang đăng",
+      "totalClosed": "Hợp đồng thành công"
+    },
+    "pipeline": {
+      "title": "Tiến độ giao dịch",
+      "subtitle": "Đang xử lý",
+      "activeLeads": "Khách tiềm năng",
+      "onProgress": "Đang xử lý",
+      "closedDeals": "Đã chốt",
+      "viewPipeline": "Xem tiến độ"
+    },
+    "performance": {
+      "title": "Hiệu suất",
+      "revenue": "Doanh thu",
+      "visit": "Lượt xem",
+      "week": "T",
+      "month": "M",
+      "year": "N",
+      "featuredProperty": "The Somerset",
+      "featuredType": "Nhà ở",
+      "sold": "Đã bán",
+      "rented": "Đã cho thuê",
+      "views": "Lượt xem",
+      "recommendedTo": "Được gợi ý cho 14 khách",
+      "closedDeals": "Đã chốt",
+      "onProgress": "Đang xử lý"
+    },
+    "reminder": {
+      "title": "Nhắc nhở",
+      "viewAll": "Xem tất cả",
+      "items": {
+        "followUp": {
+          "title": "Theo dõi khách hàng",
+          "description": "Liên hệ với anh Aditya về tình trạng thanh toán."
+        },
+        "uploadPhotos": {
+          "title": "Tải ảnh mới",
+          "description": "Tải ảnh mới cho villa sắp ra mắt."
+        },
+        "reviewContract": {
+          "title": "Xem xét hợp đồng bán",
+          "description": "Xem xét và ký bản nháp hợp đồng bán The Somerset."
+        }
+      }
+    },
+    "agentContact": {
+      "title": "Danh sách môi giới",
+      "viewAll": "Xem tất cả",
+      "activeLeads": "{count} khách tiềm năng"
+    },
+    "salesAnalytics": {
+      "title": "Phân tích doanh số",
+      "thisMonth": "Tháng này",
+      "total": "Tổng",
+      "channels": {
+        "direct": "Bán trực tiếp",
+        "agent": "Qua môi giới"
+      }
+    },
+    "propertyOverview": {
+      "title": "Tổng quan bất động sản",
+      "viewAll": "Xem tất cả",
+      "totalProperty": "Tổng BĐS",
+      "listedProperty": "Đang đăng",
+      "propertySold": "Đã bán",
+      "activeListing": "Đang hoạt động"
+    },
+    "schedule": {
+      "title": "Lịch trình",
+      "tabs": {
+        "all": "Tất cả",
+        "assigned": "Được giao",
+        "mySchedule": "Của tôi"
+      },
+      "myScheduleLabel": "của tôi",
+      "assignedLabel": "được giao",
+      "currentPlan": {
+        "title": "Gói hiện tại",
+        "loading": "Đang tải gói...",
+        "empty": "Bạn chưa có gói đăng ký đang hoạt động.",
+        "expireAt": "Hết hạn: {date}",
+        "unlimitedQuota": "Không giới hạn quota",
+        "usedQuota": "Đã dùng {used}/{total}",
+        "remaining": "còn lại",
+        "viewAll": "Xem tất cả",
+        "featureType": {
+          "listing": "Tin đăng",
+          "tour3d": "3D Tour",
+          "aiRequest": "AI"
+        }
+      }
+    },
+    "propertyTable": {
+      "title": "Tin đang đăng",
+      "properties": "{count} tin đăng",
+      "searchPlaceholder": "Tìm bất động sản...",
+      "allStatus": "Tất cả trạng thái",
+      "columns": {
+        "property": "Tin đăng",
+        "type": "Loại",
+        "cost": "Giá",
+        "activeLeads": "Khách tiềm năng",
+        "views": "Lượt xem",
+        "status": "Trạng thái"
+      },
+      "status": {
+        "available": "Còn trống",
+        "occupied": "Đang thuê",
+        "soldOut": "Đã bán"
+      }
+    }
+  }
+}

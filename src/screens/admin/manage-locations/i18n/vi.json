@@ -10,19 +10,30 @@
       "WARD": "Phường/Xã"
     },
     "search": {
-      "placeholder": "Tìm kiếm theo tên hoặc mã..."
+      "placeholder": "Tìm theo tên hoặc mã địa điểm..."
     },
     "filters": {
       "allCities": "Tất cả tỉnh/thành phố",
       "allDistricts": "Tất cả quận/huyện",
+      "allStatuses": "Tất cả trạng thái",
       "selectCityFirst": "Chọn tỉnh/thành phố trước"
     },
     "table": {
       "columns": {
+        "no": "STT",
         "name": "Tên",
         "code": "Mã",
         "level": "Cấp",
+        "status": "Trạng thái",
+        "usedByProperties": "Tin dùng",
+        "updatedAt": "Cập nhật",
         "actions": "Thao tác"
+      },
+      "editTooltip": "Chỉnh sửa địa điểm",
+      "moreActions": "Thao tác khác",
+      "actions": {
+        "activate": "Kích hoạt",
+        "archive": "Lưu trữ"
       },
       "empty": {
         "title": "Không tìm thấy địa điểm",
@@ -34,19 +45,28 @@
       "DISTRICT": "Quận/Huyện",
       "WARD": "Phường/Xã"
     },
+    "statuses": {
+      "ACTIVE": "Đang hoạt động",
+      "ARCHIVED": "Đã lưu trữ"
+    },
     "form": {
       "addTitle": "Thêm địa điểm",
       "editTitle": "Chỉnh sửa địa điểm",
+      "addDescription": "Điền thông tin để thêm địa điểm mới vào hệ thống.",
+      "editDescription": "Cập nhật tên và mã của địa điểm. Cấp hành chính và địa điểm cha không thể thay đổi.",
       "level": "Cấp hành chính",
       "selectLevel": "Chọn cấp",
+      "levelLockedHint": "Cấp hành chính không thể thay đổi sau khi tạo.",
       "parentCity": "Tỉnh/Thành phố",
       "selectCity": "Chọn tỉnh/thành phố",
       "parentDistrict": "Quận/Huyện",
       "selectDistrict": "Chọn quận/huyện",
+      "selectCityFirstHint": "Vui lòng chọn tỉnh/thành phố trước.",
       "name": "Tên",
       "namePlaceholder": "VD: Hà Nội",
       "code": "Mã",
       "codePlaceholder": "VD: HN",
+      "codeHint": "Chỉ chữ cái, số, dấu gạch dưới (_) hoặc gạch ngang (-).",
       "cancel": "Hủy",
       "submit": "Thêm địa điểm",
       "save": "Lưu thay đổi",
@@ -56,7 +76,16 @@
       "createSuccess": "Đã thêm địa điểm thành công",
       "createError": "Không thể thêm địa điểm",
       "updateSuccess": "Đã cập nhật địa điểm thành công",
-      "updateError": "Không thể cập nhật địa điểm"
+      "updateError": "Không thể cập nhật địa điểm",
+      "activeSuccess": "Đã kích hoạt địa điểm",
+      "activeError": "Không thể kích hoạt địa điểm",
+      "archivedSuccess": "Đã lưu trữ địa điểm",
+      "archivedError": "Không thể lưu trữ địa điểm"
+    },
+    "confirm": {
+      "archive": "Bạn có chắc muốn lưu trữ địa điểm này? Địa điểm sẽ không còn xuất hiện trong danh sách công khai.",
+      "archiveTitle": "Lưu trữ địa điểm",
+      "archiveDescription": "Lưu trữ {name}? Địa điểm sẽ không còn xuất hiện trong danh sách công khai."
     },
     "validation": {
       "nameRequired": "Tên là bắt buộc",

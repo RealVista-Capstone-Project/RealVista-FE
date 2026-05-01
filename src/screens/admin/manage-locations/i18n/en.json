@@ -15,14 +15,25 @@
     "filters": {
       "allCities": "All cities",
       "allDistricts": "All districts",
+      "allStatuses": "All statuses",
       "selectCityFirst": "Select a city first"
     },
     "table": {
       "columns": {
+        "no": "No",
         "name": "Name",
         "code": "Code",
         "level": "Level",
+        "status": "Status",
+        "usedByProperties": "Used by",
+        "updatedAt": "Updated",
         "actions": "Actions"
+      },
+      "editTooltip": "Edit location",
+      "moreActions": "More actions",
+      "actions": {
+        "activate": "Activate",
+        "archive": "Archive"
       },
       "empty": {
         "title": "No locations found",
@@ -34,19 +45,28 @@
       "DISTRICT": "District",
       "WARD": "Ward"
     },
+    "statuses": {
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived"
+    },
     "form": {
       "addTitle": "Add Location",
       "editTitle": "Edit Location",
-      "level": "Level",
+      "addDescription": "Fill in the details to add a new location to the system.",
+      "editDescription": "Update the name and code. Administrative level and parent location cannot be changed.",
+      "level": "Administrative level",
       "selectLevel": "Select level",
+      "levelLockedHint": "Administrative level cannot be changed after creation.",
       "parentCity": "City",
       "selectCity": "Select city",
       "parentDistrict": "District",
       "selectDistrict": "Select district",
+      "selectCityFirstHint": "Please select a city first.",
       "name": "Name",
       "namePlaceholder": "e.g. Hà Nội",
       "code": "Code",
       "codePlaceholder": "e.g. HN",
+      "codeHint": "Letters, numbers, underscores (_) and hyphens (-) only.",
       "cancel": "Cancel",
       "submit": "Add location",
       "save": "Save changes",
@@ -56,7 +76,16 @@
       "createSuccess": "Location created successfully",
       "createError": "Failed to create location",
       "updateSuccess": "Location updated successfully",
-      "updateError": "Failed to update location"
+      "updateError": "Failed to update location",
+      "activeSuccess": "Location activated",
+      "activeError": "Failed to activate location",
+      "archivedSuccess": "Location archived",
+      "archivedError": "Failed to archive location"
+    },
+    "confirm": {
+      "archive": "Archive this location? It will no longer appear in public location lists.",
+      "archiveTitle": "Archive location",
+      "archiveDescription": "Archive {name}? It will no longer appear in public location lists."
     },
     "validation": {
       "nameRequired": "Name is required",
