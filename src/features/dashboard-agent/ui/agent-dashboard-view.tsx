@@ -9,17 +9,22 @@ import {
   type ChartConfig,
 } from '@/shared/ui/chart';
 import { Skeleton } from '@/shared/ui/skeleton';
-import type {
-  AgentDateRange,
-  AgentPerformancePeriod,
-} from '../model/agent-dashboard.types';
+import type { AgentDateRange, AgentPerformancePeriod } from '../model/agent-dashboard.types';
 import {
   useAgentAppointmentsSnapshot,
   useAgentDashboardMetrics,
   useAgentPerformanceMetrics,
   useAgentPlanSnapshot,
 } from '../api/use-agent-dashboard';
-import { CalendarDays, CircleAlert, TrendingDown, TrendingUp } from 'lucide-react';
+import {
+  Building2,
+  CalendarDays,
+  CircleAlert,
+  Home,
+  TrendingDown,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { memo, useState } from 'react';
@@ -116,7 +121,11 @@ function toInputDateValue(value: Date) {
 function toDateRangeLabel(range: AgentDateRange, locale: string) {
   const from = new Date(`${range.from}T00:00:00`);
   const to = new Date(`${range.to}T00:00:00`);
-  const formatConfig: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  const formatConfig: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  };
   return `${from.toLocaleDateString(locale, formatConfig)} - ${to.toLocaleDateString(locale, formatConfig)}`;
 }
 
@@ -197,7 +206,10 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
   const totalChannelLeads = channelData.reduce((sum, row) => sum + Number(row.leads ?? 0), 0);
   const nonZeroChannelData = channelData.filter((row) => Number(row.leads ?? 0) > 0);
   const maxLeadCount = Math.max(...channelData.map((row) => Number(row.leads ?? 0)), 0);
-  const minLeadCount = Math.min(...nonZeroChannelData.map((row) => Number(row.leads ?? 0)), maxLeadCount);
+  const minLeadCount = Math.min(
+    ...nonZeroChannelData.map((row) => Number(row.leads ?? 0)),
+    maxLeadCount
+  );
   const spreadRatio = maxLeadCount > 0 ? (maxLeadCount - minLeadCount) / maxLeadCount : 0;
   const useBarChart = nonZeroChannelData.length >= 5 || spreadRatio < 0.45;
   const channelPieData = channelData.map((row) => ({
@@ -231,7 +243,8 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
 
   const applyCustomRange = () => {
     if (!customFrom || !customTo) return;
-    if (new Date(`${customFrom}T00:00:00`).getTime() > new Date(`${customTo}T00:00:00`).getTime()) return;
+    if (new Date(`${customFrom}T00:00:00`).getTime() > new Date(`${customTo}T00:00:00`).getTime())
+      return;
     setActiveRange({ from: customFrom, to: customTo });
     setActivePreset('CUSTOM');
     setCustomOpen(false);
@@ -297,7 +310,12 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
                   className='h-8 rounded-lg border border-border/70 bg-background px-2.5 text-xs text-foreground outline-none ring-offset-background focus-visible:ring-1 focus-visible:ring-primary'
                 />
               </label>
-              <Button type='button' size='sm' className='h-8 rounded-lg px-3 text-xs' onClick={applyCustomRange}>
+              <Button
+                type='button'
+                size='sm'
+                className='h-8 rounded-lg px-3 text-xs'
+                onClick={applyCustomRange}
+              >
                 {t('timebound.apply')}
               </Button>
             </div>
@@ -346,7 +364,9 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
                       tickLine={false}
                       axisLine={false}
                       tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
-                      tickFormatter={(value: string) => leadStatusLabel[value as keyof typeof leadStatusLabel]}
+                      tickFormatter={(value: string) =>
+                        leadStatusLabel[value as keyof typeof leadStatusLabel]
+                      }
                     />
                     <ChartTooltip
                       cursor={false}
@@ -451,6 +471,8 @@ export function AgentDashboardView() {
       trend: 'up' as const,
       deltaPercent: 0,
       unit: undefined,
+      iconBg: 'bg-emerald-100 dark:bg-emerald-500/20',
+      icon: <Home className='h-4 w-4 text-emerald-600 dark:text-emerald-400' />,
     },
     {
       id: 'delegated-properties',
@@ -458,6 +480,8 @@ export function AgentDashboardView() {
       trend: 'up' as const,
       deltaPercent: 0,
       unit: undefined,
+      iconBg: 'bg-amber-100 dark:bg-amber-500/20',
+      icon: <Building2 className='h-4 w-4 text-amber-600 dark:text-amber-400' />,
     },
     {
       id: 'open-appointments',
@@ -465,6 +489,8 @@ export function AgentDashboardView() {
       trend: 'up' as const,
       deltaPercent: 0,
       unit: undefined,
+      iconBg: 'bg-sky-100 dark:bg-sky-500/20',
+      icon: <CalendarDays className='h-4 w-4 text-sky-600 dark:text-sky-400' />,
     },
     {
       id: 'crm-leads',
@@ -472,6 +498,8 @@ export function AgentDashboardView() {
       trend: 'up' as const,
       deltaPercent: 0,
       unit: undefined,
+      iconBg: 'bg-rose-100 dark:bg-rose-500/20',
+      icon: <Users className='h-4 w-4 text-rose-600 dark:text-rose-400' />,
     },
   ];
 
@@ -518,8 +546,18 @@ export function AgentDashboardView() {
           return (
             <Card key={kpi.id} className='border-border/70 bg-card shadow-sm'>
               <CardHeader className='pb-3'>
-                <CardDescription>{t(`kpi.${kpi.id}`)}</CardDescription>
-                <CardTitle className='text-3xl font-semibold'>
+                <div className='flex items-center justify-between gap-2'>
+                  <CardDescription>{t(`kpi.${kpi.id}`)}</CardDescription>
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-xl',
+                      kpi.iconBg
+                    )}
+                  >
+                    {kpi.icon}
+                  </div>
+                </div>
+                <CardTitle className='text-2xl font-semibold'>
                   {kpi.value.toLocaleString()}
                   {kpi.unit ? ` ${kpi.unit}` : ''}
                 </CardTitle>
