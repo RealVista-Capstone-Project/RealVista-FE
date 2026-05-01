@@ -245,8 +245,8 @@ export function HorizontalListingCard({
                     {attr.value_boolean === true
                       ? attr.attribute_name
                       : attr.value_text !== null && attr.value_text !== undefined
-                        ? `${attr.attribute_name}: ${attr.value_text}`
-                        : [attr.attribute_name, attr.value_number].filter(Boolean).join(' ')}
+                        ? `${attr.value_text}`
+                        : [attr.attribute_name, attr.value_number !== null && attr.value_number !== undefined ? Math.round(attr.value_number) : null].filter(Boolean).join(' ')}
                   </span>
                 </div>
               ))}

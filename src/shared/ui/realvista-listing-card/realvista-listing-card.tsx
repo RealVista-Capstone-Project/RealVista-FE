@@ -148,27 +148,27 @@ export function RealVistaListingCard({
             return attr.value_text.trim() !== '';
           return false;
         })
-        .slice(0, 3);
+        .slice(0, 2);
 
       if (visible.length === 0) return null;
 
       return (
-        <div className={cn('flex flex-wrap items-center', compact ? 'gap-2' : 'gap-3')}>
+        <div className={cn('flex items-center', compact ? 'gap-3' : 'gap-4')}>
           {visible.map((attr) => (
-            <div key={attr.attribute_id} className='flex items-center gap-1'>
+            <div key={attr.attribute_id} className={cn('flex items-center', compact ? 'gap-0.5' : 'gap-1')}>
               {attr.icon && (
                 <AttributeIcon
                   iconName={attr.icon}
-                  className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')}
+                  className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-4 w-4')}
                   strokeWidth={2.3}
                 />
               )}
-              <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+              <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-xs')}>
                 {attr.value_boolean === true
                   ? attr.attribute_name
                   : attr.value_text !== null && attr.value_text !== undefined
                     ? `${attr.value_text}`
-                    : [attr.attribute_name, attr.value_number].filter(Boolean).join(' ')}
+                    : [attr.attribute_name, attr.value_number !== null && attr.value_number !== undefined ? Math.round(attr.value_number) : null].filter(Boolean).join(' ')}
               </span>
             </div>
           ))}

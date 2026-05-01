@@ -95,7 +95,7 @@ export function TopNav({
               {pageTitle}
             </span>
           ) : (
-            <Link href={`/${locale}${logoHref}`} className='flex items-center gap-2'>
+            <Link href={`/${locale}${logoHref}`} className='flex items-center gap-[2px]'>
               <RealVistaLogo />
               <span className='text-lg lg:text-xl font-bold leading-[1.5] tracking-[-0.24px] text-foreground'>
                 RealVista
