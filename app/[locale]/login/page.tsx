@@ -36,7 +36,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
       <div className='flex w-full flex-col lg:w-1/2 overflow-y-auto'>
         {/* Logo */}
         <div className='px-6 pt-4 pb-4 lg:px-8 lg:pt-5'>
-          <Link href='/buy' className='flex items-center gap-2'>
+          <Link href='/buy' className='flex items-center gap-1'>
             <RealVistaLogo />
             <span className='text-xl font-bold'>RealVista</span>
           </Link>

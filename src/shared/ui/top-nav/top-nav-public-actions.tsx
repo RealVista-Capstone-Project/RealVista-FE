@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, CreditCard, Menu, ChevronDown } from 'lucide-react';
+import { Heart, Menu, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { ROUTES } from '@/shared/config/routes';
@@ -68,22 +68,6 @@ export function PublicActions({
           />
         </button>
       )}
-
-      {/* Subscribe — shown regardless of auth state, hidden on mobile */}
-      <button
-        type='button'
-        onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
-        className={cn(
-          'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
-          isRouteActive('/subscribe')
-            ? 'bg-primary text-white'
-            : 'bg-primary/5 text-foreground hover:bg-primary/10'
-        )}
-        aria-label={t('subscribe')}
-        title={t('subscribe')}
-      >
-        <CreditCard className='h-5 w-5' strokeWidth={2} />
-      </button>
 
       {/* Chat — logged-in only, hidden on mobile */}
       {isUserLoggedIn && (
