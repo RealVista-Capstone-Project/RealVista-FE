@@ -100,13 +100,13 @@ export function PublicActions({
         <div className='hidden lg:flex items-center gap-3'>
           <Link
             href={`/${locale}${ROUTES.login}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg border border-primary/20 bg-white font-medium text-primary transition-colors hover:bg-primary/5'
+            className='flex h-12 items-center justify-center px-6 rounded-lg border border-primary/20 bg-white text-[15px] font-medium text-primary transition-colors hover:bg-primary/5'
           >
             {t('login')}
           </Link>
           <Link
             href={`/${locale}${ROUTES.register}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-white font-medium transition-colors hover:bg-primary/90'
+            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-[15px] font-medium text-white transition-colors hover:bg-primary/90'
           >
             {t('signup')}
           </Link>
