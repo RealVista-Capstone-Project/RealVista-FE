@@ -18,6 +18,58 @@ import {
 } from 'recharts';
 
 const PERIODS = ['W', 'M', 'Y'] as const satisfies readonly AgentPerformancePeriod[];
+const PERIOD_LABELS_VI: Record<AgentPerformancePeriod, string> = {
+  W: 'Tuần',
+  M: 'Tháng',
+  Y: 'Năm',
+};
+
+const MONTH_LABELS_VI: Record<string, string> = {
+  jan: 'Th1',
+  january: 'Th1',
+  feb: 'Th2',
+  february: 'Th2',
+  mar: 'Th3',
+  march: 'Th3',
+  apr: 'Th4',
+  april: 'Th4',
+  may: 'Th5',
+  jun: 'Th6',
+  june: 'Th6',
+  jul: 'Th7',
+  july: 'Th7',
+  aug: 'Th8',
+  august: 'Th8',
+  sep: 'Th9',
+  sept: 'Th9',
+  september: 'Th9',
+  oct: 'Th10',
+  october: 'Th10',
+  nov: 'Th11',
+  november: 'Th11',
+  dec: 'Th12',
+  december: 'Th12',
+};
+
+const WEEKDAY_LABELS_VI: Record<string, string> = {
+  mon: 'T2',
+  monday: 'T2',
+  tue: 'T3',
+  tues: 'T3',
+  tuesday: 'T3',
+  wed: 'T4',
+  wednesday: 'T4',
+  thu: 'T5',
+  thur: 'T5',
+  thurs: 'T5',
+  thursday: 'T5',
+  fri: 'T6',
+  friday: 'T6',
+  sat: 'T7',
+  saturday: 'T7',
+  sun: 'CN',
+  sunday: 'CN',
+};
 
 function formatAxisTick(value: number) {
   if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
@@ -33,6 +85,38 @@ function formatTooltipValue(v: TooltipValueType | undefined) {
   if (typeof v === 'string') return v;
   if (Array.isArray(v)) return v.map((x) => (typeof x === 'number' ? x.toLocaleString() : String(x))).join(', ');
   return String(v);
+}
+
+function formatPeriodLabelVi(value: string | number, period: AgentPerformancePeriod): string {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+
+  // Normalize week-index labels (e.g. W1, w2, Week 3) to Vietnamese.
+  const weekMatch = raw.match(/^(?:w|week)\s*[-_]?(\d{1,2})$/i);
+  if (weekMatch?.[1]) {
+    return `Tuần ${weekMatch[1]}`;
+  }
+
+  // If backend sends parseable date strings, format directly in Vietnamese.
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) {
+    if (period === 'W') {
+      return parsed.toLocaleDateString('vi-VN', { weekday: 'short' });
+    }
+    if (period === 'M') {
+      return parsed.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+    }
+    return parsed.toLocaleDateString('vi-VN', { month: 'short', year: '2-digit' });
+  }
+
+  const normalized = raw.toLowerCase().replace(/\./g, '');
+  if (period === 'Y') {
+    return MONTH_LABELS_VI[normalized] ?? raw;
+  }
+  if (period === 'W') {
+    return WEEKDAY_LABELS_VI[normalized] ?? raw;
+  }
+  return raw;
 }
 
 function AgentPerformanceTooltip({
@@ -99,7 +183,7 @@ export function AgentDashboardPerformanceChartContent({
       <div className='flex flex-wrap items-center justify-between gap-3'>
         <CardTitle>{t('sections.performance.title')}</CardTitle>
         <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
-          {PERIODS.map((period) => (
+              {PERIODS.map((period) => (
             <button
               key={period}
               type='button'
@@ -111,7 +195,7 @@ export function AgentDashboardPerformanceChartContent({
                   : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              {period}
+                  {PERIOD_LABELS_VI[period]}
             </button>
           ))}
         </div>
@@ -141,6 +225,7 @@ export function AgentDashboardPerformanceChartContent({
             axisLine={false}
             tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
             tickMargin={8}
+            tickFormatter={(value) => formatPeriodLabelVi(value, selectedPeriod)}
           />
           <YAxis
             tickLine={false}
@@ -153,7 +238,7 @@ export function AgentDashboardPerformanceChartContent({
               <AgentPerformanceTooltip
                 active={active}
                 payload={payload}
-                label={label}
+                label={label != null ? formatPeriodLabelVi(label, selectedPeriod) : label}
                 viewsLabel={t('charts.views')}
                 inquiriesLabel={t('charts.inquiries')}
               />
