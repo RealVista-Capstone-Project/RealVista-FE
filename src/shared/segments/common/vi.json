@@ -911,6 +911,19 @@
       },
       "channelsEmpty": "Chưa có dữ liệu lead trong kỳ này."
     },
+    "timebound": {
+      "presets": {
+        "7d": "7 ngày",
+        "30d": "30 ngày",
+        "90d": "90 ngày",
+        "thisMonth": "Tháng này"
+      },
+      "customCta": "Tùy chỉnh khoảng",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "apply": "Áp dụng",
+      "activeRange": "Đang hiển thị: {range}"
+    },
     "channels": {
       "Website": "Website",
       "Social": "Mạng xã hội",

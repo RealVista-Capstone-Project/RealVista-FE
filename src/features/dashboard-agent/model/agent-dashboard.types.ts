@@ -2,6 +2,11 @@ import type { ApiResponse } from '@/shared/types/api-response';
 
 export type AgentPerformancePeriod = 'W' | 'M' | 'Y';
 
+export interface AgentDateRange {
+  from: string;
+  to: string;
+}
+
 export interface AgentPerformancePoint {
   month: string;
   views: number;

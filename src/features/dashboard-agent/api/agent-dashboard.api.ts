@@ -1,6 +1,7 @@
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '@/shared/types/api-response';
 import type {
+  AgentDateRange,
   AgentAppointmentCalendarDay,
   AgentAppointmentCalendarRange,
   AgentAppointmentsSnapshot,
@@ -338,14 +339,26 @@ function normalizePlanSnapshot(rows: unknown): AgentPlanSnapshot {
   return { subscriptions };
 }
 
-async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
+function withDateRange(path: string, range?: AgentDateRange): string {
+  if (!range?.from || !range?.to) return path;
+  const query = new URLSearchParams({
+    from: range.from,
+    to: range.to,
+  });
+  return `${path}?${query.toString()}`;
+}
+
+async function getMetricsPayload(range?: AgentDateRange): Promise<AgentDashboardMetrics> {
   const [listingSummary, propertySummary, appointmentSummary, crmSummary, crmStatusSummary] =
     await Promise.all([
     safeGet('/listings/managed-listings/summary', DEFAULT_METRICS_PAYLOAD.listingSummary),
     safeGet('/properties/me/summary', DEFAULT_METRICS_PAYLOAD.propertySummary),
     safeGet('/appointments/summary', DEFAULT_METRICS_PAYLOAD.appointmentSummary),
-    safeGet('/crm/leads/summary', DEFAULT_METRICS_PAYLOAD.crmSummary),
-    safeGet('/crm/leads/status-summary', DEFAULT_METRICS_PAYLOAD.crmStatusSummary),
+    safeGet(withDateRange('/crm/leads/summary', range), DEFAULT_METRICS_PAYLOAD.crmSummary),
+    safeGet(
+      withDateRange('/crm/leads/status-summary', range),
+      DEFAULT_METRICS_PAYLOAD.crmStatusSummary
+    ),
   ]);
 
   return {
@@ -358,8 +371,8 @@ async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
 }
 
 export const agentDashboardApi = {
-  getMetrics: async (): Promise<AgentDashboardMetricsResponse> => {
-    const payload = await getMetricsPayload();
+  getMetrics: async (range?: AgentDateRange): Promise<AgentDashboardMetricsResponse> => {
+    const payload = await getMetricsPayload(range);
     return {
       success: true,
       message: 'Agent dashboard metrics fetched successfully.',

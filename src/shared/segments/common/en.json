@@ -909,6 +909,19 @@
       },
       "channelsEmpty": "No leads in this period."
     },
+    "timebound": {
+      "presets": {
+        "7d": "7D",
+        "30d": "30D",
+        "90d": "90D",
+        "thisMonth": "This month"
+      },
+      "customCta": "Custom range",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "activeRange": "Showing: {range}"
+    },
     "channels": {
       "Website": "Website",
       "Social": "Social",

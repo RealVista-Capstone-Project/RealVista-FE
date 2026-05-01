@@ -89,7 +89,7 @@ export function AgentDashboardPerformanceChart({
   const gradientInquiriesId = `${rawId}-inquiries`;
 
   return (
-    <Card className='xl:col-span-2'>
+    <Card className='xl:col-span-8'>
       <CardHeader>
         <div className='flex flex-wrap items-center justify-between gap-3'>
           <CardTitle>{t('sections.performance.title')}</CardTitle>

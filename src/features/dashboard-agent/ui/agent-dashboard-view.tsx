@@ -13,6 +13,7 @@ import { Progress } from '@/shared/ui/progress';
 import { Skeleton } from '@/shared/ui/skeleton';
 import type {
   AgentAppointmentTabFilter,
+  AgentDateRange,
   AppointmentItem,
   AgentPerformancePeriod,
 } from '../model/agent-dashboard.types';
@@ -22,11 +23,11 @@ import {
   useAgentPerformanceMetrics,
   useAgentPlanSnapshot,
 } from '../api/use-agent-dashboard';
-import { CircleAlert, TrendingDown, TrendingUp, Zap } from 'lucide-react';
+import { CalendarDays, CircleAlert, TrendingDown, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { memo, useEffect, useMemo, useState } from 'react';
-import { Pie, PieChart } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts';
 
 const AgentDashboardPerformanceChart = dynamic(
   () =>
@@ -35,7 +36,7 @@ const AgentDashboardPerformanceChart = dynamic(
     })),
   {
     loading: () => (
-      <Card className='xl:col-span-2'>
+      <Card className='xl:col-span-8'>
         <CardHeader>
           <Skeleton className='h-6 w-48 max-w-full' />
           <Skeleton className='mt-2 h-4 w-full max-w-lg' />
@@ -123,6 +124,39 @@ function toSafeDate(value: string) {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
+function toInputDateValue(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const day = String(value.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toDateRangeLabel(range: AgentDateRange, locale: string) {
+  const from = new Date(`${range.from}T00:00:00`);
+  const to = new Date(`${range.to}T00:00:00`);
+  const formatConfig: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  return `${from.toLocaleDateString(locale, formatConfig)} - ${to.toLocaleDateString(locale, formatConfig)}`;
+}
+
+function buildRangeByDays(days: number): AgentDateRange {
+  const to = new Date();
+  const from = new Date();
+  from.setDate(from.getDate() - (days - 1));
+  return {
+    from: toInputDateValue(from),
+    to: toInputDateValue(to),
+  };
+}
+
+function buildThisMonthRange(): AgentDateRange {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  return {
+    from: toInputDateValue(firstDay),
+    to: toInputDateValue(now),
+  };
+}
+
 function formatCalendarHeaderDate(value: Date, locale: string) {
   return value.toLocaleDateString(locale, {
     weekday: 'long',
@@ -146,7 +180,15 @@ function AgentPerformanceChartSection() {
 
 const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
   const t = useTranslations('AgentDashboard');
-  const metricsQuery = useAgentDashboardMetrics();
+  const locale = useLocale();
+  const [activePreset, setActivePreset] = useState<'7D' | '30D' | '90D' | 'THIS_MONTH' | 'CUSTOM'>(
+    '30D'
+  );
+  const [activeRange, setActiveRange] = useState<AgentDateRange>(() => buildRangeByDays(30));
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customFrom, setCustomFrom] = useState(activeRange.from);
+  const [customTo, setCustomTo] = useState(activeRange.to);
+  const metricsQuery = useAgentDashboardMetrics(activeRange);
 
   const channelChartConfig = {
     new: { label: t('charts.status.new'), color: 'var(--primary)' },
@@ -179,6 +221,11 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
     leads: statusCountMap.get(status) ?? 0,
   }));
   const totalChannelLeads = channelData.reduce((sum, row) => sum + Number(row.leads ?? 0), 0);
+  const nonZeroChannelData = channelData.filter((row) => Number(row.leads ?? 0) > 0);
+  const maxLeadCount = Math.max(...channelData.map((row) => Number(row.leads ?? 0)), 0);
+  const minLeadCount = Math.min(...nonZeroChannelData.map((row) => Number(row.leads ?? 0)), maxLeadCount);
+  const spreadRatio = maxLeadCount > 0 ? (maxLeadCount - minLeadCount) / maxLeadCount : 0;
+  const useBarChart = nonZeroChannelData.length >= 5 || spreadRatio < 0.45;
   const channelPieData = channelData.map((row) => ({
     ...row,
     channel: row.channel,
@@ -186,13 +233,107 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
     fill: `var(--color-${row.channel})`,
   }));
 
+  const presetButtons: Array<{ key: '7D' | '30D' | '90D' | 'THIS_MONTH'; label: string }> = [
+    { key: '7D', label: t('timebound.presets.7d') },
+    { key: '30D', label: t('timebound.presets.30d') },
+    { key: '90D', label: t('timebound.presets.90d') },
+    { key: 'THIS_MONTH', label: t('timebound.presets.thisMonth') },
+  ];
+
+  const applyPreset = (preset: '7D' | '30D' | '90D' | 'THIS_MONTH') => {
+    const nextRange =
+      preset === '7D'
+        ? buildRangeByDays(7)
+        : preset === '30D'
+          ? buildRangeByDays(30)
+          : preset === '90D'
+            ? buildRangeByDays(90)
+            : buildThisMonthRange();
+    setActivePreset(preset);
+    setActiveRange(nextRange);
+    setCustomFrom(nextRange.from);
+    setCustomTo(nextRange.to);
+  };
+
+  const applyCustomRange = () => {
+    if (!customFrom || !customTo) return;
+    if (new Date(`${customFrom}T00:00:00`).getTime() > new Date(`${customTo}T00:00:00`).getTime()) return;
+    setActiveRange({ from: customFrom, to: customTo });
+    setActivePreset('CUSTOM');
+    setCustomOpen(false);
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('sections.channels.title')}</CardTitle>
-        <CardDescription>{t('sections.channels.description')}</CardDescription>
+    <Card className='border-border/70 bg-card shadow-sm xl:col-span-4'>
+      <CardHeader className='space-y-4'>
+        <div className='space-y-1'>
+          <CardTitle>{t('sections.channels.title')}</CardTitle>
+          <CardDescription>{t('sections.channels.description')}</CardDescription>
+        </div>
+        <div className='space-y-3 rounded-xl border border-border/70 bg-muted/20 p-3'>
+          <div className='flex flex-wrap items-center gap-2'>
+            {presetButtons.map((preset) => (
+              <Button
+                key={preset.key}
+                type='button'
+                size='sm'
+                variant='ghost'
+                className={cn(
+                  'h-8 rounded-lg border px-3 text-xs font-medium',
+                  activePreset === preset.key
+                    ? 'border-primary bg-primary/10 text-primary hover:bg-primary/15'
+                    : 'border-border/70 bg-background text-muted-foreground hover:text-foreground'
+                )}
+                onClick={() => applyPreset(preset.key)}
+              >
+                {preset.label}
+              </Button>
+            ))}
+            <Button
+              type='button'
+              size='sm'
+              variant='outline'
+              className={cn(
+                'ml-auto h-8 rounded-lg border-border/70 px-3 text-xs',
+                customOpen && 'border-primary/60 text-primary'
+              )}
+              onClick={() => setCustomOpen((prev) => !prev)}
+            >
+              <CalendarDays className='mr-1 h-3.5 w-3.5' />
+              {t('timebound.customCta')}
+            </Button>
+          </div>
+          {customOpen ? (
+            <div className='flex flex-wrap items-end gap-2'>
+              <label className='flex min-w-[9rem] flex-1 flex-col gap-1 text-xs text-muted-foreground'>
+                {t('timebound.from')}
+                <input
+                  type='date'
+                  value={customFrom}
+                  onChange={(event) => setCustomFrom(event.target.value)}
+                  className='h-8 rounded-lg border border-border/70 bg-background px-2.5 text-xs text-foreground outline-none ring-offset-background focus-visible:ring-1 focus-visible:ring-primary'
+                />
+              </label>
+              <label className='flex min-w-[9rem] flex-1 flex-col gap-1 text-xs text-muted-foreground'>
+                {t('timebound.to')}
+                <input
+                  type='date'
+                  value={customTo}
+                  onChange={(event) => setCustomTo(event.target.value)}
+                  className='h-8 rounded-lg border border-border/70 bg-background px-2.5 text-xs text-foreground outline-none ring-offset-background focus-visible:ring-1 focus-visible:ring-primary'
+                />
+              </label>
+              <Button type='button' size='sm' className='h-8 rounded-lg px-3 text-xs' onClick={applyCustomRange}>
+                {t('timebound.apply')}
+              </Button>
+            </div>
+          ) : null}
+          <p className='text-xs text-muted-foreground'>
+            {t('timebound.activeRange', { range: toDateRangeLabel(activeRange, locale) })}
+          </p>
+        </div>
       </CardHeader>
-      <CardContent className='min-h-[280px]'>
+      <CardContent className='min-h-[300px]'>
         {metricsQuery.isError && !metricsQuery.data ? (
           <div className='flex h-[240px] items-center justify-center text-center text-sm text-muted-foreground'>
             {t('error.partialDescription')}
@@ -215,27 +356,59 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
                 config={channelChartConfig}
                 className='aspect-square size-full min-h-[11rem] [&>div]:justify-center'
               >
-                <PieChart accessibilityLayer>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel nameKey='channel' />}
-                  />
-                  <Pie
-                    data={channelPieData}
-                    dataKey='leads'
-                    nameKey='channel'
-                    innerRadius={52}
-                    outerRadius={72}
-                    strokeWidth={3}
-                  />
-                </PieChart>
+                {useBarChart ? (
+                  <BarChart
+                    accessibilityLayer
+                    data={channelData}
+                    layout='vertical'
+                    margin={{ top: 8, right: 8, left: 12, bottom: 8 }}
+                  >
+                    <CartesianGrid strokeDasharray='3 3' horizontal={false} />
+                    <XAxis type='number' hide />
+                    <YAxis
+                      type='category'
+                      dataKey='channel'
+                      width={96}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                      tickFormatter={(value: string) => leadStatusLabel[value as keyof typeof leadStatusLabel]}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel nameKey='channel' />}
+                    />
+                    <Bar dataKey='leads' radius={6}>
+                      {channelData.map((entry) => (
+                        <Cell key={entry.channel} fill={`var(--color-${entry.channel})`} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                ) : (
+                  <PieChart accessibilityLayer>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel nameKey='channel' />}
+                    />
+                    <Pie
+                      data={channelPieData}
+                      dataKey='leads'
+                      nameKey='channel'
+                      innerRadius={52}
+                      outerRadius={72}
+                      strokeWidth={3}
+                    />
+                  </PieChart>
+                )}
               </ChartContainer>
-              <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
-                <p className='text-2xl font-bold tabular-nums text-foreground'>
-                  {totalChannelLeads.toLocaleString()}
-                </p>
-                <p className='text-[10px] text-muted-foreground'>{t('charts.leads')}</p>
-              </div>
+              {!useBarChart ? (
+                <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center'>
+                  <p className='text-2xl font-bold tabular-nums text-foreground'>
+                    {totalChannelLeads.toLocaleString()}
+                  </p>
+                  <p className='text-[10px] text-muted-foreground'>{t('charts.leads')}</p>
+                </div>
+              ) : null}
             </div>
             <div className='w-full min-w-0 space-y-2.5 sm:flex-1'>
               {LEAD_STATUS_ORDER.map((status) => {
@@ -271,7 +444,7 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
 
 function AgentDashboardPerformanceSection() {
   return (
-    <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
+    <section className='grid grid-cols-1 gap-4 xl:grid-cols-12'>
       <AgentPerformanceChartSection />
       <AgentLeadChannelsCard />
     </section>
