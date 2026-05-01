@@ -56,6 +56,15 @@ export interface LeadSummaryMetrics {
   bySource: LeadSourceSummary[];
 }
 
+export interface LeadStatusSummary {
+  status: string;
+  count: number;
+}
+
+export interface LeadStatusSummaryMetrics {
+  byStatus: LeadStatusSummary[];
+}
+
 export interface AppointmentItem {
   appointmentId: string;
   listingId: string;
@@ -112,6 +121,7 @@ export interface AgentDashboardMetrics {
   propertySummary: PropertySummaryMetrics;
   appointmentSummary: AppointmentSummaryMetrics;
   crmSummary: LeadSummaryMetrics;
+  crmStatusSummary: LeadStatusSummaryMetrics;
 }
 
 export interface AgentPerformanceMetrics {

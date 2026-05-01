@@ -1,7 +1,4 @@
 'use client';
-
-import { Link } from '@/shared/config/i18n/navigation';
-import { ROUTES } from '@/shared/config/routes';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Calendar, CalendarDayButton } from '@/shared/ui/calendar';
@@ -25,14 +22,7 @@ import {
   useAgentPerformanceMetrics,
   useAgentPlanSnapshot,
 } from '../api/use-agent-dashboard';
-import {
-  ArrowUpRight,
-  CircleAlert,
-  TrendingDown,
-  TrendingUp,
-  Zap,
-} from 'lucide-react';
-import type { User } from 'next-auth';
+import { CircleAlert, TrendingDown, TrendingUp, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { memo, useEffect, useMemo, useState } from 'react';
@@ -55,16 +45,28 @@ const AgentDashboardPerformanceChart = dynamic(
         </CardContent>
       </Card>
     ),
-  },
+  }
 );
 
-/** Order matches CRM so legend and slice semantics stay consistent. */
-const LEAD_SOURCE_ORDER = ['manual', 'chat', 'tour'] as const;
+/** Keep status order stable so chart slices/legend don't jump between renders. */
+const LEAD_STATUS_ORDER = [
+  'new',
+  'consulting',
+  'tour_scheduled',
+  'toured',
+  'negotiating',
+  'closed',
+  'not_potential',
+] as const;
 
-const SOURCE_DOT_STYLES: Record<(typeof LEAD_SOURCE_ORDER)[number], { background: string }> = {
-  manual: { background: 'var(--primary)' },
-  chat: { background: 'var(--chart-2)' },
-  tour: { background: 'var(--chart-3)' },
+const STATUS_DOT_STYLES: Record<(typeof LEAD_STATUS_ORDER)[number], { background: string }> = {
+  new: { background: 'var(--primary)' },
+  consulting: { background: 'var(--chart-2)' },
+  tour_scheduled: { background: 'var(--chart-3)' },
+  toured: { background: 'var(--chart-4)' },
+  negotiating: { background: 'var(--chart-5)' },
+  closed: { background: 'var(--chart-1)' },
+  not_potential: { background: 'var(--muted-foreground)' },
 };
 
 const FEATURE_TYPE_VI_LABELS: Record<string, string> = {
@@ -133,28 +135,48 @@ function AgentPerformanceChartSection() {
   const [selectedPeriod, setSelectedPeriod] = useState<AgentPerformancePeriod>('M');
   const performanceQuery = useAgentPerformanceMetrics(selectedPeriod);
   const trendData = performanceQuery.data?.data.trend ?? [];
-  return <AgentDashboardPerformanceChart trendData={trendData} selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />;
+  return (
+    <AgentDashboardPerformanceChart
+      trendData={trendData}
+      selectedPeriod={selectedPeriod}
+      onPeriodChange={setSelectedPeriod}
+    />
+  );
 }
 
 const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
   const t = useTranslations('AgentDashboard');
-  const performanceQuery = useAgentPerformanceMetrics('M');
+  const metricsQuery = useAgentDashboardMetrics();
 
   const channelChartConfig = {
-    manual: { label: t('charts.source.manual'), color: 'var(--primary)' },
-    chat: { label: t('charts.source.chat'), color: 'var(--chart-2)' },
-    tour: { label: t('charts.source.tour'), color: 'var(--chart-3)' },
+    new: { label: t('charts.status.new'), color: 'var(--primary)' },
+    consulting: { label: t('charts.status.consulting'), color: 'var(--chart-2)' },
+    tour_scheduled: { label: t('charts.status.tour_scheduled'), color: 'var(--chart-3)' },
+    toured: { label: t('charts.status.toured'), color: 'var(--chart-4)' },
+    negotiating: { label: t('charts.status.negotiating'), color: 'var(--chart-5)' },
+    closed: { label: t('charts.status.closed'), color: 'var(--chart-1)' },
+    not_potential: { label: t('charts.status.not_potential'), color: 'var(--muted-foreground)' },
   } satisfies ChartConfig;
 
-  const leadSourceLabel = {
-    manual: t('charts.source.manual'),
-    chat: t('charts.source.chat'),
-    tour: t('charts.source.tour'),
+  const leadStatusLabel = {
+    new: t('charts.status.new'),
+    consulting: t('charts.status.consulting'),
+    tour_scheduled: t('charts.status.tour_scheduled'),
+    toured: t('charts.status.toured'),
+    negotiating: t('charts.status.negotiating'),
+    closed: t('charts.status.closed'),
+    not_potential: t('charts.status.not_potential'),
   } as const;
 
-  const channelData = (performanceQuery.data?.data.channels ?? []).map((channel) => ({
-    ...channel,
-    channel: channel.channel.toLowerCase(),
+  const statusCountMap = new Map(
+    (metricsQuery.data?.data.crmStatusSummary.byStatus ?? []).map((item) => [
+      item.status.toLowerCase(),
+      Number(item.count ?? 0),
+    ])
+  );
+  const channelData = LEAD_STATUS_ORDER.map((status) => ({
+    channel: status,
+    leads: statusCountMap.get(status) ?? 0,
   }));
   const totalChannelLeads = channelData.reduce((sum, row) => sum + Number(row.leads ?? 0), 0);
   const channelPieData = channelData.map((row) => ({
@@ -171,11 +193,11 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
         <CardDescription>{t('sections.channels.description')}</CardDescription>
       </CardHeader>
       <CardContent className='min-h-[280px]'>
-        {performanceQuery.isError && !performanceQuery.data ? (
+        {metricsQuery.isError && !metricsQuery.data ? (
           <div className='flex h-[240px] items-center justify-center text-center text-sm text-muted-foreground'>
             {t('error.partialDescription')}
           </div>
-        ) : performanceQuery.isLoading && !performanceQuery.data ? (
+        ) : metricsQuery.isLoading && !metricsQuery.data ? (
           <div className='space-y-3'>
             <Skeleton className='mx-auto h-44 w-44 rounded-full' />
             <Skeleton className='h-4 w-full' />
@@ -216,18 +238,21 @@ const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
               </div>
             </div>
             <div className='w-full min-w-0 space-y-2.5 sm:flex-1'>
-              {LEAD_SOURCE_ORDER.map((source) => {
-                const row = channelData.find((c) => c.channel === source);
+              {LEAD_STATUS_ORDER.map((status) => {
+                const row = channelData.find((c) => c.channel === status);
                 const count = row ? Number(row.leads ?? 0) : 0;
-                const pct = totalChannelLeads > 0 ? Math.round((count / totalChannelLeads) * 100) : 0;
+                const pct =
+                  totalChannelLeads > 0 ? Math.round((count / totalChannelLeads) * 100) : 0;
                 return (
-                  <div key={source} className='flex items-center justify-between gap-2 text-sm'>
+                  <div key={status} className='flex items-center justify-between gap-2 text-sm'>
                     <div className='flex min-w-0 items-center gap-2'>
                       <span
                         className='size-2.5 shrink-0 rounded-full'
-                        style={SOURCE_DOT_STYLES[source]}
+                        style={STATUS_DOT_STYLES[status]}
                       />
-                      <span className='truncate text-muted-foreground'>{leadSourceLabel[source]}</span>
+                      <span className='truncate text-muted-foreground'>
+                        {leadStatusLabel[status]}
+                      </span>
                     </div>
                     <div className='flex shrink-0 items-baseline gap-1.5 tabular-nums'>
                       <span className='font-semibold text-foreground'>{count}</span>
@@ -253,18 +278,14 @@ function AgentDashboardPerformanceSection() {
   );
 }
 
-export function AgentDashboardView({ user }: { user?: User }) {
+export function AgentDashboardView() {
   const t = useTranslations('AgentDashboard');
   const locale = useLocale();
   const metricsQuery = useAgentDashboardMetrics();
   const appointmentsQuery = useAgentAppointmentsSnapshot();
   const planQuery = useAgentPlanSnapshot();
-  const name = user?.name || user?.email?.split('@')[0] || 'Agent';
 
-  const loading =
-    metricsQuery.isLoading ||
-    appointmentsQuery.isLoading ||
-    planQuery.isLoading;
+  const loading = metricsQuery.isLoading || appointmentsQuery.isLoading || planQuery.isLoading;
 
   const hasError =
     metricsQuery.isError &&
@@ -274,10 +295,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
     planQuery.isError &&
     !planQuery.data;
 
-  const hasPartialError =
-    metricsQuery.isError ||
-    appointmentsQuery.isError ||
-    planQuery.isError;
+  const hasPartialError = metricsQuery.isError || appointmentsQuery.isError || planQuery.isError;
 
   const metrics = metricsQuery.data?.data;
   const kpis = [
@@ -320,7 +338,9 @@ export function AgentDashboardView({ user }: { user?: User }) {
     [appointmentSnapshot?.calendarDays]
   );
   const [appointmentFilter, setAppointmentFilter] = useState<AgentAppointmentTabFilter>('all');
-  const [selectedAppointmentDay, setSelectedAppointmentDay] = useState<Date | undefined>(new Date());
+  const [selectedAppointmentDay, setSelectedAppointmentDay] = useState<Date | undefined>(
+    new Date()
+  );
   const [visibleCalendarMonth, setVisibleCalendarMonth] = useState<Date>(new Date());
   const plan = planQuery.data?.data;
   const subscriptions = plan?.subscriptions ?? [];
@@ -370,7 +390,9 @@ export function AgentDashboardView({ user }: { user?: User }) {
     }
   }, [calendarDayMap, calendarDays, snapshotTimezone]);
 
-  const selectedDayKey = selectedAppointmentDay ? toDateKey(selectedAppointmentDay, snapshotTimezone) : '';
+  const selectedDayKey = selectedAppointmentDay
+    ? toDateKey(selectedAppointmentDay, snapshotTimezone)
+    : '';
   const selectedDayAppointments = useMemo(() => {
     return appointments
       .filter((appointment) => {
@@ -382,13 +404,21 @@ export function AgentDashboardView({ user }: { user?: User }) {
       .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
   }, [appointmentFilter, appointments, selectedDayKey, snapshotTimezone]);
 
-  const tourCount = selectedDayAppointments.filter((item) => item.appointmentType === 'TOUR').length;
-  const blockCount = selectedDayAppointments.filter((item) => item.appointmentType === 'BLOCK').length;
+  const tourCount = selectedDayAppointments.filter(
+    (item) => item.appointmentType === 'TOUR'
+  ).length;
+  const blockCount = selectedDayAppointments.filter(
+    (item) => item.appointmentType === 'BLOCK'
+  ).length;
   const statusPillClass = (status: AppointmentItem['status']) => {
-    if (status === 'ACCEPTED') return 'text-emerald-700 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300';
-    if (status === 'COMPLETED') return 'text-sky-700 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-300';
-    if (status === 'REJECTED') return 'text-rose-700 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-300';
-    if (status === 'CANCELED') return 'text-zinc-700 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300';
+    if (status === 'ACCEPTED')
+      return 'text-emerald-700 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300';
+    if (status === 'COMPLETED')
+      return 'text-sky-700 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-300';
+    if (status === 'REJECTED')
+      return 'text-rose-700 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-300';
+    if (status === 'CANCELED')
+      return 'text-zinc-700 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300';
     return 'text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300';
   };
 
@@ -416,28 +446,6 @@ export function AgentDashboardView({ user }: { user?: User }) {
 
   return (
     <div className='space-y-6 p-4 md:p-6'>
-      <section className='rounded-2xl border border-primary/15 bg-card p-5 shadow-sm'>
-        <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-          <div>
-            <h1 className='text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'>
-              {t('header.title')}
-            </h1>
-            <p className='mt-1 text-sm text-muted-foreground'>{t('header.subtitle', { name })}</p>
-          </div>
-          <div className='flex gap-2'>
-            <Button variant='outline' size='sm' asChild>
-              <Link href={ROUTES.dashboard.appointments}>
-                {t('header.actions.viewAppointments')}
-              </Link>
-            </Button>
-            <Button size='sm' asChild>
-              <Link href={ROUTES.dashboard.propertyFeed}>
-                {t('header.actions.exploreProperties')}
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
       {hasPartialError && !hasError && (
         <Card className='border-amber-400/40 bg-amber-50/40 dark:bg-amber-900/10'>
           <CardHeader className='py-4'>
@@ -531,8 +539,7 @@ export function AgentDashboardView({ user }: { user?: User }) {
                       const block = dayStats?.blockCount ?? 0;
                       const total = dayStats?.total ?? 0;
                       const hasItemsDay = Boolean(
-                        dayStats &&
-                          (dayStats.hasItems || total > 0 || tour > 0 || block > 0)
+                        dayStats && (dayStats.hasItems || total > 0 || tour > 0 || block > 0)
                       );
                       const isTourDay = Boolean(dayStats && tour > 0);
                       const isBlockDay = Boolean(dayStats && block > 0);
@@ -703,17 +710,18 @@ export function AgentDashboardView({ user }: { user?: User }) {
                     className='space-y-3 rounded-xl border border-primary/20 bg-primary/5 p-3'
                   >
                     <div className='space-y-1'>
-                      <p className='text-sm font-medium text-foreground'>{subscription.package_name}</p>
+                      <p className='text-sm font-medium text-foreground'>
+                        {subscription.package_name}
+                      </p>
                       <div className='space-y-0.5 text-xs text-muted-foreground'>
                         <p>
-                          {t('sections.plan.feature')}: {getFeatureTypeViLabel(subscription.feature_type)}
+                          {t('sections.plan.feature')}:{' '}
+                          {getFeatureTypeViLabel(subscription.feature_type)}
                         </p>
                         <p>
                           {t('sections.plan.status')}: {subscription.status}
                         </p>
-                        <p>
-                          {t('sections.plan.startedOn', { date: startedDate })}
-                        </p>
+                        <p>{t('sections.plan.startedOn', { date: startedDate })}</p>
                       </div>
                     </div>
 
@@ -730,26 +738,6 @@ export function AgentDashboardView({ user }: { user?: User }) {
             )}
           </CardContent>
         </Card>
-      </section>
-
-      <section className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4'>
-        {[
-          { label: t('quickActions.propertyFeed'), href: ROUTES.dashboard.propertyFeed },
-          { label: t('quickActions.manageProposals'), href: ROUTES.dashboard.manageProposals },
-          { label: t('quickActions.crmWorkspace'), href: ROUTES.dashboard.crm },
-          { label: t('quickActions.myEngagements'), href: ROUTES.dashboard.myEngagements },
-        ].map((item) => (
-          <Card key={item.label} className='group'>
-            <CardContent className='flex items-center justify-between p-4'>
-              <p className='text-sm font-medium text-foreground'>{item.label}</p>
-              <Button variant='ghost' size='icon-sm' asChild className='rounded-full'>
-                <Link href={item.href} aria-label={item.label}>
-                  <ArrowUpRight className='h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5' />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
       </section>
     </div>
   );

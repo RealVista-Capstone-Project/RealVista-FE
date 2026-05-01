@@ -54,6 +54,9 @@ const DEFAULT_METRICS_PAYLOAD: AgentDashboardMetrics = {
     previousClosedLeads: 0,
     bySource: [],
   },
+  crmStatusSummary: {
+    byStatus: [],
+  },
 };
 
 async function safeGet<T>(path: string, fallback: T): Promise<T> {
@@ -206,6 +209,31 @@ function normalizeLeadSummary(payload: unknown): AgentDashboardMetrics['crmSumma
   };
 }
 
+function normalizeLeadStatusSummary(payload: unknown): AgentDashboardMetrics['crmStatusSummary'] {
+  const fallback = DEFAULT_METRICS_PAYLOAD.crmStatusSummary;
+  if (!payload || typeof payload !== 'object') return fallback;
+  const o = payload as LooseRecord;
+  const rawByStatus = o.byStatus ?? o.by_status;
+  const byStatus = Array.isArray(rawByStatus)
+    ? rawByStatus
+        .map((entry) => {
+          if (!entry || typeof entry !== 'object') return null;
+          const e = entry as LooseRecord;
+          const status = readStr(e.status);
+          if (!status) return null;
+          return {
+            status,
+            count: readNum(e.count),
+          };
+        })
+        .filter(
+          (entry): entry is AgentDashboardMetrics['crmStatusSummary']['byStatus'][number] =>
+            entry !== null
+        )
+    : fallback.byStatus;
+  return { byStatus };
+}
+
 function mapCalendarDayRow(row: unknown): AgentAppointmentCalendarDay | null {
   if (!row || typeof row !== 'object') return null;
   const o = row as LooseRecord;
@@ -311,11 +339,13 @@ function normalizePlanSnapshot(rows: unknown): AgentPlanSnapshot {
 }
 
 async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
-  const [listingSummary, propertySummary, appointmentSummary, crmSummary] = await Promise.all([
+  const [listingSummary, propertySummary, appointmentSummary, crmSummary, crmStatusSummary] =
+    await Promise.all([
     safeGet('/listings/managed-listings/summary', DEFAULT_METRICS_PAYLOAD.listingSummary),
     safeGet('/properties/me/summary', DEFAULT_METRICS_PAYLOAD.propertySummary),
     safeGet('/appointments/summary', DEFAULT_METRICS_PAYLOAD.appointmentSummary),
     safeGet('/crm/leads/summary', DEFAULT_METRICS_PAYLOAD.crmSummary),
+    safeGet('/crm/leads/status-summary', DEFAULT_METRICS_PAYLOAD.crmStatusSummary),
   ]);
 
   return {
@@ -323,6 +353,7 @@ async function getMetricsPayload(): Promise<AgentDashboardMetrics> {
     propertySummary: normalizePropertySummary(propertySummary),
     appointmentSummary: normalizeAppointmentSummary(appointmentSummary),
     crmSummary: normalizeLeadSummary(crmSummary),
+    crmStatusSummary: normalizeLeadStatusSummary(crmStatusSummary),
   };
 }
 

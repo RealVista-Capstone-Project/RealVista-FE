@@ -858,8 +858,8 @@
         "description": "Views and inquiries trend across recent months."
       },
       "channels": {
-        "title": "Lead Channels",
-        "description": "CRM lead volume by acquisition source."
+        "title": "Lead Statuses",
+        "description": "CRM lead volume by pipeline status."
       },
       "appointments": {
         "title": "Appointments & Reminders",
@@ -897,6 +897,15 @@
         "manual": "Manual",
         "chat": "Chat",
         "tour": "Scheduled tour"
+      },
+      "status": {
+        "new": "New",
+        "consulting": "Consulting",
+        "tour_scheduled": "Tour scheduled",
+        "toured": "Toured",
+        "negotiating": "Negotiating",
+        "closed": "Closed",
+        "not_potential": "Not potential"
       },
       "channelsEmpty": "No leads in this period."
     },

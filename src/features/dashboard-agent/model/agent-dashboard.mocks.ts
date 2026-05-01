@@ -44,6 +44,17 @@ export const mockAgentDashboardMetrics: AgentDashboardMetricsResponse = {
         { source: 'MANUAL', count: 16 },
       ],
     },
+    crmStatusSummary: {
+      byStatus: [
+        { status: 'NEW', count: 12 },
+        { status: 'CONSULTING', count: 16 },
+        { status: 'TOUR_SCHEDULED', count: 9 },
+        { status: 'TOURED', count: 7 },
+        { status: 'NEGOTIATING', count: 8 },
+        { status: 'CLOSED', count: 10 },
+        { status: 'NOT_POTENTIAL', count: 6 },
+      ],
+    },
   },
 };
 
@@ -123,11 +134,6 @@ export const mockAgentPlanSnapshot: AgentPlanSnapshotResponse = {
   message: 'Agent plan snapshot fetched.',
   timestamp: nowIso,
   data: {
-    planName: 'Pro Agent',
-    renewsAt: '2026-06-20T00:00:00.000Z',
-    listingQuotaUsed: 18,
-    listingQuotaTotal: 30,
-    boostsUsed: 7,
-    boostsTotal: 12,
+    subscriptions: [],
   },
 };

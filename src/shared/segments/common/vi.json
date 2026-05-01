@@ -860,8 +860,8 @@
         "description": "Xu hướng lượt xem và lượt quan tâm trong các tháng gần đây."
       },
       "channels": {
-        "title": "Kênh khách hàng",
-        "description": "Số lượng lead CRM theo nguồn tiếp cận."
+        "title": "Trạng thái khách hàng",
+        "description": "Số lượng lead CRM theo trạng thái phễu."
       },
       "appointments": {
         "title": "Lịch hẹn & nhắc việc",
@@ -899,6 +899,15 @@
         "manual": "Thêm thủ công",
         "chat": "Chat",
         "tour": "Đặt lịch xem"
+      },
+      "status": {
+        "new": "Mới",
+        "consulting": "Tư vấn",
+        "tour_scheduled": "Đã đặt lịch xem",
+        "toured": "Đã xem nhà",
+        "negotiating": "Đàm phán",
+        "closed": "Đã chốt",
+        "not_potential": "Không tiềm năng"
       },
       "channelsEmpty": "Chưa có dữ liệu lead trong kỳ này."
     },
