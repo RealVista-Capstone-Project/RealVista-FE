@@ -6,9 +6,9 @@ import { DashboardStats } from '@/widgets/dashboard-stats';
 import { useAuthSession } from '@/features/auth/model';
 import { useTranslations } from 'next-intl';
 
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  AreaChart, Area, CartesianGrid 
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  AreaChart, Area, CartesianGrid, PieChart, Pie, Cell
 } from 'recharts';
 import { motion } from 'framer-motion';
 
@@ -16,9 +16,9 @@ import { useQuery } from '@tanstack/react-query';
 import { adminQueries } from '@/entities/admin/api';
 import { parseISO, format, subDays } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { 
-  ShieldAlert, User as UserIcon, Clock, 
-  TrendingUp, Home, DollarSign, Package, Users, 
+import {
+  ShieldAlert, User as UserIcon, Clock,
+  TrendingUp, Home, DollarSign, Package, Users,
   ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 import Link from 'next/link';
@@ -54,8 +54,8 @@ const CustomTooltip = ({ active, payload, label, t }: any) => {
                 <span className="text-sm text-slate-700 dark:text-slate-300">{entry.name}:</span>
               </div>
               <span className="text-sm font-black text-slate-900 dark:text-slate-100">
-                {typeof entry.value === 'number' && entry.name.toLowerCase().includes('doanh thu') 
-                  ? formatVND(entry.value) 
+                {typeof entry.value === 'number' && entry.name.toLowerCase().includes('doanh thu')
+                  ? formatVND(entry.value)
                   : entry.value}
               </span>
             </div>
@@ -76,15 +76,26 @@ export function AdminDashboard() {
     const end = new Date();
     const start = subDays(end, days);
     return {
-      startDate: start.toISOString(),
-      endDate: end.toISOString()
+      startDate: format(start, "yyyy-MM-dd'T'HH:mm:ss"),
+      endDate: format(end, "yyyy-MM-dd'T'HH:mm:ss")
     };
   }, [days]);
 
-  const { data: stats, isLoading } = useQuery(adminQueries.stats(startDate, endDate));
+  const { data: stats, isLoading, error } = useQuery(adminQueries.stats(startDate, endDate));
+
+  React.useEffect(() => {
+    if (stats) {
+      console.log('[AdminDashboard] System Time:', new Date().toISOString());
+      console.log('[AdminDashboard] Query Range:', { startDate, endDate });
+      console.log('[AdminDashboard] Received stats data:', stats);
+    }
+    if (error) {
+      console.error('[AdminDashboard] Query error:', error);
+    }
+  }, [stats, error]);
 
   const translatedPackageInsights = useMemo(() => {
-    return (stats?.package_insights ?? []).map(item => ({
+    return (stats?.package_insights ?? []).map((item) => ({
       ...item,
       translatedLabel: t(item.label)
     }));
@@ -94,6 +105,22 @@ export function AdminDashboard() {
     return (
       <div className='flex h-full items-center justify-center'>
         <div className='h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-primary dark:border-slate-800 dark:border-t-primary' />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='flex flex-col items-center justify-center h-[50vh] gap-4'>
+        <ShieldAlert className='h-12 w-12 text-rose-500' />
+        <h2 className='text-xl font-black text-slate-900'>Đã có lỗi xảy ra khi tải dữ liệu</h2>
+        <p className='text-sm text-slate-500'>{(error as any)?.payload?.message || (error as any)?.message || 'Vui lòng kiểm tra lại kết nối API'}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className='px-6 py-2 bg-slate-900 text-white rounded-xl font-black text-sm hover:bg-slate-800 transition-all'
+        >
+          Thử lại
+        </button>
       </div>
     );
   }
@@ -124,8 +151,8 @@ export function AdminDashboard() {
                 onClick={() => setDays(d)}
                 className={cn(
                   "px-4 py-2 rounded-xl text-xs font-black transition-all duration-300",
-                  days === d 
-                    ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20 dark:bg-white dark:text-slate-900" 
+                  days === d
+                    ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20 dark:bg-white dark:text-slate-900"
                     : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
                 )}
               >
@@ -144,7 +171,7 @@ export function AdminDashboard() {
       {/* Main Analytics Row: Revenue Breakdown & User Growth */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         {/* Revenue Breakdown Area Chart */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
@@ -188,14 +215,14 @@ export function AdminDashboard() {
                   width={60}
                 />
                 <Tooltip content={<CustomTooltip t={t} />} />
-                <Area 
-                  type="monotone" 
-                  dataKey="value" 
+                <Area
+                  type="monotone"
+                  dataKey="value"
                   name={t('revenue')}
-                  stroke="#10b981" 
-                  fillOpacity={1} 
-                  fill="url(#colorRev)" 
-                  strokeWidth={4} 
+                  stroke="#10b981"
+                  fillOpacity={1}
+                  fill="url(#colorRev)"
+                  strokeWidth={4}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -203,7 +230,7 @@ export function AdminDashboard() {
         </motion.div>
 
         {/* User Growth Bar Chart */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -233,12 +260,12 @@ export function AdminDashboard() {
                 />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <Tooltip content={<CustomTooltip t={t} />} />
-                <Bar 
-                  dataKey="value" 
+                <Bar
+                  dataKey="value"
                   name={t('newRegistration')}
-                  fill="#0f172a" 
-                  radius={[8, 8, 0, 0]} 
-                  barSize={45} 
+                  fill="#0f172a"
+                  radius={[8, 8, 0, 0]}
+                  barSize={45}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -248,7 +275,7 @@ export function AdminDashboard() {
 
       {/* Listing Creation Trend */}
       <div className='grid grid-cols-1 mb-6'>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
@@ -278,12 +305,12 @@ export function AdminDashboard() {
                 />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
                 <Tooltip content={<CustomTooltip t={t} />} />
-                <Bar 
-                  dataKey="value" 
+                <Bar
+                  dataKey="value"
                   name={t('newListing')}
-                  fill="#f43f5e" 
-                  radius={[8, 8, 0, 0]} 
-                  barSize={45} 
+                  fill="#f43f5e"
+                  radius={[8, 8, 0, 0]}
+                  barSize={45}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -294,7 +321,7 @@ export function AdminDashboard() {
       {/* Insights Row: Package Distribution & Top Agents */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         {/* Package Distribution (Pie Chart) */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
@@ -307,14 +334,30 @@ export function AdminDashboard() {
           <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-8">{t(`days${days}`)}</p>
           <div className='h-[300px] w-full relative'>
             <ResponsiveContainer width="100%" height="100%">
-              {/* Note: In a real implementation we would use PieChart from recharts */}
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                   <Package className="h-12 w-12 text-slate-200 mx-auto mb-2" />
-                   <p className="text-xs text-slate-400 italic">Chart data available in full view</p>
-                </div>
-              </div>
+              <PieChart>
+                <Pie
+                  data={translatedPackageInsights}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={120}
+                  paddingAngle={8}
+                  dataKey="value"
+                  nameKey="translatedLabel"
+                >
+                  {translatedPackageInsights.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
             </ResponsiveContainer>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+              <p className="text-3xl font-black text-slate-900 dark:text-white">
+                {translatedPackageInsights.reduce((sum, item) => sum + item.value, 0)}
+              </p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('activePlans')}</p>
+            </div>
           </div>
           <div className='mt-8 grid grid-cols-1 gap-4'>
             {translatedPackageInsights.map((entry, index) => (
@@ -331,7 +374,7 @@ export function AdminDashboard() {
         </motion.div>
 
         {/* Top Active Agents */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className='lg:col-span-2 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
@@ -349,7 +392,7 @@ export function AdminDashboard() {
               {t('viewAllLogs')}
             </Link>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -366,8 +409,8 @@ export function AdminDashboard() {
                       <div className="flex items-center gap-4">
                         <div className="relative">
                            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-black text-lg overflow-hidden ${
-                             index === 0 ? 'bg-amber-100 text-amber-600' : 
-                             index === 1 ? 'bg-slate-100 text-slate-600' : 
+                             index === 0 ? 'bg-amber-100 text-amber-600' :
+                             index === 1 ? 'bg-slate-100 text-slate-600' :
                              'bg-indigo-50 text-indigo-400'
                            }`}>
                              {agent.avatar_url ? (
@@ -405,7 +448,7 @@ export function AdminDashboard() {
 
       {/* Detail Section: Top Listings Table */}
       <div className='grid grid-cols-1 gap-6'>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
@@ -436,7 +479,12 @@ export function AdminDashboard() {
                       <div className="flex items-center gap-4">
                         <div className="h-16 w-24 relative rounded-2xl overflow-hidden bg-slate-100 shrink-0">
                           {listing.thumbnail_url ? (
-                            <Image src={listing.thumbnail_url} alt={listing.title} width={96} height={64} className="object-cover" />
+                            <Image
+                              src={listing.thumbnail_url}
+                              alt={listing.title}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center text-slate-300">
                               <Home className="h-6 w-6" />

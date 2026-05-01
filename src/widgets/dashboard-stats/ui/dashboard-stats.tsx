@@ -8,16 +8,16 @@ import {
   AlertOctagon,
   TrendingUp,
   TrendingDown,
-  Zap,
   Rocket,
   DollarSign,
   LucideIcon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { adminApi, adminQueries } from '@/entities/admin/api';
+import { adminQueries } from '@/entities/admin/api';
 import { cn, formatVND, formatNumber } from '@/shared/lib/utils';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { format } from 'date-fns';
 
 interface StatCardProps {
   title: string;
@@ -102,12 +102,19 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
     const start = new Date();
     start.setDate(end.getDate() - days);
     return {
-      startDate: start.toISOString(),
-      endDate: end.toISOString()
+      startDate: format(start, "yyyy-MM-dd'T'HH:mm:ss"),
+      endDate: format(end, "yyyy-MM-dd'T'HH:mm:ss")
     };
   }, [days]);
 
   const { data: overview, isLoading } = useQuery(adminQueries.overview(startDate, endDate));
+  React.useEffect(() => {
+    if (overview) {
+      console.log('[DashboardStats] System Time:', new Date().toISOString());
+      console.log('[DashboardStats] Query Range:', { startDate, endDate });
+      console.log('[DashboardStats] Received overview data:', overview);
+    }
+  }, [overview, startDate, endDate]);
 
   if (isLoading) return <StatsSkeleton />;
 
@@ -115,7 +122,7 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
     <>
       <StatCard
         title={t('revenueInPeriod')}
-        value={formatVND(overview?.revenue_in_period ?? 0)}
+        value={formatVND(Number(overview?.revenue_in_period ?? 0))}
         icon={DollarSign}
         trend={{ value: '+15.4%', isPositive: true }}
         description={t(`days${days}`)}
@@ -124,7 +131,7 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
 
       <StatCard
         title={t('listingsCreated')}
-        value={formatNumber(overview?.listings_in_period ?? 0)}
+        value={formatNumber(Number(overview?.listings_in_period ?? 0))}
         icon={Rocket}
         trend={{ value: t('new'), isPositive: true }}
         description={t(`days${days}`)}
@@ -133,7 +140,7 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
 
       <StatCard
         title={t('newUsers')}
-        value={formatNumber(overview?.new_users_in_period ?? 0)}
+        value={formatNumber(Number(overview?.new_users_in_period ?? 0))}
         icon={Users}
         trend={{ value: t('active'), isPositive: true }}
         description={t(`days${days}`)}

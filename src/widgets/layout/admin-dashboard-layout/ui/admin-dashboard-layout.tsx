@@ -25,14 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 import { adminQueries } from '@/entities/admin/api';
 
 
-export interface SidebarMenuItem {
-  id: string;
-  label: string;
-  href: string;
-  icon: LucideIcon;
-  badge?: number | string;
-  badgeVariant?: 'danger' | 'warning' | 'info' | 'success';
-}
+import { SidebarMenuItem } from '../../types';
 
 export interface AdminDashboardLayoutProps {
   children: React.ReactNode;

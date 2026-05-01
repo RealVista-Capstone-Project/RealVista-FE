@@ -9,11 +9,15 @@ export interface AdminOverview {
   total_listings: number;
   total_boosts: number;
   listings_created_today: number;
+  revenue_in_period?: number;
+  listings_in_period?: number;
+  new_users_in_period?: number;
 }
 
 
 export interface AdminStats {
   user_growth: { label: string; value: number }[];
+  listing_growth: { label: string; value: number }[];
   listing_status: { label: string; value: number }[];
   revenue_trend: { label: string; value: number; extra?: Record<string, number> }[];
   top_listings: {

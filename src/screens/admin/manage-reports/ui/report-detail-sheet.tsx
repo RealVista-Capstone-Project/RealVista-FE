@@ -94,7 +94,7 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
     } else if (report.report_target_type === 'USER') {
       url = `${ROUTES.dashboard.manageUsers}?search=${report.report_target_id}`;
     }
-    
+
     if (url) {
       window.open(url, '_blank');
     }
@@ -157,7 +157,7 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
                      <Badge variant='outline' className='text-[9px] font-bold bg-white text-slate-500 uppercase h-4 px-1'>
                       {currentReport.report_target_type}
                      </Badge>
-                     <div 
+                     <div
                         className='flex items-center gap-1 text-[10px] text-primary font-bold hover:underline cursor-pointer'
                         onClick={handleViewTarget}
                       >

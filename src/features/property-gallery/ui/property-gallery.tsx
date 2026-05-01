@@ -26,7 +26,7 @@ export function PropertyGallery({
   isFavorite = false,
 }: PropertyGalleryProps) {
   const t = useTranslations('PropertyGallery');
-  const safeImages = (images || []).filter(img => img.url);
+  const safeImages = (images || []).filter((img) => img.url);
   const [mainImage, setMainImage] = useState(safeImages[0]);
   const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
   const [mediaViewerTab, setMediaViewerTab] = useState<'photos' | '3d-tour' | 'video'>('photos');
@@ -49,7 +49,7 @@ export function PropertyGallery({
     const targetType = type || (mainImage?.type === 'photo' ? 'photos' : mainImage?.type as any);
     setMediaViewerTab(targetType);
     setMediaViewerOpen(true);
-    
+
     // Call external handlers if provided
     if (targetType === 'photos' && onViewAllPhotos) onViewAllPhotos();
     if (targetType === '3d-tour' && on3DTour) on3DTour();
@@ -82,7 +82,7 @@ export function PropertyGallery({
   return (
     <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
       {/* Hero Image */}
-      <div 
+      <div
         className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-primary/5 cursor-pointer group/hero'
         onClick={() => handleOpenMedia()}
       >

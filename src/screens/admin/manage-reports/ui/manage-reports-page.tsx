@@ -90,10 +90,10 @@ export function ManageReportsPage() {
                 ? row.original.reported_listing_name
                 : row.original.reported_user_name}
             </span>
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
-                const url = row.original.report_target_type === 'LISTING' 
+                const url = row.original.report_target_type === 'LISTING'
                   ? `/buy/${row.original.report_target_id}`
                   : `/admin?search=${row.original.report_target_id}`;
                 window.open(url, '_blank');
