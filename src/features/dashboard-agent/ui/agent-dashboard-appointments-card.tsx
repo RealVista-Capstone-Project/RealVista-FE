@@ -4,6 +4,7 @@ import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Calendar, CalendarDayButton } from '@/shared/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
+import { enUS, vi as viLocale } from 'date-fns/locale';
 import { useLocale, useTranslations } from 'next-intl';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useAgentAppointmentsSnapshot } from '../api/use-agent-dashboard';
@@ -74,6 +75,7 @@ function statusPillClass(status: AppointmentItem['status']) {
 export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppointmentsCard() {
   const t = useTranslations('AgentDashboard');
   const locale = useLocale();
+  const calendarLocale = locale === 'vi' ? viLocale : enUS;
   const appointmentsQuery = useAgentAppointmentsSnapshot();
 
   const appointmentSnapshot = appointmentsQuery.data?.data;
@@ -170,6 +172,7 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
             <Calendar
               mode='single'
               navLayout='around'
+              locale={calendarLocale}
               selected={selectedAppointmentDay}
               onSelect={(day) => {
                 setSelectedAppointmentDay(day);
