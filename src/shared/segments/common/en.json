@@ -886,7 +886,17 @@
         "startedOn": "Started on {date}",
         "quota": "Quota",
         "unlimited": "Unlimited",
-        "empty": "No active subscriptions found."
+        "empty": "No active subscriptions found.",
+        "loading": "Loading current plan...",
+        "expireAt": "Expires: {date}",
+        "unlimitedQuota": "Unlimited quota",
+        "usedQuota": "Used {used}/{total}",
+        "remaining": "left",
+        "featureType": {
+          "listing": "Listing",
+          "tour3d": "3D Tour",
+          "aiRequest": "AI"
+        }
       }
     },
     "charts": {

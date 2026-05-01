@@ -888,7 +888,17 @@
         "startedOn": "Bắt đầu từ {date}",
         "quota": "Hạn mức",
         "unlimited": "Không giới hạn",
-        "empty": "Chưa có gói đăng ký đang hoạt động."
+        "empty": "Chưa có gói đăng ký đang hoạt động.",
+        "loading": "Đang tải gói...",
+        "expireAt": "Hết hạn: {date}",
+        "unlimitedQuota": "Không giới hạn quota",
+        "usedQuota": "Đã dùng {used}/{total}",
+        "remaining": "còn lại",
+        "featureType": {
+          "listing": "Tin đăng",
+          "tour3d": "3D Tour",
+          "aiRequest": "AI"
+        }
       }
     },
     "charts": {

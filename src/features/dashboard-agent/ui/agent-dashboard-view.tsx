@@ -8,7 +8,6 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/shared/ui/chart';
-import { Progress } from '@/shared/ui/progress';
 import { Skeleton } from '@/shared/ui/skeleton';
 import type {
   AgentDateRange,
@@ -20,7 +19,7 @@ import {
   useAgentPerformanceMetrics,
   useAgentPlanSnapshot,
 } from '../api/use-agent-dashboard';
-import { CalendarDays, CircleAlert, TrendingDown, TrendingUp, Zap } from 'lucide-react';
+import { CalendarDays, CircleAlert, TrendingDown, TrendingUp } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { memo, useState } from 'react';
@@ -66,6 +65,26 @@ const AgentDashboardAppointmentsCard = dynamic(
   }
 );
 
+const AgentDashboardPlanCard = dynamic(
+  () =>
+    import('./agent-dashboard-plan-card').then((m) => ({
+      default: m.AgentDashboardPlanCard,
+    })),
+  {
+    loading: () => (
+      <Card>
+        <CardHeader>
+          <Skeleton className='h-6 w-48 max-w-full' />
+          <Skeleton className='mt-2 h-4 w-full max-w-md' />
+        </CardHeader>
+        <CardContent className='space-y-3'>
+          <Skeleton className='h-36 w-full rounded-xl' />
+        </CardContent>
+      </Card>
+    ),
+  }
+);
+
 /** Keep status order stable so chart slices/legend don't jump between renders. */
 const LEAD_STATUS_ORDER = [
   'new',
@@ -86,21 +105,6 @@ const STATUS_DOT_STYLES: Record<(typeof LEAD_STATUS_ORDER)[number], { background
   closed: { background: 'var(--chart-1)' },
   not_potential: { background: 'var(--muted-foreground)' },
 };
-
-const FEATURE_TYPE_VI_LABELS: Record<string, string> = {
-  LISTING: 'Tin đăng',
-  '3D_TOUR': 'Tour 3D',
-  AI_REQUEST: 'AI Chat bot',
-};
-
-function deriveRatio(numerator: number, denominator: number) {
-  if (!denominator) return 0;
-  return Math.round((numerator / denominator) * 100);
-}
-
-function getFeatureTypeViLabel(featureType: string) {
-  return FEATURE_TYPE_VI_LABELS[featureType] ?? featureType;
-}
 
 function toInputDateValue(value: Date) {
   const year = value.getFullYear();
@@ -423,7 +427,6 @@ function AgentDashboardPerformanceSection() {
 
 export function AgentDashboardView() {
   const t = useTranslations('AgentDashboard');
-  const locale = useLocale();
   const metricsQuery = useAgentDashboardMetrics();
   const appointmentsQuery = useAgentAppointmentsSnapshot();
   const planQuery = useAgentPlanSnapshot();
@@ -471,8 +474,6 @@ export function AgentDashboardView() {
       unit: undefined,
     },
   ];
-  const plan = planQuery.data?.data;
-  const subscriptions = plan?.subscriptions ?? [];
 
   if (loading) {
     return (
@@ -543,69 +544,7 @@ export function AgentDashboardView() {
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         <AgentDashboardAppointmentsCard />
 
-        {/* Plan Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <Zap className='h-4 w-4 text-primary' />
-              {t('sections.plan.title')}
-            </CardTitle>
-            <CardDescription>{t('sections.plan.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className='space-y-3'>
-            {subscriptions.length === 0 ? (
-              <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
-                {t('sections.plan.empty')}
-              </div>
-            ) : (
-              subscriptions.map((subscription) => {
-                const quotaLimit = Number(subscription.quota_limit ?? 0);
-                const remainingQuota = Number(subscription.remaining_quota ?? 0);
-                const usedQuota = Math.max(0, quotaLimit - remainingQuota);
-                const hasFiniteQuota = !subscription.unlimited && quotaLimit > 0;
-                const startedDate = subscription.start_date
-                  ? new Date(subscription.start_date).toLocaleDateString(locale)
-                  : '-';
-                const quotaLabel = subscription.unlimited
-                  ? t('sections.plan.unlimited')
-                  : subscription.quota_limit === null || subscription.remaining_quota === null
-                    ? '-'
-                    : `${remainingQuota}/${quotaLimit}`;
-
-                return (
-                  <div
-                    key={subscription.subscription_id}
-                    className='space-y-3 rounded-xl border border-primary/20 bg-primary/5 p-3'
-                  >
-                    <div className='space-y-1'>
-                      <p className='text-sm font-medium text-foreground'>
-                        {subscription.package_name}
-                      </p>
-                      <div className='space-y-0.5 text-xs text-muted-foreground'>
-                        <p>
-                          {t('sections.plan.feature')}:{' '}
-                          {getFeatureTypeViLabel(subscription.feature_type)}
-                        </p>
-                        <p>
-                          {t('sections.plan.status')}: {subscription.status}
-                        </p>
-                        <p>{t('sections.plan.startedOn', { date: startedDate })}</p>
-                      </div>
-                    </div>
-
-                    <div className='space-y-2'>
-                      <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                        <span>{t('sections.plan.quota')}</span>
-                        <span>{quotaLabel}</span>
-                      </div>
-                      {hasFiniteQuota && <Progress value={deriveRatio(usedQuota, quotaLimit)} />}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
+        <AgentDashboardPlanCard />
       </section>
     </div>
   );
