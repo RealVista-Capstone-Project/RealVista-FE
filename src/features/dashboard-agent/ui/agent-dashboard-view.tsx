@@ -118,6 +118,20 @@ function toInputDateValue(value: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function buildTrend(currentValue: number, previousValue: number) {
+  if (previousValue <= 0) {
+    return {
+      trend: currentValue >= 0 ? ('up' as const) : ('down' as const),
+      deltaPercent: currentValue > 0 ? 100 : 0,
+    };
+  }
+  const deltaPercent = ((currentValue - previousValue) / previousValue) * 100;
+  return {
+    trend: deltaPercent >= 0 ? ('up' as const) : ('down' as const),
+    deltaPercent: Math.round(Math.abs(deltaPercent)),
+  };
+}
+
 function toDateRangeLabel(range: AgentDateRange, locale: string) {
   const from = new Date(`${range.from}T00:00:00`);
   const to = new Date(`${range.to}T00:00:00`);
@@ -464,12 +478,28 @@ export function AgentDashboardView() {
   const hasPartialError = metricsQuery.isError || appointmentsQuery.isError || planQuery.isError;
 
   const metrics = metricsQuery.data?.data;
+  const listingTrend = buildTrend(
+    metrics?.listingSummary.currentMonthAll ?? 0,
+    metrics?.listingSummary.previousAll ?? 0
+  );
+  const propertyTrend = buildTrend(
+    metrics?.propertySummary.currentMonthTotalProperties ?? 0,
+    metrics?.propertySummary.previousTotalProperties ?? 0
+  );
+  const appointmentTrend = buildTrend(
+    metrics?.appointmentSummary.currentMonthUpcomingAppointments ?? 0,
+    metrics?.appointmentSummary.previousUpcomingAppointments ?? 0
+  );
+  const crmTrend = buildTrend(
+    metrics?.crmSummary.totalLeads ?? 0,
+    metrics?.crmSummary.previousTotalLeads ?? 0
+  );
   const kpis = [
     {
       id: 'active-listings',
       value: metrics?.listingSummary.all ?? 0,
-      trend: 'up' as const,
-      deltaPercent: 0,
+      trend: listingTrend.trend,
+      deltaPercent: listingTrend.deltaPercent,
       unit: undefined,
       iconBg: 'bg-emerald-100 dark:bg-emerald-500/20',
       icon: <Home className='h-4 w-4 text-emerald-600 dark:text-emerald-400' />,
@@ -477,8 +507,8 @@ export function AgentDashboardView() {
     {
       id: 'delegated-properties',
       value: metrics?.propertySummary.totalProperties ?? 0,
-      trend: 'up' as const,
-      deltaPercent: 0,
+      trend: propertyTrend.trend,
+      deltaPercent: propertyTrend.deltaPercent,
       unit: undefined,
       iconBg: 'bg-amber-100 dark:bg-amber-500/20',
       icon: <Building2 className='h-4 w-4 text-amber-600 dark:text-amber-400' />,
@@ -486,8 +516,8 @@ export function AgentDashboardView() {
     {
       id: 'open-appointments',
       value: metrics?.appointmentSummary.upcomingAppointments ?? 0,
-      trend: 'up' as const,
-      deltaPercent: 0,
+      trend: appointmentTrend.trend,
+      deltaPercent: appointmentTrend.deltaPercent,
       unit: undefined,
       iconBg: 'bg-sky-100 dark:bg-sky-500/20',
       icon: <CalendarDays className='h-4 w-4 text-sky-600 dark:text-sky-400' />,
@@ -495,8 +525,8 @@ export function AgentDashboardView() {
     {
       id: 'crm-leads',
       value: metrics?.crmSummary.totalLeads ?? 0,
-      trend: 'up' as const,
-      deltaPercent: 0,
+      trend: crmTrend.trend,
+      deltaPercent: crmTrend.deltaPercent,
       unit: undefined,
       iconBg: 'bg-rose-100 dark:bg-rose-500/20',
       icon: <Users className='h-4 w-4 text-rose-600 dark:text-rose-400' />,

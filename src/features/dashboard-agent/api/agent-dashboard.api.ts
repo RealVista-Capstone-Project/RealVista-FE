@@ -27,9 +27,21 @@ const DEFAULT_PLAN_SNAPSHOT: AgentPlanSnapshotResponse = {
 };
 
 const DEFAULT_METRICS_PAYLOAD: AgentDashboardMetrics = {
-  listingSummary: { all: 0, rent: 0, sale: 0 },
+  listingSummary: {
+    all: 0,
+    rent: 0,
+    sale: 0,
+    currentMonthAll: 0,
+    currentMonthRent: 0,
+    currentMonthSale: 0,
+    previousAll: 0,
+    previousRent: 0,
+    previousSale: 0,
+  },
   propertySummary: {
     totalProperties: 0,
+    currentMonthTotalProperties: 0,
+    previousTotalProperties: 0,
     availableProperties: 0,
     reservedProperties: 0,
     soldProperties: 0,
@@ -41,12 +53,16 @@ const DEFAULT_METRICS_PAYLOAD: AgentDashboardMetrics = {
   },
   appointmentSummary: {
     totalAppointments: 0,
+    currentMonthTotalAppointments: 0,
+    previousTotalAppointments: 0,
     pendingAppointments: 0,
     acceptedAppointments: 0,
     rejectedAppointments: 0,
     canceledAppointments: 0,
     completedAppointments: 0,
     upcomingAppointments: 0,
+    currentMonthUpcomingAppointments: 0,
+    previousUpcomingAppointments: 0,
   },
   crmSummary: {
     totalLeads: 0,
@@ -125,6 +141,18 @@ function normalizeListingSummary(payload: unknown): AgentDashboardMetrics['listi
     all: readNum(o.all ?? o.total ?? fallback.all),
     rent: readNum(o.rent ?? fallback.rent),
     sale: readNum(o.sale ?? fallback.sale),
+    currentMonthAll: readNum(
+      o.currentMonthAll ?? o.current_month_all ?? o.monthlyAll ?? o.monthly_all ?? fallback.currentMonthAll
+    ),
+    currentMonthRent: readNum(
+      o.currentMonthRent ?? o.current_month_rent ?? o.monthlyRent ?? o.monthly_rent ?? fallback.currentMonthRent
+    ),
+    currentMonthSale: readNum(
+      o.currentMonthSale ?? o.current_month_sale ?? o.monthlySale ?? o.monthly_sale ?? fallback.currentMonthSale
+    ),
+    previousAll: readNum(o.previousAll ?? o.previous_all ?? fallback.previousAll),
+    previousRent: readNum(o.previousRent ?? o.previous_rent ?? fallback.previousRent),
+    previousSale: readNum(o.previousSale ?? o.previous_sale ?? fallback.previousSale),
   };
 }
 
@@ -134,6 +162,16 @@ function normalizePropertySummary(payload: unknown): AgentDashboardMetrics['prop
   const o = payload as LooseRecord;
   return {
     totalProperties: readNum(o.totalProperties ?? o.total_properties ?? fallback.totalProperties),
+    currentMonthTotalProperties: readNum(
+      o.currentMonthTotalProperties ??
+        o.current_month_total_properties ??
+        o.monthlyTotalProperties ??
+        o.monthly_total_properties ??
+        fallback.currentMonthTotalProperties
+    ),
+    previousTotalProperties: readNum(
+      o.previousTotalProperties ?? o.previous_total_properties ?? fallback.previousTotalProperties
+    ),
     availableProperties: readNum(
       o.availableProperties ?? o.available_properties ?? fallback.availableProperties
     ),
@@ -157,6 +195,16 @@ function normalizeAppointmentSummary(payload: unknown): AgentDashboardMetrics['a
   const o = payload as LooseRecord;
   return {
     totalAppointments: readNum(o.totalAppointments ?? o.total_appointments ?? fallback.totalAppointments),
+    currentMonthTotalAppointments: readNum(
+      o.currentMonthTotalAppointments ??
+        o.current_month_total_appointments ??
+        o.monthlyTotalAppointments ??
+        o.monthly_total_appointments ??
+        fallback.currentMonthTotalAppointments
+    ),
+    previousTotalAppointments: readNum(
+      o.previousTotalAppointments ?? o.previous_total_appointments ?? fallback.previousTotalAppointments
+    ),
     pendingAppointments: readNum(
       o.pendingAppointments ?? o.pending_appointments ?? fallback.pendingAppointments
     ),
@@ -174,6 +222,16 @@ function normalizeAppointmentSummary(payload: unknown): AgentDashboardMetrics['a
     ),
     upcomingAppointments: readNum(
       o.upcomingAppointments ?? o.upcoming_appointments ?? fallback.upcomingAppointments
+    ),
+    currentMonthUpcomingAppointments: readNum(
+      o.currentMonthUpcomingAppointments ??
+        o.current_month_upcoming_appointments ??
+        o.monthlyUpcomingAppointments ??
+        o.monthly_upcoming_appointments ??
+        fallback.currentMonthUpcomingAppointments
+    ),
+    previousUpcomingAppointments: readNum(
+      o.previousUpcomingAppointments ?? o.previous_upcoming_appointments ?? fallback.previousUpcomingAppointments
     ),
   };
 }

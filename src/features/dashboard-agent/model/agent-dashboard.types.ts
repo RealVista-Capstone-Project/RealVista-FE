@@ -24,10 +24,18 @@ export interface ManagedListingSummary {
   all: number;
   rent: number;
   sale: number;
+  currentMonthAll: number;
+  currentMonthRent: number;
+  currentMonthSale: number;
+  previousAll: number;
+  previousRent: number;
+  previousSale: number;
 }
 
 export interface PropertySummaryMetrics {
   totalProperties: number;
+  currentMonthTotalProperties: number;
+  previousTotalProperties: number;
   availableProperties: number;
   reservedProperties: number;
   soldProperties: number;
@@ -40,12 +48,16 @@ export interface PropertySummaryMetrics {
 
 export interface AppointmentSummaryMetrics {
   totalAppointments: number;
+  currentMonthTotalAppointments: number;
+  previousTotalAppointments: number;
   pendingAppointments: number;
   acceptedAppointments: number;
   rejectedAppointments: number;
   canceledAppointments: number;
   completedAppointments: number;
   upcomingAppointments: number;
+  currentMonthUpcomingAppointments: number;
+  previousUpcomingAppointments: number;
 }
 
 export interface LeadSourceSummary {
