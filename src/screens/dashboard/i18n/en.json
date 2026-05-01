@@ -60,8 +60,6 @@
     "FAILED": "Failed",
     "REFUNDED": "Refunded",
     "cpuUsage": "CPU Usage",
-
-
     "memoryUsage": "Memory Usage",
     "diskSpace": "Disk Space",
     "uptime": "Uptime",
@@ -83,16 +81,48 @@
     "newRegistration": "New Registration",
     "newTransaction": "New Transaction",
     "newListing": "New Listing",
+    "listingCreationTrend": "Listing Creation Trend",
     "revenueBreakdown": "Revenue Breakdown",
     "systemLiquidity": "System Liquidity",
     "avgSalesCycle": "Avg. Sales Cycle",
     "trustIndex": "Trust Index",
     "liquidityDesc": "Percentage of listings that are successfully sold or rented.",
     "salesCycleDesc": "Average time to close a deal (days).",
-    "trustIndexDesc": "Community trust level based on verified interactions."
+    "trustIndexDesc": "Community trust level based on verified interactions.",
+    "activePlans": "Active Plans",
+    "days7": "Last 7 Days",
+    "days30": "Last 30 Days",
+    "days90": "Last 90 Days",
+    "customRange": "Custom Range",
+    "selectTimeRange": "Select Time Range",
+    "totalViews": "Total Views",
+    "engagement": "Engagement",
+    "boostRevenue": "Service Revenue",
+    "revenueAI": "AI Revenue",
+    "revenueBoost": "Boosting Revenue",
+    "FEATURED": "Featured Boost",
+    "HOT_BADGE": "Hot Badge",
+    "revenueListing": "Listing Revenue",
+    "revenueTour": "3D Tour Revenue",
+    "LISTING_FREE": "Free Listing Package",
+    "LISTING_10": "10 Listings Package",
+    "LISTING_25": "25 Listings Package",
+    "LISTING_50": "50 Listings Package",
+    "LISTING_UNLIMITED": "Unlimited Listings Package",
+    "AI_FREE": "Free AI Package",
+    "AI_50": "50 AI Requests",
+    "AI_100": "100 AI Requests",
+    "AI_200": "200 AI Requests",
+    "AI_UNLIMITED": "Unlimited AI",
+    "BASIC": "Basic Plan",
+    "PRO": "Professional Plan",
+    "PREMIUM": "Premium Plan",
+    "3D_TOUR_FREE": "Free 3D Tour",
+    "3D_TOUR_5": "5 3D Tours",
+    "3D_TOUR_15": "15 3D Tours",
+    "3D_TOUR_30": "30 3D Tours",
+    "3D_TOUR_UNLIMITED": "Unlimited 3D Tours"
   },
-
-
   "AdminDashboard": {
     "totalActiveUsers": "Active Users",
     "platformGrowth": "Platform Growth",
@@ -104,6 +134,11 @@
     "revenueDriver": "Revenue Driver",
     "unresolvedReports": "Unresolved Reports",
     "highPriority": "High Priority",
-    "requiresImmediateResolution": "Requires immediate resolution"
+    "requiresImmediateResolution": "Requires immediate resolution",
+    "revenueAI": "AI Revenue",
+    "revenueBoost": "Boosting Revenue",
+    "revenueListing": "Listing Revenue",
+    "revenueTour": "3D Tour Revenue",
+    "revenueBreakdown": "Revenue Breakdown"
   }
 }

@@ -17,7 +17,6 @@ import {
   Package,
   ShieldCheck,
   Flag,
-  type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -207,14 +206,6 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       label: t('menu.packages'),
       href: ROUTES.dashboard.managePackages,
       icon: Package,
-    },
-    {
-      id: 'listings',
-      label: t('menu.listings'),
-      href: ROUTES.dashboard.managedListings,
-      icon: Columns,
-      badge: badges.listings,
-      badgeVariant: 'warning'
     },
 
     {

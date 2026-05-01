@@ -27,6 +27,7 @@ export interface AdminStats {
     views: number;
     interactions: number;
     revenue: number;
+    breakdown?: Record<string, number>;
     trend: string;
   }[];
   package_insights: { id: string; label: string; value: number; extra?: Record<string, number> }[];

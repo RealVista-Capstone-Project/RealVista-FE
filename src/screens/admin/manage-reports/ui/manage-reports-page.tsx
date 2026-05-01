@@ -20,6 +20,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 
 import { reportApi, Report, ReportStatus, ReportTargetType } from '@/entities/report/api/report.api';
 import { DataTable } from '@/shared/ui/data-table/data-table';
@@ -41,6 +43,7 @@ import { format, differenceInHours } from 'date-fns';
 
 export function ManageReportsPage() {
   const t = useTranslations('ManageReports');
+  const router = useRouter();
   const [selectedReport, setSelectedReport] = React.useState<Report | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
 
@@ -80,9 +83,6 @@ export function ManageReportsPage() {
             <span className='text-[10px] font-bold text-slate-400 uppercase tracking-tighter'>
               {row.original.report_target_type}
             </span>
-            {row.original.report_reason === 'SCAM' && (
-               <span className='w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse' title={t('detail.highPriority')} />
-            )}
           </div>
           <div className='flex items-center gap-2'>
             <span className='text-sm font-semibold text-slate-900 truncate max-w-[200px]'>
@@ -95,8 +95,8 @@ export function ManageReportsPage() {
                 e.stopPropagation();
                 const url = row.original.report_target_type === 'LISTING'
                   ? `/buy/${row.original.report_target_id}`
-                  : `/admin?search=${row.original.report_target_id}`;
-                window.open(url, '_blank');
+                  : `${ROUTES.dashboard.manageUsers}?search=${encodeURIComponent(row.original.reported_user_name || '')}`;
+                router.push(url);
               }}
               className='p-1 rounded-md hover:bg-slate-100 text-primary transition-colors'
               title={t('detail.actions.viewTarget')}

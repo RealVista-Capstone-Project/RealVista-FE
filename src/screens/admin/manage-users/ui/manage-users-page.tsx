@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import {
@@ -61,7 +62,9 @@ export function ManageUsersPage() {
   const queryClient = useQueryClient();
 
   // State for filters and pagination
-  const [search, setSearch] = React.useState('');
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+  const [search, setSearch] = React.useState(urlSearch);
   const debouncedSearch = useDebounce(search, 500);
   const [role, setRole] = React.useState<RoleCode | 'ALL'>('ALL');
   const [status, setStatus] = React.useState<UserStatus | 'ALL'>('ALL');

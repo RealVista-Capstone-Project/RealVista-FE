@@ -7,9 +7,16 @@ import { useAuthSession } from '@/features/auth/model';
 import { useTranslations } from 'next-intl';
 
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  AreaChart, Area, CartesianGrid, PieChart, Pie, Cell
+  BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
+  AreaChart, Area, CartesianGrid, PieChart, Pie, Cell,
+  LineChart, Line, Legend
 } from 'recharts';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider
+} from '@/shared/ui/tooltip';
 import { motion } from 'framer-motion';
 
 import { useQuery } from '@tanstack/react-query';
@@ -41,7 +48,7 @@ const formatRevenueAxis = (val: number) => {
   return new Intl.NumberFormat('vi-VN').format(val) + ' vnđ';
 };
 
-const CustomTooltip = ({ active, payload, label, t }: any) => {
+const CustomTooltip = ({ active, payload, label, t, isCurrency }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xl">
@@ -50,11 +57,11 @@ const CustomTooltip = ({ active, payload, label, t }: any) => {
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
+                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill || entry.stroke }} />
                 <span className="text-sm text-slate-700 dark:text-slate-300">{entry.name}:</span>
               </div>
               <span className="text-sm font-black text-slate-900 dark:text-slate-100">
-                {typeof entry.value === 'number' && entry.name.toLowerCase().includes('doanh thu')
+                {typeof entry.value === 'number' && (isCurrency || entry.name.toLowerCase().includes('doanh thu') || entry.name.toLowerCase().includes('revenue'))
                   ? formatVND(entry.value)
                   : entry.value}
               </span>
@@ -81,7 +88,11 @@ export function AdminDashboard() {
     };
   }, [days]);
 
-  const { data: stats, isLoading, error } = useQuery(adminQueries.stats(startDate, endDate));
+  // Don't pass endDate to keep it always up to the current moment on every refetch
+  const { data: stats, isLoading, error } = useQuery({
+    ...adminQueries.stats(startDate),
+    refetchInterval: 30000, // Refetch every 30 seconds to keep data fresh
+  });
 
   const translatedPackageInsights = useMemo(() => {
     return (stats?.package_insights ?? []).map((item) => ({
@@ -180,13 +191,7 @@ export function AdminDashboard() {
           </div>
           <div className='h-[350px] w-full'>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueTrend}>
-                <defs>
-                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
+              <LineChart data={revenueTrend}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis
                   dataKey="label"
@@ -203,17 +208,50 @@ export function AdminDashboard() {
                   tickFormatter={formatRevenueAxis}
                   width={60}
                 />
-                <Tooltip content={<CustomTooltip t={t} />} />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  name={t('revenue')}
-                  stroke="#10b981"
-                  fillOpacity={1}
-                  fill="url(#colorRev)"
-                  strokeWidth={4}
+                <RechartsTooltip content={<CustomTooltip t={t} isCurrency={true} />} />
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  iconType="circle"
+                  wrapperStyle={{ paddingBottom: '20px', fontSize: '12px', fontWeight: 'bold' }}
                 />
-              </AreaChart>
+                <Line
+                  type="monotone"
+                  dataKey="extra.AI"
+                  name={t('revenueAI')}
+                  stroke="#8b5cf6"
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="extra.BOOST"
+                  name={t('revenueBoost')}
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="extra.LISTING"
+                  name={t('revenueListing')}
+                  stroke="#f59e0b"
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="extra.TOUR"
+                  name={t('revenueTour')}
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
@@ -248,7 +286,7 @@ export function AdminDashboard() {
                   dy={10}
                 />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
-                <Tooltip content={<CustomTooltip t={t} />} />
+                <RechartsTooltip content={<CustomTooltip t={t} />} />
                 <Bar
                   dataKey="value"
                   name={t('newRegistration')}
@@ -293,7 +331,7 @@ export function AdminDashboard() {
                   dy={10}
                 />
                 <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
-                <Tooltip content={<CustomTooltip t={t} />} />
+                <RechartsTooltip content={<CustomTooltip t={t} />} />
                 <Bar
                   dataKey="value"
                   name={t('newListing')}
@@ -315,50 +353,87 @@ export function AdminDashboard() {
           animate={{ opacity: 1, x: 0 }}
           className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
         >
-          <h3 className='text-xl font-black flex items-center gap-2'>
-            <Package className='h-5 w-5 text-indigo-500' />
-            {t('packageInsights')}
-            <Clock className="h-3 w-3 text-indigo-500 animate-pulse" />
-          </h3>
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-8">{t(`days${days}`)}</p>
-          <div className='h-[300px] w-full relative'>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={translatedPackageInsights}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={120}
-                  paddingAngle={8}
-                  dataKey="value"
-                  nameKey="translatedLabel"
-                >
-                  {translatedPackageInsights.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-              <p className="text-3xl font-black text-slate-900 dark:text-white">
-                {translatedPackageInsights.reduce((sum, item) => sum + item.value, 0)}
-              </p>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('activePlans')}</p>
+          <div className='flex items-center justify-between mb-8'>
+            <div className="flex flex-col gap-1">
+              <h3 className='text-xl font-black flex items-center gap-2'>
+                <Package className='h-5 w-5 text-indigo-500' />
+                {t('packageInsights')}
+                <Clock className="h-3 w-3 text-indigo-500 animate-pulse" />
+              </h3>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
             </div>
           </div>
-          <div className='mt-8 grid grid-cols-1 gap-4'>
-            {translatedPackageInsights.map((entry, index) => (
-              <div key={entry.id || index} className='flex items-center gap-3 p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors'>
-                <div className='h-3 w-3 rounded-full shrink-0' style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                <div className="flex flex-col">
-                  <span className='text-xs font-black text-slate-900 dark:text-slate-100'>
-                    {entry.translatedLabel} ({entry.value})
-                  </span>
-                </div>
+
+          <div className='flex flex-col gap-8'>
+            {/* Donut Chart */}
+            <div className='h-[240px] w-full relative'>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={translatedPackageInsights}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={75}
+                    outerRadius={100}
+                    paddingAngle={2}
+                    dataKey="value"
+                    nameKey="translatedLabel"
+                  >
+                    {translatedPackageInsights.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                        stroke="none"
+                        className="hover:opacity-80 transition-opacity outline-none"
+                      />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip content={<CustomTooltip isCurrency={true} />} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                <p className="text-4xl font-black text-slate-900 dark:text-white leading-tight">
+                  {translatedPackageInsights.reduce((sum, item) => sum + item.value, 0)}
+                </p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('activePlans')}</p>
               </div>
-            ))}
+            </div>
+
+            {/* Premium Legend with Progress Bars */}
+            <div className='space-y-5 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar'>
+              {translatedPackageInsights.map((entry, index) => {
+                const total = translatedPackageInsights.reduce((sum, item) => sum + item.value, 0);
+                const percent = total > 0 ? Math.round((entry.value / total) * 100) : 0;
+                const color = COLORS[index % COLORS.length];
+
+                return (
+                  <div key={entry.id || index} className='flex flex-col gap-2'>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                        <span className="text-sm font-black text-slate-700 dark:text-slate-300">
+                          {entry.translatedLabel}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-black text-slate-900 dark:text-white">{entry.value}</span>
+                        <span className="text-[10px] font-black text-slate-400">({percent}%)</span>
+                      </div>
+                    </div>
+                    {/* Tiny Progress Bar */}
+                    <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percent}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full rounded-full"
+                        style={{ backgroundColor: color }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </motion.div>
 
@@ -458,11 +533,11 @@ export function AdminDashboard() {
                 <tr className="text-left border-b border-slate-100 dark:border-slate-800">
                   <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('trending')}</th>
                   <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('totalViews')}</th>
-                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('boostRevenue')}</th>
+                  <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('revenueBoost')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                {topListings.map((listing, index) => (
+                {topListings.map((listing) => (
                   <tr key={listing.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                     <td className="py-4">
                       <div className="flex items-center gap-4">
@@ -492,7 +567,39 @@ export function AdminDashboard() {
                        </span>
                     </td>
                     <td className="py-4 text-right">
-                       <span className="text-sm font-black text-slate-900 dark:text-white">{formatVND(listing.revenue)}</span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                             <span className={cn(
+                               "text-sm font-black dark:text-white cursor-help border-b border-dotted border-slate-300 dark:border-slate-700",
+                               listing.revenue > 0 ? "text-emerald-600" : "text-slate-400"
+                             )}>
+                               {formatVND(listing.revenue)}
+                             </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-slate-900 text-white border-slate-800 p-3 rounded-xl shadow-2xl">
+                             <div className="flex flex-col gap-2 min-w-[120px]">
+                               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                                 {t('revenueBreakdown')}
+                               </p>
+                               {listing.breakdown && Object.keys(listing.breakdown).length > 0 ? (
+                                 Object.entries(listing.breakdown).map(([key, value]) => (
+                                   <div key={key} className="flex justify-between items-center gap-4">
+                                      <span className="text-xs text-slate-300">{t(key)}</span>
+                                      <span className="text-xs font-bold">{value} {t('interactions').toLowerCase()}</span>
+                                   </div>
+                                 ))
+                               ) : (
+                                 <p className="text-xs text-slate-500 italic">No boost revenue recorded</p>
+                               )}
+                               <div className="mt-1 pt-1 border-t border-slate-800 flex justify-between items-center">
+                                 <span className="text-[10px] text-slate-400">Total</span>
+                                 <span className="text-xs font-black text-emerald-400">{formatVND(listing.revenue)}</span>
+                               </div>
+                             </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </td>
                   </tr>
                 ))}

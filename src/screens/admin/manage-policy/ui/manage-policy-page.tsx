@@ -72,7 +72,7 @@ export function ManagePolicyPage() {
         slug: selectedPolicy.slug,
         content: selectedPolicy.content
       });
-      setTab('edit');
+      setTab('preview');
     } else {
       setFormData({ title: '', slug: '', content: '' });
       setTab('edit');
@@ -123,6 +123,7 @@ export function ManagePolicyPage() {
   const handleCreateNew = () => {
     setSelectedId(null);
     setFormData({ title: '', slug: '', content: '' });
+    setTab('edit');
   };
 
   const hasUnsavedChanges = selectedPolicy && (
@@ -281,11 +282,11 @@ export function ManagePolicyPage() {
         <div className='px-6 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between'>
           <Tabs value={tab} onValueChange={(v: any) => setTab(v)}>
             <TabsList className='h-9'>
-              <TabsTrigger value='edit' className='text-xs px-4'>
-                <Edit3 className='h-3.5 w-3.5 mr-2' /> {t('editor.tabs.edit')}
-              </TabsTrigger>
               <TabsTrigger value='preview' className='text-xs px-4'>
                 <Eye className='h-3.5 w-3.5 mr-2' /> {t('editor.tabs.preview')}
+              </TabsTrigger>
+              <TabsTrigger value='edit' className='text-xs px-4'>
+                <Edit3 className='h-3.5 w-3.5 mr-2' /> {t('editor.tabs.edit')}
               </TabsTrigger>
             </TabsList>
           </Tabs>

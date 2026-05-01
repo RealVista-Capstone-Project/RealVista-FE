@@ -46,6 +46,8 @@
       "resolution": "Giải quyết",
       "resolutionAction": {
         "title": "Hành động xử lý",
+        "reviewRequired": "Cần xem xét kỹ lưỡng",
+        "reviewDesc": "Vui lòng kiểm tra kỹ bằng chứng trước khi đưa ra quyết định xử lý.",
         "banListing": "Gỡ bài đăng vi phạm",
         "banListingDesc": "Bài đăng này sẽ bị ẩn vĩnh viễn khỏi hệ thống và không thể truy cập công khai.",
         "banUser": "Khóa tài khoản người dùng",
@@ -71,9 +73,11 @@
       "actions": {
         "startReview": "Bắt đầu xem xét",
         "resolve": "Giải quyết",
+        "markAsResolved": "Đã xử lý (Resolve)",
         "dismiss": "Bác bỏ",
         "suspendTarget": "Đình chỉ đối tượng",
-        "viewTarget": "Xem đối tượng"
+        "viewTarget": "Xem đối tượng",
+        "manageUser": "Xem & Xử lý người dùng"
       },
       "confirm": {
         "resolveTitle": "Giải quyết báo cáo",

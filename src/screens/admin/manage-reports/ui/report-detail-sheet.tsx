@@ -9,7 +9,8 @@ import {
   ExternalLink,
   Flag,
   ShieldAlert,
-  AlertTriangle
+  AlertTriangle,
+  User
 } from 'lucide-react';
 
 import {
@@ -94,11 +95,11 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
     if (report.report_target_type === 'LISTING') {
       url = `/buy/${report.report_target_id}`;
     } else if (report.report_target_type === 'USER') {
-      url = `${ROUTES.dashboard.manageUsers}?search=${report.report_target_id}`;
+      url = `${ROUTES.dashboard.manageUsers}?search=${encodeURIComponent(report.reported_user_name || '')}`;
     }
 
     if (url) {
-      window.open(url, '_blank');
+      router.push(url);
     }
   };
 
@@ -221,37 +222,32 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
 
                 {isReviewing && (
                   <div className='space-y-6 pt-2 animate-in fade-in slide-in-from-bottom-4 duration-500'>
-                    <div className='p-4 rounded-xl border border-red-100 bg-red-50/30 space-y-3'>
-                      <div className='flex items-start gap-3'>
-                        <div className='p-2 rounded-lg bg-red-50 text-red-600'>
-                          <ShieldAlert className='h-5 w-5' />
+                      <div className='p-4 rounded-xl border border-primary/10 bg-primary/5 space-y-3'>
+                        <div className='flex items-start gap-3'>
+                          <div className='p-2 rounded-lg bg-primary/10 text-primary'>
+                            <ShieldAlert className='h-5 w-5' />
+                          </div>
+                          <div className='flex-1 space-y-1'>
+                            <h5 className='text-sm font-black text-primary uppercase tracking-tight'>
+                              {t('detail.resolutionAction.reviewRequired')}
+                            </h5>
+                            <p className='text-xs text-slate-600 leading-relaxed font-medium'>
+                              {t('detail.resolutionAction.reviewDesc')}
+                            </p>
+                          </div>
                         </div>
-                        <div className='flex-1 space-y-1'>
-                          <h5 className='text-sm font-black text-red-900 uppercase tracking-tight'>
-                            {t(`detail.resolutionAction.${currentReport.report_target_type === 'LISTING' ? 'banListing' : 'banUser'}`)}
-                          </h5>
-                          <p className='text-xs text-red-700 leading-relaxed font-medium'>
-                            {t(`detail.resolutionAction.${currentReport.report_target_type === 'LISTING' ? 'banListingDesc' : 'banUserDesc'}`)}
-                          </p>
-                        </div>
-                      </div>
 
-                      <div className='pt-2 flex items-center gap-3'>
-                        <input
-                          type="checkbox"
-                          id="confirm-resolution"
-                          checked={isConfirmed}
-                          onChange={(e) => setIsConfirmed(e.target.checked)}
-                          className='h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500 cursor-pointer'
-                        />
-                        <label
-                          htmlFor="confirm-resolution"
-                          className='text-xs font-bold text-red-900 cursor-pointer select-none'
-                        >
-                          {t('detail.resolutionAction.confirmCheckbox')}
-                        </label>
+                        {currentReport.report_target_type === 'USER' && (
+                          <Button
+                            variant='outline'
+                            className='w-full h-9 rounded-lg bg-white border-primary/20 text-primary font-bold hover:bg-primary/5'
+                            onClick={handleViewTarget}
+                          >
+                            <User className='h-4 w-4 mr-2' />
+                            {t('detail.actions.manageUser')}
+                          </Button>
+                        )}
                       </div>
-                    </div>
 
                     <div className='flex gap-3 pt-2'>
                       <Button
@@ -263,12 +259,12 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
                         {t('detail.actions.dismiss')}
                       </Button>
                       <Button
-                        className='flex-[2] h-11 rounded-xl bg-red-600 text-white font-black shadow-lg shadow-red-600/20 hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100'
+                        className='flex-[2] h-11 rounded-xl bg-slate-900 text-white font-black shadow-lg shadow-slate-900/20 hover:bg-slate-800 hover:scale-[1.02] active:scale-95 transition-all'
                         onClick={() => resolveMutation.mutate()}
-                        disabled={resolveMutation.isPending || !isConfirmed}
+                        disabled={resolveMutation.isPending}
                       >
                         {resolveMutation.isPending && <span className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent' />}
-                        {t('detail.actions.resolve')}
+                        {t('detail.actions.markAsResolved')}
                       </Button>
                     </div>
                   </div>

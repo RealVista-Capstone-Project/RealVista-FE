@@ -60,8 +60,6 @@
     "FAILED": "Thất bại",
     "REFUNDED": "Đã hoàn tiền",
     "cpuUsage": "Sử dụng CPU",
-
-
     "memoryUsage": "Sử dụng RAM",
     "diskSpace": "Dung lượng đĩa",
     "uptime": "Thời gian hoạt động",
@@ -99,7 +97,13 @@
     "selectTimeRange": "Chọn khoảng thời gian",
     "totalViews": "Tổng lượt xem",
     "engagement": "Tương tác",
-    "boostRevenue": "Doanh thu đẩy tin",
+    "boostRevenue": "Doanh thu dịch vụ",
+    "revenueAI": "Doanh thu AI",
+    "revenueBoost": "Dịch vụ Boosting",
+    "FEATURED": "Tin nổi bật",
+    "HOT_BADGE": "Tin nhãn Hot",
+    "revenueListing": "Doanh thu Tin đăng",
+    "revenueTour": "Doanh thu 3D Tour",
     "LISTING_FREE": "Gói tin miễn phí",
     "LISTING_10": "Gói 10 tin đăng",
     "LISTING_25": "Gói 25 tin đăng",
@@ -119,8 +123,6 @@
     "3D_TOUR_30": "3D Tour 30 tin",
     "3D_TOUR_UNLIMITED": "3D Tour Không giới hạn"
   },
-
-
   "AdminDashboard": {
     "totalActiveUsers": "Người dùng hoạt động",
     "platformGrowth": "Tăng trưởng hệ thống",
@@ -139,6 +141,11 @@
     "days7": "7 ngày qua",
     "days30": "30 ngày qua",
     "days90": "90 ngày qua",
-    "new": "Mới"
+    "new": "Mới",
+    "revenueAI": "Doanh thu AI",
+    "revenueBoost": "Dịch vụ Boosting",
+    "revenueListing": "Doanh thu Tin đăng",
+    "revenueTour": "Doanh thu 3D Tour",
+    "revenueBreakdown": "Phân tích doanh thu"
   }
 }

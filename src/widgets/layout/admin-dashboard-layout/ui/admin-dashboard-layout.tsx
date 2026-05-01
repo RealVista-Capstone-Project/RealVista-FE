@@ -13,7 +13,6 @@ import {
   Package,
   ShieldCheck,
   Flag,
-  type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -66,14 +65,6 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       label: t('menu.packages'),
       href: ROUTES.dashboard.managePackages,
       icon: Package,
-    },
-    {
-      id: 'listings',
-      label: t('menu.listings'),
-      href: ROUTES.dashboard.managedListings,
-      icon: Columns,
-      badge: badges.listings,
-      badgeVariant: 'warning'
     },
 
     {
@@ -226,7 +217,7 @@ export function AdminDashboardLayout({
             >
               <item.icon className='h-5 w-5' />
               {!isCollapsed && <span className='text-sm'>{item.label}</span>}
-              {!isCollapsed && item.badge && (
+              {!isCollapsed && item.badge && Number(item.badge) > 0 && (
                 <span className={cn('ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white',
                   item.badgeVariant === 'danger' ? 'bg-red-500' : 'bg-amber-500')}>
                   {item.badge}

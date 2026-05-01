@@ -10,9 +10,11 @@ import {
   TrendingDown,
   Rocket,
   DollarSign,
-  LucideIcon
+  LucideIcon,
+  ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 import { adminQueries } from '@/entities/admin/api';
 import { cn, formatVND, formatNumber } from '@/shared/lib/utils';
@@ -29,16 +31,12 @@ interface StatCardProps {
   };
   description?: string;
   delay?: number;
+  href?: string;
 }
 
-function StatCard({ title, value, icon: Icon, trend, description, delay = 0 }: StatCardProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay }}
-      className='group relative bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-500 overflow-hidden'
-    >
+function StatCard({ title, value, icon: Icon, trend, description, delay = 0, href }: StatCardProps) {
+  const content = (
+    <>
       <div className='absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors' />
 
       <div className='relative flex flex-col gap-4'>
@@ -61,9 +59,14 @@ function StatCard({ title, value, icon: Icon, trend, description, delay = 0 }: S
           <p className='text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2'>
             {title}
           </p>
-          <h3 className='text-3xl font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors'>
-            {value}
-          </h3>
+          <div className='flex items-end justify-between'>
+            <h3 className='text-3xl font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors'>
+              {value}
+            </h3>
+            {href && (
+              <ChevronRight className='h-5 w-5 text-slate-300 group-hover:text-primary transition-all duration-500 transform group-hover:translate-x-1' />
+            )}
+          </div>
           {description && (
             <p className='mt-2 text-xs font-bold text-slate-500'>
               {description}
@@ -71,6 +74,32 @@ function StatCard({ title, value, icon: Icon, trend, description, delay = 0 }: S
           )}
         </div>
       </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className='block h-full'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay }}
+          className='group relative h-full bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-500 overflow-hidden cursor-pointer'
+        >
+          {content}
+        </motion.div>
+      </Link>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay }}
+      className='group relative h-full bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-500 overflow-hidden'
+    >
+      {content}
     </motion.div>
   );
 }
@@ -97,17 +126,19 @@ function StatsSkeleton() {
 export function DashboardStats({ days = 7 }: { days?: number }) {
   const t = useTranslations('AdminDashboard');
 
-  const { startDate, endDate } = React.useMemo(() => {
+  const { startDate } = React.useMemo(() => {
     const end = new Date();
     const start = new Date();
     start.setDate(end.getDate() - days);
     return {
-      startDate: format(start, "yyyy-MM-dd'T'HH:mm:ss"),
-      endDate: format(end, "yyyy-MM-dd'T'HH:mm:ss")
+      startDate: format(start, "yyyy-MM-dd'T'HH:mm:ss")
     };
   }, [days]);
 
-  const { data: overview, isLoading } = useQuery(adminQueries.overview(startDate, endDate));
+  const { data: overview, isLoading } = useQuery({
+    ...adminQueries.overview(startDate),
+    refetchInterval: 30000,
+  });
 
   if (isLoading) return <StatsSkeleton />;
 
@@ -147,6 +178,7 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
         trend={{ value: t('highPriority'), isPositive: false }}
         description={t('requiresImmediateResolution')}
         delay={0.3}
+        href="/admin/manage-reports"
       />
     </>
   );
