@@ -7,7 +7,9 @@ import { toast } from 'sonner';
 import {
   Calendar,
   ExternalLink,
-  Flag
+  Flag,
+  ShieldAlert,
+  AlertTriangle
 } from 'lucide-react';
 
 import {
@@ -43,6 +45,7 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
   });
 
   const [adminNote, setAdminNote] = React.useState(report?.admin_note || '');
+  const [isConfirmed, setIsConfirmed] = React.useState(false);
 
   const currentReport = reportData?.payload?.data || report;
 
@@ -61,7 +64,6 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
 
   const resolveMutation = useMutation({
     mutationFn: () => {
-      console.log('[DEBUG] Resolving report:', currentReport?.report_id, 'with note:', adminNote);
       return reportApi.resolve(currentReport!.report_id, adminNote);
     },
     onSuccess: () => {
@@ -218,22 +220,57 @@ export function ReportDetailSheet({ report, open, onOpenChange }: ReportDetailSh
                 )}
 
                 {isReviewing && (
-                  <div className='flex gap-3 pt-1'>
-                    <Button
-                      variant='outline'
-                      className='flex-1 h-10 rounded-lg border-slate-200 text-slate-600 font-bold hover:bg-slate-50'
-                      onClick={() => dismissMutation.mutate()}
-                      disabled={dismissMutation.isPending}
-                    >
-                      {t('detail.actions.dismiss')}
-                    </Button>
-                    <Button
-                      className='flex-1 h-10 rounded-lg bg-primary text-white font-bold'
-                      onClick={() => resolveMutation.mutate()}
-                      disabled={resolveMutation.isPending}
-                    >
-                      {t('detail.actions.resolve')}
-                    </Button>
+                  <div className='space-y-6 pt-2 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+                    <div className='p-4 rounded-xl border border-red-100 bg-red-50/30 space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='p-2 rounded-lg bg-red-50 text-red-600'>
+                          <ShieldAlert className='h-5 w-5' />
+                        </div>
+                        <div className='flex-1 space-y-1'>
+                          <h5 className='text-sm font-black text-red-900 uppercase tracking-tight'>
+                            {t(`detail.resolutionAction.${currentReport.report_target_type === 'LISTING' ? 'banListing' : 'banUser'}`)}
+                          </h5>
+                          <p className='text-xs text-red-700 leading-relaxed font-medium'>
+                            {t(`detail.resolutionAction.${currentReport.report_target_type === 'LISTING' ? 'banListingDesc' : 'banUserDesc'}`)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className='pt-2 flex items-center gap-3'>
+                        <input
+                          type="checkbox"
+                          id="confirm-resolution"
+                          checked={isConfirmed}
+                          onChange={(e) => setIsConfirmed(e.target.checked)}
+                          className='h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500 cursor-pointer'
+                        />
+                        <label
+                          htmlFor="confirm-resolution"
+                          className='text-xs font-bold text-red-900 cursor-pointer select-none'
+                        >
+                          {t('detail.resolutionAction.confirmCheckbox')}
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className='flex gap-3 pt-2'>
+                      <Button
+                        variant='ghost'
+                        className='flex-1 h-11 rounded-xl text-slate-400 font-bold hover:bg-slate-100 hover:text-slate-600'
+                        onClick={() => dismissMutation.mutate()}
+                        disabled={dismissMutation.isPending}
+                      >
+                        {t('detail.actions.dismiss')}
+                      </Button>
+                      <Button
+                        className='flex-[2] h-11 rounded-xl bg-red-600 text-white font-black shadow-lg shadow-red-600/20 hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100'
+                        onClick={() => resolveMutation.mutate()}
+                        disabled={resolveMutation.isPending || !isConfirmed}
+                      >
+                        {resolveMutation.isPending && <span className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent' />}
+                        {t('detail.actions.resolve')}
+                      </Button>
+                    </div>
                   </div>
                 )}
 

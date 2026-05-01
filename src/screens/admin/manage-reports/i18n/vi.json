@@ -44,6 +44,14 @@
       "moderationActions": "Hành động kiểm duyệt",
       "reviewFullReport": "Xem toàn bộ báo cáo",
       "resolution": "Giải quyết",
+      "resolutionAction": {
+        "title": "Hành động xử lý",
+        "banListing": "Gỡ bài đăng vi phạm",
+        "banListingDesc": "Bài đăng này sẽ bị ẩn vĩnh viễn khỏi hệ thống và không thể truy cập công khai.",
+        "banUser": "Khóa tài khoản người dùng",
+        "banUserDesc": "Tài khoản sẽ bị đình chỉ vĩnh viễn. Người dùng không thể đăng nhập và tất cả bài đăng của họ sẽ bị ẩn.",
+        "confirmCheckbox": "Tôi xác nhận đã kiểm tra kỹ bằng chứng và chịu trách nhiệm về quyết định này."
+      },
       "highPriority": "Ưu tiên cao",
       "displayName": "Tên hiển thị",
       "emailAddress": "Địa chỉ Email",

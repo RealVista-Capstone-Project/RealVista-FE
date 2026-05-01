@@ -44,6 +44,14 @@
       "moderationActions": "Moderation Actions",
       "reviewFullReport": "Review Full Report",
       "resolution": "Resolution",
+      "resolutionAction": {
+        "title": "Resolution Action",
+        "banListing": "Remove Violating Listing",
+        "banListingDesc": "This listing will be permanently hidden from the system and will no longer be publicly accessible.",
+        "banUser": "Ban User Account",
+        "banUserDesc": "The account will be permanently suspended. The user will be unable to log in, and all their listings will be hidden.",
+        "confirmCheckbox": "I confirm that I have reviewed the evidence and take responsibility for this decision."
+      },
       "highPriority": "High Priority",
       "displayName": "Display Name",
       "emailAddress": "Email Address",

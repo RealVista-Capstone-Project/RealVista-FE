@@ -108,13 +108,6 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
   }, [days]);
 
   const { data: overview, isLoading } = useQuery(adminQueries.overview(startDate, endDate));
-  React.useEffect(() => {
-    if (overview) {
-      console.log('[DashboardStats] System Time:', new Date().toISOString());
-      console.log('[DashboardStats] Query Range:', { startDate, endDate });
-      console.log('[DashboardStats] Received overview data:', overview);
-    }
-  }, [overview, startDate, endDate]);
 
   if (isLoading) return <StatsSkeleton />;
 

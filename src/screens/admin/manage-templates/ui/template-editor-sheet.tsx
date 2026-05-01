@@ -18,6 +18,7 @@ import { Button } from '@/shared/ui/button';
 // SRP Components
 import { EditorHeader } from './editor-header';
 import { ConfigSection } from './config-section';
+import { VariableLibrary } from './variable-library';
 
 interface TemplateEditorSheetProps {
   template: NotificationTemplate | null;
@@ -128,12 +129,14 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
     const content = formData.content_body || '';
     const title = formData.title || '';
     const combinedContent = `${title} ${content}`;
-    const variableRegex = /\${(.*?)}/g;
+    // Support both {{var}} and ${var}
+    const variableRegex = /\{\{(.*?)\}\}|\$\{(.*?)\}/g;
     const usedVariables = new Set<string>();
     let match;
 
     while ((match = variableRegex.exec(combinedContent)) !== null) {
-      usedVariables.add(match[1]);
+      const varName = match[1] || match[2];
+      if (varName) usedVariables.add(varName.trim());
     }
 
     // 2. Validate against schema
@@ -184,7 +187,8 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
 
     const editor = editorRef.current;
     const monaco = monacoRef.current;
-    const variableRegex = /\${([^}]+)}/g;
+    // Support both {{var}} and ${var}
+    const variableRegex = /\{\{[^}]+\}\}|\$\{[^}]+\}/g;
     const matches = [];
     let match;
 
@@ -214,6 +218,30 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
     const content = value || '';
     setFormData({ ...formData, content_body: content });
     updateDecorations(content);
+  };
+
+  const handleInsertVariable = (varName: string) => {
+    const placeholder = `{{${varName}}}`;
+    if (editorRef.current) {
+      const editor = editorRef.current;
+      const selection = editor.getSelection();
+      const range = new monacoRef.current.Range(
+        selection.startLineNumber,
+        selection.startColumn,
+        selection.endLineNumber,
+        selection.endColumn
+      );
+      editor.executeEdits('insert-variable', [{
+        range,
+        text: placeholder,
+        forceMoveMarkers: true
+      }]);
+      editor.focus();
+    } else {
+      // Fallback for text area
+      const content = formData.content_body || '';
+      setFormData({ ...formData, content_body: content + placeholder });
+    }
   };
 
   return (
@@ -301,6 +329,11 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
                   />
                 )}
               </div>
+
+              <VariableLibrary
+                templateKey={formData.template_key || ''}
+                onInsert={handleInsertVariable}
+              />
             </div>
           </div>
 
@@ -311,7 +344,7 @@ export function TemplateEditorSheet({ template, open, onOpenChange }: TemplateEd
                  {t('form.livePreview')}
               </h3>
 
-              {formData.type === 'EMAIL' && (
+              {(formData.type === 'EMAIL' || formData.type === 'IN_APP') && (
                 <Button
                   variant="ghost"
                   size="sm"

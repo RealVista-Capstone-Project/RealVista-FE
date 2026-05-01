@@ -4,8 +4,6 @@ import * as React from 'react';
 import { useTranslations } from 'next-intl';
 import { Mail, Smartphone, Bell, Globe, Reply, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
 
 interface TemplatePreviewProps {
   type: 'EMAIL' | 'IN_APP';
@@ -21,9 +19,9 @@ export function TemplatePreview({ type, language, title, contentBody, className 
   const processContent = (content: string) => {
     if (!content) return '';
 
-    // Wrap variables ($${var} or ${var}) in styled HTML spans that rehype-raw will preserve
-    return content.replace(/\$?\$\{([^}]+)\}/g, (match) => {
-      return `<span class="inline-block bg-primary/10 text-primary font-bold px-1 rounded mx-0.5 border border-primary/20 break-all max-w-full">${match}</span>`;
+    // Support both {{var}} and ${var}
+    return content.replace(/\{\{(.*?)\}\}|\$\{(.*?)\}/g, (match) => {
+      return `<span class="inline-block bg-indigo-100 text-indigo-700 font-bold px-1 rounded mx-0.5 border border-indigo-200 break-all max-w-full">${match}</span>`;
     });
   };
 
@@ -49,21 +47,22 @@ export function TemplatePreview({ type, language, title, contentBody, className 
         </div>
       </div>
 
-      <div className='p-6 flex-1 overflow-y-auto'>
+      <div className='p-6 flex-1 overflow-y-auto custom-scrollbar'>
         <div className='mb-6 space-y-1.5'>
           <p className='text-[10px] text-slate-400 uppercase font-bold tracking-wider'>{language === 'vi' ? 'TIÊU ĐỀ' : 'SUBJECT / TITLE'}</p>
           <h4 className='text-lg font-bold text-slate-900'>{title || (language === 'vi' ? 'Không có chủ đề' : 'No Subject')}</h4>
         </div>
 
-        <div className='space-y-1.5'>
+        <div className='space-y-1.5 h-full'>
           <p className='text-[10px] text-slate-400 uppercase font-bold tracking-wider'>{language === 'vi' ? 'NỘI DUNG' : 'CONTENT BODY'}</p>
-          <div className='p-4 rounded-lg bg-slate-50 border border-slate-100 text-sm text-slate-600 leading-relaxed prose prose-slate max-w-none'>
+          <div className='rounded-lg bg-white border border-slate-100 text-sm text-slate-600 leading-relaxed overflow-hidden'>
             {processedContent ? (
-              <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                {processedContent}
-              </ReactMarkdown>
+              <div
+                className="w-full h-full min-h-[300px]"
+                dangerouslySetInnerHTML={{ __html: processedContent }}
+              />
             ) : (
-              <div dangerouslySetInnerHTML={{ __html: emptyContent }} />
+              <div className="p-4" dangerouslySetInnerHTML={{ __html: emptyContent }} />
             )}
           </div>
         </div>

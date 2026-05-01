@@ -83,17 +83,6 @@ export function AdminDashboard() {
 
   const { data: stats, isLoading, error } = useQuery(adminQueries.stats(startDate, endDate));
 
-  React.useEffect(() => {
-    if (stats) {
-      console.log('[AdminDashboard] System Time:', new Date().toISOString());
-      console.log('[AdminDashboard] Query Range:', { startDate, endDate });
-      console.log('[AdminDashboard] Received stats data:', stats);
-    }
-    if (error) {
-      console.error('[AdminDashboard] Query error:', error);
-    }
-  }, [stats, error]);
-
   const translatedPackageInsights = useMemo(() => {
     return (stats?.package_insights ?? []).map((item) => ({
       ...item,
@@ -377,7 +366,7 @@ export function AdminDashboard() {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className='lg:col-span-2 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+          className='lg:col-span-2 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 flex flex-col'
         >
           <div className="flex items-center justify-between mb-8">
             <div className="flex flex-col gap-1">
@@ -393,8 +382,8 @@ export function AdminDashboard() {
             </Link>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="flex-1 overflow-x-auto">
+            <table className="w-full h-full">
               <thead>
                 <tr className="text-left border-b border-slate-100 dark:border-slate-800">
                   <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('topPerformer')}</th>

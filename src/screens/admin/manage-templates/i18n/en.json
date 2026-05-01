@@ -11,7 +11,8 @@
       "languages": "Languages"
     },
     "search": {
-      "placeholder": "Search by key or name..."
+      "placeholder": "Search by key or name...",
+      "noResults": "No templates found matching your search."
     },
     "filters": {
       "all": "All",

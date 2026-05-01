@@ -11,7 +11,8 @@
       "languages": "Ngôn ngữ"
     },
     "search": {
-      "placeholder": "Tìm kiếm mẫu theo khóa hoặc tên..."
+      "placeholder": "Tìm kiếm mẫu theo khóa hoặc tên...",
+      "noResults": "Không tìm thấy mẫu nào phù hợp với từ khóa của bạn."
     },
     "filters": {
       "all": "Tất cả",

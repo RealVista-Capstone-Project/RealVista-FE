@@ -54,9 +54,6 @@ export function ManageTemplatesPage() {
 
   const templates = pageData?.content || [];
 
-  const emailTemplatesCount = templates.filter((t: any) => t.type === 'EMAIL').length;
-  const inAppNotificationsCount = templates.filter((t: any) => t.type === 'IN_APP').length;
-  const languagesCount = new Set(templates.map((t: any) => t.language)).size;
 
   const deleteMutation = useMutation({
     mutationFn: templateApi.delete,
@@ -186,28 +183,56 @@ export function ManageTemplatesPage() {
       <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8'>
         <StatsCard
           label={t('stats.total')}
-          value={templates.length}
+          value={pageData?.total_elements || 0}
           icon={FileText}
           color='blue'
         />
         <StatsCard
           label={t('stats.email')}
-          value={emailTemplatesCount}
+          value={templates.filter((t: any) => t.type === 'EMAIL').length}
           icon={Mail}
           color='blue'
         />
         <StatsCard
           label={t('stats.inApp')}
-          value={inAppNotificationsCount}
+          value={templates.filter((t: any) => t.type === 'IN_APP').length}
           icon={Bell}
           color='purple'
         />
         <StatsCard
           label={t('stats.languages')}
-          value={languagesCount}
+          value={new Set(templates.map((t: any) => t.language)).size}
           icon={Database}
           color='purple'
         />
+      </div>
+
+      {/* Search and Filters Bar */}
+      <div className='bg-white rounded-xl border border-slate-200 shadow-sm dark:bg-slate-950 dark:border-slate-800 p-4 px-6 mb-4'>
+        <div className='flex flex-col sm:flex-row items-center gap-4 w-full'>
+          <Tabs
+            value={statusTab}
+            onValueChange={setStatusTab}
+            className='w-full sm:w-auto'
+          >
+            <TabsList className='h-9'>
+              <TabsTrigger value='ALL' className='text-xs px-4'>{t('filters.all')}</TabsTrigger>
+              <TabsTrigger value='EMAIL' className='text-xs px-4'>{t('filters.email')}</TabsTrigger>
+              <TabsTrigger value='IN_APP' className='text-xs px-4'>{t('filters.inApp')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <div className='relative w-full sm:w-64'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 z-10 pointer-events-none' />
+            <Input
+              placeholder={t('search.placeholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className='h-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all rounded-xl'
+              style={{ paddingLeft: '48px' }}
+            />
+          </div>
+        </div>
       </div>
 
       {templates.length === 0 && !isLoading ? (
@@ -217,7 +242,7 @@ export function ManageTemplatesPage() {
           </div>
           <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-50 tracking-tight'>{t('emptyState.title')}</h3>
           <p className='text-sm text-slate-500 mt-2 max-w-sm'>
-            {t('emptyState.description')}
+            {debouncedSearch ? t('search.noResults') : t('emptyState.description')}
           </p>
            <Button
             variant='outline'
@@ -233,32 +258,6 @@ export function ManageTemplatesPage() {
         </div>
       ) : (
         <div className='flex-1 flex flex-col overflow-hidden bg-white rounded-xl border border-slate-200 shadow-sm dark:bg-slate-950 dark:border-slate-800'>
-          <div className='p-4 px-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between'>
-            <div className='flex flex-col sm:flex-row items-center gap-4 w-full'>
-              <Tabs
-                value={statusTab}
-                onValueChange={setStatusTab}
-                className='w-full sm:w-auto'
-              >
-                <TabsList className='h-9'>
-                  <TabsTrigger value='ALL' className='text-xs px-4'>{t('filters.all')}</TabsTrigger>
-                  <TabsTrigger value='EMAIL' className='text-xs px-4'>{t('filters.email')}</TabsTrigger>
-                  <TabsTrigger value='IN_APP' className='text-xs px-4'>{t('filters.inApp')}</TabsTrigger>
-                </TabsList>
-              </Tabs>
-
-              <div className='relative w-full sm:w-64'>
-                <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-slate-500' />
-                <Input
-                  placeholder={t('search.placeholder')}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className='pl-9 h-9 bg-transparent border-slate-200 dark:border-slate-800'
-                />
-              </div>
-            </div>
-          </div>
-
           <div className='flex-1 overflow-auto custom-scrollbar'>
             <DataTable
               columns={columns}
