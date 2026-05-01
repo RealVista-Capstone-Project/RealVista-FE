@@ -151,3 +151,24 @@ export type AgentDashboardMetricsResponse = ApiResponse<AgentDashboardMetrics>;
 export type AgentPerformanceMetricsResponse = ApiResponse<AgentPerformanceMetrics>;
 export type AgentAppointmentsSnapshotResponse = ApiResponse<AgentAppointmentsSnapshot>;
 export type AgentPlanSnapshotResponse = ApiResponse<AgentPlanSnapshot>;
+
+export type AgentListingAnalyticsSort = 'views' | 'inquiries' | 'tours';
+
+export interface AgentListingAnalyticsRow {
+  listingId: string;
+  name: string;
+  slug: string;
+  thumbnail: string | null;
+  listingType: 'RENT' | 'SALE';
+  status: string;
+  price: number | null;
+  fullAddress: string;
+  publishedAt: string | null;
+  totalViews: number;
+  uniqueViewers: number;
+  tourBookings: number;
+  inquiries: number;
+  conversionRate: number;
+}
+
+export type AgentTopListingsResponse = ApiResponse<AgentListingAnalyticsRow[]>;

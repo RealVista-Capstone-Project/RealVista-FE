@@ -90,6 +90,36 @@ const AgentDashboardPlanCard = dynamic(
   }
 );
 
+const AgentDashboardTopListingsCard = dynamic(
+  () =>
+    import('./agent-dashboard-top-listings-card').then((m) => ({
+      default: m.AgentDashboardTopListingsCard,
+    })),
+  {
+    loading: () => (
+      <Card className='border-border/70 bg-card shadow-sm'>
+        <CardHeader>
+          <Skeleton className='h-6 w-56 max-w-full' />
+          <Skeleton className='mt-2 h-4 w-full max-w-lg' />
+        </CardHeader>
+        <CardContent className='space-y-4'>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className='flex gap-3'>
+              <Skeleton className='h-8 w-8 shrink-0 rounded-full' />
+              <Skeleton className='h-12 w-12 shrink-0 rounded-lg' />
+              <div className='min-w-0 flex-1 space-y-2'>
+                <Skeleton className='h-4 w-2/3' />
+                <Skeleton className='h-2 w-full' />
+                <Skeleton className='h-3 w-4/5' />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    ),
+  }
+);
+
 /** Keep status order stable so chart slices/legend don't jump between renders. */
 const LEAD_STATUS_ORDER = [
   'new',
@@ -608,6 +638,8 @@ export function AgentDashboardView() {
       </section>
 
       <AgentDashboardPerformanceSection />
+
+      <AgentDashboardTopListingsCard />
 
       <section className='grid grid-cols-1 gap-4 xl:grid-cols-3'>
         <AgentDashboardAppointmentsCard />

@@ -9,11 +9,14 @@ import type {
   AgentDashboardMetrics,
   AgentDashboardMetricsResponse,
   AgentPerformancePeriod,
+  AgentListingAnalyticsRow,
+  AgentListingAnalyticsSort,
   AgentPerformanceMetrics,
   AgentPerformanceMetricsResponse,
   AgentPlanSnapshot,
   AgentPlanSnapshotResponse,
   AgentPlanSubscriptionRow,
+  AgentTopListingsResponse,
   AppointmentItem,
 } from '../model/agent-dashboard.types';
 
@@ -131,6 +134,43 @@ function readNullableNum(v: unknown): number | null {
   if (v === null || v === undefined) return null;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
+}
+
+function readNullableStr(v: unknown): string | null {
+  if (v === null || v === undefined) return null;
+  return typeof v === 'string' ? v : null;
+}
+
+function normalizeTopListingRow(row: unknown): AgentListingAnalyticsRow | null {
+  if (!row || typeof row !== 'object') return null;
+  const o = row as LooseRecord;
+  const listingId = readStr(o.listing_id ?? o.listingId);
+  if (!listingId) return null;
+  const listingTypeRaw = readStr(o.listing_type ?? o.listingType).toUpperCase();
+  const listingType = listingTypeRaw === 'RENT' ? ('RENT' as const) : ('SALE' as const);
+  return {
+    listingId,
+    name: readStr(o.name),
+    slug: readStr(o.slug),
+    thumbnail: readNullableStr(o.thumbnail),
+    listingType,
+    status: readStr(o.status),
+    price: readNullableNum(o.price),
+    fullAddress: readStr(o.full_address ?? o.fullAddress),
+    publishedAt: readNullableStr(o.published_at ?? o.publishedAt),
+    totalViews: readNum(o.total_views ?? o.totalViews),
+    uniqueViewers: readNum(o.unique_viewers ?? o.uniqueViewers),
+    tourBookings: readNum(o.tour_bookings ?? o.tourBookings),
+    inquiries: readNum(o.inquiries),
+    conversionRate: readNum(o.conversion_rate ?? o.conversionRate),
+  };
+}
+
+function normalizeTopListingsPayload(raw: unknown): AgentListingAnalyticsRow[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((row) => normalizeTopListingRow(row))
+    .filter((row): row is AgentListingAnalyticsRow => row !== null);
 }
 
 function normalizeListingSummary(payload: unknown): AgentDashboardMetrics['listingSummary'] {
@@ -449,6 +489,24 @@ export const agentDashboardApi = {
       message: 'Agent performance metrics fetched successfully.',
       timestamp: new Date().toISOString(),
       data: performance,
+    };
+  },
+  getTopListings: async (
+    sortBy: AgentListingAnalyticsSort = 'views',
+    limit = 5,
+  ): Promise<AgentTopListingsResponse> => {
+    const params = new URLSearchParams({
+      sort_by: sortBy,
+      limit: String(limit),
+    });
+    const raw = await safeGet<unknown>(`/listings/analytics/my-top-listings?${params.toString()}`, []);
+    const rows = normalizeTopListingsPayload(raw);
+
+    return {
+      success: true,
+      message: 'Top listings with analytics fetched successfully.',
+      timestamp: new Date().toISOString(),
+      data: rows,
     };
   },
   getAppointmentsSnapshot: async (): Promise<AgentAppointmentsSnapshotResponse> => {

@@ -859,6 +859,22 @@
         "title": "Hiệu suất tin đăng",
         "description": "Xu hướng lượt xem và lượt quan tâm trong các tháng gần đây."
       },
+      "topListings": {
+        "title": "Tin đăng nổi bật",
+        "description": "Tin đăng của bạn xếp hạng theo chỉ số hiệu suất.",
+        "empty": "Chưa có dữ liệu phân tích tin đăng.",
+        "sort": {
+          "views": "Lượt xem",
+          "inquiries": "Quan tâm",
+          "tours": "Lịch xem"
+        },
+        "metrics": {
+          "views": "Xem",
+          "inquiries": "Quan tâm",
+          "tours": "Tour",
+          "conversion": "CV%"
+        }
+      },
       "channels": {
         "title": "Trạng thái khách hàng",
         "description": "Số lượng lead CRM theo trạng thái phễu."

@@ -857,6 +857,22 @@
         "title": "Listings Performance",
         "description": "Views and inquiries trend across recent months."
       },
+      "topListings": {
+        "title": "Top listings",
+        "description": "Your listings ranked by performance metrics.",
+        "empty": "No listing analytics yet.",
+        "sort": {
+          "views": "Views",
+          "inquiries": "Inquiries",
+          "tours": "Tours"
+        },
+        "metrics": {
+          "views": "Views",
+          "inquiries": "Inquiries",
+          "tours": "Tours",
+          "conversion": "Conv."
+        }
+      },
       "channels": {
         "title": "Lead Statuses",
         "description": "CRM lead volume by pipeline status."
