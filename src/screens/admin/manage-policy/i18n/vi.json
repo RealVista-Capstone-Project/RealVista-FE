@@ -1,0 +1,41 @@
+{
+  "ManagePolicy": {
+    "sidebar": {
+      "title": "Chính sách & Pháp lý",
+      "search": "Tìm kiếm chính sách...",
+      "empty": "Không tìm thấy chính sách nào"
+    },
+    "editor": {
+      "header": {
+        "edit": "Chỉnh sửa Chính sách",
+        "create": "Tạo Chính sách mới",
+        "published": "ĐANG HOẠT ĐỘNG",
+        "draft": "BẢN NHÁP",
+        "version": "Phiên bản",
+        "lastUpdated": "Cập nhật cuối"
+      },
+      "actions": {
+        "deactivate": "Ngừng hoạt động",
+        "activate": "Kích hoạt",
+        "save": "Lưu thay đổi"
+      },
+      "tabs": {
+        "edit": "Soạn thảo",
+        "preview": "Xem trước"
+      },
+      "unsaved": "Có thay đổi chưa lưu",
+      "title": "Tiêu đề chính sách",
+      "slug": "Đường dẫn (Slug)",
+      "content": "Nội dung (Markdown)",
+      "preview": {
+        "updated": "Cập nhật ngày",
+        "empty": "Chưa có nội dung để hiển thị"
+      }
+    },
+    "placeholders": {
+      "title": "VD: Điều khoản sử dụng",
+      "slug": "vd: dieu-khoan-su-dung",
+      "content": "Sử dụng Markdown để soạn thảo nội dung chính sách..."
+    }
+  }
+}

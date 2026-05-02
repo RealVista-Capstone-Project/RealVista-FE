@@ -13,6 +13,17 @@ export interface ApiResponse<T = unknown> {
   data: T;
 }
 
+export interface PagedResponse<T> {
+  content: T[];
+  total_elements: number;
+  total_pages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
 /**
  * HTTP utility response format
  * Wraps the raw backend response with status code

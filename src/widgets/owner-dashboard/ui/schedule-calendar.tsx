@@ -26,16 +26,10 @@ function formatTime(time: string) {
 export function ScheduleCalendar() {
   const t = useTranslations('OwnerDashboard.schedule');
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [activeTab] = useState<TabKey>('all');
 
   const selectedDate = useMemo(() => formatDateToApi(date), [date]);
   const { data: schedules } = useDashboardSchedules({ date: selectedDate, type: activeTab });
-
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: 'all', label: t('tabs.all') },
-    { key: 'assigned', label: t('tabs.assigned') },
-    { key: 'mySchedule', label: t('tabs.mySchedule') },
-  ];
 
   return (
     <div className='flex flex-col gap-5 rounded-2xl border bg-card p-5 shadow-sm'>

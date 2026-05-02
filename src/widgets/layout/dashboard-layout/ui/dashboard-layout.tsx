@@ -15,28 +15,29 @@ import {
   ContactRound,
   MapPin,
   Package,
-  type LucideIcon,
+  ShieldCheck,
+  Flag,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 import { useAuthSession } from '@/features/auth/model';
 import { ROUTES } from '@/shared/config/routes';
 import { TopNavContainer } from '@/shared/ui/top-nav/top-nav-container';
+import { useQuery } from '@tanstack/react-query';
+import { adminQueries } from '@/entities/admin/api';
 
-export interface SidebarMenuItem {
-  id: string;
-  label: string;
-  href: string;
-  icon: LucideIcon;
-}
+
+import { SidebarMenuItem } from '../../types';
+
+
 
 export interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarItems?: SidebarMenuItem[];
-  logoHref?: string;
   className?: string;
+  pageTitle?: string;
 }
 
 type TFn = ReturnType<typeof useTranslations<'DashboardLayout'>>;
@@ -174,7 +175,7 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
   ];
 }
 
-function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
+function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: number; totalListings?: number } = {}): SidebarMenuItem[] {
   return [
     {
       id: 'dashboard',
@@ -183,6 +184,17 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
       icon: LayoutDashboard,
     },
     { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
+    { id: 'policies', label: t('menu.policies'), href: ROUTES.dashboard.managePolicies, icon: ShieldCheck },
+    {
+      id: 'reports',
+      label: t('menu.reports'),
+      href: ROUTES.dashboard.manageReports,
+      icon: Flag,
+      badge: badges.reports,
+      badgeVariant: 'danger'
+    },
+    { id: 'templates', label: t('menu.templates'), href: ROUTES.dashboard.manageTemplates, icon: FileText },
+
     {
       id: 'locations',
       label: t('menu.locations'),
@@ -195,13 +207,22 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
       href: ROUTES.dashboard.managePackages,
       icon: Package,
     },
+
     {
-      id: 'listings',
-      label: t('menu.listings'),
-      href: ROUTES.dashboard.managedListings,
-      icon: Columns,
+      id: 'property',
+      label: t('menu.property'),
+      href: ROUTES.dashboard.property,
+      icon: Building2,
+      badge: badges.totalListings,
+      badgeVariant: 'info'
     },
-    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
+
+    {
+      id: 'manage-properties',
+      label: t('menu.manageProperties'),
+      href: ROUTES.dashboard.manageProperties,
+      icon: Building2,
+    },
     {
       id: 'messages',
       label: t('menu.messages'),
@@ -211,31 +232,46 @@ function getAdminSidebarItems(t: TFn): SidebarMenuItem[] {
   ];
 }
 
+
 export function DashboardLayout({
   children,
   sidebarItems,
-  logoHref = ROUTES.homePage,
   className,
+  pageTitle: overridePageTitle,
 }: DashboardLayoutProps) {
   const { data: session } = useAuthSession();
-  const backendRoles: string[] = session?.user?.backendRoles ?? [];
+  const backendRoles: string[] = React.useMemo(() => session?.user?.backendRoles ?? [], [session?.user?.backendRoles]);
   const isAgent = session?.user?.role === 'AGENT' || backendRoles.includes('AGENT');
   const isTenant = backendRoles.includes('TENANT') && !backendRoles.includes('OWNER');
 
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const pathname = usePathname();
   const t = useTranslations('DashboardLayout');
-  const locale = useLocale();
+
+  const { data: adminOverview } = useQuery({
+    ...adminQueries.overview(),
+    enabled: backendRoles.includes('ADMIN'),
+  });
 
   const resolvedSidebarItems = React.useMemo(() => {
     if (sidebarItems) return sidebarItems;
-    if (backendRoles.includes('ADMIN')) return getAdminSidebarItems(t);
+    if (backendRoles.includes('ADMIN')) {
+      return getAdminSidebarItems(t, {
+        reports: adminOverview?.unresolved_reports,
+        listings: adminOverview?.pending_listings,
+        totalListings: adminOverview?.total_listings,
+      });
+
+    }
     if (isAgent) return getAgentSidebarItems(t);
     if (isTenant) return getTenantSidebarItems(t);
     return getOwnerSidebarItems(t);
-  }, [sidebarItems, isAgent, isTenant, backendRoles, t]);
+  }, [sidebarItems, isAgent, isTenant, backendRoles, t, adminOverview]);
+
 
   const pageTitle = React.useMemo(() => {
+    if (overridePageTitle) return overridePageTitle;
+
     if (
       pathname === ROUTES.dashboard.managedListings ||
       pathname.startsWith(ROUTES.dashboard.managedListings)
@@ -302,6 +338,12 @@ export function DashboardLayout({
       return t('pageTitle.managePackages');
     }
     if (
+      pathname === ROUTES.dashboard.manageProperties ||
+      pathname.startsWith(ROUTES.dashboard.manageProperties)
+    ) {
+      return t('pageTitle.manageProperties');
+    }
+    if (
       pathname === ROUTES.dashboard.manageUsers ||
       pathname.startsWith(ROUTES.dashboard.manageUsers)
     ) {
@@ -326,7 +368,7 @@ export function DashboardLayout({
       return t('pageTitle.crm');
     }
     return t('pageTitle.default');
-  }, [pathname, t]);
+  }, [pathname, t, overridePageTitle]);
 
   const isItemActive = (href: string) => {
     if (pathname === href) return true;
@@ -446,7 +488,31 @@ export function DashboardLayout({
                   strokeWidth={isActive ? 2.5 : 2}
                 />
                 {!isCollapsed && <span className='text-sm'>{item.label}</span>}
+                {!isCollapsed && Number(item.badge) > 0 && (
+                  <span className={cn(
+                    'ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold shadow-sm transition-all',
+                    item.badgeVariant === 'danger' && 'bg-red-500 text-white',
+                    item.badgeVariant === 'warning' && 'bg-amber-500 text-white',
+                    item.badgeVariant === 'info' && 'bg-blue-500 text-white',
+                    item.badgeVariant === 'success' && 'bg-emerald-500 text-white',
+                    !item.badgeVariant && 'bg-primary text-primary-foreground'
+                  )}>
+                    {item.badge}
+                  </span>
+                )}
+                {isCollapsed && Number(item.badge) > 0 && (
+                  <div className={cn(
+                    'absolute right-3 top-2.5 h-2 w-2 rounded-full ring-2 ring-white animate-pulse',
+                    item.badgeVariant === 'danger' && 'bg-red-500',
+                    item.badgeVariant === 'warning' && 'bg-amber-500',
+                    item.badgeVariant === 'info' && 'bg-blue-500',
+                    item.badgeVariant === 'success' && 'bg-emerald-500',
+                    !item.badgeVariant && 'bg-primary'
+                  )} />
+                )}
               </Link>
+
+
             );
           })}
         </nav>

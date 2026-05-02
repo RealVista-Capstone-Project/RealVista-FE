@@ -39,6 +39,16 @@
     },
     "common": {
       "processing": "Đang xử lý..."
+    },
+    "toasts": {
+      "listingPublishedSuccessfully": "Đăng tin thành công",
+      "failedToPublishListing": "Không thể đăng tin",
+      "listingUnpublished": "Đã gỡ tin",
+      "failedToUnpublishListing": "Không thể gỡ tin",
+      "listingMarkedAsSold": "Đã đánh dấu đã bán",
+      "failedToMarkAsSold": "Không thể đánh dấu đã bán",
+      "listingMarkedAsRented": "Đã đánh dấu đã cho thuê",
+      "failedToMarkAsRented": "Không thể đánh dấu đã cho thuê"
     }
   }
 }

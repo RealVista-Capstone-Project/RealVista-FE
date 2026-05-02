@@ -27,6 +27,8 @@ const ERROR_CODE_TO_I18N_KEY: Record<string, string> = {
   DUPLICATE_LISTING_PUBLISH: 'Common.errors.duplicateListingPublish',
   ERROR_PROPERTY_NOT_AVAILABLE: 'Common.errors.propertyNotAvailable',
   PROPERTY_NOT_AVAILABLE: 'Common.errors.propertyNotAvailable',
+  ERROR_RENT_LISTING_DISABLED_WHILE_RENTED: 'Common.errors.rentListingDisabledWhileRented',
+  ERROR_AVAILABLE_FROM_REQUIRED_FOR_RENTED_PROPERTY: 'Common.errors.availableFromRequiredForRentedProperty',
   // Lease
   ERROR_LEASE_PROPERTY_NOT_AVAILABLE: 'Common.errors.leasePropertyNotAvailable',
   ERROR_LEASE_ACTIVE_EXISTS: 'Common.errors.leaseActiveExists',

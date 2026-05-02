@@ -54,6 +54,15 @@ const ENGAGEMENT_STATUS_BADGE: Record<string, { cls: string }> = {
   FINISHED: { cls: 'bg-blue-50 text-blue-700 border-blue-200' },
 };
 
+function getAgentAccountState(agent: AgentListItem): 'deleted' | 'inactive' | null {
+  if (agent.deleted || agent.is_deleted || agent.deleted_at) {
+    return 'deleted';
+  }
+
+  const status = (agent.user_status ?? agent.status)?.toUpperCase();
+  return status === 'BANNED' || status === 'SUSPENDED' ? 'inactive' : null;
+}
+
 function StarRating({ value }: { value: number }) {
   return (
     <div className='flex items-center gap-0.5'>
@@ -82,6 +91,8 @@ function AgentCard({
   t: ReturnType<typeof useTranslations>;
 }) {
   const isAccepted = agent.engagement_status === 'ACCEPTED';
+  const accountState = getAgentAccountState(agent);
+  const isUnavailable = isAccepted || accountState !== null;
   const engagementBadge = agent.engagement_status
     ? ENGAGEMENT_STATUS_BADGE[agent.engagement_status]
     : null;
@@ -93,14 +104,14 @@ function AgentCard({
   return (
     <button
       type='button'
-      onClick={isAccepted ? undefined : onClick}
-      disabled={isAccepted}
+      onClick={isUnavailable ? undefined : onClick}
+      disabled={isUnavailable}
       className={cn(
         'relative flex flex-col items-center text-center rounded-2xl border transition-all duration-200 p-4 gap-2.5 w-full',
         isSelected
           ? 'border-primary shadow-md bg-primary/5 ring-1 ring-primary/20'
           : 'border-slate-200 bg-white hover:border-primary/50 hover:shadow-md',
-        isAccepted && 'cursor-not-allowed opacity-80'
+        isUnavailable && 'cursor-not-allowed opacity-80'
       )}
     >
       {/* Engagement badge — top right */}
@@ -112,6 +123,12 @@ function AgentCard({
           )}
         >
           {t(`status${agent.engagement_status}` as Parameters<typeof t>[0])}
+        </span>
+      )}
+
+      {accountState && (
+        <span className='absolute top-2.5 left-2.5 text-[9px] font-bold px-1.5 py-0.5 rounded-md border bg-red-50 text-red-700 border-red-200'>
+          {accountState === 'deleted' ? t('deletedAgent') : t('inactiveAgent')}
         </span>
       )}
 
@@ -179,6 +196,16 @@ function AgentCard({
           </div>
         </div>
       )}
+      {accountState && (
+        <div className='absolute inset-0 rounded-2xl bg-white/70 flex items-center justify-center pointer-events-none'>
+          <div className='flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-xl px-3 py-1.5 shadow-sm'>
+            <User className='h-4 w-4 text-red-600' />
+            <span className='text-xs font-bold text-red-700'>
+              {accountState === 'deleted' ? t('deletedAgent') : t('inactiveAgent')}
+            </span>
+          </div>
+        </div>
+      )}
     </button>
   );
 }
@@ -219,6 +246,7 @@ function AgentDetailPanel({
   const queryClient = useQueryClient();
 
   const isAccepted = agent.engagement_status === 'ACCEPTED';
+  const accountState = getAgentAccountState(agent);
   const hasActiveEngagement =
     agent.engagement_status != null &&
     agent.engagement_status !== 'REJECTED' &&
@@ -272,6 +300,11 @@ function AgentDetailPanel({
         </div>
         <div className='flex-1 min-w-0'>
           <h2 className='text-base font-bold text-slate-900'>{agent.full_name ?? '—'}</h2>
+          {accountState && (
+            <Badge variant='outline' className='mt-1 bg-red-50 text-red-700 border-red-200 text-[10px] font-bold'>
+              {accountState === 'deleted' ? t('deletedAgent') : t('inactiveAgent')}
+            </Badge>
+          )}
           {agent.rating != null && (
             <div className='flex items-center gap-1 mt-0.5'>
               <Star className='h-4 w-4 text-amber-400 fill-amber-400' />
@@ -360,7 +393,7 @@ function AgentDetailPanel({
       )}
 
       {/* Hire button */}
-      {!isAccepted && (
+      {!isAccepted && !accountState && (
         <div className='pt-1'>
           <Button
             className='w-full rounded-xl gap-2 bg-primary'
@@ -369,6 +402,11 @@ function AgentDetailPanel({
             <UserCheck className='h-4 w-4' />
             {t('hireButton')}
           </Button>
+        </div>
+      )}
+      {accountState && (
+        <div className='rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-700'>
+          {t('inactiveAgentHint')}
         </div>
       )}
 
@@ -445,7 +483,7 @@ function AgentDetailPanel({
             <Button
               size='sm'
               className='rounded-lg bg-primary'
-              disabled={isPending}
+              disabled={isPending || accountState !== null}
               onClick={() => sendInvitation()}
             >
               {isPending ? (
@@ -497,11 +535,18 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
 
   // Specialty filter is client-side only (based on property type names)
   const filteredAgents = useMemo(() => {
-    if (specialtyFilter === 'all') return agents;
-    return agents.filter((a) =>
+    const assignableAgents = agents.filter((agent) => getAgentAccountState(agent) === null);
+    if (specialtyFilter === 'all') return assignableAgents;
+    return assignableAgents.filter((a) =>
       a.specialties?.toLowerCase().includes(specialtyFilter.toLowerCase())
     );
   }, [agents, specialtyFilter]);
+
+  React.useEffect(() => {
+    if (!selectedAgent) return;
+    const refreshedAgent = filteredAgents.find((agent) => agent.user_id === selectedAgent.user_id);
+    setSelectedAgent(refreshedAgent ?? null);
+  }, [filteredAgents, selectedAgent]);
 
   return (
     <div className='flex flex-col h-full overflow-hidden'>

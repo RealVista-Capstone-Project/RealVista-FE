@@ -33,6 +33,7 @@ export default function PropertyEditPage({ id }: Props) {
         width: property.width_m ? Number(property.width_m) : 0,
         length: property.length_m ? Number(property.length_m) : 0,
         propertyType: property.property_type_code || '',
+        allowRentListingWhenRented: Boolean(property.allow_rent_listing_when_rented),
         amenityIds: property.amenities?.map((a) => a.amenity_id) || [],
         dynamicAttributes:
           property.attributes?.reduce(
@@ -84,7 +85,12 @@ export default function PropertyEditPage({ id }: Props) {
   return (
     <div className='container py-8 max-w-5xl mx-auto'>
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-        <PropertyForm initialData={initialData} propertyId={id} isEditMode={true} />
+        <PropertyForm
+          initialData={initialData}
+          propertyId={id}
+          isEditMode={true}
+          propertyStatus={property.status}
+        />
       </APIProvider>
     </div>
   );

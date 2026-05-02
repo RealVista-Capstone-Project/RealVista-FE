@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardLayout } from '@/widgets/layout';
+import { AdminDashboardLayout } from '@/widgets/layout';
 import { RoleGuard } from '@/shared/lib/auth/role-guard';
 
 export default function AdminRouteLayout({ children }: { children: React.ReactNode }) {
@@ -10,7 +10,7 @@ export default function AdminRouteLayout({ children }: { children: React.ReactNo
       allowedBackendRoles={['ADMIN']}
       redirectPath='/'
     >
-      <DashboardLayout>{children}</DashboardLayout>
+      <AdminDashboardLayout>{children}</AdminDashboardLayout>
     </RoleGuard>
   );
 }

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import {
@@ -15,14 +16,17 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  Clock,
   Ban,
   UserX,
   UserCheck,
+  Trash2,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { userQueries, userApi, userKeys } from '@/entities/user/api';
 import { UserProfile, UserStatus, RoleCode } from '@/entities/user/model/types';
+import { agentProfileKeys } from '@/entities/agent-profile';
+import { listingKeys } from '@/entities/listing/api/keys';
 import { DataTable } from '@/shared/ui/data-table';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
@@ -60,7 +64,9 @@ export function ManageUsersPage() {
   const queryClient = useQueryClient();
 
   // State for filters and pagination
-  const [search, setSearch] = React.useState('');
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+  const [search, setSearch] = React.useState(urlSearch);
   const debouncedSearch = useDebounce(search, 500);
   const [role, setRole] = React.useState<RoleCode | 'ALL'>('ALL');
   const [status, setStatus] = React.useState<UserStatus | 'ALL'>('ALL');
@@ -91,6 +97,17 @@ export function ManageUsersPage() {
     setIsBanConfirmOpen(true);
   };
 
+  // State for delete confirmation
+  const [userToDelete, setUserToDelete] = React.useState<{ id: string; name: string; email: string } | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = React.useState(false);
+  const [confirmDeleteEmail, setConfirmDeleteEmail] = React.useState('');
+
+  const handleOpenDeleteConfirm = (userId: string, userName: string, userEmail: string) => {
+    setUserToDelete({ id: userId, name: userName, email: userEmail });
+    setConfirmDeleteEmail('');
+    setIsDeleteConfirmOpen(true);
+  };
+
   const handleConfirmSuspend = () => {
     if (userToSuspend) {
       suspendMutation.mutate(userToSuspend.id);
@@ -102,6 +119,13 @@ export function ManageUsersPage() {
     if (userToBan) {
       banMutation.mutate(userToBan.id);
       setIsBanConfirmOpen(false);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (userToDelete) {
+      deleteMutation.mutate(userToDelete.id);
+      setIsDeleteConfirmOpen(false);
     }
   };
 
@@ -132,7 +156,6 @@ export function ManageUsersPage() {
   const {
     data: pageData,
     isLoading,
-    isError,
   } = useQuery(
     userQueries.paged({
       page: pageIndex,
@@ -142,6 +165,19 @@ export function ManageUsersPage() {
       status: status === 'ALL' ? undefined : status,
       sort: 'createdAt,desc', // Default sort
     })
+  );
+
+  const invalidateAccountSideEffects = React.useCallback(
+    (userId?: string) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: listingKeys.all });
+      queryClient.invalidateQueries({ queryKey: agentProfileKeys.all });
+    },
+    [queryClient]
   );
 
   // Mutations for user actions
@@ -169,12 +205,27 @@ export function ManageUsersPage() {
 
   const banMutation = useMutation({
     mutationFn: userApi.ban,
-    onSuccess: () => {
+    onSuccess: (_data, userId) => {
       toast.success(t('actions.banSuccess'));
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+      invalidateAccountSideEffects(userId);
     },
     onError: () => {
       toast.error(t('actions.banError'));
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: userApi.deleteAccount,
+    onSuccess: (_data, userId) => {
+      toast.success(t('actions.deleteSuccess'));
+      if (selectedUserId === userId) {
+        setIsDetailOpen(false);
+        setSelectedUserId(null);
+      }
+      invalidateAccountSideEffects(userId);
+    },
+    onError: () => {
+      toast.error(t('actions.deleteError'));
     },
   });
 
@@ -185,6 +236,8 @@ export function ManageUsersPage() {
         header: t('table.columns.user'),
         cell: ({ row }) => {
           const user = row.original;
+          const isDeleted = Boolean(user.deleted || user.is_deleted || user.deleted_at);
+          const isInactive = isDeleted || user.status === 'BANNED' || user.status === 'SUSPENDED';
           const initials = (user.full_name || user.email)
             .split(' ')
             .map((n) => n[0])
@@ -208,6 +261,11 @@ export function ManageUsersPage() {
                   <Mail className='h-3 w-3' />
                   {user.email}
                 </span>
+                {isInactive && (
+                  <span className='mt-1 text-[10px] font-semibold uppercase tracking-wide text-red-600'>
+                    {isDeleted ? t('accountLabels.deleted') : t('accountLabels.inactive')}
+                  </span>
+                )}
               </div>
             </div>
           );
@@ -289,6 +347,7 @@ export function ManageUsersPage() {
         id: 'actions',
         header: t('table.columns.actions'),
         cell: ({ row }) => {
+          const isDeleted = Boolean(row.original.deleted || row.original.is_deleted || row.original.deleted_at);
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -322,7 +381,7 @@ export function ManageUsersPage() {
                   <DropdownMenuItem
                     onClick={() => handleOpenSuspendConfirm(row.original.user_id, row.original.full_name || row.original.email)}
                     className='text-amber-600 font-medium gap-2'
-                    disabled={suspendMutation.isPending || banMutation.isPending}
+                    disabled={isDeleted || suspendMutation.isPending || banMutation.isPending || deleteMutation.isPending}
                   >
                     <UserX className='h-4 w-4' />
                     {t('actions.suspend')}
@@ -331,23 +390,36 @@ export function ManageUsersPage() {
                   <DropdownMenuItem
                     onClick={() => activateMutation.mutate(row.original.user_id)}
                     className='text-emerald-600 font-medium gap-2'
-                    disabled={activateMutation.isPending || banMutation.isPending}
+                    disabled={isDeleted || activateMutation.isPending || banMutation.isPending || deleteMutation.isPending}
                   >
                     <UserCheck className='h-4 w-4' />
                     {t('actions.activate')}
                   </DropdownMenuItem>
                 ) : null}
 
-                {row.original.status !== 'BANNED' && (
+                {!isDeleted && row.original.status !== 'BANNED' && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => handleOpenBanConfirm(row.original.user_id, row.original.full_name || row.original.email, row.original.email)}
                       className='text-red-600 font-bold gap-2'
-                      disabled={banMutation.isPending}
+                      disabled={banMutation.isPending || deleteMutation.isPending}
                     >
                       <Ban className='h-4 w-4' />
                       {t('actions.ban')}
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {!isDeleted && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleOpenDeleteConfirm(row.original.user_id, row.original.full_name || row.original.email, row.original.email)}
+                      className='text-red-700 font-bold gap-2'
+                      disabled={deleteMutation.isPending || banMutation.isPending}
+                    >
+                      <Trash2 className='h-4 w-4' />
+                      {t('actions.delete')}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -357,23 +429,34 @@ export function ManageUsersPage() {
         },
       },
     ],
-    [t]
+    [t, activateMutation, suspendMutation.isPending, banMutation.isPending, deleteMutation.isPending]
   );
 
   return (
-    <div className='flex h-full flex-col gap-6 p-6 overflow-hidden'>
-      {/* Header section */}
-      <div className='flex flex-col gap-2'>
-        <div className='flex items-center gap-3'>
-          <div className='p-2.5 bg-primary/10 rounded-xl border border-primary/20 shadow-sm shadow-primary/5'>
-            <Users className='h-6 w-6 text-primary' />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className='relative flex h-full flex-col gap-8 p-8 overflow-hidden max-w-[1700px] mx-auto min-h-[calc(100vh-140px)]'
+    >
+      {/* Subtle Background Orbs */}
+      <div className='pointer-events-none absolute inset-0 overflow-hidden'>
+        <div className='absolute -left-[10%] top-[20%] h-[40rem] w-[40rem] rounded-full bg-primary/5 blur-[120px] dark:bg-primary/10' />
+        <div className='absolute -right-[10%] top-[-10%] h-[30rem] w-[30rem] rounded-full bg-emerald-500/5 blur-[100px] dark:bg-emerald-500/10' />
+      </div>
+
+      <header className='relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6'>
+        <div className='flex items-center gap-5'>
+          <div className='bg-white/80 p-4 rounded-[2rem] shadow-2xl shadow-primary/5 border border-slate-200/60 backdrop-blur-xl'>
+            <div className='bg-primary p-3 rounded-2xl shadow-xl shadow-primary/20'>
+              <Users className='h-8 w-8 text-white' />
+            </div>
           </div>
           <div>
             <h1 className='text-2xl font-bold tracking-tight text-foreground'>{t('title')}</h1>
             <p className='text-sm text-muted-foreground'>{t('description')}</p>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main content - shadow and rounded borders added in DataTable wrapper */}
       <div className='flex-1 overflow-hidden flex flex-col gap-4'>
@@ -437,6 +520,37 @@ export function ManageUsersPage() {
           emptyTitle={t('table.empty.title')}
           emptyDescription={t('table.empty.description')}
         />
+
+        <div className='px-8 py-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/30'>
+          <div className='flex items-center gap-3'>
+            <p className='text-[11px] text-slate-400 font-bold uppercase tracking-widest'>
+              Population Index {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, pageData?.total_elements || 0)}
+            </p>
+            <Badge variant='outline' className='bg-white text-[10px] border-slate-200 px-2'>
+              Total {pageData?.total_elements || 0}
+            </Badge>
+          </div>
+          <div className='flex gap-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setPagination((p) => ({ ...p, pageIndex: Math.max(0, p.pageIndex - 1) }))}
+              disabled={pageData?.first || isLoading}
+              className='h-10 px-6 rounded-xl bg-white border-slate-200 font-bold shadow-sm hover:translate-x-[-2px] transition-all disabled:opacity-40'
+            >
+              Previous
+            </Button>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setPagination((p) => ({ ...p, pageIndex: p.pageIndex + 1 }))}
+              disabled={pageData?.last || isLoading}
+              className='h-10 px-6 rounded-xl bg-white border-slate-200 font-bold shadow-sm hover:translate-x-[2px] transition-all disabled:opacity-40'
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
       <UserDetailSheet userId={selectedUserId} open={isDetailOpen} onOpenChange={setIsDetailOpen} />
 
@@ -555,6 +669,86 @@ export function ManageUsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className='sm:max-w-md border-red-100 shadow-2xl shadow-red-100/50'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2 text-red-700'>
+              <div className='p-2 bg-red-50 rounded-lg'>
+                <Trash2 className='h-5 w-5' />
+              </div>
+              {t('actions.deleteConfirmTitle')}
+            </DialogTitle>
+            <DialogDescription className='pt-4 text-sm leading-relaxed'>
+              {t('actions.deleteConfirmDescription')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {userToDelete && (
+            <div className='space-y-4 py-2'>
+              <div className='bg-red-50/50 p-4 rounded-xl border border-red-100/50 flex flex-col gap-2'>
+                <div className='flex items-center gap-3'>
+                  <Avatar className='h-10 w-10 border-2 border-white shadow-sm'>
+                    <AvatarFallback className='bg-red-100 text-red-700 text-xs font-bold'>
+                      {userToDelete.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className='flex flex-col'>
+                    <span className='text-sm font-bold text-red-900'>{userToDelete.name}</span>
+                    <span className='text-xs text-red-700/70'>{userToDelete.email}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className='rounded-lg bg-orange-50 border border-orange-100 p-3 flex gap-3'>
+                <Shield className='h-5 w-5 text-orange-600 shrink-0' />
+                <p className='text-xs text-orange-800 font-medium leading-normal'>
+                  {t('actions.deleteWarning')}
+                </p>
+              </div>
+
+              <div className='space-y-2'>
+                <p className='text-[11px] font-semibold text-muted-foreground uppercase tracking-wider'>
+                  {t('actions.confirmDeleteInstruction', { email: userToDelete.email })}
+                </p>
+                <Input
+                  value={confirmDeleteEmail}
+                  onChange={(e) => setConfirmDeleteEmail(e.target.value)}
+                  placeholder={t('actions.confirmDeletePlaceholder')}
+                  className={cn(
+                    'h-11 border-red-100 focus:ring-red-100 focus:border-red-300 transition-all',
+                    confirmDeleteEmail && confirmDeleteEmail !== userToDelete.email && 'border-red-300 bg-red-50/30'
+                  )}
+                />
+                {confirmDeleteEmail && confirmDeleteEmail !== userToDelete.email && (
+                  <p className='text-[10px] text-red-500 font-medium'>
+                    {t('actions.confirmDeleteMismatch')}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className='mt-2 sm:justify-end gap-2'>
+            <Button
+              variant='ghost'
+              onClick={() => setIsDeleteConfirmOpen(false)}
+              disabled={deleteMutation.isPending}
+              className='hover:bg-slate-100'
+            >
+              {t('actions.cancel')}
+            </Button>
+            <Button
+              variant='destructive'
+              className='bg-red-700 hover:bg-red-800 h-11 px-8 shadow-lg shadow-red-200 font-bold'
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending || (userToDelete !== null && confirmDeleteEmail !== userToDelete.email)}
+            >
+              {deleteMutation.isPending ? t('actions.deleting') : t('actions.confirmDelete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </motion.div>
   );
 }
