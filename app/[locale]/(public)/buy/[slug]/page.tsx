@@ -40,11 +40,12 @@ export default async function ListingPage({ params }: ListingPageProps) {
 
     const isPublished = listing.status === 'PUBLISHED';
     const isCreator = !!session && session.user.id === listing.user_id;
+    const isAdmin = !!session && session.user.role === 'admin';
     const isPropertyOwner = !!session && session.user.id === listing.property_owner?.user_id;
 
-    // Non-published listings: only the creator/property owner can preview — everyone else gets 404
+    // Non-published listings: only the creator, property owner or an admin can view — everyone else gets 404
     // Returning notFound() (not 403) to avoid leaking that the listing exists
-    if (!isPublished && !isCreator && !isPropertyOwner) {
+    if (!isPublished && !isCreator && !isAdmin && !isPropertyOwner) {
       notFound();
     }
 

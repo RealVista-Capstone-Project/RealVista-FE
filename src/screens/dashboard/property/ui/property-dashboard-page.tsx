@@ -1268,7 +1268,7 @@ export default function PropertyDashboardPage() {
     if (!isMobile && properties.length > 0) {
       setSelectedProperty((prev) => prev ?? properties[0]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [isMobile, properties]);
 
   // Sync selectedProperty with latest query data (e.g. after edit/update)

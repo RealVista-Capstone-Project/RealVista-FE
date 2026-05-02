@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import {
@@ -20,6 +21,7 @@ import {
   UserCheck,
   Trash2,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { userQueries, userApi, userKeys } from '@/entities/user/api';
 import { UserProfile, UserStatus, RoleCode } from '@/entities/user/model/types';
@@ -62,7 +64,9 @@ export function ManageUsersPage() {
   const queryClient = useQueryClient();
 
   // State for filters and pagination
-  const [search, setSearch] = React.useState('');
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+  const [search, setSearch] = React.useState(urlSearch);
   const debouncedSearch = useDebounce(search, 500);
   const [role, setRole] = React.useState<RoleCode | 'ALL'>('ALL');
   const [status, setStatus] = React.useState<UserStatus | 'ALL'>('ALL');
@@ -429,19 +433,30 @@ export function ManageUsersPage() {
   );
 
   return (
-    <div className='flex h-full flex-col gap-6 p-6 overflow-hidden'>
-      {/* Header section */}
-      <div className='flex flex-col gap-2'>
-        <div className='flex items-center gap-3'>
-          <div className='p-2.5 bg-primary/10 rounded-xl border border-primary/20 shadow-sm shadow-primary/5'>
-            <Users className='h-6 w-6 text-primary' />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className='relative flex h-full flex-col gap-8 p-8 overflow-hidden max-w-[1700px] mx-auto min-h-[calc(100vh-140px)]'
+    >
+      {/* Subtle Background Orbs */}
+      <div className='pointer-events-none absolute inset-0 overflow-hidden'>
+        <div className='absolute -left-[10%] top-[20%] h-[40rem] w-[40rem] rounded-full bg-primary/5 blur-[120px] dark:bg-primary/10' />
+        <div className='absolute -right-[10%] top-[-10%] h-[30rem] w-[30rem] rounded-full bg-emerald-500/5 blur-[100px] dark:bg-emerald-500/10' />
+      </div>
+
+      <header className='relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6'>
+        <div className='flex items-center gap-5'>
+          <div className='bg-white/80 p-4 rounded-[2rem] shadow-2xl shadow-primary/5 border border-slate-200/60 backdrop-blur-xl'>
+            <div className='bg-primary p-3 rounded-2xl shadow-xl shadow-primary/20'>
+              <Users className='h-8 w-8 text-white' />
+            </div>
           </div>
           <div>
             <h1 className='text-2xl font-bold tracking-tight text-foreground'>{t('title')}</h1>
             <p className='text-sm text-muted-foreground'>{t('description')}</p>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main content - shadow and rounded borders added in DataTable wrapper */}
       <div className='flex-1 overflow-hidden flex flex-col gap-4'>
@@ -505,6 +520,37 @@ export function ManageUsersPage() {
           emptyTitle={t('table.empty.title')}
           emptyDescription={t('table.empty.description')}
         />
+
+        <div className='px-8 py-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/30'>
+          <div className='flex items-center gap-3'>
+            <p className='text-[11px] text-slate-400 font-bold uppercase tracking-widest'>
+              Population Index {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, pageData?.total_elements || 0)}
+            </p>
+            <Badge variant='outline' className='bg-white text-[10px] border-slate-200 px-2'>
+              Total {pageData?.total_elements || 0}
+            </Badge>
+          </div>
+          <div className='flex gap-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setPagination((p) => ({ ...p, pageIndex: Math.max(0, p.pageIndex - 1) }))}
+              disabled={pageData?.first || isLoading}
+              className='h-10 px-6 rounded-xl bg-white border-slate-200 font-bold shadow-sm hover:translate-x-[-2px] transition-all disabled:opacity-40'
+            >
+              Previous
+            </Button>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setPagination((p) => ({ ...p, pageIndex: p.pageIndex + 1 }))}
+              disabled={pageData?.last || isLoading}
+              className='h-10 px-6 rounded-xl bg-white border-slate-200 font-bold shadow-sm hover:translate-x-[2px] transition-all disabled:opacity-40'
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </div>
       <UserDetailSheet userId={selectedUserId} open={isDetailOpen} onOpenChange={setIsDetailOpen} />
 
@@ -623,7 +669,6 @@ export function ManageUsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <DialogContent className='sm:max-w-md border-red-100 shadow-2xl shadow-red-100/50'>
@@ -704,6 +749,6 @@ export function ManageUsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { Box, Camera, Video } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 import type { PropertyImage } from '@/entities/property';
@@ -26,39 +26,49 @@ export function PropertyGallery({
   isFavorite = false,
 }: PropertyGalleryProps) {
   const t = useTranslations('PropertyGallery');
-  const safeImages = images || [];
+  const safeImages = (images || []).filter((img) => img.url);
   const [mainImage, setMainImage] = useState(safeImages[0]);
-  const thumbnailImages = safeImages.slice(1, 3);
-
   const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
   const [mediaViewerTab, setMediaViewerTab] = useState<'photos' | '3d-tour' | 'video'>('photos');
+
+  // Reset state when images change (e.g. navigating between listings)
+  useEffect(() => {
+    if (safeImages.length > 0) {
+      setMainImage(safeImages[0]);
+      setMediaViewerTab('photos');
+    }
+  }, [images]);
+
+  const thumbnailImages = safeImages.slice(1, 3);
 
   const photoCount = safeImages.filter((img) => img.type === 'photo').length;
   const tourCount = safeImages.filter((img) => img.type === '3d-tour').length;
   const videoCount = safeImages.filter((img) => img.type === 'video').length;
 
-  const handleOpenPhotos = () => {
-    if (onViewAllPhotos) {
-      onViewAllPhotos();
-    }
-    setMediaViewerTab('photos');
+  const handleOpenMedia = (type?: 'photos' | '3d-tour' | 'video', mediaId?: string) => {
+    const targetType = type || (mainImage?.type === 'photo' ? 'photos' : mainImage?.type as any);
+    setMediaViewerTab(targetType);
     setMediaViewerOpen(true);
+
+    // Call external handlers if provided
+    if (targetType === 'photos' && onViewAllPhotos) onViewAllPhotos();
+    if (targetType === '3d-tour' && on3DTour) on3DTour();
+    if (targetType === 'video' && onVideo) onVideo();
   };
 
-  const handleOpen3DTour = () => {
-    if (on3DTour) {
-      on3DTour();
-    }
-    setMediaViewerTab('3d-tour');
-    setMediaViewerOpen(true);
+  const handleOpenPhotos = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    handleOpenMedia('photos');
   };
 
-  const handleOpenVideo = () => {
-    if (onVideo) {
-      onVideo();
-    }
-    setMediaViewerTab('video');
-    setMediaViewerOpen(true);
+  const handleOpen3DTour = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    handleOpenMedia('3d-tour');
+  };
+
+  const handleOpenVideo = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    handleOpenMedia('video');
   };
 
   if (!mainImage) {
@@ -72,7 +82,10 @@ export function PropertyGallery({
   return (
     <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
       {/* Hero Image */}
-      <div className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-primary/5'>
+      <div
+        className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-primary/5 cursor-pointer group/hero'
+        onClick={() => handleOpenMedia()}
+      >
         {mainImage.type === 'video' ? (
           <video
             src={mainImage.url}
@@ -231,6 +244,7 @@ export function PropertyGallery({
         media={safeImages}
         defaultTab={mediaViewerTab}
         onFavorite={onFavorite}
+        initialMediaId={mainImage?.id}
       />
     </div>
   );
