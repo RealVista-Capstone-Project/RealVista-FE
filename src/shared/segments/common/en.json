@@ -845,6 +845,159 @@
     "error": "Failed to save search. Please try again later.",
     "buttonLabel": "Save search"
   },
+  "AgentDashboard": {
+    "error": {
+      "title": "Agent dashboard is unavailable",
+      "description": "We could not load dashboard insights right now. Please refresh and try again.",
+      "partialTitle": "Some dashboard data is temporarily unavailable",
+      "partialDescription": "You are seeing partial data. We are still loading available insights."
+    },
+    "header": {
+      "title": "Agent Dashboard",
+      "subtitle": "Welcome back, {name}. Here is your latest business snapshot.",
+      "actions": {
+        "viewAppointments": "View Appointments",
+        "exploreProperties": "Explore Properties"
+      }
+    },
+    "kpi": {
+      "active-listings": "Active Listings",
+      "delegated-properties": "Delegated Properties",
+      "open-appointments": "Open Appointments",
+      "crm-leads": "CRM Leads",
+      "vsLastMonth": "{value}% vs last month"
+    },
+    "sections": {
+      "performance": {
+        "title": "Listings Performance",
+        "description": "Views and inquiries trend across recent months."
+      },
+      "topListings": {
+        "title": "Top listings",
+        "description": "Your listings ranked by performance metrics.",
+        "empty": "No listing analytics yet.",
+        "sort": {
+          "views": "Views",
+          "inquiries": "Inquiries",
+          "tours": "Tours"
+        },
+        "metrics": {
+          "views": "Views",
+          "inquiries": "Inquiries",
+          "tours": "Tours",
+          "conversion": "Conv."
+        }
+      },
+      "channels": {
+        "title": "Lead Statuses",
+        "description": "CRM lead volume by pipeline status."
+      },
+      "appointments": {
+        "title": "Appointments & Reminders",
+        "description": "Upcoming tours, meetings, and follow-ups.",
+        "tabs": {
+          "all": "All",
+          "tour": "Tour",
+          "block": "Busy Blocks"
+        },
+        "types": {
+          "tour": "Tour",
+          "block": "Busy Block"
+        },
+        "selectedDate": "{date}",
+        "summary": "{total} items • {tour} tours • {block} busy blocks",
+        "noDateSelected": "No date selected",
+        "emptyForFilter": "No appointments match this filter on the selected day."
+      },
+      "plan": {
+        "title": "Plan & Boosting",
+        "description": "Usage snapshot for subscription and boosts.",
+        "subscriptions": "Subscriptions",
+        "boosts": "Boost Packages",
+        "boost": "Boost",
+        "feature": "Feature",
+        "status": "Status",
+        "daysLeft": "{days}d",
+        "startedOn": "Started on {date}",
+        "quota": "Quota",
+        "unlimited": "Unlimited",
+        "empty": "No active subscriptions found.",
+        "loading": "Loading current plan...",
+        "expireAt": "Expires: {date}",
+        "unlimitedQuota": "Unlimited quota",
+        "usedQuota": "Used {used}/{total}",
+        "boostFeaturedQuota": "Featured boost {used}/{total}",
+        "boostHotBadgeQuota": "Hot badge boost {used}/{total}",
+        "remaining": "left",
+        "statusValue": {
+          "active": "Active",
+          "expired": "Expired",
+          "canceled": "Canceled",
+          "pending": "Pending",
+          "paused": "Paused",
+          "completed": "Completed",
+          "unknown": "Unknown"
+        },
+        "featureType": {
+          "listing": "Listing",
+          "tour3d": "3D Tour",
+          "aiRequest": "AI"
+        }
+      }
+    },
+    "charts": {
+      "views": "Views",
+      "inquiries": "Inquiries",
+      "leads": "Leads",
+      "source": {
+        "manual": "Manual",
+        "chat": "Chat",
+        "tour": "Scheduled tour"
+      },
+      "status": {
+        "new": "New",
+        "consulting": "Consulting",
+        "tour_scheduled": "Tour scheduled",
+        "toured": "Toured",
+        "negotiating": "Negotiating",
+        "closed": "Closed",
+        "not_potential": "Not potential"
+      },
+      "channelsEmpty": "No leads in this period."
+    },
+    "timebound": {
+      "presets": {
+        "7d": "7D",
+        "30d": "30D",
+        "90d": "90D",
+        "thisMonth": "This month"
+      },
+      "customCta": "Custom range",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "activeRange": "Showing: {range}"
+    },
+    "channels": {
+      "Website": "Website",
+      "Social": "Social",
+      "Referrals": "Referrals",
+      "Walk-in": "Walk-in"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "canceled": "Canceled"
+    },
+    "quickActions": {
+      "propertyFeed": "Property Feed",
+      "manageProposals": "Manage Proposals",
+      "crmWorkspace": "CRM Workspace",
+      "myEngagements": "My Engagements"
+    }
+  },
   "HeroSearch": {
     "heroTitle": "Find Your Dream Home",
     "heroWith": "With RealVista",
