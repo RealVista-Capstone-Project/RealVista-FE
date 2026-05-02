@@ -16,15 +16,17 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  Clock,
   Ban,
   UserX,
   UserCheck,
+  Trash2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { userQueries, userApi, userKeys } from '@/entities/user/api';
 import { UserProfile, UserStatus, RoleCode } from '@/entities/user/model/types';
+import { agentProfileKeys } from '@/entities/agent-profile';
+import { listingKeys } from '@/entities/listing/api/keys';
 import { DataTable } from '@/shared/ui/data-table';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
@@ -95,6 +97,17 @@ export function ManageUsersPage() {
     setIsBanConfirmOpen(true);
   };
 
+  // State for delete confirmation
+  const [userToDelete, setUserToDelete] = React.useState<{ id: string; name: string; email: string } | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = React.useState(false);
+  const [confirmDeleteEmail, setConfirmDeleteEmail] = React.useState('');
+
+  const handleOpenDeleteConfirm = (userId: string, userName: string, userEmail: string) => {
+    setUserToDelete({ id: userId, name: userName, email: userEmail });
+    setConfirmDeleteEmail('');
+    setIsDeleteConfirmOpen(true);
+  };
+
   const handleConfirmSuspend = () => {
     if (userToSuspend) {
       suspendMutation.mutate(userToSuspend.id);
@@ -106,6 +119,13 @@ export function ManageUsersPage() {
     if (userToBan) {
       banMutation.mutate(userToBan.id);
       setIsBanConfirmOpen(false);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (userToDelete) {
+      deleteMutation.mutate(userToDelete.id);
+      setIsDeleteConfirmOpen(false);
     }
   };
 
@@ -136,7 +156,6 @@ export function ManageUsersPage() {
   const {
     data: pageData,
     isLoading,
-    isError,
   } = useQuery(
     userQueries.paged({
       page: pageIndex,
@@ -146,6 +165,19 @@ export function ManageUsersPage() {
       status: status === 'ALL' ? undefined : status,
       sort: 'createdAt,desc', // Default sort
     })
+  );
+
+  const invalidateAccountSideEffects = React.useCallback(
+    (userId?: string) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: listingKeys.all });
+      queryClient.invalidateQueries({ queryKey: agentProfileKeys.all });
+    },
+    [queryClient]
   );
 
   // Mutations for user actions
@@ -173,12 +205,27 @@ export function ManageUsersPage() {
 
   const banMutation = useMutation({
     mutationFn: userApi.ban,
-    onSuccess: () => {
+    onSuccess: (_data, userId) => {
       toast.success(t('actions.banSuccess'));
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+      invalidateAccountSideEffects(userId);
     },
     onError: () => {
       toast.error(t('actions.banError'));
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: userApi.deleteAccount,
+    onSuccess: (_data, userId) => {
+      toast.success(t('actions.deleteSuccess'));
+      if (selectedUserId === userId) {
+        setIsDetailOpen(false);
+        setSelectedUserId(null);
+      }
+      invalidateAccountSideEffects(userId);
+    },
+    onError: () => {
+      toast.error(t('actions.deleteError'));
     },
   });
 
@@ -189,6 +236,8 @@ export function ManageUsersPage() {
         header: t('table.columns.user'),
         cell: ({ row }) => {
           const user = row.original;
+          const isDeleted = Boolean(user.deleted || user.is_deleted || user.deleted_at);
+          const isInactive = isDeleted || user.status === 'BANNED' || user.status === 'SUSPENDED';
           const initials = (user.full_name || user.email)
             .split(' ')
             .map((n) => n[0])
@@ -212,6 +261,11 @@ export function ManageUsersPage() {
                   <Mail className='h-3 w-3' />
                   {user.email}
                 </span>
+                {isInactive && (
+                  <span className='mt-1 text-[10px] font-semibold uppercase tracking-wide text-red-600'>
+                    {isDeleted ? t('accountLabels.deleted') : t('accountLabels.inactive')}
+                  </span>
+                )}
               </div>
             </div>
           );
@@ -293,6 +347,7 @@ export function ManageUsersPage() {
         id: 'actions',
         header: t('table.columns.actions'),
         cell: ({ row }) => {
+          const isDeleted = Boolean(row.original.deleted || row.original.is_deleted || row.original.deleted_at);
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -326,7 +381,7 @@ export function ManageUsersPage() {
                   <DropdownMenuItem
                     onClick={() => handleOpenSuspendConfirm(row.original.user_id, row.original.full_name || row.original.email)}
                     className='text-amber-600 font-medium gap-2'
-                    disabled={suspendMutation.isPending || banMutation.isPending}
+                    disabled={isDeleted || suspendMutation.isPending || banMutation.isPending || deleteMutation.isPending}
                   >
                     <UserX className='h-4 w-4' />
                     {t('actions.suspend')}
@@ -335,23 +390,36 @@ export function ManageUsersPage() {
                   <DropdownMenuItem
                     onClick={() => activateMutation.mutate(row.original.user_id)}
                     className='text-emerald-600 font-medium gap-2'
-                    disabled={activateMutation.isPending || banMutation.isPending}
+                    disabled={isDeleted || activateMutation.isPending || banMutation.isPending || deleteMutation.isPending}
                   >
                     <UserCheck className='h-4 w-4' />
                     {t('actions.activate')}
                   </DropdownMenuItem>
                 ) : null}
 
-                {row.original.status !== 'BANNED' && (
+                {!isDeleted && row.original.status !== 'BANNED' && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => handleOpenBanConfirm(row.original.user_id, row.original.full_name || row.original.email, row.original.email)}
                       className='text-red-600 font-bold gap-2'
-                      disabled={banMutation.isPending}
+                      disabled={banMutation.isPending || deleteMutation.isPending}
                     >
                       <Ban className='h-4 w-4' />
                       {t('actions.ban')}
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {!isDeleted && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleOpenDeleteConfirm(row.original.user_id, row.original.full_name || row.original.email, row.original.email)}
+                      className='text-red-700 font-bold gap-2'
+                      disabled={deleteMutation.isPending || banMutation.isPending}
+                    >
+                      <Trash2 className='h-4 w-4' />
+                      {t('actions.delete')}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -361,7 +429,7 @@ export function ManageUsersPage() {
         },
       },
     ],
-    [t]
+    [t, activateMutation, suspendMutation.isPending, banMutation.isPending, deleteMutation.isPending]
   );
 
   return (
@@ -597,6 +665,86 @@ export function ManageUsersPage() {
               disabled={banMutation.isPending || (userToBan !== null && confirmEmail !== userToBan.email)}
             >
               {banMutation.isPending ? t('actions.banning') : t('actions.confirmBan')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className='sm:max-w-md border-red-100 shadow-2xl shadow-red-100/50'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2 text-red-700'>
+              <div className='p-2 bg-red-50 rounded-lg'>
+                <Trash2 className='h-5 w-5' />
+              </div>
+              {t('actions.deleteConfirmTitle')}
+            </DialogTitle>
+            <DialogDescription className='pt-4 text-sm leading-relaxed'>
+              {t('actions.deleteConfirmDescription')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {userToDelete && (
+            <div className='space-y-4 py-2'>
+              <div className='bg-red-50/50 p-4 rounded-xl border border-red-100/50 flex flex-col gap-2'>
+                <div className='flex items-center gap-3'>
+                  <Avatar className='h-10 w-10 border-2 border-white shadow-sm'>
+                    <AvatarFallback className='bg-red-100 text-red-700 text-xs font-bold'>
+                      {userToDelete.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className='flex flex-col'>
+                    <span className='text-sm font-bold text-red-900'>{userToDelete.name}</span>
+                    <span className='text-xs text-red-700/70'>{userToDelete.email}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className='rounded-lg bg-orange-50 border border-orange-100 p-3 flex gap-3'>
+                <Shield className='h-5 w-5 text-orange-600 shrink-0' />
+                <p className='text-xs text-orange-800 font-medium leading-normal'>
+                  {t('actions.deleteWarning')}
+                </p>
+              </div>
+
+              <div className='space-y-2'>
+                <p className='text-[11px] font-semibold text-muted-foreground uppercase tracking-wider'>
+                  {t('actions.confirmDeleteInstruction', { email: userToDelete.email })}
+                </p>
+                <Input
+                  value={confirmDeleteEmail}
+                  onChange={(e) => setConfirmDeleteEmail(e.target.value)}
+                  placeholder={t('actions.confirmDeletePlaceholder')}
+                  className={cn(
+                    'h-11 border-red-100 focus:ring-red-100 focus:border-red-300 transition-all',
+                    confirmDeleteEmail && confirmDeleteEmail !== userToDelete.email && 'border-red-300 bg-red-50/30'
+                  )}
+                />
+                {confirmDeleteEmail && confirmDeleteEmail !== userToDelete.email && (
+                  <p className='text-[10px] text-red-500 font-medium'>
+                    {t('actions.confirmDeleteMismatch')}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className='mt-2 sm:justify-end gap-2'>
+            <Button
+              variant='ghost'
+              onClick={() => setIsDeleteConfirmOpen(false)}
+              disabled={deleteMutation.isPending}
+              className='hover:bg-slate-100'
+            >
+              {t('actions.cancel')}
+            </Button>
+            <Button
+              variant='destructive'
+              className='bg-red-700 hover:bg-red-800 h-11 px-8 shadow-lg shadow-red-200 font-bold'
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending || (userToDelete !== null && confirmDeleteEmail !== userToDelete.email)}
+            >
+              {deleteMutation.isPending ? t('actions.deleting') : t('actions.confirmDelete')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -416,7 +416,10 @@ export function ListingInformationStep({
                   badge={t('readOnly')}
                 />
               )}
-              {selectedProperty.widthM && selectedProperty.lengthM && (
+              {selectedProperty.widthM != null &&
+                selectedProperty.lengthM != null &&
+                selectedProperty.widthM > 0 &&
+                selectedProperty.lengthM > 0 && (
                 <ReadOnlyField
                   label={t('dimensions', { fallback: 'Dimensions' })}
                   value={`${selectedProperty.widthM}m × ${selectedProperty.lengthM}m`}

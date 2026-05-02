@@ -30,6 +30,10 @@
       "BANNED": "Banned",
       "VERIFIED": "Verified"
     },
+    "accountLabels": {
+      "inactive": "Inactive account",
+      "deleted": "Deleted account"
+    },
     "actions": {
       "suspend": "Suspend User",
       "activate": "Activate User",
@@ -49,13 +53,24 @@
       "banSuccess": "User banned permanently",
       "banError": "Failed to ban user",
       "banConfirmTitle": "Ban User Permanently",
-      "banConfirmDescription": "Are you sure you want to PERMANENTLY ban this user? This action is IRREVERSIBLE and will cancel all their listings, properties, appointments, and active subscriptions.",
+      "banConfirmDescription": "Are you sure you want to PERMANENTLY ban this user? Their properties will move to draft, listings and appointments will be cancelled, and agent assignments will be detached.",
       "banning": "Banning...",
       "confirmBan": "Confirm Ban",
-      "banWarning": "This action will permanently delete all business data for this user and cannot be undone.",
+      "banWarning": "This action blocks the account and refreshes affected properties, listings, appointments, subscriptions, and agent assignments.",
       "confirmBanPlaceholder": "Enter email to confirm",
       "confirmBanInstruction": "Please type \"{email}\" to confirm this action.",
-      "confirmBanMismatch": "Email does not match."
+      "confirmBanMismatch": "Email does not match.",
+      "delete": "Delete Account",
+      "deleteSuccess": "User deleted successfully",
+      "deleteError": "Failed to delete user",
+      "deleteConfirmTitle": "Delete Account",
+      "deleteConfirmDescription": "Are you sure you want to delete this account? The account will be marked deleted while owned properties move to draft and active business records are cancelled.",
+      "deleting": "Deleting...",
+      "confirmDelete": "Confirm Delete",
+      "deleteWarning": "This action disables the account and refreshes affected properties, listings, appointments, subscriptions, and agent assignments.",
+      "confirmDeletePlaceholder": "Enter email to confirm",
+      "confirmDeleteInstruction": "Please type \"{email}\" to confirm this action.",
+      "confirmDeleteMismatch": "Email does not match."
     },
     "roles": {
       "ADMIN": "Admin",

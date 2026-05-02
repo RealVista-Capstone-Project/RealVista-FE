@@ -1,0 +1,99 @@
+{
+  "AdminManageProperties": {
+    "title": "Manage Properties",
+    "description": "View, edit, and delete all properties across the platform.",
+    "filters": {
+      "title": "Filters",
+      "description": "Narrow results by status, type, and location.",
+      "reset": "Reset",
+      "searchPlaceholder": "Search address, owner, phone...",
+      "statusPlaceholder": "Status",
+      "allStatuses": "All statuses",
+      "propertyTypePlaceholder": "Property type",
+      "allPropertyTypes": "All types",
+      "cityPlaceholder": "City",
+      "allCities": "All cities",
+      "districtPlaceholder": "District",
+      "allDistricts": "All districts",
+      "wardPlaceholder": "Ward",
+      "allWards": "All wards"
+    },
+    "statuses": {
+      "DRAFT": "Draft",
+      "PENDING": "Pending",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected",
+      "AVAILABLE": "Available",
+      "RESERVED": "Reserved",
+      "SOLD": "Sold",
+      "RENTED": "Rented"
+    },
+    "table": {
+      "address": "Address",
+      "status": "Status",
+      "type": "Property Type",
+      "owner": "Owner",
+      "actions": "Actions",
+      "edit": "Edit",
+      "viewUser": "View user",
+      "chat": "Chat",
+      "changeOwner": "Change owner",
+      "delete": "Delete",
+      "empty": {
+        "title": "No properties found",
+        "description": "No properties match your current filters."
+      }
+    },
+    "chatError": "Could not open chat for this owner.",
+    "ownerDialog": {
+      "title": "Change Owner",
+      "description": "Reassign \"{address}\" to another owner.",
+      "currentOwner": "Current owner",
+      "newOwner": "New owner email",
+      "emailPlaceholder": "New owner's email...",
+      "ownerFound": "User found",
+      "ownerNotFound": "No user found with this email",
+      "cancel": "Cancel",
+      "confirm": "Change owner",
+      "saving": "Saving...",
+      "success": "Owner changed successfully.",
+      "error": "Failed to change owner."
+    },
+    "preview": {
+      "title": "Property Preview",
+      "loading": "Loading property preview...",
+      "noImage": "No image available",
+      "type": "Type",
+      "area": "Usable area",
+      "rentPrice": "Rent from",
+      "buyPrice": "Buy from",
+      "owner": "Owner",
+      "description": "Description"
+    },
+    "deleteSuccess": "Property deleted successfully.",
+    "deleteError": "Failed to delete property.",
+    "deleteDialog": {
+      "title": "Confirm Delete",
+      "description": "Are you sure you want to delete the property \"{address}\"? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "checkingListings": "Checking active listings...",
+      "activeListingsWarning": "Warning: This property has {count} active listing(s). Deleting it will affect these listings."
+    },
+    "edit": {
+      "reassignSection": "Owner Information (Admin only)",
+      "streetAddress": "Street Address",
+      "currentOwner": "Current Owner",
+      "reassignOwner": "Reassign Owner (enter email)",
+      "ownerEmailPlaceholder": "New owner's email...",
+      "ownerFound": "User found",
+      "ownerNotFound": "No user found with this email",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "updateSuccess": "Property updated successfully.",
+      "updateError": "Failed to update property.",
+      "loadError": "Could not load property details."
+    }
+  }
+}

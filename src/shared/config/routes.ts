@@ -35,6 +35,7 @@ export const ROUTES = {
     managePolicies: '/admin/manage-policies',
     manageReports: '/admin/manage-reports',
     manageTemplates: '/admin/manage-templates',
+    manageProperties: '/dashboard/manage-properties',
     locations: '/dashboard/locations',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
     propertyFeed: '/dashboard/property-feed',

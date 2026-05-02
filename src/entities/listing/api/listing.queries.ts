@@ -59,7 +59,7 @@ export const listingQueries = {
         const response = await listingApi.getManagedListings(params);
         return response.payload.data;
       },
-      staleTime: 2 * 60 * 1000, // 2 minutes
+      staleTime: 0,
     }),
 
   /**
@@ -72,7 +72,7 @@ export const listingQueries = {
         const response = await listingApi.getManagedListingSummary();
         return response.payload.data;
       },
-      staleTime: 5 * 60 * 1000,
+      staleTime: 0,
     }),
 
   /**

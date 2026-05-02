@@ -27,6 +27,7 @@ import {
   EyeOff,
   Clock,
   CheckCircle2,
+  Key,
 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -597,7 +598,7 @@ function PropertyDetailPanel({
   const statusRef = React.useRef<HTMLDivElement>(null);
 
   // Owner-settable statuses (excludes system-controlled ones)
-  const OWNER_STATUSES = ['DRAFT', 'AVAILABLE', 'RESERVED', 'SOLD'] as const;
+  const OWNER_STATUSES = ['DRAFT', 'AVAILABLE', 'RESERVED', 'SOLD', 'RENTED'] as const;
   type OwnerStatus = (typeof OWNER_STATUSES)[number];
 
   // Close actions dropdown on outside click
@@ -810,7 +811,7 @@ function PropertyDetailPanel({
       {/* Status — badge dropdown (interactive for owner) or static badge */}
       <div className='px-4 sm:px-6 pb-3'>
         {(() => {
-          const isFinal = property.status === 'SOLD' || property.status === 'RENTED';
+          const isFinal = property.status === 'SOLD';
           const canChange = isOwner && !SYSTEM_STATUSES.has(property.status) && !isFinal;
 
           const STATUS_OPTIONS: { status: OwnerStatus; icon: React.ReactNode }[] = [
@@ -818,6 +819,7 @@ function PropertyDetailPanel({
             { status: 'DRAFT', icon: <EyeOff className='h-3.5 w-3.5' strokeWidth={2} /> },
             { status: 'RESERVED', icon: <Clock className='h-3.5 w-3.5' strokeWidth={2} /> },
             { status: 'SOLD', icon: <CheckCircle2 className='h-3.5 w-3.5' strokeWidth={2} /> },
+            { status: 'RENTED', icon: <Key className='h-3.5 w-3.5' strokeWidth={2} /> },
           ];
 
           const currentOpt = STATUS_OPTIONS.find((o) => o.status === property.status);

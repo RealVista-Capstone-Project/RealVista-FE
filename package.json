@@ -83,6 +83,7 @@
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@eslint/eslintrc": "^3.3.4",
+    "@playwright/cli": "^0.1.10",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@testing-library/dom": "^10.4.1",
