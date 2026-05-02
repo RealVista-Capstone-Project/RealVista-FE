@@ -55,7 +55,6 @@ import {
   MapPin,
   Route,
   Container,
-  Info,
 } from 'lucide-react';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form';
@@ -70,7 +69,7 @@ import {
   SelectLabel,
 } from '@/shared/ui/select';
 import { Switch } from '@/shared/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/ui';
+
 import {
   PROPERTY_TYPES,
 } from '@/shared/config/property-types';
@@ -828,50 +827,6 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
           </div>
         </div>
 
-        <FormField
-          control={control}
-          name='info.allowRentListingWhenRented'
-          render={({ field }) => (
-            <FormItem className='mt-8 rounded-2xl border border-teal-200 bg-gradient-to-br from-teal-50 via-white to-amber-50 p-4 shadow-sm'>
-              <div className='flex items-start justify-between gap-4'>
-                <div className='space-y-1.5'>
-                  <div className='flex items-center gap-2'>
-                    <FormLabel className='text-sm font-semibold text-foreground'>
-                      {t('allowRentListingWhenRented')}
-                    </FormLabel>
-                    <TooltipProvider delayDuration={200}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            type='button'
-                            className='inline-flex size-5 items-center justify-center rounded-full border border-teal-200 bg-white text-teal-700 shadow-sm'
-                            aria-label={t('allowRentListingWhenRentedTooltip')}
-                          >
-                            <Info className='size-3.5' />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side='top' className='max-w-[280px] text-sm'>
-                          {t('allowRentListingWhenRentedTooltip')}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <p className='max-w-xl text-xs leading-5 text-muted-foreground'>
-                    {t('allowRentListingWhenRentedHelper')}
-                  </p>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={Boolean(field.value)}
-                    onCheckedChange={field.onChange}
-                    className='mt-1'
-                  />
-                </FormControl>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </div>
     </div>
   );
