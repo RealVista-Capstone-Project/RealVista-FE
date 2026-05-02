@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useAuthSession } from '@/features/auth/model';
-import { useFCMToken } from '@/features/auth/hooks/use-fcm-token';
 import { AdminDashboard } from '@/widgets/admin-dashboard';
 import { OwnerDashboard } from '@/widgets/owner-dashboard';
 import { AgentDashboardView } from '@/features/dashboard-agent';
@@ -18,9 +17,6 @@ export function DashboardPage() {
   const { data: session, status } = useAuthSession();
   const router = useRouter();
   const locale = useLocale();
-
-  // Initialize Firebase Cloud Messaging token
-  useFCMToken();
 
   const user = session?.user;
   const backendRoles: string[] = user?.backendRoles ?? [];
