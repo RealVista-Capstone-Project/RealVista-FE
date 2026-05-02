@@ -36,6 +36,11 @@ interface PropertyFormProps {
   initialData?: Partial<PropertyFormValues>;
   propertyId?: string;
   isEditMode?: boolean;
+  /**
+   * When provided, called instead of the default updateProperty mutation.
+   * Receives the fully-built request so the admin page can append new_owner_id.
+   */
+  onAdminSubmit?: (request: CreatePropertyRequest) => void;
 }
 
 const DRAFT_KEY = 'property-form-draft';
@@ -57,7 +62,7 @@ function hasErrors(obj: unknown): boolean {
   return Object.values(o).some(hasErrors);
 }
 
-export function PropertyForm({ initialData, propertyId, isEditMode = false }: PropertyFormProps) {
+export function PropertyForm({ initialData, propertyId, isEditMode = false, onAdminSubmit }: PropertyFormProps) {
   const t = useTranslations('PropertyManagement');
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -347,6 +352,12 @@ export function PropertyForm({ initialData, propertyId, isEditMode = false }: Pr
       if (isEditMode && propertyId) {
         const request = transformToRequest(finalData, submissionStatus);
         console.log('[PropertyForm] update request:', JSON.stringify(request, null, 2));
+
+        if (onAdminSubmit) {
+          onAdminSubmit(request);
+          return;
+        }
+
         updateProperty.mutate(
           { propertyId, request },
           {
