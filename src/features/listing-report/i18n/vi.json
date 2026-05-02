@@ -1,0 +1,14 @@
+{
+  "ReportDialog": {
+    "title": "Báo cáo tin đăng",
+    "disclaimer": "Vui lòng cung cấp chi tiết về lý do bạn báo cáo tin đăng này. Báo cáo sai sự thật có thể dẫn đến việc đình chỉ tài khoản.",
+    "reasonLabel": "Lý do báo cáo",
+    "reasonPlaceholder": "Mô tả vấn đề với tin đăng này (ví dụ: thông tin sai, lừa đảo, nội dung không phù hợp)...",
+    "cancel": "Hủy",
+    "submit": "Gửi báo cáo",
+    "submitting": "Đang gửi...",
+    "successMessage": "Báo cáo của bạn đã được gửi thành công. Chúng tôi sẽ xem xét trong thờigian sớm nhất.",
+    "errorMessage": "Gửi báo cáo thất bại. Vui lòng thử lại.",
+    "errorEmptyReason": "Vui lòng cung cấp lý do báo cáo"
+  }
+}

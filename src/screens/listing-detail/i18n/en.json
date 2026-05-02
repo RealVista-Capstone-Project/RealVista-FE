@@ -1,6 +1,13 @@
 {
   "ListingDetailScreen": {
     "previewBadge": "Preview",
-    "previewMessage": "This listing is not published yet. Only you can see this preview."
+    "previewMessage": "This listing is not published yet. Only you can see this preview.",
+    "back": "Back",
+    "description": "Description",
+    "rentPrice": "Rent Price",
+    "salePrice": "Sale Price",
+    "perMonth": "/month",
+    "contactNow": "Contact Now",
+    "report": "Report"
   }
 }

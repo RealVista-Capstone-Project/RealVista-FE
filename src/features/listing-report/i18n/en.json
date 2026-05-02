@@ -1,0 +1,14 @@
+{
+  "ReportDialog": {
+    "title": "Report Listing",
+    "disclaimer": "Please provide details about why you are reporting this listing. False reports may result in account suspension.",
+    "reasonLabel": "Reason for reporting",
+    "reasonPlaceholder": "Describe the issue with this listing (e.g., incorrect information, scam, inappropriate content)...",
+    "cancel": "Cancel",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "successMessage": "Your report has been submitted successfully. We will review it shortly.",
+    "errorMessage": "Failed to submit report. Please try again.",
+    "errorEmptyReason": "Please provide a reason for reporting"
+  }
+}
