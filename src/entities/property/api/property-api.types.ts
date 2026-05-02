@@ -25,6 +25,8 @@ export interface PropertySummaryResponse {
   thumbnail_url: string | null;
   amenities: PropertyAmenityItem[] | null;
   owner_name: string | null;
+  owner_email: string | null;
+  owner_avatar_url: string | null;
   owner_phone: string | null;
   has_3d: boolean;
   price_range: PropertyPriceRange | null;

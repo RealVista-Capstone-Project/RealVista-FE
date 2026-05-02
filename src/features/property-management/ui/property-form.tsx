@@ -45,6 +45,11 @@ interface PropertyFormProps {
   propertyId?: string;
   isEditMode?: boolean;
   propertyStatus?: string;
+  /**
+   * When provided, called instead of the default updateProperty mutation.
+   * Receives the fully-built request so the admin page can append new_owner_id.
+   */
+  onAdminSubmit?: (request: CreatePropertyRequest) => void;
 }
 
 const DRAFT_KEY = 'property-form-draft';
@@ -70,6 +75,7 @@ export function PropertyForm({
   initialData,
   propertyId,
   isEditMode = false,
+  onAdminSubmit,
   propertyStatus,
 }: PropertyFormProps) {
   const t = useTranslations('PropertyManagement');
@@ -146,7 +152,11 @@ export function PropertyForm({
     mode: 'onTouched',
   });
 
-  const { handleSubmit, trigger, formState: { errors } } = methods;
+  const {
+    handleSubmit,
+    trigger,
+    formState: { errors },
+  } = methods;
 
   const clearDraft = useCallback(() => sessionStorage.removeItem(DRAFT_KEY), [DRAFT_KEY]);
 
@@ -179,7 +189,9 @@ export function PropertyForm({
       const saved = sessionStorage.getItem(DRAFT_KEY);
       const existing = saved ? JSON.parse(saved) : {};
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...existing, step: currentStep }));
-    } catch { /* ignore quota errors */ }
+    } catch {
+      /* ignore quota errors */
+    }
   }, [currentStep, isEditMode, DRAFT_KEY]);
 
   // Persist form values on every change (skip File objects which can't be serialized)
@@ -188,14 +200,19 @@ export function PropertyForm({
     const { unsubscribe } = methods.watch(() => {
       try {
         const currentValues = methods.getValues();
-        const { newFiles: _newFiles, ...media } = (currentValues.media ?? {}) as Record<string, unknown>;
+        const { newFiles: _newFiles, ...media } = (currentValues.media ?? {}) as Record<
+          string,
+          unknown
+        >;
         const saved = sessionStorage.getItem(DRAFT_KEY);
         const existing = saved ? JSON.parse(saved) : {};
         sessionStorage.setItem(
           DRAFT_KEY,
           JSON.stringify({ ...existing, values: { ...currentValues, media } })
         );
-      } catch { /* ignore quota errors */ }
+      } catch {
+        /* ignore quota errors */
+      }
     });
     return unsubscribe;
   }, [methods, isEditMode, DRAFT_KEY]);
@@ -203,7 +220,11 @@ export function PropertyForm({
   const ALL_STEPS = useMemo(
     () => [
       { id: 'role', component: <PropertySearchStep />, label: t('tabRole') },
-      { id: 'info', component: <PropertyInfoStep onErrorChange={setInfoHasError} />, label: t('tabInfo') },
+      {
+        id: 'info',
+        component: <PropertyInfoStep onErrorChange={setInfoHasError} />,
+        label: t('tabInfo'),
+      },
       { id: 'media', component: <PropertyMediaStep />, label: t('tabMedia') },
     ],
     [t]
@@ -293,12 +314,20 @@ export function PropertyForm({
       allow_rent_listing_when_rented: Boolean(data.info.allowRentListingWhenRented),
       price_range: data.info.priceRange
         ? {
-            rent: data.info.priceRange.rent?.min != null || data.info.priceRange.rent?.max != null
-              ? { min: data.info.priceRange.rent?.min ?? undefined, max: data.info.priceRange.rent?.max ?? undefined }
-              : undefined,
-            buy: data.info.priceRange.buy?.min != null || data.info.priceRange.buy?.max != null
-              ? { min: data.info.priceRange.buy?.min ?? undefined, max: data.info.priceRange.buy?.max ?? undefined }
-              : undefined,
+            rent:
+              data.info.priceRange.rent?.min != null || data.info.priceRange.rent?.max != null
+                ? {
+                    min: data.info.priceRange.rent?.min ?? undefined,
+                    max: data.info.priceRange.rent?.max ?? undefined,
+                  }
+                : undefined,
+            buy:
+              data.info.priceRange.buy?.min != null || data.info.priceRange.buy?.max != null
+                ? {
+                    min: data.info.priceRange.buy?.min ?? undefined,
+                    max: data.info.priceRange.buy?.max ?? undefined,
+                  }
+                : undefined,
           }
         : undefined,
       attributes: Object.entries(data.info.dynamicAttributes || {}).map(([code, value]) => {
@@ -374,6 +403,12 @@ export function PropertyForm({
       if (isEditMode && propertyId) {
         const request = transformToRequest(finalData, submissionStatus);
         console.log('[PropertyForm] update request:', JSON.stringify(request, null, 2));
+
+        if (onAdminSubmit) {
+          onAdminSubmit(request);
+          return;
+        }
+
         updateProperty.mutate(
           { propertyId, request },
           {
@@ -533,7 +568,10 @@ export function PropertyForm({
                 <Button
                   type='button'
                   variant='ghost'
-                  onClick={() => { clearDraft(); router.push('/dashboard/property'); }}
+                  onClick={() => {
+                    clearDraft();
+                    router.push('/dashboard/property');
+                  }}
                   disabled={isPending}
                   className='h-12 rounded-lg text-muted-foreground hover:text-foreground'
                 >
