@@ -148,7 +148,6 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
         title={t('revenueInPeriod')}
         value={formatVND(Number(overview?.revenue_in_period ?? 0))}
         icon={DollarSign}
-        trend={{ value: '+15.4%', isPositive: true }}
         description={t(`days${days}`)}
         delay={0}
       />

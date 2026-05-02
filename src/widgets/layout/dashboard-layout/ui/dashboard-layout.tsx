@@ -476,7 +476,7 @@ export function DashboardLayout({
                   strokeWidth={isActive ? 2.5 : 2}
                 />
                 {!isCollapsed && <span className='text-sm'>{item.label}</span>}
-                {!isCollapsed && item.badge && Number(item.badge) > 0 && (
+                {!isCollapsed && Number(item.badge) > 0 && (
                   <span className={cn(
                     'ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold shadow-sm transition-all',
                     item.badgeVariant === 'danger' && 'bg-red-500 text-white',
@@ -488,7 +488,7 @@ export function DashboardLayout({
                     {item.badge}
                   </span>
                 )}
-                {isCollapsed && item.badge && Number(item.badge) > 0 && (
+                {isCollapsed && Number(item.badge) > 0 && (
                   <div className={cn(
                     'absolute right-3 top-2.5 h-2 w-2 rounded-full ring-2 ring-white animate-pulse',
                     item.badgeVariant === 'danger' && 'bg-red-500',

@@ -17,7 +17,10 @@ import {
   TooltipContent,
   TooltipProvider
 } from '@/shared/ui/tooltip';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
+import { RevenueTable } from './revenue-table';
 
 import { useQuery } from '@tanstack/react-query';
 import { adminQueries } from '@/entities/admin/api';
@@ -26,7 +29,8 @@ import { vi } from 'date-fns/locale';
 import {
   ShieldAlert, User as UserIcon, Clock,
   TrendingUp, Home, DollarSign, Package, Users,
-  ArrowUpRight, ArrowDownRight
+  ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight,
+  Rocket, Building2, Flame
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/shared/ui/badge';
@@ -78,6 +82,8 @@ export function AdminDashboard() {
   const { status } = useAuthSession();
   const t = useTranslations('Dashboard');
   const [days, setDays] = useState(7);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [activeTab, setActiveTab] = useState('ALL');
 
   const { startDate, endDate } = useMemo(() => {
     const end = new Date();
@@ -91,15 +97,20 @@ export function AdminDashboard() {
   // Don't pass endDate to keep it always up to the current moment on every refetch
   const { data: stats, isLoading, error } = useQuery({
     ...adminQueries.stats(startDate),
-    refetchInterval: 30000, // Refetch every 30 seconds to keep data fresh
+    refetchInterval: 30000,
+  });
+
+  const { data: txPage, isLoading: isTxLoading } = useQuery({
+    ...adminQueries.transactions(currentPage, 10, activeTab, startDate, endDate),
+    refetchInterval: 30000,
   });
 
   const translatedPackageInsights = useMemo(() => {
     return (stats?.package_insights ?? []).map((item) => ({
       ...item,
-      translatedLabel: t(item.label)
+      translatedLabel: item.label
     }));
-  }, [stats?.package_insights, t]);
+  }, [stats?.package_insights]);
 
   if (status === 'loading' || isLoading) {
     return (
@@ -185,9 +196,6 @@ export function AdminDashboard() {
               </h3>
               <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
             </div>
-            <Badge className="bg-emerald-500/10 text-emerald-600 border-none px-3 py-1 font-black">
-              +15.4%
-            </Badge>
           </div>
           <div className='h-[350px] w-full'>
             <ResponsiveContainer width="100%" height="100%">
@@ -300,6 +308,117 @@ export function AdminDashboard() {
         </motion.div>
       </div>
 
+      {/* Detailed Revenue Analysis Table - Moved Up and Improved UI */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className='rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900'
+      >
+        <div className='flex flex-col gap-6'>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+            <div className="flex flex-col gap-1">
+              <h3 className='text-2xl font-black flex items-center gap-2 text-slate-900 dark:text-white'>
+                <DollarSign className='h-6 w-6 text-emerald-500' />
+                {t('detailedRevenueAnalysis')}
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dữ liệu giao dịch thời gian thực</p>
+              </div>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setCurrentPage(0); }} className="w-full sm:w-auto">
+              <TabsList className="bg-slate-50 dark:bg-slate-800/50 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800 h-auto flex flex-wrap justify-start sm:justify-center">
+                {[
+                  { value: 'ALL', label: 'Tất cả' },
+                  { value: 'BOOST', label: 'Boosting' },
+                  { value: 'LISTING', label: 'Tin đăng' },
+                  { value: '3D_TOUR', label: '3D Tour' },
+                  { value: 'AI', label: 'AI Request' }
+                ].map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="px-5 py-2 rounded-xl text-xs font-black data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
+
+          <div className="mt-4">
+            <RevenueTable
+              transactions={txPage?.content ?? []}
+              isLoading={isTxLoading}
+            />
+
+            {/* Premium Pagination Controls */}
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-100 dark:border-slate-800 pt-8">
+              <div className="flex flex-col gap-1">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center sm:text-left">
+                  Trang {currentPage + 1} / {txPage?.total_pages ?? txPage?.totalPages ?? 1}
+                </p>
+                <p className="text-[11px] font-bold text-slate-500 text-center sm:text-left">
+                  Hiển thị {txPage?.content?.length || 0} trên tổng số {txPage?.total_elements ?? txPage?.totalElements ?? 0} giao dịch
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+                  disabled={currentPage === 0 || isTxLoading}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-20 transition-all font-black text-[10px] uppercase tracking-widest"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  {t('previous')}
+                </button>
+                <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                  {(() => {
+                    const totalPages = txPage?.total_pages ?? txPage?.totalPages ?? 1;
+                    const maxVisible = 5;
+                    let startPage = Math.max(0, currentPage - Math.floor(maxVisible / 2));
+                    const endPage = Math.min(totalPages - 1, startPage + maxVisible - 1);
+
+                    if (endPage - startPage + 1 < maxVisible) {
+                      startPage = Math.max(0, endPage - maxVisible + 1);
+                    }
+
+                    const pages = [];
+                    for (let i = startPage; i <= endPage; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={cn(
+                            "min-w-[32px] h-8 flex items-center justify-center rounded-lg text-[10px] font-black transition-all",
+                            currentPage === i
+                              ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-lg scale-110"
+                              : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          )}
+                        >
+                          {i + 1}
+                        </button>
+                      );
+                    }
+                    return pages;
+                  })()}
+                </div>
+                <button
+                  onClick={() => setCurrentPage((prev) => (prev + 1 < (txPage?.total_pages ?? txPage?.totalPages ?? 1) ? prev + 1 : prev))}
+                  disabled={currentPage + 1 >= (txPage?.total_pages ?? txPage?.totalPages ?? 1) || isTxLoading}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-20 transition-all font-black text-[10px] uppercase tracking-widest"
+                >
+                  {t('next')}
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Listing Creation Trend */}
       <div className='grid grid-cols-1 mb-6'>
         <motion.div
@@ -367,6 +486,12 @@ export function AdminDashboard() {
           <div className='flex flex-col gap-8'>
             {/* Donut Chart */}
             <div className='h-[240px] w-full relative'>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none z-0">
+                <p className="text-4xl font-black text-slate-900 dark:text-white leading-tight">
+                  {translatedPackageInsights.reduce((sum, item) => sum + item.value, 0)}
+                </p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('activePlans')}</p>
+              </div>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -388,15 +513,12 @@ export function AdminDashboard() {
                       />
                     ))}
                   </Pie>
-                  <RechartsTooltip content={<CustomTooltip isCurrency={true} />} />
+                  <RechartsTooltip
+                    content={<CustomTooltip isCurrency={false} />}
+                    wrapperStyle={{ zIndex: 100 }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                <p className="text-4xl font-black text-slate-900 dark:text-white leading-tight">
-                  {translatedPackageInsights.reduce((sum, item) => sum + item.value, 0)}
-                </p>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('activePlans')}</p>
-              </div>
             </div>
 
             {/* Premium Legend with Progress Bars */}
@@ -492,7 +614,7 @@ export function AdminDashboard() {
                     </td>
                     <td className="py-4 text-center">
                       <Badge className="bg-slate-900 text-white border-none font-black px-3 py-1">
-                        {agent.listing_count || 0}
+                        {agent.listing_count ?? 0}
                       </Badge>
                     </td>
                     <td className="py-4 text-right">
@@ -567,39 +689,53 @@ export function AdminDashboard() {
                        </span>
                     </td>
                     <td className="py-4 text-right">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                             <span className={cn(
-                               "text-sm font-black dark:text-white cursor-help border-b border-dotted border-slate-300 dark:border-slate-700",
-                               listing.revenue > 0 ? "text-emerald-600" : "text-slate-400"
-                             )}>
-                               {formatVND(listing.revenue)}
-                             </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-slate-900 text-white border-slate-800 p-3 rounded-xl shadow-2xl">
-                             <div className="flex flex-col gap-2 min-w-[120px]">
-                               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                                 {t('revenueBreakdown')}
-                               </p>
-                               {listing.breakdown && Object.keys(listing.breakdown).length > 0 ? (
-                                 Object.entries(listing.breakdown).map(([key, value]) => (
-                                   <div key={key} className="flex justify-between items-center gap-4">
-                                      <span className="text-xs text-slate-300">{t(key)}</span>
-                                      <span className="text-xs font-bold">{value} {t('interactions').toLowerCase()}</span>
-                                   </div>
-                                 ))
-                               ) : (
-                                 <p className="text-xs text-slate-500 italic">No boost revenue recorded</p>
-                               )}
-                               <div className="mt-1 pt-1 border-t border-slate-800 flex justify-between items-center">
-                                 <span className="text-[10px] text-slate-400">Total</span>
-                                 <span className="text-xs font-black text-emerald-400">{formatVND(listing.revenue)}</span>
-                               </div>
-                             </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                              <div className="flex items-center justify-end gap-2">
+                                {listing.breakdown?.FEATURED && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                          <Rocket className="h-4 w-4" />
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="bg-slate-900 text-white border-slate-800 text-[10px] font-black uppercase tracking-widest">
+                                        {t('FEATURED')}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                                {listing.breakdown?.HOT_BADGE && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="p-2 rounded-xl bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                                          <Flame className="h-4 w-4" />
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="bg-slate-900 text-white border-slate-800 text-[10px] font-black uppercase tracking-widest">
+                                        {t('HOT_BADGE')}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                                {listing.has3dTour && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
+                                          <Building2 className="h-4 w-4" />
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="bg-slate-900 text-white border-slate-800 text-[10px] font-black uppercase tracking-widest">
+                                        3D Virtual Tour
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                                {(!listing.breakdown?.FEATURED && !listing.breakdown?.HOT_BADGE && !listing.has3dTour) && (
+                                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{t('none')}</span>
+                                )}
+                              </div>
                     </td>
                   </tr>
                 ))}

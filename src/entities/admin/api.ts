@@ -28,6 +28,7 @@ export interface AdminStats {
     interactions: number;
     revenue: number;
     breakdown?: Record<string, number>;
+    has3dTour?: boolean;
     trend: string;
   }[];
   package_insights: { id: string; label: string; value: number; extra?: Record<string, number> }[];
@@ -46,6 +47,17 @@ export interface AdminStats {
     status: string;
     timestamp: string;
     target_id: string;
+  }[];
+  detailed_transactions: {
+    id: string;
+    user_name: string;
+    user_email: string;
+    user_avatar?: string;
+    type: string;
+    plan_name: string;
+    amount: number;
+    timestamp: string;
+    status: string;
   }[];
   system_health: Record<string, number>;
 }
@@ -67,6 +79,17 @@ export const adminApi = {
     if (params.toString()) url += `?${params.toString()}`;
     return http.get<ApiResponse<AdminStats>>(url).then((res) => res.payload.data);
   },
+  getTransactions: (page = 0, size = 10, type?: string, startDate?: string, endDate?: string) => {
+    let url = '/admin/transactions';
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    if (type && type !== 'ALL') params.append('type', type);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    if (params.toString()) url += `?${params.toString()}`;
+    return http.get<ApiResponse<any>>(url).then((res) => res.payload.data);
+  },
 };
 
 export const adminQueries = {
@@ -77,5 +100,9 @@ export const adminQueries = {
   stats: (startDate?: string, endDate?: string) => ({
     queryKey: ['admin', 'stats', startDate, endDate],
     queryFn: () => adminApi.getStats(startDate, endDate),
+  }),
+  transactions: (page = 0, size = 10, type?: string, startDate?: string, endDate?: string) => ({
+    queryKey: ['admin', 'transactions', page, size, type, startDate, endDate],
+    queryFn: () => adminApi.getTransactions(page, size, type, startDate, endDate),
   }),
 };

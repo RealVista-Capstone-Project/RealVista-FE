@@ -69,7 +69,7 @@
     "EXPIRED": "Đã hết hạn",
     "packageInsights": "Phân bổ gói dịch vụ",
     "revenueByPackage": "Doanh thu theo gói",
-    "topAgentsActivity": "Môi giới hoạt động mạnh",
+    "topAgentsActivity": "Thống kê Môi giới hàng đầu",
     "listingCount": "Số tin đăng",
     "revenueGenerated": "Doanh thu tạo ra",
     "views": "Lượt xem",
@@ -83,6 +83,9 @@
     "newListing": "Tin đăng mới",
     "listingCreationTrend": "Xu hướng đăng tin",
     "revenueBreakdown": "Phân tích doanh thu",
+    "detailedRevenueAnalysis": "Phân tích doanh thu chi tiết",
+    "previous": "Trang trước",
+    "next": "Trang sau",
     "systemLiquidity": "Thanh khoản hệ thống",
     "avgSalesCycle": "Tốc độ giao dịch",
     "trustIndex": "Chỉ số tin cậy",
@@ -146,6 +149,9 @@
     "revenueBoost": "Dịch vụ Boosting",
     "revenueListing": "Doanh thu Tin đăng",
     "revenueTour": "Doanh thu 3D Tour",
-    "revenueBreakdown": "Phân tích doanh thu"
+    "revenueBreakdown": "Phân tích doanh thu",
+    "detailedRevenueAnalysis": "Phân tích doanh thu chi tiết",
+    "previous": "Trang trước",
+    "next": "Trang sau"
   }
 }

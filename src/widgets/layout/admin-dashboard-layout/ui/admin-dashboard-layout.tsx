@@ -101,9 +101,9 @@ export function AdminDashboardLayout({
 
   const sidebarItems = React.useMemo(() => {
     return getAdminSidebarItems(t, {
-      reports: adminOverview?.unresolved_reports,
-      listings: adminOverview?.pending_listings,
-      totalListings: adminOverview?.total_listings,
+      reports: Number(adminOverview?.unresolved_reports) || undefined,
+      listings: Number(adminOverview?.pending_listings) || undefined,
+      totalListings: Number(adminOverview?.total_listings) || undefined,
     });
   }, [t, adminOverview]);
 
@@ -207,7 +207,7 @@ export function AdminDashboardLayout({
         <nav className='flex flex-1 flex-col gap-1 p-3 overflow-y-auto'>
           {sidebarItems.map((item) => (
             <Link
-              key={item.id}
+              key={`${item.id}-${item.badge || 'none'}`}
               href={item.href}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
@@ -216,12 +216,16 @@ export function AdminDashboardLayout({
               )}
             >
               <item.icon className='h-5 w-5' />
-              {!isCollapsed && <span className='text-sm'>{item.label}</span>}
-              {!isCollapsed && item.badge && Number(item.badge) > 0 && (
-                <span className={cn('ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white',
-                  item.badgeVariant === 'danger' ? 'bg-red-500' : 'bg-amber-500')}>
-                  {item.badge}
-                </span>
+              {!isCollapsed && (
+                <>
+                  <span className='text-sm flex-1'>{item.label}</span>
+                  {Number(item.badge) > 0 && (
+                    <span className={cn('px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white',
+                      item.badgeVariant === 'danger' ? 'bg-red-500' : 'bg-amber-500')}>
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
             </Link>
           ))}

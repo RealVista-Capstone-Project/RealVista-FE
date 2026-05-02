@@ -83,6 +83,9 @@
     "newListing": "New Listing",
     "listingCreationTrend": "Listing Creation Trend",
     "revenueBreakdown": "Revenue Breakdown",
+    "detailedRevenueAnalysis": "Detailed Revenue Analysis",
+    "previous": "Previous Page",
+    "next": "Next Page",
     "systemLiquidity": "System Liquidity",
     "avgSalesCycle": "Avg. Sales Cycle",
     "trustIndex": "Trust Index",
@@ -139,6 +142,9 @@
     "revenueBoost": "Boosting Revenue",
     "revenueListing": "Listing Revenue",
     "revenueTour": "3D Tour Revenue",
-    "revenueBreakdown": "Revenue Breakdown"
+    "revenueBreakdown": "Revenue Breakdown",
+    "detailedRevenueAnalysis": "Detailed Revenue Analysis",
+    "previous": "Previous Page",
+    "next": "Next Page"
   }
 }
