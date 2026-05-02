@@ -30,6 +30,7 @@ export function createPropertyInfoSchema(t: (key: string) => string) {
         .number({ invalid_type_error: t('validation.lengthMin') })
         .min(0, t('validation.lengthMin')),
       propertyType: z.string().min(1, t('validation.propertyTypeRequired')),
+      allowRentListingWhenRented: z.boolean().optional().default(false),
       dynamicAttributes: z.record(z.string(), z.any()).optional().default({}),
       amenityIds: z.array(z.string()).optional().default([]),
       priceRange: z

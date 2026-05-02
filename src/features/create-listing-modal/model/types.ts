@@ -3,7 +3,15 @@
  * Aligned with PropertySummaryResponse from the backend
  */
 
-export type PropertyStatus = 'DRAFT' | 'AVAILABLE' | 'RESERVED' | 'SOLD';
+export type PropertyStatus =
+  | 'DRAFT'
+  | 'PENDING'
+  | 'VERIFIED'
+  | 'REJECTED'
+  | 'AVAILABLE'
+  | 'RESERVED'
+  | 'SOLD'
+  | 'RENTED';
 
 export interface UserPropertyLocation {
   locationId: string;
@@ -65,6 +73,7 @@ export interface UserProperty {
   areaSqft: number | null;
   description: string | null;
   status: PropertyStatus;
+  allowRentListingWhenRented: boolean;
   thumbnailUrl: string | null;
   location: UserPropertyLocation;
   propertyType: UserPropertyType;

@@ -69,6 +69,7 @@ export const propertyApi = {
     const size = criteria?.size ?? 10;
     if (criteria?.keyword) queryParams.append('keyword', criteria.keyword);
     if (criteria?.status) queryParams.append('status', criteria.status);
+    criteria?.statuses?.forEach((status) => queryParams.append('statuses', status));
     queryParams.append('page', page.toString());
     queryParams.append('size', size.toString());
 

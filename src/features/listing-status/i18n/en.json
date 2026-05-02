@@ -39,6 +39,16 @@
     },
     "common": {
       "processing": "Processing..."
+    },
+    "toasts": {
+      "listingPublishedSuccessfully": "Listing published successfully",
+      "failedToPublishListing": "Failed to publish listing",
+      "listingUnpublished": "Listing unpublished",
+      "failedToUnpublishListing": "Failed to unpublish listing",
+      "listingMarkedAsSold": "Listing marked as sold",
+      "failedToMarkAsSold": "Failed to mark as sold",
+      "listingMarkedAsRented": "Listing marked as rented",
+      "failedToMarkAsRented": "Failed to mark as rented"
     }
   }
 }

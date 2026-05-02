@@ -13,22 +13,22 @@ const actionToApiMethod = {
   'mark-as-rented': listingApi.markAsRented,
 };
 
-const actionToMessage: Record<ListingStatusAction, { success: string; error: string }> = {
+const actionToKey: Record<ListingStatusAction, { success: string; error: string }> = {
   publish: {
-    success: 'Listing published successfully',
-    error: 'Failed to publish listing',
+    success: 'ListingStatus.toasts.listingPublishedSuccessfully',
+    error: 'ListingStatus.toasts.failedToPublishListing',
   },
   unpublish: {
-    success: 'Listing unpublished',
-    error: 'Failed to unpublish listing',
+    success: 'ListingStatus.toasts.listingUnpublished',
+    error: 'ListingStatus.toasts.failedToUnpublishListing',
   },
   'mark-as-sold': {
-    success: 'Listing marked as sold',
-    error: 'Failed to mark as sold',
+    success: 'ListingStatus.toasts.listingMarkedAsSold',
+    error: 'ListingStatus.toasts.failedToMarkAsSold',
   },
   'mark-as-rented': {
-    success: 'Listing marked as rented',
-    error: 'Failed to mark as rented',
+    success: 'ListingStatus.toasts.listingMarkedAsRented',
+    error: 'ListingStatus.toasts.failedToMarkAsRented',
   },
 };
 
@@ -82,10 +82,10 @@ export async function executeStatusUpdate(
   action: ListingStatusAction,
   t: (key: string) => string
 ) {
-  const messages = actionToMessage[action];
+  const keys = actionToKey[action];
   try {
     await mutateAsync({ listingId, action });
-    toast.success(messages.success);
+    toast.success(t(keys.success as Parameters<typeof t>[0]));
   } catch (error: any) {
     handleErrorApi({ error, t });
   }
