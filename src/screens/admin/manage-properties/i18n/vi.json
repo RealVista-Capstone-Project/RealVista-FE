@@ -1,0 +1,99 @@
+{
+  "AdminManageProperties": {
+    "title": "Quản lý bất động sản",
+    "description": "Xem, chỉnh sửa và xóa tất cả bất động sản trên nền tảng.",
+    "filters": {
+      "title": "Bộ lọc",
+      "description": "Lọc theo trạng thái, loại và khu vực.",
+      "reset": "Đặt lại",
+      "searchPlaceholder": "Tìm địa chỉ, chủ sở hữu, SĐT...",
+      "statusPlaceholder": "Trạng thái",
+      "allStatuses": "Tất cả trạng thái",
+      "propertyTypePlaceholder": "Loại bất động sản",
+      "allPropertyTypes": "Tất cả loại",
+      "cityPlaceholder": "Tỉnh/Thành",
+      "allCities": "Tất cả tỉnh/thành",
+      "districtPlaceholder": "Quận/Huyện",
+      "allDistricts": "Tất cả quận/huyện",
+      "wardPlaceholder": "Phường/Xã",
+      "allWards": "Tất cả phường/xã"
+    },
+    "statuses": {
+      "DRAFT": "Nháp",
+      "PENDING": "Chờ duyệt",
+      "VERIFIED": "Đã xác minh",
+      "REJECTED": "Bị từ chối",
+      "AVAILABLE": "Đang trống",
+      "RESERVED": "Đã đặt cọc",
+      "SOLD": "Đã bán",
+      "RENTED": "Đã cho thuê"
+    },
+    "table": {
+      "address": "Địa chỉ",
+      "status": "Trạng thái",
+      "type": "Loại bất động sản",
+      "owner": "Chủ sở hữu",
+      "actions": "Hành động",
+      "edit": "Chỉnh sửa",
+      "viewUser": "Xem người dùng",
+      "chat": "Nhắn tin",
+      "changeOwner": "Đổi chủ sở hữu",
+      "delete": "Xóa",
+      "empty": {
+        "title": "Không tìm thấy bất động sản",
+        "description": "Không có bất động sản nào khớp với bộ lọc hiện tại."
+      }
+    },
+    "chatError": "Không thể mở cuộc trò chuyện với chủ sở hữu này.",
+    "ownerDialog": {
+      "title": "Đổi chủ sở hữu",
+      "description": "Chuyển bất động sản \"{address}\" cho chủ sở hữu khác.",
+      "currentOwner": "Chủ sở hữu hiện tại",
+      "newOwner": "Email chủ sở hữu mới",
+      "emailPlaceholder": "Email của chủ mới...",
+      "ownerFound": "Đã tìm thấy người dùng",
+      "ownerNotFound": "Không tìm thấy người dùng với email này",
+      "cancel": "Hủy",
+      "confirm": "Đổi chủ sở hữu",
+      "saving": "Đang lưu...",
+      "success": "Đã đổi chủ sở hữu thành công.",
+      "error": "Đổi chủ sở hữu thất bại."
+    },
+    "preview": {
+      "title": "Xem nhanh bất động sản",
+      "loading": "Đang tải xem nhanh bất động sản...",
+      "noImage": "Chưa có hình ảnh",
+      "type": "Loại",
+      "area": "Diện tích sử dụng",
+      "rentPrice": "Giá thuê từ",
+      "buyPrice": "Giá bán từ",
+      "owner": "Chủ sở hữu",
+      "description": "Mô tả"
+    },
+    "deleteSuccess": "Đã xóa bất động sản thành công.",
+    "deleteError": "Xóa bất động sản thất bại.",
+    "deleteDialog": {
+      "title": "Xác nhận xóa",
+      "description": "Bạn có chắc chắn muốn xóa bất động sản \"{address}\"? Hành động này không thể hoàn tác.",
+      "cancel": "Hủy",
+      "confirm": "Xóa",
+      "deleting": "Đang xóa...",
+      "checkingListings": "Đang kiểm tra bài đăng...",
+      "activeListingsWarning": "Cảnh báo: Bất động sản này có {count} bài đăng đang hoạt động. Xóa sẽ ảnh hưởng đến các bài đăng này."
+    },
+    "edit": {
+      "reassignSection": "Thông tin chủ sở hữu (chỉ Admin)",
+      "streetAddress": "Địa chỉ",
+      "currentOwner": "Chủ sở hữu hiện tại",
+      "reassignOwner": "Chuyển chủ sở hữu (nhập email)",
+      "ownerEmailPlaceholder": "Email của chủ mới...",
+      "ownerFound": "Đã tìm thấy người dùng",
+      "ownerNotFound": "Không tìm thấy người dùng với email này",
+      "cancel": "Hủy",
+      "save": "Lưu thay đổi",
+      "updateSuccess": "Đã cập nhật bất động sản thành công.",
+      "updateError": "Cập nhật bất động sản thất bại.",
+      "loadError": "Không thể tải thông tin bất động sản."
+    }
+  }
+}

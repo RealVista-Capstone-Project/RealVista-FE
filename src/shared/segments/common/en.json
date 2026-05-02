@@ -16,7 +16,8 @@
       "users": "User Management",
       "locations": "Locations",
       "crm": "CRM",
-      "packages": "Package Management"
+      "packages": "Package Management",
+      "manageProperties": "Manage Properties"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -38,7 +39,8 @@
       "manageAgent": "Manage Agent",
       "crm": "CRM Board",
       "managePackages": "Package Management",
-      "locations": "Locations"
+      "locations": "Locations",
+      "manageProperties": "Manage Properties"
     },
     "actionButton": {
       "addProperty": "Add a property",

@@ -201,4 +201,46 @@ export const propertyApi = {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
+
+  // ── Admin methods ─────────────────────────────────────────────────────────
+
+  adminListProperties: (criteria?: {
+    keyword?: string;
+    status?: string;
+    userId?: string;
+    propertyTypeId?: string;
+    locationId?: string;
+    page?: number;
+    size?: number;
+  }) => {
+    const queryParams = new URLSearchParams();
+    if (criteria?.keyword) queryParams.append('keyword', criteria.keyword);
+    if (criteria?.status) queryParams.append('status', criteria.status);
+    if (criteria?.userId) queryParams.append('userId', criteria.userId);
+    if (criteria?.propertyTypeId) queryParams.append('propertyTypeId', criteria.propertyTypeId);
+    if (criteria?.locationId) queryParams.append('locationId', criteria.locationId);
+    queryParams.append('page', (criteria?.page ?? 0).toString());
+    queryParams.append('size', (criteria?.size ?? 10).toString());
+    return http.get<MyPropertiesResponse>(`properties/admin?${queryParams.toString()}`, {
+      baseUrl: env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  adminUpdateProperty: ({
+    propertyId,
+    request,
+  }: {
+    propertyId: string;
+    request: UpdatePropertyRequest & { new_owner_id?: string };
+  }) => {
+    return http.put<ApiResponse<PropertyDetailResponse>>(`properties/admin/${propertyId}`, request, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  adminDeleteProperty: (propertyId: string) => {
+    return http.delete<ApiResponse<void>>(`properties/admin/${propertyId}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
 };
