@@ -28,4 +28,8 @@ export const listingKeys = {
   // Listings by property ID
   byProperty: (propertyId: string, size: number) =>
     ([...listingKeys.all, 'by-property', propertyId, size] as const),
+
+  // Related listings by property ID (rent + sale)
+  relatedByProperty: (propertyId: string) =>
+    ([...listingKeys.all, 'related-by-property', propertyId] as const),
 } as const;

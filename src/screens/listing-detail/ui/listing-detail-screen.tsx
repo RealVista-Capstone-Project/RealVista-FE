@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Heart, ArrowLeft, MoreHorizontal, Flag, MessageCircle, Calendar } from 'lucide-react';
+import { Heart, ArrowLeft, MoreHorizontal, Flag, MessageCircle, Calendar, Phone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { PropertyGallery } from '@/features/property-gallery';
 import { PriceAndTour } from '@/features/price-and-tour';
@@ -51,6 +51,11 @@ import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { GoogleMap } from '@/shared/ui/map/google-map';
+import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
+import { RentVsBuyComparison } from '@/features/rent-vs-buy';
+import { MortgageCalculator } from '@/features/mortgage-calculator/ui/mortgage-calculator';
+import { useQuery } from '@tanstack/react-query';
+import { listingQueries } from '@/entities/listing/api';
 
 export interface ListingDetailScreenProps {
   listing: Listing;
@@ -63,6 +68,8 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
   const [isBookTourOpen, setIsBookTourOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isReportUserOpen, setIsReportUserOpen] = useState(false);
+  const [isMortgageOpen, setIsMortgageOpen] = useState(false);
   const { data: session } = useAuthSession();
   const t = useTranslations('PropertyCard');
   const tScreen = useTranslations('ListingDetailScreen');
@@ -183,6 +190,15 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
   // Get attributes from listing
   const attributes = listing.attributes ?? [];
 
+  // Fetch related listings (rent + sale) for the same property
+  const { data: relatedListings } = useQuery(
+    listingQueries.relatedByProperty(listing.property_id)
+  );
+
+  // BE returns snake_case keys (rent_listing, sale_listing)
+  const hasBothRentAndSale =
+    relatedListings?.rent_listing != null && relatedListings?.sale_listing != null;
+
   return (
     <div className='min-h-screen bg-background pb-22 md:pb-0'>
       {/* Preview Mode Banner */}
@@ -199,17 +215,19 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
         </div>
       )}
 
-      <div className='max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-4 sm:py-8'>
-        {/* Back Button */}
+      {/* Back Button */}
+      <div className='max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 pt-4 sm:pt-5'>
         <button
           type='button'
           onClick={() => router.back()}
-          className='flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium text-sm mb-4'
+          className='flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium text-sm mb-2'
         >
           <ArrowLeft className='size-4' />
           <span className='hidden sm:inline'>{tScreen('back')}</span>
         </button>
+      </div>
 
+      <div className='max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 pb-4 sm:pb-8'>
         {/* Row 1: Media (70%) + Contact/Book Tour (30%) */}
         <div className='flex flex-col lg:flex-row lg:gap-8'>
           {/* Left: Media Gallery + Info - 70% */}
@@ -332,150 +350,111 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
           {/* Right: Agent Card + Analytics - 30% */}
           <div className='hidden lg:block lg:w-[30%] lg:max-w-[400px] shrink-0'>
             <div className='space-y-3'>
-              {/* Agent Card */}
-              <div className='bg-white border border-primary/10 rounded-2xl p-5 shadow-sm'>
-                {/* 3 Dots Menu */}
-                <div className='flex justify-end mb-2'>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className='p-1 hover:bg-muted rounded-full transition-colors'>
-                        <MoreHorizontal className='size-5 text-muted-foreground' />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end' className='w-48'>
-                      <DropdownMenuItem
-                        onClick={() => setIsReportOpen(true)}
-                        className='cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10'
-                      >
-                        <Flag className='size-4 mr-2' />
-                        {tScreen('report')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+              {/* Agent / Contact Card */}
+              <div className='bg-white border border-primary/10 rounded-2xl p-4 shadow-sm relative'>
+                {/* Price */}
+                <div className='mb-4 pb-4 border-b border-border'>
+                  <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
+                    {listing.listing_type === 'RENT' ? 'Giá thuê' : 'Giá bán'}
+                  </span>
+                  <div className='flex items-baseline gap-2 flex-wrap mt-1'>
+                    <span className='text-2xl font-bold text-primary'>
+                      {new Intl.NumberFormat('vi-VN').format(property.price)}
+                    </span>
+                    <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+                    {listing.listing_type === 'RENT' && (
+                      <span className='text-xs text-muted-foreground'>/ tháng</span>
+                    )}
+                  </div>
+                  {listing.listing_type === 'SALE' && (
+                    <button
+                      onClick={() => setIsMortgageOpen(true)}
+                      className='mt-2 text-xs text-primary border border-primary/30 rounded-full px-2.5 py-1 hover:bg-primary/5 transition-colors'
+                    >
+                      Tính khoản vay ›
+                    </button>
+                  )}
                 </div>
 
-                {/* Avatar */}
-                <div className='flex justify-center mb-4'>
-                  <div className='relative'>
+                {/* Agent / Owner Row */}
+                <div className='flex gap-3 mb-4'>
+                  {/* Left: Avatar + Role + Name */}
+                  <div className='flex flex-col gap-1 w-[120px]'>
                     <img
                       src={listing.agent?.avatar_url || '/default-avatar.png'}
                       alt={listing.agent?.full_name || 'Agent'}
-                      className='w-20 h-20 rounded-full object-cover border-2 border-primary/10'
+                      className='w-10 h-10 rounded-full object-cover border border-primary/10'
                     />
-                    <div className='absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1'>
-                      <div className='w-2 h-2 bg-white rounded-full' />
+                    <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
+                      {isListingPostedByAgent ? 'Agent' : 'Owner'}
+                    </span>
+                    <p className='text-sm font-semibold text-foreground leading-tight'>
+                      {listing.agent?.full_name || 'Agent'}
+                    </p>
+                  </div>
+
+                  {/* Right: 3 dots + Contact icons */}
+                  <div className='flex-1 flex flex-col items-end justify-between'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className='p-0.5 hover:bg-muted rounded-full transition-colors'>
+                          <MoreHorizontal className='size-3.5 text-muted-foreground' />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end' className='w-48'>
+                        <DropdownMenuItem
+                          onClick={() => setIsReportUserOpen(true)}
+                          className='cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10'
+                        >
+                          <Flag className='size-4 mr-2' />
+                          {tScreen('reportUser')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className='flex items-center gap-2'>
+                      {listing.agent?.phone && (
+                        <a
+                          href={`tel:${listing.agent.phone}`}
+                          className='flex items-center justify-center w-9 h-9 rounded-full border border-border hover:bg-muted transition-colors'
+                        >
+                          <Phone className='size-4 text-foreground' />
+                        </a>
+                      )}
+                      <button
+                        onClick={handleContact}
+                        className='flex items-center justify-center w-9 h-9 rounded-full border border-border hover:bg-muted transition-colors'
+                      >
+                        <MessageCircle className='size-4 text-foreground' />
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Agent Name */}
-                <h3 className='text-center font-semibold text-lg text-foreground mb-1'>
-                  {listing.agent?.full_name || 'Agent'}
-                </h3>
-
-                {/* Rating */}
-                <div className='flex items-center justify-center gap-2 mb-4'>
-                  <span className='text-yellow-500 text-sm'>★ 4.5/5</span>
-                  <span className='text-muted-foreground text-sm'>(228)</span>
-                </div>
-
-                {/* Phone Number */}
-                <div className='flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2 mb-3'>
-                  <span className='text-foreground font-mono text-sm'>
-                    {listing.agent?.phone?.slice(0, 6) || '000'}****{listing.agent?.phone?.slice(-2) || '**'}
-                  </span>
-                  <button className='text-primary text-sm font-medium hover:underline'>
-                    Hiện số
-                  </button>
-                </div>
-
-                {/* Properties Count */}
-                <p className='text-center text-muted-foreground text-sm mb-4'>
-                  2 tin đăng
-                </p>
-
-                {/* Contact Button */}
+                {/* Request Tour Button */}
                 <RealVistaButton
                   variant='primary'
                   size='small'
-                  className='w-full mb-3'
-                  onClick={handleContact}
-                >
-                  <MessageCircle className='h-4 w-4' />
-                  <span>Liên hệ ngay</span>
-                </RealVistaButton>
-
-                {/* Book Tour Button */}
-                <RealVistaButton
-                  variant='secondary'
-                  size='small'
-                  className='w-full border-primary text-primary hover:bg-primary/5'
+                  className='w-full h-11 bg-primary text-white hover:bg-primary/90 border-primary'
                   onClick={handleRequestTour}
                 >
-                  <Calendar className='h-4 w-4' />
-                  <span>Đặt lịch xem</span>
+                  <span className='text-sm font-semibold'>Request a tour</span>
                 </RealVistaButton>
-              </div>
-
-              {/* Service Fee Analysis Card */}
-              <div className='bg-white border border-primary/10 rounded-2xl p-5 shadow-sm'>
-                <h3 className='font-semibold text-foreground mb-4 flex items-center gap-2'>
-                  Phân tích chi phí
-                  <span className='text-muted-foreground cursor-help' title='Chi phí ước tính'>ⓘ</span>
-                </h3>
-
-                {/* Short-term Rent Occupancy */}
-                <div className='flex items-center gap-4 mb-4'>
-                  <div className='relative w-16 h-16'>
-                    <svg className='w-16 h-16 transform -rotate-90'>
-                      <circle
-                        cx='32'
-                        cy='32'
-                        r='28'
-                        fill='none'
-                        stroke='#e5e7eb'
-                        strokeWidth='6'
-                      />
-                      <circle
-                        cx='32'
-                        cy='32'
-                        r='28'
-                        fill='none'
-                        stroke='#22c55e'
-                        strokeWidth='6'
-                        strokeDasharray={`${64 * 1.76} ${100 * 1.76}`}
-                        strokeLinecap='round'
-                      />
-                    </svg>
-                    <span className='absolute inset-0 flex items-center justify-center text-sm font-bold'>64%</span>
-                  </div>
-                  <div>
-                    <p className='text-xs text-muted-foreground'>Tỷ lệ lấp đầy</p>
-                    <p className='text-lg font-bold text-foreground'>
-                      {formatVND(Math.round(property.price * 0.64))} VNĐ
-                    </p>
-                    <p className='text-xs text-muted-foreground'>Thu nhập/tháng ước tính</p>
-                  </div>
-                </div>
-
-                {/* Price Info */}
-                <div className='space-y-2 pt-4 border-t border-border'>
-                  <div className='flex justify-between text-sm'>
-                    <span className='text-muted-foreground'>Giá thuê/tháng</span>
-                    <span className='font-semibold'>{formattedPrice} VNĐ</span>
-                  </div>
-                  <div className='flex justify-between text-sm'>
-                    <span className='text-muted-foreground'>Phí dịch vụ</span>
-                    <span className='font-semibold text-green-600'>~10%</span>
-                  </div>
-                  <div className='flex justify-between text-sm'>
-                    <span className='text-muted-foreground'>Thuế (nếu có)</span>
-                    <span className='font-semibold'>0 VNĐ</span>
-                  </div>
-                </div>
               </div>
 
               <PriceHistoryChart listingId={listing.listing_id} />
+
+              {/* Monthly Cost Breakdown - only for rent listings */}
+              {listing.listing_type === 'RENT' && property.costBreakdown && (
+                <MonthlyCostBreakdown costBreakdown={property.costBreakdown} />
+              )}
+
+              {/* Rent vs Buy Comparison - only when both RENT and SALE exist for same property */}
+              {hasBothRentAndSale && relatedListings?.rent_listing && relatedListings?.sale_listing && (
+                <RentVsBuyComparison
+                  rentPrice={relatedListings.rent_listing.price}
+                  salePrice={relatedListings.sale_listing.price}
+                />
+              )}
 
             </div>
           </div>
@@ -585,12 +564,29 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
         </DialogContent>
       </Dialog>
 
-      {/* Report Dialog */}
+      {/* Report Listing Dialog */}
       <ReportDialog
-        listingId={listing.listing_id}
-        listingName={listing.name}
+        targetType='LISTING'
+        targetId={listing.listing_id}
+        targetName={listing.name}
         open={isReportOpen}
         onOpenChange={setIsReportOpen}
+      />
+
+      {/* Report User Dialog */}
+      <ReportDialog
+        targetType='USER'
+        targetId={listing.agent?.user_id || ''}
+        targetName={listing.agent?.full_name || ''}
+        open={isReportUserOpen}
+        onOpenChange={setIsReportUserOpen}
+      />
+
+      {/* Mortgage Calculator Sheet */}
+      <MortgageCalculator
+        open={isMortgageOpen}
+        onOpenChange={setIsMortgageOpen}
+        listingPrice={property.price}
       />
     </div>
   );

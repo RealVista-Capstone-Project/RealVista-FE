@@ -88,4 +88,19 @@ export const listingQueries = {
       staleTime: 2 * 60 * 1000,
       enabled: !!propertyId,
     }),
+
+  /**
+   * Get related listings by property ID
+   * Returns RENT and SALE listings for the same property (if both exist and are active)
+   */
+  relatedByProperty: (propertyId: string) =>
+    queryOptions({
+      queryKey: listingKeys.relatedByProperty(propertyId),
+      queryFn: async () => {
+        const response = await listingApi.getRelatedByProperty(propertyId);
+        return response.payload.data;
+      },
+      staleTime: 5 * 60 * 1000,
+      enabled: !!propertyId,
+    }),
 };

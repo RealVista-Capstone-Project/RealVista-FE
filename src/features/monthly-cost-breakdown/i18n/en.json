@@ -1,8 +1,9 @@
 {
   "MonthlyCostBreakdown": {
-    "title": "Monthly Breakdown",
-    "description": "See how your monthly payment is distributed",
-    "basePrice": "Base Price",
-    "totalMonthlyPayment": "Total monthly payment"
+    "rentPrice": "Rent Price",
+    "salePrice": "Sale Price",
+    "perMonth": "month",
+    "serviceFees": "Service Fees",
+    "total": "Total"
   }
 }

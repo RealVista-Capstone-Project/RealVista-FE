@@ -72,8 +72,9 @@ export function ListingActions({
 
       {/* Report Dialog */}
       <ReportDialog
-        listingId={listingId}
-        listingName={listingName}
+        targetType='LISTING'
+        targetId={listingId}
+        targetName={listingName}
         open={isReportOpen}
         onOpenChange={setIsReportOpen}
       />

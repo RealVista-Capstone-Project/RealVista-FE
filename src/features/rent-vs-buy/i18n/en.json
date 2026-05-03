@@ -1,0 +1,23 @@
+{
+  "RentVsBuy": {
+    "title": "Rent vs Buy",
+    "rent": "Rent",
+    "buy": "Buy",
+    "rentPrice": "Rent Price",
+    "salePrice": "Sale Price",
+    "perMonth": "month",
+    "fullPrice": "full price",
+    "serviceFees": "Service Fees",
+    "totalMonthly": "Total Monthly",
+    "analysisTitle": "Purchase price {price}:",
+    "equalsMonths": "equals {months} months of rent",
+    "equalsYears": "equals {years} years of renting this apartment",
+    "recommendBuy": "You should buy — P/R under 15 years, high returns",
+    "recommendConsider": "Consider carefully — P/R 15–20 years, depends on situation",
+    "recommendRent": "You should rent — P/R over 20 years, buying not efficient",
+    "formulaTitle": "P/R Rating Formula",
+    "formulaGreen": "P/R < 15 years → Buy",
+    "formulaYellow": "P/R 15–20 years → Consider",
+    "formulaRed": "P/R > 20 years → Rent"
+  }
+}

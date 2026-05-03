@@ -1,0 +1,23 @@
+{
+  "RentVsBuy": {
+    "title": "So sánh thuê & mua",
+    "rent": "Thuê",
+    "buy": "Mua",
+    "rentPrice": "Giá thuê",
+    "salePrice": "Giá mua",
+    "perMonth": "tháng",
+    "fullPrice": "giá đầy đủ",
+    "serviceFees": "Phí dịch vụ",
+    "totalMonthly": "Tổng hàng tháng",
+    "analysisTitle": "Giá mua căn hộ {price}:",
+    "equalsMonths": "bằng {months} tháng thuê căn hộ",
+    "equalsYears": "bằng {years} năm thuê căn hộ này",
+    "recommendBuy": "Bạn nên mua căn hộ này — P/R dưới 15 năm, lợi nhuận cao",
+    "recommendConsider": "Bạn nên cân nhắc — P/R từ 15–20 năm, tùy tình huống",
+    "recommendRent": "Bạn nên thuê — P/R trên 20 năm, mua chưa hiệu quả",
+    "formulaTitle": "Công thức đánh giá P/R",
+    "formulaGreen": "P/R < 15 năm → Nghiêng về mua",
+    "formulaYellow": "P/R 15–20 năm → Cân nhắc",
+    "formulaRed": "P/R > 20 năm → Nghiêng về thuê"
+  }
+}

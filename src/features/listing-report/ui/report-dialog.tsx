@@ -11,36 +11,65 @@ import {
   DialogFooter,
 } from '@/shared/ui/dialog/dialog';
 import { Button } from '@/shared/ui/button';
-import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { Textarea } from '@/shared/ui/textarea';
-import { Flag, AlertCircle } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/select/select';
+import {
+  reportApi,
+  LISTING_REPORT_REASONS,
+  USER_REPORT_REASONS,
+  type ReportReason,
+  type ReportTargetType,
+} from '@/entities/report/api/report.api';
+import { Flag } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface ReportDialogProps {
-  listingId: string;
-  listingName: string;
+  targetType: ReportTargetType;
+  targetId: string;
+  targetName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function ReportDialog({ listingId, listingName, open, onOpenChange }: ReportDialogProps) {
+export function ReportDialog({
+  targetType,
+  targetId,
+  targetName,
+  open,
+  onOpenChange,
+}: ReportDialogProps) {
   const t = useTranslations('ReportDialog');
-  const [reason, setReason] = useState('');
+  const [reason, setReason] = useState<ReportReason | ''>('');
+  const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const reasons =
+    targetType === 'LISTING' ? LISTING_REPORT_REASONS : USER_REPORT_REASONS;
+
   const handleSubmit = async () => {
-    if (!reason.trim()) {
+    if (!reason) {
       toast.error(t('errorEmptyReason'));
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // TODO: Implement API call to submit report
-      // await reportApi.submit({ listingId, reason });
+      await reportApi.submit({
+        target_type: targetType,
+        target_id: targetId,
+        reason,
+        description: description.trim() || undefined,
+      });
 
       toast.success(t('successMessage'));
       setReason('');
+      setDescription('');
       onOpenChange(false);
     } catch (error) {
       toast.error(t('errorMessage'));
@@ -51,6 +80,7 @@ export function ReportDialog({ listingId, listingName, open, onOpenChange }: Rep
 
   const handleClose = () => {
     setReason('');
+    setDescription('');
     onOpenChange(false);
   };
 
@@ -59,50 +89,63 @@ export function ReportDialog({ listingId, listingName, open, onOpenChange }: Rep
       <DialogContent className='max-w-md p-0 overflow-hidden'>
         <DialogHeader className='p-6 pb-4 border-b border-border'>
           <div className='flex items-center gap-3'>
-            <div className='size-10 rounded-full bg-destructive/10 flex items-center justify-center'>
-              <Flag className='size-5 text-destructive' />
-            </div>
+            <Flag className='size-5 text-destructive' />
             <div>
-              <DialogTitle className='text-lg font-semibold'>{t('title')}</DialogTitle>
+              <DialogTitle className='text-lg font-semibold'>
+                {targetType === 'LISTING' ? t('titleListing') : t('titleUser')}
+              </DialogTitle>
               <DialogDescription className='text-sm text-muted-foreground mt-0.5'>
-                {listingName}
+                {targetName}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className='p-6 space-y-4'>
-          <div className='flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg'>
-            <AlertCircle className='size-5 text-amber-600 shrink-0 mt-0.5' />
-            <p className='text-sm text-amber-800'>{t('disclaimer')}</p>
-          </div>
-
-          <div className='space-y-2'>
+        <div className='p-6 space-y-5'>
+          <div className='space-y-3'>
             <label className='text-sm font-medium text-foreground'>
               {t('reasonLabel')}
+              <span className='text-red-500 ml-0.5'>*</span>
+            </label>
+            <Select value={reason} onValueChange={(v) => setReason(v as ReportReason)}>
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder={t('reasonPlaceholder')} />
+              </SelectTrigger>
+              <SelectContent className='max-h-[240px] overflow-y-auto w-full'>
+                {reasons.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {t(`reasons.${r}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className='space-y-3'>
+            <label className='text-sm font-medium text-foreground'>
+              {t('descriptionLabel')}
             </label>
             <Textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={t('reasonPlaceholder')}
-              className='min-h-[120px] resize-none'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t('descriptionPlaceholder')}
+              className='min-h-[100px] resize-none'
             />
           </div>
         </div>
 
         <DialogFooter className='p-6 pt-4 border-t border-border gap-3'>
-          <Button variant='outline' onClick={handleClose} className='flex-1'>
+          <Button variant='outline' size='sm' onClick={handleClose} className='flex-1'>
             {t('cancel')}
           </Button>
-          <RealVistaButton
-            variant='primary'
-            size='medium'
+          <Button
+            size='sm'
             onClick={handleSubmit}
-            disabled={isSubmitting || !reason.trim()}
-            className='flex-1 bg-destructive hover:bg-destructive/90'
+            disabled={isSubmitting || !reason}
+            className='flex-1 bg-black text-white hover:bg-black/90'
           >
             {isSubmitting ? t('submitting') : t('submit')}
-          </RealVistaButton>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

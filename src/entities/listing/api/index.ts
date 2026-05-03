@@ -42,6 +42,15 @@ export const listingApi = {
     http.get<ApiResponse<SimilarListingsResponse>>(`/listings/${listingId}/similar?limit=${limit}`),
 
   /**
+   * Get related listings by property ID
+   * Returns RENT and SALE listings for the same property (if both exist and are active)
+   */
+  getRelatedByProperty: (propertyId: string) =>
+    http.get<ApiResponse<{ rent_listing: Listing | null; sale_listing: Listing | null }>>(
+      `/listings/property/${propertyId}/related`
+    ),
+
+  /**
    * Get managed listings (listings created by the authenticated user)
    * Returns a paginated list of listings
    * Requires authentication

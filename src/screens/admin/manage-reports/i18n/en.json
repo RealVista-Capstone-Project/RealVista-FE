@@ -66,6 +66,12 @@
         "FAKE_INFO": "Fake Information",
         "DUPLICATE": "Duplicate",
         "HARASSMENT": "Harassment / Abusive",
+        "SPAM": "Spam",
+        "MISLEADING": "Misleading Content",
+        "INAPPROPRIATE": "Inappropriate Content",
+        "WRONG_INFO": "Wrong Information",
+        "FAKE_PROFILE": "Fake Profile",
+        "VIOLATES_TERMS": "Violates Terms of Service",
         "OTHER": "Other"
       },
       "actions": {
