@@ -9,6 +9,10 @@
     "perMonth": "/tháng",
     "contactNow": "Liên hệ ngay",
     "report": "Báo cáo tin đăng",
-    "reportUser": "Báo cáo ngưởi dùng"
+    "reportUser": "Báo cáo ngưởi dùng",
+    "agent": "Môi giới",
+    "owner": "Chủ nhà",
+    "requestTour": "Đặt lịch xem",
+    "estimateLoan": "Ước tính khoản vay"
   }
 }

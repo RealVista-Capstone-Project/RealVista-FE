@@ -4,6 +4,8 @@
     "salePrice": "Giá mua",
     "perMonth": "tháng",
     "serviceFees": "Phí dịch vụ",
-    "total": "Tổng cộng"
+    "serviceFeesSubtotal": "Tổng phí dịch vụ",
+    "rentOrSalePrice": "Giá thuê/ mua",
+    "total": "Tổng"
   }
 }

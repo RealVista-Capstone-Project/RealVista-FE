@@ -1,6 +1,6 @@
 {
   "RentVsBuy": {
-    "title": "Rent vs Buy",
+    "title": "Price Ratio Analysis",
     "rent": "Rent",
     "buy": "Buy",
     "rentPrice": "Rent Price",
@@ -12,12 +12,12 @@
     "analysisTitle": "Purchase price {price}:",
     "equalsMonths": "equals {months} months of rent",
     "equalsYears": "equals {years} years of renting this apartment",
-    "recommendBuy": "You should buy — P/R under 15 years, high returns",
-    "recommendConsider": "Consider carefully — P/R 15–20 years, depends on situation",
-    "recommendRent": "You should rent — P/R over 20 years, buying not efficient",
-    "formulaTitle": "P/R Rating Formula",
-    "formulaGreen": "P/R < 15 years → Buy",
-    "formulaYellow": "P/R 15–20 years → Consider",
-    "formulaRed": "P/R > 20 years → Rent"
+    "recommendBuy": "You should buy — price-to-rent ratio under 15 years, high returns",
+    "recommendConsider": "Consider carefully — price-to-rent ratio 15–20 years, depends on situation",
+    "recommendRent": "You should rent — price-to-rent ratio over 20 years, buying not efficient",
+    "formulaTitle": "Price-to-Rent Ratio Formula",
+    "formulaGreen": "Ratio < 15 years → Buy",
+    "formulaYellow": "Ratio 15–20 years → Consider",
+    "formulaRed": "Ratio > 20 years → Rent"
   }
 }

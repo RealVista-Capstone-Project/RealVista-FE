@@ -150,7 +150,7 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
   const yMin = Math.max(0, minPriceValue - priceRange * 0.02);
   const yMax = maxPriceValue + priceRange * 0.02;
 
-  if (chartData.length === 0) {
+  if (chartData.length <= 1) {
     return null;
   }
 

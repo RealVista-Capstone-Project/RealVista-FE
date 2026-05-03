@@ -94,22 +94,15 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
                 Trả trước
               </Label>
               <span className='text-sm font-bold text-foreground'>
-                {formatVND(downPaymentAmount)}
+                {formatVND(downPaymentAmount)} ({downPaymentPercent}%)
               </span>
             </div>
-            <div className='flex items-center gap-3'>
-              <Input
-                type='range'
-                min={10}
-                max={90}
-                value={downPaymentPercent}
-                onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
-                className='flex-1 h-2 accent-primary'
-              />
-              <span className='text-sm font-semibold w-12 text-right'>
-                {downPaymentPercent}%
-              </span>
-            </div>
+            <SliderTrack
+              min={10}
+              max={90}
+              value={downPaymentPercent}
+              onChange={setDownPaymentPercent}
+            />
           </div>
 
           {/* Interest Rate */}
@@ -122,17 +115,13 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
                 {interestRate}%
               </span>
             </div>
-            <div className='flex items-center gap-3'>
-              <Input
-                type='range'
-                min={1}
-                max={20}
-                step={0.1}
-                value={interestRate}
-                onChange={(e) => setInterestRate(Number(e.target.value))}
-                className='flex-1 h-2 accent-primary'
-              />
-            </div>
+            <SliderTrack
+              min={1}
+              max={20}
+              step={0.1}
+              value={interestRate}
+              onChange={setInterestRate}
+            />
           </div>
 
           {/* Loan Term */}
@@ -145,16 +134,12 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
                 {loanTerm} năm
               </span>
             </div>
-            <div className='flex items-center gap-3'>
-              <Input
-                type='range'
-                min={5}
-                max={30}
-                value={loanTerm}
-                onChange={(e) => setLoanTerm(Number(e.target.value))}
-                className='flex-1 h-2 accent-primary'
-              />
-            </div>
+            <SliderTrack
+              min={5}
+              max={30}
+              value={loanTerm}
+              onChange={setLoanTerm}
+            />
           </div>
 
           {/* Results */}
@@ -197,5 +182,48 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
         </SheetFooter>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function SliderTrack({
+  min,
+  max,
+  step = 1,
+  value,
+  onChange,
+}: {
+  min: number;
+  max: number;
+  step?: number;
+  value: number;
+  onChange: (val: number) => void;
+}) {
+  const percent = ((value - min) / (max - min)) * 100;
+
+  return (
+    <div className='relative h-2 w-full'>
+      {/* Background track */}
+      <div className='absolute inset-0 rounded-full bg-primary/20' />
+      {/* Filled portion */}
+      <div
+        className='absolute left-0 top-0 h-full rounded-full bg-primary'
+        style={{ width: `${percent}%` }}
+      />
+      {/* Circular thumb */}
+      <div
+        className='absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-primary shadow-sm pointer-events-none'
+        style={{ left: `calc(${percent}% - 8px)` }}
+      />
+      {/* Invisible input for interaction */}
+      <input
+        type='range'
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
+      />
+    </div>
   );
 }

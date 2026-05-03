@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Receipt } from 'lucide-react';
 import type { CostBreakdown } from '@/shared/types';
 
 export interface MonthlyCostBreakdownProps {
@@ -11,7 +10,6 @@ export interface MonthlyCostBreakdownProps {
 
 export function MonthlyCostBreakdown({
   costBreakdown,
-  listingType = 'RENT',
 }: MonthlyCostBreakdownProps) {
   const t = useTranslations('MonthlyCostBreakdown');
 
@@ -28,58 +26,65 @@ export function MonthlyCostBreakdown({
     ...(costBreakdown.optionalFees || []),
   ];
 
+  const serviceFeesTotal =
+    (costBreakdown.requiredFeesSubtotal || 0) +
+    (costBreakdown.optionalFeesSubtotal || 0);
+
   return (
     <div className='bg-white border border-primary/10 rounded-2xl p-4 shadow-sm'>
       {/* Header */}
-      <div className='flex items-center gap-2 mb-4 pb-3 border-b border-border'>
-        <Receipt className='size-5 text-primary' />
-        <h3 className='text-sm font-semibold text-foreground'>
-          {listingType === 'RENT' ? t('rentPrice') : t('salePrice')}
-        </h3>
-      </div>
+      <h3 className='text-sm font-bold text-foreground'>
+        {t('serviceFees')}
+      </h3>
 
-      {/* Base Price */}
-      <div className='flex items-baseline gap-2 flex-wrap mb-4'>
-        <span className='text-2xl font-bold text-primary'>
-          {formatCurrency(costBreakdown.basePrice)}
-        </span>
-        <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
-        {listingType === 'RENT' && (
-          <span className='text-xs text-muted-foreground'>/ {t('perMonth')}</span>
-        )}
-      </div>
+      {/* Disclaimer under header */}
+      {costBreakdown.disclaimer && (
+        <p className='text-[10px] text-muted-foreground mb-5 italic leading-relaxed'>
+          {costBreakdown.disclaimer}
+        </p>
+      )}
 
-      {/* Service Fees */}
+      {/* Service Fees List */}
       {allFees.length > 0 && (
         <div className='space-y-2 mb-4'>
-          <p className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-            {t('serviceFees')}
-          </p>
           {allFees.map((fee, index) => (
             <div key={index} className='flex items-center justify-between text-sm'>
               <span className='text-foreground/70'>{fee.name}</span>
               <span className='font-medium text-foreground'>
-                {formatCurrency(fee.amount)} VNĐ
+                {formatCurrency(fee.amount)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
               </span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Divider + Total */}
-      <div className='border-t border-border pt-3 flex items-center justify-between'>
-        <span className='text-sm font-bold text-foreground'>{t('total')}</span>
-        <span className='text-lg font-bold text-primary'>
-          {formatCurrency(costBreakdown.totalCost)} VNĐ
-        </span>
+      {/* Divider + Summary */}
+      <div className='border-t border-border pt-3 space-y-2'>
+        {/* Total Service Fees */}
+        <div className='flex items-center justify-between text-sm'>
+          <span className='text-foreground/70'>{t('serviceFeesSubtotal')}</span>
+          <span className='font-medium text-foreground'>
+            {formatCurrency(serviceFeesTotal)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+          </span>
+        </div>
+
+        {/* Base Price */}
+        <div className='flex items-center justify-between text-sm'>
+          <span className='text-foreground/70'>{t('rentOrSalePrice')}</span>
+          <span className='font-medium text-foreground'>
+            {formatCurrency(costBreakdown.basePrice)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+          </span>
+        </div>
+
+        {/* Grand Total */}
+        <div className='flex items-center justify-between pt-2 border-t border-border'>
+          <span className='text-sm font-bold text-foreground'>{t('total')}</span>
+          <span className='text-lg font-bold text-primary'>
+            {formatCurrency(costBreakdown.totalCost)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+          </span>
+        </div>
       </div>
 
-      {/* Disclaimer */}
-      {costBreakdown.disclaimer && (
-        <p className='text-[10px] text-muted-foreground mt-3 italic leading-relaxed'>
-          {costBreakdown.disclaimer}
-        </p>
-      )}
     </div>
   );
 }

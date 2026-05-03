@@ -102,8 +102,8 @@ export function ReportDialog({
         </DialogHeader>
 
         <div className='p-6 space-y-5'>
-          <div className='space-y-3'>
-            <label className='text-sm font-medium text-foreground'>
+          <div>
+            <label className='block text-sm font-medium text-foreground mb-2'>
               {t('reasonLabel')}
               <span className='text-red-500 ml-0.5'>*</span>
             </label>
@@ -121,28 +121,27 @@ export function ReportDialog({
             </Select>
           </div>
 
-          <div className='space-y-3'>
-            <label className='text-sm font-medium text-foreground'>
+          <div>
+            <label className='block text-sm font-medium text-foreground mb-2'>
               {t('descriptionLabel')}
             </label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('descriptionPlaceholder')}
-              className='min-h-[100px] resize-none'
+              className='min-h-[100px] resize-none bg-slate-50'
             />
           </div>
         </div>
 
         <DialogFooter className='p-6 pt-4 border-t border-border gap-3'>
-          <Button variant='outline' size='sm' onClick={handleClose} className='flex-1'>
+          <Button variant='outline' onClick={handleClose} className='flex-1 h-10'>
             {t('cancel')}
           </Button>
           <Button
-            size='sm'
             onClick={handleSubmit}
             disabled={isSubmitting || !reason}
-            className='flex-1 bg-black text-white hover:bg-black/90'
+            className='flex-1 h-10 bg-black text-white hover:bg-black/90'
           >
             {isSubmitting ? t('submitting') : t('submit')}
           </Button>

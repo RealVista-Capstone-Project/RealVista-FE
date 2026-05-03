@@ -9,6 +9,10 @@
     "perMonth": "/month",
     "contactNow": "Contact Now",
     "report": "Report Listing",
-    "reportUser": "Report User"
+    "reportUser": "Report User",
+    "agent": "Agent",
+    "owner": "Owner",
+    "requestTour": "Request a tour",
+    "estimateLoan": "Estimate loan"
   }
 }

@@ -4,6 +4,8 @@
     "salePrice": "Sale Price",
     "perMonth": "month",
     "serviceFees": "Service Fees",
+    "serviceFeesSubtotal": "Total Service Fees",
+    "rentOrSalePrice": "Rent/Purchase Price",
     "total": "Total"
   }
 }

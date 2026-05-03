@@ -369,9 +369,9 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                   {listing.listing_type === 'SALE' && (
                     <button
                       onClick={() => setIsMortgageOpen(true)}
-                      className='mt-2 text-xs text-primary border border-primary/30 rounded-full px-2.5 py-1 hover:bg-primary/5 transition-colors'
+                      className='mt-2 text-xs text-foreground border border-border rounded-full px-2.5 py-1 hover:bg-muted transition-colors'
                     >
-                      Tính khoản vay ›
+                      {tScreen('estimateLoan')} ›
                     </button>
                   )}
                 </div>
@@ -386,7 +386,7 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                       className='w-10 h-10 rounded-full object-cover border border-primary/10'
                     />
                     <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
-                      {isListingPostedByAgent ? 'Agent' : 'Owner'}
+                      {isListingPostedByAgent ? tScreen('agent') : tScreen('owner')}
                     </span>
                     <p className='text-sm font-semibold text-foreground leading-tight'>
                       {listing.agent?.full_name || 'Agent'}
@@ -437,7 +437,7 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                   className='w-full h-11 bg-primary text-white hover:bg-primary/90 border-primary'
                   onClick={handleRequestTour}
                 >
-                  <span className='text-sm font-semibold'>Request a tour</span>
+                  <span className='text-sm font-semibold'>{tScreen('requestTour')}</span>
                 </RealVistaButton>
               </div>
 
