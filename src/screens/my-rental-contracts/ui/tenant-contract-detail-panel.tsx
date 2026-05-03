@@ -14,7 +14,7 @@ import {
 } from '@/features/rental-contract/ui/signed-document-card';
 import { Badge, Button, CardContent, Dialog, DialogContent } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { Download, ExternalLink, FileText, Loader2, Pen, X } from 'lucide-react';
+import { ExternalLink, FileText, Loader2, Pen, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   formatContractCurrency,
@@ -149,12 +149,6 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
                 </div>
                 {previewUrl && (
                   <div className='flex items-center gap-2'>
-                    <Button asChild size='sm' variant='outline' className='h-9 rounded-lg'>
-                      <a href={previewUrl} download target='_blank' rel='noreferrer'>
-                        <Download className='h-3.5 w-3.5' />
-                        Download
-                      </a>
-                    </Button>
                     <Button asChild size='sm' className='h-9 rounded-lg bg-primary text-white hover:bg-primary/90'>
                       <a href={previewUrl} target='_blank' rel='noreferrer'>
                         <ExternalLink className='h-3.5 w-3.5' />

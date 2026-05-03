@@ -52,8 +52,7 @@
       "sentSuccess": "Contract sent for signing",
       "moreActions": "More actions",
       "contractActions": "Contract actions",
-      "viewDetail": "View detail",
-      "download": "Download"
+      "viewDetail": "View detail"
     },
     "statusActionHints": {
       "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",

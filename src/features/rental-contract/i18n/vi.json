@@ -52,8 +52,7 @@
       "sentSuccess": "Đã gửi hợp đồng để ký",
       "moreActions": "Thêm thao tác",
       "contractActions": "Thao tác hợp đồng",
-      "viewDetail": "Xem chi tiết",
-      "download": "Tải xuống"
+      "viewDetail": "Xem chi tiết"
     },
     "statusActionHints": {
       "sendForSigning": "Tạo hoặc sử dụng lại phong bì DocuSign và gửi cho cả hai bên.",

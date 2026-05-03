@@ -7,7 +7,6 @@ import {
   Bell,
   CheckCircle2,
   Clock,
-  Download,
   ExternalLink,
   Loader2,
   MoreHorizontal,
@@ -155,20 +154,6 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
             <ExternalLink className='h-4 w-4' />
             {t('statusActions.viewDetail')}
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={!previewUrl} asChild={Boolean(previewUrl)}>
-            {previewUrl ? (
-              <a href={previewUrl} download target='_blank' rel='noreferrer'>
-                <Download className='h-4 w-4' />
-                {t('statusActions.download')}
-              </a>
-            ) : (
-              <span>
-                <Download className='h-4 w-4' />
-                {t('statusActions.download')}
-              </span>
-            )}
-          </DropdownMenuItem>
-
           {(canSendToLandlord || canSignNow || canSendNotification || canTerminate) && (
             <DropdownMenuSeparator />
           )}
@@ -285,19 +270,6 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
           >
             <ExternalLink className='h-4 w-4' />
             {t('statusActions.viewDetail')}
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled={!previewUrl} asChild={Boolean(previewUrl)}>
-            {previewUrl ? (
-              <a href={previewUrl} download target='_blank' rel='noreferrer'>
-                <Download className='h-4 w-4' />
-                {t('statusActions.download')}
-              </a>
-            ) : (
-              <span>
-                <Download className='h-4 w-4' />
-                {t('statusActions.download')}
-              </span>
-            )}
           </DropdownMenuItem>
           {canSignNow && (
             <>

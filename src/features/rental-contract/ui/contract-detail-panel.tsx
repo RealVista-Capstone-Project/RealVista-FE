@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import { ChevronDown, Download, ExternalLink, FileText, Loader2, Pen, X } from 'lucide-react';
+import { ChevronDown, ExternalLink, FileText, Loader2, Pen, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   formatContractCurrency,
@@ -254,12 +254,6 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                     </div>
                     {previewUrl && (
                       <div className='flex items-center gap-2'>
-                        <Button asChild size='sm' variant='outline' className='h-9 rounded-lg'>
-                          <a href={previewUrl} download target='_blank' rel='noreferrer'>
-                            <Download className='h-3.5 w-3.5' />
-                            Download
-                          </a>
-                        </Button>
                         <Button asChild size='sm' className='h-9 rounded-lg bg-primary text-white hover:bg-primary/90'>
                           <a href={previewUrl} target='_blank' rel='noreferrer'>
                             <ExternalLink className='h-3.5 w-3.5' />
