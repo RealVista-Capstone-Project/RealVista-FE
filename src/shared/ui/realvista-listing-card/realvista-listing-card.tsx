@@ -247,7 +247,7 @@ export function RealVistaListingCard({
       >
         {statusTag ? t(`status.${statusTag}`) : ''}
       </div>
-      <div className='absolute left-0 top-full h-1 w-1'>
+      <div className='absolute left-0 top-full h-[8px] w-[8px]'>
         <svg
           width='8'
           height='8'
@@ -285,7 +285,7 @@ export function RealVistaListingCard({
               HOT
             </span>
           </div>
-          <div className='absolute left-0 top-full h-1 w-1'>
+          <div className='absolute left-0 top-full h-[8px] w-[8px]'>
             <svg
               width='8'
               height='8'

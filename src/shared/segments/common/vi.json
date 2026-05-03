@@ -459,9 +459,9 @@
   },
   "Navigation": {
     "explore": "Khám phá",
-    "rent": "Thuê nhà",
-    "buy": "Mua nhà",
-    "sell": "Bán nhà",
+    "rent": "Thuê",
+    "buy": "Mua",
+    "sell": "Bán",
     "favorited": "Yêu thích",
     "subscribe": "Nâng cấp",
     "appointments": "Lịch hẹn",
