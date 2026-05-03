@@ -23,6 +23,8 @@ export const routeConfig: RouteConfig[] = [
   { path: '/about', accessLevel: 'public' },
   { path: '/login', accessLevel: 'public' },
   { path: '/register', accessLevel: 'public' },
+  { path: '/forgot-password', accessLevel: 'public' },
+  { path: '/reset-password', accessLevel: 'public' },
 
   // Protected routes (require authentication)
   { path: '/dashboard', accessLevel: 'protected', requiredRole: 'user' },

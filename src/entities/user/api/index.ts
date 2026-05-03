@@ -73,6 +73,18 @@ export const userApi = {
   }) => http.post<RegisterResponse>('/auth/register', data),
 
   /**
+   * Request password reset email (always succeeds from enumeration perspective)
+   */
+  forgotPassword: (data: { email: string }) =>
+    http.post<ApiResponse<null>>('/auth/forgot-password', data),
+
+  /**
+   * Set new password using token from email
+   */
+  resetPassword: (data: { token: string; new_password: string }) =>
+    http.post<ApiResponse<null>>('/auth/reset-password', data),
+
+  /**
    * Update user profile
    */
   update: (data: UpdateUserData) => http.put<User>('/user/profile', data),
