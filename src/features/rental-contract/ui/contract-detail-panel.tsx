@@ -141,7 +141,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   };
 
   const handleTerminate = async (
-    _nextStatus: RentalContractStatus.TERMINATED,
+    _nextStatus: RentalContractStatus,
     reason?: string
   ) => {
     try {

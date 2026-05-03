@@ -59,6 +59,18 @@ export function useAgentContractsQuery(
   });
 }
 
+export function useCancelLeaseMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ leaseId, reason }: { leaseId: string; reason?: string }) =>
+      rentalContractApi.cancelLease(leaseId, reason ? { reason } : undefined),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rentalContractKeys.all });
+    },
+  });
+}
+
 export function useUpdateRentalContractStatusMutation() {
   const queryClient = useQueryClient();
 

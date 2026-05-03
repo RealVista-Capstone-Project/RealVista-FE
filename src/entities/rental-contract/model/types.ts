@@ -6,6 +6,7 @@ export enum RentalContractStatus {
   EXPIRED = 'EXPIRED',
   TERMINATED = 'TERMINATED',
   REJECTED = 'REJECTED',
+  CANCELLED = 'CANCELLED',
 }
 
 export type SignedDocumentStatus =
@@ -101,6 +102,9 @@ export interface LeaseResponse {
   reject_reason: string | null;
   termination_reason: string | null;
   terminated_at: string | null;
+  cancel_reason?: string | null;
+  cancelled_at?: string | null;
+  cancelled_by?: string | null;
   verified_by: string | null;
   docusign_envelope_id: string | null;
   docusign_status: string | null;
@@ -131,6 +135,14 @@ export interface LeaseApiResponse {
   data: LeaseResponse;
   timestamp: string;
 }
+
+export type CancelLeaseRequest = {
+  reason?: string;
+};
+
+export type CancelLeaseResponse = LeaseApiResponse;
+
+export type ConfirmLandlordSignedResponse = LeaseApiResponse;
 
 /** Raw body sent to POST /api/v1/leases */
 export interface CreateLeaseRequest {
