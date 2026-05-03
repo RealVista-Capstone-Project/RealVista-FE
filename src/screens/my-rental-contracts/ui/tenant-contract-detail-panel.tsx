@@ -3,8 +3,15 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { RentalContractStatus, type RentalContract } from '@/entities/rental-contract';
-import { useGetRenterSigningUrlMutation } from '@/features/rental-contract/hooks/use-rental-contracts';
+import {
+  useGetRenterSigningUrlMutation,
+  useRentalContractDetailQuery,
+} from '@/features/rental-contract/hooks/use-rental-contracts';
 import { DocuSignSigningModal } from '@/features/rental-contract/ui/docusign-signing-modal';
+import {
+  isSignedDocumentRunning,
+  SignedDocumentCard,
+} from '@/features/rental-contract/ui/signed-document-card';
 import { Badge, Button, CardContent } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import { FileText, Loader2, Pen, X } from 'lucide-react';
@@ -25,6 +32,10 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
   const tContract = useTranslations('RentalContract');
   const locale = useLocale();
   const getRenterSigningUrlMutation = useGetRenterSigningUrlMutation();
+  const detailQuery = useRentalContractDetailQuery(contract.id, {
+    refetchInterval: isSignedDocumentRunning(contract.signedDocumentStatus) ? 5000 : false,
+  });
+  const liveContract = detailQuery.data ?? contract;
 
   const [signingUrl, setSigningUrl] = useState<string | null>(null);
 
@@ -38,7 +49,7 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=renter`
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=renter&viewerRole=tenant`
           : undefined;
       const data = await getRenterSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
@@ -200,6 +211,8 @@ export function TenantContractDetailPanel({ contract, onClose }: TenantContractD
                   ))}
                 </div>
               </div>
+
+              <SignedDocumentCard contract={liveContract} />
 
               {contract.terminationReason && (
                 <div className='rounded-xl border border-dashed border-primary/20 bg-primary/5 p-4'>

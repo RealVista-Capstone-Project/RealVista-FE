@@ -77,6 +77,15 @@
       "signingUnavailable": "Signing is temporarily unavailable. Please try again later.",
       "signingError": "Failed to load signing link. Please try again."
     },
+    "signedDocument": {
+      "title": "Final signed contract",
+      "notAvailable": "Final signed contract is not available yet.",
+      "preparing": "Final contract is being prepared...",
+      "completed": "Your final signed contract is ready.",
+      "viewButton": "View signed contract",
+      "failed": "Could not prepare signed contract. Please try again later.",
+      "missingUrl": "Signed contract is completed but the document link is unavailable."
+    },
     "common": {
       "cancel": "Cancel"
     }

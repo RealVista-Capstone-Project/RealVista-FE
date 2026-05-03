@@ -8,6 +8,7 @@ import {
 } from '@/entities/rental-contract';
 import {
   useGetLandlordSigningUrlMutation,
+  useRentalContractDetailQuery,
   useSendToLandlordMutation,
   useSendToRenterMutation,
   useUpdateRentalContractStatusMutation,
@@ -30,6 +31,7 @@ import {
 } from '../lib/utils';
 import { UpdateContractStatusDialog } from './update-contract-status-dialog';
 import { DocuSignSigningModal } from './docusign-signing-modal';
+import { isSignedDocumentRunning, SignedDocumentCard } from './signed-document-card';
 
 interface ContractDetailPanelProps {
   contract: RentalContract;
@@ -49,6 +51,10 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
   const sendToLandlordMutation = useSendToLandlordMutation();
   const sendToRenterMutation = useSendToRenterMutation();
   const getLandlordSigningUrlMutation = useGetLandlordSigningUrlMutation();
+  const detailQuery = useRentalContractDetailQuery(contract.id, {
+    refetchInterval: isSignedDocumentRunning(contract.signedDocumentStatus) ? 5000 : false,
+  });
+  const liveContract = detailQuery.data ?? contract;
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
@@ -72,7 +78,7 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=landlord`
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=landlord&viewerRole=owner`
           : undefined;
       const data = await getLandlordSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
@@ -292,6 +298,8 @@ export function ContractDetailPanel({ contract, onClose }: ContractDetailPanelPr
                   ))}
                 </div>
               </div>
+
+              <SignedDocumentCard contract={liveContract} />
 
               {contract.terminationReason && (
                 <div className='rounded-xl border border-dashed border-primary/20 bg-secondary p-4'>

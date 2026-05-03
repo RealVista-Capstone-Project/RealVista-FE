@@ -17,12 +17,15 @@ function ManageRentalContractContent() {
     isError,
     isLoading,
     searchQuery,
+    selectedContract,
     setSearchQuery,
+    setSelectedContract,
     setStatusFilter,
     statusFilter,
     setCurrentPage,
     totalElements,
     totalPages,
+    handleContractClick,
   } = useManageRentalContractContext();
 
   const t = useTranslations('ManageRentalContract');
@@ -62,6 +65,9 @@ function ManageRentalContractContent() {
       totalPages={totalPages}
       itemsPerPage={10}
       onPageChange={setCurrentPage}
+      selectedContract={selectedContract}
+      onContractClick={handleContractClick}
+      onContractDetailClose={() => setSelectedContract(null)}
     />
   );
 }

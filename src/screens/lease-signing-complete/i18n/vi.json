@@ -26,6 +26,10 @@
       "subtitle": "Chữ ký của bạn đã được ghi nhận. Hợp đồng đang được xem xét.",
       "infoTitle": "Bước tiếp theo",
       "infoBody": "Cả hai bên đã ký. Hợp đồng của bạn sẽ được xem xét và kích hoạt trong thời gian tới.",
+      "documentPreparing": "Cả hai bên đã ký. Hợp đồng cuối cùng đang được chuẩn bị...",
+      "documentReady": "Hợp đồng đã ký cuối cùng của bạn đã sẵn sàng. Đang chuyển bạn về danh sách hợp đồng...",
+      "documentFailed": "Không thể chuẩn bị hợp đồng đã ký. Vui lòng thử lại sau. Đang chuyển bạn về danh sách hợp đồng...",
+      "documentTimeout": "Hợp đồng cuối cùng vẫn đang được chuẩn bị. Bạn có thể kiểm tra lại trong danh sách hợp đồng.",
       "backButton": "Quay lại hợp đồng của tôi",
       "steps": {
         "landlordSigned": "Chủ nhà đã ký",

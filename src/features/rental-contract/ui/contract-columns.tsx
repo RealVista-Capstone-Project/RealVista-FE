@@ -71,7 +71,7 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=landlord`
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=landlord&viewerRole=owner`
           : undefined;
       const data = await getLandlordSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
@@ -233,7 +233,7 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=renter`
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=renter&viewerRole=tenant`
           : undefined;
       const data = await getRenterSigningUrlMutation.mutateAsync({
         leaseId: contract.id,

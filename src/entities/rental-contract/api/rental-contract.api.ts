@@ -53,6 +53,10 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     ownerSignedAt: lease.signed_by_landlord_at,
     tenantSignedAt: lease.signed_by_renter_at,
     terminationReason: lease.termination_reason ?? lease.reject_reason,
+    signedDocumentUrl: lease.signed_document_url ?? null,
+    signedDocumentStatus: lease.signed_document_status ?? null,
+    signedDocumentError: lease.signed_document_error ?? null,
+    signedDocumentProcessedAt: lease.signed_document_processed_at ?? null,
     paymentDueDay: null,
     specialClauses: null,
   };
@@ -102,6 +106,12 @@ export const rentalContractApi = {
         },
       },
     };
+  },
+
+  // ── Detail ───────────────────────────────────────────────────────────────
+  async getRentalContractById(leaseId: string): Promise<RentalContract> {
+    const result = await http.get<LeaseApiResponse>(`/leases/${leaseId}`);
+    return mapLeaseToContract(result.payload.data);
   },
 
   // ── Create draft ─────────────────────────────────────────────────────────

@@ -8,6 +8,13 @@ export enum RentalContractStatus {
   REJECTED = 'REJECTED',
 }
 
+export type SignedDocumentStatus =
+  | 'NOT_REQUESTED'
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'COMPLETED'
+  | 'FAILED';
+
 export interface RentalContractTenant {
   id: string;
   user_id?: string;
@@ -51,6 +58,10 @@ export interface RentalContract {
   ownerSignedAt?: string | null;
   tenantSignedAt?: string | null;
   terminationReason?: string | null;
+  signedDocumentUrl?: string | null;
+  signedDocumentStatus?: SignedDocumentStatus | null;
+  signedDocumentError?: string | null;
+  signedDocumentProcessedAt?: string | null;
 }
 
 export interface LeaseResponse {
@@ -85,6 +96,10 @@ export interface LeaseResponse {
   verified_by: string | null;
   docusign_envelope_id: string | null;
   docusign_status: string | null;
+  signed_document_url?: string | null;
+  signed_document_status?: SignedDocumentStatus | null;
+  signed_document_error?: string | null;
+  signed_document_processed_at?: string | null;
 }
 
 export interface LeasesApiResponse {

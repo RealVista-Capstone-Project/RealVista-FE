@@ -14,33 +14,48 @@ import {
 
 export function useRentalContractsQuery(
   params: GetRentalContractsParams,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean; refetchInterval?: number | false }
 ) {
   return useQuery({
     ...rentalContractQueries.list(params),
     enabled: options?.enabled ?? true,
+    refetchInterval: options?.refetchInterval,
+  });
+}
+
+export function useRentalContractDetailQuery(
+  leaseId: string | null,
+  options?: { enabled?: boolean; refetchInterval?: number | false }
+) {
+  return useQuery({
+    queryKey: rentalContractKeys.detailById(leaseId ?? ''),
+    queryFn: () => rentalContractApi.getRentalContractById(leaseId!),
+    enabled: Boolean(leaseId) && (options?.enabled ?? true),
+    refetchInterval: options?.refetchInterval,
   });
 }
 
 export function useRenterContractsQuery(
   params: GetRenterContractsParams,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean; refetchInterval?: number | false }
 ) {
   return useQuery({
     queryKey: [...rentalContractKeys.all, 'renter', params.renterId, params],
     queryFn: () => rentalContractApi.getRenterContracts(params),
     enabled: options?.enabled ?? true,
+    refetchInterval: options?.refetchInterval,
   });
 }
 
 export function useAgentContractsQuery(
   params: GetAgentContractsParams,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean; refetchInterval?: number | false }
 ) {
   return useQuery({
     queryKey: [...rentalContractKeys.all, 'agent', params.agentId, params],
     queryFn: () => rentalContractApi.getAgentContracts(params),
     enabled: options?.enabled ?? true,
+    refetchInterval: options?.refetchInterval,
   });
 }
 

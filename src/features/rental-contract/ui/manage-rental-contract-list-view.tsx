@@ -15,6 +15,7 @@ import { formatNumber } from '@/shared/lib/utils/format-currency';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 
 import { useContractColumns } from './contract-columns';
+import { ContractDetailPanel } from './contract-detail-panel';
 
 type StatusFilter = 'all' | RentalContractStatus;
 
@@ -31,6 +32,9 @@ interface ManageRentalContractListViewProps {
   totalPages: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  selectedContract: RentalContract | null;
+  onContractClick: (contract: RentalContract) => void;
+  onContractDetailClose: () => void;
 }
 
 export const ManageRentalContractListView = ({
@@ -46,6 +50,9 @@ export const ManageRentalContractListView = ({
   totalPages,
   itemsPerPage,
   onPageChange,
+  selectedContract,
+  onContractClick,
+  onContractDetailClose,
 }: ManageRentalContractListViewProps) => {
   const t = useTranslations('ManageRentalContract');
   const router = useRouter();
@@ -229,6 +236,8 @@ export const ManageRentalContractListView = ({
           columns={columns}
           data={contracts}
           isLoading={isLoading}
+          onRowClick={onContractClick}
+          isRowSelected={(contract) => selectedContract?.id === contract.id}
           pageCount={totalPages}
           pagination={pagination}
           onPaginationChange={(updater) => {
@@ -245,6 +254,10 @@ export const ManageRentalContractListView = ({
           }}
         />
       </div>
+
+      {selectedContract && (
+        <ContractDetailPanel contract={selectedContract} onClose={onContractDetailClose} />
+      )}
     </div>
   );
 };

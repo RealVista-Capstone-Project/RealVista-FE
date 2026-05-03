@@ -77,6 +77,15 @@
       "signingUnavailable": "Chức năng ký tạm thời không khả dụng. Vui lòng thử lại sau.",
       "signingError": "Không thể tải liên kết ký. Vui lòng thử lại."
     },
+    "signedDocument": {
+      "title": "Hợp đồng đã ký cuối cùng",
+      "notAvailable": "Hợp đồng đã ký cuối cùng chưa khả dụng.",
+      "preparing": "Hợp đồng cuối cùng đang được chuẩn bị...",
+      "completed": "Hợp đồng đã ký cuối cùng của bạn đã sẵn sàng.",
+      "viewButton": "Xem hợp đồng đã ký",
+      "failed": "Không thể chuẩn bị hợp đồng đã ký. Vui lòng thử lại sau.",
+      "missingUrl": "Hợp đồng đã ký đã hoàn tất nhưng liên kết tài liệu chưa khả dụng."
+    },
     "common": {
       "cancel": "Hủy"
     }

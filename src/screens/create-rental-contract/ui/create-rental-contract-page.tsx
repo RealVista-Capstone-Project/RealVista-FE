@@ -317,7 +317,11 @@ export function CreateRentalContractPage() {
   const sendForSigning = async () => {
     try {
       const contract = await createContractMutation.mutateAsync(buildPayload());
-      const signing = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id });
+      const returnUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=landlord&viewerRole=owner`
+          : undefined;
+      const signing = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id, returnUrl });
       toast.success(t('toast.sentSuccess'));
       // Agents create the contract on behalf of the owner — they have nothing to sign,
       // so skip the DocuSign modal and redirect straight to the contracts list.

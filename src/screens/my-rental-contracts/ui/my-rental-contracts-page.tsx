@@ -218,6 +218,8 @@ function MyRentalContractsContent() {
           columns={columns}
           data={contracts}
           isLoading={isLoading}
+          onRowClick={handleContractClick}
+          isRowSelected={(contract) => selectedContract?.id === contract.id}
           pageCount={totalPages}
           pagination={pagination}
           onPaginationChange={(updater) => {
@@ -234,6 +236,13 @@ function MyRentalContractsContent() {
           }}
         />
       </div>
+
+      {selectedContract && (
+        <TenantContractDetailPanel
+          contract={selectedContract}
+          onClose={() => setSelectedContract(null)}
+        />
+      )}
     </div>
   );
 }
