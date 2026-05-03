@@ -25,7 +25,7 @@ import {
   X,
   MapPin,
 } from 'lucide-react';
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
@@ -46,7 +46,9 @@ import { ChangePasswordForm } from '@/widgets/settings/ui/change-password-form';
 import type { UpdateMeData } from '@/entities/user/model/types';
 import type { UpdateSettingPreferenceData } from '@/entities/setting-preference/model/types';
 import type { CustomerProfile } from '@/entities/customer-profile/model/types';
-import { firebaseApp } from '@/shared/config/firebase';
+import { getFirebaseAuth } from '@/shared/config/firebase';
+import { isFirebasePhoneAuthHostnameCaptchaIssue } from '@/shared/lib/firebase-phone-auth-host';
+import { normalizeVietnamesePhoneForE164 } from '@/shared/lib/phone-vn';
 import { cn } from '@/shared/lib/utils';
 import {
   FLAT_PROPERTY_TYPES,
@@ -135,6 +137,8 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const phoneRecaptchaContainerId = isAgentDashboard
     ? 'agent-dashboard-phone-recaptcha'
     : 'settings-phone-recaptcha';
+  /** Stable wrapper; verifier mounts on a freshly created inner node each attempt (avoids grecaptcha "already rendered"). */
+  const phoneRecaptchaHostId = `${phoneRecaptchaContainerId}-host`;
 
   const rawTab = searchParams?.get('tab');
   const activeTab: Tab = rawTab === 'settings' ? 'settings' : 'profile';
@@ -185,12 +189,16 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const phoneCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const recaptchaVerifier = useRef<RecaptchaVerifier | null>(null);
   const confirmationResultRef = useRef<ConfirmationResult | null>(null);
+  /** E.164 Firebase used after successful send; avoids desync if user edits the input before OTP confirm */
+  const phoneE164PendingRef = useRef<string | null>(null);
+  /** Prevents overlapping signInWithPhoneNumber + duplicate invisible reCAPTCHA render */
+  const phoneOtpSendingRef = useRef(false);
 
   const queryClient = useQueryClient();
 
   const { data: session } = useSession();
   const isAuthenticated = !!(session as { user?: { accessToken?: string } })?.user?.accessToken;
-  const auth = getAuth(firebaseApp);
+  const auth = getFirebaseAuth();
 
   // Data queries
   const { data: meResponse, isLoading: meLoading } = useQuery({ ...userQueries.me(), enabled: isAuthenticated });
@@ -373,12 +381,14 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       if (expireRef.current) clearInterval(expireRef.current);
       if (phoneCountdownRef.current) clearInterval(phoneCountdownRef.current);
       if (recaptchaVerifier.current) {
-        recaptchaVerifier.current.clear();
+        try { recaptchaVerifier.current.clear(); } catch { }
         recaptchaVerifier.current = null;
       }
+      const host = typeof document !== 'undefined' ? document.getElementById(phoneRecaptchaHostId) : null;
+      host?.replaceChildren();
       if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
     };
-  }, [avatarPreviewUrl]);
+  }, [avatarPreviewUrl, phoneRecaptchaHostId]);
 
   // Stop timers and clear OTP state when user closes the verify-email panel.
   useEffect(() => {
@@ -651,27 +661,31 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     },
   });
 
-  // Clear stale RecaptchaVerifier when phone section is closed
-  useEffect(() => {
-    if (!isChangingPhone) {
-      if (recaptchaVerifier.current) {
-        try { recaptchaVerifier.current.clear(); } catch { }
-        recaptchaVerifier.current = null;
-      }
-      confirmationResultRef.current = null;
-    }
-  }, [isChangingPhone]);
+  const resetPhoneRecaptchaHost = useCallback(() => {
+    document.getElementById(phoneRecaptchaHostId)?.replaceChildren();
+  }, [phoneRecaptchaHostId]);
 
   const initRecaptcha = useCallback(() => {
-    // Reuse existing verifier if available — same pattern as agent-verification-modal
-    if (recaptchaVerifier.current) return recaptchaVerifier.current;
-    const container = document.getElementById(phoneRecaptchaContainerId);
-    if (!container) {
-      console.error('[Settings] Recaptcha container not found in DOM');
+    const host = document.getElementById(phoneRecaptchaHostId);
+    if (!host) {
+      console.error('[Settings] reCAPTCHA host not found in DOM');
       return null;
     }
+    if (recaptchaVerifier.current) {
+      try {
+        recaptchaVerifier.current.clear();
+      } catch {
+        /* widget already torn down */
+      }
+      recaptchaVerifier.current = null;
+    }
+    host.replaceChildren();
+
+    const mount = document.createElement('div');
+    host.appendChild(mount);
+
     try {
-      const verifier = new RecaptchaVerifier(auth, container, {
+      const verifier = new RecaptchaVerifier(auth, mount, {
         size: 'invisible',
         callback: () => {
           console.log('[Settings] Recaptcha solved');
@@ -682,16 +696,32 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
             try { recaptchaVerifier.current.clear(); } catch { }
             recaptchaVerifier.current = null;
           }
+          document.getElementById(phoneRecaptchaHostId)?.replaceChildren();
           setIsPhoneOtpSent(false);
+          phoneE164PendingRef.current = null;
         },
       });
       recaptchaVerifier.current = verifier;
       return verifier;
     } catch (err) {
       console.error('[Settings] Failed to initialize Recaptcha:', err);
+      host.replaceChildren();
       return null;
     }
-  }, [auth, phoneRecaptchaContainerId]);
+  }, [auth, phoneRecaptchaHostId]);
+
+  // Clear stale RecaptchaVerifier when phone section is closed
+  useEffect(() => {
+    if (!isChangingPhone) {
+      if (recaptchaVerifier.current) {
+        try { recaptchaVerifier.current.clear(); } catch { }
+        recaptchaVerifier.current = null;
+      }
+      document.getElementById(phoneRecaptchaHostId)?.replaceChildren();
+      confirmationResultRef.current = null;
+      phoneE164PendingRef.current = null;
+    }
+  }, [isChangingPhone, phoneRecaptchaHostId]);
 
   const startPhoneCountdown = useCallback((seconds: number) => {
     setPhoneOtpCountdown(seconds);
@@ -710,16 +740,31 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const handleSendPhoneOtp = useCallback(async () => {
     if (!newPhone.trim()) return;
     if (phoneOtpCountdown > 0) return;
-
-    const verifier = initRecaptcha();
-    if (!verifier) {
-      toast.error(t('myAccount.recaptchaError') ?? 'Không thể khởi tạo reCAPTCHA. Vui lòng thử lại.');
-      return;
-    }
+    if (phoneOtpSendingRef.current) return;
+    phoneOtpSendingRef.current = true;
 
     try {
-      const result = await signInWithPhoneNumber(auth, newPhone.trim(), verifier);
+      const verifier = initRecaptcha();
+      if (!verifier) {
+        toast.error(t('myAccount.recaptchaError') ?? 'Không thể khởi tạo reCAPTCHA. Vui lòng thử lại.');
+        return;
+      }
+
+      const e164 = normalizeVietnamesePhoneForE164(newPhone);
+      if (!e164) {
+        toast.error(t('myAccount.invalidPhoneNumber') ?? 'Invalid phone number. Please check the format.');
+        return;
+      }
+
+      const result = await signInWithPhoneNumber(auth, e164, verifier);
+      if (recaptchaVerifier.current) {
+        try { recaptchaVerifier.current.clear(); } catch { /* already cleared */ }
+        recaptchaVerifier.current = null;
+      }
+      resetPhoneRecaptchaHost();
+
       confirmationResultRef.current = result;
+      phoneE164PendingRef.current = e164;
       // @ts-expect-error – window fallback (same pattern as agent-verification-modal)
       window.phoneConfirmationResult = result;
       setIsPhoneOtpSent(true);
@@ -727,13 +772,15 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       toast.success(t('myAccount.phoneOtpSent') ?? 'Mã OTP đã được gửi đến số điện thoại của bạn!');
     } catch (err: unknown) {
       console.error('[Settings] Firebase phone auth error:', err);
-      // Clear spent verifier so next attempt gets a fresh one
       if (recaptchaVerifier.current) {
         try { recaptchaVerifier.current.clear(); } catch { }
         recaptchaVerifier.current = null;
       }
+      resetPhoneRecaptchaHost();
+      phoneE164PendingRef.current = null;
 
       const errObj = err as { code?: string; message?: string };
+      const errTextLower = `${(err instanceof Error ? err.message : '')} ${JSON.stringify(err)}`.toLowerCase();
       const errorStr = JSON.stringify(err);
       let errorMsg = t('toast.profileUpdateFailed');
 
@@ -745,16 +792,34 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
         errorMsg = t('myAccount.tooManyOtpAttempts') ?? 'Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.';
       } else if (errObj.code === 'auth/invalid-phone-number') {
         errorMsg = t('myAccount.invalidPhoneNumber') ?? 'Số điện thoại không hợp lệ. Vui lòng dùng định dạng +84xxxxxxxxx.';
-      } else if (
-        errObj.code === 'auth/captcha-check-failed' ||
-        errObj.code === 'auth/invalid-app-credential'
-      ) {
-        errorMsg = t('myAccount.recaptchaError') ?? 'Xác minh reCAPTCHA thất bại. Vui lòng thử lại.';
+      } else if (errObj.code === 'auth/invalid-app-credential') {
+        errorMsg =
+          typeof window !== 'undefined' && window.location.hostname === 'localhost'
+            ? t('myAccount.phoneAuthInvalidAppCredentialLocalhost')
+            : t('myAccount.phoneAuthInvalidAppCredential');
+      } else if (errObj.code === 'auth/captcha-check-failed') {
+        const host = typeof window !== 'undefined' ? window.location.hostname : '';
+        errorMsg =
+          isFirebasePhoneAuthHostnameCaptchaIssue(errObj.message, host)
+            ? t('myAccount.phoneAuthCaptchaHostname', { hostname: host })
+            : t('myAccount.recaptchaError');
+      } else if (errTextLower.includes('already been rendered')) {
+        errorMsg = t('myAccount.recaptchaRetry') ?? 'reCAPTCHA was reset — please tap Send OTP again.';
       }
 
       toast.error(errorMsg);
+    } finally {
+      phoneOtpSendingRef.current = false;
     }
-  }, [auth, initRecaptcha, newPhone, phoneOtpCountdown, startPhoneCountdown, t]);
+  }, [
+    auth,
+    initRecaptcha,
+    newPhone,
+    phoneOtpCountdown,
+    resetPhoneRecaptchaHost,
+    startPhoneCountdown,
+    t,
+  ]);
 
   const handleVerifyPhoneOtp = useCallback(async () => {
     if (phoneOtp.length !== 6) return;
@@ -767,8 +832,14 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
     }
     try {
       await confirmation.confirm(phoneOtp);
-      verifyPhoneMutation.mutate(newPhone.trim());
-      setProfileForm((f) => ({ ...f, phone: newPhone.trim() }));
+      const e164 =
+        phoneE164PendingRef.current ?? normalizeVietnamesePhoneForE164(newPhone);
+      if (!e164) {
+        toast.error(t('myAccount.invalidPhoneNumber') ?? 'Invalid phone number. Please check the format.');
+        return;
+      }
+      verifyPhoneMutation.mutate(e164);
+      setProfileForm((f) => ({ ...f, phone: e164 }));
     } catch {
       toast.error(t('toast.otpInvalid') ?? 'Mã OTP không hợp lệ');
     }
@@ -1323,8 +1394,8 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                             : (me?.is_phone_verified ? t('myAccount.changeAction') : t('myAccount.verifyAction'))}
                         </span>
                       </button>
-                      {/* Recaptcha container must always be in DOM for Firebase to work */}
-                      <div id={phoneRecaptchaContainerId} />
+                      {/* Host stays mounted; verifier targets a fresh child node each send (avoid grecaptcha double-render) */}
+                      <div id={phoneRecaptchaHostId} aria-hidden />
                       {isChangingPhone && (
                         <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
                           <div className='space-y-1.5'>

@@ -1522,7 +1522,8 @@ export default function PropertyDashboardPage() {
           }}
           propertyId={verifyTarget.property_id}
           ownerName={verifyTarget.owner_name || ''}
-          ownerPhone={verifyTarget.owner_phone || ''}
+          ownerPhoneRaw={verifyTarget.owner_phone || ''}
+          ownerPhoneDisplay={verifyTarget.owner_phone_display || verifyTarget.owner_phone || ''}
         />
       )}
     </div>
