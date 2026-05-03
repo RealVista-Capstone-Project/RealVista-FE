@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
+import { vi } from 'date-fns/locale';
 import { Calendar } from '@/shared/ui/calendar';
 import { MapPin, User, Clock } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
@@ -42,6 +43,7 @@ export function ScheduleCalendar() {
           selected={date}
           onSelect={setDate as (date: Date | undefined) => void}
           className='w-full'
+          locale={vi}
         />
       </div>
 
