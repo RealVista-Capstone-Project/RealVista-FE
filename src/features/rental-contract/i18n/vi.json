@@ -49,7 +49,11 @@
       "noAvailableAction": "Không có thao tác",
       "signNow": "Ký ngay",
       "sendToOwner": "Gửi chủ nhà ký",
-      "sentSuccess": "Đã gửi hợp đồng để ký"
+      "sentSuccess": "Đã gửi hợp đồng để ký",
+      "moreActions": "Thêm thao tác",
+      "contractActions": "Thao tác hợp đồng",
+      "viewDetail": "Xem chi tiết",
+      "download": "Tải xuống"
     },
     "statusActionHints": {
       "sendForSigning": "Tạo hoặc sử dụng lại phong bì DocuSign và gửi cho cả hai bên.",
@@ -84,7 +88,9 @@
       "completed": "Hợp đồng đã ký cuối cùng của bạn đã sẵn sàng.",
       "viewButton": "Xem hợp đồng đã ký",
       "failed": "Không thể chuẩn bị hợp đồng đã ký. Vui lòng thử lại sau.",
-      "missingUrl": "Hợp đồng đã ký đã hoàn tất nhưng liên kết tài liệu chưa khả dụng."
+      "missingUrl": "Hợp đồng đã ký đã hoàn tất nhưng liên kết tài liệu chưa khả dụng.",
+      "securePreview": "Bản xem trước bảo mật",
+      "iframeTitle": "Xem trước hợp đồng đã ký"
     },
     "common": {
       "cancel": "Hủy"

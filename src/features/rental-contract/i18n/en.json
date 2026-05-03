@@ -49,7 +49,11 @@
       "noAvailableAction": "No Available Action",
       "signNow": "Sign Now",
       "sendToOwner": "Send to Owner",
-      "sentSuccess": "Contract sent for signing"
+      "sentSuccess": "Contract sent for signing",
+      "moreActions": "More actions",
+      "contractActions": "Contract actions",
+      "viewDetail": "View detail",
+      "download": "Download"
     },
     "statusActionHints": {
       "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",
@@ -84,7 +88,9 @@
       "completed": "Your final signed contract is ready.",
       "viewButton": "View signed contract",
       "failed": "Could not prepare signed contract. Please try again later.",
-      "missingUrl": "Signed contract is completed but the document link is unavailable."
+      "missingUrl": "Signed contract is completed but the document link is unavailable.",
+      "securePreview": "Secure preview",
+      "iframeTitle": "Signed contract preview"
     },
     "common": {
       "cancel": "Cancel"

@@ -3,11 +3,30 @@
 import React, { useMemo, useState } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
-import { Bell, CheckCircle2, Clock, Loader2, Pen, Trophy, XCircle } from 'lucide-react';
+import {
+  Bell,
+  CheckCircle2,
+  Clock,
+  Download,
+  ExternalLink,
+  Loader2,
+  MoreHorizontal,
+  Pen,
+  XCircle,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { RentalContractStatus, type RentalContract } from '@/entities/rental-contract';
-import { Badge, Button } from '@/shared/ui';
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/ui';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { cn } from '@/shared/lib/utils';
 import { handleErrorApi } from '@/shared/lib/utils/handle-error';
@@ -27,6 +46,12 @@ import {
 import { UpdateContractStatusDialog } from './update-contract-status-dialog';
 import { DocuSignSigningModal } from './docusign-signing-modal';
 
+function getContractPreviewUrl(contract: RentalContract) {
+  return contract.signedDocumentStatus === 'COMPLETED' && contract.signedDocumentUrl
+    ? contract.signedDocumentUrl
+    : contract.contractDocumentUrl || null;
+}
+
 // ─── Actions cell ────────────────────────────────────────────────────────────
 
 function ContractActionsCell({ contract }: { contract: RentalContract }) {
@@ -38,10 +63,7 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
   const sendToLandlordMutation = useSendToLandlordMutation();
 
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
-  const [signingModal, setSigningModal] = useState<{
-    url: string;
-    role: 'landlord' | 'renter';
-  } | null>(null);
+  const previewUrl = getContractPreviewUrl(contract);
 
   // Show "Send to owner to sign" when DRAFT
   const canSendToLandlord = contract.status === RentalContractStatus.DRAFT;
@@ -108,83 +130,79 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
 
   return (
     <>
-      <div className='flex items-center gap-2'>
-        {/* Send to owner to sign — DRAFT */}
-        {canSendToLandlord && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
             type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-primary px-3 text-white hover:bg-primary/90 disabled:opacity-60'
-            onClick={handleSendToLandlord}
-            disabled={sendToLandlordMutation.isPending}
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 rounded-lg hover:bg-primary/5'
+            onClick={(event) => event.stopPropagation()}
+            aria-label={t('statusActions.moreActions')}
           >
-            {sendToLandlordMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
+            <MoreHorizontal className='h-4 w-4' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-56 rounded-xl border-primary/10 p-2 shadow-xl'>
+          <DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-muted-foreground'>
+            {t('statusActions.contractActions')}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            disabled={!previewUrl}
+            onSelect={() => previewUrl && window.open(previewUrl, '_blank', 'noopener,noreferrer')}
+          >
+            <ExternalLink className='h-4 w-4' />
+            {t('statusActions.viewDetail')}
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={!previewUrl} asChild={Boolean(previewUrl)}>
+            {previewUrl ? (
+              <a href={previewUrl} download target='_blank' rel='noreferrer'>
+                <Download className='h-4 w-4' />
+                {t('statusActions.download')}
+              </a>
             ) : (
-              <>
-                <Pen className='h-3.5 w-3.5' />
-                {t('statusActions.sendToOwner')}
-              </>
+              <span>
+                <Download className='h-4 w-4' />
+                {t('statusActions.download')}
+              </span>
             )}
-          </Button>
-        )}
+          </DropdownMenuItem>
 
-        {/* Sign Now — PENDING_LANDLORD */}
-        {canSignNow && (
-          <Button
-            type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
-            onClick={handleSignNow}
-            disabled={getLandlordSigningUrlMutation.isPending}
-          >
-            {getLandlordSigningUrlMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <Pen className='h-3.5 w-3.5' />
-                {t('statusActions.signNow')}
-              </>
-            )}
-          </Button>
-        )}
+          {(canSendToLandlord || canSignNow || canSendNotification || canTerminate) && (
+            <DropdownMenuSeparator />
+          )}
 
-        {/* Send Notification — PENDING_RENTER */}
-        {/* TODO: wire up send-notification-to-renter API once implemented */}
-        {canSendNotification && (
-          <Button
-            type='button'
-            size='sm'
-            variant='outline'
-            className='h-8 rounded-lg border-blue-200 px-3 text-blue-700 hover:bg-blue-50 hover:text-blue-800 disabled:opacity-60'
-            onClick={handleSendNotification}
-          >
-            <Bell className='h-3.5 w-3.5' />
-            {t('statusActions.sendToRenter')}
-          </Button>
-        )}
-
-        {/* Terminate — ACTIVE */}
-        {canTerminate && (
-          <Button
-            type='button'
-            size='sm'
-            variant='outline'
-            className='h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700 disabled:opacity-60'
-            onClick={() => setShowTerminateDialog(true)}
-            disabled={updateStatusMutation.isPending}
-          >
-            {updateStatusMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <XCircle className='h-3.5 w-3.5' />
-                {t('statusActions.terminate')}
-              </>
-            )}
-          </Button>
-        )}
-      </div>
+          {canSendToLandlord && (
+            <DropdownMenuItem onSelect={handleSendToLandlord} disabled={sendToLandlordMutation.isPending}>
+              {sendToLandlordMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.sendToOwner')}
+            </DropdownMenuItem>
+          )}
+          {canSignNow && (
+            <DropdownMenuItem onSelect={handleSignNow} disabled={getLandlordSigningUrlMutation.isPending}>
+              {getLandlordSigningUrlMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.signNow')}
+            </DropdownMenuItem>
+          )}
+          {canSendNotification && (
+            <DropdownMenuItem onSelect={handleSendNotification}>
+              <Bell className='h-4 w-4' />
+              {t('statusActions.sendToRenter')}
+            </DropdownMenuItem>
+          )}
+          {canTerminate && (
+            <DropdownMenuItem
+              variant='destructive'
+              onSelect={() => setShowTerminateDialog(true)}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <XCircle className='h-4 w-4' />}
+              {t('statusActions.terminate')}
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {showTerminateDialog && (
         <UpdateContractStatusDialog
@@ -198,15 +216,6 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
           isPending={updateStatusMutation.isPending}
         />
       )}
-
-      {signingModal && (
-        <DocuSignSigningModal
-          open={Boolean(signingModal)}
-          signingUrl={signingModal.url}
-          signerRole={signingModal.role}
-          onClose={() => setSigningModal(null)}
-        />
-      )}
     </>
   );
 }
@@ -218,6 +227,7 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
 
   const getRenterSigningUrlMutation = useGetRenterSigningUrlMutation();
 
+  const previewUrl = getContractPreviewUrl(contract);
   const [signingModal, setSigningModal] = useState<{
     url: string;
     role: 'landlord' | 'renter';
@@ -251,26 +261,55 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
 
   return (
     <>
-      <div className='flex items-center gap-2'>
-        {canSignNow && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
             type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
-            onClick={handleSignNow}
-            disabled={getRenterSigningUrlMutation.isPending}
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 rounded-lg hover:bg-primary/5'
+            onClick={(event) => event.stopPropagation()}
+            aria-label={t('statusActions.moreActions')}
           >
-            {getRenterSigningUrlMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <Pen className='h-3.5 w-3.5' />
-                {t('statusActions.signNow')}
-              </>
-            )}
+            <MoreHorizontal className='h-4 w-4' />
           </Button>
-        )}
-      </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-52 rounded-xl border-primary/10 p-2 shadow-xl'>
+          <DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-muted-foreground'>
+            {t('statusActions.contractActions')}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            disabled={!previewUrl}
+            onSelect={() => previewUrl && window.open(previewUrl, '_blank', 'noopener,noreferrer')}
+          >
+            <ExternalLink className='h-4 w-4' />
+            {t('statusActions.viewDetail')}
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={!previewUrl} asChild={Boolean(previewUrl)}>
+            {previewUrl ? (
+              <a href={previewUrl} download target='_blank' rel='noreferrer'>
+                <Download className='h-4 w-4' />
+                {t('statusActions.download')}
+              </a>
+            ) : (
+              <span>
+                <Download className='h-4 w-4' />
+                {t('statusActions.download')}
+              </span>
+            )}
+          </DropdownMenuItem>
+          {canSignNow && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={handleSignNow} disabled={getRenterSigningUrlMutation.isPending}>
+                {getRenterSigningUrlMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+                {t('statusActions.signNow')}
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {signingModal && (
         <DocuSignSigningModal

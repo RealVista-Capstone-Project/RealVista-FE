@@ -5,16 +5,11 @@ import {
   MyRentalContractsProvider,
   useMyRentalContractsContext,
 } from '../model/my-rental-contracts-context';
-import { TenantContractListItem } from './tenant-contract-list-item';
-import { TenantContractDetailPanel } from './tenant-contract-detail-panel';
-import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Spinner } from '@/shared/ui/spinner';
 import { cn } from '@/shared/lib/utils';
 import {
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   FileSearch,
   Filter,
   Search,
@@ -29,16 +24,13 @@ function MyRentalContractsContent() {
   const {
     contracts,
     currentPage,
-    handleContractClick,
     isError,
     isLoading,
     inputValue,
     itemsPerPage,
     searchQuery,
-    selectedContract,
     setCurrentPage,
     setSearchQuery,
-    setSelectedContract,
     setStatusFilter,
     statusFilter,
     totalElements,
@@ -218,8 +210,6 @@ function MyRentalContractsContent() {
           columns={columns}
           data={contracts}
           isLoading={isLoading}
-          onRowClick={handleContractClick}
-          isRowSelected={(contract) => selectedContract?.id === contract.id}
           pageCount={totalPages}
           pagination={pagination}
           onPaginationChange={(updater) => {
@@ -236,13 +226,6 @@ function MyRentalContractsContent() {
           }}
         />
       </div>
-
-      {selectedContract && (
-        <TenantContractDetailPanel
-          contract={selectedContract}
-          onClose={() => setSelectedContract(null)}
-        />
-      )}
     </div>
   );
 }
