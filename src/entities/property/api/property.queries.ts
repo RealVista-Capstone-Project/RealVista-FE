@@ -47,4 +47,18 @@ export const propertyQueries = {
       queryFn: () => propertyApi.getPropertyTypes(),
       staleTime: 10 * 60 * 1000,
     }),
+  adminList: (criteria?: {
+    keyword?: string;
+    status?: string;
+    userId?: string;
+    propertyTypeId?: string;
+    locationId?: string;
+    page?: number;
+    size?: number;
+  }) =>
+    queryOptions({
+      queryKey: ['properties', 'admin', criteria],
+      queryFn: () => propertyApi.adminListProperties(criteria),
+      placeholderData: (previousData) => previousData,
+    }),
 };

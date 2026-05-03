@@ -36,6 +36,9 @@ export interface UserProfile {
   status: string
   roles?: string[]
   avatar_url?: string
+  deleted?: boolean
+  is_deleted?: boolean
+  deleted_at?: string | null
   is_email_verified?: boolean
   is_phone_verified?: boolean
   email_verified_at?: string | null

@@ -25,9 +25,12 @@ export interface PropertySummaryResponse {
   thumbnail_url: string | null;
   amenities: PropertyAmenityItem[] | null;
   owner_name: string | null;
+  owner_email: string | null;
+  owner_avatar_url: string | null;
   owner_phone: string | null;
   has_3d: boolean;
   price_range: PropertyPriceRange | null;
+  allow_rent_listing_when_rented: boolean;
   sold_by_user_id: string | null;
   sold_by_name: string | null;
   sold_by_phone: string | null;
@@ -105,6 +108,7 @@ export interface PropertySearchResponse {
 export interface MyPropertiesSearchCriteria {
   keyword?: string;
   status?: string;
+  statuses?: string[];
   page: number;
   size: number;
 }
@@ -175,6 +179,7 @@ export interface PropertySummaryResponse {
   owner_phone: string | null;
   has_3d: boolean;
   price_range: PropertyPriceRange | null;
+  allow_rent_listing_when_rented: boolean;
   sold_by_user_id: string | null;
   sold_by_name: string | null;
   sold_by_phone: string | null;
@@ -238,6 +243,7 @@ export interface CreatePropertyRequest {
   attributes?: PropertyAttributeRequest[];
   media?: PropertyMediaRequest[];
   status?: string;
+  allow_rent_listing_when_rented?: boolean;
   price_range?: {
     rent?: { min?: number; max?: number };
     buy?: { min?: number; max?: number };
@@ -300,6 +306,7 @@ export interface PropertyDetailResponse {
   }>;
   active_listings?: ListingSummaryDTO[];
   price_range?: PropertyPriceRange | null;
+  allow_rent_listing_when_rented?: boolean;
 }
 
 export interface PropertySummary {
@@ -344,6 +351,7 @@ export interface ApiResponse<T> {
 export interface MyPropertiesSearchCriteria {
   keyword?: string;
   status?: string;
+  statuses?: string[];
   page: number;
   size: number;
 }

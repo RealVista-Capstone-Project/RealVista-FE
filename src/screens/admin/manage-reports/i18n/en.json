@@ -1,0 +1,95 @@
+{
+  "ManageReports": {
+    "title": "Manage Reports",
+    "description": "Review and handle policy violation reports from users.",
+    "header": {
+      "liveSystem": "Live System",
+      "incoming": "Incoming",
+      "unresolved": "Unresolved"
+    },
+    "stats": {
+      "total": "Total Reports",
+      "pending": "Pending",
+      "reviewing": "Reviewing",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "filters": {
+      "allReports": "All Reports",
+      "searchPlaceholder": "Search by name, ID or reason..."
+    },
+    "table": {
+      "columns": {
+        "reporter": "Reporter",
+        "target": "Target",
+        "reason": "Reason",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions",
+        "slaBreach": "{hours}H SLA Breach"
+      },
+      "pagination": {
+        "records": "Records {from} - {to} of {total}",
+        "page": "Page {page}",
+        "previous": "Previous",
+        "next": "Next"
+      }
+    },
+    "detail": {
+      "title": "Report Details",
+      "reporterInfo": "Reporter Information",
+      "reportedTarget": "Reported Target",
+      "evidence": "Evidence & Details",
+      "adminAction": "Admin Action",
+      "moderationActions": "Moderation Actions",
+      "reviewFullReport": "Review Full Report",
+      "resolution": "Resolution",
+      "resolutionAction": {
+        "title": "Resolution Action",
+        "banListing": "Remove Violating Listing",
+        "banListingDesc": "This listing will be permanently hidden from the system and will no longer be publicly accessible.",
+        "banUser": "Ban User Account",
+        "banUserDesc": "The account will be permanently suspended. The user will be unable to log in, and all their listings will be hidden.",
+        "confirmCheckbox": "I confirm that I have reviewed the evidence and take responsibility for this decision."
+      },
+      "highPriority": "High Priority",
+      "displayName": "Display Name",
+      "emailAddress": "Email Address",
+      "submittedOn": "Submitted On",
+      "primaryReason": "Primary Reason",
+      "noDescription": "No description provided by the reporter.",
+      "resolutionNotes": "Case Resolution Notes",
+      "characters": "{count} characters",
+      "finalized": "This case has been finalized and locked.",
+      "reasons": {
+        "SCAM": "Scam / Fraud",
+        "FAKE_INFO": "Fake Information",
+        "DUPLICATE": "Duplicate",
+        "HARASSMENT": "Harassment / Abusive",
+        "OTHER": "Other"
+      },
+      "actions": {
+        "startReview": "Start Review",
+        "resolve": "Resolve",
+        "dismiss": "Dismiss",
+        "suspendTarget": "Suspend Target",
+        "viewTarget": "View Target"
+      },
+      "confirm": {
+        "resolveTitle": "Resolve Report",
+        "resolveDesc": "Provide internal notes on how this report was resolved.",
+        "dismissTitle": "Dismiss Report",
+        "dismissDesc": "Provide a reason why this report is being dismissed.",
+        "placeholder": "Enter admin notes..."
+      }
+    },
+    "toast": {
+      "startedReview": "Started reviewing report",
+      "resolved": "Report resolved",
+      "dismissed": "Report dismissed"
+    },
+    "form": {
+      "cancel": "Close"
+    }
+  }
+}

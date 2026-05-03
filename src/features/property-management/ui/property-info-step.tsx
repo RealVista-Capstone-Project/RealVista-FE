@@ -69,6 +69,7 @@ import {
   SelectLabel,
 } from '@/shared/ui/select';
 import { Switch } from '@/shared/ui/switch';
+
 import {
   PROPERTY_TYPES,
 } from '@/shared/config/property-types';
@@ -825,6 +826,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

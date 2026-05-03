@@ -60,6 +60,9 @@
     "rejectedSuccess": "Đã từ chối yêu cầu tham quan",
     "genericError": "Có lỗi xảy ra. Vui lòng thử lại sau.",
     "publicSubtitle": "Xem và quản lý các yêu cầu tham quan của bạn",
-    "statusFilter": "Lọc trạng thái"
+    "statusFilter": "Lọc trạng thái",
+    "reasons": {
+      "REASON_PROPERTY_DELETED": "Bất động sản đã bị xóa."
+    }
   }
 }
