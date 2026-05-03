@@ -131,7 +131,7 @@ export function BookmarksFilter({
   return (
     <section className='pt-10 px-6 sm:px-6 lg:px-8'>
       <div className='mx-auto max-w-7xl'>
-        <div className='flex items-center justify-between gap-4 rounded-lg border border-primary/10 bg-primary/5 px-6 py-4 shadow-sm'>
+        <div className='flex items-center justify-between gap-4 rounded-lg border border-border bg-white px-6 py-4 shadow-sm'>
           {/* Left: Tabs + Dropdowns */}
           <div className='flex items-center gap-4'>
             {/* Listing Type Tabs */}
@@ -142,7 +142,7 @@ export function BookmarksFilter({
                 className={cn(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   listingType === 'buy'
-                    ? 'bg-primary text-white'
+                    ? 'bg-slate-100 text-foreground'
                     : 'text-muted-foreground hover:bg-primary/5'
                 )}
               >
@@ -154,7 +154,7 @@ export function BookmarksFilter({
                 className={cn(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   listingType === 'rent'
-                    ? 'bg-primary text-white'
+                    ? 'bg-slate-100 text-foreground'
                     : 'text-muted-foreground hover:bg-primary/5'
                 )}
               >

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, CreditCard, Menu, ChevronDown } from 'lucide-react';
+import { Heart, Menu, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { ROUTES } from '@/shared/config/routes';
@@ -69,22 +69,6 @@ export function PublicActions({
         </button>
       )}
 
-      {/* Subscribe — shown regardless of auth state, hidden on mobile */}
-      <button
-        type='button'
-        onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
-        className={cn(
-          'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
-          isRouteActive('/subscribe')
-            ? 'bg-primary text-white'
-            : 'bg-primary/5 text-foreground hover:bg-primary/10'
-        )}
-        aria-label={t('subscribe')}
-        title={t('subscribe')}
-      >
-        <CreditCard className='h-5 w-5' strokeWidth={2} />
-      </button>
-
       {/* Chat — logged-in only, hidden on mobile */}
       {isUserLoggedIn && (
         <div className='hidden lg:block'>
@@ -116,13 +100,13 @@ export function PublicActions({
         <div className='hidden lg:flex items-center gap-3'>
           <Link
             href={`/${locale}${ROUTES.login}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg border border-primary/20 bg-white font-medium text-primary transition-colors hover:bg-primary/5'
+            className='flex h-12 items-center justify-center px-6 rounded-lg border border-primary/20 bg-white text-[15px] font-medium text-primary transition-colors hover:bg-primary/5'
           >
             {t('login')}
           </Link>
           <Link
             href={`/${locale}${ROUTES.register}`}
-            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-white font-medium transition-colors hover:bg-primary/90'
+            className='flex h-12 items-center justify-center px-6 rounded-lg bg-primary text-[15px] font-medium text-white transition-colors hover:bg-primary/90'
           >
             {t('signup')}
           </Link>

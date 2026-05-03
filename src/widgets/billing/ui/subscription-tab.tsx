@@ -676,9 +676,11 @@ function StepLabel({
 
 function HorizontalWizardSteps({
   activeStep,
+  completed,
   onStepChange,
 }: {
   activeStep: WizardStep;
+  completed?: boolean;
   typeSummary?: React.ReactNode;
   planSummary?: React.ReactNode;
   paymentSummary?: React.ReactNode;
@@ -688,9 +690,9 @@ function HorizontalWizardSteps({
     <div className='mb-6 w-full overflow-x-auto pb-1'>
       <div className='flex min-w-0 items-start pl-1'>
         {WIZARD_STEP_DEFS.map((item, index) => {
-          const done = activeStep > item.num;
-          const active = activeStep === item.num;
-          const reachable = activeStep >= item.num;
+          const done = completed || activeStep > item.num;
+          const active = !completed && activeStep === item.num;
+          const reachable = completed || activeStep >= item.num;
           const isLast = index === WIZARD_STEP_DEFS.length - 1;
 
           return (
@@ -1713,10 +1715,12 @@ function Step4Content({
   transactionId,
   plan,
   onDone,
+  forceSuccess,
 }: {
   transactionId: string | null;
   plan: Plan | null;
   onDone: () => void;
+  forceSuccess?: boolean;
 }) {
   const queryClient = useQueryClient();
   const savedTxnRef = React.useRef<string | null>(null);
@@ -1751,8 +1755,8 @@ function Step4Content({
     });
   }, [statusData?.status, transactionId, saveTransactionMutation]);
 
-  const isPending = !statusData || statusData.status === 'PENDING' || isLoading;
-  const isSuccess = statusData?.status === 'COMPLETED';
+  const isPending = !forceSuccess && (!statusData || statusData.status === 'PENDING' || isLoading);
+  const isSuccess = forceSuccess || statusData?.status === 'COMPLETED';
 
   // Calculate date range
   const getDateRange = () => {
@@ -2011,12 +2015,35 @@ function PurchaseWizard() {
 
   const handlePaymentNext = () => setStep(4);
 
+  const [forceSuccess, setForceSuccess] = React.useState(false);
+
+  // Detect return from VNPay/PayOS payment success
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hasPaymentSuccess =
+      new URLSearchParams(window.location.search).get('payment') === 'success' ||
+      sessionStorage.getItem('billing-payment-success') === '1';
+    if (hasPaymentSuccess) {
+      setForceSuccess(true);
+      setStep(4);
+      sessionStorage.removeItem('billing-payment-success');
+      // Clean the param from URL without reload
+      const params = new URLSearchParams(window.location.search);
+      params.delete('payment');
+      const newUrl = params.toString()
+        ? `${window.location.pathname}?${params.toString()}`
+        : window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, []);
+
   const handleDone = () => {
     setStep(1);
     setSelectedType(null);
     setSelectedPlanId(null);
     setSelectedPayment(null);
     setCheckoutData(null);
+    setForceSuccess(false);
     localStorage.removeItem('subscription-wizard-state');
   };
 
@@ -2035,6 +2062,7 @@ function PurchaseWizard() {
 
       <HorizontalWizardSteps
         activeStep={step}
+        completed={forceSuccess}
         onStepChange={toggleStep}
       />
 
@@ -2080,6 +2108,7 @@ function PurchaseWizard() {
             transactionId={checkoutData?.checkout_order_id ?? null}
             plan={selectedPlan}
             onDone={handleDone}
+            forceSuccess={forceSuccess}
           />
         )}
       </div>

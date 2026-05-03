@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Flame, MapPin } from 'lucide-react';
+import { Heart, Flame, MapPin, Box } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { cn, formatVND } from '@/shared/lib/utils';
@@ -30,6 +30,7 @@ export interface HorizontalListingCardProps {
   boostTags?: string[];
   userType?: 'AGENT' | 'OWNER';
   listingType?: 'RENT' | 'SALE';
+  has3D?: boolean;
   onToggleFavorite?: (id: string) => void;
   onClick?: (id: string) => void;
   className?: string;
@@ -47,6 +48,7 @@ export function HorizontalListingCard({
   boostTags,
   userType,
   listingType = 'RENT',
+  has3D = false,
   onToggleFavorite,
   onClick,
   className,
@@ -166,6 +168,19 @@ export function HorizontalListingCard({
               </div>
             </div>
           )}
+
+          {/* 3D Badge - Bottom right corner */}
+          {has3D && !isUnavailable && (
+            <div
+              className='absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1.5 shadow-lg backdrop-blur-md border border-white/50'
+              title='3D Virtual Tour available'
+            >
+              <Box className='h-3.5 w-3.5 text-gray-700' strokeWidth={2} />
+              <span className='text-xs font-bold uppercase leading-3 tracking-[0.5px] text-gray-700'>
+                3D
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Content Section */}
@@ -181,7 +196,7 @@ export function HorizontalListingCard({
                 <span className='text-xl font-bold tracking-tight text-primary'>
                   {formatVND(price)}
                 </span>
-                <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
+                <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
                 {listingType === 'RENT' && (
                   <span className='text-sm text-muted-foreground'>
                     {t('perMonth')}
@@ -196,7 +211,7 @@ export function HorizontalListingCard({
                 size='icon'
               >
                 <Heart
-                  className={cn('h-4 w-4', isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground')}
+                  className={cn('h-4 w-4', isFavorite ? 'fill-red-500 text-red-500' : 'text-primary')}
                   strokeWidth={2}
                 />
               </Button>
@@ -230,8 +245,8 @@ export function HorizontalListingCard({
                     {attr.value_boolean === true
                       ? attr.attribute_name
                       : attr.value_text !== null && attr.value_text !== undefined
-                        ? attr.value_text
-                        : [attr.value_number, attr.attribute_name].filter(Boolean).join(' ')}
+                        ? `${attr.value_text}`
+                        : [attr.attribute_name, attr.value_number !== null && attr.value_number !== undefined ? Math.round(attr.value_number) : null].filter(Boolean).join(' ')}
                   </span>
                 </div>
               ))}

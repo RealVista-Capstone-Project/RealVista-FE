@@ -87,8 +87,8 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
   }
 
   return (
-    <div className='bg-white w-full pt-8 pb-12 sm:pt-10 sm:pb-16'>
-      <div className='max-w-[1200px] mx-auto px-10 sm:px-14'>
+    <div className='w-full pb-12 sm:pb-16'>
+      <div className='max-w-[1400px] mx-auto'>
         {/* Section Title */}
         <h2 className='text-foreground text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px] mb-6 sm:mb-8'>
           {t('similarListings')}
@@ -99,7 +99,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
           <Carousel opts={{ align: 'start' }}>
             <CarouselContent>
               {[1, 2, 3].map((i) => (
-                <CarouselItem key={i} className='basis-full sm:basis-1/2 lg:basis-1/3'>
+                <CarouselItem key={i} className='basis-full sm:basis-1/2 lg:basis-1/4'>
                   <div className='rounded-lg border-[1.5px] border-primary/10 bg-background p-6 h-full'>
                     <Skeleton className='aspect-[16/10] w-full rounded-t-lg mb-6' />
                     <Skeleton className='h-8 w-3/4 mb-3' />
@@ -130,7 +130,7 @@ export function SimilarListings({ propertyId, onPropertyClick }: SimilarListings
           <Carousel opts={{ align: 'start' }} className='relative'>
             <CarouselContent>
               {listings.map((property) => (
-                <CarouselItem key={property.id} className='basis-full sm:basis-1/2 lg:basis-1/3'>
+                <CarouselItem key={property.id} className='basis-full sm:basis-1/2 lg:basis-1/4'>
                   <RealVistaListingCard
                     {...property}
                     compact

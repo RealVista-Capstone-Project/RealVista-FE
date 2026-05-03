@@ -5,27 +5,26 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { bookmarkApi } from '@/entities/bookmark';
-import { ChevronLeft } from 'lucide-react';
-import { RealVistaButton } from '@/shared/ui/realvista-button/realvista-button';
+import { List, Search, MapPin, X, SlidersHorizontal, ChevronDown, Filter } from 'lucide-react';
 import { useAuthSession } from '@/features/auth/model';
 import { LoginRequiredModal } from '@/shared/ui/login-required-modal/login-required-modal';
 import { PropertyMap, type PropertyLocation } from '@/shared/ui/property-map';
-import { PropertySearchHeader } from '@/shared/ui/property-search-header';
-import { PropertyFilters, type ViewMode } from '@/shared/ui/property-filters';
+import type { ViewMode } from '@/shared/ui/property-filters';
 import {
   propertyQueries,
   type PropertyListingDto,
   type PropertySearchRequest,
 } from '@/entities/property';
 import { formatVND } from '@/shared/lib/utils/format-currency';
-import {
-  PropertyFiltersModal,
-  type PropertyFilters as PropertyFilterValues,
-  type RentalPeriod,
-} from '@/shared/ui/property-filters-modal';
+import { cn } from '@/shared/lib/utils';
+import { PropertyFiltersModal, type PropertyFilters as PropertyFilterValues, type RentalPeriod } from '@/shared/ui/property-filters-modal';
 import { HCM_CITY_CENTER } from '@/shared/constants';
 import { FLAT_PROPERTY_TYPES } from '@/shared/config/property-types';
 import { SearchListingResults } from './search-listing-results';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
+import { Label } from '@/shared/ui/label/label';
+import { Button } from '@/shared/ui/button/button';
 
 // Default filter values
 const DEFAULT_FILTERS: PropertyFilterValues = {
@@ -33,6 +32,13 @@ const DEFAULT_FILTERS: PropertyFilterValues = {
   rentalPeriod: 'any',
   attributes: {},
 };
+
+const sortOptions = [
+  { label: 'Mới nhất', value: 'NEWEST' },
+  { label: 'Giá thấp đến cao', value: 'PRICE_ASC' },
+  { label: 'Giá cao đến thấp', value: 'PRICE_DESC' },
+  { label: 'Ưu tiên', value: 'PRIORITY' },
+];
 
 export interface PropertyMapBasedSearchPageProps {
   initialListingType?: 'RENT' | 'SALE';
@@ -97,7 +103,7 @@ export function PropertyMapBasedSearchPage({
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { data: session } = useAuthSession();
   const queryClient = useQueryClient();
-  const pageSize = 10;
+  const pageSize = 12;
 
   const { data: searchResponse, isLoading } = useQuery({
     ...propertyQueries.search(
@@ -232,10 +238,13 @@ export function PropertyMapBasedSearchPage({
     setSelectedPropertyIds(ids);
   }, []);
 
+  const currentSortLabel = sortOptions.find((opt) => opt.value === sortBy)?.label || 'Mới nhất';
+  const isPriceActive = filters.priceRange.min > 0 || filters.priceRange.max < 20000000000;
+
   return (
     <div className='flex h-full w-full'>
       {/* Left Side - Map */}
-      <div className='relative hidden lg:block lg:w-1/2 h-full'>
+      <div className='relative hidden lg:block lg:w-[40%] h-full'>
         <PropertyMap
           properties={propertyLocations}
           selectedPropertyIds={selectedPropertyIds}
@@ -259,99 +268,204 @@ export function PropertyMapBasedSearchPage({
       </div>
 
       {/* Right Side - Property Listings */}
-      <div className='w-full lg:w-1/2 overflow-y-auto bg-primary/5 h-full'>
-        <div className='mx-auto max-w-4xl p-6'>
-          <PropertySearchHeader
-            title={initialListingType === 'SALE' ? t('searchTitleSale') : t('searchTitleRent')}
-            propertyCount={totalElements}
-            propertyCountLabel={
-              initialListingType === 'SALE'
-                ? t('propertiesAvailableSale')
-                : t('propertiesAvailableRent')
-            }
-            searchPlaceholder='Tìm theo phố, phường, quận hoặc tên dự án...'
-            searchValue={searchValue}
-            onSearchChange={(val) => {
-              setSearchValue(val);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setCurrentPage(1);
-              }
-            }}
-            onMoreFilters={() => setFiltersModalOpen(true)}
-            moreFiltersLabel={t('moreFilters')}
-            action={
-              onBack && (
-                <RealVistaButton
-                  type='button'
-                  onClick={onBack}
-                  variant='secondary'
-                  className='w-full justify-between gap-3 border-[1.5px] bg-white px-4 py-3 h-auto text-base font-medium text-secondary opacity-70 hover:bg-white hover:opacity-100 sm:w-auto cursor-pointer'
-                >
-                  <span>Quay lại</span>
-                  <div className='relative flex h-5 w-5 items-center justify-center'>
-                    {/* Background circle */}
-                    <div className='absolute inset-0 rounded-full bg-primary/5'></div>
-                    {/* Icon */}
-                    <ChevronLeft className='relative h-3 w-3 text-primary' strokeWidth={2.5} />
-                  </div>
-                </RealVistaButton>
-              )
-            }
-          />
+      <div className='w-full lg:w-[60%] bg-primary/5 h-full flex flex-col'>
+        {/* Fixed Header Section - không scroll */}
+        <div className='flex-shrink-0 px-4 pt-6 pb-4'>
+          <div className='mx-auto max-w-6xl'>
+            {/* Title and Property Count - Outside wrapper */}
+            <div className='mb-4'>
+              <div className='flex flex-col gap-1'>
+                <div className='flex items-center gap-3'>
+                  <h1 className='text-xl font-bold tracking-tight text-foreground sm:text-2xl'>
+                    {initialListingType === 'SALE' ? t('searchTitleSale') : t('searchTitleRent')}
+                  </h1>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <div className='h-2 w-2 rounded-full bg-primary' />
+                  <p className='text-sm font-medium text-muted-foreground'>
+                    <span className='font-bold text-primary'>{totalElements}</span> {
+                      initialListingType === 'SALE'
+                        ? t('propertiesAvailableSale')
+                        : t('propertiesAvailableRent')
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          {/* Filters Container */}
-          <div className='mt-6 sticky top-0 z-10 bg-primary/5 backdrop-blur-md py-2 px-1'>
-            <PropertyFilters
-              priceRange={{
-                min: filters.priceRange.min,
-                max: filters.priceRange.max,
-              }}
-              onPriceChange={(min, max) => {
-                setFilters({
-                  ...filters,
-                  priceRange: { min, max },
-                });
-                setCurrentPage(1);
-              }}
-              priceLabel={
-                filters.priceRange.min > 0 || filters.priceRange.max < 20000000000
-                  ? `${formatVND(filters.priceRange.min)} - ${formatVND(filters.priceRange.max)}`
-                  : t('priceRange')
-              }
-              typeLabel={
-                propertyType
-                  ? FLAT_PROPERTY_TYPES.find((t) => t.code === propertyType)?.label || propertyType
-                  : 'Loại bất động sản'
-              }
-              sortBy={sortBy}
-              onSortChange={(val) => {
-                setSortBy(val);
-                setCurrentPage(1);
-              }}
-              onMoreFilters={() => setFiltersModalOpen(true)}
+            {/* Search & Filters Section - White Card Wrapper (Landing Page Style) */}
+            <div className='rounded-xl bg-white shadow-lg sm:p-3 sm:pb-1'>
+              {/* ROW 1 — Location + Price + Sort + Back Button */}
+              <div className='flex items-center gap-3 mb-3'>
+                {/* Location Input */}
+                <div className='relative flex-1 min-w-0 rounded-full bg-slate-100'>
+                  <MapPin className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+                  <input
+                    type='text'
+                    placeholder='Tìm kiếm với địa chỉ cụ thể'
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setCurrentPage(1);
+                      }
+                    }}
+                    className='h-10 w-full bg-transparent pl-9 pr-8 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none rounded-full'
+                    maxLength={100}
+                  />
+                  {searchValue && (
+                    <button
+                      type='button'
+                      onClick={() => setSearchValue('')}
+                      className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
+                    >
+                      <X className='h-4 w-4' />
+                    </button>
+                  )}
+                </div>
+
+                {/* Price Filter Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type='button'
+                      className={cn(
+                        'flex h-9 items-center gap-2 rounded-full border-[1.5px] px-4 text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0',
+                        isPriceActive
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-primary/20 bg-white text-foreground hover:border-primary/50'
+                      )}
+                    >
+                      <span>
+                        {isPriceActive
+                          ? `${formatVND(filters.priceRange.min)} - ${formatVND(filters.priceRange.max)}`
+                          : t('priceRange')}
+                      </span>
+                      <ChevronDown className={cn('h-4 w-4 transition-transform', isPriceActive ? 'text-primary' : 'text-muted-foreground')} />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-[420px] p-6' align='start'>
+                    <div className='space-y-6'>
+                      <h4 className='text-lg font-bold text-foreground'>Khoảng giá</h4>
+                      <div className='flex flex-col gap-5'>
+                        <div className='space-y-5'>
+                          <div className='space-y-2'>
+                            <Label className='text-sm font-semibold text-muted-foreground'>Giá tối thiểu (VNĐ)</Label>
+                            <VndAmountInput
+                              value={filters.priceRange.min}
+                              onChange={(val) => setFilters({ ...filters, priceRange: { ...filters.priceRange, min: Math.max(0, Math.trunc(val || 0)) } })}
+                              placeholder='0'
+                              hidePreview
+                              inputClassName='h-12 text-lg font-medium'
+                            />
+                          </div>
+                          <div className='space-y-2'>
+                            <Label className='text-sm font-semibold text-muted-foreground'>Giá tối đa (VNĐ)</Label>
+                            <VndAmountInput
+                              value={filters.priceRange.max}
+                              onChange={(val) => setFilters({ ...filters, priceRange: { ...filters.priceRange, max: Math.max(0, Math.trunc(val || 0)) } })}
+                              placeholder='Bất kỳ'
+                              hidePreview
+                              inputClassName='h-12 text-lg font-medium'
+                            />
+                          </div>
+                        </div>
+                        <div className='flex justify-end gap-2 border-t border-primary/20 pt-4'>
+                          <Button variant='link' size='sm' className='text-sm font-bold text-primary h-auto p-0' onClick={() => setFilters({ ...filters, priceRange: { min: 0, max: 20000000000 } })}>
+                            Xóa tất cả
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Sort Filter Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type='button'
+                      className={cn(
+                        'flex h-9 items-center gap-2 rounded-full border-[1.5px] px-4 text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0',
+                        sortBy !== 'NEWEST'
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-primary/20 bg-white text-foreground hover:border-primary/50'
+                      )}
+                    >
+                      <span>{currentSortLabel}</span>
+                      <ChevronDown className={cn('h-4 w-4 transition-transform', sortBy !== 'NEWEST' ? 'text-primary' : 'text-muted-foreground')} />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-56 p-2' align='start'>
+                    <div className='flex flex-col'>
+                      {sortOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => {
+                            setSortBy(opt.value);
+                            setCurrentPage(1);
+                          }}
+                          className={cn(
+                            'flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                            sortBy === opt.value
+                              ? 'bg-primary/5 text-primary'
+                              : 'text-foreground hover:bg-muted'
+                          )}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Filter Icon - Opens PropertyFiltersModal */}
+                <button
+                  type='button'
+                  onClick={() => setFiltersModalOpen(true)}
+                  className='flex h-9 w-9 items-center justify-center rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors cursor-pointer shrink-0'
+                  title={t('moreFilters')}
+                >
+                  <Filter className='h-4 w-4' />
+                </button>
+
+                {/* Back Button */}
+                {onBack && (
+                  <button
+                    type='button'
+                    onClick={onBack}
+                    className='flex h-9 w-9 items-center justify-center rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors cursor-pointer shrink-0'
+                    title='List view'
+                  >
+                    <List className='h-4 w-4' />
+                  </button>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable Listings Section */}
+        <div className='flex-1 overflow-y-auto px-4 pb-4'>
+          <div className='mx-auto max-w-6xl'>
+            <SearchListingResults
+              properties={properties}
+              isLoading={isLoading}
               viewMode={viewMode}
-              onViewModeChange={setViewMode}
+              selectedPropertyIds={selectedPropertyIds}
+              favoriteOverrides={favoriteOverrides}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              locale={locale}
+              listingType={initialListingType}
+              onHoverProperty={handleHoverProperty}
+              onSelectProperty={handleSelectProperty}
+              onToggleFavorite={handleToggleFavorite}
+              onPageChange={handlePageChange}
+              onResetFilters={handleResetFilters}
             />
           </div>
-
-          <SearchListingResults
-            properties={properties}
-            isLoading={isLoading}
-            viewMode={viewMode}
-            selectedPropertyIds={selectedPropertyIds}
-            favoriteOverrides={favoriteOverrides}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            locale={locale}
-            listingType={initialListingType}
-            onHoverProperty={handleHoverProperty}
-            onSelectProperty={handleSelectProperty}
-            onToggleFavorite={handleToggleFavorite}
-            onPageChange={handlePageChange}
-            onResetFilters={handleResetFilters}
-          />
         </div>
 
         {/* Filters Modal */}

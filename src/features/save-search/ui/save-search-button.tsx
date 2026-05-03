@@ -126,7 +126,7 @@ export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearch
         disabled={isPending}
         className={
           fullWidth
-            ? 'w-full h-9 border-transparent bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 text-sm'
+            ? 'w-full h-9 border-primary text-primary hover:bg-primary/5 text-sm'
             : 'h-9 w-9 shrink-0 border-primary text-primary hover:bg-primary/5'
         }
         title={t('buttonLabel')}

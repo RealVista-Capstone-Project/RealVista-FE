@@ -55,6 +55,7 @@ export function BillingReturnQueryEffects() {
 
     switch (payment) {
       case 'success':
+        sessionStorage.setItem('billing-payment-success', '1');
         toast.success('Thanh toán thành công! Gói dịch vụ đã được kích hoạt.');
         void Promise.all([
           queryClient.resetQueries({ queryKey: billingKeys.all }),

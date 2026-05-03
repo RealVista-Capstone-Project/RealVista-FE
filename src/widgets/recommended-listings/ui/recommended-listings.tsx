@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw, Sparkles } from 'lucide-react';
+import { AlertCircle, RefreshCw, Sparkles } from 'lucide-react';
 import { RealVistaListingCard } from '@/shared/ui/realvista-listing-card/realvista-listing-card';
 import { Skeleton } from '@/shared/ui/skeleton/skeleton';
 import { Button } from '@/shared/ui/button/button';
@@ -14,7 +14,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  useCarousel,
 } from '@/shared/ui/carousel';
 import { recommendationQueries, recommendationApi, recommendationKeys } from '@/entities/recommendation';
 import type { RecommendedListingDTO } from '@/entities/recommendation';
@@ -51,36 +50,6 @@ interface RecommendedListingsProps {
   sourcePage: 'buy' | 'rent';
 }
 
-/**
- * Carousel navigation arrows placed in the section header.
- * Must be rendered inside a <Carousel> provider so useCarousel() works.
- */
-function CarouselNavButtons() {
-  const { scrollPrev, scrollNext, canScrollPrev, canScrollNext } = useCarousel();
-
-  return (
-    <>
-      <button
-        type='button'
-        onClick={scrollPrev}
-        disabled={!canScrollPrev}
-        className='hidden sm:flex items-center justify-center h-8 w-8 rounded-full border border-primary/30 bg-background text-primary transition-all duration-200 hover:bg-primary/10 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100'
-        aria-label='Previous recommendations'
-      >
-        <ChevronLeft className='h-4 w-4' />
-      </button>
-      <button
-        type='button'
-        onClick={scrollNext}
-        disabled={!canScrollNext}
-        className='hidden sm:flex items-center justify-center h-8 w-8 rounded-full border border-primary/30 bg-background text-primary transition-all duration-200 hover:bg-primary/10 hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100'
-        aria-label='Next recommendations'
-      >
-        <ChevronRight className='h-4 w-4' />
-      </button>
-    </>
-  );
-}
 
 /**
  * Recommended Listings Widget
@@ -217,17 +186,17 @@ export function RecommendedListings({ sourcePage }: RecommendedListingsProps) {
               </h2>
             </div>
             <div className='flex items-center gap-2'>
-              <CarouselNavButtons />
               <Button
                 variant='outline'
                 size='sm'
                 onClick={() => refreshMutation.mutate()}
                 disabled={refreshMutation.isPending}
-                className='flex items-center gap-2 text-primary border-primary hover:bg-primary/10'
+                className='flex items-center gap-2 text-primary border-primary/30 hover:border-primary hover:bg-primary/5 rounded-full px-4 transition-all duration-200'
               >
                 <RefreshCw
                   className={`h-4 w-4 ${refreshMutation.isPending ? 'animate-spin' : ''}`}
                 />
+                <span className='text-sm font-medium'>Làm mới</span>
               </Button>
             </div>
           </div>

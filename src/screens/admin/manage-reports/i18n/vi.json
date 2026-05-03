@@ -68,6 +68,12 @@
         "FAKE_INFO": "Thông tin giả mạo",
         "DUPLICATE": "Trùng lặp",
         "HARASSMENT": "Quấy rối / Lăng mạ",
+        "SPAM": "Spam",
+        "MISLEADING": "Nội dung gây hiểu lầm",
+        "INAPPROPRIATE": "Nội dung không phù hợp",
+        "WRONG_INFO": "Thông tin sai",
+        "FAKE_PROFILE": "Hồ sơ giả mạo",
+        "VIOLATES_TERMS": "Vi phạm điều khoản dịch vụ",
         "OTHER": "Lý do khác"
       },
       "actions": {

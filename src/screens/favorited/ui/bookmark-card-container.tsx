@@ -48,7 +48,7 @@ export function BookmarkCardContainer({
   };
 
   return (
-    <div className='relative overflow-hidden rounded-xl shadow-sm ring-1 ring-neutral-200/70 transition-shadow hover:shadow-md'>
+    <div className='relative rounded-xl shadow-sm ring-1 ring-neutral-200/70 transition-shadow hover:shadow-md'>
       {/* Card */}
       <RealVistaListingCard
         id={id}

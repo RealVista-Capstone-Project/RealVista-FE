@@ -119,8 +119,11 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
     (a, b) => new Date(a.changed_at).getTime() - new Date(b.changed_at).getTime()
   );
 
+  // Only show last 5 entries to prevent right-side overload
+  const recentHistory = sortedHistory.slice(-5);
+
   // Transform data for the chart with 3 price lines
-  const chartData = sortedHistory.map((entry) => ({
+  const chartData = recentHistory.map((entry) => ({
     date: formatDate(entry.changed_at, locale),
     fullDate: formatFullDate(entry.changed_at, locale),
     price: entry.price,
@@ -139,68 +142,58 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
   const isIncrease = latestEntry?.change_type === 'INCREASED';
   const priceChangePercent = latestEntry?.price_change_percent ?? 0;
 
-  // Calculate min and max for Y axis (considering all 3 lines)
-  const allPrices = sortedHistory.flatMap((e) => [e.price, e.min_price, e.max_price]);
+  // Calculate min and max for Y axis (considering only the last 5 entries shown)
+  const allPrices = recentHistory.flatMap((e) => [e.price, e.min_price, e.max_price]);
   const minPriceValue = Math.min(...allPrices);
   const maxPriceValue = Math.max(...allPrices);
   const priceRange = maxPriceValue - minPriceValue;
-  const yMin = Math.max(0, minPriceValue - priceRange * 0.1);
-  const yMax = maxPriceValue + priceRange * 0.1;
+  const yMin = Math.max(0, minPriceValue - priceRange * 0.02);
+  const yMax = maxPriceValue + priceRange * 0.02;
 
-  if (chartData.length === 0) {
+  if (chartData.length <= 1) {
     return null;
   }
 
   return (
-    <div className='flex flex-col gap-6'>
-      <div className='flex flex-col gap-2'>
-        <h2 className='text-foreground text-[24px] font-bold leading-[1.5] tracking-[-0.24px]'>
-          {t('title')}
-        </h2>
-        <p className='text-foreground/70 text-[16px] font-medium leading-[1.6]'>
-          {t('description')}
-        </p>
-      </div>
-
-      <Card className='border-primary/20 bg-white'>
-        <CardHeader className='pb-2'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <CardTitle className='text-foreground text-lg font-bold'>
-                {t('priceHistory')}
-              </CardTitle>
-              <CardDescription className='text-muted-foreground'>
-                {chartData.length} {t('priceChanges')}
-              </CardDescription>
-            </div>
-            {hasPriceChange && (
-              <div
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${isIncrease
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
-                  }`}
-              >
-                {isIncrease ? (
-                  <TrendingUp className='h-4 w-4' />
-                ) : (
-                  <TrendingDown className='h-4 w-4' />
-                )}
-                {isIncrease ? '+' : '-'}
-                {Math.abs(priceChangePercent).toFixed(1)}%
-              </div>
-            )}
+    <Card className='border-primary/20 bg-white p-0'>
+      <CardHeader className='pb-0 pt-5 px-5'>
+        <div className='flex items-center justify-between'>
+          <div>
+            <CardTitle className='text-foreground text-sm font-bold'>
+              {t('priceHistory')}
+            </CardTitle>
+            <CardDescription className='text-muted-foreground text-xs'>
+              {chartData.length} {t('priceChanges')}
+            </CardDescription>
           </div>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className='h-64 w-full'>
+          {hasPriceChange && (
+            <div
+              className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${isIncrease
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
+                }`}
+            >
+              {isIncrease ? (
+                <TrendingUp className='h-3 w-3' />
+              ) : (
+                <TrendingDown className='h-3 w-3' />
+              )}
+              {isIncrease ? '+' : '-'}
+              {Math.abs(priceChangePercent).toFixed(1)}%
+            </div>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className='px-5 pb-5 pt-0'>
+        <ChartContainer config={chartConfig} className='h-44 w-full'>
             <LineChart
               accessibilityLayer
               data={chartData}
               margin={{
-                left: 12,
+                left: 0,
                 right: 12,
-                top: 12,
-                bottom: 12,
+                top: 0,
+                bottom: 0,
               }}
             >
               <CartesianGrid
@@ -212,14 +205,15 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
                 dataKey='date'
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
-                tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
+                tickMargin={4}
+                tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
-                tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }}
+                tickMargin={4}
+                width={40}
+                tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                 tickFormatter={(value) => formatPrice(value, locale)}
                 domain={[yMin, yMax]}
               />
@@ -339,9 +333,8 @@ export function PriceHistoryChart({ listingId }: PriceHistoryChartProps) {
                 }}
               />
             </LineChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-    </div>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 }
