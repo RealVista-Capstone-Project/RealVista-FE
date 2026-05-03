@@ -103,4 +103,19 @@ export const listingQueries = {
       staleTime: 5 * 60 * 1000,
       enabled: !!propertyId,
     }),
+
+  /**
+   * Get compare data for multiple listings
+   * Returns comprehensive data for comparison including attributes, amenities, and boost status
+   */
+  compare: (listingIds: string[]) =>
+    queryOptions({
+      queryKey: listingKeys.compare(listingIds),
+      queryFn: async () => {
+        const response = await listingApi.getCompareData(listingIds);
+        return response.payload.data;
+      },
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      enabled: listingIds.length > 0 && listingIds.length <= 3,
+    }),
 };

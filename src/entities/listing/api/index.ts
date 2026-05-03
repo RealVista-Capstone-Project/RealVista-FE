@@ -1,6 +1,7 @@
 import http from '@/shared/lib/http';
 import type {
   Listing,
+  ListingCompareData,
   ApiResponse,
   PriceHistory,
   SimilarListingsResponse,
@@ -131,6 +132,16 @@ export const listingApi = {
    * Requires authentication and ownership
    */
   deleteListing: (listingId: string) => http.delete<ApiResponse<void>>(`/listings/${listingId}`),
+
+  /**
+   * Get compare data for multiple listings
+   * Returns comprehensive data for comparison including attributes, amenities, and boost status
+   */
+  getCompareData: (listingIds: string[]) => {
+    const query = new URLSearchParams();
+    listingIds.forEach((id) => query.append('ids', id));
+    return http.get<ApiResponse<ListingCompareData[]>>(`/listings/compare?${query.toString()}`);
+  },
 } as const;
 
 // Re-export query keys, queries, and actions

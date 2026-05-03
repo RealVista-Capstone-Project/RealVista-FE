@@ -121,13 +121,13 @@ export function FavoritedPage() {
     setCompareSelectedIds((prev) => {
       if (!selected) return prev.filter((x) => x !== id);
       if (prev.includes(id)) return prev;
-      if (prev.length >= 2) return prev;
+      if (prev.length >= 3) return prev;
       return [...prev, id];
     });
   };
 
   const handleCompareNavigate = () => {
-    if (compareSelectedIds.length !== 2) return;
+    if (compareSelectedIds.length < 2) return;
     const q = compareSelectedIds.join(',');
     router.push(`/${locale}${ROUTES.compare}?ids=${encodeURIComponent(q)}`);
   };
@@ -167,7 +167,7 @@ export function FavoritedPage() {
         propertyType={propertyType}
         onPropertyTypeChange={handlePropertyTypeChange}
         compareSelectedCount={compareSelectedIds.length}
-        isCompareEnabled={compareSelectedIds.length === 2}
+        isCompareEnabled={compareSelectedIds.length >= 2}
         onCompareClick={handleCompareNavigate}
         isCompareMode={isCompareMode}
         onStartCompareMode={handleStartCompareMode}
@@ -210,7 +210,7 @@ export function FavoritedPage() {
                       isSelected={compareSelectedIds.includes(item.listing_id)}
                       compareUnavailable={listingStatusIsSold(item.status)}
                       compareSelectDisabled={
-                        compareSelectedIds.length >= 2 &&
+                        compareSelectedIds.length >= 3 &&
                         !compareSelectedIds.includes(item.listing_id)
                       }
                       onSelectionChange={handleCompareSelectionChange}
