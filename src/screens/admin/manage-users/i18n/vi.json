@@ -30,6 +30,10 @@
       "BANNED": "Đã cấm",
       "VERIFIED": "Đã xác minh"
     },
+    "accountLabels": {
+      "inactive": "Tài khoản không hoạt động",
+      "deleted": "Tài khoản đã xóa"
+    },
     "actions": {
       "suspend": "Đình chỉ người dùng",
       "activate": "Kích hoạt người dùng",
@@ -49,13 +53,24 @@
       "banSuccess": "Đã cấm người dùng vĩnh viễn",
       "banError": "Không thể cấm người dùng",
       "banConfirmTitle": "Cấm người dùng vĩnh viễn",
-      "banConfirmDescription": "Bạn có chắc chắn muốn cấm người dùng này VĨNH VIỄN không? Hành động này KHÔNG THỂ HOÀN TÁC và sẽ hủy tất cả tin đăng, bất động sản, lịch hẹn và các gói dịch vụ đang hoạt động của họ.",
+      "banConfirmDescription": "Bạn có chắc chắn muốn cấm người dùng này VĨNH VIỄN không? Bất động sản của họ sẽ chuyển về nháp, tin đăng và lịch hẹn sẽ bị hủy, và phân công môi giới sẽ được gỡ.",
       "banning": "Đang cấm...",
       "confirmBan": "Xác nhận cấm",
-      "banWarning": "Hành động này sẽ hủy tất cả dữ liệu kinh doanh của người dùng này và không thể thu hồi.",
+      "banWarning": "Hành động này khóa tài khoản và làm mới các bất động sản, tin đăng, lịch hẹn, gói dịch vụ và phân công môi giới liên quan.",
       "confirmBanPlaceholder": "Nhập email để xác nhận",
       "confirmBanInstruction": "Vui lòng nhập \"{email}\" để xác nhận hành động này.",
-      "confirmBanMismatch": "Email không khớp."
+      "confirmBanMismatch": "Email không khớp.",
+      "delete": "Xóa tài khoản",
+      "deleteSuccess": "Đã xóa người dùng thành công",
+      "deleteError": "Không thể xóa người dùng",
+      "deleteConfirmTitle": "Xóa tài khoản",
+      "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa tài khoản này không? Tài khoản sẽ được đánh dấu đã xóa, bất động sản chuyển về nháp và các bản ghi kinh doanh đang hoạt động sẽ bị hủy.",
+      "deleting": "Đang xóa...",
+      "confirmDelete": "Xác nhận xóa",
+      "deleteWarning": "Hành động này vô hiệu hóa tài khoản và làm mới các bất động sản, tin đăng, lịch hẹn, gói dịch vụ và phân công môi giới liên quan.",
+      "confirmDeletePlaceholder": "Nhập email để xác nhận",
+      "confirmDeleteInstruction": "Vui lòng nhập \"{email}\" để xác nhận hành động này.",
+      "confirmDeleteMismatch": "Email không khớp."
     },
     "roles": {
       "ADMIN": "Quản trị viên",

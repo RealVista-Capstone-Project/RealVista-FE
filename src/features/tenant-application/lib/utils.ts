@@ -3,7 +3,8 @@ import { vi } from 'date-fns/locale';
 
 export const formatCurrency = (amount?: number) => {
   if (amount === undefined || amount === null) return 'N/A';
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  const formatted = new Intl.NumberFormat('vi-VN').format(amount);
+  return `${formatted} vnđ`;
 };
 
 export const formatDate = (dateString: any, formatStr: string = 'dd MMM, HH:mm') => {

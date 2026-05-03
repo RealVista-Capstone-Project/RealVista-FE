@@ -10,7 +10,6 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  Clock,
   Ban,
   User as UserIcon,
   Fingerprint,
@@ -113,6 +112,16 @@ export function UserDetailSheet({ userId, open, onOpenChange }: UserDetailSheetP
             </div>
           ) : user ? (
             <div className="p-6 flex flex-col gap-8">
+              {(() => {
+                const isDeleted = Boolean(user.deleted || user.is_deleted || user.deleted_at);
+                const isInactive = isDeleted || user.status === 'BANNED' || user.status === 'SUSPENDED';
+
+                return isInactive ? (
+                  <Badge variant="outline" className="self-center bg-red-50 text-red-700 border-red-200 text-[10px] font-bold uppercase tracking-wide">
+                    {isDeleted ? t('accountLabels.deleted') : t('accountLabels.inactive')}
+                  </Badge>
+                ) : null;
+              })()}
               <div className="flex flex-col items-center text-center gap-4">
                 <div className="relative">
                   <Avatar className="h-24 w-24 border-4 border-white shadow-xl">

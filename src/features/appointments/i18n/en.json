@@ -60,6 +60,9 @@
     "rejectedSuccess": "Appointment rejected successfully",
     "genericError": "An error occurred. Please try again.",
     "publicSubtitle": "View and manage your tour requests",
-    "statusFilter": "Filter status"
+    "statusFilter": "Filter status",
+    "reasons": {
+      "REASON_PROPERTY_DELETED": "Property has been deleted."
+    }
   }
 }

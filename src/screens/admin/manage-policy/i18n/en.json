@@ -1,0 +1,41 @@
+{
+  "ManagePolicy": {
+    "sidebar": {
+      "title": "Policies & Legal",
+      "search": "Search policies...",
+      "empty": "No policies found"
+    },
+    "editor": {
+      "header": {
+        "edit": "Edit Policy",
+        "create": "Create New Policy",
+        "published": "PUBLISHED",
+        "draft": "DRAFT",
+        "version": "Version",
+        "lastUpdated": "Last updated"
+      },
+      "actions": {
+        "deactivate": "Deactivate",
+        "activate": "Activate",
+        "save": "Save Changes"
+      },
+      "tabs": {
+        "edit": "Editor",
+        "preview": "Preview"
+      },
+      "unsaved": "Unsaved changes",
+      "title": "Policy Title",
+      "slug": "Slug",
+      "content": "Content (Markdown)",
+      "preview": {
+        "updated": "Updated on",
+        "empty": "No content to display"
+      }
+    },
+    "placeholders": {
+      "title": "e.g. Terms of Service",
+      "slug": "e.g. terms-of-service",
+      "content": "Use Markdown to write your policy content..."
+    }
+  }
+}
