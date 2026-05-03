@@ -274,6 +274,22 @@ export function PropertyForm({
   ]);
 
   const transformToRequest = (data: PropertyFormValues, status: string): CreatePropertyRequest => {
+    const currentUserId = session?.user?.id;
+    const ownerId = data.role.ownerId;
+    const isAgentForOtherOwner =
+      !isEditMode &&
+      data.role.role === 'AGENT' &&
+      Boolean(ownerId && currentUserId && ownerId !== currentUserId);
+
+    const statusForRequest: string | undefined =
+      !isEditMode && status
+        ? isAgentForOtherOwner
+          ? status === 'DRAFT'
+            ? 'DRAFT'
+            : undefined
+          : status
+        : undefined;
+
     const mediaItems: PropertyMediaRequest[] = [];
 
     if (data.media.images && data.media.images.length > 0) {
@@ -310,7 +326,7 @@ export function PropertyForm({
       width_m: data.info.width != null ? data.info.width : undefined,
       length_m: data.info.length != null ? data.info.length : undefined,
       amenity_ids: data.info.amenityIds || [],
-      ...(status && !isEditMode ? { status } : {}),
+      ...(statusForRequest ? { status: statusForRequest } : {}),
       allow_rent_listing_when_rented: Boolean(data.info.allowRentListingWhenRented),
       price_range: data.info.priceRange
         ? {
