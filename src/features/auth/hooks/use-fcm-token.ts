@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { messaging, getToken, onMessage } from '@/shared/config/firebase';
+import {
+  getToken,
+  onMessage,
+  type MessagePayload,
+} from 'firebase/messaging';
+import { getFirebaseMessaging } from '@/shared/config/firebase';
 import { env } from '@/shared/lib/env/env';
 
 interface UseFCMTokenReturn {
@@ -16,27 +21,50 @@ export function useFCMToken(): UseFCMTokenReturn {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!messaging) {
-      setError('Firebase Messaging is not available');
-      return;
-    }
+    let cancelled = false;
+    let unsubscribeMessaging: (() => void) | undefined;
 
-    const requestPermission = async () => {
+    void (async () => {
+      const messagingInstance = await getFirebaseMessaging();
+      if (cancelled) return;
+
+      if (!messagingInstance) {
+        setError('Firebase Messaging is not available');
+        return;
+      }
+
+      unsubscribeMessaging = onMessage(
+        messagingInstance,
+        (payload: MessagePayload) => {
+          if (cancelled) return;
+
+          console.log('Foreground notification:', payload);
+
+          if (payload.notification) {
+            new Notification(payload.notification.title || 'New Message', {
+              body: payload.notification.body,
+              icon: '/icon.png',
+            });
+          }
+        }
+      );
+
       setIsLoading(true);
 
       try {
         const permission = await Notification.requestPermission();
+        if (cancelled) return;
 
         if (permission === 'granted') {
-          // Get FCM token using validated VAPID key from env
-          const fcmToken = await getToken(messaging, {
+          const fcmToken = await getToken(messagingInstance, {
             vapidKey: env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
           });
+
+          if (cancelled) return;
 
           setToken(fcmToken);
           console.log('FCM Token:', fcmToken);
 
-          // Send token to backend using validated API endpoint
           await fetch('http://localhost:8080/api/test/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -51,29 +79,24 @@ export function useFCMToken(): UseFCMTokenReturn {
         } else {
           setError('Notification permission denied');
         }
-      } catch (err: any) {
-        setError(err.message);
-        console.error('FCM Error:', err);
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const message =
+            err instanceof Error ? err.message : 'Failed to initialize FCM';
+          setError(message);
+          console.error('FCM Error:', err);
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
+    })();
+
+    return () => {
+      cancelled = true;
+      unsubscribeMessaging?.();
     };
-
-    requestPermission();
-
-    // Listen for foreground messages
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log('Foreground notification:', payload);
-
-      if (payload.notification) {
-        new Notification(payload.notification.title || 'New Message', {
-          body: payload.notification.body,
-          icon: '/icon.png',
-        });
-      }
-    });
-
-    return () => unsubscribe();
   }, []);
 
   return { token, error, isLoading };
