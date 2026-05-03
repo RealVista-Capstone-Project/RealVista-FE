@@ -85,7 +85,7 @@ export function LeaseSigningCompletePage() {
     if (!isRenter || !isSuccess || !leaseId || (!isPollingTerminal && !pollTimedOut)) return;
 
     const timeout = window.setTimeout(() => {
-      router.push(`/${locale}${ROUTES.dashboard.myContracts}?leaseId=${leaseId}`);
+      router.push(`/${locale}${ROUTES.myContracts}?leaseId=${leaseId}`);
     }, 1200);
 
     return () => window.clearTimeout(timeout);
@@ -97,7 +97,7 @@ export function LeaseSigningCompletePage() {
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${leaseId}&signerRole=renter&viewerRole=tenant`
+          ? `${window.location.origin}/${locale}${ROUTES.leases.signingComplete}?leaseId=${leaseId}&signerRole=renter&viewerRole=tenant`
           : undefined;
       const data = await sendToRenterMutation.mutateAsync({ leaseId, returnUrl });
       if (data.signing_url) {
@@ -299,7 +299,9 @@ export function LeaseSigningCompletePage() {
                 >
                   <Link
                     href={
-                      isRenter ? ROUTES.dashboard.myContracts : ROUTES.dashboard.rentalContracts
+                      isRenter
+                        ? `${ROUTES.myContracts}${leaseId ? `?leaseId=${leaseId}` : ''}`
+                        : ROUTES.dashboard.rentalContracts
                     }
                   >
                     <ArrowLeft className='h-4 w-4' />

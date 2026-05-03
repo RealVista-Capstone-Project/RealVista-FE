@@ -1,10 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import {
   Bell,
+  Building2,
   CheckCircle2,
   Clock,
   ExternalLink,
@@ -209,6 +211,7 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
 
 function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
   const t = useTranslations('RentalContract');
+  const locale = useLocale();
 
   const getRenterSigningUrlMutation = useGetRenterSigningUrlMutation();
 
@@ -228,7 +231,7 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=renter&viewerRole=tenant`
+          ? `${window.location.origin}/${locale}/leases/signing-complete?leaseId=${contract.id}&signerRole=renter&viewerRole=tenant`
           : undefined;
       const data = await getRenterSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
@@ -429,9 +432,24 @@ export function useTenantContractColumns(): ColumnDef<RentalContract, unknown>[]
         cell: ({ row }) => {
           const { property } = row.original;
           return (
-            <div className='min-w-0'>
-              <p className='truncate text-sm font-semibold text-foreground'>{property.title}</p>
-              <p className='truncate text-xs text-muted-foreground'>{property.address}</p>
+            <div className='flex min-w-0 items-center gap-3'>
+              <div className='relative flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary/5'>
+                {property.thumbnailUrl ? (
+                  <Image
+                    src={property.thumbnailUrl}
+                    alt={property.title}
+                    fill
+                    sizes='64px'
+                    className='object-cover'
+                  />
+                ) : (
+                  <Building2 className='h-5 w-5 text-primary' />
+                )}
+              </div>
+              <div className='min-w-0'>
+                <p className='truncate text-sm font-semibold text-foreground'>{property.title}</p>
+                <p className='truncate text-xs text-muted-foreground'>{property.address}</p>
+              </div>
             </div>
           );
         },

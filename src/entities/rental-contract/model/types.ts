@@ -32,6 +32,8 @@ export interface RentalContractProperty {
   listingType?: string;
   bedrooms?: number;
   bathrooms?: number;
+  thumbnailUrl?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface RentalContract {
@@ -41,6 +43,8 @@ export interface RentalContract {
   agent_id?: string | null;
   landlordName?: string;
   landlordEmail?: string;
+  landlordPhone?: string | null;
+  landlordAvatarUrl?: string | null;
   tenant: RentalContractTenant;
   property: RentalContractProperty;
   monthlyRent: number;
@@ -81,12 +85,16 @@ export interface LeaseResponse {
   renter_full_name: string;
   renter_email: string;
   renter_phone: string | null;
+  renter_avatar_url: string | null;
   landlord_full_name: string;
   landlord_email: string;
   landlord_phone: string | null;
+  landlord_avatar_url: string | null;
   property_title: string;
   property_address: string;
   property_type: string;
+  property_thumbnail_url: string | null;
+  property_image_url: string | null;
   lease_document_url: string | null;
   signed_by_renter_at: string | null;
   signed_by_landlord_at: string | null;
