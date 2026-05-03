@@ -34,7 +34,8 @@ interface AgentVerificationModalProps {
   onClose: () => void;
   propertyId: string;
   ownerName: string;
-  ownerPhone: string;
+  ownerPhoneRaw: string;
+  ownerPhoneDisplay: string;
 }
 
 /**
@@ -47,7 +48,8 @@ export function AgentVerificationModal({
   onClose,
   propertyId,
   ownerName,
-  ownerPhone,
+  ownerPhoneRaw,
+  ownerPhoneDisplay,
 }: AgentVerificationModalProps) {
   const RESEND_COOLDOWN_SECONDS = 60;
   const t = useTranslations('PropertyManagement');
@@ -154,7 +156,7 @@ export function AgentVerificationModal({
     phoneOtpSendingRef.current = true;
 
     try {
-      const ownerE164 = normalizeVietnamesePhoneForE164(ownerPhone);
+      const ownerE164 = normalizeVietnamesePhoneForE164(ownerPhoneRaw);
       if (!ownerE164) {
         const msg = t('invalidOwnerPhone', {
           default: 'Owner phone format is invalid. Use +84, 84, or domestic 0… format.',
@@ -251,7 +253,16 @@ export function AgentVerificationModal({
     } finally {
       phoneOtpSendingRef.current = false;
     }
-  }, [auth, initRecaptcha, ownerPhone, resetAgentRecaptchaHost, propertyData?.status, resendCountdown, step, t]);
+  }, [
+    auth,
+    initRecaptcha,
+    ownerPhoneRaw,
+    resetAgentRecaptchaHost,
+    propertyData?.status,
+    resendCountdown,
+    step,
+    t,
+  ]);
 
   const handleVerifyOtp = useCallback(async () => {
     if (!otp || otp.length !== 6) return;
@@ -342,7 +353,7 @@ export function AgentVerificationModal({
               <Smartphone className='size-5 text-primary' />
             </div>
             <div className='flex-1 text-sm font-medium text-foreground'>
-              {ownerPhone}
+              {ownerPhoneDisplay}
             </div>
             {step === 'IDLE' && (
               <Button

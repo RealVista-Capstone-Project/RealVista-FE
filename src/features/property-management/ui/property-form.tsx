@@ -644,7 +644,10 @@ export function PropertyForm({
           }}
           propertyId={createdPropertyId}
           ownerName={methods.getValues('role.ownerName') ?? ''}
-          ownerPhone={methods.getValues('role.ownerPhone') ?? ''}
+          ownerPhoneRaw={methods.getValues('role.ownerPhone') ?? ''}
+          ownerPhoneDisplay={
+            methods.getValues('role.ownerMaskedPhone') || methods.getValues('role.ownerPhone') || ''
+          }
         />
       )}
 
