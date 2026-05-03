@@ -39,6 +39,7 @@ const defaultNavItems: NavItem[] = [
   { id: 'buy', translationKey: 'buy', href: ROUTES.buy },
   { id: 'rent', translationKey: 'rent', href: ROUTES.rent },
   { id: 'sell', translationKey: 'sell', href: ROUTES.sell },
+  { id: 'subscribe', translationKey: 'subscribe', href: ROUTES.subscribe },
   { id: 'appointments', translationKey: 'appointments', href: ROUTES.appointments, authOnly: true },
   { id: 'my-contracts', translationKey: 'myContracts', href: ROUTES.myContracts, authOnly: true },
 ];
@@ -95,7 +96,7 @@ export function TopNav({
               {pageTitle}
             </span>
           ) : (
-            <Link href={`/${locale}${logoHref}`} className='flex items-center gap-2'>
+            <Link href={`/${locale}${logoHref}`} className='flex items-center gap-[2px]'>
               <RealVistaLogo />
               <span className='text-lg lg:text-xl font-bold leading-[1.5] tracking-[-0.24px] text-foreground'>
                 RealVista
@@ -130,7 +131,7 @@ export function TopNav({
                     key={item.id}
                     href={`/${locale}${item.href}`}
                     className={cn(
-                      'text-base leading-[1.5] transition-colors hover:text-primary',
+                      'text-[15px] leading-[1.5] transition-colors hover:text-primary',
                       isActive ? 'font-bold text-primary' : 'font-medium text-foreground'
                     )}
                     aria-current={isActive ? 'page' : undefined}
@@ -205,7 +206,7 @@ export function TopNav({
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
-                        'py-3 text-base leading-[1.5] transition-colors',
+                      'py-3 text-[15px] leading-[1.5] transition-colors',
                         isActive
                           ? 'font-bold text-primary'
                           : 'font-medium text-foreground hover:text-primary'
@@ -260,7 +261,7 @@ function NavItemDropdown({
       <Link
         href={`/${locale}${item.href}`}
         className={cn(
-          'text-base leading-[1.5] transition-colors hover:text-primary',
+          'text-[15px] leading-[1.5] transition-colors hover:text-primary',
           isActive ? 'font-bold text-primary' : 'font-medium text-foreground'
         )}
         aria-current={isActive ? 'page' : undefined}
@@ -280,7 +281,7 @@ function NavItemDropdown({
         <Link
           href={`/${locale}${item.href}`}
           className={cn(
-            'flex items-center gap-1 text-base leading-[1.5] transition-colors hover:text-primary outline-none',
+          'flex items-center gap-1 text-[15px] leading-[1.5] transition-colors hover:text-primary outline-none',
             isActive ? 'font-bold text-primary' : 'font-medium text-foreground',
             open && 'text-primary'
           )}

@@ -148,27 +148,27 @@ export function RealVistaListingCard({
             return attr.value_text.trim() !== '';
           return false;
         })
-        .slice(0, 3);
+        .slice(0, 2);
 
       if (visible.length === 0) return null;
 
       return (
-        <div className={cn('flex flex-wrap items-center', compact ? 'gap-2' : 'gap-3')}>
+        <div className={cn('flex items-center', compact ? 'gap-3' : 'gap-4')}>
           {visible.map((attr) => (
-            <div key={attr.attribute_id} className='flex items-center gap-1'>
+            <div key={attr.attribute_id} className={cn('flex items-center', compact ? 'gap-0.5' : 'gap-1')}>
               {attr.icon && (
                 <AttributeIcon
                   iconName={attr.icon}
-                  className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-5 w-5')}
+                  className={cn('text-primary', compact ? 'h-3.5 w-3.5' : 'h-4 w-4')}
                   strokeWidth={2.3}
                 />
               )}
-              <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+              <span className={cn('font-normal leading-[1.4] text-muted-foreground', compact ? 'text-xs' : 'text-xs')}>
                 {attr.value_boolean === true
                   ? attr.attribute_name
                   : attr.value_text !== null && attr.value_text !== undefined
-                    ? attr.value_text
-                    : [attr.value_number, attr.attribute_name].filter(Boolean).join(' ')}
+                    ? `${attr.value_text}`
+                    : [attr.attribute_name, attr.value_number !== null && attr.value_number !== undefined ? Math.round(attr.value_number) : null].filter(Boolean).join(' ')}
               </span>
             </div>
           ))}
@@ -247,7 +247,7 @@ export function RealVistaListingCard({
       >
         {statusTag ? t(`status.${statusTag}`) : ''}
       </div>
-      <div className='absolute left-0 top-full h-1 w-1'>
+      <div className='absolute left-0 top-full h-[8px] w-[8px]'>
         <svg
           width='8'
           height='8'
@@ -285,7 +285,7 @@ export function RealVistaListingCard({
               HOT
             </span>
           </div>
-          <div className='absolute left-0 top-full h-1 w-1'>
+          <div className='absolute left-0 top-full h-[8px] w-[8px]'>
             <svg
               width='8'
               height='8'
@@ -380,7 +380,7 @@ export function RealVistaListingCard({
                     <span className='text-xl font-bold leading-[1.4] tracking-[-0.5px] text-primary'>
                       {formatVND(price)}
                     </span>
-                    <span className='text-xs font-semibold text-muted-foreground'>VNĐ</span>
+                    <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
                     {listingType === 'RENT' && (
                       <span className='text-sm font-normal leading-[1.5] text-muted-foreground'>
                         {t('perMonth')}
@@ -462,7 +462,7 @@ export function RealVistaListingCard({
                 <span className={cn('font-bold tracking-[-0.5px] text-primary', compact ? 'text-base leading-[1.4]' : 'text-2xl leading-[1.5] tracking-[-1px]')}>
                   {formatVND(price)}
                 </span>
-                <span className={cn('font-semibold text-muted-foreground', compact ? 'text-[11px]' : 'text-sm')}>VNĐ</span>
+                <span className={cn('font-semibold text-muted-foreground/60', compact ? 'text-[11px]' : 'text-sm')}>VNĐ</span>
                 {listingType === 'RENT' && (
                   <span className={cn('font-normal leading-[1.5] text-muted-foreground', compact ? 'text-xs' : 'text-base')}>
                     {t('perMonth')}

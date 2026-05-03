@@ -1,6 +1,18 @@
 {
   "ListingDetailScreen": {
     "previewBadge": "Xem trước",
-    "previewMessage": "Tin đăng này chưa được công khai. Chỉ bạn mới có thể xem bản xem trước này."
+    "previewMessage": "Tin đăng này chưa được công khai. Chỉ bạn mới có thể xem bản xem trước này.",
+    "back": "Quay lại",
+    "description": "Mô tả",
+    "rentPrice": "Giá thuê",
+    "salePrice": "Giá bán",
+    "perMonth": "/tháng",
+    "contactNow": "Liên hệ ngay",
+    "report": "Báo cáo tin đăng",
+    "reportUser": "Báo cáo ngưởi dùng",
+    "agent": "Môi giới",
+    "owner": "Chủ nhà",
+    "requestTour": "Đặt lịch xem",
+    "estimateLoan": "Ước tính khoản vay"
   }
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { CreditCard } from 'lucide-react';
 import { ProfileDropdown, Separator, useProfileMenuItems } from '@/shared/ui';
 import { NotificationDropdownContainer } from '@/widgets/notification-dropdown';
 import { cn } from '@/shared/lib/utils';
@@ -33,22 +32,6 @@ export function DashboardActions({
 
   return (
     <div className='flex items-center gap-6'>
-      {/* Subscribe — logically before notifications or after? Placed before notifications usually */}
-      <button
-        type='button'
-        onClick={() => router.push(`/${locale}${ROUTES.subscribe}`)}
-        className={cn(
-          'hidden lg:flex size-10 items-center justify-center rounded-lg transition-colors',
-          isRouteActive('/subscribe')
-            ? 'bg-primary text-white'
-            : 'bg-primary/5 text-foreground hover:bg-primary/10'
-        )}
-        aria-label={t('subscribe')}
-        title={t('subscribe')}
-      >
-        <CreditCard className='h-5 w-5' strokeWidth={2} />
-      </button>
-
       {/* Notifications — always visible in dashboard */}
       <NotificationDropdownContainer />
 

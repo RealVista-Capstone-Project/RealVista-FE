@@ -1,221 +1,90 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { BanknoteIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-  RadialBarChart,
-  RadialBar,
-  PolarRadiusAxis,
-  Label,
-} from '@/shared/ui/chart';
 import type { CostBreakdown } from '@/shared/types';
 
 export interface MonthlyCostBreakdownProps {
   costBreakdown?: CostBreakdown | null;
-  currency?: string;
-  locale?: string;
+  listingType?: 'RENT' | 'SALE';
 }
 
-interface ChartItem {
-  name: string;
-  amount: number;
-  category: 'base' | 'required' | 'optional';
-}
-
-/**
- * MonthlyCostBreakdown component displays a breakdown of monthly costs
- * with a radial stacked bar chart and colored legend
- */
 export function MonthlyCostBreakdown({
   costBreakdown,
-  currency = 'VND',
-  locale = 'vi-VN',
 }: MonthlyCostBreakdownProps) {
   const t = useTranslations('MonthlyCostBreakdown');
 
-  // Guard clause: return null if costBreakdown is not available
   if (!costBreakdown) {
     return null;
   }
 
-  // Format currency with Vietnamese style (e.g., 20.000.000 đ)
   const formatCurrency = (amount: number) => {
-    const formatted = new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-
-    // Add currency symbol
-    return currency === 'VND' ? `${formatted} đ` : formatted;
+    return new Intl.NumberFormat('vi-VN').format(amount);
   };
 
-  // Prepare chart items: base price + required fees + optional fees
-  const chartItems: ChartItem[] = [
-    {
-      name: t('basePrice'),
-      amount: costBreakdown.basePrice,
-      category: 'base',
-    },
-    ...(costBreakdown.requiredFees || []).map((fee) => ({
-      name: fee.name,
-      amount: fee.amount,
-      category: 'required' as const,
-    })),
-    ...(costBreakdown.optionalFees || []).map((fee) => ({
-      name: fee.name,
-      amount: fee.amount,
-      category: 'optional' as const,
-    })),
+  const allFees = [
+    ...(costBreakdown.requiredFees || []),
+    ...(costBreakdown.optionalFees || []),
   ];
 
-  // Prepare chart data - stack all items into a single data point
-  const chartData = [
-    chartItems.reduce(
-      (acc, item, index) => {
-        const key = `item${index}`;
-        return {
-          ...acc,
-          [key]: item.amount,
-        };
-      },
-      { month: 'total' }
-    ),
-  ];
-
-  // Build chart config dynamically
-  const chartConfig: ChartConfig = chartItems.reduce((config, item, index) => {
-    const key = `item${index}`;
-    const colors = [
-      'var(--chart-1)',
-      'var(--chart-2)',
-      'var(--chart-3)',
-      'var(--chart-4)',
-      'var(--chart-5)',
-    ];
-    return {
-      ...config,
-      [key]: {
-        label: item.name,
-        color: colors[index % colors.length],
-      },
-    };
-  }, {} as ChartConfig);
-
-  // Direct hex colors for legend (outside ChartContainer scope)
-  const legendColors = [
-    'var(--chart-1)',
-    'var(--chart-2)',
-    'var(--chart-3)',
-    'var(--chart-4)',
-    'var(--chart-5)',
-  ];
-  const getDirectColor = (index: number) => {
-    return legendColors[index % legendColors.length];
-  };
+  const serviceFeesTotal =
+    (costBreakdown.requiredFeesSubtotal || 0) +
+    (costBreakdown.optionalFeesSubtotal || 0);
 
   return (
-    <Card className='border-primary/20 gap-3'>
-      <CardHeader className='items-center gap-0'>
-        <div className='flex items-center gap-2'>
-          <BanknoteIcon className='w-5 h-5 sm:w-6 sm:h-6 text-primary' />
-          <CardTitle className='text-foreground text-[20px] sm:text-[24px] font-bold leading-[1.6]'>
-            {t('title')}
-          </CardTitle>
+    <div className='bg-white border border-primary/10 rounded-2xl p-4 shadow-sm'>
+      {/* Header */}
+      <h3 className='text-sm font-bold text-foreground'>
+        {t('serviceFees')}
+      </h3>
+
+      {/* Disclaimer under header */}
+      {costBreakdown.disclaimer && (
+        <p className='text-[10px] text-muted-foreground mb-5 italic leading-relaxed'>
+          {costBreakdown.disclaimer}
+        </p>
+      )}
+
+      {/* Service Fees List */}
+      {allFees.length > 0 && (
+        <div className='space-y-2 mb-4'>
+          {allFees.map((fee, index) => (
+            <div key={index} className='flex items-center justify-between text-sm'>
+              <span className='text-foreground/70'>{fee.name}</span>
+              <span className='font-medium text-foreground'>
+                {formatCurrency(fee.amount)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+              </span>
+            </div>
+          ))}
         </div>
-        <CardDescription className='pl-4'>{t('description')}</CardDescription>
-      </CardHeader>
-      <CardContent className='flex flex-col sm:flex-row items-center'>
-        {/* Radial Stacked Bar Chart - Left side */}
-        <div className='flex-shrink-0'>
-          <ChartContainer config={chartConfig} className='aspect-square w-[200px] sm:w-[250px]'>
-            <RadialBarChart
-              data={chartData}
-              startAngle={90}
-              endAngle={-270}
-              innerRadius={85}
-              outerRadius={130}
-            >
-              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-              <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                <Label
-                  content={({ viewBox }) => {
-                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                      return (
-                        <text x={viewBox.cx} y={viewBox.cy} textAnchor='middle'>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) - 10}
-                            className='fill-primary text-2xl font-bold'
-                          >
-                            {formatCurrency(costBreakdown.totalCost)}
-                          </tspan>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 12}
-                            className='fill-muted-foreground text-sm'
-                          >
-                            {t('totalMonthlyPayment')}
-                          </tspan>
-                        </text>
-                      );
-                    }
-                  }}
-                />
-              </PolarRadiusAxis>
-              {chartItems.map((item, index) => {
-                const key = `item${index}`;
-                return (
-                  <RadialBar
-                    key={key}
-                    dataKey={key}
-                    stackId='a'
-                    cornerRadius={5}
-                    fill={`var(--color-${key})`}
-                    className='stroke-background stroke-2'
-                  />
-                );
-              })}
-            </RadialBarChart>
-          </ChartContainer>
+      )}
+
+      {/* Divider + Summary */}
+      <div className='border-t border-border pt-3 space-y-2'>
+        {/* Total Service Fees */}
+        <div className='flex items-center justify-between text-sm'>
+          <span className='text-foreground/70'>{t('serviceFeesSubtotal')}</span>
+          <span className='font-medium text-foreground'>
+            {formatCurrency(serviceFeesTotal)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+          </span>
         </div>
 
-        {/* Legend Items - Right side */}
-        <div className='flex flex-col gap-3 flex-1 w-full'>
-          {chartItems.map((item, index) => {
-            const color = getDirectColor(index);
-
-            return (
-              <div key={index} className='flex items-center justify-between gap-3'>
-                <div className='flex items-center gap-3 flex-1 min-w-0'>
-                  {/* Color dot */}
-                  <div
-                    className='w-3 h-3 rounded-full flex-shrink-0'
-                    style={{ backgroundColor: color }}
-                  />
-                  {/* Label */}
-                  <span className='text-foreground text-[14px] sm:text-[16px] font-medium leading-[1.5] truncate'>
-                    {item.name}
-                  </span>
-                </div>
-                {/* Amount */}
-                <span className='text-foreground text-[14px] sm:text-[16px] font-semibold leading-[1.4] tabular-nums flex-shrink-0'>
-                  {formatCurrency(item.amount)}
-                </span>
-              </div>
-            );
-          })}
-
-          {/* Disclaimer */}
-          {costBreakdown.disclaimer && (
-            <p className='text-muted-foreground text-xs italic mt-2'>{costBreakdown.disclaimer}</p>
-          )}
+        {/* Base Price */}
+        <div className='flex items-center justify-between text-sm'>
+          <span className='text-foreground/70'>{t('rentOrSalePrice')}</span>
+          <span className='font-medium text-foreground'>
+            {formatCurrency(costBreakdown.basePrice)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+          </span>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Grand Total */}
+        <div className='flex items-center justify-between pt-2 border-t border-border'>
+          <span className='text-sm font-bold text-foreground'>{t('total')}</span>
+          <span className='text-lg font-bold text-primary'>
+            {formatCurrency(costBreakdown.totalCost)} <span className='text-xs font-semibold text-muted-foreground/60'>VNĐ</span>
+          </span>
+        </div>
+      </div>
+
+    </div>
   );
 }

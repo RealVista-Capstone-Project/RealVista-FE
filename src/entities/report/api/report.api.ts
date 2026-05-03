@@ -22,7 +22,56 @@ export interface Report {
   resolved_at?: string;
 }
 
+export interface CreateReportPayload {
+  target_type: ReportTargetType;
+  target_id: string;
+  reason: ReportReason;
+  description?: string;
+  evidence_media_url?: string;
+}
+
+export type ReportReason =
+  | 'SCAM'
+  | 'FAKE_INFO'
+  | 'DUPLICATE'
+  | 'HARASSMENT'
+  | 'SPAM'
+  | 'MISLEADING'
+  | 'INAPPROPRIATE'
+  | 'WRONG_INFO'
+  | 'FAKE_PROFILE'
+  | 'VIOLATES_TERMS'
+  | 'OTHER';
+
+export const LISTING_REPORT_REASONS: ReportReason[] = [
+  'SCAM',
+  'FAKE_INFO',
+  'DUPLICATE',
+  'WRONG_INFO',
+  'MISLEADING',
+  'SPAM',
+  'INAPPROPRIATE',
+  'VIOLATES_TERMS',
+  'HARASSMENT',
+  'OTHER',
+];
+
+export const USER_REPORT_REASONS: ReportReason[] = [
+  'SCAM',
+  'FAKE_PROFILE',
+  'HARASSMENT',
+  'SPAM',
+  'INAPPROPRIATE',
+  'VIOLATES_TERMS',
+  'FAKE_INFO',
+  'MISLEADING',
+  'OTHER',
+];
+
 export const reportApi = {
+  submit: (payload: CreateReportPayload) =>
+    http.post<ApiResponse<Report>>('/reports', payload),
+
   getPaged: (params: {
     page: number;
     size: number;

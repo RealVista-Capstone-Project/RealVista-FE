@@ -1,8 +1,11 @@
 {
   "MonthlyCostBreakdown": {
-    "title": "Chi tiết hàng tháng",
-    "description": "Xem các khoản chi phí hàng tháng của bạn",
-    "basePrice": "Giá cơ bản",
-    "totalMonthlyPayment": "Hàng tháng"
+    "rentPrice": "Giá thuê",
+    "salePrice": "Giá mua",
+    "perMonth": "tháng",
+    "serviceFees": "Phí dịch vụ",
+    "serviceFeesSubtotal": "Tổng phí dịch vụ",
+    "rentOrSalePrice": "Giá thuê/ mua",
+    "total": "Tổng"
   }
 }

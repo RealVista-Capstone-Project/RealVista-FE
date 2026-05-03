@@ -42,10 +42,9 @@ export function PropertySearchHeader({
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-3'>
-            <h1 className='text-2xl font-bold tracking-tight text-foreground sm:text-3xl'>
+            <h1 className='text-xl font-bold tracking-tight text-foreground sm:text-2xl'>
               {title}
             </h1>
-            {action && <div className='flex shrink-0 items-center'>{action}</div>}
           </div>
           <div className='flex items-center gap-2'>
             <div className='h-2 w-2 rounded-full bg-primary' />
@@ -64,8 +63,13 @@ export function PropertySearchHeader({
             onChange={(e) => onSearchChange?.(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder={searchPlaceholder}
-            className='h-12 w-full border-primary/20 bg-white pl-12 pr-4 text-base font-medium shadow-sm transition-all focus:border-primary focus:ring-4 focus:ring-primary/10'
+            className='h-12 w-full border-primary/20 bg-white pl-12 pr-14 text-base font-medium shadow-sm transition-all focus:border-primary focus:ring-4 focus:ring-primary/10'
           />
+          {action && (
+            <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+              {action}
+            </div>
+          )}
         </div>
         <button
           onClick={onMoreFilters}

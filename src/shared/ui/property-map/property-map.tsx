@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { useTranslations } from 'next-intl';
+import { Map as MapIcon, Satellite, ChevronDown } from 'lucide-react';
 import { MAP_CONFIG } from '@/shared/config/maps';
 import { cn } from '@/shared/lib/utils';
 import { PropertyMapMarker } from '@/shared/ui/property-map-marker';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 
 export interface PropertyLocation {
   id: string; // This will be the ID of the first property in the group
@@ -24,7 +27,7 @@ interface PropertyMapProps {
   onPropertyClick?: (propertyIds: string[]) => void;
   onBoundsChange?: (bounds: { north: number; south: number; east: number; west: number }) => void;
   apiKey?: string;
-  defaultCenter?: google.maps.LatLngLiteral;
+  defaultCenter?: { lat: number; lng: number };
   defaultZoom?: number;
   className?: string;
 }
@@ -48,6 +51,7 @@ export function PropertyMap({
   defaultZoom = MAP_CONFIG.DEFAULT_ZOOM,
   className,
 }: PropertyMapProps) {
+  const t = useTranslations('PropertyMap');
   const [mapType, setMapType] = useState<MapType>('roadmap');
 
   if (!apiKey) {
@@ -120,33 +124,51 @@ export function PropertyMap({
           ))}
         </Map>
 
-        {/* Map/Satellite Toggle */}
-        <div className='absolute left-4 top-4 z-10 flex gap-2'>
-          <button
-            type='button'
-            onClick={() => setMapType('roadmap')}
-            className={cn(
-              'rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-md transition-all',
-              mapType === 'roadmap'
-                ? 'bg-primary text-white'
-                : 'text-foreground hover:bg-primary/5'
-            )}
-          >
-            Map
-          </button>
-          <button
-            type='button'
-            onClick={() => setMapType('satellite')}
-            className={cn(
-              'rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-md transition-all',
-              mapType === 'satellite'
-                ? 'bg-primary text-white'
-                : 'text-foreground hover:bg-primary/5'
-            )}
-          >
-            Satellite
-          </button>
-        </div>
+        {/* Map/Satellite Dropdown */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type='button'
+              className='absolute left-6 lg:left-8 top-4 z-10 flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1.5 shadow-lg backdrop-blur-md border border-white/50 text-xs font-medium text-gray-700 hover:bg-white transition-all duration-200'
+            >
+              {mapType === 'roadmap' ? (
+                <MapIcon className='h-4 w-4' />
+              ) : (
+                <Satellite className='h-4 w-4' />
+              )}
+              <span className="capitalize">{mapType === 'roadmap' ? t('map') : t('satellite')}</span>
+              <ChevronDown className='h-3.5 w-3.5 text-gray-500' />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className='w-40 p-1.5 bg-white/95 backdrop-blur-md border border-white/50 shadow-lg rounded-xl' align='start'>
+            <button
+              type='button'
+              onClick={() => setMapType('roadmap')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                mapType === 'roadmap'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-gray-700 hover:bg-gray-100'
+              )}
+            >
+              <MapIcon className='h-4 w-4' />
+              <span>{t('map')}</span>
+            </button>
+            <button
+              type='button'
+              onClick={() => setMapType('satellite')}
+              className={cn(
+                'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                mapType === 'satellite'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-gray-700 hover:bg-gray-100'
+              )}
+            >
+              <Satellite className='h-4 w-4' />
+              <span>{t('satellite')}</span>
+            </button>
+          </PopoverContent>
+        </Popover>
       </APIProvider>
     </div>
   );

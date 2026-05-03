@@ -14,9 +14,10 @@ import { RealVistaButton } from '@/shared/ui/realvista-button';
 interface SharePopoverProps {
   url: string;
   title?: string;
+  variant?: 'default' | 'icon';
 }
 
-export function SharePopover({ url, title }: SharePopoverProps) {
+export function SharePopover({ url, title, variant = 'default' }: SharePopoverProps) {
   const t = useTranslations('SharePopover');
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -44,10 +45,19 @@ export function SharePopover({ url, title }: SharePopoverProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <RealVistaButton variant={'secondary'}>
-          <Share2 className='size-4' />
-          {t('share')}
-        </RealVistaButton>
+        {variant === 'icon' ? (
+          <button
+            type='button'
+            className='flex items-center justify-center w-10 h-10 rounded-full border border-border bg-background hover:bg-muted transition-colors'
+          >
+            <Share2 className='size-5' />
+          </button>
+        ) : (
+          <RealVistaButton variant={'secondary'}>
+            <Share2 className='size-4' />
+            {t('share')}
+          </RealVistaButton>
+        )}
       </PopoverTrigger>
       <PopoverContent className='w-44 p-2' align='end' sideOffset={8}>
         <div className='flex flex-col gap-1'>

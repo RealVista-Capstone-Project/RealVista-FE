@@ -52,19 +52,19 @@ export const SearchListingResults = memo(function SearchListingResults({
       {/* Property Grid/List */}
       <div id='property-listings-top' />
       <div
-        className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col gap-4'}`}
+        className={`mt-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 [&>*]:w-full' : 'flex flex-col gap-3'}`}
       >
         {isLoading ? (
-          <div className='col-span-full grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
             {[...Array(6)].map((_, i) => (
-              <div key={i} className='flex flex-col gap-3 rounded-2xl border border-primary/20 bg-white p-3'>
-                <Skeleton className='aspect-[4/3] w-full rounded-xl' />
-                <div className='space-y-2 px-1'>
-                  <Skeleton className='h-6 w-3/4' />
-                  <Skeleton className='h-4 w-1/2' />
-                  <div className='flex gap-2 pt-2'>
-                    <Skeleton className='h-8 w-20 rounded-full' />
-                    <Skeleton className='h-8 w-20 rounded-full' />
+              <div key={i} className='flex flex-col gap-2 rounded-xl border border-primary/20 bg-white p-2'>
+                <Skeleton className='aspect-[16/10] w-full rounded-lg' />
+                <div className='space-y-1.5 px-1'>
+                  <Skeleton className='h-5 w-3/4' />
+                  <Skeleton className='h-3.5 w-1/2' />
+                  <div className='flex gap-1.5 pt-1'>
+                    <Skeleton className='h-6 w-16 rounded-full' />
+                    <Skeleton className='h-6 w-16 rounded-full' />
                   </div>
                 </div>
               </div>
@@ -84,6 +84,7 @@ export const SearchListingResults = memo(function SearchListingResults({
             <div
               key={property.listing_id}
               id={`property-${property.listing_id}`}
+              className='relative'
               onMouseEnter={() => onHoverProperty([property.listing_id])}
               onMouseLeave={() => onHoverProperty([])}
               onClick={() => onSelectProperty([property.listing_id])}
@@ -100,16 +101,13 @@ export const SearchListingResults = memo(function SearchListingResults({
                 boostTags={property.is_boosted ? property.boost_packages : undefined}
                 userType={property.user_type as 'AGENT' | 'OWNER'}
                 variant={viewMode}
+                compact={viewMode === 'grid'}
                 listingType={listingType}
                 onToggleFavorite={onToggleFavorite}
                 onClick={() =>
                   router.push(`/${locale}/listing/${property.slug || property.listing_id}`)
                 }
-                className={
-                  selectedPropertyIds.includes(property.listing_id)
-                    ? 'ring-2 ring-primary'
-                    : ''
-                }
+                className={`overflow-visible !rounded-xl shadow-sm ring-1 ring-neutral-200/70 hover:shadow-md ${selectedPropertyIds.includes(property.listing_id) ? 'ring-2 ring-primary' : ''}`}
               />
             </div>
           ))
