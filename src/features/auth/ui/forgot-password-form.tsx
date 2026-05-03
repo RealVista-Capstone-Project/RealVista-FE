@@ -37,9 +37,8 @@ export function ForgotPasswordForm() {
   const onSubmit = async (data: ForgotPasswordValues) => {
     setIsLoading(true);
     try {
-      const res = await userApi.forgotPassword({ email: data.email.trim() });
-      const msg = (res.payload as { message?: string })?.message;
-      toast.success(msg || t('forgotPasswordSuccessToast'));
+      await userApi.forgotPassword({ email: data.email.trim() });
+      toast.success(t('forgotPasswordSuccessToast'));
     } catch (error) {
       if (isHttpError(error) && error.status === 429) {
         toast.error(t('forgotPasswordRateLimited'));

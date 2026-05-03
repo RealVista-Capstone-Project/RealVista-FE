@@ -53,12 +53,11 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const onSubmit = async (data: ResetPasswordFormValues) => {
     setIsLoading(true);
     try {
-      const res = await userApi.resetPassword({
+      await userApi.resetPassword({
         token,
         new_password: data.password,
       });
-      const msg = (res.payload as { message?: string })?.message;
-      toast.success(msg || t('resetPasswordSuccessToast'));
+      toast.success(t('resetPasswordSuccessToast'));
       router.push('/login');
     } catch (error) {
       if (isHttpError(error) && error.status === 429) {
