@@ -42,6 +42,7 @@ import http from '@/shared/lib/http';
 import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 import type { ApiResponse } from '@/shared/types/api';
 import { BillingReturnQueryEffects } from '@/widgets/billing/ui/billing-return-query-effects';
+import { ChangePasswordForm } from '@/widgets/settings/ui/change-password-form';
 import type { UpdateMeData } from '@/entities/user/model/types';
 import type { UpdateSettingPreferenceData } from '@/entities/setting-preference/model/types';
 import type { CustomerProfile } from '@/entities/customer-profile/model/types';
@@ -149,7 +150,6 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
   const [newProfileName, setNewProfileName] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [changePasswordForm, setChangePasswordForm] = useState({ current: '', next: '', confirm: '' });
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Avatar upload
@@ -499,17 +499,6 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
       toast.success(t('toast.profileSwitched'));
     },
     onError: () => toast.error(t('toast.profileSwitchFailed')),
-  });
-
-  const changePasswordMutation = useMutation({
-    mutationFn: (data: { current_password: string; new_password: string }) =>
-      userApi.changePassword(me!.user_id, data),
-    onSuccess: () => {
-      setIsChangingPassword(false);
-      setChangePasswordForm({ current: '', next: '', confirm: '' });
-      toast.success(t('toast.passwordChanged'));
-    },
-    onError: (error) => handleErrorApi({ error }),
   });
 
   const deleteAccountMutation = useMutation({
@@ -1510,61 +1499,12 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
                           : <ChevronRight className='h-4 w-4 text-muted-foreground' />
                         }
                       </button>
-                      {isChangingPassword && (
-                        <div className='mt-2 space-y-3 rounded-lg border border-border p-4'>
-                          <div className='space-y-1.5'>
-                            <Label className='text-sm text-muted-foreground'>{t('myAccount.currentPassword')}</Label>
-                            <Input
-                              type='password'
-                              value={changePasswordForm.current}
-                              onChange={(e) => setChangePasswordForm((f) => ({ ...f, current: e.target.value }))}
-                              placeholder={t('myAccount.currentPasswordPlaceholder')}
-                            />
-                          </div>
-                          <div className='space-y-1.5'>
-                            <Label className='text-sm text-muted-foreground'>{t('myAccount.newPassword')}</Label>
-                            <Input
-                              type='password'
-                              value={changePasswordForm.next}
-                              onChange={(e) => setChangePasswordForm((f) => ({ ...f, next: e.target.value }))}
-                              placeholder={t('myAccount.newPasswordPlaceholder')}
-                            />
-                          </div>
-                          <div className='space-y-1.5'>
-                            <Label className='text-sm text-muted-foreground'>{t('myAccount.confirmPassword')}</Label>
-                            <Input
-                              type='password'
-                              value={changePasswordForm.confirm}
-                              onChange={(e) => setChangePasswordForm((f) => ({ ...f, confirm: e.target.value }))}
-                              placeholder={t('myAccount.confirmPasswordPlaceholder')}
-                            />
-                          </div>
-                          {changePasswordForm.next && changePasswordForm.confirm && changePasswordForm.next !== changePasswordForm.confirm && (
-                            <p className='text-xs text-red-500'>{t('myAccount.passwordMismatch')}</p>
-                          )}
-                          <div className='flex justify-end gap-2 pt-1'>
-                            <Button
-                              size='sm'
-                              variant='ghost'
-                              onClick={() => { setIsChangingPassword(false); setChangePasswordForm({ current: '', next: '', confirm: '' }); }}
-                            >
-                              {t('myAccount.cancel')}
-                            </Button>
-                            <Button
-                              size='sm'
-                              onClick={() => changePasswordMutation.mutate({ current_password: changePasswordForm.current, new_password: changePasswordForm.next })}
-                              disabled={
-                                !changePasswordForm.current ||
-                                !changePasswordForm.next ||
-                                changePasswordForm.next !== changePasswordForm.confirm ||
-                                changePasswordMutation.isPending
-                              }
-                              className='bg-primary text-white hover:bg-primary/90'
-                            >
-                              {changePasswordMutation.isPending ? t('myAccount.saving') : t('myAccount.confirm')}
-                            </Button>
-                          </div>
-                        </div>
+                      {isChangingPassword && me?.user_id && (
+                        <ChangePasswordForm
+                          userId={me.user_id}
+                          onSuccess={() => setIsChangingPassword(false)}
+                          onCancel={() => setIsChangingPassword(false)}
+                        />
                       )}
                     </div>
 
