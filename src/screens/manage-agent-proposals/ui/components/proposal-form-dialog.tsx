@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Plus, Edit3, Percent, Award, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -65,6 +66,27 @@ function toDraftPayload(form: ProposalFormValues): ApplyAgentProposalPayload {
     price_range: form.price_range,
     status: AgentProposalStatus.DRAFT,
   };
+}
+
+function getDraftFingerprint(payload: ApplyAgentProposalPayload): string {
+  return JSON.stringify({
+    title: payload.title.trim(),
+    commission_rate: payload.commission_rate ?? null,
+    experience_years: payload.experience_years ?? null,
+    pitch_content: payload.pitch_content,
+    specialty: payload.specialty?.trim() || undefined,
+    price_range: {
+      rent: {
+        min: payload.price_range?.rent?.min ?? 0,
+        max: payload.price_range?.rent?.max ?? 0,
+      },
+      sale: {
+        min: payload.price_range?.sale?.min ?? 0,
+        max: payload.price_range?.sale?.max ?? 0,
+      },
+    },
+    status: AgentProposalStatus.DRAFT,
+  });
 }
 
 /* ─── Form validation ─── */
@@ -253,6 +275,21 @@ export function ProposalFormDialog({
   const [touched, setTouched] = React.useState<Partial<Record<keyof ProposalFormValues, boolean>>>(
     {}
   );
+  const initialDraftFingerprint = React.useMemo(() => {
+    if (mode !== 'edit' || !initialData) return null;
+    const initialForm: ProposalFormValues = {
+      title: initialData.title,
+      commission_rate: typeof initialData.commission_rate === 'number' ? initialData.commission_rate : '',
+      experience_years: typeof initialData.experience_years === 'number' ? initialData.experience_years : '',
+      pitch_content: initialData.pitch_content,
+      specialty: getAgentProposalSpecialtyCode(initialData),
+      price_range: initialData.price_range || {
+        rent: { min: 0, max: 0 },
+        sale: { min: 0, max: 0 },
+      },
+    };
+    return getDraftFingerprint(toDraftPayload(initialForm));
+  }, [mode, initialData]);
 
   // Sync form with initialData when dialog opens
   React.useEffect(() => {
@@ -339,7 +376,12 @@ export function ProposalFormDialog({
     const draftErrors = validateDraftForm(form, t);
     setErrors(draftErrors);
     if (Object.keys(draftErrors).length > 0) return;
-    onSaveDraft(toDraftPayload(form));
+    const draftPayload = toDraftPayload(form);
+    if (mode === 'edit' && initialDraftFingerprint && getDraftFingerprint(draftPayload) === initialDraftFingerprint) {
+      toast.info(t('toastDraftNoChanges'));
+      return;
+    }
+    onSaveDraft(draftPayload);
   };
 
   return (

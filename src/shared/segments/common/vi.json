@@ -811,6 +811,7 @@
     "toastDeleteSuccess": "Đã lưu trữ hồ sơ thành công.",
     "toastDeleteError": "Xóa hồ sơ thất bại. Vui lòng thử lại.",
     "toastDraftSaved": "Đã lưu bản nháp trên trình duyệt của bạn.",
+    "toastDraftNoChanges": "Không có thay đổi để lưu nháp.",
     "toastDraftError": "Không thể lưu nháp. Vui lòng thử lại.",
     "validation": {
       "titleRequired": "Tiêu đề hồ sơ là bắt buộc",

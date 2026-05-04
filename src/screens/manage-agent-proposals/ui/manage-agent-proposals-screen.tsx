@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/shared/config/i18n/navigation';
-import { ROUTES } from '@/shared/config/routes';
 import {
   useMyProposalsQuery,
   useCancelProposalMutation,
@@ -159,7 +158,6 @@ type StatusFilter = 'all' | AgentProposalStatus;
 export function ManageAgentProposalsScreen() {
   const t = useTranslations('ManageProposals');
   const locale = useLocale();
-  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearch = useDebounce(searchQuery, 350);

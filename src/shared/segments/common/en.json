@@ -806,6 +806,7 @@
     "toastDeleteSuccess": "Proposal archived successfully.",
     "toastDeleteError": "Failed to delete proposal. Please try again.",
     "toastDraftSaved": "Draft saved in your browser.",
+    "toastDraftNoChanges": "No changes to save as draft.",
     "toastDraftError": "Could not save draft. Please try again.",
     "validation": {
       "titleRequired": "Proposal title is required",
