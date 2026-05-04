@@ -12,7 +12,7 @@ import { AgentApplyProposalModal } from '@/features/agent-proposal/ui/agent-appl
 import { useAgentProposalCtaForOwnerProperty } from '@/features/agent-proposal/hooks/use-agent-proposal-cta-for-owner-property';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
-import { formatNumber } from '@/shared/lib/utils/format-currency';
+import { formatNumber, formatVND } from '@/shared/lib/utils/format-currency';
 import { Search, Home, Filter, X, DollarSign, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
@@ -155,6 +155,7 @@ function FilterContent({ onApply }: FilterContentProps) {
 
   const showRentFilter = listingType === 'ALL' || listingType === 'RENT';
   const showBuyFilter = listingType === 'ALL' || listingType === 'SELL';
+  const priceInputClass = 'h-9 rounded-lg text-sm text-right tabular-nums';
 
   const typesByCategory = useMemo(() => {
     const map = new Map<string, { categoryName: string; types: typeof availablePropertyTypes }>();
@@ -238,25 +239,30 @@ function FilterContent({ onApply }: FilterContentProps) {
           <div className='grid grid-cols-2 gap-2'>
             <Input
               inputMode='numeric'
-              placeholder={t('filter.min')}
+              placeholder={`${t('filter.min')} (${t('filter.rentPrice')})`}
               value={localFilter.minRentPrice}
               onChange={(e) => handlePriceChange('minRentPrice', e.target.value)}
-              className={cn(
-                'h-9 rounded-lg text-sm',
-                rentError && 'border-red-400 focus:border-red-400'
-              )}
+              className={cn(priceInputClass, rentError && 'border-red-400 focus:border-red-400')}
             />
             <Input
               inputMode='numeric'
-              placeholder={t('filter.max')}
+              placeholder={`${t('filter.max')} (${t('filter.rentPrice')})`}
               value={localFilter.maxRentPrice}
               onChange={(e) => handlePriceChange('maxRentPrice', e.target.value)}
-              className={cn(
-                'h-9 rounded-lg text-sm',
-                rentError && 'border-red-400 focus:border-red-400'
-              )}
+              className={cn(priceInputClass, rentError && 'border-red-400 focus:border-red-400')}
             />
           </div>
+          {!!(localFilter.minRentPrice || localFilter.maxRentPrice) && (
+            <p className='text-[11px] text-muted-foreground tabular-nums'>
+              {localFilter.minRentPrice
+                ? formatVND(parseInputNumber(localFilter.minRentPrice) ?? 0)
+                : t('filter.min')}{' '}
+              -{' '}
+              {localFilter.maxRentPrice
+                ? formatVND(parseInputNumber(localFilter.maxRentPrice) ?? 0)
+                : t('filter.max')}
+            </p>
+          )}
           {rentError && <p className='text-xs text-red-500'>{rentError}</p>}
         </div>
       )}
@@ -271,25 +277,30 @@ function FilterContent({ onApply }: FilterContentProps) {
           <div className='grid grid-cols-2 gap-2'>
             <Input
               inputMode='numeric'
-              placeholder={t('filter.min')}
+              placeholder={`${t('filter.min')} (${t('filter.buyPrice')})`}
               value={localFilter.minBuyPrice}
               onChange={(e) => handlePriceChange('minBuyPrice', e.target.value)}
-              className={cn(
-                'h-9 rounded-lg text-sm',
-                buyError && 'border-red-400 focus:border-red-400'
-              )}
+              className={cn(priceInputClass, buyError && 'border-red-400 focus:border-red-400')}
             />
             <Input
               inputMode='numeric'
-              placeholder={t('filter.max')}
+              placeholder={`${t('filter.max')} (${t('filter.buyPrice')})`}
               value={localFilter.maxBuyPrice}
               onChange={(e) => handlePriceChange('maxBuyPrice', e.target.value)}
-              className={cn(
-                'h-9 rounded-lg text-sm',
-                buyError && 'border-red-400 focus:border-red-400'
-              )}
+              className={cn(priceInputClass, buyError && 'border-red-400 focus:border-red-400')}
             />
           </div>
+          {!!(localFilter.minBuyPrice || localFilter.maxBuyPrice) && (
+            <p className='text-[11px] text-muted-foreground tabular-nums'>
+              {localFilter.minBuyPrice
+                ? formatVND(parseInputNumber(localFilter.minBuyPrice) ?? 0)
+                : t('filter.min')}{' '}
+              -{' '}
+              {localFilter.maxBuyPrice
+                ? formatVND(parseInputNumber(localFilter.maxBuyPrice) ?? 0)
+                : t('filter.max')}
+            </p>
+          )}
           {buyError && <p className='text-xs text-red-500'>{buyError}</p>}
         </div>
       )}
