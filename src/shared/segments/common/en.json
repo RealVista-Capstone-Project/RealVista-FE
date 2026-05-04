@@ -803,7 +803,7 @@
     "toastCreateError": "Failed to create proposal. Please check and try again.",
     "toastUpdateSuccess": "Proposal updated successfully!",
     "toastUpdateError": "Update failed. Please try again.",
-    "toastDeleteSuccess": "Proposal archived successfully.",
+    "toastDeleteSuccess": "Proposal deleted successfully.",
     "toastDeleteError": "Failed to delete proposal. Please try again.",
     "toastDraftSaved": "Draft saved in your browser.",
     "toastDraftNoChanges": "No changes to save as draft.",

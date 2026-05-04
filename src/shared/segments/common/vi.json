@@ -808,7 +808,7 @@
     "toastCreateError": "Tạo hồ sơ thất bại. Vui lòng kiểm tra lại.",
     "toastUpdateSuccess": "Cập nhật hồ sơ thành công!",
     "toastUpdateError": "Cập nhật thất bại. Vui lòng thử lại.",
-    "toastDeleteSuccess": "Đã lưu trữ hồ sơ thành công.",
+    "toastDeleteSuccess": "Đã xóa hồ sơ thành công.",
     "toastDeleteError": "Xóa hồ sơ thất bại. Vui lòng thử lại.",
     "toastDraftSaved": "Đã lưu bản nháp trên trình duyệt của bạn.",
     "toastDraftNoChanges": "Không có thay đổi để lưu nháp.",
