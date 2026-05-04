@@ -823,7 +823,7 @@
       "pitchTooShort": "Content must be at least 50 characters",
       "pitchTooLong": "Content must not exceed 2000 characters",
       "priceRangeMinMax": "Minimum price cannot be greater than maximum price",
-      "priceRangeMax": "Price range cannot exceed 999,999,999,999 VND"
+      "priceRangeMax": "Price range cannot exceed 10,000,000,000,000 VND"
     },
     "footerCreated": "Created: {date}",
     "footerUpdated": "Updated: {date}",

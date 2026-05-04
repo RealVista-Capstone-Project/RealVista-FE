@@ -32,7 +32,7 @@ import {
 } from '@/entities/agent-proposal/model/types';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input';
 
-const MAX_PRICE_RANGE_VND = 999_999_999_999;
+const MAX_PRICE_RANGE_VND = 10_000_000_000_000;
 
 /** Form model: commission / experience start empty until the user fills them. */
 type ProposalFormValues = Omit<
@@ -338,7 +338,7 @@ export function ProposalFormDialog({
   };
 
   const updatePriceRange = (type: 'rent' | 'sale', field: 'min' | 'max', value: number) => {
-    const normalizedValue = Math.min(Math.max(0, value), MAX_PRICE_RANGE_VND);
+    const normalizedValue = Math.max(0, value);
     setForm((prev) => ({
       ...prev,
       price_range: {
@@ -536,6 +536,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.rent?.min ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'min', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -550,6 +551,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.rent?.max ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'max', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -573,6 +575,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.sale?.min ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'min', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -587,6 +590,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.sale?.max ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'max', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
