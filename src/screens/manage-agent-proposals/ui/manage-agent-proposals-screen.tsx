@@ -162,7 +162,7 @@ export function ManageAgentProposalsScreen() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearch = useDebounce(searchQuery, 350);
   const [page, setPage] = React.useState(0);
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 10;
 
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);

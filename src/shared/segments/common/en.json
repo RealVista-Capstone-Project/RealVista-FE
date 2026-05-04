@@ -796,7 +796,7 @@
     "btnSave": "Save Changes",
     "btnSaving": "Saving...",
     "deleteTitle": "Delete this proposal?",
-    "deleteDesc": "The proposal will be archived and can be restored later if needed. Are you sure you want to continue?",
+    "deleteDesc": "This proposal will be permanently deleted and cannot be restored. Are you sure you want to continue?",
     "btnConfirmDelete": "Confirm Delete",
     "btnDeleting": "Processing...",
     "toastCreateSuccess": "Proposal created successfully!",

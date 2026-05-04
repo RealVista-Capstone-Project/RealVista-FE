@@ -801,7 +801,7 @@
     "btnSave": "Lưu thay đổi",
     "btnSaving": "Đang lưu...",
     "deleteTitle": "Xóa hồ sơ cá nhân?",
-    "deleteDesc": "Hồ sơ sẽ được lưu trữ và có thể khôi phục sau nếu cần. Bạn có chắc muốn tiếp tục?",
+    "deleteDesc": "Hồ sơ sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc muốn tiếp tục?",
     "btnConfirmDelete": "Xác nhận xóa",
     "btnDeleting": "Đang xử lý...",
     "toastCreateSuccess": "Tạo hồ sơ thành công!",
