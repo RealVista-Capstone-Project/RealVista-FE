@@ -675,6 +675,15 @@ function PropertyDetailPanel({
         : property.sold_by_role === 'AGENT'
           ? `Được bán bởi agent${property.sold_by_name ? ` ... ${property.sold_by_name}` : ''}`
           : null;
+  const rentedByText =
+    property.status !== 'RENTED' || !property.rented_by_name
+      ? null
+      : property.rented_by_role === 'OWNER'
+        ? t('rentedByOwner', { name: property.rented_by_name })
+        : property.rented_by_role === 'AGENT'
+          ? t('rentedByAgent', { name: property.rented_by_name })
+          : property.rented_by_name;
+  const statusAttributionText = soldByText ?? rentedByText;
 
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
@@ -837,57 +846,66 @@ function PropertyDetailPanel({
                   {currentOpt?.icon}
                   {t(`status${property.status}` as Parameters<typeof t>[0])}
                 </span>
-                {soldByText && (
-                  <span className='text-xs font-medium text-muted-foreground'>{soldByText}</span>
+                {statusAttributionText && (
+                  <span className='text-xs font-medium text-muted-foreground'>
+                    {statusAttributionText}
+                  </span>
                 )}
               </div>
             );
           }
 
           return (
-            <div className='relative inline-block' ref={statusRef}>
-              {/* Badge trigger */}
-              <button
-                type='button'
-                disabled={isStatusChanging}
-                onClick={() => setIsStatusOpen((v) => !v)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border cursor-pointer transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                  getStatusStyle(property.status)
-                )}
-              >
-                {currentOpt?.icon}
-                {t(`status${property.status}` as Parameters<typeof t>[0])}
-                <ChevronDown
-                  className={cn('h-3 w-3 transition-transform', isStatusOpen && 'rotate-180')}
-                  strokeWidth={2.5}
-                />
-              </button>
-
-              {/* Dropdown */}
-              {isStatusOpen && (
-                <div className='absolute left-0 top-full z-30 mt-1.5 min-w-[160px] rounded-xl border border-primary/20 bg-white shadow-lg p-1.5 flex flex-col gap-0.5'>
-                  {STATUS_OPTIONS.filter((o) => o.status !== property.status).map(
-                    ({ status, icon }) => (
-                      <button
-                        key={status}
-                        type='button'
-                        onClick={() => {
-                          setIsStatusOpen(false);
-                          setPendingStatus(status);
-                          setStatusConfirmOpen(true);
-                        }}
-                        className={cn(
-                          'flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors hover:bg-primary/5',
-                          getStatusStyle(status)
-                        )}
-                      >
-                        {icon}
-                        {t(`status${status}` as Parameters<typeof t>[0])}
-                      </button>
-                    )
+            <div className='inline-flex items-center gap-2'>
+              <div className='relative inline-block' ref={statusRef}>
+                {/* Badge trigger */}
+                <button
+                  type='button'
+                  disabled={isStatusChanging}
+                  onClick={() => setIsStatusOpen((v) => !v)}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border cursor-pointer transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
+                    getStatusStyle(property.status)
                   )}
-                </div>
+                >
+                  {currentOpt?.icon}
+                  {t(`status${property.status}` as Parameters<typeof t>[0])}
+                  <ChevronDown
+                    className={cn('h-3 w-3 transition-transform', isStatusOpen && 'rotate-180')}
+                    strokeWidth={2.5}
+                  />
+                </button>
+
+                {/* Dropdown */}
+                {isStatusOpen && (
+                  <div className='absolute left-0 top-full z-30 mt-1.5 min-w-[160px] rounded-xl border border-primary/20 bg-white shadow-lg p-1.5 flex flex-col gap-0.5'>
+                    {STATUS_OPTIONS.filter((o) => o.status !== property.status).map(
+                      ({ status, icon }) => (
+                        <button
+                          key={status}
+                          type='button'
+                          onClick={() => {
+                            setIsStatusOpen(false);
+                            setPendingStatus(status);
+                            setStatusConfirmOpen(true);
+                          }}
+                          className={cn(
+                            'flex items-center gap-2 w-full px-3 py-2 text-xs font-medium rounded-lg transition-colors hover:bg-primary/5',
+                            getStatusStyle(status)
+                          )}
+                        >
+                          {icon}
+                          {t(`status${status}` as Parameters<typeof t>[0])}
+                        </button>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+              {statusAttributionText && (
+                <span className='text-xs font-medium text-muted-foreground'>
+                  {statusAttributionText}
+                </span>
               )}
             </div>
           );

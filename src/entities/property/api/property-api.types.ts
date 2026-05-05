@@ -38,6 +38,11 @@ export interface PropertySummaryResponse {
   sold_by_phone: string | null;
   sold_by_role: 'OWNER' | 'AGENT' | null;
   sold_at: string | null;
+  rented_by_user_id?: string | null;
+  rented_by_name?: string | null;
+  rented_by_phone?: string | null;
+  rented_by_role?: 'OWNER' | 'AGENT' | null;
+  rented_at?: string | null;
 }
 export interface PropertySearchRequest {
   north_lat: number;
@@ -189,6 +194,11 @@ export interface PropertySummaryResponse {
   sold_by_phone: string | null;
   sold_by_role: 'OWNER' | 'AGENT' | null;
   sold_at: string | null;
+  rented_by_user_id?: string | null;
+  rented_by_name?: string | null;
+  rented_by_phone?: string | null;
+  rented_by_role?: 'OWNER' | 'AGENT' | null;
+  rented_at?: string | null;
 }
 
 export interface PageResponse<T> {
