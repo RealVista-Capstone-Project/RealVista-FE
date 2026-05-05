@@ -14,7 +14,7 @@ export interface ThreeDQuota {
   isLocked: boolean;
   isLoading: boolean;
   isError: boolean;
-  decrementQuota: () => void;
+  decrementQuota: (amount?: number) => void;
   invalidateQuota: () => void;
 }
 
@@ -36,14 +36,14 @@ export function useThreeDQuota(): ThreeDQuota {
     !threeDSub || (!threeDSub.unlimited && (threeDSub.remaining_quota ?? 0) <= 0)
   );
 
-  const decrementQuota = useCallback(() => {
+  const decrementQuota = useCallback((amount: number = 1) => {
     queryClient.setQueryData<ActiveSubscriptionResponse[]>(
       billingKeys.mySubscriptions(),
       (old) => {
         if (!old) return old;
         return old.map((sub) => {
           if (sub.feature_type === '3D_TOUR' && sub.status === 'ACTIVE' && !sub.unlimited && sub.remaining_quota != null) {
-            return { ...sub, remaining_quota: Math.max(0, sub.remaining_quota - 1) };
+            return { ...sub, remaining_quota: Math.max(0, sub.remaining_quota - amount) };
           }
           return sub;
         });
