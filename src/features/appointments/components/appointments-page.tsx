@@ -4,14 +4,23 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { format, addDays, startOfWeek } from 'date-fns';
 import { vi as viLocale, enUS } from 'date-fns/locale';
-import { useAppointments, useUpdateAppointmentStatus, useSyncBlocks, useDeleteAppointment } from '../api/appointment.queries';
+import { cn } from '@/shared/lib/utils';
+import { useAppointments, useUpdateAppointmentStatus, useSyncBlocks, useDeleteAppointment, useRespondReschedule, useRescheduleAppointment, useCancelReschedule } from '../api/appointment.queries';
 import { Button } from '@/shared/ui/button';
 import { SlotModal } from './slot-modal';
+import { RescheduleModal } from './reschedule-modal';
+import { Badge } from '@/shared/ui/badge';
 import { Availability } from '@/shared/ui/availability';
 import type { AppointmentWithListing } from '../types/appointment';
 import { useCurrentUser } from '@/features/auth/api/use-current-user';
-import { Check, X, Clock, Settings2, Save, RepeatIcon, CheckCircle2, RefreshCw } from 'lucide-react';
-import { canCancelAppointment, isValidUUID, toLocalIso } from '../utils/appointment';
+import { Check, X, Clock, Settings2, Save, RepeatIcon, CheckCircle2, RefreshCw, CalendarRange } from 'lucide-react';
+import {
+  getAppointmentActions,
+  getAppointmentStatusInfo,
+  hasStarted,
+  isValidUUID,
+  toLocalIso
+} from '../utils/appointment';
 import { toast } from 'sonner';
 import { TimeSpan } from '@/shared/ui/availability';
 import {
@@ -37,7 +46,7 @@ import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { listingQueries } from '@/entities/listing/api';
 
-type StatusFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED' | 'COMPLETED';
+type StatusFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED' | 'COMPLETED' | 'RESCHEDULE_PENDING';
 
 export function AppointmentsPage() {
   const t = useTranslations('appointments');
@@ -61,22 +70,25 @@ export function AppointmentsPage() {
   }, [searchParams]);
 
   const [isEditingBlocks, setIsEditingBlocks] = useState(false);
-  const [editableBlocks, setEditableBlocks] = useState<TimeSpan<AppointmentWithListing>[]>([]);
+  const [editableBlocks, setEditableBlocks] = useState<TimeSpan<any>[]>([]);
   const [originalBlockIds, setOriginalBlockIds] = useState<Set<string>>(new Set());
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [repeatWeeks, setRepeatWeeks] = useState(false);
   const [repeatCount, setRepeatCount] = useState<number>(1);
 
+  // Reschedule state
+  const [rescheduleTarget, setRescheduleTarget] = useState<AppointmentWithListing | null>(null);
+
   // Quick reject/cancel reason dialog
   const [pendingAction, setPendingAction] = useState<{
     appointmentId: string;
-    action: 'REJECT' | 'CANCEL';
+    action: 'REJECT' | 'CANCEL' | 'RESCHEDULE_ACCEPT' | 'RESCHEDULE_REJECT';
   } | null>(null);
   const [actionReason, setActionReason] = useState('');
 
   // Per-week block cache: saves drawn blocks when navigating between weeks in edit-blocks mode.
   // Key = week start timestamp (ms), Value = blocks array for that week.
-  const weekBlocksCache = useRef<Map<number, TimeSpan<AppointmentWithListing>[]>>(new Map());
+  const weekBlocksCache = useRef<Map<number, TimeSpan<any>[]>>(new Map());
   const prevWeekStartMs = useRef<number>(currentWeekStart.getTime());
   // Always-current ref so the week-change effect can read the latest blocks without being in the dep array
   const editableBlocksRef = useRef(editableBlocks);
@@ -93,7 +105,14 @@ export function AppointmentsPage() {
   const filteredAppointments = useMemo(() => {
     return appointments.filter((apt) => {
       // Status filter
-      const matchesStatus = statusFilter === 'ALL' || apt.status === statusFilter;
+      let matchesStatus = false;
+      if (statusFilter === 'ALL') {
+        // In "ALL" view, hide CANCELED or REJECTED appointments entirely to keep the calendar clean.
+        // Users can still see them by explicitly filtering for those statuses.
+        matchesStatus = apt.status !== 'CANCELED' && apt.status !== 'REJECTED';
+      } else {
+        matchesStatus = apt.status === statusFilter;
+      }
 
       // Listing filter
       const matchesListing = listingFilter === 'ALL' || apt.listing_id === listingFilter;
@@ -212,6 +231,7 @@ export function AppointmentsPage() {
         // Collect TOUR appointments for this target week to detect conflicts
         const toursThisWeek = appointments.filter((apt) => {
           if (apt.appointment_type !== 'TOUR') return false;
+          if (apt.status === 'CANCELED' || apt.status === 'REJECTED') return false;
           const aptDate = new Date(apt.start_time);
           return aptDate >= weekStart && aptDate <= weekEnd;
         });
@@ -281,6 +301,20 @@ export function AppointmentsPage() {
 
   const updateStatus = useUpdateAppointmentStatus();
   const deleteAppointment = useDeleteAppointment();
+  const respondReschedule = useRespondReschedule();
+  const cancelReschedule = useCancelReschedule();
+  const rescheduleAppointment = useRescheduleAppointment();
+
+  const handleCancelProposal = async (e: React.MouseEvent, appointmentId: string) => {
+    e.stopPropagation();
+    try {
+      await cancelReschedule.mutateAsync(appointmentId);
+      toast.success(t('rescheduleResponseSuccess') || 'Proposal withdrawn');
+    } catch (error) {
+      console.error('Failed to cancel proposal:', error);
+      toast.error(t('genericError'));
+    }
+  };
 
   const handleQuickAccept = async (e: React.MouseEvent, appointmentId: string) => {
     e.stopPropagation();
@@ -296,7 +330,7 @@ export function AppointmentsPage() {
     }
   };
 
-  const handleOpenReasonDialog = (e: React.MouseEvent, appointmentId: string, action: 'REJECT' | 'CANCEL') => {
+  const handleOpenReasonDialog = (e: React.MouseEvent, appointmentId: string, action: 'REJECT' | 'CANCEL' | 'RESCHEDULE_ACCEPT' | 'RESCHEDULE_REJECT') => {
     e.stopPropagation();
     setActionReason('');
     setPendingAction({ appointmentId, action });
@@ -304,13 +338,25 @@ export function AppointmentsPage() {
 
   const handleSubmitReason = async () => {
     if (!pendingAction || !actionReason.trim()) return;
-    const status = pendingAction.action === 'REJECT' ? 'REJECTED' : 'CANCELED';
+
     try {
-      await updateStatus.mutateAsync({
-        id: pendingAction.appointmentId,
-        data: { status, reason: actionReason.trim() },
-      });
-      toast.success(status === 'REJECTED' ? t('rejectedSuccess') : t('canceled'));
+      if (pendingAction.action === 'RESCHEDULE_ACCEPT' || pendingAction.action === 'RESCHEDULE_REJECT') {
+        await respondReschedule.mutateAsync({
+          id: pendingAction.appointmentId,
+          data: {
+            action: pendingAction.action === 'RESCHEDULE_ACCEPT' ? 'ACCEPT' : 'REJECT',
+            reason: actionReason.trim(),
+          }
+        });
+        toast.success(t('rescheduleResponseSuccess'));
+      } else {
+        const status = pendingAction.action === 'REJECT' ? 'REJECTED' : 'CANCELED';
+        await updateStatus.mutateAsync({
+          id: pendingAction.appointmentId,
+          data: { status, reason: actionReason.trim() },
+        });
+        toast.success(status === 'REJECTED' ? t('rejectedSuccess') : t('canceled'));
+      }
       setPendingAction(null);
       setActionReason('');
     } catch (error) {
@@ -339,104 +385,33 @@ export function AppointmentsPage() {
   };
 
   const renderAppointmentCard = (apt: AppointmentWithListing, dateString: string, startTime: string, endTime: string) => {
-    const isReceiver = currentUser?.user_id === apt.receiver_id;
-    const isPending = apt.status === 'PENDING';
-    const isAccepted = apt.status === 'ACCEPTED';
-
-    const canCancel = canCancelAppointment(apt, currentUser?.user_id);
+    const actions = getAppointmentActions(apt, currentUser?.user_id);
+    const statusInfo = getAppointmentStatusInfo(apt, currentUser?.user_id);
+    const isStarted = hasStarted(apt.start_time);
+    const isCompleted = apt.status === 'COMPLETED';
 
     return (
-      <div
-        className="flex h-full flex-col p-1 text-inherit overflow-hidden"
-        title={`${apt.listing_name || apt.appointment_type || 'Appointment'}${apt.rejection_reason ? `\n${t('rejectReason')}: ${t.has(`reasons.${apt.rejection_reason}`) ? t(`reasons.${apt.rejection_reason}` as Parameters<typeof t>[0]) : apt.rejection_reason}` : ''}${apt.cancellation_reason ? `\n${t('cancelReason')}: ${t.has(`reasons.${apt.cancellation_reason}`) ? t(`reasons.${apt.cancellation_reason}` as Parameters<typeof t>[0]) : apt.cancellation_reason}` : ''}`}
-      >
-        <div className={`font-semibold text-xs leading-none truncate`} title={apt.listing_name || apt.appointment_type || 'Appointment'}>
-          {apt.listing_name || (apt.appointment_type === 'BLOCK' ? t('block') : t('tour') || 'Appointment')}
-        </div>
-        <div className="flex items-center gap-1 mt-1 opacity-80">
-          <Clock className="w-2.5 h-2.5 flex-shrink-0" />
-          <span className="text-[10px] uppercase leading-none truncate">{startTime.split(':')[0]}:{startTime.split(':')[1]} - {endTime.split(':')[0]}:{endTime.split(':')[1]}</span>
-        </div>
-
-        {(apt.rejection_reason || apt.cancellation_reason) && (
-          <div className="mt-1 text-[10px] leading-tight text-red-600 dark:text-red-400 line-clamp-1 italic">
-            {(() => {
-              const raw = apt.rejection_reason || apt.cancellation_reason || '';
-              return t.has(`reasons.${raw}`) ? t(`reasons.${raw}` as Parameters<typeof t>[0]) : raw;
-            })()}
+      <div className={cn("flex flex-col h-full min-h-0 relative", (isCompleted || (isStarted && apt.status !== 'ACCEPTED')) && "opacity-60")}>
+        <div className="flex items-start justify-between gap-1 mb-1">
+          <div className="text-[10px] font-bold leading-tight truncate text-slate-900 dark:text-slate-100 pr-1">
+            {apt.listing_name || (apt.appointment_type === 'BLOCK' ? t('block') : t('tour'))}
           </div>
-        )}
+          {apt.appointment_type !== 'BLOCK' && (
+            <Badge className={cn('px-1.5 py-0 h-3.5 text-[8px] font-bold uppercase border-0 shadow-none shrink-0', statusInfo.colorClass)}>
+              {t(statusInfo.labelKey)}
+            </Badge>
+          )}
+        </div>
 
-        {apt.appointment_type === 'BLOCK' && isEditingBlocks && (
-          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-background/60 backdrop-blur-sm pl-1 rounded-sm">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-5 h-5 bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-400 rounded-sm"
-              onClick={(e) => handleDeleteBlock(e, apt.appointment_id)}
-            >
-              <X className="w-3 h-3" />
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-1 text-[8px] text-slate-500 font-medium">
+          <Clock className="w-2 h-2" />
+          <span>{startTime} – {endTime}</span>
+        </div>
 
-        {apt.appointment_type !== 'BLOCK' && (isPending || isAccepted) && (
-          <div className="absolute bottom-1 right-1 flex items-center justify-end gap-1 shrink-0 z-20 pointer-events-auto bg-background/60 backdrop-blur-sm pl-1 rounded-sm">
-            {isReceiver && isPending && (
-              <>
-                <button
-                  onClick={(e) => handleQuickAccept(e, apt.appointment_id)}
-                  disabled={updateStatus.isPending}
-                  className="cursor-pointer rounded bg-green-500/20 p-1 text-green-700 hover:bg-green-500/30 dark:text-green-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  title={t('accept')}
-                >
-                  <Check className="h-3 w-3" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenReasonDialog(e, apt.appointment_id, 'REJECT');
-                  }}
-                  className="cursor-pointer rounded bg-red-500/20 p-1 text-red-700 hover:bg-red-500/30 dark:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  title={t('reject')}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </>
-            )}
-            {isReceiver && isAccepted && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  updateStatus.mutate({
-                    id: apt.appointment_id,
-                    data: { status: 'COMPLETED' }
-                  }, {
-                    onSuccess: () => toast.success(t('completeSuccess'))
-                  });
-                }}
-                disabled={updateStatus.isPending}
-                className="cursor-pointer rounded bg-blue-500/20 p-1 text-blue-700 hover:bg-blue-500/30 dark:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                title={t('complete')}
-              >
-                <CheckCircle2 className="h-3 w-3" />
-              </button>
-            )}
-            {canCancel && !(isReceiver && isPending) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={(e) => handleOpenReasonDialog(e, apt.appointment_id, 'CANCEL')}
-                    className="cursor-pointer rounded bg-gray-500/20 p-1 text-gray-700 hover:bg-gray-500/30 dark:text-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  {t('cancelRuleTooltip')}
-                </TooltipContent>
-              </Tooltip>
-            )}
+        {apt.status === 'RESCHEDULE_PENDING' && (
+          <div className="mt-auto pt-1 flex items-center gap-1 text-[8px] font-bold text-orange-700 dark:text-orange-300 w-fit truncate">
+            <RefreshCw className="w-2 h-2 animate-spin-slow flex-shrink-0" />
+            <span className="truncate">{t('reschedule_pending')}</span>
           </div>
         )}
       </div>
@@ -452,7 +427,7 @@ export function AppointmentsPage() {
         value={isEditingBlocks ? editableBlocks : undefined}
         onValueChange={isEditingBlocks ? setEditableBlocks : undefined}
         mergeAdjacent={false}
-        appointments={filteredAppointments as AppointmentWithListing[]}
+        appointments={filteredAppointments as any[]}
         onAppointmentClick={isEditingBlocks ? undefined : handleAppointmentClick}
         renderAppointmentCard={renderAppointmentCard as any}
         currentWeekStart={currentWeekStart}
@@ -463,12 +438,13 @@ export function AppointmentsPage() {
           <div className="flex items-center gap-2 flex-wrap">
             {/* Status Filter */}
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
-              <SelectTrigger className="h-8 w-[130px] text-xs">
+              <SelectTrigger className="h-8 w-[160px] text-xs">
                 <SelectValue placeholder={t('statusLabel')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">{t('all')}</SelectItem>
                 <SelectItem value="PENDING">{t('pending')}</SelectItem>
+                <SelectItem value="RESCHEDULE_PENDING">{t('reschedule_pending')}</SelectItem>
                 <SelectItem value="ACCEPTED">{t('accepted')}</SelectItem>
                 <SelectItem value="REJECTED">{t('rejected')}</SelectItem>
                 <SelectItem value="CANCELED">{t('canceled')}</SelectItem>
@@ -556,12 +532,20 @@ export function AppointmentsPage() {
         appointments={selectedSlot?.appointments || []}
       />
 
+      <RescheduleModal
+        appointment={rescheduleTarget}
+        open={!!rescheduleTarget}
+        onOpenChange={(open) => !open && setRescheduleTarget(null)}
+      />
+
       {/* Quick reject/cancel reason dialog */}
       <Dialog open={!!pendingAction} onOpenChange={(open) => !open && setPendingAction(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              {pendingAction?.action === 'REJECT' ? t('rejectReason') : t('cancelReason')}
+              {pendingAction?.action === 'REJECT' ? t('rejectReason') :
+               pendingAction?.action === 'CANCEL' ? t('cancelReason') :
+               pendingAction?.action === 'RESCHEDULE_ACCEPT' ? t('respondReschedule') : t('rejectReason')}
             </DialogTitle>
           </DialogHeader>
           <div className="py-2">
@@ -569,13 +553,15 @@ export function AppointmentsPage() {
               value={actionReason}
               onChange={(e) => setActionReason(e.target.value)}
               placeholder={
-                pendingAction?.action === 'REJECT'
+                pendingAction?.action === 'REJECT' || pendingAction?.action === 'RESCHEDULE_REJECT'
                   ? t('enterRejectReason')
+                  : pendingAction?.action === 'RESCHEDULE_ACCEPT'
+                  ? t('enterReason')
                   : t('enterCancelReason')
               }
               rows={3}
               className="resize-none"
-              disabled={updateStatus.isPending}
+              disabled={updateStatus.isPending || respondReschedule.isPending}
             />
           </div>
           <DialogFooter className="gap-2">
@@ -584,11 +570,11 @@ export function AppointmentsPage() {
             </DialogClose>
             <Button
               size="sm"
-              variant="destructive"
+              variant={pendingAction?.action === 'RESCHEDULE_ACCEPT' ? 'default' : 'destructive'}
               onClick={handleSubmitReason}
-              disabled={!actionReason.trim() || updateStatus.isPending}
+              disabled={!actionReason.trim() || updateStatus.isPending || respondReschedule.isPending}
             >
-              {updateStatus.isPending ? t('saving') || 'Saving...' : t('submit')}
+              {(updateStatus.isPending || respondReschedule.isPending) ? t('saving') || 'Saving...' : t('submit')}
             </Button>
           </DialogFooter>
         </DialogContent>
