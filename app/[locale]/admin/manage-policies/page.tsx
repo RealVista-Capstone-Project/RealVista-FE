@@ -1,5 +1,5 @@
-import { ManagePolicyPage } from '@/screens/admin/manage-policy'
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return <ManagePolicyPage />
+export default function Page({ params }: { params: { locale: string } }) {
+  redirect(`/${params.locale}/dashboard/manage-policies`);
 }

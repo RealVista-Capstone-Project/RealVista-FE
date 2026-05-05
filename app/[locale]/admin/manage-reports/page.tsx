@@ -1,5 +1,5 @@
-import { ManageReportsPage } from '@/screens/admin/manage-reports'
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return <ManageReportsPage />
+export default function Page({ params }: { params: { locale: string } }) {
+  redirect(`/${params.locale}/dashboard/manage-reports`);
 }

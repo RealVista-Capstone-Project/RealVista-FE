@@ -1,5 +1,5 @@
-import { ManageUsersPage } from '@/screens/admin/manage-users'
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return <ManageUsersPage />
+export default function Page({ params }: { params: { locale: string } }) {
+  redirect(`/${params.locale}/dashboard/manage-users`);
 }

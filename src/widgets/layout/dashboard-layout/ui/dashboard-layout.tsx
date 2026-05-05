@@ -208,28 +208,12 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       href: ROUTES.dashboard.managePackages,
       icon: Package,
     },
-
-    {
-      id: 'property',
-      label: t('menu.property'),
-      href: ROUTES.dashboard.property,
-      icon: Building2,
-      badge: badges.totalListings,
-      badgeVariant: 'info'
-    },
-
     {
       id: 'manage-properties',
       label: t('menu.manageProperties'),
       href: ROUTES.dashboard.manageProperties,
       icon: Building2,
-    },
-    {
-      id: 'messages',
-      label: t('menu.messages'),
-      href: ROUTES.dashboard.messages,
-      icon: MessageCircle,
-    },
+    }
   ];
 }
 

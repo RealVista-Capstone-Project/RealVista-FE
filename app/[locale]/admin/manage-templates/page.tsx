@@ -1,5 +1,5 @@
-import { ManageTemplatesPage } from '@/screens/admin/manage-templates'
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return <ManageTemplatesPage />
+export default function Page({ params }: { params: { locale: string } }) {
+  redirect(`/${params.locale}/dashboard/manage-templates`);
 }

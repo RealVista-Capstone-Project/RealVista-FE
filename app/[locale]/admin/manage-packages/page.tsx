@@ -1,5 +1,5 @@
-import { ManagePackagesPage } from '@/screens/admin/manage-packages';
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return <ManagePackagesPage />;
+export default function Page({ params }: { params: { locale: string } }) {
+  redirect(`/${params.locale}/dashboard/manage-packages`);
 }
