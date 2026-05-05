@@ -14,30 +14,31 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label/label';
 import { Progress } from '@/shared/ui/progress';
 import { useGenerate3d, AzimuthImage } from '@/features/world-generation/model/use-generate-3d';
-import { MarbleModel } from '@/shared/api/marble-client';
-import { Upload, X, Box, CheckCircle2, AlertTriangle, RotateCcw } from 'lucide-react';
+import { MarbleModel, getModelCost } from '@/shared/api/marble-client';
+import { useThreeDQuota } from '@/entities/billing/hooks/use-three-d-quota';
+import { Upload, X, Box, CheckCircle2, AlertTriangle, RotateCcw, Coins } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const REQUIRED_IMAGES_COUNT = 8;
 const REQUIRED_AZIMUTHS = [0, 45, 90, 135, 180, 225, 270, 315];
 
-// English names used as storage keys (must match what the backend stores)
+// Room names used as storage keys (must match what the backend stores)
 const QUICK_FILL_ROOM_VALUES = [
-  'Living Room',
-  'Master Bedroom',
-  'Bedroom',
-  'Bathroom',
-  'Kitchen',
-  'Dining Room',
-  'Entrance',
-  'Balcony',
+  'Phòng khách',
+  'Master',
+  'Phòng ngủ',
+  'Phòng tắm',
+  'Bếp',
+  'Phòng ăn',
+  'Sảnh',
+  'Ban công',
 ] as const;
 
 // Localized display labels — index matches QUICK_FILL_ROOM_VALUES
 const QUICK_FILL_ROOM_LABELS_EN = [
   'Living Room',
-  'Master Bedroom',
+  'Master',
   'Bedroom',
   'Bathroom',
   'Kitchen',
@@ -48,12 +49,12 @@ const QUICK_FILL_ROOM_LABELS_EN = [
 
 const QUICK_FILL_ROOM_LABELS_VI = [
   'Phòng khách',
-  'Phòng ngủ chính',
+  'Master',
   'Phòng ngủ',
   'Phòng tắm',
-  'Nhà bếp',
+  'Bếp',
   'Phòng ăn',
-  'Lối vào',
+  'Sảnh',
   'Ban công',
 ] as const;
 
@@ -90,10 +91,12 @@ export function RoomGenerationDialog({
     reset,
   } = useGenerate3d(propertyId, t as any);
 
+  const { remaining, unlimited, isLoading: quotaLoading } = useThreeDQuota();
+
   const [roomName, setRoomName] = useState('');
   const [roomDisplayName, setRoomDisplayName] = useState('');
   const [images, setImages] = useState<AzimuthImage[]>([]);
-  const [selectedModel, setSelectedModel] = useState<MarbleModel>('Marble 0.1-mini');
+  const [selectedModel, setSelectedModel] = useState<MarbleModel>('marble-1.0-draft');
   const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -104,7 +107,7 @@ export function RoomGenerationDialog({
       setRoomName('');
       setRoomDisplayName('');
       setImages([]);
-      setSelectedModel('Marble 0.1-mini');
+      setSelectedModel('marble-1.0-draft');
       reset();
     }
   }, [open, reset]);
@@ -178,7 +181,8 @@ export function RoomGenerationDialog({
     onComplete();
   };
 
-  const isFormValid = roomName.trim().length > 0 && images.length === REQUIRED_IMAGES_COUNT;
+  const isFormValid = roomName.trim().length > 0 && images.length === REQUIRED_IMAGES_COUNT
+    && (unlimited || (remaining ?? 0) >= getModelCost(selectedModel));
 
   const renderUploadForm = () => (
     <div className='space-y-6'>
@@ -325,10 +329,19 @@ export function RoomGenerationDialog({
             onChange={(e) => setSelectedModel(e.target.value as MarbleModel)}
             className='w-full h-10 px-3 text-sm border-border bg-background rounded-lg shadow-sm focus:border-primary focus:ring-primary outline-none transition-colors'
           >
-            <option value='Marble 0.1-mini'>{t('draftQuality')}</option>
-            <option value='Marble 0.1-pro'>{t('highDetail')}</option>
+            <option value='marble-1.0-draft'>{t('draftQuality')}</option>
+            <option value='marble-1.0'>{t('standardQuality')}</option>
+            <option value='marble-1.1'>{t('marble11Quality')}</option>
+            <option value='marble-1.1-plus'>{t('marble11PlusQuality')}</option>
           </select>
         </div>
+
+        {!quotaLoading && !unlimited && (
+          <div className='flex items-center gap-1.5 px-3 py-1.5 bg-muted rounded-lg text-xs text-muted-foreground shrink-0'>
+            <Coins className='w-3.5 h-3.5' />
+            <span className='font-semibold'>{remaining ?? 0} {t('credits')}</span>
+          </div>
+        )}
 
         <Button
           onClick={handleGenerate}

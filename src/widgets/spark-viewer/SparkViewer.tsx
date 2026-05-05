@@ -9,9 +9,7 @@ import {
   Minimize2,
   Play,
   Pause,
-  HelpCircle,
   ChevronUp,
-  X,
 } from 'lucide-react';
 import { RealVistaButton } from '@/shared/ui/realvista-button';
 import { cn } from '@/shared/lib/utils';
@@ -31,10 +29,10 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeReady = useRef(false);
 
   // Extract URLs from metadata with nuclear-level robustness
   const spzUrls = useMemo(() => {
@@ -172,6 +170,34 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // Send URL to iframe when it changes (after initial load)
+  useEffect(() => {
+    if (iframeReady.current && currentUrl) {
+      sendCommand('SPARK_SET_URL', { url: currentUrl });
+    }
+  }, [currentUrl, sendCommand]);
+
+  // Listen for messages from iframe
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      switch (e.data?.type) {
+        case 'SPARK_LOADED':
+          iframeReady.current = true;
+          setLoading(false);
+          break;
+        case 'SPARK_LOADING_START':
+          setLoading(true);
+          break;
+        case 'SPARK_LOADING_END':
+          setLoading(false);
+          break;
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Generate HTML once — URL changes handled via postMessage
   const htmlContent = useMemo(
     () => `
 <!DOCTYPE html>
@@ -218,15 +244,22 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
   <script type="module">
     import * as THREE from "three";
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-    import { SplatMesh } from "@sparkjsdev/spark";
+    import { SplatMesh, SparkRenderer, PackedSplats } from "@sparkjsdev/spark";
 
     const loadingEl = document.getElementById("loading");
 
-    let scene, camera, renderer, controls, splatMesh;
-    let isRotating = ${isRotating};
+    const WALK_SPEED = 1.5;
+
+    let scene, camera, renderer, controls, sparkRenderer;
+    let currentMesh = null;
+    let isRotating = false;
+    let lastTime = performance.now();
+
+    const keys = new Set();
 
     function init() {
       scene = new THREE.Scene();
+
       camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1000);
       camera.position.set(2, 1, 2);
 
@@ -235,30 +268,45 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       document.body.appendChild(renderer.domElement);
 
+      sparkRenderer = new SparkRenderer({
+        renderer,
+        maxStdDev: Math.sqrt(4),
+        view: { sort360: true, sort32: true },
+      });
+      scene.add(sparkRenderer);
+
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
-      controls.autoRotate = isRotating;
+      controls.autoRotate = false;
       controls.autoRotateSpeed = 2.0;
-
-      const spzUrl = "${currentUrl}";
-      if (spzUrl) {
-        splatMesh = new SplatMesh({ url: spzUrl });
-        splatMesh.quaternion.set(1, 0, 0, 0);
-        splatMesh.position.set(0, 0, 0);
-        scene.add(splatMesh);
-      }
+      controls.enableKeys = false;
 
       window.addEventListener("resize", onWindowResize);
       window.addEventListener("message", onMessage);
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
 
-      // Notify parent
+      // Load initial URL baked into the template
+      const initialUrl = "${currentUrl}";
+      if (initialUrl) {
+        loadUrl(initialUrl);
+      }
+
       window.parent.postMessage({ type: 'SPARK_LOADED' }, '*');
-      
-      // Auto-hide loading after some time
-      setTimeout(() => loadingEl.classList.add("hidden"), 3000);
 
       animate();
+    }
+
+    function onKeyDown(e) {
+      const key = e.key.toLowerCase();
+      if (["w","a","s","d"].includes(key)) {
+        keys.add(key);
+      }
+    }
+
+    function onKeyUp(e) {
+      keys.delete(e.key.toLowerCase());
     }
 
     function onWindowResize() {
@@ -268,20 +316,92 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
     }
 
     function onMessage(e) {
-      const { type, enabled } = e.data;
+      const { type, enabled, url } = e.data;
       switch (type) {
         case 'SPARK_RESET_VIEW':
           controls.reset();
           camera.position.set(2, 1, 2);
           break;
         case 'SPARK_TOGGLE_ROTATE':
+          isRotating = enabled;
           controls.autoRotate = enabled;
+          if (enabled) {
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            const dist = camera.position.distanceTo(controls.target);
+            controls.target.copy(camera.position.clone().add(dir.multiplyScalar(dist)));
+            controls.autoRotateSpeed = 2.0;
+          }
           break;
+        case 'SPARK_SET_URL':
+          if (url) {
+            window.parent.postMessage({ type: 'SPARK_LOADING_START' }, '*');
+            loadUrl(url);
+          }
+          break;
+      }
+    }
+
+    async function loadUrl(url) {
+      try {
+        const packedSplats = new PackedSplats({ url });
+        await packedSplats.initialized;
+
+        if (currentMesh) {
+          scene.remove(currentMesh);
+          if (currentMesh.packedSplats?.dispose) {
+            currentMesh.packedSplats.dispose();
+          }
+        }
+
+        const newMesh = new SplatMesh({ packedSplats });
+        newMesh.quaternion.set(1, 0, 0, 0);
+        newMesh.position.set(0, 0, 0);
+        scene.add(newMesh);
+        currentMesh = newMesh;
+
+        loadingEl?.classList.add("hidden");
+        window.parent.postMessage({ type: 'SPARK_LOADING_END' }, '*');
+      } catch (err) {
+        console.error("Failed to load splat:", err);
+        loadingEl?.classList.add("hidden");
+        window.parent.postMessage({ type: 'SPARK_LOADING_END' }, '*');
+      }
+    }
+
+    function walk(dt) {
+      if (keys.size === 0) return;
+
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+
+      const right = new THREE.Vector3();
+      right.crossVectors(camera.up, forward).normalize();
+
+      const dir = new THREE.Vector3();
+      if (keys.has('w')) dir.add(forward);
+      if (keys.has('s')) dir.sub(forward);
+      if (keys.has('a')) dir.add(right);
+      if (keys.has('d')) dir.sub(right);
+
+      if (dir.length() > 0) {
+        dir.normalize();
+        const delta = dir.multiplyScalar(WALK_SPEED * dt);
+        camera.position.add(delta);
+        controls.target.add(delta);
       }
     }
 
     function animate() {
       requestAnimationFrame(animate);
+
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      walk(dt);
       controls.update();
       renderer.render(scene, camera);
     }
@@ -291,23 +411,8 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
 </body>
 </html>
   `,
-    [currentUrl, isRotating]
+    []
   );
-
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === 'SPARK_LOADED') {
-        setLoading(false);
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  // When quality changes, reset loading state
-  useEffect(() => {
-    setLoading(true);
-  }, [quality]);
 
   return (
     <div
@@ -421,48 +526,7 @@ export function SparkViewer({ metadata, spzUrl, className = '' }: SparkViewerPro
           )}
         </div>
 
-        {/* Help Button */}
-        <div className='border-l border-white/10 pl-3'>
-          <RealVistaButton
-            size='small'
-            onClick={() => setShowHelp(!showHelp)}
-            className='!bg-transparent !border-transparent !p-2 hover:!bg-white/10 !rounded-full'
-          >
-            <HelpCircle className='size-4 text-white/60' />
-          </RealVistaButton>
-        </div>
       </div>
-
-      {/* Navigation Help Overlay */}
-      {showHelp && (
-        <div className='absolute top-6 left-1/2 -translate-x-1/2 z-30 /80 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl max-w-sm animate-in zoom-in-95 max-h-[80vh] overflow-auto'>
-          <div className='flex justify-between items-center mb-3'>
-            <h4 className='text-white text-sm font-bold'>{t('debugTitle')}</h4>
-            <button onClick={() => setShowHelp(false)} className='text-white/40 hover:text-white'>
-              <X className='size-4' />
-            </button>
-          </div>
-          <div className='space-y-4 text-[10px] text-muted-foreground font-mono'>
-            <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-primary mb-1'>{t('debugMetadata')}</p>
-              <pre className='whitespace-pre-wrap break-all'>
-                {JSON.stringify(metadata, null, 2) || 'undefined'}
-              </pre>
-            </div>
-            <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-primary mb-1'>{t('debugUrls')}</p>
-              <pre className='whitespace-pre-wrap break-all'>
-                {JSON.stringify(spzUrls, null, 2)}
-              </pre>
-            </div>
-            <div className='p-2 bg-black/40 rounded border border-white/5'>
-              <p className='text-primary mb-1'>{t('debugPropTypes')}</p>
-              <p>metadata: {typeof metadata}</p>
-              <p>spzUrl: {typeof spzUrl}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       <iframe
         ref={iframeRef}
