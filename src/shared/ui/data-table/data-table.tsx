@@ -68,14 +68,14 @@ export function DataTable<TData>({
   return (
     <div
       className={cn(
-        'px-2 py-2 space-y-2 bg-background rounded-2xl shadow-sm border border-border',
+        'space-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm',
         className
       )}
     >
       {/* Toolbar */}
       {toolbar && toolbar}
       {/* Table */}
-      <div className='rounded-b-2xl overflow-hidden rounded-md border border-border'>
+      <div className='overflow-hidden rounded-xl border border-border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
