@@ -36,7 +36,7 @@
       "actionsColumn": "Thao tác",
       "roleAgent": "Môi giới",
       "roleOwner": "Chủ nhà",
-      "empty": "Không tìm thấy engagement nào.",
+      "empty": "Không tìm thấy hợp tác nào.",
       "clearDateFilter": "Xóa bộ lọc ngày"
     },
     "status": {
@@ -62,30 +62,30 @@
     "accept": {
       "button": "Chấp nhận",
       "dialogTitle": "Xác nhận chấp nhận",
-      "dialogDescription": "Bạn có chắc chắn muốn chấp nhận engagement này?",
+      "dialogDescription": "Bạn có chắc chắn muốn chấp nhận hợp tác này?",
       "no": "Không",
       "confirm": "Xác nhận chấp nhận"
     },
     "reject": {
       "button": "Từ chối",
       "dialogTitle": "Xác nhận từ chối",
-      "dialogDescription": "Bạn có chắc chắn muốn từ chối engagement này? Thao tác này không thể hoàn tác.",
+      "dialogDescription": "Bạn có chắc chắn muốn từ chối hợp tác này? Thao tác này không thể hoàn tác.",
       "no": "Không",
       "confirm": "Xác nhận từ chối"
     },
     "overview": {
       "title": "Tổng quan",
       "last30Days": "30 ngày qua",
-      "total": "Tổng engagements",
+      "total": "Tổng hợp tác",
       "accepted": "Được chấp nhận",
       "pendingRejected": "Đang chờ / Từ chối",
       "pending": "chờ",
       "rejected": "từ chối"
     },
     "outlook": {
-      "selectPrompt": "Chọn một engagement để xem chi tiết",
+      "selectPrompt": "Chọn một hợp tác để xem chi tiết",
       "messageTitle": "Tin nhắn",
-      "proposalTitle": "Đề xuất của Agent",
+      "proposalTitle": "Đề xuất của môi giới",
       "commission": "Tỷ lệ hoa hồng",
       "experience": "Kinh nghiệm",
       "years": "năm",
