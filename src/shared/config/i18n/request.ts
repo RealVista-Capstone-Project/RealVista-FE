@@ -35,6 +35,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/shared/ui/data-table/i18n/${locale}.json`)).default,
       ...(await import(`@/shared/ui/profile-dropdown/i18n/${locale}.json`)).default,
       ...(await import(`@/shared/ui/login-required-modal/i18n/${locale}.json`)).default,
+      ...(await import(`@/shared/ui/property-map/i18n/${locale}.json`)).default,
       ...(await import(`@/features/home/i18n/${locale}.json`)).default,
       ...(await import(`@/features/auth/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing-status/i18n/${locale}.json`)).default,
@@ -49,6 +50,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/features/rental-contract/i18n/${locale}.json`)).default,
       ...(await import(`@/features/crm/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/listing-detail/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/listing-report/i18n/${locale}.json`)).default,
       // Screen segments
       ...(await import(`@/screens/dashboard/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/property/i18n/${locale}.json`)).default,
@@ -73,6 +75,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`@/screens/admin/manage-properties/i18n/${locale}.json`)).default,
       ...(await import(`@/screens/dashboard/delegate-agent/i18n/${locale}.json`)).default,
       ...(await import(`@/features/monthly-cost-breakdown/i18n/${locale}.json`)).default,
+      ...(await import(`@/features/rent-vs-buy/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing/i18n/${locale}.json`)).default,
       ...(await import(`@/features/listing-analytics/i18n/${locale}.json`)).default,
       ...(await import(`@/features/property-search/i18n/${locale}.json`)).default,

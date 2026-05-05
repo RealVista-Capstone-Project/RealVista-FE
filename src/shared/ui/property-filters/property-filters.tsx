@@ -28,6 +28,7 @@ export interface PropertyFiltersProps {
   // View mode
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
+  hideViewModeToggle?: boolean;
 
   className?: string;
 }
@@ -68,6 +69,7 @@ export function PropertyFilters({
   onMoreFilters,
   viewMode = 'grid',
   onViewModeChange,
+  hideViewModeToggle = false,
   sortLabel = 'Mới nhất',
   sortBy = 'NEWEST',
   onSortChange,
@@ -175,34 +177,36 @@ export function PropertyFilters({
       </div>
 
       {/* View Mode Toggle */}
-      <div className='hidden sm:flex items-center gap-1 rounded-xl border-[1.5px] border-primary/20 bg-white p-1 shadow-sm shrink-0'>
-        <button
-          type='button'
-          onClick={() => onViewModeChange?.('grid')}
-          className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
-            viewMode === 'grid'
-              ? 'bg-primary text-white shadow-md'
-              : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
-          )}
-          aria-label='Grid view'
-        >
-          <Grid3x3 className='h-5 w-5' strokeWidth={2} />
-        </button>
-        <button
-          type='button'
-          onClick={() => onViewModeChange?.('list')}
-          className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
-            viewMode === 'list'
-              ? 'bg-primary text-white shadow-md'
-              : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
-          )}
-          aria-label='List view'
-        >
-          <List className='h-5 w-5' strokeWidth={2} />
-        </button>
-      </div>
+      {!hideViewModeToggle && (
+        <div className='hidden sm:flex items-center gap-1 rounded-xl border-[1.5px] border-primary/20 bg-white p-1 shadow-sm shrink-0'>
+          <button
+            type='button'
+            onClick={() => onViewModeChange?.('grid')}
+            className={cn(
+              'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
+              viewMode === 'grid'
+                ? 'bg-primary text-white shadow-md'
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+            )}
+            aria-label='Grid view'
+          >
+            <Grid3x3 className='h-5 w-5' strokeWidth={2} />
+          </button>
+          <button
+            type='button'
+            onClick={() => onViewModeChange?.('list')}
+            className={cn(
+              'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200',
+              viewMode === 'list'
+                ? 'bg-primary text-white shadow-md'
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
+            )}
+            aria-label='List view'
+          >
+            <List className='h-5 w-5' strokeWidth={2} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

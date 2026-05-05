@@ -1,11 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { HttpError } from '@/shared/lib/http';
-import {
-  getAuth,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult,
-} from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 import { ShieldCheck, Smartphone, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,18 +19,23 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from '@/shared/ui/input-otp';
-import { firebaseApp } from '@/shared/config/firebase';
+import { getFirebaseAuth } from '@/shared/config/firebase';
+import { isFirebasePhoneAuthHostnameCaptchaIssue } from '@/shared/lib/firebase-phone-auth-host';
+import { normalizeVietnamesePhoneForE164 } from '@/shared/lib/phone-vn';
 import { useTranslations } from 'next-intl';
 import { useVerifyPropertyByAgent } from '@/entities/property/api/use-verify-property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
+
+const AGENT_PHONE_RECAPTCHA_HOST_ID = 'agent-phone-verification-recaptcha-host';
 
 interface AgentVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
   propertyId: string;
   ownerName: string;
-  ownerPhone: string;
+  ownerPhoneRaw: string;
+  ownerPhoneDisplay: string;
 }
 
 /**
@@ -48,7 +48,8 @@ export function AgentVerificationModal({
   onClose,
   propertyId,
   ownerName,
-  ownerPhone,
+  ownerPhoneRaw,
+  ownerPhoneDisplay,
 }: AgentVerificationModalProps) {
   const RESEND_COOLDOWN_SECONDS = 60;
   const t = useTranslations('PropertyManagement');
@@ -60,20 +61,26 @@ export function AgentVerificationModal({
   const [resendCountdown, setResendCountdown] = useState(0);
   const recaptchaRef = useRef<HTMLDivElement>(null);
   const recaptchaVerifier = useRef<RecaptchaVerifier | null>(null);
+  const phoneOtpSendingRef = useRef(false);
 
   const { data: propertyData, isLoading: isLoadingProperty } = usePropertyDetail(propertyId);
   const verifyMutation = useVerifyPropertyByAgent();
 
-  const auth = getAuth(firebaseApp);
+  const auth = getFirebaseAuth();
 
   // Simplified effect for cleanup - we'll initialize on demand for robustness
   useEffect(() => {
     return () => {
       if (recaptchaVerifier.current) {
         console.log('[VerificationModal] Cleaning up Recaptcha...');
-        recaptchaVerifier.current.clear();
+        try {
+          recaptchaVerifier.current.clear();
+        } catch {
+          /* noop */
+        }
         recaptchaVerifier.current = null;
       }
+      document.getElementById(AGENT_PHONE_RECAPTCHA_HOST_ID)?.replaceChildren();
     };
   }, []);
 
@@ -93,25 +100,41 @@ export function AgentVerificationModal({
     return () => window.clearInterval(timer);
   }, [step, resendCountdown]);
 
-  const initRecaptcha = useCallback(() => {
-    if (recaptchaVerifier.current) return recaptchaVerifier.current;
+  const resetAgentRecaptchaHost = useCallback(() => {
+    document.getElementById(AGENT_PHONE_RECAPTCHA_HOST_ID)?.replaceChildren();
+  }, []);
 
-    const container = document.getElementById('recaptcha-container');
-    if (!container) {
-      console.error('[VerificationModal] Recaptcha container not found in DOM!');
+  const initRecaptcha = useCallback(() => {
+    const host = document.getElementById(AGENT_PHONE_RECAPTCHA_HOST_ID);
+    if (!host) {
+      console.error('[VerificationModal] reCAPTCHA host not found in DOM!');
       setError('Internal error: Recaptcha container not found');
       return null;
     }
 
+    if (recaptchaVerifier.current) {
+      try { recaptchaVerifier.current.clear(); } catch { /* stale */ }
+      recaptchaVerifier.current = null;
+    }
+    host.replaceChildren();
+
+    const mount = document.createElement('div');
+    host.appendChild(mount);
+
     console.log('[VerificationModal] Initializing Recaptcha...');
     try {
-      const verifier = new RecaptchaVerifier(auth, container, {
+      const verifier = new RecaptchaVerifier(auth, mount, {
         size: 'invisible',
         callback: () => {
           console.log('[VerificationModal] Recaptcha solved successfully');
         },
         'expired-callback': () => {
           console.error('[VerificationModal] Recaptcha expired, please try again');
+          if (recaptchaVerifier.current) {
+            try { recaptchaVerifier.current.clear(); } catch { }
+            recaptchaVerifier.current = null;
+          }
+          resetAgentRecaptchaHost();
           setStep('IDLE');
         },
       });
@@ -119,57 +142,80 @@ export function AgentVerificationModal({
       return verifier;
     } catch (err) {
       console.error('[VerificationModal] Failed to initialize Recaptcha:', err);
+      host.replaceChildren();
       setError('Failed to initialize security check');
       return null;
     }
-  }, [auth]);
+  }, [auth, resetAgentRecaptchaHost]);
 
   const handleSendOtp = useCallback(async () => {
     if (step === 'OTP_SENT' && resendCountdown > 0) {
       return;
     }
-
-    console.log('[VerificationModal] Attempting to send OTP to:', ownerPhone);
-
-    setError(null);
-    const verifier = initRecaptcha();
-
-    if (!verifier) {
-      console.error('[VerificationModal] Cannot proceed: Recaptcha verifier not ready');
-      return;
-    }
-
-    // Double check status before sending OTP
-    if (propertyData?.status && propertyData.status !== 'PENDING') {
-      const msg = `This property is ${propertyData.status.toLowerCase()} and cannot be verified.`;
-      setError(msg);
-      toast.error(msg);
-      return;
-    }
-
-    setStep('SENDING');
+    if (phoneOtpSendingRef.current) return;
+    phoneOtpSendingRef.current = true;
 
     try {
-      const confirmationResult: ConfirmationResult = await signInWithPhoneNumber(
-        auth,
-        ownerPhone,
-        verifier
-      );
+      const ownerE164 = normalizeVietnamesePhoneForE164(ownerPhoneRaw);
+      if (!ownerE164) {
+        const msg = t('invalidOwnerPhone', {
+          default: 'Owner phone format is invalid. Use +84, 84, or domestic 0… format.',
+        });
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
 
-      // Attach to window for global access in this flow
-      // @ts-expect-error - Attach to window
-      window.confirmationResult = confirmationResult;
-      setStep('OTP_SENT');
-      setResendCountdown(RESEND_COOLDOWN_SECONDS);
-      toast.success(t('otpSentSuccess', { default: 'OTP sent to owner successfully!' }));
-    } catch (err: unknown) {
-      console.error('Firebase Auth Error:', err);
+      console.log('[VerificationModal] Attempting to send OTP to:', ownerE164);
 
-      let errorMessage = t('otpSentError', { default: 'Failed to send OTP. Please try again.' });
+      setError(null);
+      const verifier = initRecaptcha();
 
-      // Handle "TOO_MANY_ATTEMPTS_TRY_LATER" or "auth/too-many-requests"
-      const errorStr = JSON.stringify(err);
-      const errObj = err as { code?: string; message?: string };
+      if (!verifier) {
+        console.error('[VerificationModal] Cannot proceed: Recaptcha verifier not ready');
+        return;
+      }
+
+      if (propertyData?.status && propertyData.status !== 'PENDING') {
+        const msg = `This property is ${propertyData.status.toLowerCase()} and cannot be verified.`;
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
+
+      setStep('SENDING');
+
+      try {
+        const confirmationResult: ConfirmationResult = await signInWithPhoneNumber(
+          auth,
+          ownerE164,
+          verifier
+        );
+
+        // @ts-expect-error - Attach to window
+        window.confirmationResult = confirmationResult;
+        if (recaptchaVerifier.current) {
+          try { recaptchaVerifier.current.clear(); } catch { /* noop */ }
+          recaptchaVerifier.current = null;
+        }
+        resetAgentRecaptchaHost();
+
+        setStep('OTP_SENT');
+        setResendCountdown(RESEND_COOLDOWN_SECONDS);
+        toast.success(t('otpSentSuccess', { default: 'OTP sent to owner successfully!' }));
+      } catch (err: unknown) {
+        console.error('Firebase Auth Error:', err);
+        if (recaptchaVerifier.current) {
+          try { recaptchaVerifier.current.clear(); } catch { /* noop */ }
+          recaptchaVerifier.current = null;
+        }
+        resetAgentRecaptchaHost();
+
+        let errorMessage = t('otpSentError', { default: 'Failed to send OTP. Please try again.' });
+
+        const errorStr = JSON.stringify(err);
+        const errObj = err as { code?: string; message?: string };
+        const errTextLower = `${(err instanceof Error ? err.message : '')} ${errorStr}`.toLowerCase();
       if (
         errorStr.includes('TOO_MANY_ATTEMPTS_TRY_LATER') ||
         errObj.code === 'auth/too-many-requests' ||
@@ -178,13 +224,45 @@ export function AgentVerificationModal({
         errorMessage = t('tooManyAttempts', {
           default: 'Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.',
         });
+      } else if (errObj.code === 'auth/invalid-phone-number') {
+        errorMessage = t('invalidOwnerPhone', {
+          default: 'Owner phone format is invalid. Use +84, 84, or domestic 0… format.',
+        });
+      } else if (errObj.code === 'auth/invalid-app-credential') {
+        errorMessage =
+          typeof window !== 'undefined' && window.location.hostname === 'localhost'
+            ? t('phoneAuthInvalidAppCredentialLocalhost')
+            : t('phoneAuthInvalidAppCredential');
+      } else if (errObj.code === 'auth/captcha-check-failed') {
+        const host = typeof window !== 'undefined' ? window.location.hostname : '';
+        errorMessage = isFirebasePhoneAuthHostnameCaptchaIssue(errObj.message, host)
+          ? t('phoneAuthCaptchaHostname', { hostname: host })
+          : t('recaptchaCheckFailed', {
+              default: 'reCAPTCHA verification failed. Please try again.',
+            });
+      } else if (errTextLower.includes('already been rendered')) {
+        errorMessage = t('recaptchaRetry', {
+          default: 'Security check reset. Tap Send OTP again.',
+        });
       }
 
-      setError(errorMessage);
-      setStep('IDLE');
-      toast.error(errorMessage);
+        setError(errorMessage);
+        setStep('IDLE');
+        toast.error(errorMessage);
+      }
+    } finally {
+      phoneOtpSendingRef.current = false;
     }
-  }, [auth, ownerPhone, t, step, resendCountdown, initRecaptcha, propertyData?.status]);
+  }, [
+    auth,
+    initRecaptcha,
+    ownerPhoneRaw,
+    resetAgentRecaptchaHost,
+    propertyData?.status,
+    resendCountdown,
+    step,
+    t,
+  ]);
 
   const handleVerifyOtp = useCallback(async () => {
     if (!otp || otp.length !== 6) return;
@@ -275,7 +353,7 @@ export function AgentVerificationModal({
               <Smartphone className='size-5 text-primary' />
             </div>
             <div className='flex-1 text-sm font-medium text-foreground'>
-              {ownerPhone}
+              {ownerPhoneDisplay}
             </div>
             {step === 'IDLE' && (
               <Button
@@ -298,7 +376,7 @@ export function AgentVerificationModal({
             )}
           </div>
 
-          <div id='recaptcha-container' ref={recaptchaRef}></div>
+          <div id={AGENT_PHONE_RECAPTCHA_HOST_ID} ref={recaptchaRef} aria-hidden />
 
           {(step === 'OTP_SENT' || step === 'SENDING') && (
             <div className='flex flex-col gap-5 animate-in fade-in slide-in-from-top-2 duration-300'>

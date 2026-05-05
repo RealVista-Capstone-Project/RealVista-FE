@@ -5,6 +5,8 @@ export const ROUTES = {
   homePage: '/',
   login: '/login',
   register: '/register',
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
   signIn: '/signin',
   signUp: '/signup',
   user: '/user',

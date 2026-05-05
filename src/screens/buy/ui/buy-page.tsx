@@ -369,6 +369,7 @@ function BuyPageContent() {
                           isFavorite={listing.is_favorite ?? false}
                           boostTags={listing.is_boosted ? listing.boost_packages : undefined}
                           userType={listing.user_type as 'AGENT' | 'OWNER'}
+                          has3D={listing.has_3d ?? false}
                           onToggleFavorite={handleToggleFavorite}
                           onClick={() => {
                             behaviorTracker.trackClick(listing.listing_id, {

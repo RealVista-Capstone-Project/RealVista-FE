@@ -219,7 +219,7 @@ export function RealVistaPropertyListingSearchBar({
               type='button'
               variant='outline'
               onClick={onAdvancedFilters}
-              className='h-[56px] px-4 flex items-center gap-2 border-primary/30 hover:border-primary hover:bg-primary/5'
+              className='h-[56px] px-4 flex items-center gap-2 border-primary/30 text-primary hover:border-primary hover:bg-primary/5'
               title='Advanced Filters'
             >
               <SlidersHorizontal className='h-5 w-5' />

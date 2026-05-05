@@ -80,10 +80,10 @@ export function PropertyGallery({
   }
 
   return (
-    <div className='flex flex-col gap-3 sm:gap-4 sm:grid sm:grid-cols-[2fr_1fr] sm:h-[400px] lg:h-[500px]'>
+    <div className='flex flex-col gap-2 sm:gap-2 sm:grid sm:grid-cols-[3fr_1fr] sm:h-[320px] lg:h-[380px]'>
       {/* Hero Image */}
       <div
-        className='relative rounded-xl overflow-hidden w-full aspect-[4/3] sm:aspect-auto sm:h-full bg-primary/5 cursor-pointer group/hero'
+        className='relative rounded-xl overflow-hidden w-full aspect-[16/9] sm:aspect-auto sm:h-full bg-primary/5 cursor-pointer group/hero'
         onClick={() => handleOpenMedia()}
       >
         {mainImage.type === 'video' ? (
@@ -172,7 +172,7 @@ export function PropertyGallery({
         </div>
       </div>
 
-      <div className='flex flex-row gap-3 mt-2 sm:mt-0 sm:flex-col sm:gap-3 sm:h-full'>
+      <div className='flex flex-row gap-2 mt-2 sm:mt-0 sm:flex-col sm:gap-2 sm:h-full'>
         {thumbnailImages.map((image) => {
           const isVideo = image.type === 'video';
           const is3D = image.type === '3d-tour';
