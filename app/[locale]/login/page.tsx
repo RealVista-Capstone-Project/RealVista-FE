@@ -70,6 +70,9 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
                 {/* Google OAuth Button */}
                 <GoogleLoginButton />
+                <p className='text-xs text-muted-foreground'>
+                  {t('agentGoogleLoginUnavailable')}
+                </p>
               </Suspense>
             </div>
 

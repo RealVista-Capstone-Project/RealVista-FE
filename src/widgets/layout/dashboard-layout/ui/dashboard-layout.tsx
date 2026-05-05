@@ -17,6 +17,7 @@ import {
   Package,
   ShieldCheck,
   Flag,
+  FileUser,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -152,7 +153,7 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       id: 'proposals',
       label: t('menu.proposals'),
       href: ROUTES.dashboard.manageProposals,
-      icon: FileText,
+      icon: FileUser,
     },
     {
       id: 'my-contracts',

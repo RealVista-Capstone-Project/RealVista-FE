@@ -14,6 +14,7 @@ export interface VndAmountInputProps extends Omit<React.ComponentProps<'input'>,
   value: number;
   onChange: (amountVnd: number) => void;
   max?: number;
+  maxBehavior?: 'clamp' | 'block';
   inputClassName?: string;
   error?: boolean;
   /** Shown when value > 0; defaults to formatVND(value). */
@@ -26,6 +27,7 @@ export function VndAmountInput({
   value,
   onChange,
   max,
+  maxBehavior = 'clamp',
   className,
   inputClassName,
   error,
@@ -46,10 +48,20 @@ export function VndAmountInput({
   const handleChange = (raw: string) => {
     const nextDigits = sanitizeVndDigits(raw);
     const parsed = digitsToVndInteger(nextDigits);
-    const maxAllowed = typeof max === "number" && Number.isFinite(max) ? Math.max(0, max) : null;
-    const normalized = maxAllowed == null ? parsed : Math.min(parsed, maxAllowed);
-    setDigits(vndIntegerToDigitString(normalized));
-    onChange(normalized);
+    const maxAllowed = typeof max === 'number' && Number.isFinite(max) ? Math.max(0, max) : null;
+
+    if (maxAllowed != null && parsed > maxAllowed) {
+      if (maxBehavior === 'block') {
+        return;
+      }
+      const clamped = maxAllowed;
+      setDigits(vndIntegerToDigitString(clamped));
+      onChange(clamped);
+      return;
+    }
+
+    setDigits(vndIntegerToDigitString(parsed));
+    onChange(parsed);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
