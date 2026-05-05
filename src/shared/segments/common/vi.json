@@ -207,6 +207,7 @@
       "proposalTemplateNotOwned": "Bạn không sở hữu mẫu đề xuất này.",
       "cannotProposeToSelf": "Bạn không thể gửi đề xuất cho bất động sản của chính mình.",
       "proposalAlreadyActive": "Bạn đã có một đề xuất đang hoạt động cho bất động sản này.",
+      "duplicateProposalTitle": "Bạn đã có một hồ sơ với tiêu đề này.",
       "subscriptionNotActive": "Gói dịch vụ này không còn hoạt động.",
       "boostAlreadyActive": "Tin đăng này đã có boost loại này đang hoạt động.",
       "boostPublishedOnly": "Boost chỉ có thể áp dụng cho tin đăng đã xuất bản.",

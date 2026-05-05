@@ -377,7 +377,13 @@ export function ProposalFormDialog({
     setErrors(draftErrors);
     if (Object.keys(draftErrors).length > 0) return;
     const draftPayload = toDraftPayload(form);
-    if (mode === 'edit' && initialDraftFingerprint && getDraftFingerprint(draftPayload) === initialDraftFingerprint) {
+    const isUnchangedEditDraft =
+      mode === 'edit' &&
+      initialData?.status === AgentProposalStatus.DRAFT &&
+      initialDraftFingerprint != null &&
+      getDraftFingerprint(draftPayload) === initialDraftFingerprint;
+
+    if (isUnchangedEditDraft) {
       toast.info(t('toastDraftNoChanges'));
       return;
     }

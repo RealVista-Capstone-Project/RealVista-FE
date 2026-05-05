@@ -207,6 +207,7 @@
       "proposalTemplateNotOwned": "You do not own this proposal template.",
       "cannotProposeToSelf": "You cannot submit a proposal to your own property.",
       "proposalAlreadyActive": "You already have an active proposal for this property.",
+      "duplicateProposalTitle": "You already have a proposal with this title.",
       "subscriptionNotActive": "This subscription plan is no longer active.",
       "boostAlreadyActive": "This listing already has an active boost of this type.",
       "boostPublishedOnly": "Boosts can only be applied to published listings.",
