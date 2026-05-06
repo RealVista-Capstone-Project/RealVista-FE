@@ -436,7 +436,7 @@ export function ManageUsersPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className='relative mx-auto flex h-full min-h-[calc(100vh-140px)] max-w-[1700px] flex-col gap-6 overflow-hidden px-4 py-6 sm:px-6 lg:px-8'
+      className='relative mx-auto flex h-full min-h-[calc(100vh-140px)] max-w-[1700px] flex-col gap-6 overflow-x-hidden overflow-y-auto px-4 py-6 sm:px-6 lg:px-8'
     >
       {/* Subtle Background Orbs */}
       <div className='pointer-events-none absolute inset-0 overflow-hidden'>
@@ -459,7 +459,7 @@ export function ManageUsersPage() {
       </header>
 
       {/* Main content - shadow and rounded borders added in DataTable wrapper */}
-      <div className='flex flex-1 flex-col gap-4 overflow-hidden'>
+      <div className='flex min-h-0 flex-1 flex-col gap-4'>
         <DataTable
           columns={columns}
           data={pageData?.content || []}
@@ -467,7 +467,8 @@ export function ManageUsersPage() {
           isLoading={isLoading}
           pagination={pagination}
           onPaginationChange={setPagination}
-          className='h-full flex flex-col'
+          className='flex h-full min-h-0 flex-col'
+          tableContainerClassName='min-h-0 flex-1 overflow-y-auto'
           toolbar={
             <div className='flex flex-col gap-3 border-b border-border/60 p-4 md:flex-row md:items-center md:justify-between'>
               <div className='group relative w-full max-w-xl flex-1'>
@@ -521,36 +522,6 @@ export function ManageUsersPage() {
           emptyDescription={t('table.empty.description')}
         />
 
-        <div className='flex flex-col gap-4 border-t border-slate-100 bg-slate-50/30 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
-          <div className='flex flex-wrap items-center gap-2 sm:gap-3'>
-            <p className='text-[11px] text-slate-400 font-bold uppercase tracking-widest'>
-              Population Index {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, pageData?.total_elements || 0)}
-            </p>
-            <Badge variant='outline' className='bg-white text-[10px] border-slate-200 px-2'>
-              Total {pageData?.total_elements || 0}
-            </Badge>
-          </div>
-          <div className='flex items-center gap-2 self-end sm:self-auto'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setPagination((p) => ({ ...p, pageIndex: Math.max(0, p.pageIndex - 1) }))}
-              disabled={pageData?.first || isLoading}
-              className='h-9 rounded-xl border-slate-200 bg-white px-5 font-bold shadow-sm transition-all hover:translate-x-[-2px] disabled:opacity-40'
-            >
-              Previous
-            </Button>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setPagination((p) => ({ ...p, pageIndex: p.pageIndex + 1 }))}
-              disabled={pageData?.last || isLoading}
-              className='h-9 rounded-xl border-slate-200 bg-white px-5 font-bold shadow-sm transition-all hover:translate-x-[2px] disabled:opacity-40'
-            >
-              Next
-            </Button>
-          </div>
-        </div>
       </div>
       <UserDetailSheet userId={selectedUserId} open={isDetailOpen} onOpenChange={setIsDetailOpen} />
 
