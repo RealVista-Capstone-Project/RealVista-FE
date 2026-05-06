@@ -836,7 +836,7 @@ function PropertyDetailPanel({
           if (!canChange) {
             // Static badge — final / system status
             return (
-              <div className='inline-flex items-center gap-2'>
+              <div className='flex flex-wrap items-center gap-2 sm:gap-3'>
                 <span
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border',
@@ -847,16 +847,20 @@ function PropertyDetailPanel({
                   {t(`status${property.status}` as Parameters<typeof t>[0])}
                 </span>
                 {statusAttributionText && (
-                  <span className='text-xs font-medium text-muted-foreground'>
-                    {statusAttributionText}
-                  </span>
+                  <div className='flex items-center gap-2'>
+                    <div className='hidden sm:block h-4 w-px bg-border' />
+                    <div className='flex items-center gap-1.5 text-[13px] font-medium text-foreground/80 bg-muted/40 border border-border px-3 py-1.5 rounded-lg shadow-sm'>
+                      <UserCheck className='h-4 w-4 text-primary/70' />
+                      <span>{statusAttributionText}</span>
+                    </div>
+                  </div>
                 )}
               </div>
             );
           }
 
           return (
-            <div className='inline-flex items-center gap-2'>
+            <div className='flex flex-wrap items-center gap-2 sm:gap-3'>
               <div className='relative inline-block' ref={statusRef}>
                 {/* Badge trigger */}
                 <button
@@ -903,9 +907,13 @@ function PropertyDetailPanel({
                 )}
               </div>
               {statusAttributionText && (
-                <span className='text-xs font-medium text-muted-foreground'>
-                  {statusAttributionText}
-                </span>
+                <div className='flex items-center gap-2'>
+                  <div className='hidden sm:block h-4 w-px bg-border' />
+                  <div className='flex items-center gap-1.5 text-[13px] font-medium text-foreground/80 bg-muted/40 border border-border px-3 py-1.5 rounded-lg shadow-sm'>
+                    <UserCheck className='h-4 w-4 text-primary/70' />
+                    <span>{statusAttributionText}</span>
+                  </div>
+                </div>
               )}
             </div>
           );
