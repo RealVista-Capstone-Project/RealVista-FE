@@ -21,15 +21,18 @@ export interface BulkMediaUploadResponse {
 }
 
 export const mediaApi = {
-  uploadBulkMedia: (files: File[], folder = 'properties', propertyId?: string) => {
+  uploadBulkMedia: (files: File[], folder = 'properties', propertyId?: string, listingId?: string) => {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
     formData.append('folder', folder);
 
-    const params = propertyId ? `?propertyId=${propertyId}` : '';
-    return http.post<BulkMediaUploadResponse>(`media/upload/bulk${params}`, formData, {
+    const params = new URLSearchParams();
+    if (propertyId) params.set('propertyId', propertyId);
+    if (listingId) params.set('listingId', listingId);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return http.post<BulkMediaUploadResponse>(`media/upload/bulk${queryString}`, formData, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },

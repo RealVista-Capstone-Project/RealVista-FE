@@ -249,7 +249,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       if (newFiles.length > 0) {
         const filesToUpload = newFiles.filter((_, i) => selectedNewFileIndices.has(i));
         if (filesToUpload.length > 0) {
-          const uploadRes = await mediaApi.uploadBulkMedia(filesToUpload, 'listings');
+          const uploadRes = await mediaApi.uploadBulkMedia(filesToUpload, 'listings', undefined, listing.listing_id);
           if (
             uploadRes.status < 200 ||
             uploadRes.status >= 300 ||

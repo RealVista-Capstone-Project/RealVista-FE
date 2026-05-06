@@ -10,7 +10,7 @@ export const useUploadMedia = () => {
 
 export const useUploadBulkMedia = () => {
   return useMutation({
-    mutationFn: ({ files, folder }: { files: File[]; folder?: string }) =>
-      mediaApi.uploadBulkMedia(files, folder),
+    mutationFn: ({ files, folder, listingId }: { files: File[]; folder?: string; listingId?: string }) =>
+      mediaApi.uploadBulkMedia(files, folder, undefined, listingId),
   });
 };
