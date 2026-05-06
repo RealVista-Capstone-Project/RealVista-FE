@@ -12,10 +12,6 @@
     "low": "Thấp (100k)",
     "cameraReset": "Đã đặt lại camera",
     "fullscreenError": "Lỗi khi bật toàn màn hình: {error}",
-    "iframeTitle": "Trình xem 3D Spark",
-    "debugTitle": "Thông tin gỡ lỗi",
-    "debugMetadata": "Metadata:",
-    "debugUrls": "URL đã trích xuất:",
-    "debugPropTypes": "Kiểu prop:"
+    "iframeTitle": "Trình xem 3D Spark"
   }
 }

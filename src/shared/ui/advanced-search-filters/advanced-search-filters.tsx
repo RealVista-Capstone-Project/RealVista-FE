@@ -148,7 +148,7 @@ export function AdvancedSearchFilters({
             value={currentValue || 'ANY'}
             onValueChange={(val) => setDynamicAttr(upperCode, val === 'ANY' ? undefined : val)}
           >
-            <SelectTrigger>
+            <SelectTrigger className='border-gray-300'>
               <SelectValue placeholder='Bất kỳ' />
             </SelectTrigger>
             <SelectContent>
@@ -198,6 +198,7 @@ export function AdvancedSearchFilters({
             onChange={(e) => setDynamicAttr(upperCode, sanitizePositiveInt(e.target.value))}
             onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()}
             maxLength={10}
+            className='border-gray-300'
           />
         </div>
       );
@@ -213,7 +214,7 @@ export function AdvancedSearchFilters({
             value={currentValue || 'ANY'}
             onValueChange={(val) => setDynamicAttr(upperCode, val === 'ANY' ? undefined : val)}
           >
-            <SelectTrigger>
+            <SelectTrigger className='border-gray-300'>
               <SelectValue placeholder='Bất kỳ' />
             </SelectTrigger>
             <SelectContent>
@@ -242,6 +243,7 @@ export function AdvancedSearchFilters({
           value={currentValue || ''}
           onChange={(e) => setDynamicAttr(upperCode, e.target.value || undefined)}
           maxLength={100}
+          className='border-gray-300'
         />
       </div>
     );
@@ -271,7 +273,7 @@ export function AdvancedSearchFilters({
                 setFilters({ ...filters, locationId: value === 'ALL' ? undefined : value })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className='border-gray-300'>
                 <SelectValue placeholder='Tất cả' />
               </SelectTrigger>
               <SelectContent>
@@ -296,6 +298,7 @@ export function AdvancedSearchFilters({
                 setFilters({ ...filters, location: e.target.value || undefined })
               }
               maxLength={100}
+              className='border-gray-300'
             />
           </div>
 
@@ -313,7 +316,7 @@ export function AdvancedSearchFilters({
                 })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className='border-gray-300'>
                 <SelectValue placeholder='Tất cả' />
               </SelectTrigger>
               <SelectContent>
@@ -345,6 +348,7 @@ export function AdvancedSearchFilters({
                   })
                 }
                 hidePreview
+                className='border-gray-300'
               />
               <VndAmountInput
                 placeholder='Giá tối đa'
@@ -356,6 +360,7 @@ export function AdvancedSearchFilters({
                   })
                 }
                 hidePreview
+                className='border-gray-300'
               />
             </div>
           </div>
@@ -396,6 +401,7 @@ export function AdvancedSearchFilters({
                   })
                 }
                 maxLength={10}
+                className='border-gray-300'
               />
               <Input
                 type='number'
@@ -411,6 +417,7 @@ export function AdvancedSearchFilters({
                   })
                 }
                 maxLength={10}
+                className='border-gray-300'
               />
             </div>
           </div>
@@ -482,7 +489,7 @@ export function AdvancedSearchFilters({
                 })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className='border-gray-300'>
                 <SelectValue placeholder='Chọn thứ tự sắp xếp' />
               </SelectTrigger>
               <SelectContent>

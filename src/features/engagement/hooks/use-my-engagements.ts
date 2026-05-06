@@ -51,7 +51,7 @@ export const useCancelEngagementMutation = (onSuccessCallback?: () => void) => {
       return engagementApi.cancelEngagement(id, accessToken, reason);
     },
     onSuccess: () => {
-      toast.success('Đã hủy engagement thành công');
+      toast.success('Đã hủy hợp tác thành công');
       queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
       if (onSuccessCallback) {
         onSuccessCallback();
@@ -74,7 +74,7 @@ export const useFinishEngagementMutation = (onSuccessCallback?: () => void) => {
       return engagementApi.finishEngagement(id, accessToken);
     },
     onSuccess: () => {
-      toast.success('Đã hoàn thành engagement');
+      toast.success('Đã hoàn thành hợp tác');
       queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
       if (onSuccessCallback) {
         onSuccessCallback();
@@ -97,7 +97,7 @@ export const useAcceptEngagementMutation = (onSuccessCallback?: () => void) => {
       return engagementApi.acceptEngagement(id, accessToken);
     },
     onSuccess: () => {
-      toast.success('Đã chấp nhận engagement');
+      toast.success('Đã chấp nhận hợp tác');
       queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
       if (onSuccessCallback) {
         onSuccessCallback();
@@ -120,7 +120,7 @@ export const useRejectEngagementMutation = (onSuccessCallback?: () => void) => {
       return engagementApi.rejectEngagement(id, accessToken);
     },
     onSuccess: () => {
-      toast.success('Đã từ chối engagement');
+      toast.success('Đã từ chối hợp tác');
       queryClient.invalidateQueries({ queryKey: ['my-engagements'] });
       if (onSuccessCallback) {
         onSuccessCallback();

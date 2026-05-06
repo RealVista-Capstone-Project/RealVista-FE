@@ -36,20 +36,6 @@ export function ConversationSidebar({
         <h1 className='text-xl font-bold text-slate-800'>{t('title')}</h1>
       </div>
 
-      {/* Search */}
-      <div className='px-4 pb-3'>
-        <div className='flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all'>
-          <Search className='size-4 shrink-0 text-slate-400' />
-          <input
-            type='text'
-            placeholder={t('searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className='w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none'
-          />
-        </div>
-      </div>
-
       {/* Conversation List */}
       <div className='flex-1 overflow-y-auto'>
         {/* Pinned */}

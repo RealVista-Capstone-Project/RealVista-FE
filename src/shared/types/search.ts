@@ -48,6 +48,7 @@ export interface ListingSearchResponse {
   bookmarked_at?: string;
   property_type_name?: string;
   property_category_name?: string;
+  has_3d?: boolean;
   attributes?: Array<{
     attribute_id: string;
     attribute_code: string;

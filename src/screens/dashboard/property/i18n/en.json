@@ -67,6 +67,8 @@
     "hireAgent": "Hire Agent",
     "selfPosted": "Posted by me",
     "agentPosted": "Posted by agent",
+    "rentedByAgent": "Rented by agent: {name}",
+    "rentedByOwner": "Rented by owner: {name}",
     "commissionLabel": "Commission",
     "yearsExperience": "years of experience"
   }

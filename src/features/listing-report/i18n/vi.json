@@ -1,0 +1,30 @@
+{
+  "ReportDialog": {
+    "titleListing": "Báo cáo tin đăng",
+    "titleUser": "Báo cáo người dùng",
+    "disclaimer": "Vui lòng chọn lý do và cung cấp chi tiết. Báo cáo sai sự thật có thể dẫn đến việc đình chỉ tài khoản.",
+    "reasonLabel": "Lý do báo cáo",
+    "reasonPlaceholder": "Chọn lý do...",
+    "descriptionLabel": "Chi tiết bổ sung",
+    "descriptionPlaceholder": "Mô tả chi tiết hơn về vấn đề bạn gặp phải (tùy chọn)",
+    "cancel": "Hủy",
+    "submit": "Gửi báo cáo",
+    "submitting": "Đang gửi...",
+    "successMessage": "Báo cáo của bạn đã được gửi thành công. Chúng tôi sẽ xem xét trong thời gian sớm nhất.",
+    "errorMessage": "Gửi bááo cáo thất bại. Vui lòng thử lại.",
+    "errorEmptyReason": "Vui lòng chọn lý do báo cáo",
+    "reasons": {
+      "SCAM": "Lừa đảo / Gian lận",
+      "FAKE_INFO": "Thông tin giả mạo",
+      "DUPLICATE": "Tin đăng trùng lặp",
+      "HARASSMENT": "Quấy rối",
+      "SPAM": "Spam",
+      "MISLEADING": "Nội dung gây hiểu lầm",
+      "INAPPROPRIATE": "Nội dung không phù hợp",
+      "WRONG_INFO": "Thông tin sai (giá, diện tích, địa chỉ...)",
+      "FAKE_PROFILE": "Hồ sơ giả mạo",
+      "VIOLATES_TERMS": "Vi phạm điều khoản dịch vụ",
+      "OTHER": "Khác"
+    }
+  }
+}

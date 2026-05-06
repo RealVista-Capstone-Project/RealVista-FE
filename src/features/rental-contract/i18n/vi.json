@@ -27,7 +27,8 @@
       "active": "Đang hiệu lực",
       "expired": "Hết hạn",
       "terminated": "Đã chấm dứt",
-      "rejected": "Đã từ chối"
+      "rejected": "Đã từ chối",
+      "cancelled": "Đã hủy"
     },
     "table": {
       "status": "Trạng thái",
@@ -49,7 +50,11 @@
       "noAvailableAction": "Không có thao tác",
       "signNow": "Ký ngay",
       "sendToOwner": "Gửi chủ nhà ký",
-      "sentSuccess": "Đã gửi hợp đồng để ký"
+      "sentSuccess": "Đã gửi hợp đồng để ký",
+      "moreActions": "Thêm thao tác",
+      "contractActions": "Thao tác hợp đồng",
+      "viewDetail": "Xem chi tiết",
+      "cancelLease": "Hủy hợp đồng"
     },
     "statusActionHints": {
       "sendForSigning": "Tạo hoặc sử dụng lại phong bì DocuSign và gửi cho cả hai bên.",
@@ -68,14 +73,30 @@
       "reasonLabel": "Lý do",
       "reasonPlaceholder": "Viết ghi chú rõ ràng cho lần cập nhật trạng thái này...",
       "reasonHint": "Sử dụng ít nhất 10 ký tự để lịch sử cập nhật có ích.",
-      "updating": "Đang cập nhật..."
+      "updating": "Đang cập nhật...",
+      "cancelTitle": "Hủy hợp đồng thuê",
+      "cancelDescription": "Bạn có thể hủy hợp đồng này cho {tenantName} khi hợp đồng còn ở bản nháp hoặc đang chờ ký.",
+      "cancelReasonPlaceholder": "Tùy chọn: cho bên còn lại biết lý do hủy hợp đồng...",
+      "cancelReasonHint": "Không bắt buộc. Để trống nếu muốn hủy mà không gửi lý do."
     },
     "toast": {
       "updateSuccess": "Cập nhật hợp đồng thuê thành công",
       "updateError": "Không thể cập nhật hợp đồng thuê. Vui lòng thử lại.",
       "signingUrlReady": "Đường dẫn ký đã sẵn sàng — đang mở DocuSign trong tab mới.",
       "signingUnavailable": "Chức năng ký tạm thời không khả dụng. Vui lòng thử lại sau.",
-      "signingError": "Không thể tải liên kết ký. Vui lòng thử lại."
+      "signingError": "Không thể tải liên kết ký. Vui lòng thử lại.",
+      "cancelSuccess": "Đã hủy hợp đồng thuê thành công"
+    },
+    "signedDocument": {
+      "title": "Hợp đồng đã ký cuối cùng",
+      "notAvailable": "Hợp đồng đã ký cuối cùng chưa khả dụng.",
+      "preparing": "Hợp đồng cuối cùng đang được chuẩn bị...",
+      "completed": "Hợp đồng đã ký cuối cùng của bạn đã sẵn sàng.",
+      "viewButton": "Xem hợp đồng đã ký",
+      "failed": "Không thể chuẩn bị hợp đồng đã ký. Vui lòng thử lại sau.",
+      "missingUrl": "Hợp đồng đã ký đã hoàn tất nhưng liên kết tài liệu chưa khả dụng.",
+      "securePreview": "Bản xem trước bảo mật",
+      "iframeTitle": "Xem trước hợp đồng đã ký"
     },
     "common": {
       "cancel": "Hủy"

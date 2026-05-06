@@ -37,6 +37,7 @@ const STATUS_KEY_MAP: Record<RentalContractStatus, string> = {
   [RentalContractStatus.EXPIRED]: 'contractModal.statusExpired',
   [RentalContractStatus.TERMINATED]: 'contractModal.statusTerminated',
   [RentalContractStatus.REJECTED]: 'contractModal.statusRejected',
+  [RentalContractStatus.CANCELLED]: 'contractModal.statusCancelled',
 };
 
 // ── Listing URL detection ─────────────────────────────────────────────────────

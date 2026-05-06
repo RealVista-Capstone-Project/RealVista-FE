@@ -221,6 +221,39 @@ export interface ManagedListingSummary {
   sale: number;
 }
 
+// ============ Compare Data ============
+export interface ListingCompareData {
+  listing_id: string;
+  slug: string;
+  name: string;
+  price: number;
+  min_price?: number;
+  max_price?: number;
+  listing_type: ListingType;
+  is_negotiable: boolean;
+  is_featured: boolean;
+  is_hot: boolean;
+  thumbnail_url: string | null;
+  media_count: number;
+  property_type: PropertyType;
+  location: Location;
+  full_address: string;
+  usable_size_m2: number | null;
+  land_size_m2: number | null;
+  width_m: number | null;
+  length_m: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  floor: number | null;
+  total_floors: number | null;
+  direction: string | null;
+  attributes: Attribute[];
+  amenities: Amenity[];
+  available_from: string | null;
+  published_at: string;
+  content: string | null;
+}
+
 // ============ Main Listing Type (what we export) ============
 export type Listing = ListingData;
 export type PriceHistory = PriceHistoryData;

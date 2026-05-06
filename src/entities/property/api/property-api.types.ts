@@ -28,6 +28,8 @@ export interface PropertySummaryResponse {
   owner_email: string | null;
   owner_avatar_url: string | null;
   owner_phone: string | null;
+  owner_phone_display: string | null;
+  is_owner_phone_hidden: boolean | null;
   has_3d: boolean;
   price_range: PropertyPriceRange | null;
   allow_rent_listing_when_rented: boolean;
@@ -36,6 +38,11 @@ export interface PropertySummaryResponse {
   sold_by_phone: string | null;
   sold_by_role: 'OWNER' | 'AGENT' | null;
   sold_at: string | null;
+  rented_by_user_id?: string | null;
+  rented_by_name?: string | null;
+  rented_by_phone?: string | null;
+  rented_by_role?: 'OWNER' | 'AGENT' | null;
+  rented_at?: string | null;
 }
 export interface PropertySearchRequest {
   north_lat: number;
@@ -177,6 +184,8 @@ export interface PropertySummaryResponse {
   amenities: PropertyAmenityItem[] | null;
   owner_name: string | null;
   owner_phone: string | null;
+  owner_phone_display: string | null;
+  is_owner_phone_hidden: boolean | null;
   has_3d: boolean;
   price_range: PropertyPriceRange | null;
   allow_rent_listing_when_rented: boolean;
@@ -185,6 +194,11 @@ export interface PropertySummaryResponse {
   sold_by_phone: string | null;
   sold_by_role: 'OWNER' | 'AGENT' | null;
   sold_at: string | null;
+  rented_by_user_id?: string | null;
+  rented_by_name?: string | null;
+  rented_by_phone?: string | null;
+  rented_by_role?: 'OWNER' | 'AGENT' | null;
+  rented_at?: string | null;
 }
 
 export interface PageResponse<T> {

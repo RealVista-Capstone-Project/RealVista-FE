@@ -1,7 +1,6 @@
 import { auth } from '@/shared/lib/auth/config';
 import { redirect } from '@/shared/config/i18n/navigation';
 import { RegisterPageClient } from '@/features/auth/ui/register-page-client';
-import { GoogleLoginButton } from '@/features/auth/ui/google-login-button';
 import { Link } from '@/shared/config/i18n/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PropertyCardFeatured } from '@/shared/ui/property-card-featured';
@@ -23,33 +22,17 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
       <div className='flex w-full flex-col lg:w-1/2 overflow-y-auto'>
         {/* Logo */}
         <div className='px-6 pt-4 pb-4 lg:px-8 lg:pt-5'>
-          <Link href='/buy' className='flex items-center gap-2'>
+          <Link href='/buy' className='flex items-center gap-1'>
             <RealVistaLogo />
             <span className='text-xl font-bold text-foreground'>RealVista</span>
           </Link>
         </div>
-        <div className='border-b border-border' />
 
         {/* Form Container */}
         <div className='flex flex-1 items-center justify-center px-6 pb-6 lg:px-8'>
           <div className='w-full max-w-md space-y-6'>
-            {/* Register Form + role switch in header */}
-            <div className='space-y-5'>
-              <RegisterPageClient />
-
-              {/* Visual Separator */}
-              <div className='relative'>
-                <div className='absolute inset-0 flex items-center'>
-                  <span className='w-full border-t border-border' />
-                </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='bg-white px-4 text-muted-foreground'>{t('continueWith')}</span>
-                </div>
-              </div>
-
-              {/* Google OAuth Button */}
-              <GoogleLoginButton />
-            </div>
+            {/* Register Form + role-aware social auth */}
+            <RegisterPageClient />
 
             {/* Footer Links */}
             <div className='text-center text-sm text-muted-foreground'>
@@ -66,10 +49,17 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
       </div>
 
       {/* Right Column - Featured Property */}
-      <div className='hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-primary/5 lg:via-primary/5 lg:to-primary/20 lg:p-8 overflow-y-auto'>
+      <div className='hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:bg-gradient-to-br lg:from-primary/10 lg:via-primary/5 lg:to-primary/30 lg:p-8 overflow-y-auto relative'>
+        {/* Decorative gradient overlay for depth */}
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--primary)_0%,_transparent_50%)] opacity-10 pointer-events-none' />
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--primary)_0%,_transparent_40%)] opacity-5 pointer-events-none' />
         <div className='relative mx-auto w-full max-w-sm'>
-          {/* Decorative Shape */}
-          <div className='absolute -right-8 -top-8 h-48 w-48 rounded-full bg-primary opacity-10' />
+          {/* Decorative Shapes - spread out beyond card area */}
+          <div className='absolute -right-20 -top-16 h-56 w-56 rounded-full bg-primary opacity-10' />
+          <div className='absolute -left-24 top-1/4 h-40 w-40 rounded-full bg-primary opacity-5' />
+          <div className='absolute right-4 bottom-32 h-32 w-32 rounded-full bg-primary opacity-8' />
+          <div className='absolute -left-16 bottom-8 h-24 w-24 rounded-full bg-primary opacity-6' />
+          <div className='absolute right-1/4 -top-12 h-20 w-20 rounded-full bg-primary opacity-7' />
 
           {/* Property Card */}
           <PropertyCardFeatured

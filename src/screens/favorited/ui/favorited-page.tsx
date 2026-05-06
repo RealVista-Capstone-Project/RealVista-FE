@@ -121,13 +121,13 @@ export function FavoritedPage() {
     setCompareSelectedIds((prev) => {
       if (!selected) return prev.filter((x) => x !== id);
       if (prev.includes(id)) return prev;
-      if (prev.length >= 2) return prev;
+      if (prev.length >= 3) return prev;
       return [...prev, id];
     });
   };
 
   const handleCompareNavigate = () => {
-    if (compareSelectedIds.length !== 2) return;
+    if (compareSelectedIds.length < 2) return;
     const q = compareSelectedIds.join(',');
     router.push(`/${locale}${ROUTES.compare}?ids=${encodeURIComponent(q)}`);
   };
@@ -167,7 +167,7 @@ export function FavoritedPage() {
         propertyType={propertyType}
         onPropertyTypeChange={handlePropertyTypeChange}
         compareSelectedCount={compareSelectedIds.length}
-        isCompareEnabled={compareSelectedIds.length === 2}
+        isCompareEnabled={compareSelectedIds.length >= 2}
         onCompareClick={handleCompareNavigate}
         isCompareMode={isCompareMode}
         onStartCompareMode={handleStartCompareMode}
@@ -175,7 +175,7 @@ export function FavoritedPage() {
       />
 
       {/* Results Section */}
-      <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8'>
+      <section className='px-6 pb-12 pt-8 sm:px-6 lg:px-8 min-h-[calc(100vh-200px)]'>
         <div className='mx-auto max-w-7xl'>
           {isLoading ? (
             <div className='flex justify-center py-16'>
@@ -183,14 +183,14 @@ export function FavoritedPage() {
             </div>
           ) : items.length === 0 ? (
             // Empty State
-            <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-white py-16 px-6'>
+            <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-white py-20 px-16 min-h-[500px]'>
               <Heart className='mb-4 h-12 w-12 text-muted-foreground/60' strokeWidth={1.5} />
               <h2 className='mb-2 text-lg font-bold text-foreground'>{t('emptyTitle')}</h2>
               <p className='mb-6 max-w-md text-center text-sm text-muted-foreground'>
                 {t('emptyDescription')}
               </p>
               <Link
-                href={`/${locale}${ROUTES.buy}`}
+                href={`/${locale}${listingType === 'buy' ? ROUTES.buy : ROUTES.rent}`}
                 className='inline-block rounded-lg bg-primary px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-primary/90'
               >
                 {t('browseListing')}
@@ -210,7 +210,7 @@ export function FavoritedPage() {
                       isSelected={compareSelectedIds.includes(item.listing_id)}
                       compareUnavailable={listingStatusIsSold(item.status)}
                       compareSelectDisabled={
-                        compareSelectedIds.length >= 2 &&
+                        compareSelectedIds.length >= 3 &&
                         !compareSelectedIds.includes(item.listing_id)
                       }
                       onSelectionChange={handleCompareSelectionChange}

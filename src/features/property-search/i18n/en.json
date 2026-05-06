@@ -2,8 +2,8 @@
   "PropertySearch": {
     "home": "Home",
     "search": "Search",
-    "searchTitleRent": "Search rental properties",
-    "searchTitleSale": "Search properties for sale",
+    "searchTitleRent": "Explore properties for rent",
+    "searchTitleSale": "Explore properties for sale",
     "propertiesAvailableRent": "properties available for rent",
     "propertiesAvailableSale": "properties available for sale",
     "searchPlaceholder": "Search...",

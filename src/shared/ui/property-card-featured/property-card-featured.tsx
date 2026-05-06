@@ -195,25 +195,9 @@ export function PropertyCardFeatured({
           </div>
           <Button
             onClick={onApply}
-            className='h-11 rounded-lg bg-foreground px-5 text-sm font-semibold text-white hover:bg-foreground/90 transition-colors'
+            className='h-11 rounded-xl bg-foreground px-5 text-sm font-semibold text-white hover:bg-foreground/90 transition-colors mr-2'
           >
             {applyLabel}
-            <svg
-              width='12'
-              height='12'
-              viewBox='0 0 12 12'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-              className='ml-2'
-            >
-              <path
-                d='M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9'
-                stroke='white'
-                strokeWidth='1.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
           </Button>
         </div>
       </div>

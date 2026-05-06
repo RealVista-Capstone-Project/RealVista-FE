@@ -29,11 +29,6 @@ export function RentalFeatures({ property }: RentalFeaturesProps) {
 
   return (
     <div className='flex flex-col gap-6'>
-      {/* Title */}
-      <h2 className='text-foreground text-xl sm:text-2xl font-bold leading-[1.5] tracking-[-0.24px]'>
-        {t('title')}
-      </h2>
-
       {/* On-site Amenities */}
       {onSiteAmenities.length > 0 && (
         <AmenitySection title={t('onSite')} amenities={onSiteAmenities} />
@@ -54,16 +49,16 @@ function AmenitySection({ title, amenities }: { title: string; amenities: Amenit
   return (
     <div className='flex flex-col gap-4'>
       {/* Section Title */}
-      <h3 className='text-foreground text-lg sm:text-xl font-bold tracking-tight'>{title}</h3>
+      <h3 className='text-foreground text-base font-semibold tracking-tight'>{title}</h3>
 
       {/* Amenity Grid */}
-      <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4'>
+      <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3'>
         {amenities.map((amenity) => (
           <li key={amenity.amenity_id} className='flex items-start gap-3'>
-            <div className='mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
-              <Check className='h-3.5 w-3.5' strokeWidth={3} />
+            <div className='mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+              <Check className='h-3 w-3' strokeWidth={3} />
             </div>
-            <span className='text-muted-foreground text-base font-medium leading-relaxed'>
+            <span className='text-foreground/70 text-sm font-medium leading-relaxed'>
               {amenity.amenity_name}
             </span>
           </li>

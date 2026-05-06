@@ -41,7 +41,8 @@
       "statusActive": "đang hoạt động",
       "statusExpired": "đã hết hạn",
       "statusTerminated": "đã chấm dứt",
-      "statusRejected": "đã từ chối"
+      "statusRejected": "đã từ chối",
+      "statusCancelled": "đã hủy"
     }
   }
 }
