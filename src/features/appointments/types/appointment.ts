@@ -1,4 +1,10 @@
-export type AppointmentStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED' | 'COMPLETED';
+export type AppointmentStatus =
+  | 'PENDING'
+  | 'ACCEPTED'
+  | 'REJECTED'
+  | 'CANCELED'
+  | 'COMPLETED'
+  | 'RESCHEDULE_PENDING';
 
 export type AppointmentType = 'TOUR' | 'BLOCK';
 
@@ -12,6 +18,10 @@ export interface Appointment {
   receiver_name?: string;
   start_time: string;
   end_time: string;
+  proposed_start_time?: string;
+  proposed_end_time?: string;
+  reschedule_reason?: string;
+  last_modified_by_user_id?: string;
   status: AppointmentStatus;
   appointment_type: AppointmentType;
   sender_notes?: string;

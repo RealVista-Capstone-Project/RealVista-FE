@@ -13,11 +13,13 @@ export interface BookTourRequest {
 }
 
 export const appointmentApi = {
-  getAvailableSlots: async (listingId: string, date: string) => {
+  getAvailableSlots: async (listingId: string, date: string, excludeId?: string) => {
     // date format: YYYY-MM-DD
-    const response = await http.get<ApiResponse<string[]>>(
-      `/appointments/slots?listing_id=${listingId}&date=${date}`
-    );
+    let url = `/appointments/slots?listing_id=${listingId}&date=${date}`;
+    if (excludeId) {
+      url += `&exclude_appointment_id=${excludeId}`;
+    }
+    const response = await http.get<ApiResponse<string[]>>(url);
     return response;
   },
 
@@ -57,5 +59,25 @@ export const appointmentApi = {
 
   deleteAppointment: async (appointmentId: string): Promise<void> => {
     await http.delete(`/appointments/${appointmentId}`);
+  },
+
+  reschedule: async (
+    appointmentId: string,
+    data: { start_time: string; end_time: string; reason: string }
+  ): Promise<void> => {
+    await http.patch(`/appointments/${appointmentId}/reschedule`, data);
+  },
+
+  respondReschedule: async (
+    appointmentId: string,
+    data: { action: 'ACCEPT' | 'REJECT'; reason?: string }
+  ): Promise<void> => {
+    await http.patch(`/appointments/${appointmentId}/reschedule/respond`, {
+      confirm: data.action === 'ACCEPT',
+      reason: data.reason,
+    });
+  },
+  cancelReschedule: async (appointmentId: string): Promise<void> => {
+    await http.patch(`/appointments/${appointmentId}/reschedule/cancel`, {});
   },
 };
