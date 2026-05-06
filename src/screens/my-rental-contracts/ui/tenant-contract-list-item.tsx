@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Badge } from '@/shared/ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { ChevronRight, MapPin } from 'lucide-react';
@@ -47,8 +48,18 @@ export function TenantContractListItem({ contract, isSelected, onClick }: Tenant
       </div>
 
       <div className='col-span-5 flex items-center gap-3'>
-        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/5'>
-          <MapPin className='h-5 w-5 text-primary' />
+        <div className='relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary/5'>
+          {contract.property.thumbnailUrl ? (
+            <Image
+              src={contract.property.thumbnailUrl}
+              alt={contract.property.title}
+              fill
+              sizes='40px'
+              className='object-cover'
+            />
+          ) : (
+            <MapPin className='h-5 w-5 text-primary' />
+          )}
         </div>
 
         <div className='min-w-0'>

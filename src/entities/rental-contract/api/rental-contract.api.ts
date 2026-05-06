@@ -1,6 +1,7 @@
 import http from '@/shared/lib/http';
 import {
   RentalContractStatus,
+  type CancelLeaseRequest,
   type CreateLeaseRequest,
   type CreateRentalContractPayload,
   type DocuSignApiResponse,
@@ -27,18 +28,22 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     agent_id: lease.agent_id,
     landlordName: lease.landlord_full_name,
     landlordEmail: lease.landlord_email,
+    landlordPhone: lease.landlord_phone,
+    landlordAvatarUrl: lease.landlord_avatar_url,
     tenant: {
       id: lease.renter_id,
       fullName: lease.renter_full_name,
       email: lease.renter_email,
       phoneNumber: lease.renter_phone,
-      avatarUrl: null,
+      avatarUrl: lease.renter_avatar_url ?? null,
     },
     property: {
       id: lease.property_id,
       title: lease.property_title,
       address: lease.property_address,
       listingType: lease.property_type,
+      thumbnailUrl: lease.property_thumbnail_url ?? null,
+      imageUrl: lease.property_image_url ?? null,
     },
     monthlyRent: lease.monthly_rent,
     securityDeposit: lease.security_deposit,
@@ -52,7 +57,11 @@ export function mapLeaseToContract(lease: LeaseResponse): RentalContract {
     sentForSigningAt: null,
     ownerSignedAt: lease.signed_by_landlord_at,
     tenantSignedAt: lease.signed_by_renter_at,
-    terminationReason: lease.termination_reason ?? lease.reject_reason,
+    terminationReason: lease.termination_reason ?? lease.cancel_reason ?? lease.reject_reason,
+    signedDocumentUrl: lease.signed_document_url ?? null,
+    signedDocumentStatus: lease.signed_document_status ?? null,
+    signedDocumentError: lease.signed_document_error ?? null,
+    signedDocumentProcessedAt: lease.signed_document_processed_at ?? null,
     paymentDueDay: null,
     specialClauses: null,
   };
@@ -102,6 +111,12 @@ export const rentalContractApi = {
         },
       },
     };
+  },
+
+  // ── Detail ───────────────────────────────────────────────────────────────
+  async getRentalContractById(leaseId: string): Promise<RentalContract> {
+    const result = await http.get<LeaseApiResponse>(`/leases/${leaseId}`);
+    return mapLeaseToContract(result.payload.data);
   },
 
   // ── Create draft ─────────────────────────────────────────────────────────
@@ -232,8 +247,19 @@ export const rentalContractApi = {
   },
 
   // ── DocuSign — Step 1b: confirm landlord signed (after DocuSign redirect) ─
-  async confirmLandlordSigned(leaseId: string): Promise<void> {
-    await http.post<{ success: boolean }>(`/leases/${leaseId}/confirm-landlord-signed`, {});
+  async confirmLandlordSigned(leaseId: string): Promise<RentalContract> {
+    const result = await http.post<LeaseApiResponse>(
+      `/leases/${leaseId}/confirm-landlord-signed`,
+      {}
+    );
+    return mapLeaseToContract(result.payload.data);
+  },
+
+  // ── Cancel ────────────────────────────────────────────────────────────────
+  async cancelLease(leaseId: string, payload?: CancelLeaseRequest): Promise<RentalContract> {
+    const body = payload?.reason ? { reason: payload.reason } : {};
+    const result = await http.put<LeaseApiResponse>(`/leases/${leaseId}/cancel`, body);
+    return mapLeaseToContract(result.payload.data);
   },
 
   // ── Terminate ─────────────────────────────────────────────────────────────

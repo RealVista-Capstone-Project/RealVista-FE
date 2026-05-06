@@ -1,18 +1,39 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
-import { Bell, CheckCircle2, Clock, Loader2, Pen, Trophy, XCircle } from 'lucide-react';
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Loader2,
+  MoreHorizontal,
+  Pen,
+  XCircle,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 
 import { RentalContractStatus, type RentalContract } from '@/entities/rental-contract';
-import { Badge, Button } from '@/shared/ui';
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/ui';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { cn } from '@/shared/lib/utils';
 import { handleErrorApi } from '@/shared/lib/utils/handle-error';
 
 import {
+  useCancelLeaseMutation,
   useGetLandlordSigningUrlMutation,
   useGetRenterSigningUrlMutation,
   useSendToLandlordMutation,
@@ -27,36 +48,52 @@ import {
 import { UpdateContractStatusDialog } from './update-contract-status-dialog';
 import { DocuSignSigningModal } from './docusign-signing-modal';
 
+function getContractPreviewUrl(contract: RentalContract) {
+  return contract.signedDocumentStatus === 'COMPLETED' && contract.signedDocumentUrl
+    ? contract.signedDocumentUrl
+    : contract.contractDocumentUrl || null;
+}
+
 // ─── Actions cell ────────────────────────────────────────────────────────────
 
 function ContractActionsCell({ contract }: { contract: RentalContract }) {
   const t = useTranslations('RentalContract');
   const tGlobal = useTranslations();
+  const { data: session } = useSession();
 
   const updateStatusMutation = useUpdateRentalContractStatusMutation();
   const getLandlordSigningUrlMutation = useGetLandlordSigningUrlMutation();
   const sendToLandlordMutation = useSendToLandlordMutation();
+  const cancelLeaseMutation = useCancelLeaseMutation();
 
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
-  const [signingModal, setSigningModal] = useState<{
-    url: string;
-    role: 'landlord' | 'renter';
-  } | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const previewUrl = getContractPreviewUrl(contract);
+
+  const backendRoles = session?.user.backendRoles ?? [];
+  const userRole = String(session?.user.role ?? '').toUpperCase();
+  const isAgent = userRole === 'AGENT' || backendRoles.includes('AGENT');
 
   // Show "Send to owner to sign" when DRAFT
-  const canSendToLandlord = contract.status === RentalContractStatus.DRAFT;
+  const canSendToLandlord = !isAgent && contract.status === RentalContractStatus.DRAFT;
 
   // Show "Sign Now" when PENDING_LANDLORD, owner hasn't signed yet, envelope exists
   const canSignNow =
+    !isAgent &&
     contract.status === RentalContractStatus.PENDING_LANDLORD &&
     !contract.ownerSignedAt &&
     Boolean(contract.docusignEnvelopeId);
 
-  // Show "Send Notification" when PENDING_RENTER
-  const canSendNotification = contract.status === RentalContractStatus.PENDING_RENTER;
-
   // Show "Terminate" when ACTIVE
-  const canTerminate = contract.status === RentalContractStatus.ACTIVE;
+  const canTerminate = !isAgent && contract.status === RentalContractStatus.ACTIVE;
+
+  const canCancelLease =
+    !isAgent &&
+    [
+      RentalContractStatus.DRAFT,
+      RentalContractStatus.PENDING_LANDLORD,
+      RentalContractStatus.PENDING_RENTER,
+    ].includes(contract.status);
 
   const handleSendToLandlord = async () => {
     try {
@@ -71,7 +108,7 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=landlord`
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=landlord&viewerRole=owner`
           : undefined;
       const data = await getLandlordSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
@@ -87,12 +124,7 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
     }
   };
 
-  const handleSendNotification = async () => {
-    // TODO: implement send notification to renter API
-    toast.info('Send notification to renter — not implemented yet.');
-  };
-
-  const handleTerminate = async (_nextStatus: RentalContractStatus.TERMINATED, reason?: string) => {
+  const handleTerminate = async (_nextStatus: RentalContractStatus, reason?: string) => {
     try {
       await updateStatusMutation.mutateAsync({
         contractId: contract.id,
@@ -106,85 +138,94 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
     }
   };
 
+  const handleCancelLease = async (_nextStatus: RentalContractStatus, reason?: string) => {
+    try {
+      await cancelLeaseMutation.mutateAsync({ leaseId: contract.id, reason });
+      setShowCancelDialog(false);
+      toast.success(t('toast.cancelSuccess'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
+    }
+  };
+
   return (
     <>
-      <div className='flex items-center gap-2'>
-        {/* Send to owner to sign — DRAFT */}
-        {canSendToLandlord && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
             type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-primary px-3 text-white hover:bg-primary/90 disabled:opacity-60'
-            onClick={handleSendToLandlord}
-            disabled={sendToLandlordMutation.isPending}
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 rounded-lg hover:bg-primary/5'
+            onClick={(event) => event.stopPropagation()}
+            aria-label={t('statusActions.moreActions')}
           >
-            {sendToLandlordMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <Pen className='h-3.5 w-3.5' />
-                {t('statusActions.sendToOwner')}
-              </>
-            )}
+            <MoreHorizontal className='h-4 w-4' />
           </Button>
-        )}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-56 rounded-xl border-primary/10 p-2 shadow-xl'>
+          <DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-muted-foreground'>
+            {t('statusActions.contractActions')}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            disabled={!previewUrl}
+            onSelect={() => previewUrl && window.open(previewUrl, '_blank', 'noopener,noreferrer')}
+          >
+            <ExternalLink className='h-4 w-4' />
+            {t('statusActions.viewDetail')}
+          </DropdownMenuItem>
+          {(canSendToLandlord || canSignNow || canTerminate || canCancelLease) && (
+            <DropdownMenuSeparator />
+          )}
 
-        {/* Sign Now — PENDING_LANDLORD */}
-        {canSignNow && (
-          <Button
-            type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
-            onClick={handleSignNow}
-            disabled={getLandlordSigningUrlMutation.isPending}
-          >
-            {getLandlordSigningUrlMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <Pen className='h-3.5 w-3.5' />
-                {t('statusActions.signNow')}
-              </>
-            )}
-          </Button>
-        )}
+          {canSendToLandlord && (
+            <DropdownMenuItem onSelect={handleSendToLandlord} disabled={sendToLandlordMutation.isPending}>
+              {sendToLandlordMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.sendToOwner')}
+            </DropdownMenuItem>
+          )}
+          {canSignNow && (
+            <DropdownMenuItem onSelect={handleSignNow} disabled={getLandlordSigningUrlMutation.isPending}>
+              {getLandlordSigningUrlMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.signNow')}
+            </DropdownMenuItem>
+          )}
+          {canTerminate && (
+            <DropdownMenuItem
+              variant='destructive'
+              onSelect={() => setShowTerminateDialog(true)}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <XCircle className='h-4 w-4' />}
+              {t('statusActions.terminate')}
+            </DropdownMenuItem>
+          )}
+          {canCancelLease && (
+            <DropdownMenuItem
+              variant='destructive'
+              onSelect={() => setShowCancelDialog(true)}
+              disabled={cancelLeaseMutation.isPending}
+            >
+              {cancelLeaseMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <XCircle className='h-4 w-4' />}
+              {t('statusActions.cancelLease')}
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-        {/* Send Notification — PENDING_RENTER */}
-        {/* TODO: wire up send-notification-to-renter API once implemented */}
-        {canSendNotification && (
-          <Button
-            type='button'
-            size='sm'
-            variant='outline'
-            className='h-8 rounded-lg border-blue-200 px-3 text-blue-700 hover:bg-blue-50 hover:text-blue-800 disabled:opacity-60'
-            onClick={handleSendNotification}
-          >
-            <Bell className='h-3.5 w-3.5' />
-            {t('statusActions.sendToRenter')}
-          </Button>
-        )}
-
-        {/* Terminate — ACTIVE */}
-        {canTerminate && (
-          <Button
-            type='button'
-            size='sm'
-            variant='outline'
-            className='h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 hover:text-red-700 disabled:opacity-60'
-            onClick={() => setShowTerminateDialog(true)}
-            disabled={updateStatusMutation.isPending}
-          >
-            {updateStatusMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <XCircle className='h-3.5 w-3.5' />
-                {t('statusActions.terminate')}
-              </>
-            )}
-          </Button>
-        )}
-      </div>
+      {showCancelDialog && (
+        <UpdateContractStatusDialog
+          contract={contract}
+          nextStatus={RentalContractStatus.CANCELLED}
+          open={showCancelDialog}
+          onOpenChange={(open) => {
+            if (!open) setShowCancelDialog(false);
+          }}
+          onConfirm={handleCancelLease}
+          isPending={cancelLeaseMutation.isPending}
+        />
+      )}
 
       {showTerminateDialog && (
         <UpdateContractStatusDialog
@@ -198,15 +239,6 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
           isPending={updateStatusMutation.isPending}
         />
       )}
-
-      {signingModal && (
-        <DocuSignSigningModal
-          open={Boolean(signingModal)}
-          signingUrl={signingModal.url}
-          signerRole={signingModal.role}
-          onClose={() => setSigningModal(null)}
-        />
-      )}
     </>
   );
 }
@@ -215,25 +247,54 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
 
 function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
   const t = useTranslations('RentalContract');
+  const tGlobal = useTranslations();
+  const locale = useLocale();
+  const { data: session } = useSession();
 
   const getRenterSigningUrlMutation = useGetRenterSigningUrlMutation();
+  const cancelLeaseMutation = useCancelLeaseMutation();
 
+  const previewUrl = getContractPreviewUrl(contract);
   const [signingModal, setSigningModal] = useState<{
     url: string;
     role: 'landlord' | 'renter';
   } | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  // Show "Sign Now" when PENDING_RENTER, tenant hasn't signed yet, envelope exists
+  const backendRoles = session?.user.backendRoles ?? [];
+  const userRole = String(session?.user.role ?? '').toUpperCase();
+  const isAgent = userRole === 'AGENT' || backendRoles.includes('AGENT');
+
+  // Agents are view-only; tenants can sign their pending contract.
   const canSignNow =
+    !isAgent &&
     contract.status === RentalContractStatus.PENDING_RENTER &&
     !contract.tenantSignedAt &&
     Boolean(contract.docusignEnvelopeId);
+
+  const canCancelLease =
+    !isAgent &&
+    [
+      RentalContractStatus.DRAFT,
+      RentalContractStatus.PENDING_LANDLORD,
+      RentalContractStatus.PENDING_RENTER,
+    ].includes(contract.status);
+
+  const handleCancelLease = async (_nextStatus: RentalContractStatus, reason?: string) => {
+    try {
+      await cancelLeaseMutation.mutateAsync({ leaseId: contract.id, reason });
+      setShowCancelDialog(false);
+      toast.success(t('toast.cancelSuccess'));
+    } catch (error) {
+      handleErrorApi({ error, t: tGlobal });
+    }
+  };
 
   const handleSignNow = async () => {
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&role=renter`
+          ? `${window.location.origin}/${locale}/leases/signing-complete?leaseId=${contract.id}&signerRole=renter&viewerRole=tenant`
           : undefined;
       const data = await getRenterSigningUrlMutation.mutateAsync({
         leaseId: contract.id,
@@ -251,26 +312,63 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
 
   return (
     <>
-      <div className='flex items-center gap-2'>
-        {canSignNow && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
             type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
-            onClick={handleSignNow}
-            disabled={getRenterSigningUrlMutation.isPending}
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 rounded-lg hover:bg-primary/5'
+            onClick={(event) => event.stopPropagation()}
+            aria-label={t('statusActions.moreActions')}
           >
-            {getRenterSigningUrlMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
-            ) : (
-              <>
-                <Pen className='h-3.5 w-3.5' />
-                {t('statusActions.signNow')}
-              </>
-            )}
+            <MoreHorizontal className='h-4 w-4' />
           </Button>
-        )}
-      </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-52 rounded-xl border-primary/10 p-2 shadow-xl'>
+          <DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-muted-foreground'>
+            {t('statusActions.contractActions')}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            disabled={!previewUrl}
+            onSelect={() => previewUrl && window.open(previewUrl, '_blank', 'noopener,noreferrer')}
+          >
+            <ExternalLink className='h-4 w-4' />
+            {t('statusActions.viewDetail')}
+          </DropdownMenuItem>
+          {(canSignNow || canCancelLease) && <DropdownMenuSeparator />}
+          {canSignNow && (
+            <DropdownMenuItem onSelect={handleSignNow} disabled={getRenterSigningUrlMutation.isPending}>
+              {getRenterSigningUrlMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.signNow')}
+            </DropdownMenuItem>
+          )}
+          {canCancelLease && (
+            <DropdownMenuItem
+              variant='destructive'
+              onSelect={() => setShowCancelDialog(true)}
+              disabled={cancelLeaseMutation.isPending}
+            >
+              {cancelLeaseMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <XCircle className='h-4 w-4' />}
+              {t('statusActions.cancelLease')}
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {showCancelDialog && (
+        <UpdateContractStatusDialog
+          contract={contract}
+          nextStatus={RentalContractStatus.CANCELLED}
+          open={showCancelDialog}
+          onOpenChange={(open) => {
+            if (!open) setShowCancelDialog(false);
+          }}
+          onConfirm={handleCancelLease}
+          isPending={cancelLeaseMutation.isPending}
+        />
+      )}
 
       {signingModal && (
         <DocuSignSigningModal
@@ -380,6 +478,7 @@ export function useContractColumns(): ColumnDef<RentalContract, unknown>[] {
             [RentalContractStatus.EXPIRED]:         <XCircle className='h-3.5 w-3.5' />,
             [RentalContractStatus.TERMINATED]:      <XCircle className='h-3.5 w-3.5' />,
             [RentalContractStatus.REJECTED]:        <XCircle className='h-3.5 w-3.5' />,
+            [RentalContractStatus.CANCELLED]:       <XCircle className='h-3.5 w-3.5' />,
           };
 
           return (
@@ -418,9 +517,24 @@ export function useTenantContractColumns(): ColumnDef<RentalContract, unknown>[]
         cell: ({ row }) => {
           const { property } = row.original;
           return (
-            <div className='min-w-0'>
-              <p className='truncate text-sm font-semibold text-foreground'>{property.title}</p>
-              <p className='truncate text-xs text-muted-foreground'>{property.address}</p>
+            <div className='flex min-w-0 items-center gap-3'>
+              <div className='relative flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-primary/5'>
+                {property.thumbnailUrl ? (
+                  <Image
+                    src={property.thumbnailUrl}
+                    alt={property.title}
+                    fill
+                    sizes='64px'
+                    className='object-cover'
+                  />
+                ) : (
+                  <Building2 className='h-5 w-5 text-primary' />
+                )}
+              </div>
+              <div className='min-w-0'>
+                <p className='truncate text-sm font-semibold text-foreground'>{property.title}</p>
+                <p className='truncate text-xs text-muted-foreground'>{property.address}</p>
+              </div>
             </div>
           );
         },
@@ -478,6 +592,7 @@ export function useTenantContractColumns(): ColumnDef<RentalContract, unknown>[]
             [RentalContractStatus.EXPIRED]:          <XCircle className='h-3.5 w-3.5' />,
             [RentalContractStatus.TERMINATED]:       <XCircle className='h-3.5 w-3.5' />,
             [RentalContractStatus.REJECTED]:         <XCircle className='h-3.5 w-3.5' />,
+            [RentalContractStatus.CANCELLED]:        <XCircle className='h-3.5 w-3.5' />,
           };
 
           return (

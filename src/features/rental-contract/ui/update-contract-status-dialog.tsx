@@ -15,12 +15,14 @@ import {
 } from '@/shared/ui';
 import { useTranslations } from 'next-intl';
 
+type DialogStatus = RentalContractStatus.TERMINATED | RentalContractStatus.CANCELLED;
+
 interface UpdateContractStatusDialogProps {
   contract: RentalContract;
-  nextStatus: RentalContractStatus.TERMINATED;
+  nextStatus: DialogStatus;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (nextStatus: RentalContractStatus.TERMINATED, reason?: string) => Promise<void>;
+  onConfirm: (nextStatus: DialogStatus, reason?: string) => Promise<void>;
   isPending?: boolean;
 }
 
@@ -41,15 +43,31 @@ export function UpdateContractStatusDialog({
     }
   }, [open]);
 
-  const requiresReason = true; // TERMINATED always requires a reason
+  const requiresReason = nextStatus === RentalContractStatus.TERMINATED;
 
-  const config = useMemo(() => ({
-    title: t('statusDialog.terminateTitle'),
-    description: t('statusDialog.terminateDescription', {
-      tenantName: contract.tenant.fullName,
-    }),
-    confirmLabel: t('statusActions.terminate'),
-  }), [contract.tenant.fullName, t]);
+  const config = useMemo(() => {
+    if (nextStatus === RentalContractStatus.CANCELLED) {
+      return {
+        title: t('statusDialog.cancelTitle'),
+        description: t('statusDialog.cancelDescription', {
+          tenantName: contract.tenant.fullName,
+        }),
+        confirmLabel: t('statusActions.cancelLease'),
+        placeholder: t('statusDialog.cancelReasonPlaceholder'),
+        hint: t('statusDialog.cancelReasonHint'),
+      };
+    }
+
+    return {
+      title: t('statusDialog.terminateTitle'),
+      description: t('statusDialog.terminateDescription', {
+        tenantName: contract.tenant.fullName,
+      }),
+      confirmLabel: t('statusActions.terminate'),
+      placeholder: t('statusDialog.reasonPlaceholder'),
+      hint: t('statusDialog.reasonHint'),
+    };
+  }, [contract.tenant.fullName, nextStatus, t]);
 
   const handleConfirm = async () => {
     await onConfirm(nextStatus, reason.trim() || undefined);
@@ -70,8 +88,7 @@ export function UpdateContractStatusDialog({
             </DialogDescription>
           </DialogHeader>
 
-          {requiresReason && (
-            <div className='mt-5 space-y-2'>
+          <div className='mt-5 space-y-2'>
               <label className='text-sm font-medium text-foreground' htmlFor='contract-status-reason'>
                 {t('statusDialog.reasonLabel')}
               </label>
@@ -79,14 +96,13 @@ export function UpdateContractStatusDialog({
                 id='contract-status-reason'
                 value={reason}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setReason(event.target.value)}
-                placeholder={t('statusDialog.reasonPlaceholder')}
+                placeholder={config.placeholder}
                 className='min-h-28 rounded-xl border-gray-200 bg-primary/5 text-sm focus-visible:ring-primary/30'
               />
               <p className='text-xs text-muted-foreground'>
-                {t('statusDialog.reasonHint')}
+                {config.hint}
               </p>
-            </div>
-          )}
+          </div>
 
           <DialogFooter className='mt-6 flex-row gap-3 sm:justify-end sm:space-x-0'>
             <Button

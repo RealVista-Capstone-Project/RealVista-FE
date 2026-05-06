@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   CheckCircle2,
   ArrowLeft,
@@ -17,6 +17,7 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { ROUTES } from '@/shared/config/routes';
 import {
   useConfirmLandlordSignedMutation,
+  useRentalContractDetailQuery,
   useSendToRenterMutation,
 } from '@/features/rental-contract/hooks/use-rental-contracts';
 import { DocuSignSigningModal } from '@/features/rental-contract/ui/docusign-signing-modal';
@@ -26,22 +27,33 @@ type LandlordConfirmState = 'confirming' | 'confirmed' | 'confirm_error';
 export function LeaseSigningCompletePage() {
   const t = useTranslations('LeaseSigningComplete');
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const locale = useLocale();
   const leaseId = searchParams?.get('leaseId');
   const event = searchParams?.get('event');
-  const role = searchParams?.get('role');
+  const legacyRole = searchParams?.get('role');
+  const signerRole = searchParams?.get('signerRole') ?? legacyRole;
+  const viewerRole = searchParams?.get('viewerRole') ?? legacyRole;
 
   // No event param = direct nav (dev/test); treat as success
   const isSuccess = !event || event === 'signing_complete';
-  const isRenter = role === 'renter';
-  const isLandlord = role === 'landlord';
+  const isRenter = signerRole === 'renter' || viewerRole === 'tenant';
+  const isLandlord = signerRole === 'landlord' || viewerRole === 'owner' || viewerRole === 'agent';
 
   // ── Landlord confirm state machine ────────────────────────────────────────
   const [confirmState, setConfirmState] = useState<LandlordConfirmState>('confirming');
   const [renterSigningUrl, setRenterSigningUrl] = useState<string | null>(null);
   const [sendError, setSendError] = useState(false);
+  const [pollTimedOut, setPollTimedOut] = useState(false);
 
   const confirmMutation = useConfirmLandlordSignedMutation();
   const sendToRenterMutation = useSendToRenterMutation();
+  const leaseDetailQuery = useRentalContractDetailQuery(leaseId, {
+    enabled: Boolean(leaseId) && isRenter && isSuccess && !pollTimedOut,
+    refetchInterval: pollTimedOut ? false : 5000,
+  });
+  const signedDocumentStatus = leaseDetailQuery.data?.signedDocumentStatus ?? null;
+  const isPollingTerminal = signedDocumentStatus === 'COMPLETED' || signedDocumentStatus === 'FAILED';
 
   const runConfirm = () => {
     if (!leaseId || !isLandlord || !isSuccess) return;
@@ -60,13 +72,32 @@ export function LeaseSigningCompletePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Renter return: poll the lease until the final signed document is ready/failed,
+  // or stop after 2 minutes to avoid polling forever.
+  useEffect(() => {
+    if (!isRenter || !isSuccess || !leaseId) return;
+
+    const timeout = window.setTimeout(() => setPollTimedOut(true), 120_000);
+    return () => window.clearTimeout(timeout);
+  }, [isRenter, isSuccess, leaseId]);
+
+  useEffect(() => {
+    if (!isRenter || !isSuccess || !leaseId || (!isPollingTerminal && !pollTimedOut)) return;
+
+    const timeout = window.setTimeout(() => {
+      router.push(`/${locale}${ROUTES.myContracts}?leaseId=${leaseId}`);
+    }, 1200);
+
+    return () => window.clearTimeout(timeout);
+  }, [isPollingTerminal, isRenter, isSuccess, leaseId, locale, pollTimedOut, router]);
+
   const handleSendToRenter = async () => {
     if (!leaseId) return;
     setSendError(false);
     try {
       const returnUrl =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/leases/signing-complete?leaseId=${leaseId}&role=renter`
+          ? `${window.location.origin}/${locale}${ROUTES.leases.signingComplete}?leaseId=${leaseId}&signerRole=renter&viewerRole=tenant`
           : undefined;
       const data = await sendToRenterMutation.mutateAsync({ leaseId, returnUrl });
       if (data.signing_url) {
@@ -213,7 +244,13 @@ export function LeaseSigningCompletePage() {
                       </p>
                       <p className='mt-1 text-sm leading-6 text-muted-foreground'>
                         {isRenter
-                          ? t('renter.infoBody')
+                          ? signedDocumentStatus === 'COMPLETED'
+                            ? t('renter.documentReady')
+                            : signedDocumentStatus === 'FAILED'
+                              ? t('renter.documentFailed')
+                              : pollTimedOut
+                                ? t('renter.documentTimeout')
+                                : t('renter.documentPreparing')
                           : isLandlord
                             ? t('landlord.sendToRenterBody')
                             : t('infoBody')}
@@ -262,7 +299,9 @@ export function LeaseSigningCompletePage() {
                 >
                   <Link
                     href={
-                      isRenter ? ROUTES.dashboard.myContracts : ROUTES.dashboard.rentalContracts
+                      isRenter
+                        ? `${ROUTES.myContracts}${leaseId ? `?leaseId=${leaseId}` : ''}`
+                        : ROUTES.dashboard.rentalContracts
                     }
                   >
                     <ArrowLeft className='h-4 w-4' />
