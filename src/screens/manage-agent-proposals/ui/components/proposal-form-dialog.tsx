@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Plus, Edit3, Percent, Award, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +32,7 @@ import {
 } from '@/entities/agent-proposal/model/types';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input';
 
-const MAX_PRICE_RANGE_VND = 999_999_999_999;
+const MAX_PRICE_RANGE_VND = 10_000_000_000_000;
 
 /** Form model: commission / experience start empty until the user fills them. */
 type ProposalFormValues = Omit<
@@ -65,6 +66,27 @@ function toDraftPayload(form: ProposalFormValues): ApplyAgentProposalPayload {
     price_range: form.price_range,
     status: AgentProposalStatus.DRAFT,
   };
+}
+
+function getDraftFingerprint(payload: ApplyAgentProposalPayload): string {
+  return JSON.stringify({
+    title: payload.title.trim(),
+    commission_rate: payload.commission_rate ?? null,
+    experience_years: payload.experience_years ?? null,
+    pitch_content: payload.pitch_content,
+    specialty: payload.specialty?.trim() || undefined,
+    price_range: {
+      rent: {
+        min: payload.price_range?.rent?.min ?? 0,
+        max: payload.price_range?.rent?.max ?? 0,
+      },
+      sale: {
+        min: payload.price_range?.sale?.min ?? 0,
+        max: payload.price_range?.sale?.max ?? 0,
+      },
+    },
+    status: AgentProposalStatus.DRAFT,
+  });
 }
 
 /* ─── Form validation ─── */
@@ -253,6 +275,21 @@ export function ProposalFormDialog({
   const [touched, setTouched] = React.useState<Partial<Record<keyof ProposalFormValues, boolean>>>(
     {}
   );
+  const initialDraftFingerprint = React.useMemo(() => {
+    if (mode !== 'edit' || !initialData) return null;
+    const initialForm: ProposalFormValues = {
+      title: initialData.title,
+      commission_rate: typeof initialData.commission_rate === 'number' ? initialData.commission_rate : '',
+      experience_years: typeof initialData.experience_years === 'number' ? initialData.experience_years : '',
+      pitch_content: initialData.pitch_content,
+      specialty: getAgentProposalSpecialtyCode(initialData),
+      price_range: initialData.price_range || {
+        rent: { min: 0, max: 0 },
+        sale: { min: 0, max: 0 },
+      },
+    };
+    return getDraftFingerprint(toDraftPayload(initialForm));
+  }, [mode, initialData]);
 
   // Sync form with initialData when dialog opens
   React.useEffect(() => {
@@ -301,7 +338,7 @@ export function ProposalFormDialog({
   };
 
   const updatePriceRange = (type: 'rent' | 'sale', field: 'min' | 'max', value: number) => {
-    const normalizedValue = Math.min(Math.max(0, value), MAX_PRICE_RANGE_VND);
+    const normalizedValue = Math.max(0, value);
     setForm((prev) => ({
       ...prev,
       price_range: {
@@ -339,7 +376,18 @@ export function ProposalFormDialog({
     const draftErrors = validateDraftForm(form, t);
     setErrors(draftErrors);
     if (Object.keys(draftErrors).length > 0) return;
-    onSaveDraft(toDraftPayload(form));
+    const draftPayload = toDraftPayload(form);
+    const isUnchangedEditDraft =
+      mode === 'edit' &&
+      initialData?.status === AgentProposalStatus.DRAFT &&
+      initialDraftFingerprint != null &&
+      getDraftFingerprint(draftPayload) === initialDraftFingerprint;
+
+    if (isUnchangedEditDraft) {
+      toast.info(t('toastDraftNoChanges'));
+      return;
+    }
+    onSaveDraft(draftPayload);
   };
 
   return (
@@ -494,6 +542,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.rent?.min ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'min', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -508,6 +557,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.rent?.max ?? 0}
                         onChange={(n) => updatePriceRange('rent', 'max', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -531,6 +581,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.sale?.min ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'min', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }
@@ -545,6 +596,7 @@ export function ProposalFormDialog({
                         value={form.price_range?.sale?.max ?? 0}
                         onChange={(n) => updatePriceRange('sale', 'max', n)}
                         max={MAX_PRICE_RANGE_VND}
+                        maxBehavior='block'
                         inputClassName={
                           errors.price_range ? INPUT_ERROR : INPUT_DEFAULT
                         }

@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/shared/config/i18n/navigation';
-import { ROUTES } from '@/shared/config/routes';
 import {
   useMyProposalsQuery,
   useCancelProposalMutation,
@@ -11,7 +10,11 @@ import {
   useApplyProposalMutation,
   useSaveProposalDraftMutation,
 } from '@/features/agent-proposal/hooks/use-agent-proposal';
-import { AgentProposal, ApplyAgentProposalPayload, AgentProposalStatus } from '@/entities/agent-proposal/model/types';
+import {
+  AgentProposal,
+  ApplyAgentProposalPayload,
+  AgentProposalStatus,
+} from '@/entities/agent-proposal/model/types';
 import { getAgentProposalSpecialtyCode } from '@/entities/agent-proposal/model/types';
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { cn } from '@/shared/lib/utils';
@@ -21,7 +24,17 @@ import { DataTable } from '@/shared/ui/data-table';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { formatNumber } from '@/shared/lib/utils/format-currency';
-import { Search, Filter, Plus, X, ChevronDown, FileText, FileSearch, Pencil, Trash2 } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  Plus,
+  X,
+  ChevronDown,
+  FileText,
+  FileSearch,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import type { PaginationState } from '@tanstack/react-table';
 import { Badge } from '@/shared/ui/badge';
 
@@ -100,7 +113,12 @@ function ProposalColumns({
                   : 'bg-amber-50 text-amber-700 hover:bg-amber-50 border border-amber-100'
               )}
             >
-              <span className={cn('size-1.5 rounded-full', isActive ? 'bg-emerald-500' : 'bg-amber-500')} />
+              <span
+                className={cn(
+                  'size-1.5 rounded-full',
+                  isActive ? 'bg-emerald-500' : 'bg-amber-500'
+                )}
+              />
               {isActive ? t('statusActive') : t('statusDraft')}
             </Badge>
           );
@@ -159,12 +177,11 @@ type StatusFilter = 'all' | AgentProposalStatus;
 export function ManageAgentProposalsScreen() {
   const t = useTranslations('ManageProposals');
   const locale = useLocale();
-  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearch = useDebounce(searchQuery, 350);
   const [page, setPage] = React.useState(0);
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 10;
 
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
@@ -205,7 +222,6 @@ export function ManageAgentProposalsScreen() {
     { value: 'all', labelKey: 'filter.allStatuses' },
     { value: AgentProposalStatus.ACTIVE, labelKey: 'statusActive' },
     { value: AgentProposalStatus.DRAFT, labelKey: 'statusDraft' },
-    { value: AgentProposalStatus.ARCHIVED, labelKey: 'statusArchived' },
   ];
 
   // ── Data ──
@@ -363,7 +379,9 @@ export function ManageAgentProposalsScreen() {
                       )}
                     >
                       {t(opt.labelKey as Parameters<typeof t>[0])}
-                      {statusFilter === opt.value && <X className='h-3.5 w-3.5' strokeWidth={2.5} />}
+                      {statusFilter === opt.value && (
+                        <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+                      )}
                     </button>
                   ))}
                 </div>

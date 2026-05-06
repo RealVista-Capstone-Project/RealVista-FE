@@ -12,10 +12,6 @@
     "low": "Low (100k)",
     "cameraReset": "Camera reset",
     "fullscreenError": "Error attempting to enable full-screen mode: {error}",
-    "iframeTitle": "3D Spark Viewer",
-    "debugTitle": "Debug Info",
-    "debugMetadata": "Metadata Prop:",
-    "debugUrls": "Extracted URLs:",
-    "debugPropTypes": "Prop Types:"
+    "iframeTitle": "3D Spark Viewer"
   }
 }

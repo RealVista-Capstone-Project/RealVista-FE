@@ -11,7 +11,21 @@ export class MarbleApiError extends Error {
   }
 }
 
-export type MarbleModel = 'Marble 0.1-pro' | 'Marble 0.1-mini' | 'Marble 0.1-plus'
+export type MarbleModel = 'marble-1.0-draft' | 'marble-1.0' | 'marble-1.1' | 'marble-1.1-plus'
+
+export function getModelCost(model: MarbleModel): number {
+  switch (model) {
+    case 'marble-1.0-draft':
+      return 1
+    case 'marble-1.0':
+    case 'marble-1.1':
+      return 3
+    case 'marble-1.1-plus':
+      return 5
+    default:
+      return 3
+  }
+}
 
 export type WorldStatus = 'SUCCEEDED' | 'PENDING' | 'FAILED' | 'RUNNING'
 

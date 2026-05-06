@@ -101,11 +101,17 @@ export const EngagementListView = ({
   };
 
   const filterStatusOptions: { value: StatusFilter; labelKey: string }[] = [
+    { value: 'all', labelKey: 'filter.all' },
     { value: 'SUBMITTED', labelKey: 'status.SUBMITTED' },
     { value: 'ACCEPTED', labelKey: 'status.ACCEPTED' },
     { value: 'REJECTED', labelKey: 'status.REJECTED' },
     { value: 'CANCELLED', labelKey: 'status.CANCELLED' },
     { value: 'FINISHED', labelKey: 'status.FINISHED' },
+  ];
+  const directionOptions: { value: EngagementTab; label: string }[] = [
+    { value: 'all', label: t('filter.all') },
+    { value: 'sent', label: t('tabs.sent') },
+    { value: 'received', label: t('tabs.received') },
   ];
 
   const columns = useEngagementColumns({
@@ -199,20 +205,20 @@ export const EngagementListView = ({
                     {t('filter.directionLabel')}
                   </p>
                   <div className='flex flex-col gap-1'>
-                    {(['sent', 'received'] as const).map((t_tab) => (
+                    {directionOptions.map((option) => (
                       <button
-                        key={t_tab}
+                        key={option.value}
                         type='button'
-                        onClick={() => onTabChange(t_tab)}
+                        onClick={() => onTabChange(option.value)}
                         className={cn(
                           'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
-                          tab === t_tab
+                          tab === option.value
                             ? 'bg-primary/5 font-medium text-primary'
                             : 'text-foreground hover:bg-primary/5'
                         )}
                       >
-                        {t(`tabs.${t_tab}`)}
-                        {tab === t_tab && <X className='h-3.5 w-3.5' strokeWidth={2.5} />}
+                        {option.label}
+                        {tab === option.value && <X className='h-3.5 w-3.5' strokeWidth={2.5} />}
                       </button>
                     ))}
                   </div>

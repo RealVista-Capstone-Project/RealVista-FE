@@ -59,6 +59,7 @@
     "strength3": "Mạnh",
     "strength4": "Rất mạnh",
     "continueWithGoogle": "Tiếp tục với Google",
+    "agentGoogleLoginUnavailable": "Tài khoản môi giới không thể đăng nhập bằng Google. Vui lòng dùng email hoặc số điện thoại với mật khẩu.",
     "continueWith": "Hoặc tiếp tục với",
     "welcomeBack": "Chào mừng trở lại",
     "loggingIn": "Đang đăng nhập...",
