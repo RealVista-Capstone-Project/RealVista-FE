@@ -62,19 +62,6 @@ export function ChatHeader({ conversation, showDetail, onToggleDetail }: ChatHea
             )}
           </div>
         )}
-
-        <button
-          onClick={onToggleDetail}
-          className={cn(
-            'flex size-9 items-center justify-center rounded-xl transition-colors',
-            showDetail
-              ? 'bg-blue-500 text-white shadow-sm'
-              : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
-          )}
-          aria-label={showDetail ? 'Hide details' : 'Show details'}
-        >
-          <MoreHorizontal className='size-4' />
-        </button>
       </div>
     </header>
   );

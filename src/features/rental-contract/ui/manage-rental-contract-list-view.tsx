@@ -16,8 +16,6 @@ import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 
 import { useContractColumns } from './contract-columns';
 
-type StatusFilter = 'all' | RentalContractStatus;
-
 interface ManageRentalContractListViewProps {
   contracts: RentalContract[];
   totalElements: number;

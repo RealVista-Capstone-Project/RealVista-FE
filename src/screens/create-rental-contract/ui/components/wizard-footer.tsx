@@ -1,4 +1,4 @@
-import { ArrowLeft, Loader2, Save, SendHorizontal } from 'lucide-react';
+import { ArrowLeft, Loader2, SendHorizontal } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 type WizardStep = 1 | 2 | 3 | 4;
@@ -10,7 +10,6 @@ interface WizardFooterProps {
   isMutating: boolean;
   onBack: () => void;
   onNext: () => void;
-  onSaveDraft: () => void;
   onSendForSigning: () => void;
   t: (key: string) => string;
 }
@@ -22,7 +21,6 @@ export function WizardFooter({
   isMutating,
   onBack,
   onNext,
-  onSaveDraft,
   onSendForSigning,
   t,
 }: WizardFooterProps) {
@@ -47,18 +45,6 @@ export function WizardFooter({
 
       {/* Right: Save Draft + Next/Send */}
       <div className='flex items-center gap-2'>
-        {isLastStep && (
-          <button
-            type='button'
-            onClick={onSaveDraft}
-            disabled={isMutating}
-            className='flex items-center gap-1.5 rounded-lg border border-primary/20 bg-white px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-primary/5 disabled:opacity-50'
-          >
-            <Save className='h-4 w-4' />
-            {t('actions.saveDraft')}
-          </button>
-        )}
-
         {isLastStep ? (
           <button
             type='button'

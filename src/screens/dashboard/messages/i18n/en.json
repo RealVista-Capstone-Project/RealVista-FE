@@ -40,7 +40,8 @@
       "statusActive": "active",
       "statusExpired": "expired",
       "statusTerminated": "terminated",
-      "statusRejected": "rejected"
+      "statusRejected": "rejected",
+      "statusCancelled": "cancelled"
     }
   }
 }

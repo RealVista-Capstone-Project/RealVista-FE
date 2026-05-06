@@ -46,6 +46,8 @@ export function getRentalContractStatusColor(status: RentalContractStatus) {
       return 'bg-slate-100 text-slate-600 border border-slate-300';
     case RentalContractStatus.REJECTED:
       return 'bg-red-50 text-red-700 border border-red-200';
+    case RentalContractStatus.CANCELLED:
+      return 'bg-zinc-100 text-zinc-700 border border-zinc-200';
     default:
       return 'bg-slate-100 text-slate-600 border border-slate-200';
   }

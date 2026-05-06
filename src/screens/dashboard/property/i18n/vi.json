@@ -74,6 +74,8 @@
     "hireAgent": "Thuê môi giới",
     "selfPosted": "Chính tôi đăng",
     "agentPosted": "Agent đăng",
+    "rentedByAgent": "Được thuê qua môi giới: {name}",
+    "rentedByOwner": "Được thuê trực tiếp từ chủ nhà: {name}",
     "commissionLabel": "Hoa hồng",
     "yearsExperience": "năm kinh nghiệm"
   }

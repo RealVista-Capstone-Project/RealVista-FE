@@ -26,6 +26,10 @@
       "subtitle": "Your signature has been recorded. The contract is now under review.",
       "infoTitle": "What happens next",
       "infoBody": "Both parties have signed. Your contract will be reviewed and activated shortly.",
+      "documentPreparing": "Both parties have signed. Final contract is being prepared...",
+      "documentReady": "Your final signed contract is ready. Redirecting you to your contracts...",
+      "documentFailed": "Could not prepare signed contract. Please try again later. Redirecting you to your contracts...",
+      "documentTimeout": "Final contract is still being prepared. You can check it again from your contracts.",
       "backButton": "Back to My Contracts",
       "steps": {
         "landlordSigned": "Landlord has signed",
