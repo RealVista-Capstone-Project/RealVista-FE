@@ -45,6 +45,7 @@ import { ROUTES } from '@/shared/config/routes';
 type PackageType = 'subscription' | 'boost';
 type PaymentMethod = 'vnpay' | 'payos';
 type WizardStep = 1 | 2 | 3 | 4;
+type VnpayVerifyUiState = 'idle' | 'verifying' | 'pending_retry' | 'success' | 'failed';
 
 interface Plan {
   id: string;
@@ -99,16 +100,6 @@ const TIER_LABELS_VI = ['Miễn phí', 'Basic', 'Premium', 'Pro', 'Pro+'] as con
 function tierLabelVi(level: number): string {
   const i = Math.min(Math.max(0, level), 4);
   return TIER_LABELS_VI[i];
-}
-
-function maxActiveTierForFeature(
-  subs: ActiveSubscriptionResponse[] | undefined,
-  featureType: string
-): number {
-  if (!subs?.length) return 0;
-  return subs
-    .filter((s) => s.feature_type === featureType && s.status === 'ACTIVE')
-    .reduce((m, s) => Math.max(m, s.tier_level ?? packageTierLevelFromCode(s.package_code)), 0);
 }
 
 function findNextUpgradePackage(
@@ -855,10 +846,9 @@ function isCurrentActiveBoost(
 
 function isSubscriptionPlanBlocked(plan: Plan, mySubs: ActiveSubscriptionResponse[] | undefined): boolean {
   if (!plan.featureType) return false;
-  const maxT = maxActiveTierForFeature(mySubs, plan.featureType);
-  // Block if lower tier OR if exact code is already active
-  const isCurrentlyActive = mySubs?.some((s) => s.package_code === plan.id && s.status === 'ACTIVE') ?? false;
-  return plan.tierLevel < maxT || isCurrentlyActive;
+  // Only block the exact plan the user currently owns. Other tiers (higher OR
+  // lower) remain purchasable — the user can freely switch up or down.
+  return mySubs?.some((s) => s.package_code === plan.id && s.status === 'ACTIVE') ?? false;
 }
 
 function Step2Content({
@@ -1008,9 +998,8 @@ function Step2Content({
   if (type === 'subscription' && selectableCount === 0 && plansForFeatureType.length > 0) {
     return (
       <p className='py-4 text-sm text-muted-foreground'>
-        Bạn đang dùng gói cao nhất cho {featureTypeLabelVi(selectedFeatureType)}. Để đổi gói, hãy{' '}
-        <span className='font-medium text-primary'>huỷ gói hiện tại</span> ở phần trên rồi chọn gói thấp hơn (nếu
-        phù hợp), hoặc chờ hết hạn.
+        Bạn đã sở hữu mọi gói trong nhóm {featureTypeLabelVi(selectedFeatureType)}. Hãy{' '}
+        <span className='font-medium text-primary'>huỷ gói hiện tại</span> hoặc chờ hết hạn để đăng ký lại.
       </p>
     );
   }
@@ -1072,11 +1061,18 @@ function Step2Content({
                       activePlanId === plan.id && !blocked && !isCurrentActive
                         ? 'border-2 border-primary bg-white shadow-md'
                         : !blocked && !isCurrentActive && 'border border-border bg-white hover:border-primary/30 hover:bg-primary/5',
-                      (blocked || isCurrentActive) && 'border border-border bg-secondary/50'
+                      (blocked || isCurrentActive) && 'border border-border bg-muted/50'
                     )}
                   >
                     {(plan.isPopular || isCurrentActive) && (
-                      <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-muted-foreground/80' : 'bg-primary')}>
+                      <span
+                        className={cn(
+                          'absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold',
+                          isCurrentActive
+                            ? 'bg-muted-foreground/30 text-muted-foreground'
+                            : 'bg-primary text-white'
+                        )}
+                      >
                         {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                       </span>
                     )}
@@ -1173,7 +1169,14 @@ function Step2Content({
                   )}
                 >
                   {(plan.isPopular || isCurrentActive) && (
-                    <span className={cn('absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold text-white', isCurrentActive ? 'bg-muted-foreground/80' : 'bg-primary')}>
+                    <span
+                      className={cn(
+                        'absolute -top-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-bold',
+                        isCurrentActive
+                          ? 'bg-muted-foreground/30 text-muted-foreground'
+                          : 'bg-primary text-white'
+                      )}
+                    >
                       {isCurrentActive ? 'Gói đang dùng' : 'Phổ biến nhất'}
                     </span>
                   )}
@@ -1185,11 +1188,6 @@ function Step2Content({
                     <span className='text-lg font-bold text-foreground'>{plan.priceLabel}</span>
                     <span className='text-xs text-muted-foreground'>/{plan.durationLabel}</span>
                   </div>
-                  {blocked && !isCurrentActive && (
-                    <span className='absolute bottom-1 left-3 text-[10px] font-medium text-orange-600'>
-                      Đang dùng gói cao hơn
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -1278,6 +1276,7 @@ function Step3Content({
   onCheckoutCreated,
   onNext,
   onRetry,
+  onVnPayOrderCompleted,
 }: {
   selectedPlan: Plan | null;
   selectedType: PackageType | null;
@@ -1286,6 +1285,7 @@ function Step3Content({
   onCheckoutCreated: (res: CheckoutResponse) => void;
   onNext: () => void;
   onRetry: () => void;
+  onVnPayOrderCompleted?: () => void;
 }) {
   const queryClient = useQueryClient();
   const [checkout, setCheckout] = React.useState<CheckoutResponse | null>(null);
@@ -1369,16 +1369,22 @@ function Step3Content({
     return `${m}:${ss}`;
   };
 
-  // Poll VNPay transaction status when checkout is created with VNPay
+  // Poll VNPay checkout status (backup when IPN activates before return URL; max ~2 min)
   React.useEffect(() => {
     if (!checkout || checkout.payment_method !== 'VNPAY') return;
     if (!checkout.checkout_order_id) return;
 
+    let pollCount = 0;
     const interval = setInterval(() => {
+      pollCount += 1;
+      if (pollCount > 24) {
+        clearInterval(interval);
+        return;
+      }
       void queryClient.invalidateQueries({
         queryKey: billingKeys.transactionStatus(checkout.checkout_order_id),
       });
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [checkout, queryClient]);
@@ -1391,9 +1397,10 @@ function Step3Content({
 
   React.useEffect(() => {
     if (vnpayStatusData?.status === 'COMPLETED' && selectedPayment === 'vnpay') {
+      onVnPayOrderCompleted?.();
       onNext();
     }
-  }, [vnpayStatusData?.status, selectedPayment, onNext]);
+  }, [vnpayStatusData?.status, selectedPayment, onNext, onVnPayOrderCompleted]);
 
   const requestCheckout = React.useCallback(
     (method: 'PAYOS' | 'VNPAY', onDone?: (data: CheckoutResponse) => void) => {
@@ -1715,48 +1722,39 @@ function Step4Content({
   transactionId,
   plan,
   onDone,
-  forceSuccess,
+  vnpayVerifyUi,
+  vnpayVerifyAttempt,
+  onVnpayRetryVerify,
+  onBackToPayment,
 }: {
   transactionId: string | null;
   plan: Plan | null;
   onDone: () => void;
-  forceSuccess?: boolean;
+  vnpayVerifyUi?: VnpayVerifyUiState;
+  vnpayVerifyAttempt?: number;
+  onVnpayRetryVerify?: () => void;
+  onBackToPayment?: () => void;
 }) {
-  const queryClient = useQueryClient();
-  const savedTxnRef = React.useRef<string | null>(null);
-
   const { data: statusData, isLoading } = useQuery({
     ...billingQueries.transactionStatus(transactionId ?? ''),
     enabled: !!transactionId,
   });
 
-  const saveTransactionMutation = useMutation({
-    mutationFn: (id: string) => billingApi.saveTransaction(id),
-    onSuccess: () => {
-      // Billing + per-listing boost caches (separate query roots) so quota/3D/boost UI match the new purchase
-      void Promise.all([
-        queryClient.resetQueries({ queryKey: billingKeys.all }),
-        queryClient.resetQueries({ queryKey: listingBoostKeys.all }),
-      ]).catch((err) => {
-        console.error('Failed to refetch billing data:', err);
-      });
-    },
-  });
+  const isVnpayBlocking =
+    vnpayVerifyUi === 'verifying' || vnpayVerifyUi === 'pending_retry';
+  const isVnpayFailed = vnpayVerifyUi === 'failed';
 
-  // Ghi nhận giao dịch một lần khi cổng báo COMPLETED; refresh subscriptions chạy trong onSuccess
-  React.useEffect(() => {
-    if (statusData?.status !== 'COMPLETED' || !transactionId) return;
-    if (savedTxnRef.current === transactionId) return;
-    savedTxnRef.current = transactionId;
-    saveTransactionMutation.mutate(transactionId, {
-      onError: () => {
-        if (savedTxnRef.current === transactionId) savedTxnRef.current = null;
-      },
-    });
-  }, [statusData?.status, transactionId, saveTransactionMutation]);
+  const isPending =
+    !isVnpayFailed &&
+    !isVnpayBlocking &&
+    (!statusData || statusData.status === 'PENDING' || isLoading);
 
-  const isPending = !forceSuccess && (!statusData || statusData.status === 'PENDING' || isLoading);
-  const isSuccess = forceSuccess || statusData?.status === 'COMPLETED';
+  const isSuccess =
+    vnpayVerifyUi === 'success' ||
+    (vnpayVerifyUi !== 'failed' &&
+      vnpayVerifyUi !== 'verifying' &&
+      vnpayVerifyUi !== 'pending_retry' &&
+      statusData?.status === 'COMPLETED');
 
   // Calculate date range
   const getDateRange = () => {
@@ -1774,6 +1772,22 @@ function Step4Content({
   };
 
   const { startDate, endDate } = getDateRange();
+
+  if (isVnpayBlocking) {
+    return (
+      <div className='flex flex-col items-center gap-4 py-12 text-center'>
+        <Loader2 className='size-16 animate-spin text-primary' />
+        <div>
+          <h3 className='text-lg font-bold text-foreground'>Đang xác thực với VNPay…</h3>
+          <p className='mt-2 text-sm text-muted-foreground'>
+            {vnpayVerifyUi === 'pending_retry' && vnpayVerifyAttempt
+              ? `Đang thử lại (${vnpayVerifyAttempt}/4)…`
+              : 'Vui lòng đợi trong giây lát.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (isPending) {
     return (
@@ -1863,11 +1877,24 @@ function Step4Content({
         )}
       </div>
 
-      <div className='flex justify-center gap-3'>
+      <div className='flex justify-center flex-wrap gap-3'>
         {isSuccess ? (
           <RealVistaButton size='small' onClick={onDone}>
             Hoàn tất
           </RealVistaButton>
+        ) : isVnpayFailed ? (
+          <>
+            <RealVistaButton
+              variant='secondary'
+              size='small'
+              onClick={() => onBackToPayment?.()}
+            >
+              Quay lại bước thanh toán
+            </RealVistaButton>
+            <RealVistaButton size='small' onClick={() => onVnpayRetryVerify?.()}>
+              Kiểm tra lại
+            </RealVistaButton>
+          </>
         ) : (
           <>
             <RealVistaButton variant='secondary' size='small' onClick={onDone}>
@@ -1891,6 +1918,7 @@ function PurchaseWizard() {
   const { data: session } = useSession();
   const router = useRouter();
   const locale = useLocale();
+  const queryClient = useQueryClient();
   const backendRoles: string[] = session?.user?.backendRoles ?? [];
   const isOwnerOrAgent = backendRoles.includes('OWNER') || backendRoles.includes('AGENT');
 
@@ -1925,7 +1953,9 @@ function PurchaseWizard() {
 
   const selectedPlan = rawPlans.find((p) => p.id === selectedPlanId) ?? null;
 
-  // Restore state from localStorage after hydration (runs client-side only)
+  // Restore state from localStorage after hydration (runs client-side only).
+  // Step 4 (kết quả thanh toán) is intentionally NOT restored — reload/navigation
+  // from step 4 must reset the wizard back to step 1.
   React.useEffect(() => {
     const saved = localStorage.getItem('subscription-wizard-state');
     if (!saved) return;
@@ -1936,6 +1966,10 @@ function PurchaseWizard() {
         selectedPlanId: string | null;
         selectedPayment: PaymentMethod | null;
       };
+      if (state.step === 4) {
+        localStorage.removeItem('subscription-wizard-state');
+        return;
+      }
       setStep(state.step);
       setSelectedType(state.selectedType);
       setSelectedPlanId(state.selectedPlanId);
@@ -1948,10 +1982,16 @@ function PurchaseWizard() {
   // Save state to localStorage (but not checkoutData to force fresh state after redirect)
   // Skip the very first run so we don't overwrite localStorage with default values
   // before the restore effect above has had a chance to apply its state updates.
+  // When the user reaches step 4 (payment result), we explicitly clear persisted
+  // state so a reload/navigation always returns the wizard to step 1.
   const firstSaveDone = React.useRef(false);
   React.useEffect(() => {
     if (!firstSaveDone.current) {
       firstSaveDone.current = true;
+      return;
+    }
+    if (step === 4) {
+      localStorage.removeItem('subscription-wizard-state');
       return;
     }
     localStorage.setItem(
@@ -1962,22 +2002,28 @@ function PurchaseWizard() {
 
   const handleTypeNext = () => { if (selectedType) { setSelectedPlanId(null); setStep(2); } };
 
-  // Check if user already has active subscription with same feature type
+  // Check if user already has an active PAID plan that conflicts with the selected one.
+  // FREE plans (tier 0) are auto-replaced silently — no confirmation dialog needed.
   const checkSameTypeConflict = (planId: string) => {
     if (selectedType === 'subscription') {
       const newPlan = rawPlans.find((p) => p.id === planId);
       if (!newPlan || !newPlan.featureType) return null;
 
-      const activeSametype = (mySubsQuery.data ?? []).find(
-        (s) => s.status === 'ACTIVE' && s.feature_type === newPlan.featureType
-      );
+      const activeSametype = (mySubsQuery.data ?? []).find((s) => {
+        if (s.status !== 'ACTIVE' || s.feature_type !== newPlan.featureType) return false;
+        const tier = s.tier_level ?? packageTierLevelFromCode(s.package_code);
+        return tier > 0;
+      });
 
       return activeSametype || null;
     }
 
     if (selectedType === 'boost') {
-      // For boosts, check if user already has an active boost
-      const activeBoost = (myBoostsQuery.data ?? []).find((b) => b.status === 'ACTIVE');
+      const activeBoost = (myBoostsQuery.data ?? []).find((b) => {
+        if (b.status !== 'ACTIVE') return false;
+        const tier = packageTierLevelFromCode(b.code);
+        return tier > 0;
+      });
       return activeBoost || null;
     }
 
@@ -2015,27 +2061,94 @@ function PurchaseWizard() {
 
   const handlePaymentNext = () => setStep(4);
 
-  const [forceSuccess, setForceSuccess] = React.useState(false);
+  const [vnpayVerifyUi, setVnpayVerifyUi] = React.useState<VnpayVerifyUiState>('idle');
+  const [vnpayVerifyAttempt, setVnpayVerifyAttempt] = React.useState(0);
+  const [pendingVnpayCheckoutOrderId, setPendingVnpayCheckoutOrderId] = React.useState<string | null>(null);
 
-  // Detect return from VNPay/PayOS payment success
+  const runVnpayVerify = React.useCallback(
+    async (checkoutOrderId: string, attempt: number) => {
+      setVnpayVerifyUi(attempt > 1 ? 'pending_retry' : 'verifying');
+      setVnpayVerifyAttempt(attempt);
+      try {
+        const res = await billingApi.verifyVnPay({ checkout_order_id: checkoutOrderId });
+        const data = (res.payload as { data?: TransactionStatusResponse }).data;
+        if (data?.status === 'COMPLETED') {
+          setVnpayVerifyUi('success');
+          setVnpayVerifyAttempt(0);
+          toast.success('Thanh toán thành công! Gói dịch vụ đã được kích hoạt.');
+          // Force-refetch ALL billing + listing-boost queries (even inactive ones in
+          // the "Gói hiện tại" tab) so the active plan UI reflects the new purchase.
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: billingKeys.all, refetchType: 'all' }),
+            queryClient.invalidateQueries({ queryKey: listingBoostKeys.all, refetchType: 'all' }),
+          ]).catch(() => {
+            /* non-fatal */
+          });
+        }
+      } catch (e: unknown) {
+        if (e instanceof HttpError) {
+          const code = e.payload?.error_code;
+          if (code === 'ERROR_BILLING_VNPAY_PENDING' && attempt < 4) {
+            await new Promise((r) => setTimeout(r, 3000));
+            return runVnpayVerify(checkoutOrderId, attempt + 1);
+          }
+          if (code === 'ERROR_BILLING_VNPAY_PENDING') {
+            toast.error('Hệ thống chưa nhận được xác nhận từ VNPay. Vui lòng thử lại.');
+          } else if (code === 'ERROR_BILLING_VNPAY_AMOUNT_MISMATCH') {
+            toast.error('Số tiền giao dịch không khớp.');
+          } else if (code === 'ERROR_BILLING_VNPAY_NOT_VERIFIED') {
+            toast.error('Thanh toán chưa được xác nhận. Vui lòng thử lại.');
+          } else {
+            toast.error(e.payload?.message || 'Xác thực thanh toán thất bại.');
+          }
+        } else {
+          toast.error('Xác thực thanh toán thất bại.');
+        }
+        setVnpayVerifyUi('failed');
+        setVnpayVerifyAttempt(0);
+      }
+    },
+    [queryClient]
+  );
+
+  // Pending VNPay verify (session from BillingReturnQueryEffects) or legacy success flag
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
-    const hasPaymentSuccess =
-      new URLSearchParams(window.location.search).get('payment') === 'success' ||
-      sessionStorage.getItem('billing-payment-success') === '1';
-    if (hasPaymentSuccess) {
-      setForceSuccess(true);
+
+    const pendingRaw = sessionStorage.getItem('billing-vnpay-pending-verify');
+    if (pendingRaw) {
+      try {
+        const { checkoutOrderId } = JSON.parse(pendingRaw) as { checkoutOrderId: string };
+        sessionStorage.removeItem('billing-vnpay-pending-verify');
+        if (checkoutOrderId) {
+          setPendingVnpayCheckoutOrderId(checkoutOrderId);
+          setStep(4);
+          void runVnpayVerify(checkoutOrderId, 1);
+        }
+      } catch {
+        sessionStorage.removeItem('billing-vnpay-pending-verify');
+      }
+      return;
+    }
+
+    if (sessionStorage.getItem('billing-payment-success') === '1') {
+      setVnpayVerifyUi('success');
       setStep(4);
       sessionStorage.removeItem('billing-payment-success');
-      // Clean the param from URL without reload
       const params = new URLSearchParams(window.location.search);
       params.delete('payment');
       const newUrl = params.toString()
         ? `${window.location.pathname}?${params.toString()}`
         : window.location.pathname;
       window.history.replaceState({}, '', newUrl);
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: billingKeys.all, refetchType: 'all' }),
+        queryClient.invalidateQueries({ queryKey: listingBoostKeys.all, refetchType: 'all' }),
+      ]).catch(() => {
+        /* non-fatal */
+      });
     }
-  }, []);
+  }, [queryClient, runVnpayVerify]);
 
   const handleDone = () => {
     setStep(1);
@@ -2043,15 +2156,21 @@ function PurchaseWizard() {
     setSelectedPlanId(null);
     setSelectedPayment(null);
     setCheckoutData(null);
-    setForceSuccess(false);
+    setVnpayVerifyUi('idle');
+    setPendingVnpayCheckoutOrderId(null);
+    setVnpayVerifyAttempt(0);
     localStorage.removeItem('subscription-wizard-state');
   };
 
   const toggleStep = (s: WizardStep) => {
     if (step !== s) {
-      // Reset state when going back to earlier steps
       if (s < 4) setCheckoutData(null);
       if (s < 3) setSelectedPayment(null);
+      if (s < 4) {
+        setVnpayVerifyUi('idle');
+        setPendingVnpayCheckoutOrderId(null);
+        setVnpayVerifyAttempt(0);
+      }
       setStep(s);
     }
   };
@@ -2062,7 +2181,7 @@ function PurchaseWizard() {
 
       <HorizontalWizardSteps
         activeStep={step}
-        completed={forceSuccess}
+        completed={vnpayVerifyUi === 'success'}
         onStepChange={toggleStep}
       />
 
@@ -2096,6 +2215,7 @@ function PurchaseWizard() {
             onSelectPayment={setSelectedPayment}
             onCheckoutCreated={setCheckoutData}
             onNext={handlePaymentNext}
+            onVnPayOrderCompleted={() => setVnpayVerifyUi('success')}
             onRetry={() => {
               setStep(2);
               setSelectedPayment(null);
@@ -2105,10 +2225,22 @@ function PurchaseWizard() {
         )}
         {step === 4 && (
           <Step4Content
-            transactionId={checkoutData?.checkout_order_id ?? null}
+            transactionId={checkoutData?.checkout_order_id ?? pendingVnpayCheckoutOrderId ?? null}
             plan={selectedPlan}
             onDone={handleDone}
-            forceSuccess={forceSuccess}
+            vnpayVerifyUi={vnpayVerifyUi}
+            vnpayVerifyAttempt={vnpayVerifyAttempt}
+            onVnpayRetryVerify={() => {
+              const id = checkoutData?.checkout_order_id ?? pendingVnpayCheckoutOrderId;
+              if (id) void runVnpayVerify(id, 1);
+            }}
+            onBackToPayment={() => {
+              setVnpayVerifyUi('idle');
+              setVnpayVerifyAttempt(0);
+              setPendingVnpayCheckoutOrderId(null);
+              setCheckoutData(null);
+              setStep(3);
+            }}
           />
         )}
       </div>

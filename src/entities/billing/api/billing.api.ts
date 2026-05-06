@@ -58,11 +58,9 @@ export const billingApi = {
   getTransactions: () =>
     http.get<ApiResponse<TransactionResponse[]>>('/billing/transactions/me'),
 
-  saveTransaction: (transactionId: string) =>
-    http.post<ApiResponse<TransactionResponse>>(
-      `/billing/transactions/${transactionId}/save`,
-      {}
-    ),
+  /** VNPay: server calls QueryDR then activates subscription/boost (idempotent with IPN). */
+  verifyVnPay: (body: { checkout_order_id: string }) =>
+    http.post<ApiResponse<TransactionStatusResponse>>('/billing/payment/vnpay-verify', body),
 };
 
 // ───────────────────────────────────────────────────────────────────────────────

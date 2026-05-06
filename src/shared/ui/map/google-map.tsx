@@ -1,14 +1,24 @@
 'use client';
 
+import { ReactNode } from 'react';
 import { MAP_CONFIG } from '@/shared/config/maps';
 import { cn } from '@/shared/lib/utils/cn';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
+
+// Re-export marker primitives so consumers can use them via this module
+export { AdvancedMarker, Pin, InfoWindow } from '@vis.gl/react-google-maps';
 
 interface GoogleMapProps {
   apiKey?: string;
   defaultCenter?: google.maps.LatLngLiteral;
   defaultZoom?: number;
   className?: string;
+  /**
+   * Required for `AdvancedMarker` (Google Maps cloud-based map styling).
+   * If you pass markers as children, you must supply a stable `mapId`.
+   */
+  mapId?: string;
+  children?: ReactNode;
 }
 
 const MapErrorFallback = ({ message }: { message: string }) => (
@@ -22,6 +32,8 @@ export function GoogleMap({
   defaultCenter: center = MAP_CONFIG.DEFAULT_CENTER.HANOI,
   defaultZoom: zoom = MAP_CONFIG.DEFAULT_ZOOM,
   className,
+  mapId,
+  children,
 }: GoogleMapProps) {
   if (!apiKey) {
     return (
@@ -47,7 +59,10 @@ export function GoogleMap({
           defaultZoom={validZoom}
           gestureHandling={'greedy'}
           disableDefaultUI={false}
-        />
+          mapId={mapId}
+        >
+          {children}
+        </Map>
       </APIProvider>
     </div>
   );

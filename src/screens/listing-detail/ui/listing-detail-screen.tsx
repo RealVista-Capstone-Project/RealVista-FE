@@ -50,7 +50,7 @@ import { ReportDialog } from '@/features/listing-report';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
-import { GoogleMap } from '@/shared/ui/map/google-map';
+import { GoogleMap, AdvancedMarker, Pin } from '@/shared/ui/map/google-map';
 import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import { RentVsBuyComparison } from '@/features/rent-vs-buy';
 import { MortgageCalculator } from '@/features/mortgage-calculator/ui/mortgage-calculator';
@@ -187,13 +187,75 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
 
   const formattedPrice = formatVND(property.price);
 
-  // Get attributes from listing
-  const attributes = listing.attributes ?? [];
+  // Filter attributes to only show those with valid values (not null, undefined, 0, or empty)
+  const hasValidAttributeValue = (attribute: typeof listing.attributes[0]): boolean => {
+    // Check display_value first (most important)
+    if (!attribute.display_value || attribute.display_value.trim() === '') {
+      return false;
+    }
+
+    // Check based on data type
+    switch (attribute.data_type) {
+      case 'NUMBER':
+        // For numbers, check if value_number is defined and not 0
+        return attribute.value_number !== undefined && attribute.value_number !== null && attribute.value_number !== 0;
+      case 'TEXT':
+        // For text, check if value_text is not empty
+        return attribute.value_text !== undefined && attribute.value_text !== null && attribute.value_text.trim() !== '';
+      case 'BOOLEAN':
+        // For boolean, just check if it's defined
+        return attribute.value_boolean !== undefined && attribute.value_boolean !== null;
+      default:
+        // Default: display_value is already checked above
+        return true;
+    }
+  };
+
+  // Get attributes from listing and filter out invalid ones
+  const attributes = (listing.attributes ?? []).filter(hasValidAttributeValue);
 
   // Fetch related listings (rent + sale) for the same property
   const { data: relatedListings } = useQuery(
     listingQueries.relatedByProperty(listing.property_id)
   );
+
+  // Compose a best-effort address + coordinates for the description-tab map.
+  // Seed data may miss latitude/longitude or be inaccurate, so we fall back to
+  // Ho Chi Minh City centre and let the address tell the user the real location.
+  const mapInfo = useMemo(() => {
+    const addressParts = [
+      listing.property?.street_address,
+      listing.location?.ward_name,
+      listing.location?.district_name,
+      listing.location?.city_name,
+    ].filter((part): part is string => typeof part === 'string' && part.trim().length > 0);
+    const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : property.address;
+
+    const rawLat = listing.location?.latitude;
+    const rawLng = listing.location?.longitude;
+    const hasValidCoords =
+      typeof rawLat === 'number' &&
+      typeof rawLng === 'number' &&
+      Number.isFinite(rawLat) &&
+      Number.isFinite(rawLng) &&
+      !(rawLat === 0 && rawLng === 0);
+
+    const HCM_CENTER = { lat: 10.7769, lng: 106.7009 };
+    return {
+      address: fullAddress,
+      position: hasValidCoords
+        ? { lat: rawLat as number, lng: rawLng as number }
+        : HCM_CENTER,
+    };
+  }, [
+    listing.property?.street_address,
+    listing.location?.ward_name,
+    listing.location?.district_name,
+    listing.location?.city_name,
+    listing.location?.latitude,
+    listing.location?.longitude,
+    property.address,
+  ]);
 
   // BE returns snake_case keys (rent_listing, sale_listing)
   const hasBothRentAndSale =
@@ -331,10 +393,22 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                     <div className='w-full md:w-[280px] shrink-0'>
                       <div className='relative w-full h-[200px] rounded-lg overflow-hidden border border-border'>
                         <GoogleMap
-                          defaultCenter={{ lat: listing.location.latitude, lng: listing.location.longitude }}
+                          defaultCenter={mapInfo.position}
                           defaultZoom={15}
+                          mapId='listing-detail-map'
                           className='w-full h-full'
-                        />
+                        >
+                          <AdvancedMarker
+                            position={mapInfo.position}
+                            title={mapInfo.address}
+                          >
+                            <Pin
+                              background='#7065F0'
+                              borderColor='#100A55'
+                              glyphColor='#FFFFFF'
+                            />
+                          </AdvancedMarker>
+                        </GoogleMap>
                       </div>
                     </div>
                   </div>
@@ -376,28 +450,13 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                   )}
                 </div>
 
-                {/* Agent / Owner Row */}
-                <div className='flex gap-3 mb-4'>
-                  {/* Left: Avatar + Role + Name */}
-                  <div className='flex flex-col gap-1 w-[120px]'>
-                    <img
-                      src={listing.agent?.avatar_url || '/default-avatar.png'}
-                      alt={listing.agent?.full_name || 'Agent'}
-                      className='w-10 h-10 rounded-full object-cover border border-primary/10'
-                    />
-                    <span className='text-[10px] text-muted-foreground uppercase tracking-wider'>
-                      {isListingPostedByAgent ? tScreen('agent') : tScreen('owner')}
-                    </span>
-                    <p className='text-sm font-semibold text-foreground leading-tight'>
-                      {listing.agent?.full_name || 'Agent'}
-                    </p>
-                  </div>
-
-                  {/* Right: 3 dots + Contact icons */}
-                  <div className='flex-1 flex flex-col items-end justify-between'>
+                {/* Agent / Owner Section - Center Aligned */}
+                <div className='flex flex-col items-center relative'>
+                  {/* 3 dots menu - absolute top right of container */}
+                  <div className='absolute top-0 right-0'>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className='p-0.5 hover:bg-muted rounded-full transition-colors'>
+                        <button className='p-1.5 hover:bg-muted rounded-full transition-colors'>
                           <MoreHorizontal className='size-3.5 text-muted-foreground' />
                         </button>
                       </DropdownMenuTrigger>
@@ -411,34 +470,87 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className='flex items-center gap-2'>
-                      {listing.agent?.phone && (
-                        <a
-                          href={`tel:${listing.agent.phone}`}
-                          className='flex items-center justify-center w-9 h-9 rounded-full border border-border hover:bg-muted transition-colors'
-                        >
-                          <Phone className='size-4 text-foreground' />
-                        </a>
-                      )}
-                      <button
-                        onClick={handleContact}
-                        className='flex items-center justify-center w-9 h-9 rounded-full border border-border hover:bg-muted transition-colors'
-                      >
-                        <MessageCircle className='size-4 text-foreground' />
-                      </button>
+                  </div>
+
+                  {/* Avatar with background circle */}
+                  <div className='mb-3'>
+                    <div className='w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center'>
+                      <img
+                        src={listing.agent?.avatar_url || '/default-avatar.png'}
+                        alt={listing.agent?.full_name || 'Agent'}
+                        className='w-[72px] h-[72px] rounded-full object-cover'
+                      />
                     </div>
                   </div>
-                </div>
 
-                {/* Request Tour Button */}
-                <RealVistaButton
-                  variant='primary'
-                  size='small'
-                  className='w-full h-11 bg-primary text-white hover:bg-primary/90 border-primary'
-                  onClick={handleRequestTour}
-                >
-                  <span className='text-sm font-semibold'>{tScreen('requestTour')}</span>
-                </RealVistaButton>
+                  {/* Agent label */}
+                  <span className='text-[11px] text-muted-foreground uppercase tracking-wider mb-1'>
+                    {isListingPostedByAgent ? tScreen('agent') : tScreen('owner')}
+                  </span>
+
+                  {/* Agent name */}
+                  <h3 className='text-lg font-bold text-foreground mb-4 text-center'>
+                    {listing.agent?.full_name || 'Agent'}
+                  </h3>
+
+                  {/* Phone section - chip style */}
+                  {listing.agent?.phone && (
+                    <div
+                      className='bg-muted/50 rounded-full px-4 py-1.5 mb-4 flex items-center justify-center'
+                    >
+                      <span className='text-xs font-medium text-muted-foreground'>
+                        {(() => {
+                          // Check hide_phone_number from agent's setting_preferences
+                          // If hide_phone_number is false or not set, show full phone
+                          const hidePhone = (listing.agent as any)?.hide_phone_number ?? false;
+
+                          if (!hidePhone) {
+                            // Show full phone number
+                            return listing.agent.phone;
+                          } else {
+                            // Mask phone number: show first 3 and last 3 digits
+                            const phone = listing.agent.phone.replace(/\D/g, '');
+                            const firstPart = phone.slice(0, 3);
+                            const lastPart = phone.slice(-3);
+                            return `+${firstPart} *** ${lastPart}`;
+                          }
+                        })()}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Contact buttons - 2 buttons side by side */}
+                  <div className='w-full flex gap-2 mb-3'>
+                    {/* Message button */}
+                    <button
+                      onClick={handleContact}
+                      className='flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2'
+                    >
+                      <MessageCircle className='size-4' />
+                      <span className='text-sm'>Nhắn tin</span>
+                    </button>
+
+                    {/* Call button */}
+                    {listing.agent?.phone && (
+                      <a
+                        href={`tel:${listing.agent.phone}`}
+                        className='flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2'
+                      >
+                        <Phone className='size-4' />
+                        <span className='text-sm'>Gọi điện</span>
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Request Tour Button - Light Primary */}
+                  <button
+                    onClick={handleRequestTour}
+                    className='w-full h-10 bg-primary/10 hover:bg-primary/15 text-primary rounded-lg transition-colors flex items-center justify-center gap-2'
+                  >
+                    <Calendar className='size-4' />
+                    <span className='text-sm font-medium'>{tScreen('requestTour')}</span>
+                  </button>
+                </div>
               </div>
 
               <PriceHistoryChart listingId={listing.listing_id} />
