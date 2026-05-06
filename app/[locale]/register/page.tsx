@@ -1,7 +1,6 @@
 import { auth } from '@/shared/lib/auth/config';
 import { redirect } from '@/shared/config/i18n/navigation';
 import { RegisterPageClient } from '@/features/auth/ui/register-page-client';
-import { GoogleLoginButton } from '@/features/auth/ui/google-login-button';
 import { Link } from '@/shared/config/i18n/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PropertyCardFeatured } from '@/shared/ui/property-card-featured';
@@ -32,23 +31,8 @@ export default async function RegisterPage({ params }: { params: Promise<{ local
         {/* Form Container */}
         <div className='flex flex-1 items-center justify-center px-6 pb-6 lg:px-8'>
           <div className='w-full max-w-md space-y-6'>
-            {/* Register Form + role switch in header */}
-            <div className='space-y-5'>
-              <RegisterPageClient />
-
-              {/* Visual Separator */}
-              <div className='relative'>
-                <div className='absolute inset-0 flex items-center'>
-                  <span className='w-full border-t border-border' />
-                </div>
-                <div className='relative flex justify-center text-sm'>
-                  <span className='bg-white px-4 text-muted-foreground'>{t('continueWith')}</span>
-                </div>
-              </div>
-
-              {/* Google OAuth Button */}
-              <GoogleLoginButton />
-            </div>
+            {/* Register Form + role-aware social auth */}
+            <RegisterPageClient />
 
             {/* Footer Links */}
             <div className='text-center text-sm text-muted-foreground'>

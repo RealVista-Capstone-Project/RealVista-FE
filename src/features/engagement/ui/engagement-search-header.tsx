@@ -12,7 +12,7 @@ import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
 
-export type EngagementTab = 'sent' | 'received';
+export type EngagementTab = 'all' | 'sent' | 'received';
 
 interface EngagementSearchHeaderProps {
   tab: EngagementTab;

@@ -35,6 +35,7 @@ import {
 import Link from 'next/link';
 import { Badge } from '@/shared/ui/badge';
 import { cn, formatVND } from '@/shared/lib/utils';
+import { ROUTES } from '@/shared/config/routes';
 
 const COLORS = ['#0f172a', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'];
 
@@ -574,7 +575,7 @@ export function AdminDashboard() {
               </h3>
               <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t(`days${days}`)}</p>
             </div>
-            <Link href="/admin/users" className="text-xs font-black text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">
+            <Link href={ROUTES.dashboard.manageUsers} className="text-xs font-black text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">
               {t('viewAllLogs')}
             </Link>
           </div>

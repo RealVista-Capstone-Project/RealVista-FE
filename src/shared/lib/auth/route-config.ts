@@ -36,6 +36,15 @@ export const routeConfig: RouteConfig[] = [
 
   // Admin routes (require admin role)
   { path: '/admin', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/admin/manage-packages', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/admin/manage-policies', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/admin/manage-reports', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/admin/manage-templates', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/dashboard/manage-users', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/dashboard/manage-packages', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/dashboard/manage-policies', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/dashboard/manage-reports', accessLevel: 'admin', requiredRole: 'admin' },
+  { path: '/dashboard/manage-templates', accessLevel: 'admin', requiredRole: 'admin' },
 ];
 
 /**

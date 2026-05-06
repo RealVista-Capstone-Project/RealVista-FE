@@ -17,6 +17,7 @@ import {
   Package,
   ShieldCheck,
   Flag,
+  FileUser,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -152,7 +153,7 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       id: 'proposals',
       label: t('menu.proposals'),
       href: ROUTES.dashboard.manageProposals,
-      icon: FileText,
+      icon: FileUser,
     },
     {
       id: 'my-contracts',
@@ -207,28 +208,12 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       href: ROUTES.dashboard.managePackages,
       icon: Package,
     },
-
-    {
-      id: 'property',
-      label: t('menu.property'),
-      href: ROUTES.dashboard.property,
-      icon: Building2,
-      badge: badges.totalListings,
-      badgeVariant: 'info'
-    },
-
     {
       id: 'manage-properties',
       label: t('menu.manageProperties'),
       href: ROUTES.dashboard.manageProperties,
       icon: Building2,
-    },
-    {
-      id: 'messages',
-      label: t('menu.messages'),
-      href: ROUTES.dashboard.messages,
-      icon: MessageCircle,
-    },
+    }
   ];
 }
 

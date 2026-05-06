@@ -42,6 +42,8 @@ const ERROR_CODE_TO_I18N_KEY: Record<string, string> = {
   ERROR_PROPOSAL_TEMPLATE_NOT_OWNED: 'Common.errors.proposalTemplateNotOwned',
   ERROR_CANNOT_PROPOSE_TO_SELF: 'Common.errors.cannotProposeToSelf',
   ERROR_PROPOSAL_ALREADY_ACTIVE: 'Common.errors.proposalAlreadyActive',
+  ERROR_DUPLICATE_PROPOSAL_TITLE: 'Common.errors.duplicateProposalTitle',
+  DUPLICATE_PROPOSAL_TITLE: 'Common.errors.duplicateProposalTitle',
   // Billing
   ERROR_SUBSCRIPTION_NOT_ACTIVE: 'Common.errors.subscriptionNotActive',
   ERROR_BOOST_ALREADY_ACTIVE: 'Common.errors.boostAlreadyActive',

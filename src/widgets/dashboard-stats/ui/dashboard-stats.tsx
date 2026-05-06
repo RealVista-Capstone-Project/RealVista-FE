@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { adminQueries } from '@/entities/admin/api';
 import { cn, formatVND, formatNumber } from '@/shared/lib/utils';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { ROUTES } from '@/shared/config/routes';
 import { format } from 'date-fns';
 
 interface StatCardProps {
@@ -177,7 +178,7 @@ export function DashboardStats({ days = 7 }: { days?: number }) {
         trend={{ value: t('highPriority'), isPositive: false }}
         description={t('requiresImmediateResolution')}
         delay={0.3}
-        href="/admin/manage-reports"
+        href={ROUTES.dashboard.manageReports}
       />
     </>
   );

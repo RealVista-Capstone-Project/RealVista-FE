@@ -148,10 +148,11 @@ export const MyEngagementsProvider: React.FC<{ children: React.ReactNode }> = ({
   const filteredEngagements = useMemo(() => {
     return (
       engagements?.filter((eng: Engagement) => {
-        // Tab filter: sent = current user is initiator, received = current user is receiver
+        // Direction filter: sent = current user is initiator, received = current user is receiver,
+        // all = no direction restriction.
         if (currentUserId) {
           if (tab === 'sent' && eng.initiatorId !== currentUserId) return false;
-          if (tab === 'received' && eng.receiverId !== currentUserId) return false;
+          else if (tab === 'received' && eng.receiverId !== currentUserId) return false;
         }
 
         const matchesSearch =

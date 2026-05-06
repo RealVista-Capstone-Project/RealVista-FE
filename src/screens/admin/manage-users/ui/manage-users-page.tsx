@@ -247,19 +247,19 @@ export function ManageUsersPage() {
 
           return (
             <div className='flex items-center gap-3'>
-              <Avatar className='h-9 w-9 border border-primary/10 shadow-sm'>
+              <Avatar className='h-10 w-10 border border-primary/15 shadow-sm'>
                 <AvatarImage src={user.avatar_url} alt={user.full_name || ''} />
                 <AvatarFallback className='bg-primary/5 text-primary text-xs font-bold'>
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className='flex flex-col'>
-                <span className='text-sm font-semibold text-foreground'>
+              <div className='flex min-w-0 flex-col'>
+                <span className='truncate text-sm font-semibold text-foreground'>
                   {user.full_name || 'N/A'}
                 </span>
-                <span className='text-xs text-muted-foreground flex items-center gap-1'>
-                  <Mail className='h-3 w-3' />
-                  {user.email}
+                <span className='flex items-center gap-1 text-xs text-muted-foreground'>
+                  <Mail className='h-3 w-3 shrink-0' />
+                  <span className='truncate'>{user.email}</span>
                 </span>
                 {isInactive && (
                   <span className='mt-1 text-[10px] font-semibold uppercase tracking-wide text-red-600'>
@@ -282,7 +282,7 @@ export function ManageUsersPage() {
                 <Badge
                   key={r}
                   variant='outline'
-                  className='bg-secondary/30 text-[10px] font-bold uppercase tracking-wider border-primary/20'
+                  className='border-primary/20 bg-secondary/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider'
                 >
                   <Shield className='mr-1 h-3 w-3 text-primary/50' />
                   {t(`roles.${r}` as any) || r}
@@ -323,7 +323,7 @@ export function ManageUsersPage() {
           const Icon = config.icon;
 
           return (
-            <Badge variant='outline' className={cn('gap-1 font-medium', config.className)}>
+            <Badge variant='outline' className={cn('gap-1 px-2 py-0.5 font-semibold', config.className)}>
               <Icon className='h-3 w-3' />
               {config.label}
             </Badge>
@@ -336,7 +336,7 @@ export function ManageUsersPage() {
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
           return (
-            <div className='flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap'>
+            <div className='flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground'>
               <Calendar className='h-3.5 w-3.5 opacity-40' />
               {date.toLocaleDateString()}
             </div>
@@ -351,7 +351,7 @@ export function ManageUsersPage() {
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='h-8 w-8 p-0'>
+                <Button variant='ghost' className='h-8 w-8 rounded-full p-0 text-muted-foreground hover:bg-muted/60 hover:text-foreground'>
                   <span className='sr-only'>Open menu</span>
                   <MoreHorizontal className='h-4 w-4' />
                 </Button>
@@ -436,30 +436,30 @@ export function ManageUsersPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className='relative flex h-full flex-col gap-8 p-8 overflow-hidden max-w-[1700px] mx-auto min-h-[calc(100vh-140px)]'
+      className='relative mx-auto flex h-full min-h-[calc(100vh-140px)] max-w-[1700px] flex-col gap-6 overflow-hidden px-4 py-6 sm:px-6 lg:px-8'
     >
       {/* Subtle Background Orbs */}
       <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-        <div className='absolute -left-[10%] top-[20%] h-[40rem] w-[40rem] rounded-full bg-primary/5 blur-[120px] dark:bg-primary/10' />
-        <div className='absolute -right-[10%] top-[-10%] h-[30rem] w-[30rem] rounded-full bg-emerald-500/5 blur-[100px] dark:bg-emerald-500/10' />
+        <div className='absolute -left-[10%] top-[20%] h-[32rem] w-[32rem] rounded-full bg-primary/5 blur-[140px] dark:bg-primary/10' />
+        <div className='absolute -right-[10%] top-[-10%] h-[24rem] w-[24rem] rounded-full bg-emerald-500/5 blur-[120px] dark:bg-emerald-500/10' />
       </div>
 
-      <header className='relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6'>
-        <div className='flex items-center gap-5'>
-          <div className='bg-white/80 p-4 rounded-[2rem] shadow-2xl shadow-primary/5 border border-slate-200/60 backdrop-blur-xl'>
+      <header className='relative z-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
+        <div className='flex items-start gap-4 sm:items-center'>
+          <div className='rounded-[1.75rem] border border-slate-200/70 bg-white/80 p-3.5 shadow-xl shadow-primary/5 backdrop-blur-xl'>
             <div className='bg-primary p-3 rounded-2xl shadow-xl shadow-primary/20'>
-              <Users className='h-8 w-8 text-white' />
+              <Users className='h-7 w-7 text-white' />
             </div>
           </div>
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight text-foreground'>{t('title')}</h1>
-            <p className='text-sm text-muted-foreground'>{t('description')}</p>
+          <div className='space-y-1'>
+            <h1 className='text-2xl font-bold tracking-tight text-foreground sm:text-[1.75rem]'>{t('title')}</h1>
+            <p className='max-w-3xl text-sm leading-relaxed text-muted-foreground'>{t('description')}</p>
           </div>
         </div>
       </header>
 
       {/* Main content - shadow and rounded borders added in DataTable wrapper */}
-      <div className='flex-1 overflow-hidden flex flex-col gap-4'>
+      <div className='flex flex-1 flex-col gap-4 overflow-hidden'>
         <DataTable
           columns={columns}
           data={pageData?.content || []}
@@ -469,20 +469,20 @@ export function ManageUsersPage() {
           onPaginationChange={setPagination}
           className='h-full flex flex-col'
           toolbar={
-            <div className='flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50'>
-              <div className='relative flex-1 max-w-sm group'>
-                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors' />
+            <div className='flex flex-col gap-3 border-b border-border/60 p-4 md:flex-row md:items-center md:justify-between'>
+              <div className='group relative w-full max-w-xl flex-1'>
+                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50 transition-colors group-focus-within:text-primary' />
                 <Input
                   placeholder={t('search.placeholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className='pl-9 h-10 border-primary/10 bg-primary/5 hover:border-primary/30 focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all'
+                  className='h-10 rounded-xl border-primary/10 bg-primary/5 pl-9 pr-3 text-sm shadow-sm transition-all hover:border-primary/30 focus:border-primary focus:ring-4 focus:ring-primary/5'
                 />
               </div>
 
-              <div className='flex items-center gap-2'>
+              <div className='grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2'>
                 <Select value={role} onValueChange={(v) => setRole(v as RoleCode | 'ALL')}>
-                  <SelectTrigger className='w-[140px] h-10 border-primary/10 bg-white'>
+                  <SelectTrigger className='h-10 w-full min-w-[180px] rounded-xl border-primary/10 bg-white shadow-sm'>
                     <div className='flex items-center gap-2'>
                       <Shield className='h-4 w-4 text-muted-foreground/60' />
                       <SelectValue placeholder={t('filters.role')} />
@@ -500,7 +500,7 @@ export function ManageUsersPage() {
                 </Select>
 
                 <Select value={status} onValueChange={(v) => setStatus(v as UserStatus | 'ALL')}>
-                  <SelectTrigger className='w-[140px] h-10 border-primary/10 bg-white'>
+                  <SelectTrigger className='h-10 w-full min-w-[180px] rounded-xl border-primary/10 bg-white shadow-sm'>
                     <div className='flex items-center gap-2'>
                       <Filter className='h-4 w-4 text-muted-foreground/60' />
                       <SelectValue placeholder={t('filters.status')} />
@@ -521,8 +521,8 @@ export function ManageUsersPage() {
           emptyDescription={t('table.empty.description')}
         />
 
-        <div className='px-8 py-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/30'>
-          <div className='flex items-center gap-3'>
+        <div className='flex flex-col gap-4 border-t border-slate-100 bg-slate-50/30 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
+          <div className='flex flex-wrap items-center gap-2 sm:gap-3'>
             <p className='text-[11px] text-slate-400 font-bold uppercase tracking-widest'>
               Population Index {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, pageData?.total_elements || 0)}
             </p>
@@ -530,13 +530,13 @@ export function ManageUsersPage() {
               Total {pageData?.total_elements || 0}
             </Badge>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex items-center gap-2 self-end sm:self-auto'>
             <Button
               variant='outline'
               size='sm'
               onClick={() => setPagination((p) => ({ ...p, pageIndex: Math.max(0, p.pageIndex - 1) }))}
               disabled={pageData?.first || isLoading}
-              className='h-10 px-6 rounded-xl bg-white border-slate-200 font-bold shadow-sm hover:translate-x-[-2px] transition-all disabled:opacity-40'
+              className='h-9 rounded-xl border-slate-200 bg-white px-5 font-bold shadow-sm transition-all hover:translate-x-[-2px] disabled:opacity-40'
             >
               Previous
             </Button>
@@ -545,7 +545,7 @@ export function ManageUsersPage() {
               size='sm'
               onClick={() => setPagination((p) => ({ ...p, pageIndex: p.pageIndex + 1 }))}
               disabled={pageData?.last || isLoading}
-              className='h-10 px-6 rounded-xl bg-white border-slate-200 font-bold shadow-sm hover:translate-x-[2px] transition-all disabled:opacity-40'
+              className='h-9 rounded-xl border-slate-200 bg-white px-5 font-bold shadow-sm transition-all hover:translate-x-[2px] disabled:opacity-40'
             >
               Next
             </Button>

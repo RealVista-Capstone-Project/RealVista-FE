@@ -59,6 +59,7 @@
     "strength3": "Strong",
     "strength4": "Very strong",
     "continueWithGoogle": "Continue with Google",
+    "agentGoogleLoginUnavailable": "Agent accounts cannot sign in with Google. Please use email or phone with password.",
     "continueWith": "Or continue with",
     "welcomeBack": "Welcome back",
     "loggingIn": "Logging in...",
