@@ -432,7 +432,6 @@ export function CreateRentalContractPage() {
             setCurrentStep(next);
             setMaxReachedStep((prev) => (next > prev ? next : prev));
           }}
-          onSaveDraft={saveDraft}
           onSendForSigning={sendForSigning}
           t={(key) => t(key as never)}
         />
