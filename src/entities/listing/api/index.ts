@@ -18,9 +18,10 @@ export const listingApi = {
   getById: (
     listingId: string,
     recordView: boolean = false,
+    editing: boolean = false,
     options?: Parameters<typeof http.get<ApiResponse<Listing>>>[1]
   ) =>
-    http.get<ApiResponse<Listing>>(`/listings/${listingId}?recordView=${recordView}`, {
+    http.get<ApiResponse<Listing>>(`/listings/${listingId}?recordView=${recordView}&editing=${editing}`, {
       next: { tags: ['listing-detail', listingId] },
       ...options,
       headers: {
