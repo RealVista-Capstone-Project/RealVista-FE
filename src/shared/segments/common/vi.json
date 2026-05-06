@@ -18,7 +18,7 @@
       "reports": "Quản lý báo cáo",
       "templates": "Quản lý mẫu thông báo",
       "locations": "Quản lý địa điểm",
-      "crm": "CRM",
+      "crm": "Khách hàng tiềm năng",
       "packages": "Quản lý gói dịch vụ",
       "manageProperties": "Quản lý bất động sản"
     },
@@ -894,7 +894,7 @@
       "active-listings": "Tin đăng đang được rao",
       "delegated-properties": "Bất động sản được ủy quyền",
       "open-appointments": "Lịch hẹn đang mở",
-      "crm-leads": "Khách hàng tiềm năng CRM",
+      "crm-leads": "Khách hàng tiềm năng",
       "vsLastMonth": "{value}% so với tháng trước"
     },
     "sections": {
@@ -920,7 +920,7 @@
       },
       "channels": {
         "title": "Trạng thái khách hàng",
-        "description": "Số lượng lead CRM theo trạng thái phễu."
+        "description": "Số lượng khách hàng tiềm năng theo trạng thái phễu."
       },
       "appointments": {
         "title": "Lịch hẹn & nhắc việc",
