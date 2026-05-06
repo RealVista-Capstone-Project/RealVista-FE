@@ -37,7 +37,7 @@ export interface TimeSpan<T extends AppointmentData = AppointmentData> {
   appointment?: T
 }
 
-export type AppointmentStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELED' | 'COMPLETED'
+export type AppointmentStatus = string
 
 export interface AppointmentData {
   appointment_id: string
@@ -50,7 +50,7 @@ export interface AppointmentData {
   receiver_name: string
   start_time: string // ISO datetime
   end_time: string // ISO datetime
-  status: AppointmentStatus
+  status: any
   appointment_type: 'TOUR' | 'BLOCK'
   sender_notes?: string
   rejection_reason?: string
@@ -179,6 +179,7 @@ export const APPOINTMENT_STATUS_COLORS: Record<AppointmentStatus, string> = {
   REJECTED: "bg-red-50 border-l-4 border-red-400 text-red-700 dark:bg-red-950 dark:text-red-300",
   CANCELED: "bg-gray-50 border-l-4 border-gray-400 text-gray-700 dark:bg-gray-950 dark:text-gray-300",
   COMPLETED: "bg-blue-50 border-l-4 border-blue-400 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+  RESCHEDULE_PENDING: "bg-orange-50 border-l-4 border-orange-400 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
 }
 
 /**

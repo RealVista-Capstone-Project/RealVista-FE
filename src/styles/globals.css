@@ -55,6 +55,16 @@
   --radius-4xl: calc(var(--radius) * 2.6);
   --font-serif: Lora, serif;
   --radius: 0.625rem;
+
+  --animation-spin-slow: spin-slow 3s linear infinite;
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 :root {
