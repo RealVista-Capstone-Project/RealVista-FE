@@ -33,6 +33,7 @@ export interface DataTableProps<TData> {
   /** Check if a row is selected (for highlighting). */
   isRowSelected?: (row: TData) => boolean;
   className?: string;
+  tableContainerClassName?: string;
 }
 
 export function DataTable<TData>({
@@ -50,6 +51,7 @@ export function DataTable<TData>({
   onRowClick,
   isRowSelected,
   className,
+  tableContainerClassName,
 }: DataTableProps<TData>) {
   const t = useTranslations('DataTable');
   const table = useReactTable({
@@ -75,7 +77,7 @@ export function DataTable<TData>({
       {/* Toolbar */}
       {toolbar && toolbar}
       {/* Table */}
-      <div className='overflow-hidden rounded-xl border border-border'>
+      <div className={cn('overflow-hidden rounded-xl border border-border', tableContainerClassName)}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
