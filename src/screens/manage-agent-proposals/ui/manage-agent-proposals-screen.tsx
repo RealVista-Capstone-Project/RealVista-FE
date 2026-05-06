@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/shared/config/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   useMyProposalsQuery,
   useCancelProposalMutation,
@@ -177,6 +178,8 @@ type StatusFilter = 'all' | AgentProposalStatus;
 export function ManageAgentProposalsScreen() {
   const t = useTranslations('ManageProposals');
   const locale = useLocale();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearch = useDebounce(searchQuery, 350);
@@ -195,6 +198,16 @@ export function ManageAgentProposalsScreen() {
   const [selectedProposal, setSelectedProposal] = React.useState<AgentProposal | null>(null);
 
   const [isSearchPending, setIsSearchPending] = React.useState(false);
+  const [showReturnToApplyCta, setShowReturnToApplyCta] = React.useState(false);
+
+  const returnPath = searchParams.get('returnPath');
+  const returnPropertyAddress = searchParams.get('returnPropertyAddress');
+  const resumeApplyHref = React.useMemo(() => {
+    if (!returnPath || !returnPropertyAddress) return null;
+    if (!returnPath.startsWith('/dashboard/property-feed')) return null;
+    const separator = returnPath.includes('?') ? '&' : '?';
+    return `${returnPath}${separator}openApplyModal=1&propertyAddress=${encodeURIComponent(returnPropertyAddress)}`;
+  }, [returnPath, returnPropertyAddress]);
 
   React.useEffect(() => {
     setIsSearchPending(searchQuery !== debouncedSearch);
@@ -245,7 +258,12 @@ export function ManageAgentProposalsScreen() {
   }, [proposals, debouncedSearch, statusFilter]);
 
   // ── Mutations ──
-  const createMutation = useApplyProposalMutation(() => setIsFormOpen(false));
+  const createMutation = useApplyProposalMutation(() => {
+    setIsFormOpen(false);
+    if (resumeApplyHref) {
+      setShowReturnToApplyCta(true);
+    }
+  });
   const updateMutation = useUpdateProposalMutation(() => setIsFormOpen(false));
   const draftMutation = useSaveProposalDraftMutation(() => setIsFormOpen(false));
   const deleteMutation = useCancelProposalMutation(() => {
@@ -286,6 +304,22 @@ export function ManageAgentProposalsScreen() {
 
   const toolbar = (
     <div className='flex flex-col gap-4 p-4 sm:p-5'>
+      {showReturnToApplyCta && resumeApplyHref && (
+        <div className='flex flex-col gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between'>
+          <p className='text-sm font-medium text-emerald-800'>
+            {t('toastCreateSuccess')}
+          </p>
+          <Button
+            type='button'
+            size='sm'
+            className='h-8 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700'
+            onClick={() => router.push(resumeApplyHref)}
+          >
+            {t('returnToApplyCta')}
+          </Button>
+        </div>
+      )}
+
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <h2 className='text-xl font-bold text-foreground'>{t('pageTitle')}</h2>

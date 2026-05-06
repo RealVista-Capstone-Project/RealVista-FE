@@ -14,6 +14,7 @@ import { useMyProposalsQuery } from '../hooks/use-agent-proposal';
 
 interface AgentApplyProposalModalProps {
   propertyId: string;
+  propertyAddress: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmitSuccess?: () => void;
@@ -21,6 +22,7 @@ interface AgentApplyProposalModalProps {
 
 export function AgentApplyProposalModal({
   propertyId,
+  propertyAddress,
   isOpen,
   onClose,
   onSubmitSuccess,
@@ -90,7 +92,12 @@ export function AgentApplyProposalModal({
   const handleGoToManage = () => {
     onClose();
     const locale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'vi' : 'vi';
-    window.location.href = `/${locale}/dashboard/manage-proposals`;
+    const returnPath = '/dashboard/property-feed';
+    const query = new URLSearchParams({
+      returnPath,
+      returnPropertyAddress: propertyAddress,
+    });
+    window.location.href = `/${locale}/dashboard/manage-proposals?${query.toString()}`;
   };
 
   return (
