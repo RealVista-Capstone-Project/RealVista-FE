@@ -1433,7 +1433,7 @@ function Step3Content({
 
     if (method === 'vnpay') {
       setCheckout(null);
-      // VNPay: tạo link khi chọn (show button section)
+      // VNPay: tạo link khi chọn; tab thanh toán chỉ mở khi user bấm nút "Chuyển sang VNPay"
       if (!selectedPlan || !selectedType) return;
       if (checkoutMutation.isPending) return;
       requestCheckout('VNPAY');
@@ -1692,7 +1692,7 @@ function Step3Content({
             size='small'
             className='bg-primary text-white hover:bg-primary-dark'
             onClick={() => {
-              window.open(checkout.checkout_url, '_blank');
+              window.open(checkout.checkout_url, '_blank', 'noopener,noreferrer');
             }}
           >
             Chuyển sang VNPay thanh toán
@@ -2004,18 +2004,27 @@ function PurchaseWizard() {
 
   // Check if user already has an active PAID plan that conflicts with the selected one.
   // FREE plans (tier 0) are auto-replaced silently — no confirmation dialog needed.
+  // Downgrades (same feature type, lower tier) proceed without this dialog — payment step
+  // creates a checkout as usual and activation supersedes the previous paid subscription.
   const checkSameTypeConflict = (planId: string) => {
     if (selectedType === 'subscription') {
       const newPlan = rawPlans.find((p) => p.id === planId);
       if (!newPlan || !newPlan.featureType) return null;
 
-      const activeSametype = (mySubsQuery.data ?? []).find((s) => {
+      const paidSameType = (mySubsQuery.data ?? []).filter((s) => {
         if (s.status !== 'ACTIVE' || s.feature_type !== newPlan.featureType) return false;
         const tier = s.tier_level ?? packageTierLevelFromCode(s.package_code);
         return tier > 0;
       });
 
-      return activeSametype || null;
+      if (paidSameType.length === 0) return null;
+
+      const maxActiveTier = Math.max(
+        ...paidSameType.map((s) => s.tier_level ?? packageTierLevelFromCode(s.package_code))
+      );
+      if (newPlan.tierLevel < maxActiveTier) return null;
+
+      return paidSameType[0] ?? null;
     }
 
     if (selectedType === 'boost') {
