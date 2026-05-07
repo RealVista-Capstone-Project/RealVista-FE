@@ -57,7 +57,6 @@ export function AgentApplyProposalModal({
   // Load proposals - using existing query hook for consistency
   const { data, isLoading } = useMyProposalsQuery(0, 50);
   const proposals = React.useMemo(() => data?.content ?? [], [data]);
-  console.log(`modal agent apply proposal open?: ${isOpen}, ${propertyId}, ${propertyAddress}`);
 
   // Reset state when opening/closing
   React.useEffect(() => {

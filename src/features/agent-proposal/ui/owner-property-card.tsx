@@ -6,7 +6,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/utils';
 import { MapPin, Ruler, Home, BedDouble, CheckCircle2, SendHorizonal } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useMessages } from 'next-intl';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 
 interface OwnerPropertyCardProps {
@@ -70,6 +70,7 @@ function GridCard({
   isAgent?: boolean;
 }) {
   const t = useTranslations('PropertyFeed');
+  const messages = useMessages() as any;
 
   const thumbnailUrl =
     property.media?.find((m) => m.is_primary)?.media_url ?? property.media?.[0]?.media_url;
@@ -123,7 +124,41 @@ function GridCard({
               getStatusStyle(property.status)
             )}
           >
-            {t(`status.${property.status.toLowerCase()}` as any)}
+            {(() => {
+              const status = (property.status || '').toLowerCase().trim();
+              if (!status) return property.status;
+
+              // Core fallback map for critical statuses
+              const fallbackMap: Record<string, string> = {
+                available: 'Sẵn sàng',
+                pending: 'Đang chờ',
+                verified: 'Đã xác thực',
+                rejected: 'Đã từ chối',
+                sold: 'Đã bán',
+                rented: 'Đã cho thuê',
+              };
+
+              // 1. Try PropertyFeed.status (direct object access to avoid console errors)
+              try {
+                const statusObj = messages?.PropertyFeed?.status;
+                if (statusObj && typeof statusObj === 'object') {
+                  const val = statusObj[status] || statusObj[status.toUpperCase()];
+                  if (val && typeof val === 'string') return val;
+                }
+              } catch (e) {}
+
+              // 2. Try Common.Status (direct object access)
+              try {
+                const commonStatusObj = messages?.Common?.Status;
+                if (commonStatusObj && typeof commonStatusObj === 'object') {
+                  const val = commonStatusObj[status] || commonStatusObj[status.toUpperCase()];
+                  if (val && typeof val === 'string') return val;
+                }
+              } catch (e) {}
+
+              // 3. Try hardcoded fallback
+              return fallbackMap[status] || property.status;
+            })()}
           </Badge>
         </div>
 
@@ -235,6 +270,7 @@ export function OwnerPropertyCard({
   isAgent,
 }: OwnerPropertyCardProps) {
   const t = useTranslations('PropertyFeed');
+  const messages = useMessages() as any;
 
   // Grid variant — new full design
   if (variant === 'grid') {
@@ -310,7 +346,37 @@ export function OwnerPropertyCard({
               getStatusStyle(property.status)
             )}
           >
-            {t(`status.${property.status.toLowerCase()}` as any)}
+            {(() => {
+              const status = (property.status || '').toLowerCase().trim();
+              if (!status) return property.status;
+
+              const fallbackMap: Record<string, string> = {
+                available: 'Sẵn sàng',
+                pending: 'Đang chờ',
+                verified: 'Đã xác thực',
+                rejected: 'Đã từ chối',
+                sold: 'Đã bán',
+                rented: 'Đã cho thuê',
+              };
+
+              try {
+                const statusObj = messages?.PropertyFeed?.status;
+                if (statusObj && typeof statusObj === 'object') {
+                  const val = statusObj[status] || statusObj[status.toUpperCase()];
+                  if (val && typeof val === 'string') return val;
+                }
+              } catch (e) {}
+
+              try {
+                const commonStatusObj = messages?.Common?.Status;
+                if (commonStatusObj && typeof commonStatusObj === 'object') {
+                  const val = commonStatusObj[status] || commonStatusObj[status.toUpperCase()];
+                  if (val && typeof val === 'string') return val;
+                }
+              } catch (e) {}
+
+              return fallbackMap[status] || property.status;
+            })()}
           </Badge>
         </div>
       </div>

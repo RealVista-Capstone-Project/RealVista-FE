@@ -38,10 +38,18 @@
       "pending": "Đang chờ",
       "verified": "Đã xác thực",
       "rejected": "Đã từ chối",
+      "AVAILABLE": "Sẵn sàng",
       "available": "Sẵn sàng",
       "reserved": "Đã đặt chỗ",
       "sold": "Đã bán",
-      "rented": "Đã cho thuê"
+      "rented": "Đã cho thuê",
+      "DRAFT": "Bản nháp",
+      "PENDING": "Đang chờ",
+      "VERIFIED": "Đã xác thực",
+      "REJECTED": "Đã từ chối",
+      "RESERVED": "Đã đặt chỗ",
+      "SOLD": "Đã bán",
+      "RENTED": "Đã cho thuê"
     },
     "empty": {
       "title": "Không tìm thấy BĐS nào.",

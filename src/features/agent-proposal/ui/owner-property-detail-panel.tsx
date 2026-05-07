@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 import { cn } from '@/shared/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useMessages } from 'next-intl';
 import { AgentApplyProposalModal } from './agent-apply-proposal-modal';
 import { useAgentProposalCtaForOwnerProperty } from '../hooks/use-agent-proposal-cta-for-owner-property';
 import { usePropertyFeedContext, type ListingType } from '../model/property-feed-context';
@@ -142,6 +142,7 @@ function InfoTile({ label, value, icon }: { label: string; value: string; icon: 
  */
 export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDetailPanelProps) {
   const t = useTranslations('PropertyFeed');
+  const messages = useMessages() as any;
   const { listingType } = usePropertyFeedContext();
   const {
     isAgent,
@@ -230,7 +231,37 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
                   getStatusStyle(property.status)
                 )}
               >
-                {t(`status.${property.status.toLowerCase()}` as any)}
+                {(() => {
+                  const status = (property.status || '').toLowerCase().trim();
+                  if (!status) return property.status;
+
+                  const fallbackMap: Record<string, string> = {
+                    available: 'Sẵn sàng',
+                    pending: 'Đang chờ',
+                    verified: 'Đã xác thực',
+                    rejected: 'Đã từ chối',
+                    sold: 'Đã bán',
+                    rented: 'Đã cho thuê',
+                  };
+
+                  try {
+                    const statusObj = messages?.PropertyFeed?.status;
+                    if (statusObj && typeof statusObj === 'object') {
+                      const val = statusObj[status] || statusObj[status.toUpperCase()];
+                      if (val && typeof val === 'string') return val;
+                    }
+                  } catch (e) {}
+
+                  try {
+                    const commonStatusObj = messages?.Common?.Status;
+                    if (commonStatusObj && typeof commonStatusObj === 'object') {
+                      const val = commonStatusObj[status] || commonStatusObj[status.toUpperCase()];
+                      if (val && typeof val === 'string') return val;
+                    }
+                  } catch (e) {}
+
+                  return fallbackMap[status] || property.status;
+                })()}
               </Badge>
             </div>
           </div>

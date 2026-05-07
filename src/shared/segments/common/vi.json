@@ -219,6 +219,24 @@
     "pagination": {
       "showing": "Hiển thị {from} - {to} trong tổng số {total} kết quả",
       "pageInfo": "Trang {current} của {total}"
+    },
+    "Status": {
+      "draft": "Bản nháp",
+      "pending": "Đang chờ",
+      "verified": "Đã xác thực",
+      "rejected": "Đã từ chối",
+      "available": "Sẵn sàng",
+      "reserved": "Đã đặt chỗ",
+      "sold": "Đã bán",
+      "rented": "Đã cho thuê",
+      "DRAFT": "Bản nháp",
+      "PENDING": "Đang chờ",
+      "VERIFIED": "Đã xác thực",
+      "REJECTED": "Đã từ chối",
+      "AVAILABLE": "Sẵn sàng",
+      "RESERVED": "Đã đặt chỗ",
+      "SOLD": "Đã bán",
+      "RENTED": "Đã cho thuê"
     }
   },
   "Chat": {

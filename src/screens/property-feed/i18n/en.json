@@ -41,7 +41,15 @@
       "available": "Available",
       "reserved": "Reserved",
       "sold": "Sold",
-      "rented": "Rented"
+      "rented": "Rented",
+      "DRAFT": "Draft",
+      "PENDING": "Pending",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected",
+      "AVAILABLE": "Available",
+      "RESERVED": "Reserved",
+      "SOLD": "Sold",
+      "RENTED": "Rented"
     },
     "empty": {
       "title": "No properties found.",
