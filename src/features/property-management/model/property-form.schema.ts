@@ -1,6 +1,37 @@
 import { z } from 'zod';
 import { ATTRIBUTE_TYPES, PropertyAttribute } from '@/shared/config/property-types';
 
+export const FEE_TYPES = [
+  'MANAGEMENT',
+  'PARKING',
+  'INTERNET',
+  'ELECTRICITY',
+  'WATER',
+  'GARBAGE',
+  'SECURITY',
+  'OTHER',
+] as const;
+
+export const BILLING_CYCLES = ['MONTHLY', 'YEARLY', 'ONE_TIME'] as const;
+
+export function createServiceFeeItemSchema(t: (key: string) => string) {
+  return z.object({
+    feeType: z.enum(FEE_TYPES),
+    feeName: z
+      .string()
+      .min(1, t('validation.feeNameRequired'))
+      .max(100, t('validation.feeNameMax')),
+    amount: z.coerce
+      .number({ invalid_type_error: t('validation.feeAmountNumber') })
+      .min(0, t('validation.feeAmountMin')),
+    billingCycle: z.enum(BILLING_CYCLES),
+    isOptional: z.boolean().default(false),
+    description: z.string().max(500).optional().or(z.literal('')),
+  });
+}
+
+export type ServiceFeeItemValues = z.infer<ReturnType<typeof createServiceFeeItemSchema>>;
+
 const uploadedMediaItemSchema = z.object({
   url: z.string().url(),
   type: z.enum(['IMAGE', 'VIDEO', 'VIRTUAL_TOUR', 'DOCUMENT']),
@@ -11,7 +42,7 @@ export function createPropertyInfoSchema(t: (key: string) => string) {
     .object({
       city: z.string().optional(),
       district: z.string().optional(),
-      ward: z.string().optional(),
+      ward: z.string().min(1, t('validation.wardRequired')),
       streetAddress: z.string().min(1, t('validation.streetRequired')),
       location: z.object({
         lat: z.number(),
@@ -25,10 +56,10 @@ export function createPropertyInfoSchema(t: (key: string) => string) {
         .min(1, t('validation.usableSizeMin')),
       width: z.coerce
         .number({ invalid_type_error: t('validation.widthMin') })
-        .min(0, t('validation.widthMin')),
+        .positive({ message: t('validation.widthMin') }),
       length: z.coerce
         .number({ invalid_type_error: t('validation.lengthMin') })
-        .min(0, t('validation.lengthMin')),
+        .positive({ message: t('validation.lengthMin') }),
       propertyType: z.string().min(1, t('validation.propertyTypeRequired')),
       allowRentListingWhenRented: z.boolean().optional().default(false),
       dynamicAttributes: z.record(z.string(), z.any()).optional().default({}),
@@ -61,6 +92,27 @@ export function createPropertyInfoSchema(t: (key: string) => string) {
           message: t('validation.usableSizeLtLandSize'),
           path: ['usableSize'],
         });
+      }
+
+      const w = data.width;
+      const l = data.length;
+      const land = data.landSize;
+      if (
+        w != null &&
+        l != null &&
+        land != null &&
+        Number.isFinite(w) &&
+        Number.isFinite(l) &&
+        Number.isFinite(land)
+      ) {
+        const product = w * l;
+        if (Math.abs(product - land) > 0.01) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation.widthLengthMatchesLandSize'),
+            path: ['landSize'],
+          });
+        }
       }
 
       const rentMin = data.priceRange?.rent?.min;
@@ -156,19 +208,56 @@ export function createPropertyMediaSchema(t: (key: string) => string) {
   });
 }
 
+/** True if the row has any user-entered content (empty placeholder rows are skipped). */
+function feeRowHasUserContent(item: Record<string, unknown>): boolean {
+  const name = String(item.feeName ?? '').trim();
+  const amount = Number(item.amount);
+  const desc = String(item.description ?? '').trim();
+  return name !== '' || (Number.isFinite(amount) && amount > 0) || desc !== '';
+}
+
+/** Rows the user added but left completely empty are dropped so they do not block the fees step. */
+function preprocessFeesInput(val: unknown): unknown {
+  if (!Array.isArray(val)) return [];
+  return val.filter(
+    (item) => item && typeof item === 'object' && feeRowHasUserContent(item as Record<string, unknown>)
+  );
+}
+
+/** Same filtering as validation preprocess; use before API sync so blank rows are not sent. */
+export function filterNonEmptyFeeRowsForSync<T extends Record<string, unknown>>(
+  fees: T[] | undefined | null
+): T[] {
+  if (!fees?.length) return [];
+  return fees.filter((item) => feeRowHasUserContent(item));
+}
+
 export function createPropertyFormSchema(t: (key: string) => string) {
   return z
     .object({
       role: createPropertyRoleSchema(t),
       info: z.any(),
       media: z.any(),
+      fees: z.preprocess(
+        preprocessFeesInput,
+        z.array(createServiceFeeItemSchema(t)).optional().default([])
+      ),
       isExistingProperty: z.boolean().optional().default(false),
       selectedPropertyId: z.string().uuid().nullable().optional(),
+      /** Step 0: true only when Google-selected address is in Ho Chi Minh City service area. */
+      step0AddressInHcmArea: z.boolean().optional(),
     })
     .superRefine((data, ctx) => {
       // If NOT an existing property, we must enforce required info/media fields
       if (!data.isExistingProperty) {
-        const infoResult = createPropertyInfoSchema(t).safeParse(data.info);
+        const rawInfo = data.info as Record<string, unknown>;
+        const infoNormalized = {
+          ...rawInfo,
+          ward:
+            (typeof rawInfo.ward === 'string' && rawInfo.ward) ||
+            (typeof rawInfo.locationId === 'string' ? rawInfo.locationId : ''),
+        };
+        const infoResult = createPropertyInfoSchema(t).safeParse(infoNormalized);
         if (!infoResult.success) {
           infoResult.error.issues.forEach((issue) => {
             ctx.addIssue({
