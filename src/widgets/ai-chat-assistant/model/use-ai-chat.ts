@@ -137,16 +137,14 @@ export function useAiChat() {
     abortRef.current?.abort();
 
     const userMsg = createMessage(trimmedText, 'user');
-    const assistantMsg = createMessage('', 'assistant');
-
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setIsStreaming(true);
     setError(null);
 
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const assistantId = assistantMsg.id;
+    const assistantId = `assistant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
     const body: { message: string; listing_id?: string } = { message: trimmedText };
     if (listingId) {
@@ -160,11 +158,25 @@ export function useAiChat() {
       onData: (chunk) => {
         // Token event — append text to the assistant message
         if (chunk.content) {
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantId ? { ...msg, content: msg.content + chunk.content } : msg
-            )
-          );
+          setMessages((prev) => {
+            const lastMsg = prev[prev.length - 1];
+            if (lastMsg && lastMsg.id === assistantId) {
+              return prev.map((msg) =>
+                msg.id === assistantId ? { ...msg, content: msg.content + chunk.content } : msg
+              );
+            }
+            // First chunk: add the assistant message now
+            const content = chunk.content || '';
+            return [
+              ...prev,
+              {
+                id: assistantId,
+                content: content,
+                role: 'assistant',
+                timestamp: new Date(),
+              },
+            ];
+          });
         }
 
         // Start event — no action needed (backend manages thread)
