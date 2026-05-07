@@ -26,17 +26,17 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
       className={cn(
         'grid grid-cols-12 gap-4 px-5 py-3.5 items-center cursor-pointer transition-all duration-150 group relative border-l-[3px]',
         isSelected
-          ? 'bg-indigo-50/70 border-l-primary'
-          : 'bg-white border-l-transparent hover:bg-gray-50/80 hover:border-l-gray-200'
+          ? 'border-l-primary bg-primary/10'
+          : 'border-l-transparent bg-card hover:border-l-primary/25 hover:bg-primary/[0.04]'
       )}
       onClick={() => onClick(agent)}
     >
       {/* Hired Date */}
       <div className='col-span-2'>
-        <div className='text-sm font-semibold text-gray-800 tabular-nums'>
+        <div className='text-sm font-semibold tabular-nums text-foreground'>
           {formatDate(agent.hired_at, 'dd MMM', locale)}
         </div>
-        <div className='text-xs text-gray-400 mt-0.5 tabular-nums'>
+        <div className='mt-0.5 text-xs tabular-nums text-muted-foreground'>
           {formatDate(agent.hired_at, 'yyyy', locale)}
         </div>
       </div>
@@ -46,22 +46,22 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
         <Avatar
           className={cn(
             'h-9 w-9 flex-shrink-0 ring-2 ring-offset-1 transition-all duration-150',
-            isSelected ? 'ring-primary/30' : 'ring-gray-100'
+            isSelected ? 'ring-primary/30' : 'ring-border'
           )}
         >
           <AvatarImage
             src={agent.agent_avatar_url ?? undefined}
             alt={agent.agent_full_name}
           />
-          <AvatarFallback className='bg-indigo-100 text-indigo-700 text-xs font-bold'>
+          <AvatarFallback className='bg-primary/15 text-primary text-xs font-bold'>
             {getInitials(agent.agent_full_name)}
           </AvatarFallback>
         </Avatar>
         <div className='min-w-0'>
-          <div className='font-semibold text-gray-900 truncate text-sm leading-tight'>
+          <div className='truncate text-sm font-semibold leading-tight text-foreground'>
             {agent.agent_full_name}
           </div>
-          <div className='text-xs text-gray-400 truncate mt-0.5'>
+          <div className='mt-0.5 truncate text-xs text-muted-foreground'>
             {agent.agent_email ?? t('listItem.noEmail')}
           </div>
         </div>
@@ -73,7 +73,7 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
         <span
           className={cn(
             'text-sm font-semibold tabular-nums',
-            agent.agent_rating != null ? 'text-gray-800' : 'text-gray-400'
+            agent.agent_rating != null ? 'text-foreground' : 'text-muted-foreground'
           )}
         >
           {agent.agent_rating != null ? agent.agent_rating.toFixed(1) : t('common.na')}
@@ -82,13 +82,13 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
 
       {/* Property */}
       <div className='col-span-2 min-w-0'>
-        <div className='text-sm text-gray-700 font-medium truncate'>
+        <div className='truncate text-sm font-medium text-foreground'>
           {agent.property_type_name ?? t('common.na')}
         </div>
         {agent.property_location_name && (
           <div className='flex items-center gap-1 mt-0.5'>
-            <MapPin className='h-3 w-3 text-gray-300 flex-shrink-0' />
-            <span className='text-xs text-gray-400 truncate'>
+            <MapPin className='h-3 w-3 shrink-0 text-muted-foreground/50' />
+            <span className='truncate text-xs text-muted-foreground'>
               {agent.property_location_name}
             </span>
           </div>
@@ -111,7 +111,7 @@ export function AgentListItem({ agent, isSelected, onClick }: AgentListItemProps
             'h-4 w-4 flex-shrink-0 transition-all duration-150',
             isSelected
               ? 'text-primary'
-              : 'text-gray-200 group-hover:text-gray-400'
+              : 'text-muted/30 group-hover:text-muted-foreground'
           )}
         />
       </div>

@@ -19,14 +19,14 @@ export function AgentListingsSection(_props: AgentListingsSectionProps) {
   const t = useTranslations('AgentEngagement');
 
   return (
-    <Card className='border border-gray-100 shadow-sm rounded-2xl overflow-hidden'>
+    <Card className='overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm'>
       <CardHeader className='px-5 pt-5 pb-3'>
         <div className='flex items-start justify-between gap-3'>
           <div>
-            <CardTitle className='text-sm font-bold text-gray-900'>
+            <CardTitle className='text-sm font-bold text-foreground'>
               {t('detailPage.listingsTitle')}
             </CardTitle>
-            <p className='text-xs text-gray-400 mt-1'>{t('detailPage.listingsSubtitle')}</p>
+            <p className='mt-1 text-xs text-muted-foreground'>{t('detailPage.listingsSubtitle')}</p>
           </div>
           <Badge
             variant='outline'
@@ -43,17 +43,17 @@ export function AgentListingsSection(_props: AgentListingsSectionProps) {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className='rounded-xl border border-dashed border-gray-200 bg-gray-50/60 overflow-hidden'
+              className='overflow-hidden rounded-xl border border-dashed border-primary/20 bg-sky-50/40 dark:bg-muted/20'
             >
-              <div className='h-28 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center'>
-                <Home className='h-7 w-7 text-gray-200' />
+              <div className='flex h-28 items-center justify-center bg-gradient-to-br from-sky-100/70 to-primary/5'>
+                <Home className='h-7 w-7 text-muted/35' />
               </div>
-              <div className='p-3 space-y-2'>
-                <div className='h-2.5 bg-gray-200/80 rounded-full animate-pulse w-3/4' />
-                <div className='h-2.5 bg-gray-200/60 rounded-full animate-pulse w-1/2' />
+              <div className='space-y-2 p-3'>
+                <div className='h-2.5 w-3/4 animate-pulse rounded-full bg-primary/15' />
+                <div className='h-2.5 w-1/2 animate-pulse rounded-full bg-primary/10' />
                 <div className='flex gap-2 pt-1'>
-                  <div className='h-2 bg-gray-200/60 rounded-full animate-pulse w-16' />
-                  <div className='h-2 bg-gray-200/60 rounded-full animate-pulse w-12' />
+                  <div className='h-2 w-16 animate-pulse rounded-full bg-primary/12' />
+                  <div className='h-2 w-12 animate-pulse rounded-full bg-primary/10' />
                 </div>
               </div>
             </div>

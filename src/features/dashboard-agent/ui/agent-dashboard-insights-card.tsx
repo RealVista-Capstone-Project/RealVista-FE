@@ -14,7 +14,7 @@ export function AgentDashboardInsightsCard() {
 
   return (
     <Card className='border-border/70 bg-card shadow-sm'>
-      <CardContent className='space-y-6 pt-6'>
+      <CardContent className='space-y-6 px-6 pb-6 pt-6'>
         <AgentDashboardPerformanceChartContent
           trendData={trendData}
           selectedPeriod={selectedPeriod}

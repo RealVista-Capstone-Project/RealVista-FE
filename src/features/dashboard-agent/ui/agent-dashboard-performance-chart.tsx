@@ -205,7 +205,7 @@ export function AgentDashboardPerformanceChartContent({
   );
 
   const chartBlock = (
-    <div className='h-52'>
+    <div className='min-h-[220px] h-52 sm:h-56'>
       <ResponsiveContainer width='100%' height='100%'>
         <AreaChart data={trendData} margin={{ top: 5, right: 5, left: -12, bottom: 0 }}>
           <defs>

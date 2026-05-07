@@ -47,7 +47,7 @@ export function ProposalCard({
         'group relative flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all duration-150 select-none',
         isSelected
           ? 'border-primary/20 bg-indigo-50 ring-1 ring-indigo-300/50'
-          : 'border-transparent hover:border-slate-200 hover:bg-slate-50',
+          : 'border-transparent hover:border-primary/25 hover:bg-sky-50/40 dark:hover:bg-primary/10',
       )}
     >
       {/* Updated at */}
@@ -55,7 +55,7 @@ export function ProposalCard({
         'mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors tabular-nums',
         isSelected
           ? 'bg-indigo-600 text-white'
-          : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200',
+          : 'bg-muted text-muted-foreground group-hover:bg-muted/80',
       )}>
         <span className='text-[10px] font-bold leading-none'>{updatedLabel}</span>
       </div>
@@ -65,7 +65,7 @@ export function ProposalCard({
         <div className='flex items-start justify-between gap-2'>
           <h3 className={cn(
             'text-sm font-semibold leading-snug line-clamp-2 transition-colors',
-            isSelected ? 'text-primary' : 'text-slate-800 group-hover:text-slate-900',
+            isSelected ? 'text-primary' : 'text-foreground group-hover:text-foreground',
           )}>
             {proposal.title}
           </h3>
@@ -74,14 +74,14 @@ export function ProposalCard({
             <div className='flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0'>
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                className='rounded-md p-1.5 text-slate-400 hover:text-primary hover:bg-indigo-50 transition-colors'
+                className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary'
                 title={t('btnEdit')}
               >
                 <Edit3 size={13} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                className='rounded-md p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors'
+                className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500'
                 title={t('btnDelete')}
               >
                 <Trash2 size={13} />
@@ -90,16 +90,16 @@ export function ProposalCard({
           )}
         </div>
 
-        <div className='mt-1 flex items-center gap-2 text-[11px] text-slate-500 min-w-0'>
+        <div className='mt-1 flex min-w-0 items-center gap-2 text-[11px] text-muted-foreground'>
           {specialtyLabel && (
-            <span className='inline-flex max-w-[65%] items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600'>
+            <span className='inline-flex max-w-[65%] items-center gap-1 rounded-full bg-primary/[0.08] px-2 py-0.5 font-semibold text-muted-foreground'>
               <Sparkles size={11} className='text-indigo-400 shrink-0' />
               <span className='truncate'>{specialtyLabel}</span>
             </span>
           )}
         </div>
 
-        <div className='mt-1.5 flex items-center gap-3 text-xs text-slate-500'>
+        <div className='mt-1.5 flex items-center gap-3 text-xs text-muted-foreground'>
           <span className='flex items-center gap-1'>
             <Award size={11} className='text-indigo-400' />
             {t('metricExperience')}: {proposal.experience_years} năm

@@ -359,7 +359,7 @@ export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
   const isLoading = planQuery.isLoading && !planQuery.data;
 
   return (
-    <Card className='xl:col-span-3'>
+    <Card className='border-border/70 bg-card shadow-sm xl:col-span-3'>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <Zap className='h-4 w-4 text-primary' />

@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import type { PaginationState } from '@tanstack/react-table';
 import { Badge } from '@/shared/ui/badge';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 
 // ─── Sub-components (split into own files) ───
 import { ProposalDetailView } from './components/proposal-detail-view';

@@ -43,9 +43,9 @@ export function getStatusColor(status: string | null | undefined) {
     case 'REJECTED':
       return 'bg-rose-100 text-rose-700';
     case 'EXPIRED':
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-muted text-muted-foreground';
     default:
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-muted text-muted-foreground';
   }
 }
 

@@ -250,6 +250,23 @@ export function DashboardLayout({
   );
 
   const pathname = usePathname();
+
+  /** Agent role + manage-agent / manage-proposals: light blue shell (aligned with admin), not gray muted. */
+  const isAgentLightBlueShell = React.useMemo(() => {
+    if (isAgent) return true;
+    if (
+      pathname === ROUTES.dashboard.manageAgent ||
+      pathname.startsWith(`${ROUTES.dashboard.manageAgent}/`)
+    )
+      return true;
+    if (
+      pathname === ROUTES.dashboard.manageProposals ||
+      pathname.startsWith(`${ROUTES.dashboard.manageProposals}/`)
+    )
+      return true;
+    return false;
+  }, [isAgent, pathname]);
+
   /** Property detail (and sub-routes like /edit, /3d): white main — avoids gray behind cards for agents/delegates. */
   const isPropertyDetailWhiteMain =
     pathname.startsWith(`${ROUTES.dashboard.property}/`) &&
@@ -407,7 +424,13 @@ export function DashboardLayout({
     pathname.startsWith(`${ROUTES.dashboard.createListing}/`);
 
   return (
-    <div className={cn('flex h-screen w-full overflow-hidden', isAdmin ? 'bg-sky-50' : 'bg-muted/50', className)}>
+    <div
+      className={cn(
+        'flex h-screen w-full overflow-hidden',
+        isAdmin || isAgentLightBlueShell ? 'bg-sky-50 dark:bg-background' : 'bg-muted/50 dark:bg-background',
+        className
+      )}
+    >
       <ChatWindowRenderer />
 
       {/* Sidebar - Now part of the flex flow on desktop */}
@@ -539,7 +562,7 @@ export function DashboardLayout({
                     'bg-white dark:bg-background',
                     !isCreateListingRoute && 'lg:min-h-[calc(100svh-3.5rem)]'
                   )
-                : isAdmin
+                : isAdmin || isAgentLightBlueShell
                   ? 'bg-sky-50 dark:bg-background'
                   : 'bg-muted/30 dark:bg-background',
             )}
