@@ -91,6 +91,17 @@ function getStatusStyle(status: string): string {
   return STATUS_STYLES[status] ?? 'bg-background text-muted-foreground border-border';
 }
 
+function getPreferredPropertyMedia(property: PropertySummaryResponse): PropertyMediaItem[] {
+  const media = property.media ?? [];
+  const standardMedia = media.filter((m) => m.is_property_standard === true);
+  return standardMedia.length > 0 ? standardMedia : media;
+}
+
+function getPreferredPropertyImages(property: PropertySummaryResponse): PropertyMediaItem[] {
+  const preferredMedia = getPreferredPropertyMedia(property);
+  return preferredMedia.filter((m) => m.media_type === 'IMAGE');
+}
+
 function PropertyListCard({
   property,
   isSelected,
@@ -101,10 +112,11 @@ function PropertyListCard({
   onClick: (p: PropertySummaryResponse) => void;
 }) {
   const t = useTranslations('PropertyDashboard');
+  const preferredMedia = getPreferredPropertyMedia(property);
   const thumbnailUrl =
     property.thumbnail_url ??
-    property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
-    property.media?.[0]?.media_url;
+    preferredMedia.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
+    preferredMedia[0]?.media_url;
 
   const location = [property.location_info?.district_name, property.location_info?.city_name]
     .filter(Boolean)
@@ -656,7 +668,7 @@ function PropertyDetailPanel({
     },
   });
 
-  const images = (property.media ?? []).filter((m) => m.media_type === 'IMAGE');
+  const images = getPreferredPropertyImages(property);
 
   React.useEffect(() => {
     setImgIndex(0);
