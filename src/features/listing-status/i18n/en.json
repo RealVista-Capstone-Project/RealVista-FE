@@ -22,17 +22,23 @@
       "propertyNotAvailable": "The associated property is not in an active state and cannot be listed."
     },
     "confirm": {
+      "addressUnknown": "No full address on file",
+      "detailLabel": "Confirmation details",
       "markAsSold": {
-        "title": "Mark as Sold",
-        "description": "Are you sure you want to mark this property as sold? This will close all other active listings for this property and notify other agents."
+        "title": "Confirm sale",
+        "intro": "Confirm the sale is complete for the property below.",
+        "consequence": "This will close other listings for this property and notify relevant agents."
       },
       "markAsRented": {
-        "title": "Mark as Rented",
-        "description": "Are you sure you want to mark this property as rented? This will close all other active listings for this property and notify other agents."
+        "title": "Confirm rental",
+        "intro": "Confirm the rental is complete for the property below.",
+        "consequence": "This will close other listings for this property and notify relevant agents."
       },
       "unpublish": {
         "title": "Unpublish Listing",
-        "description": "Are you sure you want to unpublish this listing? Active appointments will be cancelled if the listing remains unpublished for more than 24 hours."
+        "description": "Are you sure you want to unpublish this listing? Active appointments will be cancelled if the listing remains unpublished for more than 24 hours.",
+        "noteLabel": "Note",
+        "note": "Active appointments will be cancelled if the listing remains unpublished for more than 24 hours."
       },
       "cancel": "Cancel",
       "proceed": "Confirm"

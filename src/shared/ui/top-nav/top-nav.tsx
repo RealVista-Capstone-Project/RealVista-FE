@@ -32,6 +32,10 @@ export interface TopNavProps {
   };
   pageTitle?: string;
   startContent?: React.ReactNode;
+  /** Shown after the dashboard page title (inline). Prefer dashboardEndActions for actions on the right of the top bar. */
+  dashboardTitleActions?: React.ReactNode;
+  /** Shown on the top nav right, before notifications/profile (e.g. primary page action). */
+  dashboardEndActions?: React.ReactNode;
   className?: string;
 }
 
@@ -56,6 +60,8 @@ export function TopNav({
   user = defaultUser,
   pageTitle = 'RealVista',
   startContent,
+  dashboardTitleActions,
+  dashboardEndActions,
   className,
 }: TopNavProps) {
   const t = useTranslations('Navigation');
@@ -78,23 +84,33 @@ export function TopNav({
   return (
     <header
       className={cn(
-        'flex items-center justify-between bg-white px-6 py-4 lg:px-8',
-        variant === 'public' && 'border-b border-border',
+        'flex items-center justify-between bg-white',
+        variant === 'public' && 'border-b border-border px-6 py-4 lg:px-8',
+        variant === 'dashboard' && 'px-4 py-2 lg:px-6',
         className
       )}
     >
       {/* Left Section */}
-      <div className={cn('flex items-center gap-4', showNavItems && 'gap-8')}>
+      <div
+        className={cn(
+          'flex min-w-0 items-center gap-4',
+          variant === 'dashboard' && 'flex-1 pr-2',
+          showNavItems && 'gap-8'
+        )}
+      >
         {/* Start Content (e.g., SidebarTrigger) */}
         {startContent && <div className='flex items-center'>{startContent}</div>}
 
         {/* Logo and Nav Items */}
-        <div className={cn('flex items-center', showNavItems ? 'gap-8' : 'gap-4')}>
+        <div className={cn('flex min-w-0 items-center', showNavItems ? 'gap-8' : 'gap-4')}>
           {/* Logo - hide logo text for dashboard variant */}
           {variant === 'dashboard' ? (
-            <span className='font-bold text-xl lg:text-[24px] leading-[1.5] tracking-[-0.24px] text-foreground'>
-              {pageTitle}
-            </span>
+            <div className='flex min-w-0 items-center gap-2 sm:gap-3'>
+              <span className='min-w-0 truncate font-bold text-base lg:text-lg leading-snug tracking-tight text-foreground'>
+                {pageTitle}
+              </span>
+              {dashboardTitleActions}
+            </div>
           ) : (
             <Link href={`/${locale}${logoHref}`} className='flex items-center gap-[2px]'>
               <RealVistaLogo />
@@ -147,14 +163,17 @@ export function TopNav({
 
       {/* Right Actions — split per variant for clear, isolated logic */}
       {variant === 'dashboard' ? (
-        <DashboardActions
-          user={user}
-          isUserLoggedIn={isUserLoggedIn}
-          locale={locale}
-          t={t}
-          router={router}
-          isRouteActive={isRouteActive}
-        />
+        <div className='flex shrink-0 items-center gap-2 sm:gap-3'>
+          {dashboardEndActions}
+          <DashboardActions
+            user={user}
+            isUserLoggedIn={isUserLoggedIn}
+            locale={locale}
+            t={t}
+            router={router}
+            isRouteActive={isRouteActive}
+          />
+        </div>
       ) : (
         <PublicActions
           user={user}

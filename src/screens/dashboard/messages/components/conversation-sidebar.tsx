@@ -31,21 +31,18 @@ export function ConversationSidebar({
 
   return (
     <aside className='flex w-80 shrink-0 flex-col border-r border-slate-200 bg-white'>
-      {/* Header */}
-      <div className='flex items-center justify-between px-5 py-4 border-b border-slate-100'>
-        <h1 className='text-xl font-bold text-slate-800'>{t('title')}</h1>
-      </div>
-
-      {/* Search */}
-      <div className='px-4 pb-3'>
-        <div className='flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all'>
-          <Search className='size-4 shrink-0 text-slate-400' />
+      {/* Search — visuals aligned with managed listings search */}
+      <div className='px-4 pb-3 pt-3'>
+        <div className='relative min-w-0'>
+          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+            <Search className='h-4 w-4 shrink-0 text-primary/55' strokeWidth={2.5} />
+          </div>
           <input
             type='text'
             placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className='w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none'
+            className='h-9 w-full rounded-full border-2 border-primary/14 bg-[#e8f2fb] pl-10 pr-3 text-sm font-medium text-foreground shadow-sm shadow-primary/[0.04] placeholder:text-muted-foreground/65 transition-colors focus:border-primary/28 focus:bg-[#dfeef9] focus:outline-none focus:ring-2 focus:ring-primary/15'
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -38,6 +38,13 @@ import type {
 } from '@/entities/property/api/property-api.types';
 import { PropertyAttribute, ATTRIBUTE_TYPES } from '@/shared/config/property-types';
 import { AgentVerificationModal } from './components/agent-verification-modal';
+import {
+  DuplicateAddressModal,
+  type DuplicateOverrideReason,
+} from './components/duplicate-address-modal';
+import { useAddressDuplicateCheck } from '@/entities/property/api/use-address-duplicate-check';
+import type { DuplicateSeverity } from '@/entities/property/api/property-api.types';
+import { AlertTriangle, CheckCircle, Info, Loader2, XCircle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 interface PropertyFormProps {
@@ -98,6 +105,11 @@ export function PropertyForm({
   const [submissionStatus, setSubmissionStatus] = useState<'DRAFT' | 'AVAILABLE'>('AVAILABLE');
   const [pendingSubmitData, setPendingSubmitData] = useState<PropertyFormValues | null>(null);
   const [isDisableRentListingsConfirmOpen, setIsDisableRentListingsConfirmOpen] = useState(false);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const [overrideReason, setOverrideReason] = useState<DuplicateOverrideReason | null>(null);
+  // useRef ensures the correct status is read synchronously inside onSubmit,
+  // avoiding the React batched-state-update race between onClick and onSubmit.
+  const submissionStatusRef = useRef<'DRAFT' | 'AVAILABLE'>(submissionStatus);
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
@@ -236,6 +248,22 @@ export function PropertyForm({
   const watchStreetAddress = methods.watch('info.streetAddress');
   const watchIsExisting = methods.watch('isExistingProperty');
   const watchSelectedId = methods.watch('selectedPropertyId');
+  const watchWard = methods.watch('info.ward');
+
+  const { data: dupCheckResult, isLoading: isDupChecking, isDebouncing: isDupDebouncing } =
+    useAddressDuplicateCheck({
+      locationId: watchWard || undefined,
+      streetAddress: watchStreetAddress || undefined,
+      latitude: watchLocation?.lat || undefined,
+      longitude: watchLocation?.lng || undefined,
+      excludePropertyId: isEditMode ? propertyId : undefined,
+      skip: isEditMode || watchIsExisting || !watchStreetAddress?.trim() || !watchWard,
+    });
+
+  const dupSeverity: DuplicateSeverity = dupCheckResult?.severity ?? 'NONE';
+  const isAddressBlocked = dupSeverity === 'HARD_BLOCK' && !overrideReason;
+  const needsDupConfirmation =
+    dupSeverity === 'SOFT_WARNING' && !overrideReason && !isDupChecking && !isDupDebouncing;
 
   const STEPS = useMemo(() => {
     if (isEditMode) {
@@ -252,7 +280,11 @@ export function PropertyForm({
     const stepId = STEPS[currentStep]?.id;
     if (stepId === 'role') {
       if (watchIsExisting) return !watchSelectedId;
-      return !watchLocation?.lat || watchLocation?.lat === 0 || !watchStreetAddress?.trim();
+      if (!watchLocation?.lat || watchLocation?.lat === 0 || !watchStreetAddress?.trim())
+        return true;
+      if (isAddressBlocked) return true;
+      if (isDupChecking || isDupDebouncing) return true;
+      return false;
     }
     if (stepId === 'info') {
       return infoHasError;
@@ -271,6 +303,9 @@ export function PropertyForm({
     watchSelectedId,
     infoHasError,
     errors,
+    isAddressBlocked,
+    isDupChecking,
+    isDupDebouncing,
   ]);
 
   const transformToRequest = (data: PropertyFormValues, status: string): CreatePropertyRequest => {
@@ -357,6 +392,7 @@ export function PropertyForm({
       }),
       media: mediaItems.length > 0 ? mediaItems : undefined,
       owner_id: data.role.role === 'AGENT' ? data.role.ownerId : undefined,
+      ...(overrideReason ? { override_reason: overrideReason } : {}),
     };
   };
 
@@ -364,12 +400,19 @@ export function PropertyForm({
     const stepId = STEPS[currentStep].id as 'role' | 'info' | 'media';
     const isStepValid = await trigger(stepId);
 
-    if (isStepValid) {
-      setCurrentStep((prev: number) => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
+    if (!isStepValid) {
       toast.error(t('fillRequired'));
+      return;
     }
+
+    // If there's a soft warning and the user hasn't confirmed yet, open the modal
+    if (stepId === 'role' && needsDupConfirmation && dupCheckResult) {
+      setIsDuplicateModalOpen(true);
+      return;
+    }
+
+    setCurrentStep((prev: number) => prev + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBack = () => {
@@ -387,8 +430,6 @@ export function PropertyForm({
   };
 
   const submitProperty = async (data: PropertyFormValues) => {
-    console.log('Form Submit Data:', data);
-
     try {
       // 1. Upload any new files first
       let uploadedUrls: UploadedMediaItem[] = [];
@@ -417,8 +458,7 @@ export function PropertyForm({
       };
 
       if (isEditMode && propertyId) {
-        const request = transformToRequest(finalData, submissionStatus);
-        console.log('[PropertyForm] update request:', JSON.stringify(request, null, 2));
+        const request = transformToRequest(finalData, submissionStatusRef.current);
 
         if (onAdminSubmit) {
           onAdminSubmit(request);
@@ -434,7 +474,6 @@ export function PropertyForm({
               router.push('/dashboard/property');
             },
             onError: (error) => {
-              console.error('[PropertyForm] update error:', error);
               const message = (error as { payload?: { message?: string } })?.payload?.message;
               toast.error(message || t('submitError'));
             },
@@ -462,7 +501,7 @@ export function PropertyForm({
           },
         });
       } else {
-        const request = transformToRequest(finalData, submissionStatus);
+        const request = transformToRequest(finalData, submissionStatusRef.current);
         createProperty.mutate(request, {
           onSuccess: (response: { payload: { data: { property_id: string } } }) => {
             clearDraft();
@@ -560,6 +599,67 @@ export function PropertyForm({
         ))}
       </div>
 
+      {/* Address duplicate check indicator — only in create mode, role step, new property */}
+      {!isEditMode && !watchIsExisting && STEPS[currentStep]?.id === 'role' && watchStreetAddress?.trim() && watchWard && (
+        <div className='mb-4'>
+          {(isDupChecking || isDupDebouncing) && (
+            <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+              <Loader2 className='h-4 w-4 animate-spin' />
+              Đang kiểm tra địa chỉ...
+            </div>
+          )}
+          {!isDupChecking && !isDupDebouncing && dupSeverity === 'NONE' && dupCheckResult && (
+            <div className='flex items-center gap-2 text-sm text-green-600'>
+              <CheckCircle className='h-4 w-4' />
+              Địa chỉ hợp lệ
+            </div>
+          )}
+          {!isDupChecking && !isDupDebouncing && dupSeverity === 'INFO' && (
+            <div className='flex items-center gap-2 text-sm text-blue-500'>
+              <Info className='h-4 w-4' />
+              Có bất động sản gần khu vực này (chỉ để tham khảo)
+            </div>
+          )}
+          {!isDupChecking && !isDupDebouncing && dupSeverity === 'SOFT_WARNING' && (
+            <div className='flex items-center justify-between rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800'>
+              <div className='flex items-center gap-2'>
+                <AlertTriangle className='h-4 w-4 shrink-0' />
+                {overrideReason ? (
+                  <span>Đã xác nhận — property sẽ được gửi duyệt bởi Admin.</span>
+                ) : (
+                  <span>{dupCheckResult?.message ?? 'Phát hiện địa chỉ tương tự.'}</span>
+                )}
+              </div>
+              {!overrideReason && (
+                <button
+                  type='button'
+                  className='ml-2 shrink-0 underline text-yellow-700 hover:text-yellow-900 text-xs'
+                  onClick={() => setIsDuplicateModalOpen(true)}
+                >
+                  Xem chi tiết
+                </button>
+              )}
+            </div>
+          )}
+          {!isDupChecking && !isDupDebouncing && dupSeverity === 'HARD_BLOCK' && (
+            <div className='flex items-center gap-2 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700'>
+              <XCircle className='h-4 w-4 shrink-0' />
+              <span>{dupCheckResult?.message ?? 'Địa chỉ đã tồn tại.'}</span>
+              {dupCheckResult?.conflicting_properties?.[0]?.property_id && (
+                <a
+                  href={`/dashboard/property/${dupCheckResult.conflicting_properties[0].property_id}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='ml-auto shrink-0 underline text-xs'
+                >
+                  Xem property
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Form Card */}
       <div className='rounded-lg border-[1.5px] border-primary/20 bg-white p-6 sm:p-8 shadow-sm'>
         <FormProvider {...methods}>
@@ -612,7 +712,10 @@ export function PropertyForm({
                       isPending ||
                       !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
                     }
-                    onClick={() => setSubmissionStatus('DRAFT')}
+                    onClick={() => {
+                      submissionStatusRef.current = 'DRAFT';
+                      setSubmissionStatus('DRAFT');
+                    }}
                     className='w-[160px] h-12 rounded-lg bg-muted/50 text-primary font-bold hover:bg-primary/10 border-none shadow-none'
                   >
                     {t('saveDraft')}
@@ -623,7 +726,10 @@ export function PropertyForm({
                       isPending ||
                       !!(methods.formState.errors.media as { newFiles?: object })?.newFiles
                     }
-                    onClick={!isEditMode ? () => setSubmissionStatus('AVAILABLE') : undefined}
+                    onClick={!isEditMode ? () => {
+                      submissionStatusRef.current = 'AVAILABLE';
+                      setSubmissionStatus('AVAILABLE');
+                    } : undefined}
                     className='w-[160px] h-12 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 border-none shadow-none disabled:opacity-50'
                   >
                     {isPending ? t('saving') : isEditMode ? t('update') : t('create')}
@@ -648,6 +754,22 @@ export function PropertyForm({
           ownerPhoneDisplay={
             methods.getValues('role.ownerMaskedPhone') || methods.getValues('role.ownerPhone') || ''
           }
+        />
+      )}
+
+      {/* Duplicate address modal */}
+      {dupCheckResult && dupSeverity === 'SOFT_WARNING' && (
+        <DuplicateAddressModal
+          open={isDuplicateModalOpen}
+          onClose={() => setIsDuplicateModalOpen(false)}
+          duplicateCheckResult={dupCheckResult}
+          onConfirm={(reason) => {
+            setOverrideReason(reason);
+            setIsDuplicateModalOpen(false);
+            // Proceed to next step after confirmation
+            setCurrentStep((prev: number) => prev + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
         />
       )}
 

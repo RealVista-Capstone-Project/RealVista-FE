@@ -20,7 +20,8 @@
       "locations": "Locations",
       "crm": "CRM",
       "packages": "Package Management",
-      "manageProperties": "Manage Properties"
+      "manageProperties": "Manage Properties",
+      "propertyAdminSidebar": "Property overview"
     },
     "pageTitle": {
       "default": "RealVista",
@@ -36,7 +37,6 @@
       "manageProposals": "Proposal Library",
       "property": "Property",
       "propertyFeed": "Find Properties to Propose",
-      "agentSetting": "Agent profile & settings",
       "appointments": "Appointments",
       "manageUsers": "User Management",
       "managePolicies": "Policy Management",
@@ -129,7 +129,9 @@
     "makePrimary": "Make Primary",
     "newUpload": "New",
     "readOnly": "From property",
-    "noProperties": "No properties found",
+    "noProperties": "No available properties",
+    "noPropertiesDesc": "You need an active property (Available or Rented) to create a listing.",
+    "createPropertyCta": "Create Property",
     "submitting": "Submitting...",
     "createSuccess": "Listing created successfully!",
     "createError": "Failed to create listing. Please try again.",
@@ -142,16 +144,17 @@
     "select": "Select",
     "remove": "Remove",
     "cancel": "Cancel",
+    "priceRangeHint": "Optional — set an expected price range for negotiation",
     "validation": {
       "nameRequired": "Listing name is required",
       "nameTooLong": "Name must not exceed 500 characters",
+      "contentTooLong": "Description must not exceed 2,000 characters",
       "priceRequired": "Price is required",
       "priceInvalid": "Price must be a number greater than 0",
-      "minPriceRequired": "Min price is required",
       "minPriceInvalid": "Min price must be a valid number greater than 0",
-      "maxPriceRequired": "Max price is required",
       "maxPriceInvalid": "Max price must be a valid number greater than 0",
       "maxPriceLessThanMin": "Maximum price must be greater than or equal to minimum price",
+      "minMaxPairRequired": "Please fill in both min price and max price",
       "dateInvalid": "Please enter a valid date",
       "mediaRequired": "At least one media item is required to create a listing"
     },

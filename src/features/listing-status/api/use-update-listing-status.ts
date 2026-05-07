@@ -63,6 +63,10 @@ export function useUpdateListingStatus() {
         queryKey: listingKeys.managed(),
         refetchType: 'active',
       });
+      await queryClient.invalidateQueries({
+        queryKey: listingKeys.managedInfiniteLists(),
+        refetchType: 'active',
+      });
 
       // Also invalidate all listings to ensure consistency
       await queryClient.invalidateQueries({

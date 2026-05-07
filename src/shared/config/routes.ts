@@ -41,8 +41,6 @@ export const ROUTES = {
     locations: '/dashboard/locations',
     agentDetail: (id: string) => `/dashboard/manage-agent/${id}`,
     propertyFeed: '/dashboard/property-feed',
-    /** Agent-only dashboard profile & account settings */
-    agentSetting: '/dashboard/setting',
     /** Agent CRM board */
     crm: '/dashboard/crm',
   },

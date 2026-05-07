@@ -155,7 +155,7 @@ function EngagementActionsCell({
   if (!canCancelSubmitted && !canAcceptReject && !canCancelAccepted && !canFinish) return null;
 
   return (
-    <div className='flex items-center gap-2' onClick={(e) => e.stopPropagation()}>
+    <div className='flex min-w-0 flex-nowrap items-center gap-2' onClick={(e) => e.stopPropagation()}>
       {canCancelSubmitted && (
         <CancelDialog engId={eng.engagementId} onCancel={onCancel} t={t} status={st} />
       )}
@@ -247,8 +247,8 @@ export function useEngagementColumns(opts: EngagementColumnsOptions): ColumnDef<
           const item = row.original;
           const imgUrl = resolvePropertyImage(item);
           return (
-            <div className='flex items-center gap-3 min-w-[200px]'>
-              <div className='relative h-12 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0'>
+            <div className='flex min-w-0 max-w-[min(100%,220px)] items-center gap-2'>
+              <div className='relative h-10 w-14 shrink-0 overflow-hidden rounded-md bg-muted'>
                 {imgUrl ? (
                   <img src={imgUrl} alt='' className='absolute inset-0 w-full h-full object-cover' />
                 ) : (
@@ -297,8 +297,8 @@ export function useEngagementColumns(opts: EngagementColumnsOptions): ColumnDef<
           }
 
           return (
-            <div className='flex items-center gap-2.5 min-w-[140px]'>
-              <AvatarWithInitials name={otherName} size={32} />
+            <div className='flex min-w-0 max-w-[min(100%,170px)] items-center gap-2'>
+              <AvatarWithInitials name={otherName} size={28} />
               <div className='min-w-0'>
                 <p className='truncate text-sm font-semibold text-foreground'>{otherName}</p>
                 <p className='text-xs text-muted-foreground'>{roleLabel}</p>

@@ -1,6 +1,8 @@
-import { queryOptions } from '@tanstack/react-query';
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { listingApi } from './index';
 import { listingKeys } from './keys';
+import type { PageResponse } from '@/entities/listing/model/types';
+import type { ManagedListing } from '@/screens/dashboard/managed-listings/types/managed-listing';
 
 /**
  * Listing Query Factory
@@ -59,6 +61,33 @@ export const listingQueries = {
         const response = await listingApi.getManagedListings(params);
         return response.payload.data;
       },
+      staleTime: 0,
+    }),
+
+  /**
+   * Managed listings for infinite scroll (accumulate pages in the UI).
+   */
+  managedInfinite: (params?: {
+    size?: number;
+    search?: string;
+    listingType?: string;
+    status?: string;
+    sortBy?: string;
+    createdBy?: string;
+  }) =>
+    infiniteQueryOptions({
+      queryKey: [...listingKeys.managedInfiniteLists(), params ?? {}] as const,
+      queryFn: async ({ pageParam }) => {
+        const response = await listingApi.getManagedListings({
+          ...params,
+          page: pageParam as number,
+          size: params?.size ?? 10,
+        });
+        return response.payload.data;
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage: PageResponse<ManagedListing>) =>
+        lastPage.last ? undefined : lastPage.page + 1,
       staleTime: 0,
     }),
 

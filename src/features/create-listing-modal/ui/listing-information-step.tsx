@@ -219,31 +219,43 @@ export function ListingInformationStep({
 
   const validate = React.useCallback(() => {
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = t('validation.nameRequired');
-    else if (name.length > 500) errs.name = t('validation.nameTooLong');
 
+    // Name (required)
+    if (!name.trim()) errs.name = t('validation.nameRequired');
+    else if (name.trim().length > 500) errs.name = t('validation.nameTooLong');
+
+    // Content (optional, but limited)
+    if (content.length > 2000) errs.content = t('validation.contentTooLong');
+
+    // Price (required)
     if (!price.trim()) errs.price = t('validation.priceRequired');
     else if (isNaN(Number(price)) || Number(price) <= 0) errs.price = t('validation.priceInvalid');
 
-    if (!minPrice.trim()) errs.minPrice = t('validation.minPriceRequired');
-    else if (isNaN(Number(minPrice)) || Number(minPrice) <= 0)
+    // Min / Max price — optional, but validated if entered.
+    // If only one of them is provided, require the other.
+    const hasMin = minPrice.trim() !== '';
+    const hasMax = maxPrice.trim() !== '';
+
+    if (hasMin && (isNaN(Number(minPrice)) || Number(minPrice) <= 0))
       errs.minPrice = t('validation.minPriceInvalid');
 
-    if (!maxPrice.trim()) errs.maxPrice = t('validation.maxPriceRequired');
-    else if (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0)
+    if (hasMax && (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0))
       errs.maxPrice = t('validation.maxPriceInvalid');
-    else if (!errs.minPrice && Number(minPrice) > Number(maxPrice))
-      errs.maxPrice = t('validation.maxPriceLessThanMin', {
-        fallback: 'Giá cao nhất phải lớn hơn hoặc bằng giá thấp nhất',
-      });
+    else if (hasMax && !errs.maxPrice && hasMin && !errs.minPrice && Number(minPrice) > Number(maxPrice))
+      errs.maxPrice = t('validation.maxPriceLessThanMin');
 
+    // Pair constraint: if one is provided, require the other
+    if (hasMin && !hasMax && !errs.minPrice) errs.maxPrice = t('validation.minMaxPairRequired');
+    if (hasMax && !hasMin && !errs.maxPrice) errs.minPrice = t('validation.minMaxPairRequired');
+
+    // Date
     if (listingType === 'RENT' && availableFrom) {
       const d = new Date(availableFrom);
       if (isNaN(d.getTime())) errs.availableFrom = t('validation.dateInvalid');
     }
 
     return errs;
-  }, [name, price, minPrice, maxPrice, availableFrom, listingType, t]);
+  }, [name, content, price, minPrice, maxPrice, availableFrom, listingType, t]);
 
   React.useEffect(() => {
     if (hasAttemptedSubmit) setErrors(validate());
@@ -254,6 +266,8 @@ export function ListingInformationStep({
     const validationErrors = validate();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
+    // Gate on AI/media checks only after field validation passes
+    if (!canSubmit) return;
 
     const formData: CreateListingFormData = {
       propertyId: selectedProperty.propertyId,
@@ -276,14 +290,10 @@ export function ListingInformationStep({
     onSubmit(formData);
   };
 
-  const isValid =
-    name.trim() !== '' &&
-    price.trim() !== '' &&
-    Object.keys(errors).length === 0 &&
-    allImagesAnalyzed &&
-    allImagesPassed &&
-    isContentValid &&
-    (selectedMediaIds.size > 0 || selectedNewFileIndices.size > 0);
+  // canSubmit: only gate on AI/media conditions that can't be shown inline.
+  // Field errors (name, price, etc.) are surfaced via validate() on submit click.
+  const hasMedia = selectedMediaIds.size > 0 || selectedNewFileIndices.size > 0;
+  const canSubmit = hasMedia && allImagesAnalyzed && allImagesPassed && isContentValid && !isSubmitting;
 
   // ── Translation labels for shared components ──
   const priceLabels = {
@@ -294,6 +304,7 @@ export function ListingInformationStep({
     minPrice: t('minPrice'),
     maxPrice: t('maxPrice'),
     negotiable: t('negotiable'),
+    priceRangeHint: t('priceRangeHint'),
   };
 
   const mediaLabels = {
@@ -351,6 +362,7 @@ export function ListingInformationStep({
               onChange={setContent}
               label={t('listingContent')}
               placeholder={t('listingContentPlaceholder')}
+              error={errors.content}
             />
 
             {/* Content Verification */}
@@ -542,7 +554,7 @@ export function ListingInformationStep({
       </div>
 
       {/* Footer — Previous / Save as Draft / Submit */}
-      <div className='shrink-0 border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
+      <div className='shrink-0 border-t border-primary/20 px-4 md:px-8 py-4 md:py-5'>
         {/* Quota info */}
         <div className='mb-3 text-right'>
           {quotaLoading ? (
@@ -571,10 +583,10 @@ export function ListingInformationStep({
           <button
             type='button'
             onClick={() => handleSubmit(false)}
-            disabled={!isValid || isSubmitting}
+            disabled={isSubmitting}
             className={cn(
               'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg border-2 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold transition-all',
-              isValid && !isSubmitting
+              !isSubmitting
                 ? 'border-primary text-primary hover:bg-primary/5'
                 : 'border-primary/20 text-primary/20 cursor-not-allowed'
             )}
@@ -585,10 +597,10 @@ export function ListingInformationStep({
           <button
             type='button'
             onClick={() => handleSubmit(true)}
-            disabled={!isValid || isSubmitting || isLocked}
+            disabled={isSubmitting || isLocked}
             className={cn(
               'flex min-w-[100px] md:min-w-[140px] items-center justify-center rounded-lg px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all',
-              isValid && !isSubmitting && !isLocked
+              !isSubmitting && !isLocked
                 ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_rgba(112,101,240,0.3)]'
                 : 'bg-primary/30 cursor-not-allowed'
             )}

@@ -128,6 +128,7 @@ export function AdminManagePropertiesPage() {
   const [search, setSearch] = React.useState('');
   const debouncedSearch = useDebounce(search, 500);
   const [status, setStatus] = React.useState<string>('ALL');
+  const [flaggedOnly, setFlaggedOnly] = React.useState(false);
   const [propertyTypeId, setPropertyTypeId] = React.useState<string>('ALL');
   const [cityId, setCityId] = React.useState<string>('ALL');
   const [districtId, setDistrictId] = React.useState<string>('ALL');
@@ -145,7 +146,7 @@ export function AdminManagePropertiesPage() {
 
   React.useEffect(() => {
     setPagination((p) => ({ ...p, pageIndex: 0 }));
-  }, [debouncedSearch, status, propertyTypeId, finalLocationId]);
+  }, [debouncedSearch, status, propertyTypeId, finalLocationId, flaggedOnly]);
 
   // Delete confirmation
   const [propertyToDelete, setPropertyToDelete] = React.useState<{ id: string; address: string } | null>(null);
@@ -179,14 +180,19 @@ export function AdminManagePropertiesPage() {
 
   const criteria = {
     keyword: debouncedSearch || undefined,
-    status: status === 'ALL' ? undefined : status,
+    status: flaggedOnly ? 'PENDING' : status === 'ALL' ? undefined : status,
     propertyTypeId: propertyTypeId === 'ALL' ? undefined : propertyTypeId,
     locationId: finalLocationId,
     page: pagination.pageIndex,
     size: pagination.pageSize,
   };
 
-  const activeFilterCount = [status !== 'ALL', propertyTypeId !== 'ALL', !!finalLocationId].filter(Boolean).length;
+  const activeFilterCount = [
+    status !== 'ALL',
+    propertyTypeId !== 'ALL',
+    !!finalLocationId,
+    flaggedOnly,
+  ].filter(Boolean).length;
 
   const { data, isLoading } = useQuery(propertyQueries.adminList(criteria));
 
@@ -270,9 +276,17 @@ export function AdminManagePropertiesPage() {
         cell: ({ row }) => (
           <div className='flex items-center gap-2'>
             <MapPin className='h-3.5 w-3.5 text-muted-foreground shrink-0' />
-            <span className='font-medium text-sm truncate max-w-[220px]' title={row.original.street_address}>
-              {row.original.street_address || '—'}
-            </span>
+            <div className='flex flex-col min-w-0'>
+              <span className='font-medium text-sm truncate max-w-[220px]' title={row.original.street_address}>
+                {row.original.street_address || '—'}
+              </span>
+              {row.original.flagged_for_admin_review && (
+                <span className='inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 rounded-full px-1.5 py-0.5 w-fit mt-0.5'>
+                  <AlertTriangle className='h-2.5 w-2.5' />
+                  Cần duyệt
+                </span>
+              )}
+            </div>
           </div>
         ),
       },
@@ -431,6 +445,15 @@ export function AdminManagePropertiesPage() {
               />
             </div>
 
+            <Button
+              variant={flaggedOnly ? 'default' : 'outline'}
+              className={flaggedOnly ? 'bg-amber-500 text-white hover:bg-amber-600 border-amber-500' : 'border-amber-300 text-amber-700 hover:bg-amber-50'}
+              onClick={() => setFlaggedOnly((prev) => !prev)}
+            >
+              <AlertTriangle className='h-4 w-4' />
+              Cần duyệt
+            </Button>
+
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant='outline' className='justify-between sm:w-[170px]'>
@@ -461,6 +484,7 @@ export function AdminManagePropertiesPage() {
                         setCityId('ALL');
                         setDistrictId('ALL');
                         setWardId('ALL');
+                        setFlaggedOnly(false);
                       }}
                     >
                       {t('filters.reset')}

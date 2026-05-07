@@ -7,6 +7,14 @@
       "tourBookings": "Lịch hẹn xem nhà",
       "conversionRate": "Tỷ lệ chuyển đổi",
       "conversionRateTooltip": "Tỷ lệ khách truy cập đã đặt lịch xem nhà"
+    },
+    "weeklyViews": {
+      "title": "Lượt xem theo ngày",
+      "prevWeek": "Tuần trước",
+      "nextWeek": "Tuần sau",
+      "range": "{start} – {end}",
+      "tooltipLabel": "lượt xem",
+      "empty": "Chưa có lượt xem ghi nhận trong tuần này."
     }
   }
 }

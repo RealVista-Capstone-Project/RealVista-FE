@@ -23,6 +23,8 @@ export const listingKeys = {
   // Managed listings (user's own listings)
   managed: (params?: Record<string, unknown>) =>
     params ? ([...listingKeys.all, 'managed', params] as const) : ([...listingKeys.all, 'managed'] as const),
+  /** Prefix for useInfiniteQuery managed list (any filter). */
+  managedInfiniteLists: () => [...listingKeys.all, 'managed-infinite'] as const,
   managedSummary: () => [...listingKeys.all, 'managed-summary'] as const,
 
   // Listings by property ID

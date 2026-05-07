@@ -184,29 +184,46 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
 
   // ── Validation ──
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false);
 
-  const validateForm = () => {
+  const validateForm = React.useCallback(() => {
     const newErrors: Record<string, string> = {};
 
+    // Name (required)
     if (!name.trim()) newErrors.name = t('validation.nameRequired');
-    if (name.length > 500) newErrors.name = t('validation.nameTooLong');
+    else if (name.trim().length > 500) newErrors.name = t('validation.nameTooLong');
+
+    // Content (optional, but limited)
+    if (content.length > 2000) newErrors.content = t('validation.contentTooLong');
+
+    // Price (required)
     if (!price.trim()) newErrors.price = t('validation.priceRequired');
     else if (isNaN(Number(price)) || Number(price) <= 0)
       newErrors.price = t('validation.priceInvalid');
 
-    if (minPrice.trim() && (isNaN(Number(minPrice)) || Number(minPrice) <= 0))
+    // Min / Max price — optional, validated only if entered
+    const hasMin = minPrice.trim() !== '';
+    const hasMax = maxPrice.trim() !== '';
+
+    if (hasMin && (isNaN(Number(minPrice)) || Number(minPrice) <= 0))
       newErrors.minPrice = t('validation.minPriceInvalid');
 
-    if (maxPrice.trim() && (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0))
+    if (hasMax && (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0))
       newErrors.maxPrice = t('validation.maxPriceInvalid');
+    else if (hasMax && !newErrors.maxPrice && hasMin && !newErrors.minPrice && Number(minPrice) > Number(maxPrice))
+      newErrors.maxPrice = t('validation.maxPriceLessThanMin');
 
-    if (availableFrom && isNaN(Date.parse(availableFrom))) {
+    // Pair constraint
+    if (hasMin && !hasMax && !newErrors.minPrice) newErrors.maxPrice = t('validation.minMaxPairRequired');
+    if (hasMax && !hasMin && !newErrors.maxPrice) newErrors.minPrice = t('validation.minMaxPairRequired');
+
+    // Date
+    if (availableFrom && isNaN(Date.parse(availableFrom)))
       newErrors.availableFrom = t('validation.dateInvalid');
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [name, content, price, minPrice, maxPrice, availableFrom, t]);
 
   // ── AI Validity Check ──
   const hasNewUploads = newFiles.length > 0;
@@ -218,7 +235,13 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
   const isTypeUpdateDisabled =
     listing.status === 'PUBLISHED' || listing.status === 'SOLD' || listing.status === 'RENTED';
 
+  // Live re-validate after first submit attempt
+  React.useEffect(() => {
+    if (hasAttemptedSubmit) validateForm();
+  }, [hasAttemptedSubmit, validateForm]);
+
   const handleSubmit = async () => {
+    setHasAttemptedSubmit(true);
     if (!validateForm()) return;
 
     if (!aiChecksPassed) {
@@ -301,6 +324,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     minPrice: t('minPrice'),
     maxPrice: t('maxPrice'),
     negotiable: t('negotiable'),
+    priceRangeHint: t('priceRangeHint'),
   };
 
   const mediaLabels = {
@@ -371,6 +395,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
                   label={t('listingContent')}
                   placeholder={t('listingContentPlaceholder')}
                   rows={5}
+                  error={errors.content}
                 />
 
                 {/* AI Content Verification */}

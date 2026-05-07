@@ -23,10 +23,10 @@ export function ListingNameInput({
   maxLength = 500,
 }: ListingNameInputProps) {
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex flex-col gap-1.5'>
       <label className='text-sm font-medium text-foreground'>
         {label}
-        <span className='text-primary'>*</span>
+        <span className='ml-0.5 text-red-500'>*</span>
       </label>
       <input
         type='text'
@@ -35,18 +35,34 @@ export function ListingNameInput({
         maxLength={maxLength}
         placeholder={placeholder}
         className={cn(
-          'rounded-lg border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+          'rounded-lg border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
           error
-            ? 'border-red-400 focus:border-red-500'
-            : 'border-primary/20 focus:border-primary'
+            ? 'border-red-400 focus:border-red-500 focus-visible:ring-red-400/20'
+            : 'border-primary/20 focus:border-primary focus-visible:ring-primary/20'
         )}
       />
-      {error && <span className='text-xs text-red-500'>{error}</span>}
+      <div className='flex items-start justify-between gap-2'>
+        {error ? (
+          <span className='text-xs text-red-500'>{error}</span>
+        ) : (
+          <span />
+        )}
+        <span
+          className={cn(
+            'ml-auto shrink-0 text-xs tabular-nums',
+            value.length >= maxLength ? 'text-red-500 font-medium' : 'text-muted-foreground/50'
+          )}
+        >
+          {value.length}/{maxLength}
+        </span>
+      </div>
     </div>
   );
 }
 
 /* ─── Content Textarea ─── */
+
+const MAX_CONTENT_LENGTH = 2000;
 
 interface ListingContentTextareaProps {
   value: string;
@@ -54,6 +70,7 @@ interface ListingContentTextareaProps {
   label: string;
   placeholder: string;
   rows?: number;
+  error?: string;
 }
 
 export function ListingContentTextarea({
@@ -62,17 +79,41 @@ export function ListingContentTextarea({
   label,
   placeholder,
   rows = 4,
+  error,
 }: ListingContentTextareaProps) {
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex flex-col gap-1.5'>
       <label className='text-sm font-medium text-foreground'>{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className='rounded-lg border border-primary/20 bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 resize-none'
+        maxLength={MAX_CONTENT_LENGTH}
+        className={cn(
+          'rounded-lg border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 resize-none',
+          error
+            ? 'border-red-400 focus:border-red-500 focus-visible:ring-red-400/20'
+            : 'border-primary/20 focus:border-primary focus-visible:ring-primary/20'
+        )}
       />
+      <div className='flex items-start justify-between gap-2'>
+        {error ? (
+          <span className='text-xs text-red-500'>{error}</span>
+        ) : (
+          <span />
+        )}
+        <span
+          className={cn(
+            'ml-auto shrink-0 text-xs tabular-nums',
+            value.length >= MAX_CONTENT_LENGTH
+              ? 'text-red-500 font-medium'
+              : 'text-muted-foreground/50'
+          )}
+        >
+          {value.length}/{MAX_CONTENT_LENGTH}
+        </span>
+      </div>
     </div>
   );
 }

@@ -19,6 +19,15 @@ export const propertyQueries = {
       queryFn: () => propertyApi.getMyProperties(criteria),
       placeholderData: (previousData) => previousData,
     }),
+  mySummary: () =>
+    queryOptions({
+      queryKey: ['properties', 'me', 'summary'],
+      queryFn: async () => {
+        const res = await propertyApi.getMyPropertiesSummary();
+        return res.payload.data;
+      },
+      staleTime: 60 * 1000,
+    }),
   ownerAvailable: (criteria: OwnerAvailablePropertiesCriteria) =>
     queryOptions({
       queryKey: ['properties', 'owner-available', criteria],

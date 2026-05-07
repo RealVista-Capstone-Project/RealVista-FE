@@ -51,6 +51,7 @@ import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { RentalFeatures } from '@/features/rental-features';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
 import { GoogleMap, AdvancedMarker, Pin } from '@/shared/ui/map/google-map';
+import { ListingDescription } from '@/shared/ui/listing-description';
 import { MonthlyCostBreakdown } from '@/features/monthly-cost-breakdown';
 import { RentVsBuyComparison } from '@/features/rent-vs-buy';
 import { MortgageCalculator } from '@/features/mortgage-calculator/ui/mortgage-calculator';
@@ -213,6 +214,15 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
 
   // Get attributes from listing and filter out invalid ones
   const attributes = (listing.attributes ?? []).filter(hasValidAttributeValue);
+
+  // Determine if listing has any valid amenities to decide whether to show the Amenities tab.
+  // Mirrors the validity check used inside RentalFeatures so the tab matches its content.
+  const hasAmenities = (listing.amenities ?? []).some(
+    (amenity) =>
+      amenity.amenity_name !== undefined &&
+      amenity.amenity_name !== null &&
+      amenity.amenity_name.trim() !== ''
+  );
 
   // Fetch related listings (rent + sale) for the same property
   const { data: relatedListings } = useQuery(
@@ -382,16 +392,18 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
               <Tabs defaultValue='description'>
                 <TabsList variant='line' className='w-fit'>
                   <TabsTrigger value='description'>{tScreen('description')}</TabsTrigger>
-                  <TabsTrigger value='amenities'>Tiện ích</TabsTrigger>
+                  {hasAmenities && (
+                    <TabsTrigger value='amenities'>Tiện ích</TabsTrigger>
+                  )}
                 </TabsList>
 
                 <TabsContent value='description' className='mt-6'>
                   <div className='flex flex-col md:flex-row gap-6'>
-                    <div className='flex-1 prose prose-sm max-w-none text-foreground/70 leading-[1.8]'>
-                      {listing.property.description}
+                    <div className='flex-1 min-w-0'>
+                      <ListingDescription content={property.description ?? ''} />
                     </div>
-                    <div className='w-full md:w-[280px] shrink-0'>
-                      <div className='relative w-full h-[200px] rounded-lg overflow-hidden border border-border'>
+                    <div className='w-full md:w-[220px] shrink-0'>
+                      <div className='relative w-full h-[150px] rounded-lg overflow-hidden border border-border'>
                         <GoogleMap
                           defaultCenter={mapInfo.position}
                           defaultZoom={15}
@@ -414,9 +426,11 @@ export function ListingDetailScreen({ listing, isPreview = false }: ListingDetai
                   </div>
                 </TabsContent>
 
-                <TabsContent value='amenities' className='mt-6'>
-                  <RentalFeatures property={property} />
-                </TabsContent>
+                {hasAmenities && (
+                  <TabsContent value='amenities' className='mt-6'>
+                    <RentalFeatures property={property} />
+                  </TabsContent>
+                )}
               </Tabs>
             </div>
           </div>

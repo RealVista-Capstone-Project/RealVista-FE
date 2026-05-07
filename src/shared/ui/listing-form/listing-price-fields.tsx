@@ -7,6 +7,8 @@ import type { ListingType } from '@/entities/listing';
 
 /* ─── Currency Input ─── */
 
+const MAX_PRICE_DIGITS = 13; // up to 9,999,999,999,999 (~10,000 tỷ)
+
 interface CurrencyInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -32,53 +34,56 @@ export function CurrencyInput({
 }: CurrencyInputProps) {
   const [focused, setFocused] = React.useState(false);
 
-  // While focused: show raw digits. While blurred: show formatted with dot separators.
   const numericValue = value.replace(/\D/g, '');
+  // Blurred → show dot-separated; focused → show raw digits
   const displayValue = focused || !numericValue ? value : formatNumber(Number(numericValue));
 
-  // Helper text: e.g. "2 tỷ VNĐ" or "500 triệu VNĐ"
+  // Helper text e.g. "2 tỷ VNĐ"
   const helperText = React.useMemo(() => {
     const n = Number(numericValue);
     if (!numericValue || !Number.isFinite(n) || n <= 0) return null;
-    return `${formatVND(n)} VNĐ`;
+    return `≈ ${formatVND(n)} VNĐ`;
   }, [numericValue]);
 
   return (
-    <div className={cn('flex flex-col gap-2', disabled && 'opacity-50', className)}>
+    <div className={cn('flex flex-col gap-1.5', disabled && 'opacity-50', className)}>
       <label className='text-sm font-medium text-foreground'>
         {label}
-        {required && <span className='text-primary'>*</span>}
+        {required && <span className='ml-0.5 text-red-500'>*</span>}
       </label>
-      <div className={cn(
-        'flex items-center rounded-lg border border-primary/20 bg-background overflow-hidden transition-colors',
-        !disabled && 'focus-within:border-primary focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1'
-      )}>
-        <span className='flex h-full items-center border-r border-primary/20 bg-primary/5 px-3 text-sm text-muted-foreground/70'>
+      <div
+        className={cn(
+          'flex items-center rounded-lg border bg-background overflow-hidden transition-colors',
+          error
+            ? 'border-red-400 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-400/20'
+            : 'border-primary/20 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20',
+          disabled && 'cursor-not-allowed'
+        )}
+      >
+        <span className='flex h-full items-center border-r border-primary/20 bg-primary/5 px-3 py-3 text-sm text-muted-foreground/70 select-none'>
           {currency}
         </span>
         <input
           type='text'
           inputMode='numeric'
           value={displayValue}
-          onFocus={() => {
-            setFocused(true);
-          }}
+          onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onChange={(e) => {
-            const raw = e.target.value.replace(/\D/g, '');
+            const raw = e.target.value.replace(/\D/g, '').slice(0, MAX_PRICE_DIGITS);
             onChange(raw);
           }}
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none bg-transparent',
-            error && 'text-red-500',
+            'flex-1 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none bg-transparent',
             disabled && 'cursor-not-allowed'
           )}
         />
       </div>
+      {/* Helper price text — shown when value is valid and no error */}
       {helperText && !error && (
-        <span className='text-xs text-muted-foreground'>{helperText}</span>
+        <span className='text-xs font-medium text-primary/70'>{helperText}</span>
       )}
       {error && <span className='text-xs text-red-500'>{error}</span>}
     </div>
@@ -141,12 +146,14 @@ interface ListingPriceFieldsProps {
     minPrice: string;
     maxPrice: string;
     negotiable: string;
+    priceRangeHint?: string;
   };
 }
 
 /**
  * Composite component handling all pricing-related fields:
- * price, security deposit (rent only), min/max price, and negotiable toggle.
+ * price (required), security deposit (rent only), optional min/max price range,
+ * and negotiable toggle.
  */
 export function ListingPriceFields({
   listingType,
@@ -165,7 +172,7 @@ export function ListingPriceFields({
 }: ListingPriceFieldsProps) {
   return (
     <>
-      {/* Price + Security Deposit */}
+      {/* Main price + Security Deposit */}
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
         <CurrencyInput
           value={price}
@@ -182,28 +189,32 @@ export function ListingPriceFields({
             onChange={onSecurityDepositChange}
             label={labels.securityDeposit}
             placeholder={labels.pricePlaceholder}
+            error={errors.securityDeposit}
           />
         )}
       </div>
 
-      {/* Min / Max Price */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-        <CurrencyInput
-          value={minPrice}
-          onChange={onMinPriceChange}
-          label={labels.minPrice}
-          placeholder={labels.pricePlaceholder}
-          error={errors.minPrice}
-          required
-        />
-        <CurrencyInput
-          value={maxPrice}
-          onChange={onMaxPriceChange}
-          label={labels.maxPrice}
-          placeholder={labels.pricePlaceholder}
-          error={errors.maxPrice}
-          required
-        />
+      {/* Min / Max Price range (optional) */}
+      <div className='flex flex-col gap-2'>
+        {labels.priceRangeHint && (
+          <p className='text-xs text-muted-foreground/70'>{labels.priceRangeHint}</p>
+        )}
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+          <CurrencyInput
+            value={minPrice}
+            onChange={onMinPriceChange}
+            label={labels.minPrice}
+            placeholder={labels.pricePlaceholder}
+            error={errors.minPrice}
+          />
+          <CurrencyInput
+            value={maxPrice}
+            onChange={onMaxPriceChange}
+            label={labels.maxPrice}
+            placeholder={labels.pricePlaceholder}
+            error={errors.maxPrice}
+          />
+        </div>
       </div>
 
       {/* Negotiable */}

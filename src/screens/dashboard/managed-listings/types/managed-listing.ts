@@ -7,6 +7,9 @@ export enum ListingStatus {
   ARCHIVED = 'ARCHIVED',
 }
 
+/** Typography for status pills (shared). */
+const LISTING_STATUS_BADGE_TEXT = 'text-xs font-semibold leading-none';
+
 /**
  * Shared status config - single source of truth for status display across
  * listing-card, listing-detail-panel, and listing-status-actions.
@@ -15,27 +18,27 @@ export const LISTING_STATUS_CONFIG: Record<ListingStatus, { labelKey: string; cl
 {
   [ListingStatus.DRAFT]: {
     labelKey: 'status.draft',
-    className: 'bg-gray-100 text-gray-600',
+    className: `bg-gray-100 text-gray-600 ${LISTING_STATUS_BADGE_TEXT}`,
   },
   [ListingStatus.PENDING]: {
     labelKey: 'status.pending',
-    className: 'bg-yellow-50 text-yellow-600',
+    className: `bg-yellow-50 text-yellow-600 ${LISTING_STATUS_BADGE_TEXT}`,
   },
   [ListingStatus.PUBLISHED]: {
     labelKey: 'status.published',
-    className: 'bg-primary/10 text-primary',
+    className: `bg-primary/10 text-primary ${LISTING_STATUS_BADGE_TEXT}`,
   },
   [ListingStatus.SOLD]: {
     labelKey: 'status.sold',
-    className: 'bg-green-50 text-green-600',
+    className: `bg-green-50 text-green-600 ${LISTING_STATUS_BADGE_TEXT}`,
   },
   [ListingStatus.RENTED]: {
     labelKey: 'status.rented',
-    className: 'bg-green-50 text-green-600',
+    className: `bg-green-50 text-green-600 ${LISTING_STATUS_BADGE_TEXT}`,
   },
   [ListingStatus.ARCHIVED]: {
     labelKey: 'status.archived',
-    className: 'bg-gray-100 text-gray-600',
+    className: `bg-gray-100 text-gray-600 ${LISTING_STATUS_BADGE_TEXT}`,
   },
 };
 

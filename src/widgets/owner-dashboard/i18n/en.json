@@ -7,6 +7,80 @@
       "addListing": "Add Listing",
       "title": "Owner Dashboard"
     },
+    "contracts": {
+      "title": "Your contracts",
+      "viewAll": "View all",
+      "empty": "No rental contracts yet."
+    },
+    "hero": {
+      "welcomePrefix": "Welcome back,",
+      "welcomeSuffix": "Great to see you again.",
+      "welcomeGuest": "there",
+      "contactTouches": "Contacts (messages + appointments)",
+      "listingViews": "Listing views",
+      "completedContracts": "Completed contracts",
+      "contactBreakdownTitle": "Contact activity",
+      "chatMessagesLine": "{count} chat messages on your listings",
+      "appointmentsLine": "{count} appointments on your listings"
+    },
+    "listingBoard": {
+      "title": "Listing Board",
+      "recentListed": "Recent listed",
+      "sortViews": "Views",
+      "sortLeads": "Leads",
+      "sortCost": "Price",
+      "moreOptions": "More options",
+      "empty": "No listings yet.",
+      "noImage": "No image",
+      "perMonth": "/ month",
+      "viewsLabel": "views",
+      "leadsLabel": "leads",
+      "bd": "bd",
+      "bt": "bt",
+      "sqft": "ft²"
+    },
+    "appointmentStat": {
+      "title": "Appointment Statistic",
+      "thisWeek": "This Week",
+      "totalAppointments": "Total appointments",
+      "completedAppointments": "Completed",
+      "rate": "Rate",
+      "visitStatistic": "Visit Statistic",
+      "totalProfit": "Total Profit",
+      "visitors": "Visitors"
+    },
+    "messages": {
+      "title": "Messages",
+      "menu": "Open menu",
+      "openFull": "Open messages",
+      "empty": "No conversations yet.",
+      "noPreview": "No preview"
+    },
+    "purchasedPackages": {
+      "title": "Purchased packages",
+      "viewAll": "View plans",
+      "loading": "Loading subscriptions…",
+      "empty": "You have no active packages.",
+      "expires": "Expires: {date}",
+      "noExpiry": "No expiry date",
+      "quota": "Used {used} / {total}",
+      "unlimited": "Unlimited quota",
+      "featureType": {
+        "LISTING": "Listing",
+        "3D_TOUR": "3D Tour",
+        "AI_REQUEST": "AI"
+      }
+    },
+    "dailyViews": {
+      "title": "Listing views by day",
+      "subtitle": "Last 7 days",
+      "weekTotal": "Week total"
+    },
+    "verve": {
+      "label": "verve",
+      "title": "Find analytics and gain rapid access to it.",
+      "description": "A comprehensive set of solutions called One Platform will be the first one in the digitalization of your company."
+    },
     "stats": {
       "activeLeads": "Active Leads",
       "totalViews": "Total Views",

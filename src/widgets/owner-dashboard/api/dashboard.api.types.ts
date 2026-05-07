@@ -111,6 +111,14 @@ export interface DashboardPropertyItemDTO {
   views: number;
   status: 'PUBLISHED' | 'RENTED' | 'SOLD' | string;
   listing_type: 'SALE' | 'RENT' | string;
+  image_url?: string | null;
+}
+
+export interface OwnerHeroInsightsResponse {
+  listing_views_total: number;
+  chat_messages_on_listings: number;
+  appointments_on_owner_listings: number;
+  completed_contracts: number;
 }
 
 export interface PageResponse<T> {

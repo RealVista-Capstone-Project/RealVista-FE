@@ -29,6 +29,9 @@ export function useUpdateListing() {
           queryKey: listingKeys.managed(),
         }),
         queryClient.invalidateQueries({
+          queryKey: listingKeys.managedInfiniteLists(),
+        }),
+        queryClient.invalidateQueries({
           queryKey: listingKeys.managedSummary(),
         }),
       ]);

@@ -35,6 +35,13 @@ export const mockAgentDashboardMetrics: AgentDashboardMetricsResponse = {
       pendingProperties: 1,
       verifiedProperties: 0,
       rejectedProperties: 0,
+      totalLandAreaM2: 0,
+      averageLandAreaM2: 0,
+      estimatedPortfolioValueVnd: 0,
+      estimatedPortfolioValueYoyPercent: null,
+      publishedListingsCount: 0,
+      listingsExpiringSoonCount: 0,
+      showcaseTypeCounts: {},
     },
     appointmentSummary: {
       totalAppointments: 17,

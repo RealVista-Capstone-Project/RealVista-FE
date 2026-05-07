@@ -10,6 +10,44 @@
     "pageTitle": "Quản lý Bất động sản",
     "pageDesc": "Quản lý các danh sách bất động sản của bạn, thống kê lượt xem và trạng thái hoạt động.",
     "createNew": "Thêm mới",
+    "chipAll": "Tất cả ({count})",
+    "typeDropdownPlaceholder": "Loại BĐS",
+    "chipShowcase": {
+      "HOUSE": "Nhà riêng ({count})",
+      "VILLA": "Biệt thự ({count})",
+      "TOWNHOUSE": "Nhà phố ({count})",
+      "SHOPHOUSE": "Cửa hàng / Shop ({count})"
+    },
+    "chipShowcaseShort": {
+      "HOUSE": "Nhà riêng",
+      "VILLA": "Biệt thự",
+      "TOWNHOUSE": "Nhà phố",
+      "SHOPHOUSE": "Cửa hàng / Shop"
+    },
+    "statusDropdownPlaceholder": "Trạng thái",
+    "sort": {
+      "NEWEST": "Sắp xếp: Mới nhất",
+      "OLDEST": "Sắp xếp: Cũ nhất",
+      "AREA_DESC": "Sắp xếp: Diện tích giảm dần",
+      "AREA_ASC": "Sắp xếp: Diện tích tăng dần",
+      "ADDRESS_ASC": "Sắp xếp: Địa chỉ A–Z",
+      "ADDRESS_DESC": "Sắp xếp: Địa chỉ Z–A"
+    },
+    "kpi": {
+      "totalAssets": "Tổng tài sản",
+      "activeAssetsHint": "{count} đang hoạt động",
+      "totalArea": "Tổng diện tích",
+      "avgAreaHint": "Trung bình {value} m²/căn",
+      "estimatedValue": "Giá trị ước tính",
+      "yoyHint": "so với cùng kỳ năm trước (tài sản mới)",
+      "valueFootnote": "Ước tính theo khoảng giá niêm yết",
+      "runningListings": "Bài đăng đang chạy",
+      "expiringHint": "{count} bài sắp hết hạn"
+    },
+    "gridSectionTitle": "Danh sách bất động sản",
+    "addPropertyCardTitle": "Thêm bất động sản mới",
+    "cardOpenListings": "Mở bài đăng của bất động sản",
+    "cardPublicView": "Trang công khai",
     "searchPlaceholder": "Tìm kiếm theo tiêu đề, vị trí",
     "noProperties": "Không tìm thấy Bất động sản nào",
     "noPropertiesDesc": "Bạn chưa thêm bất kỳ bất động sản nào.",
@@ -38,6 +76,7 @@
     "pageInfo": "Trang {current} / {total}",
     "selectHint": "Chọn một bất động sản để xem chi tiết",
     "backToList": "Quay lại",
+    "detailLoadError": "Không tải được chi tiết bất động sản. Có thể bạn không có quyền xem hoặc tin đã bị gỡ.",
     "labelType": "Loại hình",
     "labelSize": "Diện tích",
     "labelStatus": "Trạng thái",
@@ -75,6 +114,21 @@
     "selfPosted": "Chính tôi đăng",
     "agentPosted": "Agent đăng",
     "commissionLabel": "Hoa hồng",
-    "yearsExperience": "năm kinh nghiệm"
+    "yearsExperience": "năm kinh nghiệm",
+    "priceSale": "Giá bán",
+    "priceRent": "Giá thuê",
+    "usableSize": "Diện tích sử dụng",
+    "frontage": "Mặt tiền",
+    "depth": "Chiều dài",
+    "soldBySelf": "Được bán bởi bạn",
+    "soldByAgent": "Được bán bởi agent {name}",
+    "engagementStatusSUBMITTED": "Chờ duyệt",
+    "engagementStatusSUBMITTED_BY_OWNER": "Chờ môi giới duyệt",
+    "engagementStatusACCEPTED": "Đã chấp nhận",
+    "engagementStatusREJECTED": "Từ chối",
+    "engagementStatusCANCELLED": "Đã hủy",
+    "engagementStatusFINISHED": "Hoàn thành",
+    "attributeTrue": "Có",
+    "attributeFalse": "Không"
   }
 }

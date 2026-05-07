@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Home, UserCheck, Calendar, Bell } from 'lucide-react';
+import { X, Home, UserCheck, Calendar, Bell, TrendingDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Notification } from '@/entities/notification';
@@ -18,6 +18,7 @@ function getNotificationIcon(eventType: Notification['eventType']): { Icon: Luci
   if (eventType.includes('APPLICATION') || eventType.includes('ENGAGEMENT')) {
     return { Icon: UserCheck, bg: 'bg-orange-400' };
   }
+  if (eventType === 'PRICE_CHANGE') return { Icon: TrendingDown, bg: 'bg-violet-600' };
   if (eventType.includes('DRAFT') || eventType.includes('LISTING')) {
     return { Icon: Home, bg: 'bg-primary' };
   }

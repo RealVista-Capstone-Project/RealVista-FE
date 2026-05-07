@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { ChevronRight, MapPin, Maximize2, Home, Check } from 'lucide-react';
+import { ChevronRight, MapPin, Maximize2, Home, Check, Plus } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
@@ -17,9 +17,16 @@ import type {
 import { useCreateListing } from '@/features/create-listing-modal/api/use-create-listing';
 import { ListingInformationStep } from '@/features/create-listing-modal/ui/listing-information-step';
 import { useRouter } from '@/shared/config/i18n/navigation';
+import { Link } from '@/shared/config/i18n/navigation';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
 import { handleErrorApi } from '@/shared/lib/utils/handle-error';
+import type {
+  PropertySummaryResponse,
+  PropertyMediaItem,
+  PropertyAttributeItem,
+  PropertyAmenityItem,
+} from '@/entities/property/api/property-api.types';
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
   const t = useTranslations('CreateListingModal');
@@ -277,10 +284,10 @@ export function CreateListingPage() {
   const rawProperties = propertiesResponse?.content || [];
   const totalPages = propertiesResponse?.total_pages || 0;
 
-  const properties: UserProperty[] = rawProperties.map((p: any) => {
-    const standardMedia = (p.media ?? []).filter((m: any) => m.is_property_standard);
+  const properties: UserProperty[] = rawProperties.map((p: PropertySummaryResponse) => {
+    const standardMedia = (p.media ?? []).filter((m: PropertyMediaItem) => m.is_property_standard);
     const primaryMedia =
-      standardMedia.find((m: any) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
+      standardMedia.find((m: PropertyMediaItem) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
 
     return {
       propertyId: p.property_id,
@@ -303,13 +310,13 @@ export function CreateListingPage() {
         longitude: p.location_info?.longitude ?? null,
       },
       propertyType: {
-        propertyTypeId: p.property_type_info?.property_type_id ?? p.property_type_id,
+        propertyTypeId: p.property_type_info?.property_type_id ?? p.property_type_id ?? '',
         propertyTypeName: p.property_type_info?.property_type_name ?? '',
         propertyTypeCode: p.property_type_info?.property_type_code ?? '',
         propertyCategoryName: p.property_type_info?.property_category_name ?? '',
         propertyCategoryCode: p.property_type_info?.property_category_code ?? '',
       },
-      attributes: (p.attributes ?? []).map((attr: any) => ({
+      attributes: (p.attributes ?? []).map((attr: PropertyAttributeItem) => ({
         attributeId: attr.attribute_id,
         attributeCode: attr.attribute_code,
         attributeName: attr.attribute_name,
@@ -319,13 +326,13 @@ export function CreateListingPage() {
         valueNumber: attr.value_number,
         valueText: attr.value_text,
         valueBoolean: attr.value_boolean,
-        displayValue: attr.display_value,
+        displayValue: attr.display_value ?? null,
       })),
-      amenities: (p.amenities ?? []).map((a: any) => ({
+      amenities: (p.amenities ?? []).map((a: PropertyAmenityItem) => ({
         amenityId: a.amenity_id,
         amenityName: a.amenity_name,
       })),
-      media: (p.media ?? []).map((m: any) => ({
+      media: (p.media ?? []).map((m: PropertyMediaItem) => ({
         mediaId: m.media_id,
         mediaType: m.media_type,
         mediaUrl: m.media_url,
@@ -457,7 +464,7 @@ export function CreateListingPage() {
 
   return (
     <div className='h-full overflow-hidden flex flex-col p-4 md:p-6'>
-      <div className='rounded-2xl border border-primary/20 overflow-hidden bg-white shadow-lg flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0'>
+      <div className='flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0 overflow-hidden'>
         {/* Header - Fixed */}
         <div className='shrink-0'>
           <div className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
@@ -492,10 +499,25 @@ export function CreateListingPage() {
                       <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
                     </div>
                   ) : properties.length === 0 ? (
-                    <div className='flex justify-center py-8'>
-                      <span className='text-muted-foreground/70'>
-                        {t('noProperties', { fallback: 'No properties found' })}
-                      </span>
+                    <div className='flex flex-col items-center gap-4 py-10 text-center'>
+                      <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
+                        <Home className='h-6 w-6 text-primary' strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <p className='text-sm font-semibold text-foreground'>
+                          {t('noProperties')}
+                        </p>
+                        <p className='mt-1 text-xs text-muted-foreground'>
+                          {t('noPropertiesDesc')}
+                        </p>
+                      </div>
+                      <Link
+                        href='/dashboard/property/create'
+                        className='flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary/90'
+                      >
+                        <Plus className='h-4 w-4' strokeWidth={2.5} />
+                        {t('createPropertyCta')}
+                      </Link>
                     </div>
                   ) : (
                     properties.map((property) => (
@@ -523,7 +545,7 @@ export function CreateListingPage() {
             </div>
 
             {/* Footer — Next button - Fixed */}
-            <div className='shrink-0 flex justify-end border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
+            <div className='shrink-0 flex justify-end border-t border-primary/20 px-4 md:px-8 py-4 md:py-5'>
               <button
                 type='button'
                 disabled={!selectedProperty}

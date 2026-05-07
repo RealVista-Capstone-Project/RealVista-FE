@@ -183,7 +183,7 @@ export function AgentDetailPanel({ agent, onClose }: AgentDetailPanelProps) {
       <div
         id='agent-detail-panel'
         key={agent.engagement_id}
-        className='w-full lg:w-[380px] flex-shrink-0 bg-white border border-gray-100 rounded-2xl shadow-lg flex flex-col max-h-[calc(100vh-120px)] animate-in slide-in-from-right-4 fade-in duration-300 sticky top-4 overflow-hidden'
+        className='flex h-full min-h-0 w-full max-w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg animate-in fade-in slide-in-from-right-4 duration-300 lg:w-[380px]'
       >
         {/* Header */}
         <div className='flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white flex-none'>

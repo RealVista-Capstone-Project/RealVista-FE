@@ -1,7 +1,11 @@
 import http from '@/shared/lib/http';
 import { env } from '@/shared/lib/env';
 import type {
+  AddressDuplicateCheckRequest,
+  AddressDuplicateCheckResponse,
   ApiResponse,
+  ClaimPropertyRequest,
+  ClaimPropertyResponse,
   CreatePropertyRequest,
   MyPropertiesResponse,
   Property3dOperation,
@@ -12,6 +16,7 @@ import type {
   PropertyAttributeDefinition,
   PropertyDetailResponse,
   PropertySearchResponse,
+  PropertySummaryMetricsData,
   PropertyTypesResponse,
   UpdatePropertyRequest,
 } from './property-api.types';
@@ -70,10 +75,18 @@ export const propertyApi = {
     if (criteria?.keyword) queryParams.append('keyword', criteria.keyword);
     if (criteria?.status) queryParams.append('status', criteria.status);
     criteria?.statuses?.forEach((status) => queryParams.append('statuses', status));
+    if (criteria?.property_type_id) queryParams.append('propertyTypeId', criteria.property_type_id);
+    if (criteria?.sort_by) queryParams.append('sortBy', criteria.sort_by);
     queryParams.append('page', page.toString());
     queryParams.append('size', size.toString());
 
     return http.get<MyPropertiesResponse>(`properties/me?${queryParams.toString()}`, {
+      baseUrl: env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  getMyPropertiesSummary: () => {
+    return http.get<ApiResponse<PropertySummaryMetricsData>>('properties/me/summary', {
       baseUrl: env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
@@ -243,5 +256,23 @@ export const propertyApi = {
     return http.delete<ApiResponse<void>>(`properties/admin/${propertyId}`, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
+  },
+
+  // ── Duplicate address check ──────────────────────────────────────────────
+
+  checkAddressDuplicate: (request: AddressDuplicateCheckRequest) => {
+    return http.post<ApiResponse<AddressDuplicateCheckResponse>>(
+      'properties/check-address-duplicate',
+      request,
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  claimProperty: (propertyId: string, request: ClaimPropertyRequest) => {
+    return http.post<ApiResponse<ClaimPropertyResponse>>(
+      `properties/${propertyId}/claim`,
+      request,
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
   },
 };

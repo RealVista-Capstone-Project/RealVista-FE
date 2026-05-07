@@ -33,6 +33,8 @@ export interface PropertySummaryResponse {
   has_3d: boolean;
   price_range: PropertyPriceRange | null;
   allow_rent_listing_when_rented: boolean;
+  flagged_for_admin_review: boolean | null;
+  duplicate_override_reason: string | null;
   sold_by_user_id: string | null;
   sold_by_name: string | null;
   sold_by_phone: string | null;
@@ -111,17 +113,56 @@ export interface MyPropertiesSearchCriteria {
   keyword?: string;
   status?: string;
   statuses?: string[];
+  property_type_id?: string;
+  sort_by?:
+    | 'NEWEST'
+    | 'OLDEST'
+    | 'AREA_ASC'
+    | 'AREA_DESC'
+    | 'ADDRESS_ASC'
+    | 'ADDRESS_DESC';
   page: number;
   size: number;
 }
 
-export interface PropertyTypeInfo {
-  property_type_id: string;
-  property_type_name: string | null;
-  property_type_code: string | null;
-  property_category_id: string | null;
-  property_category_name: string | null;
-  property_category_code: string | null;
+/** GET /properties/me/summary */
+export interface PropertySummaryMetricsData {
+  total_properties?: number;
+  totalProperties?: number;
+  current_month_total_properties?: number;
+  currentMonthTotalProperties?: number;
+  previous_total_properties?: number;
+  previousTotalProperties?: number;
+  available_properties?: number;
+  availableProperties?: number;
+  reserved_properties?: number;
+  reservedProperties?: number;
+  sold_properties?: number;
+  soldProperties?: number;
+  rented_properties?: number;
+  rentedProperties?: number;
+  draft_properties?: number;
+  draftProperties?: number;
+  pending_properties?: number;
+  pendingProperties?: number;
+  verified_properties?: number;
+  verifiedProperties?: number;
+  rejected_properties?: number;
+  rejectedProperties?: number;
+  total_land_area_m2?: number | string;
+  totalLandAreaM2?: number | string;
+  average_land_area_m2?: number | string;
+  averageLandAreaM2?: number | string;
+  estimated_portfolio_value_vnd?: number | string;
+  estimatedPortfolioValueVnd?: number | string;
+  estimated_portfolio_value_yoy_percent?: number | null;
+  estimatedPortfolioValueYoyPercent?: number | null;
+  published_listings_count?: number;
+  publishedListingsCount?: number;
+  listings_expiring_soon_count?: number;
+  listingsExpiringSoonCount?: number;
+  showcase_type_counts?: Record<string, number>;
+  showcaseTypeCounts?: Record<string, number>;
 }
 
 export interface LocationInfo {
@@ -311,6 +352,37 @@ export interface PropertyDetailResponse {
   active_listings?: ListingSummaryDTO[];
   price_range?: PropertyPriceRange | null;
   allow_rent_listing_when_rented?: boolean;
+  has_3d?: boolean;
+  thumbnail_url?: string | null;
+  property_type_info?: {
+    property_type_id: string;
+    property_type_name: string | null;
+    property_type_code: string | null;
+    property_category_id: string | null;
+    property_category_name: string | null;
+    property_category_code: string | null;
+  } | null;
+  location_info?: {
+    location_id: string;
+    ward_name: string | null;
+    district_name: string | null;
+    city_name: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  } | null;
+  owner_name?: string | null;
+  owner_email?: string | null;
+  owner_avatar_url?: string | null;
+  owner_phone?: string | null;
+  owner_phone_display?: string | null;
+  is_owner_phone_hidden?: boolean | null;
+  sold_by_user_id?: string | null;
+  sold_by_name?: string | null;
+  sold_by_phone?: string | null;
+  sold_by_role?: string | null;
+  sold_at?: string | null;
+  flagged_for_admin_review?: boolean | null;
+  duplicate_override_reason?: string | null;
 }
 
 export interface PropertySummary {
@@ -350,14 +422,6 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
   timestamp: string;
-}
-
-export interface MyPropertiesSearchCriteria {
-  keyword?: string;
-  status?: string;
-  statuses?: string[];
-  page: number;
-  size: number;
 }
 
 export interface OwnerAvailablePropertiesCriteria {
@@ -524,4 +588,56 @@ export interface PropertyTypesResponse {
   success: boolean;
   message: string;
   data: PropertyTypeInfoDTO[];
+}
+
+// ── Duplicate address check ────────────────────────────────────────────────
+
+export type DuplicateSeverity = 'NONE' | 'INFO' | 'SOFT_WARNING' | 'HARD_BLOCK';
+
+export type DuplicateReasonCode =
+  | 'NO_LOCATION'
+  | 'NO_MATCH'
+  | 'SAME_OWNER_ACTIVE'
+  | 'SAME_OWNER_INACTIVE'
+  | 'DIFFERENT_OWNER_ACTIVE'
+  | 'DIFFERENT_OWNER_INACTIVE';
+
+export interface ConflictingPropertySummary {
+  property_id: string;
+  street_address: string;
+  status: string;
+  is_same_owner: boolean;
+  thumbnail_url: string | null;
+}
+
+export interface AddressDuplicateCheckRequest {
+  location_id: string;
+  street_address: string;
+  latitude: number;
+  longitude: number;
+  exclude_property_id?: string;
+}
+
+export interface AddressDuplicateCheckResponse {
+  severity: DuplicateSeverity;
+  reason_code: DuplicateReasonCode;
+  message: string;
+  conflicting_properties: ConflictingPropertySummary[];
+}
+
+// ── Property claim ─────────────────────────────────────────────────────────
+
+export type ClaimReason = 'NEW_OWNER' | 'DIFFERENT_UNIT' | 'OTHER';
+
+export interface ClaimPropertyRequest {
+  claim_reason: ClaimReason;
+  message?: string;
+}
+
+export interface ClaimPropertyResponse {
+  claim_id: string;
+  property_id: string;
+  status: string;
+  expires_at: string;
+  message: string;
 }

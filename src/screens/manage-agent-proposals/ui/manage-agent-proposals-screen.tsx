@@ -19,11 +19,11 @@ import { getAgentProposalSpecialtyCode } from '@/entities/agent-proposal/model/t
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce } from '@/shared/lib/hooks';
+import { useSyncDashboardTopNavCountBadge } from '@/shared/lib/dashboard-top-nav-badge-context';
 import { Spinner } from '@/shared/ui/spinner';
 import { DataTable } from '@/shared/ui/data-table';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { formatNumber } from '@/shared/lib/utils/format-currency';
 import {
   Search,
   Filter,
@@ -230,6 +230,8 @@ export function ManageAgentProposalsScreen() {
   const totalElements = data?.total_elements ?? 0;
   const totalPages = data?.total_pages ?? 0;
 
+  useSyncDashboardTopNavCountBadge(isLoading || isError ? null : totalElements);
+
   const filteredProposals = React.useMemo(() => {
     let result = proposals;
     if (debouncedSearch.trim()) {
@@ -286,14 +288,7 @@ export function ManageAgentProposalsScreen() {
 
   const toolbar = (
     <div className='flex flex-col gap-4 p-4 sm:p-5'>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <h2 className='text-xl font-bold text-foreground'>{t('pageTitle')}</h2>
-          <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-            <span className='text-sm font-bold text-white'>{formatNumber(totalElements)}</span>
-          </div>
-        </div>
-
+      <div className='flex items-center justify-end'>
         <button
           type='button'
           onClick={openCreate}

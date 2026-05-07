@@ -444,10 +444,10 @@ export function AppointmentsPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
-
+    <>
+      <div className="m-4 bg-white rounded-md border overflow-hidden">
       <Availability
+        className="h-[calc(100vh-6rem)] min-h-[500px] bg-white"
         mode={isEditingBlocks ? 'edit-blocks' : 'view'}
         value={isEditingBlocks ? editableBlocks : undefined}
         onValueChange={isEditingBlocks ? setEditableBlocks : undefined}
@@ -546,6 +546,7 @@ export function AppointmentsPage() {
           )
         }
       />
+      </div>
 
       <SlotModal
         open={!!selectedSlot}
@@ -664,6 +665,6 @@ export function AppointmentsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

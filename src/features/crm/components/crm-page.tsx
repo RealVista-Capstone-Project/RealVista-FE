@@ -62,6 +62,7 @@ import type { CreateLeadRequest, LeadResponse, LeadSummaryResponse } from '../ty
 import { Lead, LeadStatus, LEAD_STATUS_LABELS, LEAD_STATUS_COLORS } from '../types/lead';
 import { conversationApi } from '@/entities/conversation/api';
 import { conversationKeys } from '@/entities/conversation/api/keys';
+import type { ConversationListItemResponse } from '@/entities/conversation/model/types';
 import { listingQueries } from '@/entities/listing/api';
 import { ROUTES } from '@/shared/config/routes';
 import { useLocale, useTranslations } from 'next-intl';
@@ -812,10 +813,9 @@ export function CrmPage() {
       const conversation = response.payload.data;
       const conversationId = conversation.conversation_id;
       if (conversationId) {
-        queryClient.setQueryData(conversationKeys.list(), (current: any) => {
-          const existing = current?.payload?.data ?? current?.data ?? [];
-          const items = Array.isArray(existing) ? existing : [];
-          const nextItem = {
+        queryClient.setQueryData(conversationKeys.list(), (current) => {
+          const items = Array.isArray(current) ? current : [];
+          const nextItem: ConversationListItemResponse = {
             conversation_id: conversation.conversation_id,
             other_user: {
               user_id: conversation.other_user_id,
@@ -828,31 +828,10 @@ export function CrmPage() {
             unread_count: 0,
             created_at: conversation.created_at,
           };
-
-          if (current?.payload?.data) {
-            return {
-              ...current,
-              payload: {
-                ...current.payload,
-                data: [
-                  nextItem,
-                  ...items.filter((item: any) => item.conversation_id !== nextItem.conversation_id),
-                ],
-              },
-            };
-          }
-
-          if (current?.data) {
-            return {
-              ...current,
-              data: [
-                nextItem,
-                ...items.filter((item: any) => item.conversation_id !== nextItem.conversation_id),
-              ],
-            };
-          }
-
-          return { payload: { data: [nextItem] } };
+          return [
+            nextItem,
+            ...items.filter((item) => item.conversation_id !== nextItem.conversation_id),
+          ];
         });
         router.push(`/${locale}${ROUTES.dashboard.messages}/${conversationId}`);
       }

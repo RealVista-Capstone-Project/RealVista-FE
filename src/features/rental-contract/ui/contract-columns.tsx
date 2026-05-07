@@ -133,16 +133,17 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
         {canSignNow && (
           <Button
             type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
+            size='xs'
+            variant='outline'
+            className='rounded-lg border-primary bg-transparent text-primary hover:bg-primary/10 hover:text-primary disabled:opacity-60'
             onClick={handleSignNow}
             disabled={getLandlordSigningUrlMutation.isPending}
           >
             {getLandlordSigningUrlMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
+              <Loader2 className='size-3 animate-spin' />
             ) : (
               <>
-                <Pen className='h-3.5 w-3.5' />
+                <Pen className='size-3' />
                 {t('statusActions.signNow')}
               </>
             )}
@@ -255,16 +256,17 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
         {canSignNow && (
           <Button
             type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-white hover:bg-emerald-700 disabled:opacity-60'
+            size='xs'
+            variant='outline'
+            className='rounded-lg border-primary bg-transparent text-primary hover:bg-primary/10 hover:text-primary disabled:opacity-60'
             onClick={handleSignNow}
             disabled={getRenterSigningUrlMutation.isPending}
           >
             {getRenterSigningUrlMutation.isPending ? (
-              <Loader2 className='h-3.5 w-3.5 animate-spin' />
+              <Loader2 className='size-3 animate-spin' />
             ) : (
               <>
-                <Pen className='h-3.5 w-3.5' />
+                <Pen className='size-3' />
                 {t('statusActions.signNow')}
               </>
             )}
