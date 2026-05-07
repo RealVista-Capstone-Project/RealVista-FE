@@ -12,12 +12,13 @@ interface FormTenantFields {
 interface StepTenantLookupProps {
   form: FormTenantFields;
   isLoading: boolean;
+  viewOnly?: boolean;
   onEmailChange: (email: string) => void;
   onLookup: () => void;
   t: (key: string) => string;
 }
 
-export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }: StepTenantLookupProps) {
+export function StepTenantLookup({ form, isLoading, viewOnly = false, onEmailChange, onLookup, t }: StepTenantLookupProps) {
   return (
     <div className='space-y-6'>
       {/* Search box */}
@@ -26,32 +27,37 @@ export function StepTenantLookup({ form, isLoading, onEmailChange, onLookup, t }
           {t('tenantLookup.eyebrow')}
         </p>
         <h3 className='mt-2 text-lg font-semibold text-foreground'>{t('tenantLookup.title')}</h3>
-        <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>{t('tenantLookup.description')}</p>
+        <p className='mt-1 text-sm leading-6 text-muted-foreground/80'>
+          {viewOnly ? t('tenantLookup.viewOnlyDescription') : t('tenantLookup.description')}
+        </p>
 
         <div className='mt-4 flex gap-3'>
           <div className='flex-1'>
             <Input
               type='email'
               value={form.tenantEmail}
-              onChange={(e) => onEmailChange(e.target.value)}
+              onChange={(e) => {
+                if (!viewOnly) onEmailChange(e.target.value);
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  onLookup();
+                  if (!viewOnly) onLookup();
                 }
               }}
+              readOnly={viewOnly}
               placeholder={t('tenantLookup.emailPlaceholder')}
-              className='h-11 rounded-xl border-[1.5px] border-primary/25 bg-white placeholder:text-muted-foreground/40'
+              className='h-11 rounded-xl border-[1.5px] border-primary/25 bg-white placeholder:text-muted-foreground/40 read-only:bg-primary/5 read-only:text-muted-foreground'
             />
           </div>
           <Button
             type='button'
             className='h-11 rounded-2xl bg-primary px-5 text-white shadow-[0_12px_24px_color-mix(in_oklch,var(--primary)_20%,transparent)] hover:bg-primary/90'
-            onClick={onLookup}
-            disabled={!form.tenantEmail.trim() || isLoading}
+            onClick={viewOnly ? undefined : onLookup}
+            disabled={viewOnly || !form.tenantEmail.trim() || isLoading}
           >
             {isLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : <Search className='h-4 w-4' />}
-            {t('tenantLookup.lookupAction')}
+            {viewOnly ? t('tenantLookup.viewAction') : t('tenantLookup.lookupAction')}
           </Button>
         </div>
       </div>

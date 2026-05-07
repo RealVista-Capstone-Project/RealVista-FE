@@ -32,6 +32,8 @@ interface SearchSidebarFiltersProps {
   className?: string;
 }
 
+const AREA_MAX_M2 = 100_000;
+
 export function SearchSidebarFilters({
   filters,
   onFiltersChange,
@@ -40,6 +42,7 @@ export function SearchSidebarFilters({
   className,
 }: SearchSidebarFiltersProps) {
   const [localFilters, setLocalFilters] = useState<AdvancedSearchRequest>(filters);
+  const [validationErrors, setValidationErrors] = useState<{ price?: string; area?: string }>({});
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const { data: districts = [] } = useDistricts();
@@ -61,6 +64,9 @@ export function SearchSidebarFilters({
   const applyFilters = useCallback(
     (updated: AdvancedSearchRequest) => {
       setLocalFilters(updated);
+      const errors = validate(updated);
+      setValidationErrors(errors);
+      if (Object.keys(errors).length > 0) return;
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
         onFiltersChange(updated);
@@ -86,10 +92,29 @@ export function SearchSidebarFilters({
     return [];
   }, [localFilters.propertyType]);
 
+  const validate = (updated: AdvancedSearchRequest): { price?: string; area?: string } => {
+    const errors: { price?: string; area?: string } = {};
+    const [priceMin, priceMax] = updated.price ?? [null, null];
+    if (priceMin && priceMax && priceMin > priceMax) {
+      errors.price = 'Giá tối thiểu không được lớn hơn giá tối đa';
+    }
+    const [areaMin, areaMax] = updated.area ?? [null, null];
+    if (areaMin != null && areaMax != null && areaMin > areaMax) {
+      errors.area = 'Diện tích tối thiểu không được lớn hơn tối đa';
+    }
+    return errors;
+  };
+
   const sanitizePositiveInt = (raw: string): string | undefined => {
     const digits = raw.replace(/[^0-9]/g, '');
     return digits === '' ? undefined : String(parseInt(digits, 10));
   };
+
+  const clampAreaValue = (value: number) => Math.max(0, Math.min(AREA_MAX_M2, value));
+
+  const areaMin = localFilters.area?.[0] ?? 0;
+  const areaMax = localFilters.area?.[1] ?? AREA_MAX_M2;
+  const sliderAreaValue = areaMin <= areaMax ? [areaMin, areaMax] : [areaMax, areaMin];
 
   const setDynamicAttr = (attrCode: string, value: string | undefined) => {
     const prev = localFilters.dynamicAttributes || {};
@@ -269,7 +294,7 @@ export function SearchSidebarFilters({
             placeholder='Tìm kiếm với địa chỉ cụ thể'
             value={localFilters.location || ''}
             onChange={(e) =>
-              applyFilters({ ...localFilters, location: e.target.value || undefined })
+              applyFilters({ ...localFilters, location: e.target.value.trim() || undefined })
             }
             className='h-9 text-sm'
             maxLength={100}
@@ -320,6 +345,7 @@ export function SearchSidebarFilters({
                 price: [val || null, localFilters.price?.[1] || null],
               })
             }
+            error={!!validationErrors.price}
             hidePreview
             className='h-9 text-sm'
           />
@@ -332,9 +358,13 @@ export function SearchSidebarFilters({
                 price: [localFilters.price?.[0] || null, val || null],
               })
             }
+            error={!!validationErrors.price}
             hidePreview
             className='h-9 text-sm'
           />
+          {validationErrors.price && (
+            <p className='text-xs text-destructive'>{validationErrors.price}</p>
+          )}
         </div>
 
         {/* Area Range */}
@@ -342,14 +372,14 @@ export function SearchSidebarFilters({
           <div className='flex items-center justify-between'>
             <Label className='text-sm font-semibold text-foreground'>Diện tích (m²)</Label>
             <span className='text-xs text-muted-foreground'>
-              {localFilters.area?.[0] || 0} - {localFilters.area?.[1] || 500}m²
+              {areaMin} - {areaMax}m²
             </span>
           </div>
           <Slider
             min={0}
-            max={500}
+            max={AREA_MAX_M2}
             step={10}
-            value={[localFilters.area?.[0] || 0, localFilters.area?.[1] || 500]}
+            value={sliderAreaValue}
             onValueChange={([min, max]: number[]) =>
               applyFilters({ ...localFilters, area: [min, max] })
             }
@@ -359,36 +389,39 @@ export function SearchSidebarFilters({
             <Input
               type='number'
               placeholder='Min'
+              min={0}
+              max={AREA_MAX_M2}
               value={localFilters.area?.[0] || ''}
-              onChange={(e) =>
+              onChange={(e) => {
+                const clamped = e.target.value ? clampAreaValue(Number(e.target.value)) : 0;
                 applyFilters({
                   ...localFilters,
-                  area: [
-                    e.target.value ? Number(e.target.value) : 0,
-                    localFilters.area?.[1] || 500,
-                  ],
-                })
-              }
-              className='h-9 text-sm'
+                  area: [clamped, localFilters.area?.[1] ?? AREA_MAX_M2],
+                });
+              }}
+              className={`h-9 text-sm${validationErrors.area ? ' border-destructive' : ''}`}
               maxLength={10}
             />
             <Input
               type='number'
               placeholder='Max'
+              min={0}
+              max={AREA_MAX_M2}
               value={localFilters.area?.[1] || ''}
-              onChange={(e) =>
+              onChange={(e) => {
+                const clamped = e.target.value ? clampAreaValue(Number(e.target.value)) : AREA_MAX_M2;
                 applyFilters({
                   ...localFilters,
-                  area: [
-                    localFilters.area?.[0] || 0,
-                    e.target.value ? Number(e.target.value) : 500,
-                  ],
-                })
-              }
-              className='h-9 text-sm'
+                  area: [localFilters.area?.[0] ?? 0, clamped],
+                });
+              }}
+              className={`h-9 text-sm${validationErrors.area ? ' border-destructive' : ''}`}
               maxLength={10}
             />
           </div>
+          {validationErrors.area && (
+            <p className='text-xs text-destructive'>{validationErrors.area}</p>
+          )}
         </div>
 
         {/* Dynamic Attributes */}
