@@ -17,7 +17,7 @@ export async function generateMetadata({
 
   return {
     title: `${title} | RealVista`,
-    description: tPage('pageb'),
+    description: tPage('pageSubtitle'),
   };
 }
 
