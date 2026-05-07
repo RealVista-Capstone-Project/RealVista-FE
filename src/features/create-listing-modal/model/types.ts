@@ -3,6 +3,8 @@
  * Aligned with PropertySummaryResponse from the backend
  */
 
+import type { PropertyPriceRange } from '@/entities/property/api/property-api.types';
+
 export type PropertyStatus =
   | 'DRAFT'
   | 'PENDING'
@@ -80,6 +82,8 @@ export interface UserProperty {
   attributes: UserPropertyAttribute[];
   amenities: UserPropertyAmenity[];
   media: UserPropertyMedia[];
+  /** Expected rent / buy range from the property profile (not the listing). */
+  priceRange: PropertyPriceRange | null;
 }
 
 export type CreateListingStep = 'request' | 'listing-information';

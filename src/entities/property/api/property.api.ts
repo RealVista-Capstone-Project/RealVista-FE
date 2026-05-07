@@ -6,6 +6,7 @@ import type {
   ApiResponse,
   ClaimPropertyRequest,
   ClaimPropertyResponse,
+  CreatePropertyFeeRequest,
   CreatePropertyRequest,
   MyPropertiesResponse,
   Property3dOperation,
@@ -15,11 +16,25 @@ import type {
   OwnerAvailablePropertiesResponse,
   PropertyAttributeDefinition,
   PropertyDetailResponse,
+  PropertyFeeResponse,
   PropertySearchResponse,
   PropertySummaryMetricsData,
   PropertyTypesResponse,
+  SyncPropertyFeesRequest,
   UpdatePropertyRequest,
 } from './property-api.types';
+
+/** Backend uses Jackson SNAKE_CASE; fee DTOs expect snake_case in JSON bodies. */
+function toPropertyFeeApiBody(fee: CreatePropertyFeeRequest) {
+  return {
+    fee_type: fee.feeType,
+    fee_name: fee.feeName,
+    amount: fee.amount,
+    billing_cycle: fee.billingCycle,
+    is_optional: fee.isOptional ?? false,
+    ...(fee.description != null && fee.description !== '' ? { description: fee.description } : {}),
+  };
+}
 
 export const propertyApi = {
   search: (params: {
@@ -274,5 +289,35 @@ export const propertyApi = {
       request,
       { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
     );
+  },
+
+  // ── Service fees ────────────────────────────────────────────────────────
+
+  getFees: (propertyId: string) => {
+    return http.get<ApiResponse<PropertyFeeResponse[]>>(`properties/${propertyId}/fees`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  addFee: (propertyId: string, request: CreatePropertyFeeRequest) => {
+    return http.post<ApiResponse<PropertyFeeResponse>>(
+      `properties/${propertyId}/fees`,
+      toPropertyFeeApiBody(request),
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  syncFees: (propertyId: string, request: SyncPropertyFeesRequest) => {
+    return http.put<ApiResponse<PropertyFeeResponse[]>>(
+      `properties/${propertyId}/fees`,
+      { fees: request.fees.map(toPropertyFeeApiBody) },
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  deleteFee: (propertyId: string, feeId: string) => {
+    return http.delete<ApiResponse<void>>(`properties/${propertyId}/fees/${feeId}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
   },
 };

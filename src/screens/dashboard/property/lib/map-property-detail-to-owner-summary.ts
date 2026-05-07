@@ -12,6 +12,13 @@ function toFiniteNumber(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function coerceSoldByRole(
+  v: string | null | undefined
+): PropertySummaryResponse['sold_by_role'] {
+  if (v === 'OWNER' || v === 'AGENT') return v;
+  return null;
+}
+
 function coerceStatus(status: string): PropertySummaryResponse['status'] {
   const allowed: PropertySummaryResponse['status'][] = [
     'DRAFT',
@@ -178,7 +185,7 @@ export function mapPropertyDetailToOwnerSummary(
     sold_by_user_id: d.sold_by_user_id ?? null,
     sold_by_name: d.sold_by_name ?? null,
     sold_by_phone: d.sold_by_phone ?? null,
-    sold_by_role: d.sold_by_role ?? null,
+    sold_by_role: coerceSoldByRole(d.sold_by_role),
     sold_at: d.sold_at ?? null,
   };
 }

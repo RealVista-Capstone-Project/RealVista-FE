@@ -26,6 +26,7 @@ import {
   Key,
   Eye,
   Building,
+  Receipt,
 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -48,7 +49,11 @@ import { cn } from '@/shared/lib/utils';
 import { AttributeIcon } from '@/shared/ui/attribute-icon';
 import { useMyEngagementsQuery } from '@/features/engagement/hooks/use-my-engagements';
 import { Spinner } from '@/shared/ui/spinner';
-import type { PropertySummaryResponse } from '@/entities/property/api/property-api.types';
+import type {
+  PropertyBillingCycle,
+  PropertySummaryResponse,
+} from '@/entities/property/api/property-api.types';
+import { usePropertyFees } from '@/entities/property/api/use-property-fees';
 
 
 // Statuses controlled by the system — owner cannot manually set these
@@ -68,6 +73,14 @@ const STATUS_STYLES: Record<string, string> = {
 function getStatusStyle(status: string): string {
   return STATUS_STYLES[status] ?? 'bg-background text-muted-foreground border-border';
 }
+
+function propertyFeeBillingLabel(cycle: PropertyBillingCycle, t: (key: string) => string): string {
+  if (cycle === 'MONTHLY') return t('feeBillingMonthly');
+  if (cycle === 'YEARLY') return t('feeBillingYearly');
+  if (cycle === 'ONE_TIME') return t('feeBillingOneTime');
+  return cycle;
+}
+
 function ListingsSection({
   propertyId,
   currentUserId,
@@ -86,16 +99,16 @@ function ListingsSection({
   return (
     <div>
       {/* Section header */}
-      <div className='flex items-center justify-between mb-3'>
+        <div className='flex items-center justify-between mb-3'>
         <div className='flex items-center gap-2'>
-          <h3 className='text-sm font-bold text-foreground'>{t('labelListings')}</h3>
+          <h3 className='text-base font-bold text-foreground'>{t('labelListings')}</h3>
           {totalCount > 0 && (
-            <span className='inline-flex items-center justify-center rounded-full bg-primary/10 w-5 h-5 text-[11px] font-bold text-primary'>
+            <span className='inline-flex items-center justify-center rounded-full bg-primary/10 min-w-[1.375rem] h-6 px-1 text-xs font-bold text-primary'>
               {totalCount}
             </span>
           )}
         </div>
-        <Button asChild size='sm' className='rounded-lg gap-1.5 h-8 text-xs'>
+        <Button asChild size='sm' className='rounded-lg gap-1.5 h-9 text-sm'>
           <Link href={`/dashboard/listings/create?propertyId=${propertyId}`}>
             <Plus className='h-3.5 w-3.5' />
             {t('addListing')}
@@ -110,7 +123,7 @@ function ListingsSection({
       ) : listings.length === 0 ? (
         <div className='rounded-xl border border-dashed border-border bg-background py-8 flex flex-col items-center gap-2 text-center'>
           <Home className='h-6 w-6 text-muted-foreground/40' />
-          <p className='text-xs text-muted-foreground'>{t('noListings')}</p>
+          <p className='text-sm text-muted-foreground'>{t('noListings')}</p>
         </div>
       ) : (
         <div className='space-y-2.5'>
@@ -170,7 +183,7 @@ function ListingsSection({
                 {/* Info — right column */}
                 <div className='flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-between gap-1.5'>
                   {/* Name */}
-                  <p className='text-xs font-semibold text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors'>
+                  <p className='text-sm font-semibold text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors'>
                     {listing.name}
                   </p>
 
@@ -178,14 +191,14 @@ function ListingsSection({
                   <div className='flex items-center justify-between gap-2'>
                     <span
                       className={cn(
-                        'text-[10px] font-bold px-1.5 py-0.5 rounded-md',
+                        'text-xs font-bold px-2 py-0.5 rounded-md',
                         isRent ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'
                       )}
                     >
                       {typeLabel}
                     </span>
                     {listing.user_id && (
-                      <span className='text-[10px] text-muted-foreground/60 font-medium truncate max-w-[80px]'>
+                      <span className='text-xs text-muted-foreground/60 font-medium truncate max-w-[90px]'>
                         {currentUserId && listing.user_id === currentUserId
                           ? t('selfPosted')
                           : t('agentPosted')}
@@ -196,11 +209,11 @@ function ListingsSection({
                   {/* Bottom row: status + price */}
                   <div className='flex items-center justify-between gap-2'>
                     <span
-                      className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-md', sc.cls)}
+                      className={cn('text-xs font-semibold px-2 py-0.5 rounded-md', sc.cls)}
                     >
                       {sc.label}
                     </span>
-                    <p className='text-xs font-bold text-primary whitespace-nowrap'>
+                    <p className='text-sm font-bold text-primary whitespace-nowrap'>
                       {priceDisplay}
                     </p>
                   </div>
@@ -213,7 +226,7 @@ function ListingsSection({
           {totalCount > PREVIEW_SIZE && (
             <Link
               href={`/dashboard/listings?propertyId=${propertyId}`}
-              className='flex items-center justify-center gap-1.5 w-full rounded-xl border border-primary/20 py-2.5 text-xs font-semibold text-primary hover:bg-primary/5 transition-colors'
+              className='flex items-center justify-center gap-1.5 w-full rounded-xl border border-primary/20 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors'
             >
               {t('showAllListings', { count: totalCount })}
               <ChevronRight className='h-3.5 w-3.5' />
@@ -244,9 +257,9 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
     <div>
       <div className='flex items-center justify-between mb-3'>
         <div className='flex items-center gap-2'>
-          <h3 className='text-sm font-bold text-foreground'>{t('labelEngagements')}</h3>
+          <h3 className='text-base font-bold text-foreground'>{t('labelEngagements')}</h3>
           {engagements.length > 0 && (
-            <span className='inline-flex items-center justify-center rounded-full bg-amber-100 w-5 h-5 text-[11px] font-bold text-amber-700'>
+            <span className='inline-flex items-center justify-center rounded-full bg-amber-100 min-w-[1.375rem] h-6 px-1 text-xs font-bold text-amber-700'>
               {engagements.length}
             </span>
           )}
@@ -255,7 +268,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
           asChild
           size='sm'
           variant='outline'
-          className='rounded-lg gap-1.5 h-8 text-xs border-primary/20 text-primary hover:bg-primary/5'
+          className='rounded-lg gap-1.5 h-9 text-sm border-primary/20 text-primary hover:bg-primary/5'
         >
           <Link href={`/dashboard/property/${propertyId}/delegate`}>
             <UserCheck className='h-3.5 w-3.5' />
@@ -271,7 +284,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
       ) : engagements.length === 0 ? (
         <div className='rounded-xl border border-dashed border-border bg-background py-8 flex flex-col items-center gap-2 text-center'>
           <User className='h-6 w-6 text-muted-foreground/40' />
-          <p className='text-xs text-muted-foreground'>{t('noEngagements')}</p>
+          <p className='text-sm text-muted-foreground'>{t('noEngagements')}</p>
         </div>
       ) : (
         <div className='space-y-3'>
@@ -306,7 +319,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                 >
                   <span
                     className={cn(
-                      'text-[11px] font-bold uppercase tracking-wide',
+                      'text-xs font-bold uppercase tracking-wide',
                       statusStyle.text
                     )}
                   >
@@ -315,7 +328,7 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                   <Link
                     href={`/dashboard/my-engagements?engagementId=${e.engagementId}`}
                     className={cn(
-                      'flex items-center gap-1 text-[11px] font-semibold hover:underline',
+                      'flex items-center gap-1 text-xs font-semibold hover:underline',
                       statusStyle.text
                     )}
                   >
@@ -346,11 +359,11 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
 
                     {/* Agent info */}
                     <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-bold text-foreground leading-snug'>
+                      <p className='text-base font-bold text-foreground leading-snug'>
                         {e.agentFullName ?? e.initiatorName ?? '—'}
                       </p>
                       {e.content?.title && (
-                        <p className='text-xs text-muted-foreground mt-0.5 line-clamp-1'>
+                        <p className='text-sm text-muted-foreground mt-0.5 line-clamp-1'>
                           {e.content.title}
                         </p>
                       )}
@@ -359,18 +372,18 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
                     {/* Meta pills — right side */}
                     <div className='flex flex-col items-end gap-1.5 flex-shrink-0'>
                       {e.propertyTypeName && (
-                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-primary/5 text-primary border border-primary/10 px-2.5 py-1 rounded-full'>
+                        <span className='inline-flex items-center gap-1 text-xs font-medium bg-primary/5 text-primary border border-primary/10 px-2.5 py-1 rounded-full'>
                           <Building className='h-3 w-3' />
                           {e.propertyTypeName}
                         </span>
                       )}
                       {commission != null && (
-                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full'>
+                        <span className='inline-flex items-center gap-1 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full'>
                           {t('commissionLabel')}: {commission}%
                         </span>
                       )}
                       {experience != null && (
-                        <span className='inline-flex items-center gap-1 text-[11px] font-medium bg-primary/5 text-primary border border-primary/30 px-2.5 py-1 rounded-full'>
+                        <span className='inline-flex items-center gap-1 text-xs font-medium bg-primary/5 text-primary border border-primary/30 px-2.5 py-1 rounded-full'>
                           {experience} {t('yearsExperience')}
                         </span>
                       )}
@@ -465,6 +478,11 @@ export function PropertyDetailPanel({
     session.user.id === property.owner_id
   );
 
+  const backendRoles = session?.user?.backendRoles ?? [];
+  const isAgentUser = session?.user?.role === 'AGENT' || backendRoles.includes('AGENT');
+
+  const { data: propertyFees } = usePropertyFees(property.property_id);
+
   const { mutate: changeStatus, isPending: isStatusChanging } = useMutation({
     mutationFn: (status: string) =>
       propertyApi.updatePropertyStatus({ propertyId: property.property_id, status }),
@@ -512,20 +530,20 @@ export function PropertyDetailPanel({
 
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
-      {/* Mobile back button */}
-      {onBack && (
-        <button
-          type='button'
-          onClick={onBack}
-          className='flex items-center gap-2 px-6 py-4 text-sm font-medium text-primary hover:underline'
-        >
-          <ChevronLeft className='h-4 w-4' />
-          {t('backToList')}
-        </button>
-      )}
-
       {/* Hero image / slider */}
       <div className='relative w-full h-64 bg-muted overflow-hidden'>
+        {onBack && (
+          <div className='pointer-events-none absolute left-0 right-0 top-0 z-20 px-4 pt-3 sm:px-6 sm:pt-4'>
+            <button
+              type='button'
+              onClick={onBack}
+              className='pointer-events-auto flex items-center gap-2 rounded-full bg-black/45 px-3 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+            >
+              <ChevronLeft className='h-4 w-4 shrink-0' />
+              {t('backToList')}
+            </button>
+          </div>
+        )}
         {currentImageUrl ? (
           <Image
             src={currentImageUrl}
@@ -747,12 +765,14 @@ export function PropertyDetailPanel({
             >
               {t('tabListings')}
             </TabsTrigger>
-            <TabsTrigger
-              value='agents'
-              className='rounded-none border-0 px-4 py-3 text-sm font-medium data-active:border-b-2 data-active:border-primary data-active:text-primary after:hidden'
-            >
-              {t('tabAgents')}
-            </TabsTrigger>
+            {!isAgentUser && (
+              <TabsTrigger
+                value='agents'
+                className='rounded-none border-0 px-4 py-3 text-sm font-medium data-active:border-b-2 data-active:border-primary data-active:text-primary after:hidden'
+              >
+                {t('tabAgents')}
+              </TabsTrigger>
+            )}
           </TabsList>
         </div>
 
@@ -801,8 +821,15 @@ export function PropertyDetailPanel({
             ];
 
             const hasAttributes = property.attributes && property.attributes.length > 0;
-            const hasAmenities = property.amenities && property.amenities.length > 0;
-            const hasLeft = !!property.description || hasAttributes || hasAmenities;
+            const visibleAmenities = (property.amenities ?? []).filter(
+              (a) =>
+                a.amenity_name != null && String(a.amenity_name).trim() !== ''
+            );
+            const hasAmenities = visibleAmenities.length > 0;
+            const serviceFeesList = propertyFees ?? [];
+            const hasServiceFees = serviceFeesList.length > 0;
+            const hasLeft =
+              !!property.description || hasAttributes || hasAmenities || hasServiceFees;
             const hasRight = facts.length > 0;
 
             return (
@@ -812,12 +839,12 @@ export function PropertyDetailPanel({
                   hasLeft && hasRight ? 'flex-col sm:flex-row sm:items-start' : 'flex-col'
                 )}
               >
-                {/* Left — description, attributes, amenities */}
+                {/* Left — description, attributes, service fees, amenities */}
                 {hasLeft && (
-                  <div className='flex flex-col gap-5 flex-1 min-w-0'>
+                  <div className={cn('flex flex-col gap-5 min-w-0', hasLeft && hasRight ? 'sm:w-1/2' : 'flex-1')}>
                     {property.description && (
                       <div className='flex flex-col gap-2'>
-                        <h2 className='text-base font-bold tracking-[-0.24px] text-foreground'>
+                        <h2 className='text-lg font-bold tracking-tight text-foreground'>
                           {t('labelDescription')}
                         </h2>
                         <p className='text-sm font-medium leading-[1.6] text-muted-foreground whitespace-pre-wrap'>
@@ -838,11 +865,11 @@ export function PropertyDetailPanel({
                               attr.value_text != null ||
                               attr.value_boolean != null;
                             if (!hasValue) return null;
-                            const displayValue =
+                            let displayValue: string =
                               attr.display_value != null &&
                               attr.display_value !== '' &&
                               attr.display_value !== 'undefined'
-                                ? attr.display_value
+                                ? String(attr.display_value)
                                 : attr.value_number != null
                                   ? `${attr.value_number}${attr.unit ? ' ' + attr.unit : ''}`
                                   : attr.value_text != null
@@ -852,9 +879,14 @@ export function PropertyDetailPanel({
                                         ? t('attributeTrue')
                                         : t('attributeFalse')
                                       : '—';
+                            {
+                              const b = displayValue.trim().toLowerCase();
+                              if (b === 'true') displayValue = t('attributeTrue');
+                              else if (b === 'false') displayValue = t('attributeFalse');
+                            }
                             return (
                               <div key={attr.attribute_id} className='flex flex-col gap-3'>
-                                <p className='text-sm font-medium leading-[1.5] text-muted-foreground'>
+                                <p className='text-base font-medium leading-[1.5] text-muted-foreground'>
                                   {attr.attribute_name}
                                 </p>
                                 <div className='flex items-center gap-2'>
@@ -863,7 +895,7 @@ export function PropertyDetailPanel({
                                     className='size-5 text-foreground/50'
                                     strokeWidth={2}
                                   />
-                                  <p className='text-base font-bold tracking-[-0.09px] text-foreground'>
+                                  <p className='text-lg font-bold tracking-[-0.09px] text-foreground'>
                                     {displayValue}
                                   </p>
                                 </div>
@@ -874,16 +906,57 @@ export function PropertyDetailPanel({
                       </div>
                     )}
 
+                    {hasServiceFees && (
+                      <div className='rounded-lg border border-primary/20 p-4'>
+                        <div className='mb-3 flex items-center gap-2'>
+                          <Receipt className='h-4 w-4 text-primary' strokeWidth={2} />
+                          <h2 className='text-lg font-bold tracking-tight text-foreground'>
+                            {t('labelServiceFees')}
+                          </h2>
+                        </div>
+                        <ul className='flex flex-col gap-3'>
+                          {serviceFeesList.map((fee) => (
+                            <li
+                              key={fee.property_fee_service_id}
+                              className='flex flex-col gap-0.5 border-b border-primary/10 pb-3 last:border-0 last:pb-0'
+                            >
+                              <div className='flex items-start justify-between gap-2'>
+                                <span className='text-sm font-medium text-foreground'>
+                                  {fee.fee_name}
+                                </span>
+                                <span className='shrink-0 text-sm font-semibold text-foreground'>
+                                  {formatVND(fee.amount)} đ
+                                </span>
+                              </div>
+                              <div className='flex flex-wrap items-center gap-2'>
+                                <span className='text-xs text-muted-foreground'>
+                                  {propertyFeeBillingLabel(fee.billing_cycle, t)}
+                                </span>
+                                {fee.is_optional ? (
+                                  <span className='rounded-md bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
+                                    {t('feeOptional')}
+                                  </span>
+                                ) : null}
+                              </div>
+                              {fee.description != null && fee.description.trim() !== '' ? (
+                                <p className='text-xs text-muted-foreground'>{fee.description}</p>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {hasAmenities && (
                       <div>
-                        <h2 className='text-base font-bold tracking-[-0.24px] text-foreground mb-2'>
+                        <h2 className='text-lg font-bold tracking-tight text-foreground mb-2'>
                           {t('labelAmenities')}
                         </h2>
                         <div className='flex flex-wrap gap-2'>
-                          {property.amenities!.map((a) => (
+                          {visibleAmenities.map((a) => (
                             <span
                               key={a.amenity_id}
-                              className='rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-medium px-3 py-1'
+                              className='rounded-full bg-primary/5 border border-primary/10 text-primary text-sm font-medium px-3 py-1.5'
                             >
                               {a.amenity_name}
                             </span>
@@ -896,19 +969,19 @@ export function PropertyDetailPanel({
 
                 {/* Right — facts table */}
                 {hasRight && (
-                  <div className='sm:w-52 shrink-0'>
+                  <div className={cn(hasLeft && hasRight ? 'sm:w-1/2' : 'w-full', 'shrink-0')}>
                     <div className='rounded-xl border border-primary/20 bg-white divide-y divide-primary/10'>
                       {facts.map((f, i) => (
                         <div
                           key={i}
                           className='flex items-center justify-between px-3 py-2.5 gap-3'
                         >
-                          <span className='text-xs font-medium text-muted-foreground shrink-0'>
+                          <span className='text-sm font-medium text-muted-foreground shrink-0'>
                             {f.label}
                           </span>
                           <span
                             className={cn(
-                              'text-xs font-semibold text-right',
+                              'text-sm font-semibold text-right',
                               f.accent ?? 'text-foreground'
                             )}
                           >
@@ -932,10 +1005,12 @@ export function PropertyDetailPanel({
           />
         </TabsContent>
 
-        {/* Tab: Agents */}
-        <TabsContent value='agents' className='p-4 sm:p-6'>
-          <EngagementsSection propertyId={property.property_id} />
-        </TabsContent>
+        {/* Tab: Agents (owner-centric; hidden for users with AGENT role) */}
+        {!isAgentUser && (
+          <TabsContent value='agents' className='p-4 sm:p-6'>
+            <EngagementsSection propertyId={property.property_id} />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Confirm: change status */}

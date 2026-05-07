@@ -68,7 +68,7 @@ export function ListingWeeklyViewsChart({ listingId }: ListingWeeklyViewsChartPr
     });
   }, [data?.week_start, t]);
 
-  const maxVal = Math.max(1, ...chartData.map((d) => d.views));
+  const maxVal = Math.max(1, ...chartData.map((d) => d.views ?? 0));
 
   const goPrev = () => {
     setWeekStartIso((prev) => toYyyyMmDd(addWeeks(parseISO(prev), -1)));

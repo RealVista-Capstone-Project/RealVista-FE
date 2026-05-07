@@ -7,6 +7,8 @@
       "description": "Narrow results by status, type, and location.",
       "reset": "Reset",
       "searchPlaceholder": "Search address, owner, phone...",
+      "clearSearch": "Clear search",
+      "pendingToggle": "Needs approval",
       "statusPlaceholder": "Status",
       "allStatuses": "All statuses",
       "propertyTypePlaceholder": "Property type",

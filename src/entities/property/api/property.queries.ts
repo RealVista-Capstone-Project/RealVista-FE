@@ -19,6 +19,29 @@ export const propertyQueries = {
       queryFn: () => propertyApi.getMyProperties(criteria),
       placeholderData: (previousData) => previousData,
     }),
+  myPropertiesInfinite: (criteria: Omit<MyPropertiesSearchCriteria, 'page'>) =>
+    infiniteQueryOptions({
+      queryKey: ['properties', 'me', 'infinite', criteria],
+      queryFn: ({ pageParam }) =>
+        propertyApi.getMyProperties({ ...criteria, page: pageParam as number }),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => {
+        const data = lastPage?.payload?.data;
+        if (!data) return undefined;
+        const currentPage = data.page ?? 0;
+        const totalPages = data.total_pages ?? data.totalPages;
+        if (typeof totalPages === 'number' && totalPages > 0 && currentPage + 1 >= totalPages) {
+          return undefined;
+        }
+        if (data.last === true) return undefined;
+        if (data.has_next === false) return undefined;
+        const pageSize = data.size ?? criteria.size;
+        const content = data.content ?? [];
+        if (pageSize > 0 && content.length < pageSize) return undefined;
+        return currentPage + 1;
+      },
+      staleTime: 2 * 60 * 1000,
+    }),
   mySummary: () =>
     queryOptions({
       queryKey: ['properties', 'me', 'summary'],

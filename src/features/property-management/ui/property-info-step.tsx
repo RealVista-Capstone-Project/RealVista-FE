@@ -80,6 +80,8 @@ import { locationApi } from '@/entities/location/api/location.api';
 import { MapAutocomplete } from './components/map-autocomplete';
 import { AmenityMultiSelect } from './components/amenity-multi-select';
 import { extractStreetAddress } from '@/shared/lib/location.lib';
+import { cn } from '@/shared/lib/utils';
+import { PriceInput } from './components/price-input';
 
 function PositiveNumberInput({
   value,
@@ -126,111 +128,29 @@ function PositiveNumberInput({
   );
 }
 
-function toVietnameseWords(n: number): string {
-  if (!n || n <= 0) return '';
-  const ones = ['', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
-
-  function readGroup(num: number, isFirst: boolean): string {
-    const h = Math.floor(num / 100);
-    const t = Math.floor((num % 100) / 10);
-    const u = num % 10;
-    let s = '';
-    if (h > 0) {
-      s = ones[h] + ' trăm';
-    } else if (!isFirst) {
-      s = 'không trăm';
-    }
-    if (t === 0) {
-      if (u > 0) s += (s ? ' linh ' : '') + ones[u];
-    } else if (t === 1) {
-      s += ' mười' + (u === 5 ? ' lăm' : u > 0 ? ' ' + ones[u] : '');
-    } else {
-      s += ' ' + ones[t] + ' mươi' + (u === 1 ? ' mốt' : u === 5 ? ' lăm' : u > 0 ? ' ' + ones[u] : '');
-    }
-    return s.trim();
-  }
-
-  const ty = Math.floor(n / 1_000_000_000);
-  const trieu = Math.floor((n % 1_000_000_000) / 1_000_000);
-  const nghin = Math.floor((n % 1_000_000) / 1_000);
-  const con = n % 1_000;
-  const parts: string[] = [];
-  let isFirst = true;
-
-  if (ty > 0) { parts.push(readGroup(ty, isFirst) + ' tỷ'); isFirst = false; }
-  if (trieu > 0) { parts.push(readGroup(trieu, isFirst) + ' triệu'); isFirst = false; }
-  if (nghin > 0) { parts.push(readGroup(nghin, isFirst) + ' nghìn'); isFirst = false; }
-  if (con > 0) { parts.push(readGroup(con, isFirst)); }
-
-  const result = parts.join(' ');
-  return result.charAt(0).toUpperCase() + result.slice(1) + ' đồng';
-}
-
-function PriceInput({
-  value,
-  onChange,
-  onBlur,
-  className,
-  placeholder,
-}: {
-  value: number | undefined;
-  onChange: (value: number | undefined) => void;
-  onBlur?: () => void;
-  className?: string;
-  placeholder?: string;
-}) {
-  const fmt = (n: number | undefined) =>
-    n != null ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
-
-  const [display, setDisplay] = useState(() => fmt(value));
-  const isEditing = useRef(false);
-
-  useEffect(() => {
-    if (!isEditing.current) {
-      setDisplay(fmt(value));
-    }
-  }, [value]);
-
-  const rawNum = Number(display.replace(/\./g, ''));
-  const words = display && !isNaN(rawNum) && rawNum > 0 ? toVietnameseWords(rawNum) : '';
-
-  return (
-    <div className='flex flex-col gap-1'>
-      <Input
-        type='text'
-        inputMode='numeric'
-        placeholder={placeholder}
-        className={className}
-        value={display}
-        onFocus={() => { isEditing.current = true; }}
-        onBlur={() => { isEditing.current = false; onBlur?.(); }}
-        onChange={(e) => {
-          let raw = e.target.value.replace(/\D/g, '');
-          raw = raw.replace(/^0+(\d)/, '$1');
-          setDisplay(raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '');
-          onChange(raw === '' ? undefined : Number(raw));
-        }}
-      />
-      {words && (
-        <span className='text-xs text-muted-foreground italic'>{words}</span>
-      )}
-    </div>
-  );
-}
-
 export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError: boolean) => void }) {
   const t = useTranslations('PropertyManagement');
-  const { control, setValue, setError, clearErrors } = useFormContext();
+  const { control, setValue, setError, clearErrors, getValues } = useFormContext();
   const selectedPropertyType = useWatch({ control, name: 'info.propertyType' });
   const location = useWatch({ control, name: 'info.location' });
   const landSize = useWatch({ control, name: 'info.landSize' });
   const usableSize = useWatch({ control, name: 'info.usableSize' });
+  const plotWidth = useWatch({ control, name: 'info.width' });
+  const plotLength = useWatch({ control, name: 'info.length' });
   const rentMin = useWatch({ control, name: 'info.priceRange.rent.min' });
   const rentMax = useWatch({ control, name: 'info.priceRange.rent.max' });
   const buyMin = useWatch({ control, name: 'info.priceRange.buy.min' });
   const buyMax = useWatch({ control, name: 'info.priceRange.buy.max' });
 
   const usableSizeError = usableSize != null && landSize != null && usableSize > landSize;
+  const dimensionMismatch =
+    landSize != null &&
+    plotWidth != null &&
+    plotLength != null &&
+    Number.isFinite(landSize) &&
+    Number.isFinite(plotWidth) &&
+    Number.isFinite(plotLength) &&
+    Math.abs(plotWidth * plotLength - landSize) > 0.01;
   const rentMaxError = rentMin != null && rentMax != null && rentMax <= rentMin;
   const buyMaxError = buyMin != null && buyMax != null && buyMax <= buyMin;
 
@@ -241,6 +161,17 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
       clearErrors('info.usableSize');
     }
   }, [usableSizeError]);
+
+  useEffect(() => {
+    if (dimensionMismatch) {
+      setError('info.landSize', {
+        type: 'custom',
+        message: t('validation.widthLengthMatchesLandSize'),
+      });
+    } else {
+      clearErrors('info.landSize');
+    }
+  }, [dimensionMismatch]);
 
   useEffect(() => {
     if (rentMaxError) {
@@ -259,11 +190,35 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
   }, [buyMaxError]);
 
   useEffect(() => {
-    onErrorChange?.(usableSizeError || rentMaxError || buyMaxError);
-  }, [usableSizeError, rentMaxError, buyMaxError]);
+    onErrorChange?.(
+      usableSizeError || dimensionMismatch || rentMaxError || buyMaxError
+    );
+  }, [usableSizeError, dimensionMismatch, rentMaxError, buyMaxError, onErrorChange]);
 
   const { data: amenities = [], isLoading: isAmenitiesLoading } = useAmenities();
-  const { data: attributeDefinitions = [] } = usePropertyAttributes(selectedPropertyType || undefined);
+  /** Pass '' when unset — hook treats undefined as "fetch all" for search UIs; create/edit must show none until a type is chosen. */
+  const { data: attributeDefinitions = [] } = usePropertyAttributes(selectedPropertyType ?? '');
+
+  /** Dropdown đặc tính (TEXT + ranges): tự chọn giá trị đầu tiên để tránh submit khi user quên chọn. */
+  useEffect(() => {
+    if (!attributeDefinitions.length) return;
+    for (const attr of attributeDefinitions) {
+      if (attr.data_type === 'BOOLEAN' || attr.data_type === 'NUMBER') continue;
+      const ranges = attr.ranges?.filter(Boolean);
+      if (!ranges?.length) continue;
+      const code = attr.attribute_code;
+      const path = `info.dynamicAttributes.${code}` as const;
+      const current = getValues(path);
+      if (current != null && String(current).trim() !== '') continue;
+      const ordered = [...ranges].sort(
+        (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)
+      );
+      const first = ordered[0];
+      if (first?.label != null && first.label !== '') {
+        setValue(path, first.label, { shouldValidate: true, shouldDirty: false });
+      }
+    }
+  }, [attributeDefinitions, getValues, setValue]);
 
   const getAttributeIcon = (attrCode: string) => {
     const iconMap: Record<string, React.ElementType> = {
@@ -360,7 +315,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
           control={control}
           name={`info.dynamicAttributes.${attrCode}`}
           render={({ field }) => (
-            <FormItem className='flex flex-col gap-2'>
+            <FormItem className='flex min-w-0 flex-col gap-2'>
               <div className='flex items-center gap-2'>
                 {getAttributeIcon(attrCode)}
                 <FormLabel className='text-sm font-medium text-foreground cursor-pointer mb-0'>
@@ -368,7 +323,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 </FormLabel>
               </div>
               <FormControl>
-                <div className='flex items-center justify-between h-12 px-3 rounded-lg border border-primary/20 bg-white'>
+                <div className='flex h-12 items-center justify-between rounded-lg border border-primary/20 bg-white px-3'>
                   <span className='text-sm text-muted-foreground'>
                     {field.value ? 'Có' : 'Không'}
                   </span>
@@ -388,7 +343,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
           control={control}
           name={`info.dynamicAttributes.${attrCode}`}
           render={({ field }) => (
-            <FormItem className='flex flex-col gap-2'>
+            <FormItem className='flex min-w-0 flex-col gap-2'>
               <div className='flex items-center gap-2'>
                 {getAttributeIcon(attrCode)}
                 <FormLabel className='text-sm font-medium text-foreground'>{label}</FormLabel>
@@ -399,7 +354,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   placeholder='0'
-                  className='h-12 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
+                  className='h-12 w-full min-w-0 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
                 />
               </FormControl>
               <FormMessage className='text-xs' />
@@ -417,7 +372,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
         control={control}
         name={`info.dynamicAttributes.${attrCode}`}
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2'>
+          <FormItem className='flex min-w-0 flex-col gap-2'>
             <div className='flex items-center gap-2'>
               {getAttributeIcon(attrCode)}
               <FormLabel className='text-sm font-medium text-foreground'>{label}</FormLabel>
@@ -431,7 +386,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 value={attr.ranges?.find((r) => r.label === field.value)?.range_id || ''}
               >
                 <FormControl>
-                  <SelectTrigger className='h-12 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'>
+                  <SelectTrigger className='h-12 w-full min-w-0 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:flex-1 [&_[data-slot=select-value]]:justify-start'>
                     <SelectValue
                       placeholder={t('selectOption', { default: 'Select {label}', label })}
                     />
@@ -450,7 +405,7 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 <Input
                   type='text'
                   placeholder={label}
-                  className='h-12 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
+                  className='h-12 w-full min-w-0 rounded-lg border-primary/20 bg-white transition-all focus:border-primary focus:ring-1 focus:ring-primary'
                   {...field}
                   value={field.value || ''}
                   onChange={(e) => field.onChange(e.target.value)}
@@ -499,9 +454,8 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                         try {
                           const locationRes = await locationApi.searchByCoordinates(lat, lng);
                           if (locationRes.payload.success && locationRes.payload.data) {
-                            setValue('info.locationId', locationRes.payload.data.location_id, {
-                              shouldValidate: true,
-                            });
+                            const wid = locationRes.payload.data.location_id;
+                            setValue('info.ward', wid, { shouldValidate: true });
                           }
                         } catch (error) {
                           console.error('Failed to resolve location from coordinates:', error);
@@ -561,9 +515,11 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
           </div>
           <div className='text-sm font-medium text-foreground'>
             {t('width', { default: 'Width (m)' })}
+            <span className='text-destructive ml-1'>*</span>
           </div>
           <div className='text-sm font-medium text-foreground'>
             {t('length', { default: 'Length (m)' })}
+            <span className='text-destructive ml-1'>*</span>
           </div>
         </div>
 
@@ -656,11 +612,22 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                 <span className='text-destructive ml-1'>*</span>
               </FormLabel>
               <Select
-                onValueChange={(value) => { field.onChange(value); field.onBlur(); }}
+                onValueChange={(value) => {
+                  const prev = field.value ?? '';
+                  if (value !== prev) {
+                    setValue('info.dynamicAttributes', {}, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                    clearErrors('info.dynamicAttributes');
+                  }
+                  field.onChange(value);
+                  field.onBlur();
+                }}
                 value={field.value}
               >
                 <FormControl>
-                  <SelectTrigger className='w-full h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'>
+                  <SelectTrigger className='h-12 w-full rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'>
                     <SelectValue
                       placeholder={t('selectType', { default: 'Select property type' })}
                     >
@@ -749,7 +716,6 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>
@@ -768,7 +734,6 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>
@@ -796,7 +761,6 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>
@@ -815,7 +779,6 @@ export function PropertyInfoStep({ onErrorChange }: { onErrorChange?: (hasError:
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           placeholder='0'
-                          className='h-12 rounded-lg border-primary/20 bg-white focus:border-primary focus:ring-primary'
                         />
                       </FormControl>
                       <div className='min-h-5'><FormMessage /></div>

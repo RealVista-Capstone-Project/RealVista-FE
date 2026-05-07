@@ -235,8 +235,8 @@ export function DashboardLayout({
   const isAdmin =
     session?.user?.role === 'admin' || backendRoles.includes('ADMIN') || backendRoles.includes('moderator');
   const isTenant = backendRoles.includes('TENANT') && !backendRoles.includes('OWNER');
-  /** Owner home dashboard uses full pastel blue in main — avoids gray main vs blue content mismatch */
-  const isOwnerPastelShell =
+  /** Owner role: white main content area (not agent/admin). */
+  const isOwnerWhiteMain =
     (session?.user?.role === 'owner' || backendRoles.includes('OWNER')) && !isAgent && !isAdmin;
 
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -250,6 +250,10 @@ export function DashboardLayout({
   );
 
   const pathname = usePathname();
+  /** Property detail (and sub-routes like /edit, /3d): white main — avoids gray behind cards for agents/delegates. */
+  const isPropertyDetailWhiteMain =
+    pathname.startsWith(`${ROUTES.dashboard.property}/`) &&
+    !pathname.startsWith(`${ROUTES.dashboard.property}/create`);
   const t = useTranslations('DashboardLayout');
 
   const { data: adminOverview } = useQuery({
@@ -397,8 +401,13 @@ export function DashboardLayout({
     };
   }, []);
 
+  /** Full-page forms (e.g. create listing): drop owner main min-height so scroll height tracks content — avoids a dead white band above the footer. */
+  const isCreateListingRoute =
+    pathname === ROUTES.dashboard.createListing ||
+    pathname.startsWith(`${ROUTES.dashboard.createListing}/`);
+
   return (
-    <div className={cn('flex h-screen w-full overflow-hidden bg-muted/50', className)}>
+    <div className={cn('flex h-screen w-full overflow-hidden', isAdmin ? 'bg-sky-50' : 'bg-muted/50', className)}>
       <ChatWindowRenderer />
 
       {/* Sidebar - Now part of the flex flow on desktop */}
@@ -525,9 +534,14 @@ export function DashboardLayout({
           <main
             className={cn(
               'flex min-h-0 flex-1 flex-col overflow-y-auto p-0',
-              isOwnerPastelShell
-                ? 'bg-[#e8f2fb] dark:bg-background lg:min-h-[calc(100svh-3.5rem)]'
-                : 'bg-muted/30 dark:bg-background',
+              isOwnerWhiteMain || isPropertyDetailWhiteMain
+                ? cn(
+                    'bg-white dark:bg-background',
+                    !isCreateListingRoute && 'lg:min-h-[calc(100svh-3.5rem)]'
+                  )
+                : isAdmin
+                  ? 'bg-sky-50 dark:bg-background'
+                  : 'bg-muted/30 dark:bg-background',
             )}
           >
             {children}

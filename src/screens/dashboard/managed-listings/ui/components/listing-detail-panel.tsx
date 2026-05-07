@@ -259,29 +259,29 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
-      {/* Mobile Back Button */}
-      {onBack && (
-        <div className='sticky top-0 z-20 flex items-center border-b border-primary/20 bg-white px-4 py-3 sm:hidden'>
-          <button
-            onClick={onBack}
-            className='flex cursor-pointer items-center gap-2 text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-          >
-            <ArrowLeft className='h-5 w-5' strokeWidth={2.5} />
-            <span>{t('backToList')}</span>
-          </button>
-
-          <Link
-            href={`/listing/${listing.slug}`}
-            className='flex items-center gap-2 rounded-lg border border-primary/20 bg-white px-3 py-1.5 text-xs font-bold text-foreground transition-colors hover:bg-primary/5'
-          >
-            <Eye className='h-3.5 w-3.5' strokeWidth={2.5} />
-            <span>{t('preview')}</span>
-          </Link>
-        </div>
-      )}
-
       {/* Hero media — same pattern as manage property: full-width strip, prev/next */}
       <div className='relative h-64 w-full overflow-hidden bg-muted'>
+        {/* Mobile: back + preview overlaid on hero (no extra header row) */}
+        {onBack && (
+          <div className='pointer-events-none absolute left-0 right-0 top-0 z-20 flex items-center justify-between gap-2 px-3 pt-3 sm:hidden'>
+            <button
+              type='button'
+              onClick={onBack}
+              className='pointer-events-auto flex cursor-pointer items-center gap-2 rounded-full bg-black/45 px-3 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+            >
+              <ArrowLeft className='h-5 w-5 shrink-0' strokeWidth={2.5} />
+              <span>{t('backToList')}</span>
+            </button>
+
+            <Link
+              href={`/listing/${listing.slug}`}
+              className='pointer-events-auto flex items-center gap-2 rounded-full bg-black/45 px-3 py-2 text-xs font-bold text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/55'
+            >
+              <Eye className='h-3.5 w-3.5 shrink-0' strokeWidth={2.5} />
+              <span>{t('preview')}</span>
+            </Link>
+          </div>
+        )}
         {currentSlide ? (
           currentSlide.type === 'video' ? (
             <video

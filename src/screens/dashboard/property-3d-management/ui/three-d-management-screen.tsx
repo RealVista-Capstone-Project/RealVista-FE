@@ -10,7 +10,7 @@ import {
 } from '@/entities/property';
 import type { Property3dOperation } from '@/entities/property/api/property-api.types';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Plus,
   Box,
   RefreshCw,
@@ -193,228 +193,210 @@ export function ThreeDManagementScreen({
   ).length;
 
   return (
-    <div className='min-h-[calc(100vh-80px)] bg-background'>
-      {/* Header Section */}
-      <div className='border-b border-border bg-card'>
-        <div className='container max-w-7xl mx-auto px-4 sm:px-6 py-6'>
-          <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-            <div className='flex items-center gap-4'>
-              <button
-                onClick={() =>
-                  router.push(`/${locale}/dashboard/property`)
-                }
-                className='p-2 hover:bg-accent rounded-xl transition-colors text-muted-foreground hover:text-foreground'
-                aria-label={t('goBackAriaLabel')}
-              >
-                <ArrowLeft className='w-5 h-5' />
-              </button>
-              <div className='w-px h-8 bg-border' />
-              <div>
-                <h1 className='text-2xl font-bold tracking-tight text-foreground'>
-                  {t('title')}
-                </h1>
-                <p className='text-sm text-muted-foreground mt-0.5'>
-                  {t('subtitle')}
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-center gap-2'>
-              <Button
-                variant='outline'
-                size='icon'
-                onClick={() => {
-                  refetchOps();
-                  refetchDetail();
-                }}
-                className='rounded-xl'
-                disabled={opsLoading || detailLoading}
-              >
-                <RefreshCw className={detailLoading || opsLoading ? 'animate-spin' : ''} />
-              </Button>
-              <Button
-                onClick={() => setIsDialogOpen(true)}
-                size='lg'
-                className='rounded-xl shadow-md font-semibold gap-2'
-                disabled={isLocked}
-                title={isLocked ? t('lockedTitle') : undefined}
-              >
-                {isLocked ? <Lock className='w-5 h-5' /> : <Plus className='w-5 h-5' />}
-                {t('newRoom')}
-              </Button>
-              {!isLocked && !subsLoading && (
-                <span className='text-xs text-muted-foreground'>
-                  {unlimited
-                    ? t('quotaUnlimited')
-                    : remaining != null && quotaLimit != null
-                      ? t('quotaRemaining', { remaining, total: quotaLimit })
-                      : null}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Stats Bar */}
-          {!opsLoading && totalRooms > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className='flex items-center gap-6 mt-5 text-sm'
-            >
-              <div className='flex items-center gap-2 text-muted-foreground'>
-                <Box className='w-4 h-4' />
-                <span>
-                  <strong className='text-foreground'>
-                    {t('roomsCount', { count: totalRooms })}
-                  </strong>
-                </span>
-              </div>
-              <div className='w-px h-4 bg-border' />
-              <div className='flex items-center gap-1.5'>
-                <span className='w-2 h-2 rounded-full bg-emerald-500' />
-                <span className='text-muted-foreground'>
-                  {readyRooms} {t('ready')}
-                </span>
-              </div>
-              {pendingRooms > 0 && (
-                <>
-                  <div className='w-px h-4 bg-border' />
-                  <div className='flex items-center gap-1.5'>
-                    <span className='w-2 h-2 rounded-full bg-amber-500 animate-pulse' />
-                    <span className='text-muted-foreground'>
-                      {pendingRooms} {t('processing')}
-                    </span>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Subscription Gate Card */}
-      {isLocked && !subsLoading && (
-        <div className='container max-w-7xl mx-auto px-4 sm:px-6 mt-6'>
-          <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
-            <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
-            <h3 className='text-sm font-semibold text-foreground mb-1'>
-              {remaining != null ? t('lockedTitle') : t('noSubscriptionTitle')}
-            </h3>
-            <p className='text-xs text-muted-foreground mb-4'>
-              {remaining != null ? t('lockedDescription') : t('noSubscriptionDescription')}
-            </p>
+    <div className='min-h-[calc(100vh-80px)] bg-[#e8f2fb]'>
+      <div className='mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6'>
+        <div className='overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm'>
+          {/* Row 1: Back */}
+          <div className='border-b border-primary/10 px-4 py-3 sm:px-6'>
             <button
               type='button'
-              onClick={() => router.push(`/${locale}/subscribe`)}
-              className='inline-flex items-center justify-center rounded-lg bg-foreground text-white text-xs font-semibold px-6 py-2 hover:bg-foreground/80 transition-colors cursor-pointer'
+              onClick={() => router.push(`/${locale}/dashboard/property`)}
+              className='flex w-fit cursor-pointer items-center gap-1.5 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+              aria-label={t('goBackAriaLabel')}
             >
-              {remaining != null ? t('lockedCta') : t('noSubscriptionCta')}
+              <ChevronLeft className='h-4 w-4 shrink-0' strokeWidth={2.5} />
+              <span>{t('backToList')}</span>
             </button>
           </div>
-        </div>
-      )}
 
-      {/* Main Content */}
-      <div className='container max-w-7xl mx-auto px-4 sm:px-6 py-8'>
-        {opsLoading ? (
-          <div className='flex flex-col items-center justify-center py-24'>
-            <RefreshCw className='w-8 h-8 animate-spin text-primary mb-4' />
-            <p className='text-muted-foreground font-medium'>
-              {t('loading')}
-            </p>
+          {/* Row 2: Heading + subtitle | circular add + quota */}
+          <div className='flex items-start justify-between gap-4 border-b border-primary/10 px-4 py-4 sm:px-6'>
+            <div className='min-w-0 flex-1'>
+              <h1 className='text-xl font-bold tracking-tight text-foreground sm:text-2xl'>{t('title')}</h1>
+              <p className='mt-1 text-sm text-muted-foreground'>{t('subtitle')}</p>
+            </div>
+            <div className='flex shrink-0 flex-col items-center gap-1.5'>
+              <Button
+                type='button'
+                onClick={() => setIsDialogOpen(true)}
+                size='icon'
+                disabled={isLocked}
+                title={isLocked ? t('lockedTitle') : t('newRoom')}
+                className='h-12 w-12 rounded-full shadow-md'
+              >
+                {isLocked ? <Lock className='h-5 w-5' /> : <Plus className='h-5 w-5' />}
+              </Button>
+              {!subsLoading && unlimited ? (
+                <span className='max-w-[7rem] text-center text-[11px] leading-tight text-muted-foreground'>
+                  {t('quotaUnlimited')}
+                </span>
+              ) : !subsLoading && remaining != null && quotaLimit != null ? (
+                <span className='max-w-[7rem] text-center text-[11px] leading-tight text-muted-foreground'>
+                  {t('quotaRemaining', { remaining, total: quotaLimit })}
+                </span>
+              ) : null}
+            </div>
           </div>
-        ) : roomGroups.length === 0 ? (
-          <EmptyState onCreateRoom={() => setIsDialogOpen(true)} t={t} isLocked={isLocked} />
-        ) : (
-          <div className='space-y-8'>
-            {/* 3D Viewer for selected room */}
-            <AnimatePresence mode='wait'>
-              {selectedRoom && activeViewerData.url && (
-                <motion.div
-                  key={selectedRoom}
-                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                  transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
-                  className='relative group/stage'
-                >
-                  <div className='absolute -inset-2 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 blur-2xl opacity-0 group-hover/stage:opacity-100 transition-opacity duration-700' />
 
-                  <div className='relative overflow-hidden rounded-[2rem] border border-border/50 shadow-2xl'>
-                    <div className='absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-5 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none'>
-                      <div className='flex items-center gap-4'>
-                        <div className='w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10'>
-                          <Layers className='w-6 h-6 text-primary shadow-[0_0_15px_color-mix(in_oklch,var(--primary)_50%,transparent)]' />
-                        </div>
-                        <div className='space-y-0.5'>
-                          <div className='flex items-center gap-2'>
-                            <h2 className='text-xl font-bold tracking-tight text-white drop-shadow-md'>
-                              {selectedRoom === 'Unnamed Room' ? t('unnamedRoom') : selectedRoom}
-                            </h2>
-                            <div className='flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-md'>
-                              <span className='w-1.5 h-1.5 rounded-full bg-primary animate-pulse' />
-                              <span className='text-[10px] font-bold text-primary tracking-wider uppercase'>{t('live3dBadge')}</span>
+          {/* Row 3: Grey uppercase label + stats hint | reload */}
+          <div className='flex items-start justify-between gap-3 border-b border-primary/10 bg-muted/30 px-4 py-2.5 sm:items-center sm:px-6'>
+            <div className='min-w-0 flex-1'>
+              <p className='text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground'>
+                {t('listSectionLabel')}
+              </p>
+              {!opsLoading && totalRooms > 0 ? (
+                <div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground'>
+                  <span className='inline-flex items-center gap-1.5'>
+                    <Box className='h-3.5 w-3.5 shrink-0' />
+                    <strong className='font-medium text-foreground'>{t('roomsCount', { count: totalRooms })}</strong>
+                  </span>
+                  <span className='text-muted-foreground/40'>·</span>
+                  <span>
+                    {readyRooms} {t('ready')}
+                  </span>
+                  {pendingRooms > 0 ? (
+                    <>
+                      <span className='text-muted-foreground/40'>·</span>
+                      <span className='text-amber-700'>
+                        {pendingRooms} {t('processing')}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+            <Button
+              variant='outline'
+              type='button'
+              size='icon'
+              onClick={() => {
+                refetchOps();
+                refetchDetail();
+              }}
+              className='h-9 w-9 shrink-0 rounded-lg'
+              disabled={opsLoading || detailLoading}
+            >
+              <RefreshCw className={`h-4 w-4 ${detailLoading || opsLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+
+          {/* Body */}
+          <div className='px-4 py-6 sm:px-6'>
+            {isLocked && !subsLoading ? (
+              <div className='mb-6 rounded-xl border border-dashed border-amber-300 bg-amber-50 p-5 text-center'>
+                <Lock className='mx-auto mb-3 h-8 w-8 text-amber-500' />
+                <h3 className='mb-1 text-sm font-semibold text-foreground'>
+                  {remaining != null ? t('lockedTitle') : t('noSubscriptionTitle')}
+                </h3>
+                <p className='mb-4 text-xs text-muted-foreground'>
+                  {remaining != null ? t('lockedDescription') : t('noSubscriptionDescription')}
+                </p>
+                <button
+                  type='button'
+                  onClick={() => router.push(`/${locale}/subscribe`)}
+                  className='inline-flex cursor-pointer items-center justify-center rounded-lg bg-foreground px-6 py-2 text-xs font-semibold text-white transition-colors hover:bg-foreground/80'
+                >
+                  {remaining != null ? t('lockedCta') : t('noSubscriptionCta')}
+                </button>
+              </div>
+            ) : null}
+
+            {opsLoading ? (
+              <div className='flex flex-col items-center justify-center py-16'>
+                <RefreshCw className='mb-4 h-8 w-8 animate-spin text-primary' />
+                <p className='font-medium text-muted-foreground'>{t('loading')}</p>
+              </div>
+            ) : roomGroups.length === 0 ? (
+              <EmptyState onCreateRoom={() => setIsDialogOpen(true)} t={t} isLocked={isLocked} />
+            ) : (
+              <div className='space-y-8'>
+                <AnimatePresence mode='wait'>
+                  {selectedRoom && activeViewerData.url && (
+                    <motion.div
+                      key={selectedRoom}
+                      initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                      transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                      className='group/stage relative'
+                    >
+                      <div className='absolute -inset-2 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 opacity-0 blur-2xl transition-opacity duration-700 group-hover/stage:opacity-100' />
+
+                      <div className='relative overflow-hidden rounded-[2rem] border border-border/50 shadow-2xl'>
+                        <div className='pointer-events-none absolute left-0 right-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent px-6 py-5'>
+                          <div className='flex items-center gap-4'>
+                            <div className='flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 backdrop-blur-md'>
+                              <Layers className='h-6 w-6 text-primary shadow-[0_0_15px_color-mix(in_oklch,var(--primary)_50%,transparent)]' />
+                            </div>
+                            <div className='space-y-0.5'>
+                              <div className='flex items-center gap-2'>
+                                <h2 className='text-xl font-bold tracking-tight text-white drop-shadow-md'>
+                                  {selectedRoom === 'Unnamed Room' ? t('unnamedRoom') : selectedRoom}
+                                </h2>
+                                <div className='flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/20 px-2.5 py-0.5 backdrop-blur-md'>
+                                  <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-primary' />
+                                  <span className='text-[10px] font-bold uppercase tracking-wider text-primary'>
+                                    {t('live3dBadge')}
+                                  </span>
+                                </div>
+                              </div>
+                              <p className='text-xs font-medium text-white/50'>{t('interactiveDesc')}</p>
                             </div>
                           </div>
-                          <p className='text-xs text-white/50 font-medium'>
-                            {t('interactiveDesc')}
-                          </p>
+
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => setSelectedRoom(null)}
+                            className='pointer-events-auto h-10 rounded-xl border border-white/5 bg-white/5 px-4 text-white/70 backdrop-blur-md transition-all hover:bg-white/15 hover:text-white'
+                          >
+                            {t('closeViewer')}
+                          </Button>
+                        </div>
+
+                        <div className='aspect-video overflow-hidden md:aspect-[21/9]'>
+                          <SparkViewer
+                            spzUrl={activeViewerData.url || ''}
+                            metadata={activeViewerData.metadata}
+                            className='h-full w-full'
+                          />
                         </div>
                       </div>
 
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => setSelectedRoom(null)}
-                        className='h-10 px-4 rounded-xl bg-white/5 hover:bg-white/15 border border-white/5 backdrop-blur-md text-white/70 hover:text-white transition-all pointer-events-auto'
-                      >
-                        {t('closeViewer')}
-                      </Button>
-                    </div>
+                      <div className='mt-3 flex items-center justify-center gap-4'>
+                        <div className='h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent' />
+                        <div className='flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-muted-foreground'>
+                          <div className='h-1 w-1 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]' />
+                          {t('viewingLabel')}
+                        </div>
+                        <div className='h-px flex-1 bg-gradient-to-r from-border via-border to-transparent' />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                    <div className='aspect-video md:aspect-[21/9] overflow-hidden'>
-                      <SparkViewer
-                        spzUrl={activeViewerData.url || ''}
-                        metadata={activeViewerData.metadata}
-                        className='w-full h-full'
+                <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
+                  <AnimatePresence>
+                    {roomGroups.map((room, index) => (
+                      <RoomCard
+                        key={index}
+                        room={room}
+                        index={index}
+                        isSelected={selectedRoom === room.roomName}
+                        onSelect={() => setSelectedRoom(room.roomName)}
+                        onDelete={() => setRoomToDelete(room)}
+                        threeDMedia={threeDMediaItems}
+                        propertyId={propertyId}
+                        t={t}
+                        locale={locale}
                       />
-                    </div>
-                  </div>
-
-                  <div className='mt-3 flex items-center justify-center gap-4'>
-                    <div className='h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent' />
-                    <div className='flex items-center gap-2 text-[11px] font-medium text-muted-foreground uppercase tracking-widest'>
-                      <div className='w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]' />
-                      {t('viewingLabel')}
-                    </div>
-                    <div className='h-px flex-1 bg-gradient-to-r from-border via-border to-transparent' />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Room Grid */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
-              <AnimatePresence>
-                {roomGroups.map((room, index) => (
-                  <RoomCard
-                    key={index}
-                    room={room}
-                    index={index}
-                    isSelected={selectedRoom === room.roomName}
-                    onSelect={() => setSelectedRoom(room.roomName)}
-                    onDelete={() => setRoomToDelete(room)}
-                    threeDMedia={threeDMediaItems}
-                    propertyId={propertyId}
-                    t={t}
-                    locale={locale}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Create Room Dialog */}
@@ -458,30 +440,38 @@ export function ThreeDManagementScreen({
   );
 }
 
-function EmptyState({ onCreateRoom, t, isLocked }: { onCreateRoom: () => void; t: any; isLocked?: boolean }) {
+function EmptyState({
+  onCreateRoom,
+  t,
+  isLocked,
+}: {
+  onCreateRoom: () => void;
+  t: ReturnType<typeof useTranslations<'ThreeDManagement'>>;
+  isLocked?: boolean;
+}) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className='flex flex-col items-center justify-center py-20 lg:py-28 text-center'
+      transition={{ duration: 0.4 }}
+      className='flex flex-col items-center justify-center py-10 text-center sm:py-12'
     >
-      <div className='w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-8'>
-        <Box className='w-12 h-12 text-primary/60' />
+      <div className='mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5'>
+        <Box className='h-7 w-7 text-primary/60' strokeWidth={1.75} />
       </div>
-      <h3 className='text-2xl font-bold tracking-tight text-foreground mb-3'>
+      <h3 className='mb-2 text-lg font-bold tracking-tight text-foreground'>
         {t('noRoomsTitle')}
       </h3>
-      <p className='text-muted-foreground max-w-md mb-8 leading-relaxed'>
+      <p className='mb-6 max-w-sm px-2 text-sm leading-relaxed text-muted-foreground'>
         {t('noRoomsDesc')}
       </p>
       <Button
         onClick={onCreateRoom}
-        size='lg'
-        className='rounded-xl shadow-md font-semibold gap-2 px-8'
+        size='default'
+        className='gap-1.5 rounded-lg px-5 font-semibold shadow-sm'
         disabled={isLocked}
       >
-        {isLocked ? <Lock className='w-5 h-5' /> : <Plus className='w-5 h-5' />}
+        {isLocked ? <Lock className='h-4 w-4' /> : <Plus className='h-4 w-4' />}
         {t('createFirstRoom')}
       </Button>
     </motion.div>

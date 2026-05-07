@@ -2,6 +2,8 @@
   "ThreeDManagement": {
     "title": "Quản lý Phòng 3D",
     "subtitle": "Tạo mô hình 3D sống động cho từng căn phòng",
+    "backToList": "Quay lại",
+    "listSectionLabel": "Danh sách 3D",
     "newRoom": "Thêm Phòng",
     "roomsCount": "{count, plural, =0 {Chưa có phòng} other {# Phòng}}",
     "ready": "Sẵn sàng",

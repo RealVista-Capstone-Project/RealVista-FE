@@ -15,10 +15,9 @@ import {
   Ruler,
   Building,
   Building2,
-  Eye,
   ArrowUpDown,
-  FileSignature,
-  MoreHorizontal,
+  Cuboid,
+  Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -54,13 +53,13 @@ type ShowcaseCode = (typeof SHOWCASE_TYPE_CODES)[number];
 
 const CARD_VISUAL: Record<
   string,
-  { gradient: string; Icon: typeof Home }
+  { Icon: typeof Home }
 > = {
-  SHOPHOUSE: { gradient: 'from-orange-400 via-amber-500 to-orange-600', Icon: Building },
-  HOUSE: { gradient: 'from-sky-500 via-blue-600 to-indigo-700', Icon: Home },
-  VILLA: { gradient: 'from-emerald-500 via-teal-600 to-cyan-700', Icon: Building2 },
-  TOWNHOUSE: { gradient: 'from-pink-500 via-rose-500 to-fuchsia-600', Icon: Building },
-  DEFAULT: { gradient: 'from-primary/80 via-primary to-primary/90', Icon: Building2 },
+  SHOPHOUSE: { Icon: Building },
+  HOUSE: { Icon: Home },
+  VILLA: { Icon: Building2 },
+  TOWNHOUSE: { Icon: Building },
+  DEFAULT: { Icon: Building2 },
 };
 
 function formatCardPrice(property: PropertySummaryResponse): string {
@@ -83,6 +82,14 @@ function formatCardPrice(property: PropertySummaryResponse): string {
   return '—';
 }
 
+function hasDisplayableCardPrice(property: PropertySummaryResponse): boolean {
+  const pr = property.price_range;
+  if (!pr) return false;
+  if (pr.buy?.min != null || pr.buy?.max != null) return true;
+  if (pr.rent?.min != null || pr.rent?.max != null) return true;
+  return false;
+}
+
 function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResponse }) {
   const t = useTranslations('PropertyDashboard');
   const router = useRouter();
@@ -95,15 +102,14 @@ function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResp
     property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
     property.media?.[0]?.media_url;
 
-  const imageCount =
-    property.media?.filter((m) => m.media_type === 'IMAGE' && m.media_url).length ?? 0;
-
   const location = [property.location_info?.district_name, property.location_info?.city_name]
     .filter(Boolean)
     .join(', ');
 
   const typeLabel =
     property.property_type_info?.property_type_name ?? property.property_type_info?.property_category_name ?? '—';
+
+  const showPrice = hasDisplayableCardPrice(property);
 
   function handleCardClick(e: React.MouseEvent<HTMLDivElement>) {
     if ((e.target as HTMLElement).closest('a[href]')) return;
@@ -126,48 +132,50 @@ function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResp
         'group flex w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
       )}
     >
-      <div
-        className={cn(
-          'relative h-36 overflow-hidden',
-          thumbnailUrl ? 'bg-muted' : cn('bg-gradient-to-br', visual.gradient)
-        )}
-      >
+      <div className='relative h-36 overflow-hidden bg-muted'>
         {thumbnailUrl ? (
           <Image src={thumbnailUrl} alt='' fill className='object-cover' />
         ) : (
           <Vi
-            className='pointer-events-none absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 text-white/20'
+            className='pointer-events-none absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 text-muted-foreground/25'
             strokeWidth={1.25}
           />
         )}
-        <div className='absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3'>
-          <span className='max-w-[70%] truncate rounded-lg bg-black/35 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm'>
-            {typeLabel}
-          </span>
-          <span
-            className={cn(
-              'shrink-0 rounded-lg px-2.5 py-1 text-[10px] font-bold backdrop-blur-sm',
-              property.status === 'AVAILABLE'
-                ? 'bg-emerald-500/90 text-white'
-                : property.status === 'PENDING'
-                  ? 'bg-amber-500/90 text-white'
-                  : 'bg-black/45 text-white'
-            )}
-          >
-            {t(`status${property.status}` as Parameters<typeof t>[0])}
-          </span>
-        </div>
-        {imageCount > 0 ? (
-          <div className='absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-black/55 px-2 py-1 text-[10px] font-semibold text-white'>
-            <Eye className='h-3 w-3' /> {imageCount}
+        <div className='absolute inset-x-0 top-0 flex items-start p-3'>
+          <div className='flex min-w-0 max-w-full flex-col items-start gap-1.5'>
+            <span className='max-w-full break-words rounded-lg bg-black/35 px-2.5 py-1 text-left text-[11px] font-bold leading-snug text-white backdrop-blur-sm'>
+              {typeLabel}
+            </span>
+            <span
+              className={cn(
+                'max-w-full break-words rounded-lg px-2.5 py-1 text-left text-[10px] font-bold leading-snug backdrop-blur-sm',
+                property.status === 'AVAILABLE'
+                  ? 'bg-primary/90 text-white'
+                  : property.status === 'PENDING'
+                    ? 'bg-amber-500/90 text-white'
+                    : 'bg-black/45 text-white'
+              )}
+            >
+              {t(`status${property.status}` as Parameters<typeof t>[0])}
+            </span>
           </div>
-        ) : null}
+        </div>
       </div>
 
       <div className='flex flex-1 flex-col gap-2.5 p-4'>
-        <h3 className='line-clamp-2 text-sm font-bold leading-snug text-foreground group-hover:text-primary'>
-          {property.street_address}
-        </h3>
+        <div className='flex items-start justify-between gap-2'>
+          <h3 className='line-clamp-2 text-base font-bold leading-snug text-foreground group-hover:text-primary'>
+            {property.street_address}
+          </h3>
+          <Link
+            href={`/dashboard/property/${property.property_id}/edit`}
+            onClick={(e) => e.stopPropagation()}
+            className='shrink-0 flex h-7 w-7 items-center justify-center rounded-lg border border-primary/15 bg-white text-primary transition-colors hover:bg-primary/5'
+            aria-label={t('editAction')}
+          >
+            <Edit className='h-3.5 w-3.5' strokeWidth={2} />
+          </Link>
+        </div>
         {location ? (
           <div className='flex items-center gap-1 text-xs text-muted-foreground'>
             <MapPin className='h-3.5 w-3.5 shrink-0' />
@@ -193,71 +201,78 @@ function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResp
             </span>
           )}
         </div>
-        <div className='mt-auto flex items-center justify-between gap-2 border-t border-primary/10 pt-3'>
-          <p className='text-sm font-bold text-primary'>{formatCardPrice(property)}</p>
-          <div className='flex items-center gap-1'>
-            <Link
-              href={`/dashboard/listings?propertyId=${property.property_id}`}
-              onClick={(e) => e.stopPropagation()}
-              className='flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-white text-primary transition-colors hover:bg-primary/5'
-              aria-label={t('cardOpenListings')}
-            >
-              <FileSignature className='h-4 w-4' strokeWidth={2} />
-            </Link>
-            <Link
-              href={`/dashboard/property/${property.property_id}/edit`}
-              onClick={(e) => e.stopPropagation()}
-              className='flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-white text-primary transition-colors hover:bg-primary/5'
-              aria-label={t('editAction')}
-            >
-              <Edit className='h-4 w-4' strokeWidth={2} />
-            </Link>
-            <Link
-              href={`/property/${property.property_id}`}
-              onClick={(e) => e.stopPropagation()}
-              className='flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-white text-muted-foreground transition-colors hover:bg-muted/40'
-              aria-label={t('cardPublicView')}
-            >
-              <MoreHorizontal className='h-4 w-4' strokeWidth={2} />
-            </Link>
+        <div
+          className={cn(
+            'mt-auto flex items-center gap-2 border-t border-primary/10 pt-3',
+            showPrice ? 'justify-between' : 'justify-end'
+          )}
+        >
+          {showPrice ? (
+            <p className='text-sm font-bold text-primary'>{formatCardPrice(property)}</p>
+          ) : null}
+          <div className='flex items-center gap-1.5'>
+            {property.has_3d ? (
+              <Link
+                href={`/dashboard/property/${property.property_id}/3d`}
+                onClick={(e) => e.stopPropagation()}
+                className='flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-white text-primary transition-colors hover:bg-primary/5'
+                aria-label={t('3dAction')}
+                title={t('threeDDotTooltip')}
+              >
+                <Cuboid className='h-4 w-4' strokeWidth={2} />
+              </Link>
+            ) : (
+              <Link
+                href={`/dashboard/property/${property.property_id}/3d`}
+                onClick={(e) => e.stopPropagation()}
+                className='group relative inline-flex items-center gap-1 overflow-hidden rounded-2xl px-2.5 py-1.5 text-[11px] font-semibold transition-all hover:scale-105'
+                style={{
+                  background:
+                    'linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(254,243,199,0.75) 40%, rgba(253,230,138,0.65) 100%)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255,255,255,0.7)',
+                  animation: 'borderBlinkYellow 2.5s ease-in-out infinite',
+                }}
+                aria-label={t('add3dAction')}
+                title={t('add3dTooltip')}
+              >
+                <style>{`
+                  @keyframes borderBlinkYellow {
+                    0%, 100% {
+                      box-shadow: 0 0 0 1px rgba(253,230,138,0.3), 0 0 8px 2px rgba(253,230,138,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
+                      border-color: rgba(255,255,255,0.7);
+                    }
+                    50% {
+                      box-shadow: 0 0 0 1.5px rgba(245,158,11,0.7), 0 0 16px 4px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.9);
+                      border-color: rgba(253,230,138,0.95);
+                    }
+                  }
+                  @keyframes shimmerYellow {
+                    0% { transform: translateX(-100%) skewX(-15deg); }
+                    100% { transform: translateX(300%) skewX(-15deg); }
+                  }
+                  @keyframes iconBlinkYellow {
+                    0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                    50% { opacity: 0.6; transform: scale(1.2) rotate(15deg); }
+                  }
+                `}</style>
+                <span
+                  className='pointer-events-none absolute inset-0 w-1/4'
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+                    animation: 'shimmerYellow 2.4s ease-in-out infinite',
+                  }}
+                />
+                <Sparkles
+                  className='relative h-3 w-3 shrink-0 text-amber-600'
+                  style={{ animation: 'iconBlinkYellow 1.6s ease-in-out infinite' }}
+                />
+                <span className='relative text-amber-700'>{t('add3dAction')}</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-const DISMISS_KEY = 'realvista:cta:3d-tour:dismissed';
-
-/** Wrapper that collapses when the promo banner has been dismissed */
-function ThreeDPromoBannerSection() {
-  const [dismissed, setDismissed] = useState(false);
-
-  React.useEffect(() => {
-    if (localStorage.getItem(DISMISS_KEY) === 'true') {
-      setDismissed(true);
-      return;
-    }
-    // Watch for dismiss written by ThreeDPromoBanner
-    function onStorage(e: StorageEvent) {
-      if (e.key === DISMISS_KEY && e.newValue === 'true') setDismissed(true);
-    }
-    window.addEventListener('storage', onStorage);
-    // Poll same-tab dismissal (storage events don't fire in the same tab)
-    const id = setInterval(() => {
-      if (localStorage.getItem(DISMISS_KEY) === 'true') setDismissed(true);
-    }, 300);
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      clearInterval(id);
-    };
-  }, []);
-
-  if (dismissed) return null;
-
-  return (
-    <div className='border-b border-primary/20 px-4 sm:px-6 py-4 bg-white'>
-      <ThreeDPromoBanner />
     </div>
   );
 }
@@ -394,8 +409,8 @@ export default function PropertyDashboardPage() {
 
   return (
     <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
-      <div className='sticky top-0 z-20 border-b border-primary/15 bg-[#e8f2fb]/95 px-4 py-3 backdrop-blur-sm sm:px-6'>
-          <div className='flex flex-col gap-3'>
+      <div className='sticky top-0 z-20 border-b border-primary/15 bg-white px-4 pt-3 pb-4 sm:px-6'>
+          <div className='flex flex-col gap-2'>
             <div className='flex flex-wrap items-center gap-2'>
               <div className='relative min-w-[min(100%,220px)] flex-1'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
@@ -550,7 +565,11 @@ export default function PropertyDashboardPage() {
                   className='flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border-2 border-primary/14 bg-white px-3 text-xs font-semibold text-foreground shadow-sm hover:border-primary/22'
                 >
                   <ArrowUpDown className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
-                  <span>{t(`sort.${sortBy}` as Parameters<typeof t>[0])}</span>
+                  <span>
+                    {t('sortTrigger', {
+                      label: t(`sort.${sortBy}` as Parameters<typeof t>[0]),
+                    })}
+                  </span>
                   <ChevronDown
                     className={cn('h-3.5 w-3.5 text-primary/50 transition-transform', isSortOpen && 'rotate-180')}
                     strokeWidth={2.5}
@@ -590,10 +609,10 @@ export default function PropertyDashboardPage() {
           </div>
       </div>
 
-      <ThreeDPromoBannerSection />
+      <ThreeDPromoBanner />
 
       <div className='flex min-h-0 flex-1 flex-col overflow-y-auto'>
-          <div className='grid gap-3 px-4 py-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 sm:px-6'>
+          <div className='grid gap-3 px-4 pt-3 pb-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 sm:px-6'>
             <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
               <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.totalAssets')}</p>
               <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
@@ -637,7 +656,7 @@ export default function PropertyDashboardPage() {
             </div>
           </div>
 
-          <div className='flex items-center justify-between px-4 pb-2 sm:px-6'>
+          <div className='mt-5 mb-2 flex items-center justify-between px-4 sm:px-6'>
             <h2 className='text-base font-bold text-foreground'>{t('gridSectionTitle')}</h2>
             <button
               type='button'

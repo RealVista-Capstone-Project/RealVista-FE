@@ -201,21 +201,21 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     else if (isNaN(Number(price)) || Number(price) <= 0)
       newErrors.price = t('validation.priceInvalid');
 
-    // Min / Max price — optional, validated only if entered
-    const hasMin = minPrice.trim() !== '';
-    const hasMax = maxPrice.trim() !== '';
+    if (isNegotiable) {
+      const hasMin = minPrice.trim() !== '';
+      const hasMax = maxPrice.trim() !== '';
 
-    if (hasMin && (isNaN(Number(minPrice)) || Number(minPrice) <= 0))
-      newErrors.minPrice = t('validation.minPriceInvalid');
+      if (hasMin && (isNaN(Number(minPrice)) || Number(minPrice) <= 0))
+        newErrors.minPrice = t('validation.minPriceInvalid');
 
-    if (hasMax && (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0))
-      newErrors.maxPrice = t('validation.maxPriceInvalid');
-    else if (hasMax && !newErrors.maxPrice && hasMin && !newErrors.minPrice && Number(minPrice) > Number(maxPrice))
-      newErrors.maxPrice = t('validation.maxPriceLessThanMin');
+      if (hasMax && (isNaN(Number(maxPrice)) || Number(maxPrice) <= 0))
+        newErrors.maxPrice = t('validation.maxPriceInvalid');
+      else if (hasMax && !newErrors.maxPrice && hasMin && !newErrors.minPrice && Number(minPrice) > Number(maxPrice))
+        newErrors.maxPrice = t('validation.maxPriceLessThanMin');
 
-    // Pair constraint
-    if (hasMin && !hasMax && !newErrors.minPrice) newErrors.maxPrice = t('validation.minMaxPairRequired');
-    if (hasMax && !hasMin && !newErrors.maxPrice) newErrors.minPrice = t('validation.minMaxPairRequired');
+      if (hasMin && !hasMax && !newErrors.minPrice) newErrors.maxPrice = t('validation.minMaxPairRequired');
+      if (hasMax && !hasMin && !newErrors.maxPrice) newErrors.minPrice = t('validation.minMaxPairRequired');
+    }
 
     // Date
     if (availableFrom && isNaN(Date.parse(availableFrom)))
@@ -223,7 +223,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [name, content, price, minPrice, maxPrice, availableFrom, t]);
+  }, [name, content, price, minPrice, maxPrice, availableFrom, isNegotiable, t]);
 
   // ── AI Validity Check ──
   const hasNewUploads = newFiles.length > 0;

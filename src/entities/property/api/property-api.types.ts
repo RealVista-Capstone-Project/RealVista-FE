@@ -625,6 +625,45 @@ export interface AddressDuplicateCheckResponse {
   conflicting_properties: ConflictingPropertySummary[];
 }
 
+// ── Property service fees ──────────────────────────────────────────────────
+
+export type PropertyFeeType =
+  | 'MANAGEMENT'
+  | 'PARKING'
+  | 'INTERNET'
+  | 'ELECTRICITY'
+  | 'WATER'
+  | 'GARBAGE'
+  | 'SECURITY'
+  | 'OTHER';
+
+export type PropertyBillingCycle = 'MONTHLY' | 'YEARLY' | 'ONE_TIME';
+
+/** Matches API JSON (global Jackson SNAKE_CASE). */
+export interface PropertyFeeResponse {
+  property_fee_service_id: string;
+  property_id: string;
+  fee_type: PropertyFeeType;
+  fee_name: string;
+  amount: number;
+  billing_cycle: PropertyBillingCycle;
+  is_optional: boolean;
+  description: string | null;
+}
+
+export interface CreatePropertyFeeRequest {
+  feeType: PropertyFeeType;
+  feeName: string;
+  amount: number;
+  billingCycle: PropertyBillingCycle;
+  isOptional?: boolean;
+  description?: string;
+}
+
+export interface SyncPropertyFeesRequest {
+  fees: CreatePropertyFeeRequest[];
+}
+
 // ── Property claim ─────────────────────────────────────────────────────────
 
 export type ClaimReason = 'NEW_OWNER' | 'DIFFERENT_UNIT' | 'OTHER';

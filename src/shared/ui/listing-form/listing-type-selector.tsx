@@ -8,6 +8,7 @@ interface ListingTypeSelectorProps {
   onChange: (type: 'RENT' | 'SALE') => void;
   labels: { rent: string; sale: string };
   disabled?: boolean;
+  compact?: boolean;
 }
 
 /**
@@ -19,13 +20,14 @@ export function ListingTypeSelector({
   onChange,
   labels,
   disabled = false,
+  compact = false,
 }: ListingTypeSelectorProps) {
   return (
-    <div className={cn('flex gap-4', disabled && 'opacity-60 cursor-not-allowed')}>
+    <div className={cn('flex', compact ? 'gap-3' : 'gap-4', disabled && 'opacity-60 cursor-not-allowed')}>
       {(['RENT', 'SALE'] as const).map((type) => (
         <label
           key={type}
-          className={cn('flex items-center gap-2', disabled ? 'cursor-not-allowed' : 'cursor-pointer')}
+          className={cn('flex items-center', compact ? 'gap-1.5' : 'gap-2', disabled ? 'cursor-not-allowed' : 'cursor-pointer')}
         >
           <input
             type='radio'
@@ -38,14 +40,19 @@ export function ListingTypeSelector({
           />
           <div
             className={cn(
-              'flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2',
+              'flex items-center justify-center rounded-full border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2',
+              compact ? 'h-[18px] w-[18px]' : 'h-5 w-5',
               value === type ? 'border-primary' : 'border-primary/20',
               disabled && value === type && 'border-secondary/30'
             )}
           >
             {value === type && (
               <div
-                className={cn('h-2.5 w-2.5 rounded-full bg-primary', disabled && 'bg-secondary/30')}
+                className={cn(
+                  'rounded-full bg-primary',
+                  compact ? 'h-2.5 w-2.5' : 'h-2.5 w-2.5',
+                  disabled && 'bg-secondary/30'
+                )}
               />
             )}
           </div>
