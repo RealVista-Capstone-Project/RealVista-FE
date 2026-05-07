@@ -2,8 +2,24 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
-import { Search, FileText, Check, ChevronRight, Clock, Percent, Award, Loader2, SendHorizonal } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/ui/dialog/dialog';
+import {
+  Search,
+  FileText,
+  Check,
+  ChevronRight,
+  Clock,
+  Percent,
+  Award,
+  Loader2,
+  SendHorizonal,
+} from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/shared/ui/dialog/dialog';
 import { Button } from '@/shared/ui/button';
 import { agentEngagementApi } from '@/entities/agent-engagement/api/agent-engagement.api';
 import { AgentProposalStatus } from '@/entities/agent-proposal/model/types';
@@ -19,6 +35,8 @@ interface AgentApplyProposalModalProps {
   onClose: () => void;
   onSubmitSuccess?: () => void;
 }
+
+const RETURN_TO_APPLY_INTENT_STORAGE_KEY = 'agent-proposal:return-to-apply-intent';
 
 export function AgentApplyProposalModal({
   propertyId,
@@ -39,6 +57,7 @@ export function AgentApplyProposalModal({
   // Load proposals - using existing query hook for consistency
   const { data, isLoading } = useMyProposalsQuery(0, 50);
   const proposals = React.useMemo(() => data?.content ?? [], [data]);
+  console.log(`modal agent apply proposal open?: ${isOpen}, ${propertyId}, ${propertyAddress}`);
 
   // Reset state when opening/closing
   React.useEffect(() => {
@@ -58,9 +77,8 @@ export function AgentApplyProposalModal({
   const filteredProposals = React.useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return activeProposals;
-    return activeProposals.filter((p) =>
-      p.title.toLowerCase().includes(q) ||
-      p.pitch_content.toLowerCase().includes(q)
+    return activeProposals.filter(
+      (p) => p.title.toLowerCase().includes(q) || p.pitch_content.toLowerCase().includes(q)
     );
   }, [activeProposals, searchQuery]);
 
@@ -91,10 +109,36 @@ export function AgentApplyProposalModal({
 
   const handleGoToManage = () => {
     onClose();
-    const locale = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'vi' : 'vi';
+    const locale =
+      typeof window !== 'undefined' ? window.location.pathname.split('/')[1] || 'vi' : 'vi';
     const returnPath = '/dashboard/property-feed';
+    if (typeof window !== 'undefined') {
+      try {
+        window.sessionStorage.setItem(
+          RETURN_TO_APPLY_INTENT_STORAGE_KEY,
+          JSON.stringify({
+            propertyId,
+            propertyAddress,
+            source: 'manage-proposals',
+            ts: Date.now(),
+          })
+        );
+        window.localStorage.setItem(
+          RETURN_TO_APPLY_INTENT_STORAGE_KEY,
+          JSON.stringify({
+            propertyId,
+            propertyAddress,
+            source: 'manage-proposals',
+            ts: Date.now(),
+          })
+        );
+      } catch {
+        // Ignore storage failures and keep current URL-based fallback flow.
+      }
+    }
     const query = new URLSearchParams({
       returnPath,
+      returnPropertyId: propertyId,
       returnPropertyAddress: propertyAddress,
     });
     window.location.href = `/${locale}/dashboard/manage-proposals?${query.toString()}`;
@@ -121,8 +165,18 @@ export function AgentApplyProposalModal({
 
           {/* Progress Indicator */}
           <div className='flex items-center gap-2 mt-5'>
-            <div className={cn('h-1.5 flex-1 rounded-full bg-primary transition-all duration-300', step === 1 ? 'w-full' : 'opacity-100')} />
-            <div className={cn('h-1.5 flex-1 rounded-full transition-all duration-300', step === 2 ? 'bg-primary' : 'bg-muted')} />
+            <div
+              className={cn(
+                'h-1.5 flex-1 rounded-full bg-primary transition-all duration-300',
+                step === 1 ? 'w-full' : 'opacity-100'
+              )}
+            />
+            <div
+              className={cn(
+                'h-1.5 flex-1 rounded-full transition-all duration-300',
+                step === 2 ? 'bg-primary' : 'bg-muted'
+              )}
+            />
           </div>
         </DialogHeader>
 
@@ -133,7 +187,10 @@ export function AgentApplyProposalModal({
               {/* Search Bar */}
               <div className='px-6 py-4 border-b border-muted bg-background'>
                 <div className='relative group'>
-                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors' size={16} />
+                  <Search
+                    className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors'
+                    size={16}
+                  />
                   <input
                     type='text'
                     value={searchQuery}
@@ -149,7 +206,9 @@ export function AgentApplyProposalModal({
                 {isLoading ? (
                   <div className='flex flex-col items-center justify-center py-20 gap-3'>
                     <Loader2 className='size-10 animate-spin text-primary' />
-                    <p className='text-sm font-medium text-muted-foreground/50'>Đang tải danh sách...</p>
+                    <p className='text-sm font-medium text-muted-foreground/50'>
+                      Đang tải danh sách...
+                    </p>
                   </div>
                 ) : filteredProposals.length > 0 ? (
                   filteredProposals.map((p) => (
@@ -163,19 +222,27 @@ export function AgentApplyProposalModal({
                           : 'border-border hover:border-muted-foreground/50 hover:bg-muted/50'
                       )}
                     >
-                      <div className={cn(
-                        'flex size-5 shrink-0 items-center justify-center rounded-full border transition-all mt-1',
-                        selectedId === p.agent_proposal_id
-                          ? 'bg-primary border-primary scale-110 shadow-sm shadow-primary/20'
-                          : 'bg-background border-input group-hover:border-foreground/40'
-                      )}>
-                        {selectedId === p.agent_proposal_id && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
+                      <div
+                        className={cn(
+                          'flex size-5 shrink-0 items-center justify-center rounded-full border transition-all mt-1',
+                          selectedId === p.agent_proposal_id
+                            ? 'bg-primary border-primary scale-110 shadow-sm shadow-primary/20'
+                            : 'bg-background border-input group-hover:border-foreground/40'
+                        )}
+                      >
+                        {selectedId === p.agent_proposal_id && (
+                          <Check className='h-3 w-3 text-white' strokeWidth={3} />
+                        )}
                       </div>
                       <div className='flex-1 min-w-0'>
-                        <h4 className={cn(
-                          'font-bold transition-colors truncate',
-                          selectedId === p.agent_proposal_id ? 'text-primary' : 'text-foreground group-hover:text-primary'
-                        )}>
+                        <h4
+                          className={cn(
+                            'font-bold transition-colors truncate',
+                            selectedId === p.agent_proposal_id
+                              ? 'text-primary'
+                              : 'text-foreground group-hover:text-primary'
+                          )}
+                        >
                           {p.title}
                         </h4>
                         <div className='flex items-center gap-3 mt-1.5'>
@@ -203,7 +270,11 @@ export function AgentApplyProposalModal({
                     <p className='text-sm text-muted-foreground mt-2 mb-6 leading-relaxed'>
                       {t('noProposalsDesc')}
                     </p>
-                    <Button variant='outline' className='rounded-xl border-primary/20 text-primary hover:bg-primary/5' onClick={handleGoToManage}>
+                    <Button
+                      variant='outline'
+                      className='rounded-xl border-primary/20 text-primary hover:bg-primary/5'
+                      onClick={handleGoToManage}
+                    >
                       {t('btnManage')}
                     </Button>
                   </div>
@@ -214,7 +285,11 @@ export function AgentApplyProposalModal({
             <div className='flex flex-1 min-h-0 flex-col p-8 animate-in fade-in slide-in-from-bottom-2 duration-300'>
               <div className='flex shrink-0 flex-col items-center text-center space-y-6'>
                 <div className='size-16 rounded-3xl bg-primary/5 flex items-center justify-center text-primary mb-1 border border-primary/10 shadow-sm'>
-                  <SendHorizonal size={30} strokeWidth={2.5} className='-rotate-12 translate-x-0.5' />
+                  <SendHorizonal
+                    size={30}
+                    strokeWidth={2.5}
+                    className='-rotate-12 translate-x-0.5'
+                  />
                 </div>
                 <div>
                   <h3 className='text-xl font-bold text-foreground'>{t('confirmTitle')}</h3>
@@ -228,16 +303,28 @@ export function AgentApplyProposalModal({
                 <div className='flex w-full max-w-[420px] flex-col items-center space-y-6 pb-1'>
                   {selectedProposal && (
                     <div className='w-full bg-primary/5 rounded-2xl p-5 border border-primary/10 flex flex-col items-start text-left shadow-sm'>
-                      <span className='text-[10px] font-bold text-primary uppercase tracking-widest mb-2'>{t('selectedLabel')}</span>
-                      <p className='text-base font-bold text-foreground line-clamp-2 leading-snug'>{selectedProposal.title}</p>
+                      <span className='text-[10px] font-bold text-primary uppercase tracking-widest mb-2'>
+                        {t('selectedLabel')}
+                      </span>
+                      <p className='text-base font-bold text-foreground line-clamp-2 leading-snug'>
+                        {selectedProposal.title}
+                      </p>
                       <div className='flex gap-6 mt-4 w-full'>
                         <div className='flex-1'>
-                          <p className='text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5'>{t('experienceLabel')}</p>
-                          <p className='text-sm font-bold text-foreground/70'>{selectedProposal.experience_years} {t('years')}</p>
+                          <p className='text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5'>
+                            {t('experienceLabel')}
+                          </p>
+                          <p className='text-sm font-bold text-foreground/70'>
+                            {selectedProposal.experience_years} {t('years')}
+                          </p>
                         </div>
                         <div className='flex-1'>
-                          <p className='text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5'>{t('commissionLabel')}</p>
-                          <p className='text-sm font-bold text-foreground/70'>{selectedProposal.commission_rate}%</p>
+                          <p className='text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-0.5'>
+                            {t('commissionLabel')}
+                          </p>
+                          <p className='text-sm font-bold text-foreground/70'>
+                            {selectedProposal.commission_rate}%
+                          </p>
                         </div>
                       </div>
                     </div>

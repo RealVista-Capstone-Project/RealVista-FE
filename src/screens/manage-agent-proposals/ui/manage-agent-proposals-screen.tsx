@@ -201,13 +201,19 @@ export function ManageAgentProposalsScreen() {
   const [showReturnToApplyCta, setShowReturnToApplyCta] = React.useState(false);
 
   const returnPath = searchParams.get('returnPath');
+  const returnPropertyId = searchParams.get('returnPropertyId');
   const returnPropertyAddress = searchParams.get('returnPropertyAddress');
   const resumeApplyHref = React.useMemo(() => {
-    if (!returnPath || !returnPropertyAddress) return null;
+    if (!returnPath) return null;
+    if (!returnPropertyId && !returnPropertyAddress) return null;
     if (!returnPath.startsWith('/dashboard/property-feed')) return null;
+    const query = new URLSearchParams();
+    query.set('openApplyModal', '1');
+    if (returnPropertyId) query.set('propertyId', returnPropertyId);
+    if (returnPropertyAddress) query.set('propertyAddress', returnPropertyAddress);
     const separator = returnPath.includes('?') ? '&' : '?';
-    return `${returnPath}${separator}openApplyModal=1&propertyAddress=${encodeURIComponent(returnPropertyAddress)}`;
-  }, [returnPath, returnPropertyAddress]);
+    return `${returnPath}${separator}${query.toString()}`;
+  }, [returnPath, returnPropertyId, returnPropertyAddress]);
 
   React.useEffect(() => {
     setIsSearchPending(searchQuery !== debouncedSearch);
