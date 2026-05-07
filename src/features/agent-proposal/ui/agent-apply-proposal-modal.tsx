@@ -185,8 +185,8 @@ export function AgentApplyProposalModal({
           {step === 1 ? (
             <div className='flex flex-col flex-1 min-h-0'>
               {/* Search Bar */}
-              <div className='px-6 py-4 border-b border-muted bg-background'>
-                <div className='relative group'>
+              <div className='px-6 py-4 border-b border-muted bg-background flex items-center gap-3'>
+                <div className='relative group flex-1'>
                   <Search
                     className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors'
                     size={16}
@@ -199,6 +199,13 @@ export function AgentApplyProposalModal({
                     className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-input bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-background transition-all'
                   />
                 </div>
+                <Button
+                  variant='outline'
+                  className='h-10 shrink-0 rounded-xl border-primary/20 px-4 text-xs font-bold text-primary hover:bg-primary/5'
+                  onClick={handleGoToManage}
+                >
+                  {t('btnManage')}
+                </Button>
               </div>
 
               {/* List */}
@@ -267,16 +274,9 @@ export function AgentApplyProposalModal({
                       <FileText size={28} />
                     </div>
                     <h5 className='text-base font-bold text-foreground'>{t('noProposals')}</h5>
-                    <p className='text-sm text-muted-foreground mt-2 mb-6 leading-relaxed'>
+                    <p className='text-sm text-muted-foreground mt-2 leading-relaxed'>
                       {t('noProposalsDesc')}
                     </p>
-                    <Button
-                      variant='outline'
-                      className='rounded-xl border-primary/20 text-primary hover:bg-primary/5'
-                      onClick={handleGoToManage}
-                    >
-                      {t('btnManage')}
-                    </Button>
                   </div>
                 )}
               </div>
