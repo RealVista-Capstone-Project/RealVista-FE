@@ -230,7 +230,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
                   getStatusStyle(property.status)
                 )}
               >
-                {property.status}
+                {t(`status.${property.status.toLowerCase()}` as any)}
               </Badge>
             </div>
           </div>
@@ -393,6 +393,7 @@ export function OwnerPropertyDetailPanel({ property, onBack }: OwnerPropertyDeta
       {isAgent && propertyId && (
         <AgentApplyProposalModal
           propertyId={propertyId}
+          propertyAddress={property.street_address}
           isOpen={isApplyModalOpen}
           onClose={() => setIsApplyModalOpen(false)}
           onSubmitSuccess={onApplySubmitSuccess}

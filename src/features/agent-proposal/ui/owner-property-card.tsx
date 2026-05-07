@@ -123,7 +123,7 @@ function GridCard({
               getStatusStyle(property.status)
             )}
           >
-            {property.status}
+            {t(`status.${property.status.toLowerCase()}` as any)}
           </Badge>
         </div>
 
@@ -310,7 +310,7 @@ export function OwnerPropertyCard({
               getStatusStyle(property.status)
             )}
           >
-            {property.status}
+            {t(`status.${property.status.toLowerCase()}` as any)}
           </Badge>
         </div>
       </div>

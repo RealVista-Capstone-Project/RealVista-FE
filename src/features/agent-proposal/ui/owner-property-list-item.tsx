@@ -115,7 +115,7 @@ export function OwnerPropertyListItem({
             getPropertyStatusColor(property.status)
           )}
         >
-          {property.status}
+          {t(`status.${property.status.toLowerCase()}` as any)}
         </Badge>
         <ChevronRight
           className={cn(

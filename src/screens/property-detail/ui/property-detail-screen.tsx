@@ -170,6 +170,7 @@ export function PropertyDetailScreen({ propertyId }: PropertyDetailScreenProps) 
 
       <AgentApplyProposalModal
         propertyId={property.id}
+        propertyAddress={property.address}
         isOpen={isApplyProposalOpen}
         onClose={() => setIsApplyProposalOpen(false)}
         onSubmitSuccess={() => setIsApplyProposalDisabledLocal(true)}

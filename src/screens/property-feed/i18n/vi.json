@@ -33,6 +33,16 @@
       "submitProposal": "Gửi hồ sơ",
       "alreadyProposed": "Đã gửi hồ sơ"
     },
+    "status": {
+      "draft": "Bản nháp",
+      "pending": "Đang chờ",
+      "verified": "Đã xác thực",
+      "rejected": "Đã từ chối",
+      "available": "Sẵn sàng",
+      "reserved": "Đã đặt chỗ",
+      "sold": "Đã bán",
+      "rented": "Đã cho thuê"
+    },
     "empty": {
       "title": "Không tìm thấy BĐS nào.",
       "subtitle": "Hãy thử thay đổi bộ lọc hoặc quay lại sau.",
