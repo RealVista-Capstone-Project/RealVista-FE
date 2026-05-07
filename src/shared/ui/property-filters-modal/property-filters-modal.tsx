@@ -360,7 +360,7 @@ export function PropertyFiltersModal({
                       key={attrKey}
                       className={cn(
                         'flex items-center justify-between rounded-xl px-4 py-2.5 transition-colors',
-                        isChecked ? 'bg-primary/[0.03]' : 'hover:bg-secondary'
+                        isChecked ? 'bg-primary/[0.03]' : 'hover:bg-primary/5'
                       )}
                     >
                       <div className='flex items-center gap-3'>
