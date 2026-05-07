@@ -179,26 +179,40 @@ function ContractActionsCell({ contract }: { contract: RentalContract }) {
             <DropdownMenuSeparator />
           )}
 
-        {/* Sign Now — PENDING_LANDLORD */}
-        {canSignNow && (
-          <Button
-            type='button'
-            size='xs'
-            variant='outline'
-            className='rounded-lg border-primary bg-transparent text-primary hover:bg-primary/10 hover:text-primary disabled:opacity-60'
-            onClick={handleSignNow}
-            disabled={getLandlordSigningUrlMutation.isPending}
-          >
-            {getLandlordSigningUrlMutation.isPending ? (
-              <Loader2 className='size-3 animate-spin' />
-            ) : (
-              <>
-                <Pen className='size-3' />
-                {t('statusActions.signNow')}
-              </>
-            )}
-          </Button>
-        )}
+          {canSendToLandlord && (
+            <DropdownMenuItem onSelect={handleSendToLandlord} disabled={sendToLandlordMutation.isPending}>
+              {sendToLandlordMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.sendToOwner')}
+            </DropdownMenuItem>
+          )}
+          {canSignNow && (
+            <DropdownMenuItem onSelect={handleSignNow} disabled={getLandlordSigningUrlMutation.isPending}>
+              {getLandlordSigningUrlMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pen className='h-4 w-4' />}
+              {t('statusActions.signNow')}
+            </DropdownMenuItem>
+          )}
+          {canTerminate && (
+            <DropdownMenuItem
+              variant='destructive'
+              onSelect={() => setShowTerminateDialog(true)}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <XCircle className='h-4 w-4' />}
+              {t('statusActions.terminate')}
+            </DropdownMenuItem>
+          )}
+          {canCancelLease && (
+            <DropdownMenuItem
+              variant='destructive'
+              onSelect={() => setShowCancelDialog(true)}
+              disabled={cancelLeaseMutation.isPending}
+            >
+              {cancelLeaseMutation.isPending ? <Loader2 className='h-4 w-4 animate-spin' /> : <XCircle className='h-4 w-4' />}
+              {t('statusActions.cancelLease')}
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {showCancelDialog && (
         <UpdateContractStatusDialog
@@ -302,20 +316,13 @@ function TenantContractActionsCell({ contract }: { contract: RentalContract }) {
         <DropdownMenuTrigger asChild>
           <Button
             type='button'
-            size='xs'
-            variant='outline'
-            className='rounded-lg border-primary bg-transparent text-primary hover:bg-primary/10 hover:text-primary disabled:opacity-60'
-            onClick={handleSignNow}
-            disabled={getRenterSigningUrlMutation.isPending}
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 rounded-lg hover:bg-primary/5'
+            onClick={(event) => event.stopPropagation()}
+            aria-label={t('statusActions.moreActions')}
           >
-            {getRenterSigningUrlMutation.isPending ? (
-              <Loader2 className='size-3 animate-spin' />
-            ) : (
-              <>
-                <Pen className='size-3' />
-                {t('statusActions.signNow')}
-              </>
-            )}
+            <MoreHorizontal className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-52 rounded-xl border-primary/10 p-2 shadow-xl'>
