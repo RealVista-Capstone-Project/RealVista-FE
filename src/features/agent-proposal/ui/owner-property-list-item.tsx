@@ -4,7 +4,7 @@ import type { OwnerPropertySummary } from '@/entities/property';
 import { Badge } from '@/shared/ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { MapPin, ChevronRight, Home, Ruler } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useMessages } from 'next-intl';
 
 interface OwnerPropertyListItemProps {
   property: OwnerPropertySummary;
@@ -38,6 +38,7 @@ export function OwnerPropertyListItem({
   onClick,
 }: OwnerPropertyListItemProps) {
   const t = useTranslations('PropertyFeed');
+  const messages = useMessages() as any;
 
   const location = [
     property.location_info?.ward_name,
@@ -115,7 +116,37 @@ export function OwnerPropertyListItem({
             getPropertyStatusColor(property.status)
           )}
         >
-          {property.status}
+          {(() => {
+            const status = (property.status || '').toLowerCase().trim();
+            if (!status) return property.status;
+
+            const fallbackMap: Record<string, string> = {
+              available: 'Sẵn sàng',
+              pending: 'Đang chờ',
+              verified: 'Đã xác thực',
+              rejected: 'Đã từ chối',
+              sold: 'Đã bán',
+              rented: 'Đã cho thuê',
+            };
+
+            try {
+              const statusObj = messages?.PropertyFeed?.status;
+              if (statusObj && typeof statusObj === 'object') {
+                const val = (statusObj as any)[status] || (statusObj as any)[status.toUpperCase()];
+                if (val && typeof val === 'string') return val;
+              }
+            } catch (e) {}
+
+            try {
+              const commonStatusObj = messages?.Common?.Status;
+              if (commonStatusObj && typeof commonStatusObj === 'object') {
+                const val = (commonStatusObj as any)[status] || (commonStatusObj as any)[status.toUpperCase()];
+                if (val && typeof val === 'string') return val;
+              }
+            } catch (e) {}
+
+            return fallbackMap[status] || property.status;
+          })()}
         </Badge>
         <ChevronRight
           className={cn(

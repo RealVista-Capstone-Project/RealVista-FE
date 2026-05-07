@@ -3,7 +3,7 @@
     "loading": "Đang tải bất động sản...",
     "error": "Không thể tải dữ liệu. Vui lòng thử lại.",
     "pageTitle": "Khám phá BĐS",
-    "pageSubtitle": "Duyệt qua danh sách bất động sản và gửi đề xuất môi giới của bạn.",
+    "pageSubtitle": "Duyệt qua danh sách bất động sản và gửi hồ sơ môi giới của bạn.",
     "tabs": {
       "all": "Tất cả",
       "sell": "Bán",
@@ -30,8 +30,26 @@
       "priceFrom": "Giá từ",
       "rent": "Thuê",
       "buy": "Mua",
-      "submitProposal": "Gửi đề xuất",
-      "alreadyProposed": "Đã gửi đề xuất"
+      "submitProposal": "Gửi hồ sơ",
+      "alreadyProposed": "Đã gửi hồ sơ"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "pending": "Đang chờ",
+      "verified": "Đã xác thực",
+      "rejected": "Đã từ chối",
+      "AVAILABLE": "Sẵn sàng",
+      "available": "Sẵn sàng",
+      "reserved": "Đã đặt chỗ",
+      "sold": "Đã bán",
+      "rented": "Đã cho thuê",
+      "DRAFT": "Bản nháp",
+      "PENDING": "Đang chờ",
+      "VERIFIED": "Đã xác thực",
+      "REJECTED": "Đã từ chối",
+      "RESERVED": "Đã đặt chỗ",
+      "SOLD": "Đã bán",
+      "RENTED": "Đã cho thuê"
     },
     "empty": {
       "title": "Không tìm thấy BĐS nào.",
@@ -46,19 +64,19 @@
       "cancel": "Hủy"
     },
     "proposalModal": {
-      "title": "Gửi đề xuất",
-      "description": "Gửi đề xuất của bạn để quản lý bất động sản này cho chủ nhà.",
+      "title": "Gửi hồ sơ",
+      "description": "Gửi hồ sơ của bạn để quản lý bất động sản này cho chủ nhà.",
       "titleLabel": "Tiêu đề",
       "titlePlaceholder": "VD: Tôi có 5 năm kinh nghiệm trong khu vực này...",
-      "commissionLabel": "Hoa hồng đề xuất",
+      "commissionLabel": "Hoa hồng hồ sơ",
       "commissionPlaceholder": "VD: 2% hoặc 5.000.000 VND",
       "messageLabel": "Tin nhắn",
       "messagePlaceholder": "Giới thiệu bản thân và giải thích lý do bạn phù hợp với BĐS này...",
-      "submit": "Gửi đề xuất"
+      "submit": "Gửi hồ sơ"
     },
     "toast": {
-      "proposalSuccess": "Gửi đề xuất thành công! Chủ nhà sẽ xem xét yêu cầu của bạn.",
-      "proposalError": "Gửi đề xuất thất bại. Vui lòng thử lại."
+      "proposalSuccess": "Gửi hồ sơ thành công! Chủ nhà sẽ xem xét yêu cầu của bạn.",
+      "proposalError": "Gửi hồ sơ thất bại. Vui lòng thử lại."
     }
   }
 }
