@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams } from 'next/navigation';
 import type { OwnerPropertySummary } from '@/entities/property';
@@ -19,9 +19,13 @@ export function useAgentProposalCtaForOwnerProperty(property: OwnerPropertySumma
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [applyBlockedLocal, setApplyBlockedLocal] = useState(false);
 
+  const lastIdRef = useRef(property?.property_id);
   useEffect(() => {
-    setApplyBlockedLocal(false);
-    setIsApplyModalOpen(false);
+    if (property?.property_id !== lastIdRef.current) {
+      setApplyBlockedLocal(false);
+      setIsApplyModalOpen(false);
+      lastIdRef.current = property?.property_id;
+    }
   }, [property?.property_id]);
 
   const backendRoles = session?.user?.backendRoles ?? [];

@@ -207,12 +207,22 @@ export function ManageAgentProposalsScreen() {
     if (!returnPath) return null;
     if (!returnPropertyId && !returnPropertyAddress) return null;
     if (!returnPath.startsWith('/dashboard/property-feed')) return null;
-    const query = new URLSearchParams();
-    query.set('openApplyModal', '1');
-    if (returnPropertyId) query.set('propertyId', returnPropertyId);
-    if (returnPropertyAddress) query.set('propertyAddress', returnPropertyAddress);
-    const separator = returnPath.includes('?') ? '&' : '?';
-    return `${returnPath}${separator}${query.toString()}`;
+
+    try {
+      const url = new URL(returnPath, window.location.origin);
+      url.searchParams.set('openApplyModal', '1');
+      if (returnPropertyId) url.searchParams.set('propertyId', returnPropertyId);
+      if (returnPropertyAddress) url.searchParams.set('propertyAddress', returnPropertyAddress);
+      return url.pathname + url.search;
+    } catch {
+      // Fallback to manual string manipulation if URL parsing fails
+      const query = new URLSearchParams();
+      query.set('openApplyModal', '1');
+      if (returnPropertyId) query.set('propertyId', returnPropertyId);
+      if (returnPropertyAddress) query.set('propertyAddress', returnPropertyAddress);
+      const separator = returnPath.includes('?') ? '&' : '?';
+      return `${returnPath}${separator}${query.toString()}`;
+    }
   }, [returnPath, returnPropertyId, returnPropertyAddress]);
 
   React.useEffect(() => {
@@ -270,7 +280,12 @@ export function ManageAgentProposalsScreen() {
       setShowReturnToApplyCta(true);
     }
   });
-  const updateMutation = useUpdateProposalMutation(() => setIsFormOpen(false));
+  const updateMutation = useUpdateProposalMutation(() => {
+    setIsFormOpen(false);
+    if (resumeApplyHref) {
+      setShowReturnToApplyCta(true);
+    }
+  });
   const draftMutation = useSaveProposalDraftMutation(() => setIsFormOpen(false));
   const deleteMutation = useCancelProposalMutation(() => {
     setIsDeleteOpen(false);

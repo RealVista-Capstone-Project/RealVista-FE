@@ -512,23 +512,8 @@ function PropertyCardWithProposal({
   > | null>(null);
 
   useEffect(() => {
-    if (!isAgent) return;
-    if (!autoOpenPropertyId && !autoOpenPropertyAddress) return;
-
-    const matchesTarget = autoOpenPropertyId
-      ? property.property_id === autoOpenPropertyId
-      : isFlexibleAddressMatch(autoOpenPropertyAddress, property.street_address);
-    if (!matchesTarget) return;
-
-    const targetToken = autoOpenPropertyId ?? normalizeAddress(autoOpenPropertyAddress);
-    if (confirmedHandledTargetRef.current === targetToken) return;
-
-    pendingAutoOpenAcknowledgeRef.current = {
-      property_id: property.property_id,
-      street_address: property.street_address,
-    };
-    setIsApplyModalOpen(true);
-  }, [isAgent, autoOpenPropertyAddress, autoOpenPropertyId, property.property_id, property.street_address, setIsApplyModalOpen]);
+    // Legacy auto-open logic removed in favor of page-level handling in PropertyFeedContent
+  }, []);
 
   useEffect(() => {
     if (!isApplyModalOpen) return;
@@ -584,16 +569,19 @@ function PropertyFeedContent() {
   const [shouldAutoOpenFromUrl, setShouldAutoOpenFromUrl] = useState(false);
   const [pendingReturnPropertyId, setPendingReturnPropertyId] = useState<string | null>(null);
   const [pendingReturnPropertyAddress, setPendingReturnPropertyAddress] = useState<string | null>(null);
-  const hasInitialQuerySettledRef = useRef(false);
+  const [settledSearchQuery, setSettledSearchQuery] = useState<string | null>(null);
+  const [autoOpenModalTarget, setAutoOpenModalTarget] = useState<OwnerPropertySummary | null>(null);
   const lastFetchAttemptTargetRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const params = new URLSearchParams(window.location.search);
-    const shouldOpenApplyModal = params.get('openApplyModal') === '1';
-    const targetPropertyId = params.get('propertyId');
+    const shouldOpenApplyModal = params.get('openApplyModal') === '1' || params.get('autoOpen') === '1';
+    const targetPropertyId = params.get('propertyId') || params.get('openPropertyId');
     const targetPropertyAddress = params.get('propertyAddress');
+
+    console.log('PropertyFeed: checking URL params', { shouldOpenApplyModal, targetPropertyId, targetPropertyAddress });
     if (shouldOpenApplyModal && (targetPropertyId || targetPropertyAddress)) {
       setShouldAutoOpenFromUrl(true);
       setPendingReturnPropertyId(targetPropertyId);
@@ -621,43 +609,46 @@ function PropertyFeedContent() {
 
   useEffect(() => {
     if (!isLoading) {
-      hasInitialQuerySettledRef.current = true;
+      setSettledSearchQuery(searchQuery);
     }
-  }, [isLoading]);
+  }, [isLoading, searchQuery]);
 
   useEffect(() => {
     if (!shouldAutoOpenFromUrl) return;
     if (!pendingReturnPropertyId && !pendingReturnPropertyAddress) return;
-    if (!hasInitialQuerySettledRef.current) return;
+    if (settledSearchQuery !== searchQuery) return;
 
     const targetKey = pendingReturnPropertyId ?? normalizeAddress(pendingReturnPropertyAddress);
-    const targetIsLoaded = properties.some(
-      (property) =>
+    const targetProperty = properties.find(
+      (p) =>
         pendingReturnPropertyId
-          ? property.property_id === pendingReturnPropertyId
-          : isFlexibleAddressMatch(property.street_address, pendingReturnPropertyAddress)
+          ? p.property_id === pendingReturnPropertyId
+          : isFlexibleAddressMatch(p.street_address, pendingReturnPropertyAddress)
     );
-    if (targetIsLoaded) {
-      lastFetchAttemptTargetRef.current = null;
-      return;
-    }
 
-    if (hasNextPage && !isFetchingNextPage) {
-      if (lastFetchAttemptTargetRef.current === targetKey) return;
-      lastFetchAttemptTargetRef.current = targetKey;
-      fetchNextPage();
-      return;
-    }
-
-    if (isFetchingNextPage) return;
-    if (!hasNextPage) {
+    if (targetProperty) {
       lastFetchAttemptTargetRef.current = null;
-      clearReturnToApplyIntent();
-      setShouldAutoOpenFromUrl(false);
-      setPendingReturnPropertyId(null);
-      setPendingReturnPropertyAddress(null);
+      if (!autoOpenModalTarget) {
+        setAutoOpenModalTarget(targetProperty);
+      }
+    } else {
+      if (hasNextPage && !isFetchingNextPage) {
+        if (lastFetchAttemptTargetRef.current === targetKey) return;
+        lastFetchAttemptTargetRef.current = targetKey;
+        fetchNextPage();
+        return;
+      }
+
+      if (isFetchingNextPage) return;
+      if (!hasNextPage) {
+        lastFetchAttemptTargetRef.current = null;
+        clearReturnToApplyIntent();
+        setShouldAutoOpenFromUrl(false);
+        setPendingReturnPropertyId(null);
+        setPendingReturnPropertyAddress(null);
+      }
     }
-  }, [shouldAutoOpenFromUrl, pendingReturnPropertyId, pendingReturnPropertyAddress, properties, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [shouldAutoOpenFromUrl, pendingReturnPropertyId, pendingReturnPropertyAddress, properties, hasNextPage, isFetchingNextPage, fetchNextPage, settledSearchQuery, searchQuery, autoOpenModalTarget]);
 
   useEffect(() => {
     if (!isFetchingNextPage) {
@@ -804,6 +795,23 @@ function PropertyFeedContent() {
             </div>
           )}
         </div>
+
+        {/* Page-level auto-open modal */}
+        {autoOpenModalTarget && (
+          <AgentApplyProposalModal
+            propertyId={autoOpenModalTarget.property_id}
+            propertyAddress={autoOpenModalTarget.street_address}
+            isOpen={true}
+            onClose={() => {
+              setAutoOpenModalTarget(null);
+              handleAutoOpenHandled(autoOpenModalTarget);
+            }}
+            onSubmitSuccess={() => {
+              setAutoOpenModalTarget(null);
+              handleAutoOpenHandled(autoOpenModalTarget);
+            }}
+          />
+        )}
       </div>
     </div>
   );
