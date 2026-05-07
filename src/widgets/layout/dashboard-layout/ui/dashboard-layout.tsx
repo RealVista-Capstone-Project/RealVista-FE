@@ -260,6 +260,7 @@ export function DashboardLayout({
       ROUTES.dashboard.manageAgent,
       ROUTES.dashboard.myEngagements,
       ROUTES.dashboard.messages,
+      ROUTES.dashboard.crm,
     ] as const;
     return bases.some((base) => pathname === base || pathname.startsWith(`${base}/`));
   }, [pathname]);

@@ -91,7 +91,13 @@ function hasDisplayableCardPrice(property: PropertySummaryResponse): boolean {
   return false;
 }
 
-function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResponse }) {
+function PropertyPortfolioGridCard({
+  property,
+  showEditLink,
+}: {
+  property: PropertySummaryResponse;
+  showEditLink: boolean;
+}) {
   const t = useTranslations('PropertyDashboard');
   const router = useRouter();
   const code = property.property_type_info?.property_type_code ?? '';
@@ -168,14 +174,16 @@ function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResp
           <h3 className='line-clamp-2 text-base font-bold leading-snug text-foreground group-hover:text-primary'>
             {property.street_address}
           </h3>
-          <Link
-            href={`/dashboard/property/${property.property_id}/edit`}
-            onClick={(e) => e.stopPropagation()}
-            className='shrink-0 flex h-7 w-7 items-center justify-center rounded-lg border border-primary/15 bg-white text-primary transition-colors hover:bg-primary/5'
-            aria-label={t('editAction')}
-          >
-            <Edit className='h-3.5 w-3.5' strokeWidth={2} />
-          </Link>
+          {showEditLink ? (
+            <Link
+              href={`/dashboard/property/${property.property_id}/edit`}
+              onClick={(e) => e.stopPropagation()}
+              className='shrink-0 flex h-7 w-7 items-center justify-center rounded-lg border border-primary/15 bg-white text-primary transition-colors hover:bg-primary/5'
+              aria-label={t('editAction')}
+            >
+              <Edit className='h-3.5 w-3.5' strokeWidth={2} />
+            </Link>
+          ) : null}
         </div>
         {location ? (
           <div className='flex items-center gap-1 text-xs text-muted-foreground'>
@@ -734,6 +742,7 @@ export default function PropertyDashboardPage() {
                     <PropertyPortfolioGridCard
                       key={property.property_id}
                       property={property}
+                      showEditLink={!isAgentUser}
                     />
                   ))}
                 </div>

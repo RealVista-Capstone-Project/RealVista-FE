@@ -92,22 +92,51 @@ export function DataTable<TData>({
       >
       {/* Table — scroll inside so parent flex layout avoids page scrollbar */}
       <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border', tableContainerClassName)}>
-        <div className='min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto'>
-          <Table className={tableClassName}>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
+        {isEmpty ? (
+          <>
+            <div className='shrink-0 overflow-x-auto'>
+              <Table className={tableClassName}>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            {!isEmpty && (
+                </TableHeader>
+              </Table>
+            </div>
+            <div className='relative min-h-[220px] flex-1'>
+              <div className='absolute inset-0 flex flex-col items-center justify-center px-6 py-10 text-center'>
+                {emptyIcon ?? <Inbox className='mb-2 h-10 w-10 text-muted-foreground' />}
+                <p className='text-sm font-medium text-muted-foreground'>{emptyTitle}</p>
+                {emptyDescription && (
+                  <p className='mt-1 text-xs text-muted-foreground'>{emptyDescription}</p>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className='min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto'>
+            <Table className={tableClassName}>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
               <TableBody>
                 {isLoading ? (
                   /* Skeleton loading rows */
@@ -142,19 +171,9 @@ export function DataTable<TData>({
                   })
                 )}
               </TableBody>
-            )}
-          </Table>
-          {/* Empty state — outside <table> so it can flex-1 to fill remaining height */}
-          {isEmpty && (
-            <div className='flex min-h-full flex-col items-center justify-center p-8 text-center'>
-              {emptyIcon ?? <Inbox className='mb-2 h-10 w-10 text-muted-foreground' />}
-              <p className='text-sm font-medium text-muted-foreground'>{emptyTitle}</p>
-              {emptyDescription && (
-                <p className='mt-1 text-xs text-muted-foreground'>{emptyDescription}</p>
-              )}
-            </div>
-          )}
-        </div>
+            </Table>
+          </div>
+        )}
       </div>
 
       {/* Pagination */}

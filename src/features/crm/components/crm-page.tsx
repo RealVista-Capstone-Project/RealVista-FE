@@ -68,7 +68,13 @@ import { ROUTES } from '@/shared/config/routes';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { CrmContentSkeleton } from './crm-content-skeleton';
-import { CrmHeader, getInitialDateRange } from './crm-header';
+import {
+  CrmHeader,
+  CrmViewModeToggle,
+  DateRangePicker,
+  getInitialDateRange,
+  type ViewMode,
+} from './crm-header';
 import { CrmSearchInput } from './crm-search-input';
 import { AddLeadModal } from './add-lead-modal';
 import { LeadDetailModal } from './lead-detail-modal';
@@ -195,7 +201,7 @@ const MetricCard = React.memo(function MetricCard({
   const isNegative = change < 0;
 
   return (
-    <Card className='h-[92px] rounded-2xl border-border/80 bg-card py-0 shadow-sm'>
+    <Card className='h-[92px] rounded-2xl border-border/60 bg-white py-0 shadow-sm dark:bg-card'>
       <CardContent className='flex h-full items-center justify-between gap-4 px-4 py-3'>
         <div className='space-y-1'>
           <p className='text-sm font-medium text-muted-foreground'>{title}</p>
@@ -250,7 +256,7 @@ const LeadsBySourceCard = React.memo(function LeadsBySourceCard({
   } satisfies ChartConfig;
 
   return (
-    <Card className='h-[196px] rounded-2xl border-border/80 bg-card py-0 shadow-sm'>
+    <Card className='h-[196px] rounded-2xl border-border/60 bg-white py-0 shadow-sm dark:bg-card'>
       <CardContent className='flex h-full flex-col gap-1 px-4 py-3'>
         <div>
           <p className='text-sm font-semibold text-foreground'>{t('metrics.leadsBySource')}</p>
@@ -279,7 +285,7 @@ const LeadsBySourceCard = React.memo(function LeadsBySourceCard({
             </div>
           </div>
           <div className='w-full space-y-2.5 sm:flex-1'>
-            <div className='rounded-lg bg-muted/40 px-3 py-2 text-sm font-medium text-foreground'>
+            <div className='rounded-lg bg-sky-50/90 px-3 py-2 text-sm font-medium text-foreground dark:bg-muted/40'>
               Tổng: <span className='font-bold tabular-nums'>{total}</span> khách hàng tiềm năng
             </div>
             {rows.map((row) => (
@@ -708,7 +714,6 @@ function normalizeSummary(summary?: LeadSummaryResponse): LeadSummaryResponse | 
 
 // ─── Main CRM Page ────────────────────────────────────────────────────────────
 
-type ViewMode = 'kanban' | 'table';
 type TabValue = 'all' | LeadStatus;
 
 const STATUS_TABS: { value: TabValue; label: string }[] = [
@@ -1039,23 +1044,63 @@ export function CrmPage() {
   const showRefreshSkeleton = !showInitialLoading && (isFetching || isSummaryFetching);
 
   return (
-    <div className='min-h-full flex flex-col p-6 gap-5 bg-background'>
+    <div className='flex min-h-0 flex-col gap-5 bg-transparent p-6'>
       {showInitialLoading && (
-        <div className='flex items-center justify-center flex-1 py-20 text-sm text-muted-foreground'>
+        <div className='flex items-center justify-center py-24 text-sm text-muted-foreground'>
           Đang tải dữ liệu...
         </div>
       )}
       {!showInitialLoading && (
         <>
-          <CrmHeader
-            title={t('title')}
-            dateRange={dateRange}
-            onDateRangeChange={setDateRange}
-            view={view}
-            onViewChange={setView}
-            onAddLead={handleOpenAddLead}
-            t={t}
-          />
+          <CrmHeader onAddLead={handleOpenAddLead} />
+
+          <div className='flex flex-wrap items-center gap-3 rounded-lg border border-border/60 bg-white p-3 shadow-sm dark:bg-card'>
+            <CrmSearchInput value={search} onChange={handleSearchChange} />
+
+            {managedListings.length > 0 && (
+              <Select value={listingFilter} onValueChange={setListingFilter}>
+                <SelectTrigger className='w-full bg-white sm:w-[230px] dark:bg-background'>
+                  <SelectValue placeholder={t('filters.listing')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value='all'>{t('filters.allListings')}</SelectItem>
+                    {managedListings.map((listing) => (
+                      <SelectItem key={listing.listing_id} value={listing.listing_id}>
+                        {listing.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+
+            <Select value={tab} onValueChange={handleTabChange}>
+              <SelectTrigger className='w-full bg-white sm:w-[230px] dark:bg-background'>
+                <SelectValue placeholder='Lọc theo trạng thái' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {STATUS_TABS.map((t) => {
+                    const count =
+                      t.value === 'all'
+                        ? leads.length
+                        : leads.filter((l) => l.status === t.value).length;
+                    return (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label} ({count})
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            <div className='flex shrink-0 flex-wrap items-center gap-3 sm:ml-auto'>
+              <DateRangePicker value={dateRange} onChange={setDateRange} t={t} />
+              <CrmViewModeToggle view={view} onViewChange={setView} />
+            </div>
+          </div>
 
           {/* Metrics */}
           <div className='grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]'>
@@ -1078,54 +1123,11 @@ export function CrmPage() {
             </div>
           </div>
 
-          <div className='flex items-center gap-3 flex-wrap'>
-            <CrmSearchInput value={search} onChange={handleSearchChange} />
-
-            {managedListings.length > 0 && (
-              <Select value={listingFilter} onValueChange={setListingFilter}>
-                <SelectTrigger className='w-full sm:w-[230px] bg-background/90 shadow-sm'>
-                  <SelectValue placeholder={t('filters.listing')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value='all'>{t('filters.allListings')}</SelectItem>
-                    {managedListings.map((listing) => (
-                      <SelectItem key={listing.listing_id} value={listing.listing_id}>
-                        {listing.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-
-            <Select value={tab} onValueChange={handleTabChange}>
-              <SelectTrigger className='w-full sm:w-[230px] bg-background/90 shadow-sm'>
-                <SelectValue placeholder='Lọc theo trạng thái' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {STATUS_TABS.map((t) => {
-                    const count =
-                      t.value === 'all'
-                        ? leads.length
-                        : leads.filter((l) => l.status === t.value).length;
-                    return (
-                      <SelectItem key={t.value} value={t.value}>
-                        {t.label} ({count})
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
           {showRefreshSkeleton ? (
             <CrmContentSkeleton view={view} />
           ) : leads.length === 0 ? (
-            <Card className='border-dashed shadow-sm'>
-              <CardContent className='flex flex-col items-center justify-center gap-3 px-6 py-12 text-center'>
+            <Card className='w-full gap-0 border-dashed border-border/60 bg-white py-0 shadow-md dark:bg-card'>
+              <CardContent className='flex flex-col items-center justify-center gap-3 px-6 py-8 text-center'>
                 <div className='flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary'>
                   <Users className='size-6' />
                 </div>
@@ -1135,10 +1137,7 @@ export function CrmPage() {
                     Thêm khách hàng đầu tiên để bắt đầu theo dõi.
                   </p>
                 </div>
-                <Button
-                  className='gap-1.5'
-                  onClick={() => handleOpenAddLead()}
-                >
+                <Button className='gap-1.5 rounded-lg' onClick={() => handleOpenAddLead()}>
                   <Plus className='size-4' data-icon='inline-start' />
                   Thêm khách hàng đầu tiên
                 </Button>
@@ -1222,10 +1221,10 @@ export function CrmPage() {
                 </KanbanOverlay>
               </Kanban>
               {kanbanFades.left && (
-                <div className='pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-card to-transparent' />
+                <div className='pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-sky-50 to-transparent dark:from-background' />
               )}
               {kanbanFades.right && (
-                <div className='pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent' />
+                <div className='pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-sky-50 to-transparent dark:from-background' />
               )}
             </div>
           ) : (
