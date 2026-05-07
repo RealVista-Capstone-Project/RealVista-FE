@@ -3,6 +3,7 @@
     "title": "Listings",
     "draftRuleTooltip": "Listings unpublished for more than 24 hours will have their associated active appointments automatically cancelled.",
     "createButton": "Create Listing",
+    "quotaNoticeTriggerAria": "View posting quota notice",
     "filter": "Filter",
     "creatorFilter": {
       "label": "Created By",
@@ -81,6 +82,12 @@
       "company": "Company",
       "verified": "Verified Agent",
       "contact": "Contact Agent"
+    },
+    "owner": {
+      "title": "Landlord information",
+      "subtitle": "Reach out to the property owner here",
+      "verified": "Verified owner",
+      "contact": "Contact the owner"
     },
     "deleteListing": "Delete Listing",
     "deleteConfirmTitle": "Delete Listing",

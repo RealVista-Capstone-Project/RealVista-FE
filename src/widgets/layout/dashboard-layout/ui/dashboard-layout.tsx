@@ -250,6 +250,20 @@ export function DashboardLayout({
 
   const pathname = usePathname();
 
+  /**
+   * Owner secondary flows (appointments, contracts, broker, engagements, inbox): same light blue shell as agent/admin.
+   */
+  const isSecondaryLightBlueDashboardRoute = React.useMemo(() => {
+    const bases = [
+      ROUTES.dashboard.appointments,
+      ROUTES.dashboard.rentalContracts,
+      ROUTES.dashboard.manageAgent,
+      ROUTES.dashboard.myEngagements,
+      ROUTES.dashboard.messages,
+    ] as const;
+    return bases.some((base) => pathname === base || pathname.startsWith(`${base}/`));
+  }, [pathname]);
+
   /** Agent role + manage-agent / manage-proposals: light blue shell (aligned with admin), not gray muted. */
   const isAgentLightBlueShell = React.useMemo(() => {
     if (isAgent) return true;
@@ -426,7 +440,9 @@ export function DashboardLayout({
     <div
       className={cn(
         'flex h-screen w-full overflow-hidden',
-        isAdmin || isAgentLightBlueShell ? 'bg-sky-50 dark:bg-background' : 'bg-muted/50 dark:bg-background',
+        isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
+          ? 'bg-sky-50 dark:bg-background'
+          : 'bg-muted/50 dark:bg-background',
         className
       )}
     >
@@ -556,12 +572,12 @@ export function DashboardLayout({
           <main
             className={cn(
               'flex min-h-0 flex-1 flex-col overflow-y-auto p-0',
-              isOwnerWhiteMain || isPropertyDetailWhiteMain
+              (isOwnerWhiteMain || isPropertyDetailWhiteMain) && !isSecondaryLightBlueDashboardRoute
                 ? cn(
                     'bg-white dark:bg-background',
                     !isCreateListingRoute && 'lg:min-h-[calc(100svh-3.5rem)]'
                   )
-                : isAdmin || isAgentLightBlueShell
+                : isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
                   ? 'bg-sky-50 dark:bg-background'
                   : 'bg-muted/30 dark:bg-background',
             )}

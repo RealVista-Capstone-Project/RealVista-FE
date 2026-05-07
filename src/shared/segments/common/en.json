@@ -11,7 +11,7 @@
       "messages": "Messages",
       "myContracts": "My Contracts",
       "propertyFeed": "Find Properties",
-      "proposals": "My Proposals",
+      "proposals": "Work profile management",
       "appointments": "Appointments",
       "users": "User Management",
       "policies": "Policies",
@@ -34,7 +34,7 @@
       "rentalContracts": "Rental Contracts",
       "myContracts": "My Contracts",
       "messages": "Messages",
-      "manageProposals": "Proposal Library",
+      "manageProposals": "Work profile management",
       "property": "Property",
       "propertyFeed": "Find Properties to Propose",
       "appointments": "Appointments",
@@ -796,11 +796,12 @@
     "otpExpiredError": "The OTP has expired. Please request a new one."
   },
   "ManageProposals": {
-    "pageTitle": "Proposal Library",
+    "pageTitle": "Work profile management",
     "pageSubtitle": "{count} professional proposal templates",
     "createNew": "New Proposal",
     "loadingProposals": "Loading proposals...",
     "searchPlaceholder": "Search proposals...",
+    "clearSearch": "Clear search",
     "emptyTitle": "No proposals yet",
     "emptyDesc": "Create your first proposal template to start applying",
     "emptyFilterTitle": "No results found",
@@ -1093,7 +1094,7 @@
     },
     "quickActions": {
       "propertyFeed": "Property Feed",
-      "manageProposals": "Manage Proposals",
+      "manageProposals": "Work profile management",
       "crmWorkspace": "CRM Workspace",
       "myEngagements": "My Engagements"
     }

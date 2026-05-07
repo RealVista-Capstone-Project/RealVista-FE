@@ -3,6 +3,7 @@
     "title": "Danh sách bài đăng",
     "draftRuleTooltip": "Tin đăng tạm ẩn quá 24h sẽ bị tự động hủy các lịch hẹn đang hoạt động.",
     "createButton": "Tạo mới",
+    "quotaNoticeTriggerAria": "Xem thông báo hết lượt đăng tin",
     "filter": "Lọc",
     "creatorFilter": {
       "label": "Người tạo",
@@ -81,6 +82,12 @@
       "company": "Công ty",
       "verified": "Môi giới đã xác thực",
       "contact": "Liên hệ môi giới"
+    },
+    "owner": {
+      "title": "Thông tin chủ nhà",
+      "subtitle": "Liên hệ chủ nhà nhé",
+      "verified": "Chủ nhà đã xác thực",
+      "contact": "Liên hệ chủ nhà nhé"
     },
     "deleteListing": "Xóa bài đăng",
     "deleteConfirmTitle": "Xóa bài đăng",

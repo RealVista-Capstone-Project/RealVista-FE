@@ -138,7 +138,7 @@ function AgentPerformanceTooltip({
   const inquiries = payload.find((p) => String(p.dataKey) === 'inquiries');
 
   return (
-    <div className='rounded-xl border bg-card px-3 py-2 shadow-lg'>
+    <div className='rounded-xl border bg-white px-3 py-2 shadow-lg dark:bg-card'>
       {label != null && label !== '' ? (
         <p className='text-xs text-muted-foreground'>{String(label)}</p>
       ) : null}
@@ -182,7 +182,7 @@ export function AgentDashboardPerformanceChartContent({
     <>
       <div className='flex flex-wrap items-center justify-between gap-3'>
         <CardTitle>{t('sections.performance.title')}</CardTitle>
-        <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
+        <div className='flex items-center gap-1 rounded-xl border border-border/70 bg-white p-1 dark:bg-muted/50'>
               {PERIODS.map((period) => (
             <button
               key={period}
@@ -286,7 +286,7 @@ export function AgentDashboardPerformanceChartContent({
 
 export function AgentDashboardPerformanceChart(props: AgentDashboardPerformanceChartProps) {
   return (
-    <Card className='xl:col-span-8'>
+    <Card className='border-border/70 bg-white shadow-sm dark:bg-card xl:col-span-8'>
       <AgentDashboardPerformanceChartContent {...props} variant='standalone' />
     </Card>
   );

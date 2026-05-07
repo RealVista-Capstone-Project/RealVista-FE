@@ -9,6 +9,12 @@ import { listingBoostKeys } from '@/entities/listing';
 import { env } from '@/shared/lib/env/env';
 
 /**
+ * Subscribed landing after VNPAY redirects with `?payment=…`. Same-tab history still has VNPay under this page — avoid
+ * `router.back()` on /subscribe header (sandbox would open again).
+ */
+export const BILLING_VNPAY_RETURN_TAB_KEY = 'billing-vnpay-return-tab';
+
+/**
  * VNPay Return URL: forwards vnp_* to BE (HMAC only); BE redirects here with ?payment=success&checkout_order_id=...
  * FE then calls POST /billing/payment/vnpay-verify (QueryDR). Toasts for other ?payment= values (failed, cancelled, etc.).
  */
@@ -42,6 +48,12 @@ export function BillingReturnQueryEffects() {
     if (!payment) {
       paymentNotifyShownRef.current = false;
       return;
+    }
+
+    try {
+      sessionStorage.setItem(BILLING_VNPAY_RETURN_TAB_KEY, '1');
+    } catch {
+      /* non-fatal */
     }
 
     const next = new URLSearchParams(searchParams.toString());

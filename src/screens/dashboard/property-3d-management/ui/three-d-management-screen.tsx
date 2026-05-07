@@ -193,11 +193,11 @@ export function ThreeDManagementScreen({
   ).length;
 
   return (
-    <div className='min-h-[calc(100vh-80px)] bg-[#e8f2fb]'>
-      <div className='mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6'>
-        <div className='overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm'>
+    <div className='min-h-full w-full flex-1 bg-[#e8f2fb]'>
+      <div className='mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-6'>
+        <div className='w-full overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm'>
           {/* Row 1: Back */}
-          <div className='border-b border-primary/10 px-4 py-3 sm:px-6'>
+          <div className='px-4 py-3 sm:px-6'>
             <button
               type='button'
               onClick={() => router.push(`/${locale}/dashboard/property`)}
@@ -209,22 +209,28 @@ export function ThreeDManagementScreen({
             </button>
           </div>
 
-          {/* Row 2: Heading + subtitle | circular add + quota */}
+          {/* Row 2: Heading + subtitle | add room + quota */}
           <div className='flex items-start justify-between gap-4 border-b border-primary/10 px-4 py-4 sm:px-6'>
             <div className='min-w-0 flex-1'>
               <h1 className='text-xl font-bold tracking-tight text-foreground sm:text-2xl'>{t('title')}</h1>
               <p className='mt-1 text-sm text-muted-foreground'>{t('subtitle')}</p>
             </div>
-            <div className='flex shrink-0 flex-col items-center gap-1.5'>
+            <div className='flex shrink-0 flex-col items-end gap-1.5 sm:items-center'>
               <Button
                 type='button'
                 onClick={() => setIsDialogOpen(true)}
-                size='icon'
                 disabled={isLocked}
-                title={isLocked ? t('lockedTitle') : t('newRoom')}
-                className='h-12 w-12 rounded-full shadow-md'
+                title={isLocked ? t('lockedTitle') : undefined}
+                size='lg'
+                variant='default'
+                className='gap-2 rounded-xl px-5 font-semibold shadow-sm'
               >
-                {isLocked ? <Lock className='h-5 w-5' /> : <Plus className='h-5 w-5' />}
+                {isLocked ? (
+                  <Lock className='h-4 w-4 shrink-0' strokeWidth={2.25} />
+                ) : (
+                  <Box className='h-4 w-4 shrink-0' strokeWidth={2.25} />
+                )}
+                <span>{t('newRoom')}</span>
               </Button>
               {!subsLoading && unlimited ? (
                 <span className='max-w-[7rem] text-center text-[11px] leading-tight text-muted-foreground'>
@@ -238,8 +244,8 @@ export function ThreeDManagementScreen({
             </div>
           </div>
 
-          {/* Row 3: Grey uppercase label + stats hint | reload */}
-          <div className='flex items-start justify-between gap-3 border-b border-primary/10 bg-muted/30 px-4 py-2.5 sm:items-center sm:px-6'>
+          {/* Row 3: Uppercase label + stats hint | reload */}
+          <div className='flex items-start justify-between gap-3 border-b border-primary/10 px-4 py-2.5 sm:items-center sm:px-6'>
             <div className='min-w-0 flex-1'>
               <p className='text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground'>
                 {t('listSectionLabel')}

@@ -26,7 +26,7 @@ const AgentDashboardInsightsCard = dynamic(
     })),
   {
     loading: () => (
-      <Card className='border-border/70 bg-card shadow-sm'>
+      <Card className='border-border/70 bg-white shadow-sm dark:bg-card'>
         <CardContent className='space-y-6 pt-6'>
           <div className='space-y-4'>
             <div className='space-y-2'>
@@ -127,7 +127,7 @@ const AgentLeadChannelsCard = dynamic(
     })),
   {
     loading: () => (
-      <Card className='border-border/70 bg-card shadow-sm xl:col-span-4'>
+      <Card className='border-border/70 bg-white shadow-sm dark:bg-card xl:col-span-4'>
         <CardHeader className='space-y-4'>
           <Skeleton className='h-6 w-40 max-w-full' />
           <Skeleton className='h-20 w-full rounded-xl' />
@@ -261,7 +261,7 @@ export function AgentDashboardView() {
         {kpis.map((kpi) => {
           const trendUp = kpi.trend === 'up';
           return (
-            <Card key={kpi.id} className='border-border/70 bg-card shadow-sm'>
+            <Card key={kpi.id} className='border-border/70 bg-white shadow-sm dark:bg-card'>
               <CardHeader className='pb-3'>
                 <div className='flex items-center justify-between gap-2'>
                   <CardDescription className='text-xs font-medium'>

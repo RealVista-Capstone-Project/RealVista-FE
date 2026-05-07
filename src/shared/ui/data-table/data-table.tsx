@@ -36,6 +36,8 @@ export interface DataTableProps<TData> {
   /** Applied to the flex column wrapper around the bordered table + pagination (below toolbar). */
   bodyClassName?: string;
   tableContainerClassName?: string;
+  /** Merged into the inner `<table>` element (e.g. `table-fixed` for full-width column layout). */
+  tableClassName?: string;
 }
 
 export function DataTable<TData>({
@@ -55,6 +57,7 @@ export function DataTable<TData>({
   className,
   bodyClassName,
   tableContainerClassName,
+  tableClassName,
 }: DataTableProps<TData>) {
   const t = useTranslations('DataTable');
   const table = useReactTable({
@@ -90,7 +93,7 @@ export function DataTable<TData>({
       {/* Table — scroll inside so parent flex layout avoids page scrollbar */}
       <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border', tableContainerClassName)}>
         <div className='min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto'>
-          <Table>
+          <Table className={tableClassName}>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>

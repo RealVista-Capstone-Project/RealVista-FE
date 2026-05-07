@@ -1,9 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Filter, X, ChevronDown, Plus, Building2, Lock, Users, User, Briefcase } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  X,
+  ChevronDown,
+  Plus,
+  Building2,
+  Lock,
+  Users,
+  User,
+  Briefcase,
+  Sparkles,
+} from 'lucide-react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { ListingCard } from './components/listing-card';
@@ -17,6 +29,8 @@ import { cn } from '@/shared/lib/utils';
 import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
 import { useListingQuota } from '@/entities/billing';
 import { useAuthSession } from '@/features/auth/model';
+import { ROUTES } from '@/shared/config/routes';
+import { Dialog, DialogContent, DialogTitle } from '@/shared/ui/dialog';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
@@ -36,7 +50,6 @@ type CreatorFilter = 'ALL' | 'SELF' | 'AGENT';
  * - Detailed property view
  */
 export function ManagedListingsPage() {
-  const locale = useLocale();
   const searchParams = useSearchParams();
   const initialListingId = searchParams.get('listingId');
   const router = useRouter();
@@ -50,6 +63,7 @@ export function ManagedListingsPage() {
   const [creatorFilter, setCreatorFilter] = React.useState<CreatorFilter>('ALL');
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
   const [isCreatorFilterOpen, setIsCreatorFilterOpen] = React.useState(false);
+  const [quotaNoticeOpen, setQuotaNoticeOpen] = React.useState(false);
   const filterRef = React.useRef<HTMLDivElement>(null);
   const creatorFilterRef = React.useRef<HTMLDivElement>(null);
   const listScrollRef = React.useRef<HTMLDivElement>(null);
@@ -58,6 +72,8 @@ export function ManagedListingsPage() {
   const tDetail = useTranslations('ListingDetailPanel');
   const isMobile = useIsMobile();
   const { isLocked, isLoading: quotaLoading } = useListingQuota();
+  const createBlocked = quotaLoading || isLocked;
+  const showQuotaNoticeTrigger = !quotaLoading && isLocked;
   const { data: session } = useAuthSession();
   // Backend role 'AGENT' is mapped to 'moderator' in session.user.role,
   // so we check backendRoles directly for the raw backend role.
@@ -170,8 +186,8 @@ export function ManagedListingsPage() {
     };
   }, [summary]);
 
-  // Whether any filter is active (beyond defaults)
-  const hasActiveFilters = statusFilter !== 'ALL' || sortBy !== 'newest';
+  // Whether any filter is active (beyond defaults) — creator filter uses its own control next to search
+  const hasActiveFilters = statusFilter !== 'ALL' || sortBy !== 'newest' || creatorFilter !== 'ALL';
 
   const resetFilters = () => {
     setStatusFilter('ALL');
@@ -211,40 +227,31 @@ export function ManagedListingsPage() {
         )}
       >
         <div className='flex h-full flex-col'>
-          {/* Subscription Gate */}
-          {isLocked && !quotaLoading && (
-            <div className='border-b border-purple-92/50 px-4 sm:px-6 py-4'>
-              <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
-                <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
-                <h3 className='text-sm font-semibold text-main-black mb-1'>
-                  {tDetail('subscriptionGate.title')}
-                </h3>
-                <p className='text-xs text-grey-500 mb-4'>
-                  {tDetail('subscriptionGate.description')}
-                </p>
-                <button
-                  type='button'
-                  onClick={() => router.push(`/${locale}/subscribe`)}
-                  className='inline-flex items-center justify-center rounded-lg bg-main-black text-white text-xs font-semibold px-6 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
-                >
-                  {tDetail('subscriptionGate.cta')}
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Create + search row (inside list column, below page chrome) */}
           <div className='px-4 pb-3 pt-3 sm:px-6 sm:pb-5 sm:pt-4'>
             <div className='mb-3 flex justify-end'>
-              <button
-                type='button'
-                onClick={handleCreateListing}
-                className='inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-sm shadow-primary/15 transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:px-4'
-                aria-label={t('createButton')}
-              >
-                <Plus className='h-3.5 w-3.5 shrink-0' strokeWidth={2.5} />
-                <span>{t('createButton')}</span>
-              </button>
+              <div className='relative inline-flex'>
+                <button
+                  type='button'
+                  disabled={createBlocked}
+                  onClick={handleCreateListing}
+                  className='inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-sm shadow-primary/15 transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45 disabled:hover:bg-primary sm:px-4'
+                  aria-label={t('createButton')}
+                >
+                  <Plus className='h-3.5 w-3.5 shrink-0' strokeWidth={2.5} />
+                  <span>{t('createButton')}</span>
+                </button>
+                {showQuotaNoticeTrigger ? (
+                  <button
+                    type='button'
+                    onClick={() => setQuotaNoticeOpen(true)}
+                    className='absolute -right-1 -top-1 z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-0.5 text-[11px] font-black leading-none text-white shadow-sm ring-2 ring-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
+                    aria-label={t('quotaNoticeTriggerAria')}
+                  >
+                    !
+                  </button>
+                ) : null}
+              </div>
             </div>
             <div className='flex items-center gap-3'>
               <div className='relative min-w-0 flex-1'>
@@ -346,7 +353,9 @@ export function ManagedListingsPage() {
                   />
                   {hasActiveFilters && (
                     <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
-                      {(statusFilter !== 'ALL' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)}
+                      {(statusFilter !== 'ALL' ? 1 : 0) +
+                        (sortBy !== 'newest' ? 1 : 0) +
+                        (creatorFilter !== 'ALL' ? 1 : 0)}
                     </span>
                   )}
                 </button>
@@ -539,14 +548,29 @@ export function ManagedListingsPage() {
                 ) : (
                   <>
                     <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
-                    <button
-                      type='button'
-                      onClick={handleCreateListing}
-                      className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-                    >
-                      <Plus className='h-4 w-4' strokeWidth={2.5} />
-                      <span>{t('createButton')}</span>
-                    </button>
+                    <div className='flex flex-wrap items-center justify-center'>
+                      <div className='relative inline-flex'>
+                        <button
+                          type='button'
+                          disabled={createBlocked}
+                          onClick={handleCreateListing}
+                          className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45 disabled:hover:bg-primary'
+                        >
+                          <Plus className='h-4 w-4' strokeWidth={2.5} />
+                          <span>{t('createButton')}</span>
+                        </button>
+                        {showQuotaNoticeTrigger ? (
+                          <button
+                            type='button'
+                            onClick={() => setQuotaNoticeOpen(true)}
+                            className='absolute -right-1 -top-1 z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-0.5 text-[11px] font-black leading-none text-white shadow-sm ring-2 ring-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
+                            aria-label={t('quotaNoticeTriggerAria')}
+                          >
+                            !
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
@@ -600,6 +624,77 @@ export function ManagedListingsPage() {
           </div>
         )}
       </main>
+
+      <Dialog open={quotaNoticeOpen} onOpenChange={setQuotaNoticeOpen}>
+        <DialogContent
+          showCloseButton
+          className='gap-0 border-none bg-transparent p-4 pt-6 shadow-none sm:max-w-md [&_[data-slot=dialog-close]]:text-white [&_[data-slot=dialog-close]]:opacity-90 [&_[data-slot=dialog-close]]:hover:opacity-100'
+        >
+          <DialogTitle className='sr-only'>{tDetail('subscriptionGate.title')}</DialogTitle>
+          <div className='mx-auto mt-8 w-full max-w-sm'>
+            <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
+              <Lock className='mx-auto mb-3 h-8 w-8 text-amber-500' />
+              <h3 className='mb-1 text-sm font-semibold text-main-black'>
+                {tDetail('subscriptionGate.title')}
+              </h3>
+              <p className='mb-4 text-xs text-grey-500'>{tDetail('subscriptionGate.description')}</p>
+              <button
+                type='button'
+                onClick={() => {
+                  setQuotaNoticeOpen(false);
+                  router.push(ROUTES.subscribe);
+                }}
+                className='group relative mt-0.5 inline-flex cursor-pointer items-center gap-1.5 overflow-hidden rounded-2xl px-5 py-2 text-xs font-semibold transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2'
+                style={{
+                  background:
+                    'linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(254,243,199,0.9) 42%, rgba(253,224,71,0.75) 100%)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(253,224,71,0.85)',
+                  boxShadow:
+                    '0 0 0 1px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.85)',
+                  animation: 'managedListingsSubGateBorderBlink 2.5s ease-in-out infinite',
+                }}
+              >
+                <style>{`
+                  @keyframes managedListingsSubGateBorderBlink {
+                    0%, 100% {
+                      box-shadow: 0 0 0 1px rgba(245,158,11,0.25), 0 0 8px 2px rgba(251,191,36,0.2),
+                        inset 0 1px 0 rgba(255,255,255,0.85);
+                      border-color: rgba(253,224,71,0.75);
+                    }
+                    50% {
+                      box-shadow: 0 0 0 1.5px rgba(217,119,6,0.55), 0 0 18px 5px rgba(251,191,36,0.4),
+                        inset 0 1px 0 rgba(255,255,255,0.95);
+                      border-color: rgba(252,211,77,0.95);
+                    }
+                  }
+                  @keyframes managedListingsSubGateShimmer {
+                    0% { transform: translateX(-100%) skewX(-15deg); }
+                    100% { transform: translateX(300%) skewX(-15deg); }
+                  }
+                  @keyframes managedListingsSubGateIconBlink {
+                    0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                    50% { opacity: 0.65; transform: scale(1.18) rotate(12deg); }
+                  }
+                `}</style>
+                <span
+                  className='pointer-events-none absolute inset-0 w-1/4'
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent)',
+                    animation: 'managedListingsSubGateShimmer 2.4s ease-in-out infinite',
+                  }}
+                />
+                <Sparkles
+                  className='relative h-3.5 w-3.5 shrink-0 text-amber-700'
+                  style={{ animation: 'managedListingsSubGateIconBlink 1.6s ease-in-out infinite' }}
+                />
+                <span className='relative text-amber-950'>{tDetail('subscriptionGate.cta')}</span>
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

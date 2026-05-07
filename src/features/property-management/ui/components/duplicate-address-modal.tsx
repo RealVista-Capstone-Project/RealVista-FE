@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
+import { Checkbox } from '@/shared/ui/checkbox/checkbox';
 import { propertyApi } from '@/entities/property/api/property.api';
 import type {
   AddressDuplicateCheckResponse,
@@ -24,7 +25,6 @@ import type {
 
 export type DuplicateOverrideReason =
   | 'CONFIRMED_DIFFERENT_UNIT'
-  | 'NEW_OWNER_WITH_DOCS'
   | 'CONFIRMED_NEW_BUILD';
 
 interface DuplicateAddressModalProps {
@@ -128,12 +128,10 @@ function ModalDifferentOwnerActive({
   result,
   onClose,
   onClaim,
-  onContinueWithDocs,
 }: {
   result: AddressDuplicateCheckResponse;
   onClose: () => void;
   onClaim: (reason: ClaimReason, message: string) => void;
-  onContinueWithDocs: () => void;
 }) {
   const [claimMessage, setClaimMessage] = useState('');
   const [acknowledged, setAcknowledged] = useState(false);
@@ -147,7 +145,7 @@ function ModalDifferentOwnerActive({
         </DialogTitle>
         <DialogDescription>
           Có bất động sản đang hoạt động tại địa chỉ này. Nếu bạn là chủ sở hữu mới, bạn có thể
-          gửi yêu cầu claim.
+          gửi yêu cầu xác nhận quyền sở hữu.
         </DialogDescription>
       </DialogHeader>
       <div className='flex flex-col gap-3 py-2'>
@@ -161,16 +159,15 @@ function ModalDifferentOwnerActive({
         <textarea
           className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none'
           rows={3}
-          placeholder='Mô tả lý do claim (ví dụ: tôi mới mua bất động sản này từ chủ cũ)...'
+          placeholder='Mô tả lý do (ví dụ: tôi mới mua bất động sản này từ chủ cũ)...'
           value={claimMessage}
           onChange={(e) => setClaimMessage(e.target.value)}
         />
         <label className='flex items-start gap-2 text-sm cursor-pointer'>
-          <input
-            type='checkbox'
-            className='mt-0.5 accent-primary'
+          <Checkbox
+            className='mt-0.5'
             checked={acknowledged}
-            onChange={(e) => setAcknowledged(e.target.checked)}
+            onCheckedChange={(v) => setAcknowledged(v === true)}
           />
           <span>
             Tôi xác nhận mình là chủ sở hữu hợp pháp và hiểu rằng thông tin sai sẽ bị xử lý theo
@@ -184,19 +181,11 @@ function ModalDifferentOwnerActive({
         </Button>
         <Button
           type='button'
-          variant='outline'
-          onClick={onContinueWithDocs}
-          className='border-amber-300 text-amber-700 hover:bg-amber-50'
-        >
-          Tôi có giấy tờ, cần Admin duyệt
-        </Button>
-        <Button
-          type='button'
           disabled={!acknowledged}
           onClick={() => onClaim('NEW_OWNER', claimMessage)}
           className='bg-primary text-white disabled:opacity-50'
         >
-          Gửi yêu cầu claim
+          Gửi yêu cầu xác nhận quyền sở hữu
         </Button>
       </DialogFooter>
     </>
@@ -232,11 +221,10 @@ function ModalDifferentOwnerInactive({
           <ConflictCard key={p.property_id} property={p} />
         ))}
         <label className='flex items-start gap-2 text-sm cursor-pointer mt-2'>
-          <input
-            type='checkbox'
-            className='mt-0.5 accent-primary'
+          <Checkbox
+            className='mt-0.5'
             checked={confirmed}
-            onChange={(e) => setConfirmed(e.target.checked)}
+            onCheckedChange={(v) => setConfirmed(v === true)}
           />
           <span>
             Tôi xác nhận đây là bất động sản khác (ví dụ: căn hộ riêng, tầng khác trong cùng tòa
@@ -280,11 +268,11 @@ export function DuplicateAddressModal({
       message: string;
     }) => propertyApi.claimProperty(propertyId, { claim_reason: reason, message }),
     onSuccess: () => {
-      toast.success('Yêu cầu claim đã được gửi. Chủ sở hữu sẽ được thông báo.');
+      toast.success('Yêu cầu xác nhận quyền sở hữu đã được gửi. Chủ sở hữu sẽ được thông báo.');
       onClose();
     },
     onError: () => {
-      toast.error('Không thể gửi yêu cầu claim. Vui lòng thử lại.');
+      toast.error('Không thể gửi yêu cầu xác nhận quyền sở hữu. Vui lòng thử lại.');
     },
   });
 
@@ -309,7 +297,6 @@ export function DuplicateAddressModal({
             result={duplicateCheckResult}
             onClose={onClose}
             onClaim={handleClaim}
-            onContinueWithDocs={() => onConfirm('NEW_OWNER_WITH_DOCS')}
           />
         )}
         {(reasonCode === 'DIFFERENT_OWNER_INACTIVE' || reasonCode === 'NO_MATCH') && (

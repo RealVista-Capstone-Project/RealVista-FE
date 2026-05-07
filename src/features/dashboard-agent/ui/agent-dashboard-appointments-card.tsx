@@ -156,14 +156,14 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
   ).length;
 
   return (
-    <Card className='border-border/70 bg-card shadow-sm xl:col-span-5'>
+    <Card className='border-border/70 bg-white shadow-sm dark:bg-card xl:col-span-5'>
       <CardHeader>
         <CardTitle>{t('sections.appointments.title')}</CardTitle>
         <CardDescription>{t('sections.appointments.description')}</CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
-        <div className='overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm'>
-          <div className='bg-muted/5 px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-4'>
+        <div className='overflow-hidden rounded-2xl border border-border/70 bg-white shadow-sm dark:bg-card'>
+          <div className='bg-white px-3 pb-3 pt-3 dark:bg-muted/5 sm:px-4 sm:pb-4 sm:pt-4'>
             <Calendar
               mode='single'
               navLayout='around'
@@ -241,8 +241,8 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
             />
           </div>
 
-          <div className='border-t border-border/70 bg-card/80 px-4 py-3 sm:px-5 sm:py-4'>
-            <div className='inline-flex w-full rounded-xl border border-border/70 bg-muted/40 p-1'>
+          <div className='border-t border-border/70 bg-white px-4 py-3 dark:bg-card/80 sm:px-5 sm:py-4'>
+            <div className='inline-flex w-full rounded-xl border border-border/70 bg-white p-1 dark:bg-muted/40'>
               {(['all', 'tour', 'block'] as const).map((tab) => (
                 <Button
                   key={tab}
@@ -261,8 +261,8 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
             </div>
           </div>
 
-          <div className='border-t border-border/70 bg-card'>
-            <div className='flex flex-wrap items-center justify-between gap-2 bg-muted/30 px-4 py-3 sm:px-5'>
+          <div className='border-t border-border/70 bg-white dark:bg-card'>
+            <div className='flex flex-wrap items-center justify-between gap-2 bg-white px-4 py-3 dark:bg-muted/30 sm:px-5'>
               <p className='text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
                 {selectedAppointmentDay
                   ? t('sections.appointments.selectedDate', {
@@ -282,7 +282,7 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
             <div className='max-h-[336px] space-y-0 overflow-y-auto'>
               {selectedAppointmentDay ? null : (
                 <div className='px-4 pb-4 sm:px-5'>
-                  <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
+                  <div className='rounded-xl border border-dashed border-border/70 bg-white p-4 text-sm text-muted-foreground dark:bg-muted/20'>
                     {t('sections.appointments.noDateSelected')}
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export const AgentDashboardAppointmentsCard = memo(function AgentDashboardAppoin
               {selectedAppointmentDay &&
                 (selectedDayAppointments.length === 0 ? (
                   <div className='px-4 pb-4 sm:px-5'>
-                    <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
+                    <div className='rounded-xl border border-dashed border-border/70 bg-white p-4 text-sm text-muted-foreground dark:bg-muted/20'>
                       {t('sections.appointments.emptyForFilter')}
                     </div>
                   </div>

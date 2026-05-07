@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import {
@@ -27,8 +27,11 @@ import {
   Eye,
   Building,
   Receipt,
+  Phone,
+  CalendarDays,
 } from 'lucide-react';
 
+import { Separator } from '@/shared/ui/separator';
 import { Button } from '@/shared/ui/button';
 import { Link } from '@/shared/config/i18n/navigation';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui/tabs';
@@ -72,6 +75,16 @@ const STATUS_STYLES: Record<string, string> = {
 
 function getStatusStyle(status: string): string {
   return STATUS_STYLES[status] ?? 'bg-background text-muted-foreground border-border';
+}
+
+function soldByNameInitials(name: string): string {
+  const s = name.trim();
+  if (!s) return '?';
+  const parts = s.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return s.slice(0, 2).toUpperCase();
 }
 
 function propertyFeeBillingLabel(cycle: PropertyBillingCycle, t: (key: string) => string): string {
@@ -267,8 +280,8 @@ function EngagementsSection({ propertyId }: { propertyId: string }) {
         <Button
           asChild
           size='sm'
-          variant='outline'
-          className='rounded-lg gap-1.5 h-9 text-sm border-primary/20 text-primary hover:bg-primary/5'
+          variant='default'
+          className='rounded-lg h-9 text-sm'
         >
           <Link href={`/dashboard/property/${propertyId}/delegate`}>
             <UserCheck className='h-3.5 w-3.5' />
@@ -430,6 +443,7 @@ export function PropertyDetailPanel({
   onDeleted?: () => void;
 }) {
   const t = useTranslations('PropertyDashboard');
+  const locale = useLocale();
   const { data: session } = useSession();
   const [imgIndex, setImgIndex] = useState(0);
   const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
@@ -519,14 +533,33 @@ export function PropertyDetailPanel({
     .join(', ');
 
   const currentImageUrl = images[imgIndex]?.media_url;
-  const soldByText =
-    property.status !== 'SOLD'
-      ? null
-      : property.sold_by_role === 'OWNER'
-        ? t('soldBySelf')
-        : property.sold_by_role === 'AGENT'
-          ? t('soldByAgent', { name: property.sold_by_name ?? '' })
-          : null;
+
+  const showSoldByCard =
+    property.status === 'SOLD' &&
+    (property.sold_by_role === 'OWNER' || property.sold_by_role === 'AGENT');
+
+  const soldByPersonName =
+    property.sold_by_name?.trim() ||
+    (property.sold_by_role === 'OWNER' ? t('soldByYouFallbackName') : '') ||
+    '—';
+
+  const soldByRoleLabel =
+    property.sold_by_role === 'OWNER'
+      ? t('soldByCardRoleOwner')
+      : property.sold_by_role === 'AGENT'
+        ? t('soldByCardRoleAgent')
+        : '';
+
+  const soldByPhone = property.sold_by_phone?.trim() || null;
+
+  const soldAtFormatted =
+    property.sold_at && !Number.isNaN(new Date(property.sold_at).getTime())
+      ? new Date(property.sold_at).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        })
+      : null;
 
   return (
     <div className='min-h-full bg-white pb-20 sm:pb-8'>
@@ -537,9 +570,9 @@ export function PropertyDetailPanel({
             <button
               type='button'
               onClick={onBack}
-              className='pointer-events-auto flex items-center gap-2 rounded-full bg-black/45 px-3 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+              className='pointer-events-auto flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]'
             >
-              <ChevronLeft className='h-4 w-4 shrink-0' />
+              <ChevronLeft className='h-4 w-4 shrink-0 [filter:drop-shadow(0_1px_4px_rgba(0,0,0,0.9))]' />
               {t('backToList')}
             </button>
           </div>
@@ -610,14 +643,16 @@ export function PropertyDetailPanel({
 
           {isActionsOpen && (
             <div className='absolute right-0 top-full z-30 mt-2 w-48 rounded-xl border border-primary/20 bg-white shadow-lg p-2 flex flex-col gap-1'>
-              <Link
-                href={`/dashboard/property/${property.property_id}/edit`}
-                onClick={() => setIsActionsOpen(false)}
-                className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-lg transition-colors font-medium'
-              >
-                <Edit className='h-4 w-4' strokeWidth={2} />
-                <span>{t('editAction')}</span>
-              </Link>
+              {!isAgentUser && (
+                <Link
+                  href={`/dashboard/property/${property.property_id}/edit`}
+                  onClick={() => setIsActionsOpen(false)}
+                  className='flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-lg transition-colors font-medium'
+                >
+                  <Edit className='h-4 w-4' strokeWidth={2} />
+                  <span>{t('editAction')}</span>
+                </Link>
+              )}
               <Link
                 href={`/dashboard/property/${property.property_id}/3d`}
                 onClick={() => setIsActionsOpen(false)}
@@ -689,9 +724,6 @@ export function PropertyDetailPanel({
                   {currentOpt?.icon}
                   {t(`status${property.status}` as Parameters<typeof t>[0])}
                 </span>
-                {soldByText && (
-                  <span className='text-xs font-medium text-muted-foreground'>{soldByText}</span>
-                )}
               </div>
             );
           }
@@ -745,6 +777,51 @@ export function PropertyDetailPanel({
           );
         })()}
       </div>
+
+      {showSoldByCard ? (
+        <div className='px-4 sm:px-6 pb-3'>
+          <div className='flex gap-3 rounded-xl border border-primary/15 bg-gradient-to-br from-primary/[0.04] via-white to-primary/[0.02] p-4 shadow-sm'>
+            <div
+              className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary'
+              aria-hidden
+            >
+              {soldByNameInitials(soldByPersonName)}
+            </div>
+            <div className='min-w-0 flex-1 space-y-2'>
+              <div>
+                <p className='text-[10px] font-semibold uppercase tracking-wide text-muted-foreground'>
+                  {t('soldByCardTitle')}
+                </p>
+                <p className='mt-0.5 text-base font-bold leading-snug text-foreground'>{soldByPersonName}</p>
+                {soldByRoleLabel ? (
+                  <span className='mt-1 inline-flex rounded-full border border-primary/20 bg-white/90 px-2.5 py-0.5 text-[11px] font-semibold text-primary'>
+                    {soldByRoleLabel}
+                  </span>
+                ) : null}
+              </div>
+              {soldByPhone || soldAtFormatted ? (
+                <div className='flex flex-col gap-1.5 text-xs text-muted-foreground'>
+                  {soldByPhone ? (
+                    <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
+                      <Phone className='h-3.5 w-3.5 shrink-0 text-primary/60' strokeWidth={2} />
+                      <span className='font-medium text-foreground/90'>{soldByPhone}</span>
+                      <span className='text-[11px] text-muted-foreground'>({t('soldByCardPhone')})</span>
+                    </div>
+                  ) : null}
+                  {soldAtFormatted ? (
+                    <div className='flex items-center gap-2'>
+                      <CalendarDays className='h-3.5 w-3.5 shrink-0 text-primary/60' strokeWidth={2} />
+                      <span>
+                        {t('soldByCardRecordedAt')}: <span className='font-medium text-foreground/85'>{soldAtFormatted}</span>
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Tabs */}
       <Tabs defaultValue='information' className='flex flex-col'>
@@ -828,91 +905,118 @@ export function PropertyDetailPanel({
             const hasAmenities = visibleAmenities.length > 0;
             const serviceFeesList = propertyFees ?? [];
             const hasServiceFees = serviceFeesList.length > 0;
-            const hasLeft =
-              !!property.description || hasAttributes || hasAmenities || hasServiceFees;
             const hasRight = facts.length > 0;
+            const showBottomRow = hasServiceFees || hasRight;
+            const showSepAfterAttributes = hasAttributes && (hasAmenities || showBottomRow);
+            const showSepAfterAmenities = hasAmenities && showBottomRow;
 
             return (
-              <div
-                className={cn(
-                  'flex gap-5',
-                  hasLeft && hasRight ? 'flex-col sm:flex-row sm:items-start' : 'flex-col'
-                )}
-              >
-                {/* Left — description, attributes, service fees, amenities */}
-                {hasLeft && (
-                  <div className={cn('flex flex-col gap-5 min-w-0', hasLeft && hasRight ? 'sm:w-1/2' : 'flex-1')}>
-                    {property.description && (
-                      <div className='flex flex-col gap-2'>
-                        <h2 className='text-lg font-bold tracking-tight text-foreground'>
-                          {t('labelDescription')}
-                        </h2>
-                        <p className='text-sm font-medium leading-[1.6] text-muted-foreground whitespace-pre-wrap'>
-                          {property.description}
-                        </p>
-                      </div>
-                    )}
+              <div className='flex flex-col gap-6'>
+                {property.description ? (
+                  <section className='flex flex-col gap-3'>
+                    <h3 className='text-base font-semibold tracking-tight text-foreground'>
+                      {t('labelDescription')}
+                    </h3>
+                    <p className='text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap'>
+                      {property.description}
+                    </p>
+                  </section>
+                ) : null}
 
-                    {hasAttributes && (
-                      <div className='rounded-lg border border-primary/20 p-4'>
-                        <div className='grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4'>
-                          {property.attributes!.map((attr) => {
-                            const hasValue =
-                              (attr.display_value != null &&
-                                attr.display_value !== '' &&
-                                attr.display_value !== 'undefined') ||
-                              attr.value_number != null ||
-                              attr.value_text != null ||
-                              attr.value_boolean != null;
-                            if (!hasValue) return null;
-                            let displayValue: string =
-                              attr.display_value != null &&
+                {hasAttributes ? (
+                  <section className='flex flex-col gap-3'>
+                    <h3 className='text-base font-semibold tracking-tight text-foreground'>
+                      {t('labelAttributes')}
+                    </h3>
+                    <div className='rounded-lg border border-primary/20 bg-white p-4'>
+                      <div className='grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4'>
+                        {property.attributes!.map((attr) => {
+                          const hasValue =
+                            (attr.display_value != null &&
                               attr.display_value !== '' &&
-                              attr.display_value !== 'undefined'
-                                ? String(attr.display_value)
-                                : attr.value_number != null
-                                  ? `${attr.value_number}${attr.unit ? ' ' + attr.unit : ''}`
-                                  : attr.value_text != null
-                                    ? attr.value_text
-                                    : attr.value_boolean != null
-                                      ? attr.value_boolean
-                                        ? t('attributeTrue')
-                                        : t('attributeFalse')
-                                      : '—';
-                            {
-                              const b = displayValue.trim().toLowerCase();
-                              if (b === 'true') displayValue = t('attributeTrue');
-                              else if (b === 'false') displayValue = t('attributeFalse');
-                            }
-                            return (
-                              <div key={attr.attribute_id} className='flex flex-col gap-3'>
-                                <p className='text-base font-medium leading-[1.5] text-muted-foreground'>
-                                  {attr.attribute_name}
+                              attr.display_value !== 'undefined') ||
+                            attr.value_number != null ||
+                            attr.value_text != null ||
+                            attr.value_boolean != null;
+                          if (!hasValue) return null;
+                          let displayValue: string =
+                            attr.display_value != null &&
+                            attr.display_value !== '' &&
+                            attr.display_value !== 'undefined'
+                              ? String(attr.display_value)
+                              : attr.value_number != null
+                                ? `${attr.value_number}${attr.unit ? ' ' + attr.unit : ''}`
+                                : attr.value_text != null
+                                  ? attr.value_text
+                                  : attr.value_boolean != null
+                                    ? attr.value_boolean
+                                      ? t('attributeTrue')
+                                      : t('attributeFalse')
+                                    : '—';
+                          {
+                            const b = displayValue.trim().toLowerCase();
+                            if (b === 'true') displayValue = t('attributeTrue');
+                            else if (b === 'false') displayValue = t('attributeFalse');
+                          }
+                          return (
+                            <div key={attr.attribute_id} className='flex flex-col gap-2'>
+                              <p className='text-sm font-medium leading-snug text-muted-foreground'>
+                                {attr.attribute_name}
+                              </p>
+                              <div className='flex items-center gap-2'>
+                                <AttributeIcon
+                                  iconName={attr.icon ?? attr.attribute_code}
+                                  className='size-5 shrink-0 text-foreground/50'
+                                  strokeWidth={2}
+                                />
+                                <p className='text-sm font-semibold text-foreground'>
+                                  {displayValue}
                                 </p>
-                                <div className='flex items-center gap-2'>
-                                  <AttributeIcon
-                                    iconName={attr.icon ?? attr.attribute_code}
-                                    className='size-5 text-foreground/50'
-                                    strokeWidth={2}
-                                  />
-                                  <p className='text-lg font-bold tracking-[-0.09px] text-foreground'>
-                                    {displayValue}
-                                  </p>
-                                </div>
                               </div>
-                            );
-                          })}
-                        </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
+                  </section>
+                ) : null}
 
-                    {hasServiceFees && (
-                      <div className='rounded-lg border border-primary/20 p-4'>
+                {showSepAfterAttributes ? <Separator /> : null}
+
+                {hasAmenities ? (
+                  <section className='flex flex-col gap-3'>
+                    <h3 className='text-base font-semibold tracking-tight text-foreground'>
+                      {t('labelAmenities')}
+                    </h3>
+                    <div className='flex flex-wrap gap-2'>
+                      {visibleAmenities.map((a) => (
+                        <span
+                          key={a.amenity_id}
+                          className='rounded-full border border-primary/10 bg-primary/5 px-3 py-1.5 text-sm font-medium text-primary'
+                        >
+                          {a.amenity_name}
+                        </span>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+
+                {showSepAfterAmenities ? <Separator /> : null}
+
+                {showBottomRow ? (
+                  <div
+                    className={cn(
+                      'grid gap-5',
+                      hasServiceFees && hasRight ? 'md:grid-cols-2' : 'grid-cols-1'
+                    )}
+                  >
+                    {hasServiceFees ? (
+                      <div className='rounded-xl border border-primary/20 bg-white p-4'>
                         <div className='mb-3 flex items-center gap-2'>
-                          <Receipt className='h-4 w-4 text-primary' strokeWidth={2} />
-                          <h2 className='text-lg font-bold tracking-tight text-foreground'>
+                          <Receipt className='h-4 w-4 shrink-0 text-primary' strokeWidth={2} />
+                          <h3 className='text-base font-semibold tracking-tight text-foreground'>
                             {t('labelServiceFees')}
-                          </h2>
+                          </h3>
                         </div>
                         <ul className='flex flex-col gap-3'>
                           {serviceFeesList.map((fee) => (
@@ -929,69 +1033,55 @@ export function PropertyDetailPanel({
                                 </span>
                               </div>
                               <div className='flex flex-wrap items-center gap-2'>
-                                <span className='text-xs text-muted-foreground'>
+                                <span className='text-sm text-muted-foreground'>
                                   {propertyFeeBillingLabel(fee.billing_cycle, t)}
                                 </span>
                                 {fee.is_optional ? (
-                                  <span className='rounded-md bg-primary/5 px-2 py-0.5 text-xs font-medium text-primary'>
+                                  <span className='rounded-md bg-primary/5 px-2 py-0.5 text-sm font-medium text-primary'>
                                     {t('feeOptional')}
                                   </span>
                                 ) : null}
                               </div>
                               {fee.description != null && fee.description.trim() !== '' ? (
-                                <p className='text-xs text-muted-foreground'>{fee.description}</p>
+                                <p className='text-sm text-muted-foreground'>{fee.description}</p>
                               ) : null}
                             </li>
                           ))}
                         </ul>
                       </div>
-                    )}
+                    ) : null}
 
-                    {hasAmenities && (
-                      <div>
-                        <h2 className='text-lg font-bold tracking-tight text-foreground mb-2'>
-                          {t('labelAmenities')}
-                        </h2>
-                        <div className='flex flex-wrap gap-2'>
-                          {visibleAmenities.map((a) => (
-                            <span
-                              key={a.amenity_id}
-                              className='rounded-full bg-primary/5 border border-primary/10 text-primary text-sm font-medium px-3 py-1.5'
+                    {hasRight ? (
+                      <div className='rounded-xl border border-primary/20 bg-white'>
+                        <div className='border-b border-primary/10 px-4 py-3'>
+                          <h3 className='text-base font-semibold tracking-tight text-foreground'>
+                            {t('labelTypeDetails')}
+                          </h3>
+                        </div>
+                        <div className='divide-y divide-primary/10'>
+                          {facts.map((f, i) => (
+                            <div
+                              key={i}
+                              className='flex items-center justify-between gap-3 px-4 py-2.5'
                             >
-                              {a.amenity_name}
-                            </span>
+                              <span className='shrink-0 text-sm font-medium text-muted-foreground'>
+                                {f.label}
+                              </span>
+                              <span
+                                className={cn(
+                                  'text-right text-sm font-semibold',
+                                  f.accent ?? 'text-foreground'
+                                )}
+                              >
+                                {f.value}
+                              </span>
+                            </div>
                           ))}
                         </div>
                       </div>
-                    )}
+                    ) : null}
                   </div>
-                )}
-
-                {/* Right — facts table */}
-                {hasRight && (
-                  <div className={cn(hasLeft && hasRight ? 'sm:w-1/2' : 'w-full', 'shrink-0')}>
-                    <div className='rounded-xl border border-primary/20 bg-white divide-y divide-primary/10'>
-                      {facts.map((f, i) => (
-                        <div
-                          key={i}
-                          className='flex items-center justify-between px-3 py-2.5 gap-3'
-                        >
-                          <span className='text-sm font-medium text-muted-foreground shrink-0'>
-                            {f.label}
-                          </span>
-                          <span
-                            className={cn(
-                              'text-sm font-semibold text-right',
-                              f.accent ?? 'text-foreground'
-                            )}
-                          >
-                            {f.value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                ) : null}
               </div>
             );
           })()}

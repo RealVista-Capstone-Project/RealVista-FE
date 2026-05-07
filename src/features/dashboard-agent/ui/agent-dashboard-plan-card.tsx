@@ -136,7 +136,7 @@ function PlanSubscriptionRow({ sub, t, locale }: PlanSubscriptionRowProps) {
   return (
     <div
       className={cn(
-        'relative flex flex-col gap-3 overflow-hidden rounded-xl border border-l-4 bg-card p-4 shadow-sm',
+        'relative flex flex-col gap-3 overflow-hidden rounded-xl border border-l-4 bg-white p-4 shadow-sm dark:bg-card',
         meta.accentBorder
       )}
     >
@@ -250,7 +250,7 @@ function PlanBoostRow({ boost, t, locale }: PlanBoostRowProps) {
   const isHotBadgeLow = hotBadgeQuota > 0 && hotBadgePercent >= 80;
 
   return (
-    <div className='relative flex flex-col gap-3 overflow-hidden rounded-xl border border-l-4 border-l-rose-500 bg-card p-4 shadow-sm'>
+    <div className='relative flex flex-col gap-3 overflow-hidden rounded-xl border border-l-4 border-l-rose-500 bg-white p-4 shadow-sm dark:bg-card'>
       <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-rose-500/10 to-amber-500/5 opacity-60' />
 
       <div className='relative flex items-start justify-between gap-2'>
@@ -359,7 +359,7 @@ export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
   const isLoading = planQuery.isLoading && !planQuery.data;
 
   return (
-    <Card className='border-border/70 bg-card shadow-sm xl:col-span-3'>
+    <Card className='border-border/70 bg-white shadow-sm dark:bg-card xl:col-span-3'>
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <Zap className='h-4 w-4 text-primary' />
@@ -369,12 +369,12 @@ export const AgentDashboardPlanCard = memo(function AgentDashboardPlanCard() {
       </CardHeader>
       <CardContent className='space-y-3'>
         {isLoading ? (
-          <div className='flex items-center gap-2 rounded-xl border bg-muted/30 p-4 text-xs text-muted-foreground'>
+          <div className='flex items-center gap-2 rounded-xl border bg-white p-4 text-xs text-muted-foreground dark:bg-muted/30'>
             <Loader2 className='h-4 w-4 animate-spin text-primary' />
             <span>{t('sections.plan.loading')}</span>
           </div>
         ) : activePlans.length === 0 && activeBoosts.length === 0 ? (
-          <div className='rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground'>
+          <div className='rounded-xl border border-dashed border-border/70 bg-white p-4 text-sm text-muted-foreground dark:bg-muted/20'>
             {t('sections.plan.empty')}
           </div>
         ) : (

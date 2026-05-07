@@ -21,6 +21,7 @@ export interface UpdateAgentProfilePayload {
 export interface AgentListItem {
   user_id: string;
   full_name: string | null;
+  email?: string | null;
   avatar_url: string | null;
   bio: string | null;
   specialties: string | null;

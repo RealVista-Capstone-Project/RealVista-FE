@@ -10,7 +10,7 @@ import { useContentVerification } from '@/shared/lib/hooks/use-content-verificat
 import { useMediaAnalysis } from '@/shared/lib/hooks/use-media-analysis';
 import { useListingQuota } from '@/entities/billing';
 import type { PropertyPriceRange } from '@/entities/property/api/property-api.types';
-import { toVietnameseWords } from '@/shared/lib/utils/vietnamese-number-words';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 import {
   ListingNameInput,
   ListingContentTextarea,
@@ -28,6 +28,10 @@ function formatEnMoneyLong(n: number): string {
   return `${n.toLocaleString('en-US')} VND`;
 }
 
+function formatViMoneyLong(n: number): string {
+  return `${formatNumber(n)} đồng`;
+}
+
 function formatOwnerPriceBand(
   band: { min?: number | null; max?: number | null } | undefined,
   locale: string
@@ -40,7 +44,7 @@ function formatOwnerPriceBand(
   if (!hasMin && !hasMax) return null;
   const nMin = hasMin ? Number(min) : NaN;
   const nMax = hasMax ? Number(max) : NaN;
-  const fmt = (n: number) => (locale === 'vi' ? toVietnameseWords(n) : formatEnMoneyLong(n));
+  const fmt = (n: number) => (locale === 'vi' ? formatViMoneyLong(n) : formatEnMoneyLong(n));
   if (hasMin && hasMax && nMin === nMax) return fmt(nMin);
   if (hasMin && hasMax) return `${fmt(nMin)} – ${fmt(nMax)}`;
   if (hasMin) return fmt(nMin);
@@ -117,10 +121,28 @@ export function ListingInformationStep({
     analyzeFile,
     appendEntries,
     removeEntry,
-    allImagesAnalyzed,
-    allImagesPassed,
     QUALITY_THRESHOLD,
   } = useMediaAnalysis();
+
+  /** Per-file check so an empty `analysisStatus` cannot satisfy vacuous `every()` while `newFiles` has images. */
+  const newImageAiGate = React.useMemo(() => {
+    let pending = false;
+    let allPassed = true;
+    for (let i = 0; i < newFiles.length; i++) {
+      const file = newFiles[i];
+      if (!file.type.startsWith('image/')) continue;
+      const s = analysisStatus[i];
+      if (!s || s.isLoading || (!s.result && !s.error)) {
+        pending = true;
+        allPassed = false;
+        continue;
+      }
+      if (s.error || !s.result || (s.result.finalScore ?? 100) < QUALITY_THRESHOLD) {
+        allPassed = false;
+      }
+    }
+    return { pending, allPassed };
+  }, [newFiles, analysisStatus, QUALITY_THRESHOLD]);
 
   // ── Form State ──
   /** Switch UI owns Thuê ↔ Bán; `listingType` is derived (avoids shared handler with radios). */
@@ -402,7 +424,12 @@ export function ListingInformationStep({
   // canSubmit: only gate on AI/media conditions that can't be shown inline.
   // Field errors (name, price, etc.) are surfaced via validate() on submit click.
   const hasMedia = selectedMediaIds.size > 0 || selectedNewFileIndices.size > 0;
-  const canSubmit = hasMedia && allImagesAnalyzed && allImagesPassed && isContentValid && !isSubmitting;
+  const canSubmit =
+    hasMedia &&
+    !newImageAiGate.pending &&
+    newImageAiGate.allPassed &&
+    isContentValid &&
+    !isSubmitting;
 
   // ── Translation labels for shared components ──
   const priceLabels = {
@@ -755,10 +782,10 @@ export function ListingInformationStep({
           <button
             type='button'
             onClick={() => handleSubmit(true)}
-            disabled={isSubmitting || isLocked}
+            disabled={isSubmitting || isLocked || newImageAiGate.pending}
             className={cn(
               'flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-all sm:min-w-[128px]',
-              !isSubmitting && !isLocked
+              !isSubmitting && !isLocked && !newImageAiGate.pending
                 ? 'bg-primary shadow-sm shadow-primary/20 hover:bg-primary/90'
                 : 'cursor-not-allowed bg-primary/30'
             )}

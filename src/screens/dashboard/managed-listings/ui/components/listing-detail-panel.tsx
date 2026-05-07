@@ -155,6 +155,24 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
     }
   };
 
+  // AGENT backend role is surfaced as session.user.role === 'moderator' — must read backendRoles
+  const backendRoles = session?.user?.backendRoles ?? [];
+  const isAgentViewer =
+    String(session?.user?.role ?? '').toUpperCase() === 'AGENT' || backendRoles.includes('AGENT');
+
+  const useOwnerContactUi =
+    listing.is_created_by_owner === false && isAgentViewer && !!listing.property_owner;
+
+  /** Profile shown on the listing's property tab: owner sees broker; agent sees landlord when API provides `property_owner`. */
+  const contactCardProfile =
+    listing.is_created_by_owner === false
+      ? isAgentViewer
+        ? listing.property_owner ?? listing.agent ?? undefined
+        : listing.agent ?? undefined
+      : undefined;
+
+  const showContactPartyInfo = contactCardProfile != null;
+
   const handleContact = async () => {
     if (!isAuthenticated(session)) {
       const locale = params?.locale || 'vi';
@@ -162,10 +180,16 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
       return;
     }
 
+    if (!contactCardProfile?.user_id) return;
+
+    const targetUserId = contactCardProfile.user_id;
+    const targetName = contactCardProfile.full_name;
+    const targetAvatar = contactCardProfile.avatar_url;
+
     try {
       // Use the new create or get conversation API
       const response = await queryClient.fetchQuery(
-        conversationQueries.detailOrCreate(listing.agent!.user_id)
+        conversationQueries.detailOrCreate(targetUserId)
       );
 
       const convData = (
@@ -185,9 +209,9 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
           router.push(`/${locale}${ROUTES.dashboard.messages}/${conversationId}`);
         } else {
           openWindow(conversationId, {
-            id: listing.agent!.user_id,
-            name: listing.agent!.full_name,
-            avatar: listing.agent!.avatar_url,
+            id: targetUserId,
+            name: targetName,
+            avatar: targetAvatar,
           });
         }
       }
@@ -198,9 +222,6 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
 
   // Get dynamic attributes from listing
   const attributes = listing.attributes ?? [];
-
-  // Check if listing is created by someone other than the property owner
-  const showAgentInfo = listing.is_created_by_owner === false && listing.agent;
 
   // Calculate availability status
   const availabilityDate = listing.available_from ? parseISO(listing.available_from) : null;
@@ -758,24 +779,28 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
               </>
             ) : null}
 
-            {showAgentInfo && (
+            {showContactPartyInfo && (
               <>
                 <div className='border-t border-primary/10' />
                 <div>
                   <div className='mb-3 flex items-center gap-2'>
                     <Building2 className='h-4 w-4 text-primary' strokeWidth={2} />
                     <div>
-                      <h3 className='text-base font-bold text-foreground'>{t('agent.title')}</h3>
-                      <p className='text-xs text-muted-foreground'>{t('agent.subtitle')}</p>
+                      <h3 className='text-base font-bold text-foreground'>
+                        {useOwnerContactUi ? t('owner.title') : t('agent.title')}
+                      </h3>
+                      <p className='text-xs text-muted-foreground'>
+                        {useOwnerContactUi ? t('owner.subtitle') : t('agent.subtitle')}
+                      </p>
                     </div>
                   </div>
 
                   <div className='flex items-start gap-4 rounded-xl border border-primary/12 bg-primary/[0.03] p-4'>
                     <div className='relative shrink-0'>
-                      {listing.agent!.avatar_url ? (
+                      {contactCardProfile!.avatar_url ? (
                         <Image
-                          src={listing.agent!.avatar_url}
-                          alt={listing.agent!.full_name}
+                          src={contactCardProfile.avatar_url}
+                          alt={contactCardProfile.full_name}
                           width={56}
                           height={56}
                           className='h-14 w-14 rounded-full object-cover'
@@ -783,12 +808,12 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                       ) : (
                         <div className='flex h-14 w-14 items-center justify-center rounded-full bg-primary'>
                           <span className='text-lg font-bold text-white'>
-                            {listing.agent!.first_name?.[0]}
-                            {listing.agent!.last_name?.[0]}
+                            {contactCardProfile.first_name?.[0]}
+                            {contactCardProfile.last_name?.[0]}
                           </span>
                         </div>
                       )}
-                      {listing.agent!.is_verified && (
+                      {contactCardProfile.is_verified && (
                         <div className='absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white'>
                           <BadgeCheck className='h-4 w-4 fill-blue-500 text-white' strokeWidth={2} />
                         </div>
@@ -798,38 +823,38 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                     <div className='flex-1 space-y-3'>
                       <div>
                         <h4 className='text-base font-bold text-foreground'>
-                          {listing.agent!.business_name || listing.agent!.full_name}
+                          {contactCardProfile.business_name || contactCardProfile.full_name}
                         </h4>
-                        {listing.agent!.business_name && listing.agent!.full_name && (
-                          <p className='text-sm text-muted-foreground'>{listing.agent!.full_name}</p>
+                        {contactCardProfile.business_name && contactCardProfile.full_name && (
+                          <p className='text-sm text-muted-foreground'>{contactCardProfile.full_name}</p>
                         )}
-                        {listing.agent!.is_verified && (
+                        {contactCardProfile.is_verified && (
                           <div className='mt-1 flex items-center gap-1.5'>
                             <BadgeCheck className='h-3.5 w-3.5 text-blue-500' strokeWidth={2} />
                             <span className='text-xs font-medium text-blue-600'>
-                              {t('agent.verified')}
+                              {useOwnerContactUi ? t('owner.verified') : t('agent.verified')}
                             </span>
                           </div>
                         )}
                       </div>
 
                       <div className='space-y-2 text-sm'>
-                        {listing.agent!.phone && (
+                        {contactCardProfile.phone && (
                           <div className='flex items-center gap-2 text-muted-foreground'>
                             <Phone className='h-4 w-4' strokeWidth={2} />
-                            <span>{listing.agent!.phone}</span>
+                            <span>{contactCardProfile.phone}</span>
                           </div>
                         )}
-                        {listing.agent!.email && (
+                        {contactCardProfile.email && (
                           <div className='flex items-center gap-2 text-muted-foreground'>
                             <Mail className='h-4 w-4' strokeWidth={2} />
-                            <span>{listing.agent!.email}</span>
+                            <span>{contactCardProfile.email}</span>
                           </div>
                         )}
-                        {listing.agent!.company && (
+                        {contactCardProfile.company && (
                           <div className='flex items-center gap-2 text-muted-foreground'>
                             <Building2 className='h-4 w-4' strokeWidth={2} />
-                            <span>{listing.agent!.company}</span>
+                            <span>{contactCardProfile.company}</span>
                           </div>
                         )}
                       </div>
@@ -839,7 +864,7 @@ export function ListingDetailPanel({ listing, onBack }: ListingDetailPanelProps)
                         onClick={handleContact}
                         className='mt-2 w-full cursor-pointer rounded-lg bg-primary py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                       >
-                        {t('agent.contact')}
+                        {useOwnerContactUi ? t('owner.contact') : t('agent.contact')}
                       </button>
                     </div>
                   </div>

@@ -20,7 +20,6 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/shared/ui/button';
-import { Link } from '@/shared/config/i18n/navigation';
 import { Badge } from '@/shared/ui/badge';
 import { Textarea } from '@/shared/ui/textarea';
 import { Input } from '@/shared/ui/input';
@@ -41,6 +40,7 @@ import {
 } from '@/shared/ui/dialog';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
+import { useRouter } from 'next/navigation';
 import { agentProfileQueries } from '@/entities/agent-profile';
 import { propertyQueries } from '@/entities/property';
 import { agentEngagementApi } from '@/entities/agent-engagement/api/agent-engagement.api';
@@ -107,10 +107,10 @@ function AgentCard({
       onClick={isUnavailable ? undefined : onClick}
       disabled={isUnavailable}
       className={cn(
-        'relative flex flex-col items-center text-center rounded-2xl border transition-all duration-200 p-4 gap-2.5 w-full',
+        'relative flex w-full items-center gap-4 rounded-xl border bg-white p-4 text-left transition-all duration-200',
         isSelected
           ? 'border-primary shadow-md bg-primary/5 ring-1 ring-primary/20'
-          : 'border-slate-200 bg-white hover:border-primary/50 hover:shadow-md',
+          : 'border-slate-200 hover:border-primary/50 hover:shadow-md',
         isUnavailable && 'cursor-not-allowed opacity-80'
       )}
     >
@@ -133,7 +133,7 @@ function AgentCard({
       )}
 
       {/* Avatar */}
-      <div className='h-14 w-14 rounded-full bg-slate-100 overflow-hidden ring-2 ring-white shadow flex-shrink-0'>
+      <div className='h-14 w-14 shrink-0 rounded-full bg-slate-100 overflow-hidden ring-2 ring-white shadow'>
         {agent.avatar_url ? (
           <Image
             src={agent.avatar_url}
@@ -149,47 +149,51 @@ function AgentCard({
         )}
       </div>
 
-      {/* Name */}
-      <p className='text-sm font-bold text-slate-800 leading-tight line-clamp-2 w-full px-1'>
-        {agent.full_name ?? '—'}
-      </p>
+      <div className='min-w-0 flex-1 space-y-1.5'>
+        <p className='text-sm font-bold leading-tight text-slate-800 line-clamp-2'>
+          {agent.full_name ?? '—'}
+        </p>
+        {agent.email && (
+          <p className='text-[11px] text-slate-500 truncate' title={agent.email}>
+            {agent.email}
+          </p>
+        )}
 
-      {/* Rating */}
-      {agent.rating != null ? (
-        <div className='flex items-center gap-1'>
-          <Star className='h-3.5 w-3.5 text-amber-400 fill-amber-400' />
-          <span className='text-xs font-semibold text-slate-700'>
-            {typeof agent.rating === 'number' ? agent.rating.toFixed(1) : agent.rating}
+        {agent.rating != null ? (
+          <div className='flex flex-wrap items-center gap-x-1 gap-y-0.5'>
+            <Star className='h-3.5 w-3.5 shrink-0 text-amber-400 fill-amber-400' />
+            <span className='text-xs font-semibold text-slate-700'>
+              {typeof agent.rating === 'number' ? agent.rating.toFixed(1) : agent.rating}
+            </span>
+            {agent.years_of_experience != null && (
+              <span className='text-[11px] text-slate-400'>
+                · {agent.years_of_experience} {t('agentExperience')}
+              </span>
+            )}
+          </div>
+        ) : agent.years_of_experience != null ? (
+          <span className='text-[11px] text-slate-400'>
+            {agent.years_of_experience} {t('agentExperience')}
           </span>
-          {agent.years_of_experience != null && (
-            <span className='text-[11px] text-slate-400'>
-              · {agent.years_of_experience} {t('agentExperience')}
-            </span>
-          )}
-        </div>
-      ) : agent.years_of_experience != null ? (
-        <span className='text-[11px] text-slate-400'>
-          {agent.years_of_experience} {t('agentExperience')}
-        </span>
-      ) : null}
+        ) : null}
 
-      {/* Specialty chips */}
-      {specialtyChips.length > 0 && (
-        <div className='flex flex-wrap gap-1 justify-center'>
-          {specialtyChips.map((chip) => (
-            <span
-              key={chip}
-              className='text-[10px] bg-primary/5 text-primary border border-primary/30 rounded-md px-1.5 py-0.5 font-medium'
-            >
-              {chip}
-            </span>
-          ))}
-        </div>
-      )}
+        {specialtyChips.length > 0 && (
+          <div className='flex flex-wrap gap-1'>
+            {specialtyChips.map((chip) => (
+              <span
+                key={chip}
+                className='text-[10px] bg-primary/5 text-primary border border-primary/30 rounded-md px-1.5 py-0.5 font-medium'
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Accepted overlay */}
       {isAccepted && (
-        <div className='absolute inset-0 rounded-2xl bg-white/70 flex items-center justify-center pointer-events-none'>
+        <div className='pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-white/70'>
           <div className='flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5 shadow-sm'>
             <UserCheck className='h-4 w-4 text-emerald-600' />
             <span className='text-xs font-bold text-emerald-700'>{t('alreadyHired')}</span>
@@ -197,7 +201,7 @@ function AgentCard({
         </div>
       )}
       {accountState && (
-        <div className='absolute inset-0 rounded-2xl bg-white/70 flex items-center justify-center pointer-events-none'>
+        <div className='pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-white/70'>
           <div className='flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-xl px-3 py-1.5 shadow-sm'>
             <User className='h-4 w-4 text-red-600' />
             <span className='text-xs font-bold text-red-700'>
@@ -300,6 +304,11 @@ function AgentDetailPanel({
         </div>
         <div className='flex-1 min-w-0'>
           <h2 className='text-base font-bold text-slate-900'>{agent.full_name ?? '—'}</h2>
+          {agent.email && (
+            <p className='text-xs text-slate-500 truncate mt-0.5' title={agent.email}>
+              {agent.email}
+            </p>
+          )}
           {accountState && (
             <Badge variant='outline' className='mt-1 bg-red-50 text-red-700 border-red-200 text-[10px] font-bold'>
               {accountState === 'deleted' ? t('deletedAgent') : t('inactiveAgent')}
@@ -398,6 +407,7 @@ function AgentDetailPanel({
           <Button
             className='w-full rounded-xl gap-2 bg-primary'
             onClick={() => setHireDialogOpen(true)}
+            disabled={hasActiveEngagement}
           >
             <UserCheck className='h-4 w-4' />
             {t('hireButton')}
@@ -508,6 +518,8 @@ interface DelegateAgentPageProps {
 
 export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps) {
   const t = useTranslations('DelegateAgent');
+  const tListingDetail = useTranslations('ListingDetailScreen');
+  const router = useRouter();
   const [selectedAgent, setSelectedAgent] = useState<AgentListItem | null>(null);
   const [search, setSearch] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
@@ -551,14 +563,16 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
   return (
     <div className='flex flex-col h-full overflow-hidden'>
       {/* Header */}
-      <div className='flex items-center gap-3 px-5 py-4 border-b border-slate-200 bg-white flex-shrink-0'>
-        <Button asChild variant='ghost' size='sm' className='rounded-lg gap-2 -ml-2'>
-          <Link href='/dashboard/property'>
-            <ArrowLeft className='h-4 w-4' />
-            {t('backToProperty')}
-          </Link>
-        </Button>
-        <div className='h-4 w-px bg-slate-200' />
+      <div className='flex flex-shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-5 py-4'>
+        <button
+          type='button'
+          onClick={() => router.back()}
+          className='flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80'
+        >
+          <ArrowLeft className='size-4 shrink-0' />
+          <span className='hidden sm:inline'>{tListingDetail('back')}</span>
+        </button>
+        <div className='h-4 w-px shrink-0 bg-slate-200' />
         <h1 className='text-base font-bold text-slate-900'>{t('pageTitle')}</h1>
       </div>
 
@@ -566,10 +580,9 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
       <div className='flex flex-1 overflow-hidden'>
         {/* Left: agent grid */}
         <div className='w-[65%] border-r border-slate-200 overflow-y-auto bg-slate-50/30 flex flex-col'>
-          {/* Search & filter bar */}
-          <div className='px-4 py-3 border-b border-slate-100 bg-white flex-shrink-0 space-y-2.5'>
-            <div className='flex items-center gap-2'>
-              <p className='text-xs font-bold text-slate-500 uppercase tracking-wide flex-1'>
+          <div className='flex-shrink-0 space-y-3 border-b border-slate-100 bg-white px-4 py-3'>
+            <div className='flex flex-wrap items-baseline justify-between gap-2'>
+              <p className='flex-1 text-xs font-bold uppercase tracking-wide text-slate-500'>
                 {t('agentListTitle')}
                 {!isLoading && (
                   <span className='ml-1.5 font-normal normal-case text-slate-400'>
@@ -578,45 +591,49 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
                 )}
               </p>
             </div>
-            <div className='relative'>
-              <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400' />
-              <Input
-                className='pl-8 h-8 text-sm rounded-lg'
-                placeholder={t('searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <div className='flex gap-2'>
-              <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
-                <SelectTrigger className='h-8 text-xs rounded-lg flex-1'>
-                  <SlidersHorizontal className='h-3 w-3 text-slate-400 mr-1.5 flex-shrink-0' />
-                  <SelectValue placeholder={t('filterSpecialty')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>{t('allSpecialties')}</SelectItem>
-                  {propertyTypeOptions.map((pt) => (
-                    <SelectItem key={pt.id} value={pt.name!}>{pt.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                <SelectTrigger className='h-8 text-xs rounded-lg w-[130px]'>
-                  <Star className='h-3 w-3 text-amber-400 fill-amber-400 mr-1.5 flex-shrink-0' />
-                  <SelectValue placeholder={t('filterRating')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>{t('allRatings')}</SelectItem>
-                  <SelectItem value='4'>4+ ★</SelectItem>
-                  <SelectItem value='3'>3+ ★</SelectItem>
-                  <SelectItem value='2'>2+ ★</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+              <div className='relative min-w-0 flex-1'>
+                <Search className='absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400' />
+                <Input
+                  className='h-9 rounded-lg pl-8 text-sm'
+                  placeholder={t('searchPlaceholder')}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2'>
+                <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+                  <SelectTrigger className='h-9 w-full rounded-lg text-xs sm:w-[min(100%,11rem)]'>
+                    <SlidersHorizontal className='mr-1.5 h-3 w-3 shrink-0 text-slate-400' />
+                    <SelectValue placeholder={t('filterSpecialty')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='all'>{t('allSpecialties')}</SelectItem>
+                    {propertyTypeOptions.map((pt) => (
+                      <SelectItem key={pt.id} value={pt.name!}>
+                        {pt.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={ratingFilter} onValueChange={setRatingFilter}>
+                  <SelectTrigger className='h-9 w-full rounded-lg text-xs sm:w-[8.5rem]'>
+                    <Star className='mr-1.5 h-3 w-3 shrink-0 fill-amber-400 text-amber-400' />
+                    <SelectValue placeholder={t('filterRating')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='all'>{t('allRatings')}</SelectItem>
+                    <SelectItem value='4'>4+ ★</SelectItem>
+                    <SelectItem value='3'>3+ ★</SelectItem>
+                    <SelectItem value='2'>2+ ★</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
-          {/* Agent grid */}
-          <div className='p-4 flex-1'>
+          {/* Agent list */}
+          <div className='flex-1 p-4'>
             {isLoading ? (
               <div className='flex justify-center py-10'>
                 <div className='h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-primary' />
@@ -628,17 +645,18 @@ export default function DelegateAgentPage({ propertyId }: DelegateAgentPageProps
                 </p>
               </div>
             ) : (
-              <div className='grid grid-cols-2 xl:grid-cols-3 gap-3'>
+              <ul className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
                 {filteredAgents.map((agent) => (
-                  <AgentCard
-                    key={agent.user_id}
-                    agent={agent}
-                    isSelected={selectedAgent?.user_id === agent.user_id}
-                    onClick={() => setSelectedAgent(agent)}
-                    t={t}
-                  />
+                  <li key={agent.user_id} className='min-w-0'>
+                    <AgentCard
+                      agent={agent}
+                      isSelected={selectedAgent?.user_id === agent.user_id}
+                      onClick={() => setSelectedAgent(agent)}
+                      t={t}
+                    />
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         </div>
