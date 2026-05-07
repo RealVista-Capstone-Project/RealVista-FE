@@ -36,7 +36,14 @@
       "yoyHint": "vs same period last year (new inventory)",
       "valueFootnote": "Based on midpoint of listing price range",
       "runningListings": "Live listings",
-      "expiringHint": "{count} expiring within 7 days"
+      "expiringHint": "{count} expiring within 7 days",
+      "agent": {
+        "currentProperties": "Current properties",
+        "activeProperties": "Active properties",
+        "runningListings": "Live listings",
+        "soldOrRented": "Sold / rented homes",
+        "soldRentedBreakdown": "{sold} sold · {rented} rented"
+      }
     },
     "gridSectionTitle": "Properties",
     "addPropertyCardTitle": "Add a new property",
@@ -82,6 +89,7 @@
     "feeBillingYearly": "Yearly",
     "feeBillingOneTime": "One-time",
     "labelAttributes": "Features",
+    "labelTypeDetails": "Type & details",
     "labelListings": "Listings",
     "labelEngagements": "Applications",
     "noListings": "No listings for this property yet",

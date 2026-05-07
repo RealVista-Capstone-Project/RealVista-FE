@@ -23,6 +23,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
+import { useAuthSession } from '@/features/auth/model';
 import { useQuery } from '@tanstack/react-query';
 import { propertyQueries } from '@/entities/property/api/property.queries';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
@@ -293,6 +294,10 @@ function metricNum(v: unknown): number {
 
 export default function PropertyDashboardPage() {
   const t = useTranslations('PropertyDashboard');
+  const { data: session } = useAuthSession();
+  const backendRoles = React.useMemo(() => session?.user?.backendRoles ?? [], [session?.user?.backendRoles]);
+  const isAgentUser =
+    String(session?.user?.role ?? '').toUpperCase() === 'AGENT' || backendRoles.includes('AGENT');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -363,6 +368,8 @@ export default function PropertyDashboardPage() {
   const expiringSoonMetric = metricNum(
     metrics?.listingsExpiringSoonCount ?? metrics?.listings_expiring_soon_count
   );
+  const soldPropMetric = metricNum(metrics?.soldProperties ?? metrics?.sold_properties);
+  const rentedPropMetric = metricNum(metrics?.rentedProperties ?? metrics?.rented_properties);
 
   const showcaseCounts =
     metrics?.showcaseTypeCounts ??
@@ -613,47 +620,95 @@ export default function PropertyDashboardPage() {
 
       <div className='flex min-h-0 flex-1 flex-col overflow-y-auto'>
           <div className='grid gap-3 px-4 pt-3 pb-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 sm:px-6'>
-            <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
-              <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.totalAssets')}</p>
-              <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
-                {formatNumber(totalPropsMetric || totalElements)}
-              </p>
-              <p className='mt-1 text-xs font-medium text-emerald-600'>
-                {t('kpi.activeAssetsHint', { count: formatNumber(activePropMetric) })}
-              </p>
-            </div>
-            <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
-              <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.totalArea')}</p>
-              <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
-                {formatNumber(Math.round(totalLandMetric))} m²
-              </p>
-              <p className='mt-1 text-xs text-muted-foreground'>
-                {t('kpi.avgAreaHint', { value: formatNumber(Math.round(avgLandMetric)) })}
-              </p>
-            </div>
-            <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
-              <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.estimatedValue')}</p>
-              <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
-                {portfolioMetric > 0 ? formatVND(portfolioMetric) : '—'}
-              </p>
-              {yoyPercent != null ? (
-                <p className='mt-1 text-xs font-medium text-primary'>
-                  ↑ {yoyPercent >= 0 ? '+' : ''}
-                  {yoyPercent.toFixed(1)}% {t('kpi.yoyHint')}
-                </p>
-              ) : (
-                <p className='mt-1 text-xs text-muted-foreground'>{t('kpi.valueFootnote')}</p>
-              )}
-            </div>
-            <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
-              <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.runningListings')}</p>
-              <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
-                {formatNumber(publishedListingsMetric)}
-              </p>
-              <p className='mt-1 text-xs font-medium text-amber-600'>
-                {t('kpi.expiringHint', { count: formatNumber(expiringSoonMetric) })}
-              </p>
-            </div>
+            {isAgentUser ? (
+              <>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>
+                    {t('kpi.agent.currentProperties')}
+                  </p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(totalPropsMetric || totalElements)}
+                  </p>
+                </div>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>
+                    {t('kpi.agent.activeProperties')}
+                  </p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(activePropMetric)}
+                  </p>
+                </div>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>
+                    {t('kpi.agent.runningListings')}
+                  </p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(publishedListingsMetric)}
+                  </p>
+                  <p className='mt-1 text-xs font-medium text-amber-600'>
+                    {t('kpi.expiringHint', { count: formatNumber(expiringSoonMetric) })}
+                  </p>
+                </div>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>
+                    {t('kpi.agent.soldOrRented')}
+                  </p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(soldPropMetric + rentedPropMetric)}
+                  </p>
+                  <p className='mt-1 text-xs text-muted-foreground'>
+                    {t('kpi.agent.soldRentedBreakdown', {
+                      sold: formatNumber(soldPropMetric),
+                      rented: formatNumber(rentedPropMetric),
+                    })}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.totalAssets')}</p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(totalPropsMetric || totalElements)}
+                  </p>
+                  <p className='mt-1 text-xs font-medium text-emerald-600'>
+                    {t('kpi.activeAssetsHint', { count: formatNumber(activePropMetric) })}
+                  </p>
+                </div>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.totalArea')}</p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(Math.round(totalLandMetric))} m²
+                  </p>
+                  <p className='mt-1 text-xs text-muted-foreground'>
+                    {t('kpi.avgAreaHint', { value: formatNumber(Math.round(avgLandMetric)) })}
+                  </p>
+                </div>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.estimatedValue')}</p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {portfolioMetric > 0 ? formatVND(portfolioMetric) : '—'}
+                  </p>
+                  {yoyPercent != null ? (
+                    <p className='mt-1 text-xs font-medium text-primary'>
+                      ↑ {yoyPercent >= 0 ? '+' : ''}
+                      {yoyPercent.toFixed(1)}% {t('kpi.yoyHint')}
+                    </p>
+                  ) : (
+                    <p className='mt-1 text-xs text-muted-foreground'>{t('kpi.valueFootnote')}</p>
+                  )}
+                </div>
+                <div className='rounded-2xl border border-primary/12 bg-white p-4 shadow-sm'>
+                  <p className='text-xs font-semibold text-muted-foreground'>{t('kpi.runningListings')}</p>
+                  <p className='mt-1 text-2xl font-bold tabular-nums text-foreground'>
+                    {formatNumber(publishedListingsMetric)}
+                  </p>
+                  <p className='mt-1 text-xs font-medium text-amber-600'>
+                    {t('kpi.expiringHint', { count: formatNumber(expiringSoonMetric) })}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           <div className='mt-5 mb-2 flex items-center justify-between px-4 sm:px-6'>

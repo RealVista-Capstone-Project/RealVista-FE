@@ -43,7 +43,14 @@
       "yoyHint": "so với cùng kỳ năm trước (tài sản mới)",
       "valueFootnote": "Ước tính theo khoảng giá niêm yết",
       "runningListings": "Bài đăng đang chạy",
-      "expiringHint": "{count} bài sắp hết hạn"
+      "expiringHint": "{count} bài sắp hết hạn",
+      "agent": {
+        "currentProperties": "Số bất động sản hiện tại",
+        "activeProperties": "Các bất động sản đang hoạt động",
+        "runningListings": "Bài đăng đang chạy",
+        "soldOrRented": "Số ngôi nhà đã bán / cho thuê",
+        "soldRentedBreakdown": "{sold} đã bán · {rented} cho thuê"
+      }
     },
     "gridSectionTitle": "Danh sách bất động sản",
     "addPropertyCardTitle": "Thêm bất động sản mới",
@@ -89,6 +96,7 @@
     "feeBillingYearly": "Theo năm",
     "feeBillingOneTime": "Một lần",
     "labelAttributes": "Đặc trưng",
+    "labelTypeDetails": "Chi tiết loại hình",
     "labelListings": "Bài đăng",
     "labelEngagements": "Ứng tuyển",
     "noListings": "Chưa có bài đăng nào cho bất động sản này",
