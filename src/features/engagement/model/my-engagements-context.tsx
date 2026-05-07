@@ -52,7 +52,7 @@ export const MyEngagementsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [tab, setTab] = useState<EngagementTab>('sent');
+  const [tab, setTab] = useState<EngagementTab>('all');
 
   const searchParams = useSearchParams();
   const router = useRouter();

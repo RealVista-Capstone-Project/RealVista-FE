@@ -29,7 +29,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
     const listingId = extractListingId(slug);
 
     const session = await auth();
-    const { payload: response } = await listingApi.getById(listingId, true, {
+    const { payload: response } = await listingApi.getById(listingId, true, false, {
       headers: session?.user.accessToken
         ? { Authorization: `Bearer ${session.user.accessToken}` }
         : undefined,

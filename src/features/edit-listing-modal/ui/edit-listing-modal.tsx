@@ -5,8 +5,10 @@ import { useTranslations } from 'next-intl';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import { mediaApi } from '@/entities/media/api/media.api';
+import { listingQueries } from '@/entities/listing/api';
 import { useUpdateListing } from '../api/use-update-listing';
 import type { EditListingPayload } from '../model/types';
 import type { Listing, ListingType } from '@/entities/listing';
@@ -75,9 +77,16 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
     QUALITY_THRESHOLD,
   } = useMediaAnalysis();
 
+  // ── Re-fetch listing media scoped to agent when editing ──
+  const editingQuery = useQuery({
+    ...listingQueries.detail(listing.listing_id, false, true),
+    enabled: isOpen,
+  });
+
   // ── Reset form when opened with a new listing ──
   React.useEffect(() => {
     if (isOpen) {
+      const media = editingQuery.data?.payload?.data?.media || listing.media;
       setName(listing.name);
       setContent(listing.content || '');
       setListingType(listing.listing_type);
@@ -87,13 +96,13 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       setIsNegotiable(listing.is_negotiable);
       setAvailableFrom(listing.available_from || '');
       setSecurityDeposit(listing.security_deposit?.toString() ?? '');
-      setSelectedMediaIds(new Set(listing.media?.map((m) => m.media_id) || []));
-      setPrimaryMediaId(listing.media?.find((m) => m.is_primary)?.media_id || null);
+      setSelectedMediaIds(new Set(media?.map((m) => m.media_id) || []));
+      setPrimaryMediaId(media?.find((m) => m.is_primary)?.media_id || null);
       setNewFiles([]);
       setSelectedNewFileIndices(new Set());
       setErrors({});
     }
-  }, [isOpen, listing]);
+  }, [isOpen, listing, editingQuery.data]);
 
   // ── Media Handlers ──
   const toggleMedia = (mediaId: string) => {
@@ -272,7 +281,7 @@ export function EditListingModal({ listing, isOpen, onOpenChange }: EditListingM
       if (newFiles.length > 0) {
         const filesToUpload = newFiles.filter((_, i) => selectedNewFileIndices.has(i));
         if (filesToUpload.length > 0) {
-          const uploadRes = await mediaApi.uploadBulkMedia(filesToUpload, 'listings');
+          const uploadRes = await mediaApi.uploadBulkMedia(filesToUpload, 'listings', listing.property_id);
           if (
             uploadRes.status < 200 ||
             uploadRes.status >= 300 ||

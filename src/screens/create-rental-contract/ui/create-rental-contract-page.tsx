@@ -100,11 +100,16 @@ function applyPropertyToForm(property: PropertySummaryResponse): Partial<FormSta
 
 /** Maps a full Listing API response to the same FormState fields as applyPropertyToForm */
 function applyListingToForm(listing: import('@/entities/listing').Listing): Partial<FormState> {
-  const primaryMedia = listing.media?.find((m) => m.is_primary) ?? listing.media?.[0];
+  const primaryMedia =
+    listing.media?.find((m) => m.is_primary) ??
+    listing.media?.[0] ??
+    listing.property?.media?.find((m) => m.is_primary) ??
+    listing.property?.media?.[0];
   const addressParts = [
-    listing.property.street_address,
-    listing.location.district_name,
-    listing.location.city_name,
+    listing.property?.street_address,
+    listing.location?.ward_name,
+    listing.location?.district_name,
+    listing.location?.city_name,
   ].filter(Boolean);
   const bedroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bedrooms' || a.attribute_code === 'BEDROOMS');
   const bathroomsAttr = listing.attributes?.find((a) => a.attribute_code === 'bathrooms' || a.attribute_code === 'BATHROOMS');
@@ -114,7 +119,7 @@ function applyListingToForm(listing: import('@/entities/listing').Listing): Part
 
   return {
     propertyId: listing.property_id ?? listing.listing_id,
-    propertyTitle: listing.name ?? listing.property.street_address,
+    propertyTitle: listing.property?.street_address ?? listing.name ?? '',
     propertyAddress: addressParts.join(', '),
     propertyType: listing.property_type?.property_type_name ?? '',
     bedrooms: String(bedroomsAttr?.value_number ?? 0),
@@ -267,6 +272,8 @@ export function CreateRentalContractPage() {
     return backendRoles.includes('AGENT');
   }, [session?.user]);
 
+  const isAgentPrefilledCreateFlow = isAgent && Boolean(prefillListingId) && Boolean(prefillTenantId);
+
   const buildPayload = (): CreateRentalContractPayload => {
     const sessionUserId = session?.user?.id ?? '';
 
@@ -317,7 +324,11 @@ export function CreateRentalContractPage() {
   const sendForSigning = async () => {
     try {
       const contract = await createContractMutation.mutateAsync(buildPayload());
-      const signing = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id });
+      const returnUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/leases/signing-complete?leaseId=${contract.id}&signerRole=landlord&viewerRole=owner`
+          : undefined;
+      const signing = await sendToLandlordMutation.mutateAsync({ leaseId: contract.id, returnUrl });
       toast.success(t('toast.sentSuccess'));
       // Agents create the contract on behalf of the owner — they have nothing to sign,
       // so skip the DocuSign modal and redirect straight to the contracts list.
@@ -340,9 +351,19 @@ export function CreateRentalContractPage() {
       return (
         <StepListingPicker
           selectedPropertyId={form.propertyId}
-          onSelectProperty={(property) =>
-            setForm((prev) => ({ ...prev, ...applyPropertyToForm(property) }))
-          }
+          selectedPropertyView={{
+            title: form.propertyTitle,
+            address: form.propertyAddress,
+            type: form.propertyType,
+            bedrooms: form.bedrooms,
+            bathrooms: form.bathrooms,
+            thumbnailUrl: form.thumbnailUrl,
+          }}
+          viewOnly={isAgentPrefilledCreateFlow}
+          onSelectProperty={(property) => {
+            if (isAgentPrefilledCreateFlow) return;
+            setForm((prev) => ({ ...prev, ...applyPropertyToForm(property) }));
+          }}
           t={(key, values) => t(key as never, values as never)}
         />
       );
@@ -353,6 +374,7 @@ export function CreateRentalContractPage() {
         <StepTenantLookup
           form={form}
           isLoading={tenantLookupLoading}
+          viewOnly={isAgentPrefilledCreateFlow}
           onEmailChange={handleTenantEmailChange}
           onLookup={handleTenantLookup}
           t={(key) => t(key as never)}
@@ -428,7 +450,6 @@ export function CreateRentalContractPage() {
             setCurrentStep(next);
             setMaxReachedStep((prev) => (next > prev ? next : prev));
           }}
-          onSaveDraft={saveDraft}
           onSendForSigning={sendForSigning}
           t={(key) => t(key as never)}
         />

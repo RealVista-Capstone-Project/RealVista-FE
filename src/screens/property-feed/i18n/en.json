@@ -33,6 +33,24 @@
       "submitProposal": "Submit Proposal",
       "alreadyProposed": "Proposal Sent"
     },
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected",
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "rented": "Rented",
+      "DRAFT": "Draft",
+      "PENDING": "Pending",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected",
+      "AVAILABLE": "Available",
+      "RESERVED": "Reserved",
+      "SOLD": "Sold",
+      "RENTED": "Rented"
+    },
     "empty": {
       "title": "No properties found.",
       "subtitle": "Try adjusting your filters or check back later.",

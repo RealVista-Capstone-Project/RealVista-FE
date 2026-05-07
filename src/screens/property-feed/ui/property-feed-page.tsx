@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   PropertyFeedProvider,
   usePropertyFeedContext,
-  type PriceFilter,
   type ListingType,
 } from '@/features/agent-proposal/model/property-feed-context';
 import { OwnerPropertyCard } from '@/features/agent-proposal/ui/owner-property-card';
@@ -15,7 +15,6 @@ import { Button } from '@/shared/ui/button';
 import { formatNumber, formatVND } from '@/shared/lib/utils/format-currency';
 import { Search, Home, Filter, X, DollarSign, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useIsMobile } from '@/shared/lib/hooks/use-mobile';
 import { cn } from '@/shared/lib/utils';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import type { OwnerPropertySummary } from '@/entities/property';
@@ -33,6 +32,70 @@ function parseInputNumber(value: string): number | undefined {
   if (!digits) return undefined;
   const n = parseInt(digits, 10);
   return isNaN(n) ? undefined : n;
+}
+
+function normalizeAddress(value: string | null | undefined): string {
+  return (value ?? '').trim().toLowerCase();
+}
+
+function compactAddressForMatching(value: string | null | undefined): string {
+  return normalizeAddress(value).replace(/[^a-z0-9]/g, '');
+}
+
+function isFlexibleAddressMatch(
+  leftAddress: string | null | undefined,
+  rightAddress: string | null | undefined
+): boolean {
+  const left = compactAddressForMatching(leftAddress);
+  const right = compactAddressForMatching(rightAddress);
+  if (!left || !right) return false;
+  // Guard against accidental broad matches for very short fragments.
+  if (left.length < 8 || right.length < 8) return left === right;
+  return left.includes(right) || right.includes(left);
+}
+
+const RETURN_TO_APPLY_INTENT_STORAGE_KEY = 'agent-proposal:return-to-apply-intent';
+const RETURN_TO_APPLY_INTENT_MAX_AGE_MS = 30 * 60 * 1000;
+
+interface ReturnToApplyIntent {
+  propertyId?: string;
+  propertyAddress?: string;
+  source: 'manage-proposals';
+  ts: number;
+}
+
+function readReturnToApplyIntent(): ReturnToApplyIntent | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const rawValue = window.localStorage.getItem(RETURN_TO_APPLY_INTENT_STORAGE_KEY);
+    if (!rawValue) return null;
+    const parsedValue = JSON.parse(rawValue) as Partial<ReturnToApplyIntent>;
+    if (parsedValue.source !== 'manage-proposals') return null;
+    if (typeof parsedValue.propertyId !== 'undefined' && typeof parsedValue.propertyId !== 'string') return null;
+    if (typeof parsedValue.propertyAddress !== 'undefined' && typeof parsedValue.propertyAddress !== 'string') return null;
+    if (!parsedValue.propertyId && !parsedValue.propertyAddress) return null;
+    if (typeof parsedValue.ts !== 'number') return null;
+    if (Date.now() - parsedValue.ts > RETURN_TO_APPLY_INTENT_MAX_AGE_MS) return null;
+    return {
+      propertyAddress: parsedValue.propertyAddress,
+      propertyId: parsedValue.propertyId,
+      source: 'manage-proposals',
+      ts: parsedValue.ts,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function clearReturnToApplyIntent() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(RETURN_TO_APPLY_INTENT_STORAGE_KEY);
+    // Legacy cleanup for older session-based intent writes.
+    window.sessionStorage.removeItem(RETURN_TO_APPLY_INTENT_STORAGE_KEY);
+  } catch {
+    // Ignore storage failures - URL cleanup still prevents repeat auto-open.
+  }
 }
 
 interface LocalPriceFilter {
@@ -420,9 +483,15 @@ function MobileFilterSheet() {
 function PropertyCardWithProposal({
   property,
   listingType,
+  autoOpenPropertyId,
+  autoOpenPropertyAddress,
+  onAutoOpenHandled,
 }: {
   property: OwnerPropertySummary;
   listingType: ListingType;
+  autoOpenPropertyId?: string | null;
+  autoOpenPropertyAddress?: string | null;
+  onAutoOpenHandled?: (property: Pick<OwnerPropertySummary, 'property_id' | 'street_address'>) => void;
 }) {
   const {
     isAgent,
@@ -436,6 +505,25 @@ function PropertyCardWithProposal({
 
   // Merge backend "cannot apply" state with local property flag
   const alreadyProposed = cannotApplyProposal || property.has_active_proposal;
+  const confirmedHandledTargetRef = useRef<string | null>(null);
+  const pendingAutoOpenAcknowledgeRef = useRef<Pick<
+    OwnerPropertySummary,
+    'property_id' | 'street_address'
+  > | null>(null);
+
+  useEffect(() => {
+    // Legacy auto-open logic removed in favor of page-level handling in PropertyFeedContent
+  }, []);
+
+  useEffect(() => {
+    if (!isApplyModalOpen) return;
+    const pendingTarget = pendingAutoOpenAcknowledgeRef.current;
+    if (!pendingTarget) return;
+    const handledToken = autoOpenPropertyId ?? normalizeAddress(autoOpenPropertyAddress);
+    confirmedHandledTargetRef.current = handledToken;
+    pendingAutoOpenAcknowledgeRef.current = null;
+    onAutoOpenHandled?.(pendingTarget);
+  }, [isApplyModalOpen, onAutoOpenHandled, autoOpenPropertyId, autoOpenPropertyAddress]);
 
   return (
     <>
@@ -446,9 +534,10 @@ function PropertyCardWithProposal({
         isAgent={isAgent}
         onPropose={openApplyModal}
       />
-      {isAgent && (
+      {isAgent && isApplyModalOpen && (
         <AgentApplyProposalModal
           propertyId={propertyId}
+          propertyAddress={property.street_address}
           isOpen={isApplyModalOpen}
           onClose={() => setIsApplyModalOpen(false)}
           onSubmitSuccess={onApplySubmitSuccess}
@@ -461,6 +550,7 @@ function PropertyCardWithProposal({
 // ── Main content ──────────────────────────────────────────────────────────────
 
 function PropertyFeedContent() {
+  const searchParams = useSearchParams();
   const {
     properties,
     isLoading,
@@ -476,6 +566,121 @@ function PropertyFeedContent() {
 
   const t = useTranslations('PropertyFeed');
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoOpenFromUrl, setShouldAutoOpenFromUrl] = useState(false);
+  const [pendingReturnPropertyId, setPendingReturnPropertyId] = useState<string | null>(null);
+  const [pendingReturnPropertyAddress, setPendingReturnPropertyAddress] = useState<string | null>(null);
+  const [settledSearchQuery, setSettledSearchQuery] = useState<string | null>(null);
+  const [autoOpenModalTarget, setAutoOpenModalTarget] = useState<OwnerPropertySummary | null>(null);
+  const lastFetchAttemptTargetRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const shouldOpenApplyModal = params.get('openApplyModal') === '1' || params.get('autoOpen') === '1';
+    const targetPropertyId = params.get('propertyId') || params.get('openPropertyId');
+    const targetPropertyAddress = params.get('propertyAddress');
+
+    console.log('PropertyFeed: checking URL params', { shouldOpenApplyModal, targetPropertyId, targetPropertyAddress });
+    if (shouldOpenApplyModal && (targetPropertyId || targetPropertyAddress)) {
+      setShouldAutoOpenFromUrl(true);
+      setPendingReturnPropertyId(targetPropertyId);
+      setPendingReturnPropertyAddress(targetPropertyAddress ?? null);
+      if (targetPropertyAddress) {
+        setSearchQuery(targetPropertyAddress);
+      }
+      return;
+    }
+
+    const fallbackIntent = readReturnToApplyIntent();
+    if (!fallbackIntent) {
+      clearReturnToApplyIntent();
+      setShouldAutoOpenFromUrl(false);
+      return;
+    }
+
+    setShouldAutoOpenFromUrl(true);
+    setPendingReturnPropertyId(fallbackIntent.propertyId ?? null);
+    setPendingReturnPropertyAddress(fallbackIntent.propertyAddress ?? null);
+    if (fallbackIntent.propertyAddress) {
+      setSearchQuery(fallbackIntent.propertyAddress);
+    }
+  }, [searchParams, setSearchQuery]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setSettledSearchQuery(searchQuery);
+    }
+  }, [isLoading, searchQuery]);
+
+  useEffect(() => {
+    if (!shouldAutoOpenFromUrl) return;
+    if (!pendingReturnPropertyId && !pendingReturnPropertyAddress) return;
+    if (settledSearchQuery !== searchQuery) return;
+
+    const targetKey = pendingReturnPropertyId ?? normalizeAddress(pendingReturnPropertyAddress);
+    const targetProperty = properties.find(
+      (p) =>
+        pendingReturnPropertyId
+          ? p.property_id === pendingReturnPropertyId
+          : isFlexibleAddressMatch(p.street_address, pendingReturnPropertyAddress)
+    );
+
+    if (targetProperty) {
+      lastFetchAttemptTargetRef.current = null;
+      if (!autoOpenModalTarget) {
+        setAutoOpenModalTarget(targetProperty);
+      }
+    } else {
+      if (hasNextPage && !isFetchingNextPage) {
+        if (lastFetchAttemptTargetRef.current === targetKey) return;
+        lastFetchAttemptTargetRef.current = targetKey;
+        fetchNextPage();
+        return;
+      }
+
+      if (isFetchingNextPage) return;
+      if (!hasNextPage) {
+        lastFetchAttemptTargetRef.current = null;
+        clearReturnToApplyIntent();
+        setShouldAutoOpenFromUrl(false);
+        setPendingReturnPropertyId(null);
+        setPendingReturnPropertyAddress(null);
+      }
+    }
+  }, [shouldAutoOpenFromUrl, pendingReturnPropertyId, pendingReturnPropertyAddress, properties, hasNextPage, isFetchingNextPage, fetchNextPage, settledSearchQuery, searchQuery, autoOpenModalTarget]);
+
+  useEffect(() => {
+    if (!isFetchingNextPage) {
+      lastFetchAttemptTargetRef.current = null;
+    }
+  }, [isFetchingNextPage]);
+
+  const handleAutoOpenHandled = ({
+    property_id,
+    street_address,
+  }: Pick<OwnerPropertySummary, 'property_id' | 'street_address'>) => {
+    if (typeof window === 'undefined') return;
+    if (!shouldAutoOpenFromUrl) return;
+    if (!pendingReturnPropertyId && !pendingReturnPropertyAddress) return;
+
+    const matchesTarget = pendingReturnPropertyId
+      ? pendingReturnPropertyId === property_id
+      : isFlexibleAddressMatch(pendingReturnPropertyAddress, street_address);
+    if (!matchesTarget) return;
+
+    clearReturnToApplyIntent();
+    setShouldAutoOpenFromUrl(false);
+    setPendingReturnPropertyId(null);
+    setPendingReturnPropertyAddress(null);
+    const params = new URLSearchParams(window.location.search);
+    params.delete('openApplyModal');
+    params.delete('propertyId');
+    params.delete('propertyAddress');
+    const query = params.toString();
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+    window.history.replaceState({}, '', nextUrl);
+  };
 
   // Infinite scroll
   useEffect(() => {
@@ -566,6 +771,9 @@ function PropertyFeedContent() {
                     key={property.property_id}
                     property={property}
                     listingType={listingType}
+                    autoOpenPropertyId={shouldAutoOpenFromUrl ? pendingReturnPropertyId : null}
+                    autoOpenPropertyAddress={shouldAutoOpenFromUrl ? pendingReturnPropertyAddress : null}
+                    onAutoOpenHandled={handleAutoOpenHandled}
                   />
                 ))}
               </div>
@@ -587,6 +795,23 @@ function PropertyFeedContent() {
             </div>
           )}
         </div>
+
+        {/* Page-level auto-open modal */}
+        {autoOpenModalTarget && (
+          <AgentApplyProposalModal
+            propertyId={autoOpenModalTarget.property_id}
+            propertyAddress={autoOpenModalTarget.street_address}
+            isOpen={true}
+            onClose={() => {
+              setAutoOpenModalTarget(null);
+              handleAutoOpenHandled(autoOpenModalTarget);
+            }}
+            onSubmitSuccess={() => {
+              setAutoOpenModalTarget(null);
+              handleAutoOpenHandled(autoOpenModalTarget);
+            }}
+          />
+        )}
       </div>
     </div>
   );

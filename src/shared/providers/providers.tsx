@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { AuthTokenProvider } from '@/shared/lib/auth/auth-token-provider';
+import { PostHogProvider } from '@/shared/lib/analytics';
 import { Toaster } from '@/shared/ui/sonner';
 
 /**
@@ -14,7 +15,7 @@ import { Toaster } from '@/shared/ui/sonner';
  * - AuthTokenProvider: Synchronizes auth token with HTTP client
  * - QueryClientProvider: TanStack Query for server state management
  * - Toaster: Displays toast notifications across the application
- *
+ * - PostHogProvider: PostHog analytics provider
  * Note: SubscriptionCTABanner is rendered in the locale layout, inside
  * NextIntlClientProvider, because it requires both QueryClient and next-intl context.
  *
@@ -44,12 +45,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
-      <AuthTokenProvider>
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster richColors position='top-right' />
-        </QueryClientProvider>
-      </AuthTokenProvider>
+      <PostHogProvider>
+        <AuthTokenProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+            <Toaster richColors position='top-right' />
+          </QueryClientProvider>
+        </AuthTokenProvider>
+      </PostHogProvider>
     </SessionProvider>
   );
 }

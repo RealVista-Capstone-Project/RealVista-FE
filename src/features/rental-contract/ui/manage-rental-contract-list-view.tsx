@@ -16,8 +16,6 @@ import { useSyncDashboardTopNavCountBadge } from '@/shared/lib/dashboard-top-nav
 
 import { useContractColumns } from './contract-columns';
 
-type StatusFilter = 'all' | RentalContractStatus;
-
 interface ManageRentalContractListViewProps {
   contracts: RentalContract[];
   totalElements: number;

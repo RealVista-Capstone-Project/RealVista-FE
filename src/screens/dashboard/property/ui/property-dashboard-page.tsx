@@ -99,8 +99,8 @@ function PropertyPortfolioGridCard({ property }: { property: PropertySummaryResp
 
   const thumbnailUrl =
     property.thumbnail_url ??
-    property.media?.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
-    property.media?.[0]?.media_url;
+    preferredMedia.find((m: PropertyMediaItem) => m.is_primary)?.media_url ??
+    preferredMedia[0]?.media_url;
 
   const location = [property.location_info?.district_name, property.location_info?.city_name]
     .filter(Boolean)

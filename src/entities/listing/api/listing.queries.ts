@@ -13,10 +13,10 @@ export const listingQueries = {
   /**
    * Get single listing by ID
    */
-  detail: (listingId: string, recordView: boolean = false) =>
+  detail: (listingId: string, recordView: boolean = false, editing: boolean = false) =>
     queryOptions({
-      queryKey: [...listingKeys.detail(listingId), recordView],
-      queryFn: () => listingApi.getById(listingId, recordView),
+      queryKey: [...listingKeys.detail(listingId), recordView, editing],
+      queryFn: () => listingApi.getById(listingId, recordView, editing),
       staleTime: 5 * 60 * 1000, // 5 minutes
       enabled: !!listingId,
     }),

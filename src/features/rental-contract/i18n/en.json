@@ -27,7 +27,8 @@
       "active": "Active",
       "expired": "Expired",
       "terminated": "Terminated",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
     },
     "table": {
       "status": "Status",
@@ -49,7 +50,11 @@
       "noAvailableAction": "No Available Action",
       "signNow": "Sign Now",
       "sendToOwner": "Send to Owner",
-      "sentSuccess": "Contract sent for signing"
+      "sentSuccess": "Contract sent for signing",
+      "moreActions": "More actions",
+      "contractActions": "Contract actions",
+      "viewDetail": "View detail",
+      "cancelLease": "Cancel Lease"
     },
     "statusActionHints": {
       "sendForSigning": "Create or reuse the DocuSign envelope and send it to both parties.",
@@ -68,14 +73,30 @@
       "reasonLabel": "Reason",
       "reasonPlaceholder": "Write a clear note for this status update...",
       "reasonHint": "Use at least 10 characters so the update history stays useful.",
-      "updating": "Updating..."
+      "updating": "Updating...",
+      "cancelTitle": "Cancel rental contract",
+      "cancelDescription": "You can cancel this contract for {tenantName} while it is still in draft or pending signature.",
+      "cancelReasonPlaceholder": "Optional: tell the other party why this contract is being cancelled...",
+      "cancelReasonHint": "Optional. Leave blank to cancel without sending a reason."
     },
     "toast": {
       "updateSuccess": "Rental contract updated successfully",
       "updateError": "Failed to update rental contract. Please try again.",
       "signingUrlReady": "Signing URL is ready — opening DocuSign in a new tab.",
       "signingUnavailable": "Signing is temporarily unavailable. Please try again later.",
-      "signingError": "Failed to load signing link. Please try again."
+      "signingError": "Failed to load signing link. Please try again.",
+      "cancelSuccess": "Rental contract cancelled successfully"
+    },
+    "signedDocument": {
+      "title": "Final signed contract",
+      "notAvailable": "Final signed contract is not available yet.",
+      "preparing": "Final contract is being prepared...",
+      "completed": "Your final signed contract is ready.",
+      "viewButton": "View signed contract",
+      "failed": "Could not prepare signed contract. Please try again later.",
+      "missingUrl": "Signed contract is completed but the document link is unavailable.",
+      "securePreview": "Secure preview",
+      "iframeTitle": "Signed contract preview"
     },
     "common": {
       "cancel": "Cancel"

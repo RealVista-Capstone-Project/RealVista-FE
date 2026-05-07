@@ -228,6 +228,24 @@
     "pagination": {
       "showing": "Showing {from} - {to} of {total} results",
       "pageInfo": "Page {current} of {total}"
+    },
+    "Status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected",
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "rented": "Rented",
+      "DRAFT": "Draft",
+      "PENDING": "Pending",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected",
+      "AVAILABLE": "Available",
+      "RESERVED": "Reserved",
+      "SOLD": "Sold",
+      "RENTED": "Rented"
     }
   },
   "Chat": {
@@ -819,6 +837,7 @@
     "btnDelete": "Delete",
     "btnClose": "Close",
     "btnCreateNow": "Create Now",
+    "returnToApplyCta": "Back to apply for this property",
     "formCreateTitle": "Create New Template",
     "formCreateSubtitle": "Perfect for presenting to property owners",
     "formEditTitle": "Edit Template",

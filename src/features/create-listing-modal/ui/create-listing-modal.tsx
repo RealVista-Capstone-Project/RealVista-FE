@@ -408,7 +408,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
 
     try {
       if (data.newFiles && data.newFiles.length > 0) {
-        const uploadRes = await mediaApi.uploadBulkMedia(data.newFiles, 'listings');
+        const uploadRes = await mediaApi.uploadBulkMedia(data.newFiles, 'listings', data.propertyId);
         if (
           uploadRes.status < 200 ||
           uploadRes.status >= 300 ||

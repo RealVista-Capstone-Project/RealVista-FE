@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams } from 'next/navigation';
 import type { OwnerPropertySummary } from '@/entities/property';
@@ -12,16 +12,20 @@ import { useAuthSession, isAuthenticated } from '@/features/auth/model';
  * Uses engagement apply-state API and optional local lock after successful submit.
  */
 export function useAgentProposalCtaForOwnerProperty(property: OwnerPropertySummary | null) {
-  const { data: session } = useAuthSession();
+  const { data: session, status } = useAuthSession();
   const queryClient = useQueryClient();
   const router = useRouter();
   const params = useParams();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [applyBlockedLocal, setApplyBlockedLocal] = useState(false);
 
+  const lastIdRef = useRef(property?.property_id);
   useEffect(() => {
-    setApplyBlockedLocal(false);
-    setIsApplyModalOpen(false);
+    if (property?.property_id !== lastIdRef.current) {
+      setApplyBlockedLocal(false);
+      setIsApplyModalOpen(false);
+      lastIdRef.current = property?.property_id;
+    }
   }, [property?.property_id]);
 
   const backendRoles = session?.user?.backendRoles ?? [];
@@ -41,14 +45,18 @@ export function useAgentProposalCtaForOwnerProperty(property: OwnerPropertySumma
   const cannotApplyProposal =
     applyBlockedLocal || applyStateResponse?.payload?.data?.can_apply_proposal === false;
 
-  const openApplyModal = useCallback(() => {
+  const isAuthReady = status !== 'loading';
+
+  const openApplyModal = useCallback((): boolean => {
+    if (!isAuthReady) return false;
     if (!isAuthenticated(session)) {
       const locale = params?.locale || 'vi';
       router.push(`/${locale}/login`);
-      return;
+      return false;
     }
     setIsApplyModalOpen(true);
-  }, [session, params?.locale, router]);
+    return true;
+  }, [isAuthReady, session, params?.locale, router]);
 
   const onApplySubmitSuccess = useCallback(() => {
     setApplyBlockedLocal(true);
@@ -62,6 +70,7 @@ export function useAgentProposalCtaForOwnerProperty(property: OwnerPropertySumma
 
   return {
     isAgent,
+    isAuthReady,
     isApplyModalOpen,
     setIsApplyModalOpen,
     cannotApplyProposal,

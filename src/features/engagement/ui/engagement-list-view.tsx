@@ -91,14 +91,14 @@ export const EngagementListView = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterOpen]);
 
-  const hasActiveTab = tab !== 'sent';
+  const hasActiveTab = tab !== 'all';
   const hasActiveStatus = statusFilter !== 'all';
   const hasActiveFilter = hasActiveTab || hasActiveStatus;
   const activeFilterCount = (hasActiveTab ? 1 : 0) + (hasActiveStatus ? 1 : 0);
 
   const resetFilters = () => {
     onStatusFilterChange('all');
-    onTabChange('sent');
+    onTabChange('all');
     setIsFilterOpen(false);
   };
 

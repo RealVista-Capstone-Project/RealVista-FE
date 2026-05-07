@@ -51,6 +51,12 @@ export const canAcceptAppointment = (
  * - Status must be PENDING or ACCEPTED
  * - Must be at least 4 hours before the start time
  */
+export const hasStarted = (startTimeStr: string) => {
+  const startTime = new Date(startTimeStr);
+  const now = new Date();
+  return startTime.getTime() <= now.getTime();
+};
+
 export const canCancelAppointment = (
   appointment: Appointment,
   currentUserId?: string
@@ -70,6 +76,13 @@ export const canCancelAppointment = (
   const startTime = parseAppointmentDate(appointment.start_time);
   const now = new Date();
 
+  // RULE 0: If the appointment is in the past, no actions allowed
+  if (startTime.getTime() <= now.getTime()) return false;
+
+  // If it's still PENDING, the sender (proposer) can always cancel/withdraw
+  // without being restricted by the 4-hour rule.
+  if (appointment.status === 'PENDING' && isSender) return true;
+
   if (isNaN(startTime.getTime())) return false;
 
   const fourHoursInMs = 4 * 60 * 60 * 1000;
@@ -86,6 +99,101 @@ export const getStatusColorClasses = (status: AppointmentStatus): string => {
     REJECTED: 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300',
     CANCELED: 'bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-300',
     COMPLETED: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
+    RESCHEDULE_PENDING: 'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
   };
   return configs[status] || '';
+};
+
+export interface AppointmentActions {
+  canAccept: boolean;
+  canReject: boolean;
+  canCancel: boolean;
+  canReschedule: boolean;
+  canRespondReschedule: boolean;
+  canCancelRescheduleProposal: boolean;
+  canComplete: boolean;
+}
+
+/**
+ * Determines available actions for a user on an appointment.
+ */
+export const getAppointmentActions = (
+  appointment: Appointment,
+  currentUserId?: string
+): AppointmentActions => {
+  if (!currentUserId) {
+    return {
+      canAccept: false,
+      canReject: false,
+      canCancel: false,
+      canReschedule: false,
+      canRespondReschedule: false,
+      canCancelRescheduleProposal: false,
+      canComplete: false,
+    };
+  }
+
+  const isSender = appointment.sender_id === currentUserId || appointment.is_sender === true;
+  const isReceiver = appointment.receiver_id === currentUserId;
+  const isParticipant = isSender || isReceiver;
+  const isStarted = hasStarted(appointment.start_time);
+  const status = appointment.status;
+
+  // Reschedule logic
+  const isReschedulePending = status === 'RESCHEDULE_PENDING';
+  const isMyRescheduleProposal = isReschedulePending && appointment.last_modified_by_user_id === currentUserId;
+
+  return {
+    // Basic confirmation: only receiver can accept/reject a PENDING tour
+    canAccept: !isStarted && isReceiver && status === 'PENDING',
+    canReject: !isStarted && isReceiver && status === 'PENDING',
+
+    // Cancellation:
+    // - PENDING: sender can always cancel (withdraw).
+    // - ACCEPTED: participant can cancel if > 4h (or whatever rule is in canCancelAppointment).
+    canCancel: !isStarted && isParticipant && canCancelAppointment(appointment, currentUserId),
+
+    // Rescheduling:
+    // - Allowed if PENDING or ACCEPTED and not already in a RESCHEDULE_PENDING flow.
+    canReschedule: !isStarted && isParticipant && (status === 'PENDING' || status === 'ACCEPTED'),
+
+    // Reschedule responses:
+    // - If someone proposed a change to an ACCEPTED tour, the other party can respond.
+    canRespondReschedule: !isStarted && isReschedulePending && !isMyRescheduleProposal,
+    canCancelRescheduleProposal: !isStarted && isReschedulePending && isMyRescheduleProposal,
+
+    // Completion: only for receiver/agent when it has started
+    canComplete: isReceiver && status === 'ACCEPTED' && isStarted,
+  };
+};
+
+/**
+ * Gets the localized status key and color for an appointment.
+ * Handles sub-states like "Counter-proposal" (PENDING but modified by Receiver).
+ */
+export const getAppointmentStatusInfo = (
+  appointment: Appointment,
+  currentUserId?: string
+) => {
+  const status = appointment.status;
+  const isSender = appointment.sender_id === currentUserId || appointment.is_sender === true;
+
+  // Detection for Counter-proposal:
+  // PENDING and last_modified_by_user_id exists and is NOT the original sender.
+  const isCounterProposal =
+    status === 'PENDING' &&
+    !!appointment.last_modified_by_user_id &&
+    appointment.last_modified_by_user_id !== appointment.sender_id;
+
+  if (isCounterProposal) {
+    return {
+      labelKey: isSender ? 'counterProposed' : 'pending',
+      colorClass: 'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300'
+    };
+  }
+
+  return {
+    labelKey: status.toLowerCase(),
+    colorClass: getStatusColorClasses(status)
+  };
 };

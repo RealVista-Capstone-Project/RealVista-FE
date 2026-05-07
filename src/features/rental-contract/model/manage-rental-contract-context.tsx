@@ -30,6 +30,9 @@ interface ManageRentalContractContextValue {
   totalPages: number;
   totalElements: number;
   itemsPerPage: number;
+  selectedContract: RentalContract | null;
+  setSelectedContract: (contract: RentalContract | null) => void;
+  handleContractClick: (contract: RentalContract) => void;
 }
 
 const ManageRentalContractContext = createContext<ManageRentalContractContextValue | null>(null);
@@ -39,6 +42,7 @@ export function ManageRentalContractProvider({ children }: { children: ReactNode
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedContract, setSelectedContract] = useState<RentalContract | null>(null);
 
   const queryParams = useMemo(
     () => ({
@@ -61,6 +65,10 @@ export function ManageRentalContractProvider({ children }: { children: ReactNode
   const totalPages = pageData?.total_pages ?? 0;
   const totalElements = pageData?.total_elements ?? 0;
 
+  const handleContractClick = useCallback((contract: RentalContract) => {
+    setSelectedContract((previous) => (previous?.id === contract.id ? null : contract));
+  }, []);
+
   const value = useMemo<ManageRentalContractContextValue>(
     () => ({
       contracts,
@@ -81,13 +89,18 @@ export function ManageRentalContractProvider({ children }: { children: ReactNode
       totalPages,
       totalElements,
       itemsPerPage: ITEMS_PER_PAGE,
+      selectedContract,
+      setSelectedContract,
+      handleContractClick,
     }),
     [
       contracts,
       currentPage,
       isError,
+      handleContractClick,
       isLoading,
       searchQuery,
+      selectedContract,
       statusFilter,
       totalElements,
       totalPages,
