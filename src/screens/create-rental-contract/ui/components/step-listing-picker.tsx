@@ -67,8 +67,19 @@ export function getAttributeNumber(property: PropertySummaryResponse, code: stri
 
 // ── Props ──────────────────────────────────────────────────────────────────────
 
+interface SelectedPropertyView {
+  title: string;
+  address: string;
+  type: string;
+  bedrooms: string;
+  bathrooms: string;
+  thumbnailUrl: string;
+}
+
 interface StepListingPickerProps {
   selectedPropertyId: string;
+  selectedPropertyView?: SelectedPropertyView;
+  viewOnly?: boolean;
   onSelectProperty: (property: PropertySummaryResponse) => void;
   t: (key: string, values?: Record<string, unknown>) => string;
 }
@@ -77,6 +88,8 @@ interface StepListingPickerProps {
 
 export function StepListingPicker({
   selectedPropertyId,
+  selectedPropertyView,
+  viewOnly = false,
   onSelectProperty,
   t,
 }: StepListingPickerProps) {
@@ -95,37 +108,105 @@ export function StepListingPicker({
     setPage(1);
   };
 
-  const { data, isLoading, isFetching } = useQuery(
-    propertyQueries.myProperties({
+  const { data, isLoading, isFetching } = useQuery({
+    ...propertyQueries.myProperties({
       keyword: debouncedSearch || undefined,
       status: 'AVAILABLE',
       page: page - 1,
       size: itemsPerPage,
-    })
-  );
+    }),
+    enabled: !viewOnly,
+  });
 
   const pageData = data?.payload?.data;
-  const properties: PropertySummaryResponse[] = pageData?.content ?? [];
-  const totalPages = pageData?.total_pages ?? pageData?.totalPages ?? 0;
-  const loading = isLoading || isFetching;
+  const properties: PropertySummaryResponse[] = viewOnly ? [] : (pageData?.content ?? []);
+  const totalPages = viewOnly ? 0 : (pageData?.total_pages ?? pageData?.totalPages ?? 0);
+  const loading = !viewOnly && (isLoading || isFetching);
 
   return (
     <div className='rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
       {/* Section header — title + search input */}
       <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-        <h3 className='text-lg font-bold leading-snug tracking-tight text-foreground'>
-          {t('listingPicker.title')}
-        </h3>
+        <div>
+          <h3 className='text-lg font-bold leading-snug tracking-tight text-foreground'>
+            {t('listingPicker.title')}
+          </h3>
+          {viewOnly && (
+            <p className='mt-1 text-sm text-muted-foreground/80'>
+              {t('listingPicker.viewOnlyDescription')}
+            </p>
+          )}
+        </div>
         <div className='relative w-full sm:max-w-[260px]'>
           <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60' />
           <Input
             value={searchInput}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => {
+              if (!viewOnly) handleSearchChange(e.target.value);
+            }}
+            readOnly={viewOnly}
             placeholder={t('listingPicker.searchPlaceholder')}
-            className='h-10 rounded-xl border-[1.5px] border-primary/25 bg-white pl-9 placeholder:text-muted-foreground/40'
+            className='h-10 rounded-xl border-[1.5px] border-primary/25 bg-white pl-9 placeholder:text-muted-foreground/40 read-only:bg-primary/5 read-only:text-muted-foreground'
           />
         </div>
       </div>
+
+      {viewOnly && selectedPropertyView && (
+        <div className='mb-4 flex items-center gap-4 rounded-xl border-[1.5px] border-primary bg-primary/5 p-4'>
+          <div className='relative h-[80px] w-[112px] shrink-0 overflow-hidden rounded-lg'>
+            {selectedPropertyView.thumbnailUrl ? (
+              <Image
+                src={selectedPropertyView.thumbnailUrl}
+                alt={selectedPropertyView.title}
+                fill
+                className='object-cover'
+                sizes='112px'
+              />
+            ) : (
+              <div className='flex h-full w-full items-center justify-center bg-primary/5'>
+                <Building2 className='h-6 w-6 text-muted-foreground/60' />
+              </div>
+            )}
+          </div>
+          <div className='min-w-0 flex-1'>
+            <div className='flex items-center gap-2'>
+              <p className='truncate text-sm font-bold leading-tight text-foreground'>
+                {selectedPropertyView.title || selectedPropertyView.address}
+              </p>
+              <span className='shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-white'>
+                {t('listingPicker.viewAction')}
+              </span>
+            </div>
+            <div className='mt-1 flex items-center gap-1 text-xs text-muted-foreground'>
+              <MapPin className='h-3 w-3 shrink-0' />
+              <span className='truncate'>{selectedPropertyView.address}</span>
+            </div>
+            <div className='mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+              {selectedPropertyView.type && (
+                <span className='flex items-center gap-1'>
+                  <Building2 className='h-3 w-3' />
+                  {selectedPropertyView.type}
+                </span>
+              )}
+              {Number(selectedPropertyView.bedrooms) > 0 && (
+                <span className='flex items-center gap-1'>
+                  <BedDouble className='h-3 w-3' />
+                  {t('listingPicker.bedroomsValue', { count: Number(selectedPropertyView.bedrooms) })}
+                </span>
+              )}
+              {Number(selectedPropertyView.bathrooms) > 0 && (
+                <span className='flex items-center gap-1'>
+                  <Bath className='h-3 w-3' />
+                  {t('listingPicker.bathroomsValue', { count: Number(selectedPropertyView.bathrooms) })}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary'>
+            <Check className='h-3 w-3 text-white' strokeWidth={3} />
+          </div>
+        </div>
+      )}
 
       {/* Loading spinner */}
       {loading && (
@@ -150,12 +231,18 @@ export function StepListingPicker({
                 <button
                   key={property.property_id}
                   type='button'
-                  onClick={() => onSelectProperty(property)}
+                  onClick={() => {
+                    if (!viewOnly) onSelectProperty(property);
+                  }}
+                  disabled={viewOnly}
                   className={cn(
                     'group relative flex w-full items-start gap-4 rounded-xl border-[1.5px] p-4 text-left transition-all duration-200',
+                    viewOnly && 'cursor-default',
                     isSelected
                       ? 'border-primary bg-primary/5 shadow-[0px_0px_20px_0px_color-mix(in_oklch,var(--primary)_15%,transparent)]'
-                      : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
+                      : viewOnly
+                        ? 'border-primary/20 bg-white'
+                        : 'border-primary/20 bg-white hover:border-primary/40 hover:bg-primary/5'
                   )}
                 >
                   {/* Thumbnail */}
@@ -219,7 +306,9 @@ export function StepListingPicker({
                       'mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
                       isSelected
                         ? 'border-primary bg-primary'
-                        : 'border-primary/20 bg-white group-hover:border-primary/40'
+                        : viewOnly
+                          ? 'border-primary/20 bg-white'
+                          : 'border-primary/20 bg-white group-hover:border-primary/40'
                     )}
                   >
                     {isSelected && <Check className='h-3 w-3 text-white' strokeWidth={3} />}
