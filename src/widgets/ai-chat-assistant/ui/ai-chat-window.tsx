@@ -202,10 +202,14 @@ export function AiChatWindow({
           />
         ) : (
           <div className='flex flex-col gap-3'>
-            {messages.map((msg) => (
-              <AiChatMessageItem key={msg.id} message={msg} />
-            ))}
-            {isTyping && <TypingIndicator />}
+            {messages.map((msg) => {
+              if (msg.role === 'assistant' && (!msg.content || !msg.content.trim())) return null;
+              return <AiChatMessageItem key={msg.id} message={msg} />;
+            })}
+            {isTyping &&
+              (!messages.length ||
+                messages[messages.length - 1].role !== 'assistant' ||
+                !messages[messages.length - 1].content?.trim()) && <TypingIndicator />}
             {error && (
               <ErrorBanner
                 message={error}

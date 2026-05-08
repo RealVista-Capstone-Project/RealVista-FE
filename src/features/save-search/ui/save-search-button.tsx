@@ -136,7 +136,17 @@ export function SaveSearchButton({ searchType, criteria, fullWidth }: SaveSearch
       </Button>
       <LoginRequiredModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
-      <Dialog open={showBoardModal} onOpenChange={setShowBoardModal}>
+      <Dialog
+        open={showBoardModal}
+        onOpenChange={(open) => {
+          setShowBoardModal(open);
+          if (!open) {
+            setBoardId('Mặc định');
+            setIsRecommendation(false);
+            setIsAddingProfile(false);
+          }
+        }}
+      >
         <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
             <DialogTitle>Lưu tìm kiếm</DialogTitle>

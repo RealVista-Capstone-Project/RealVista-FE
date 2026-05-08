@@ -48,13 +48,17 @@ export function useDeleteSavedSearch() {
       const previousData = queryClient.getQueryData(savedSearchKeys.lists());
 
       // Optimistically update to the new value
-      queryClient.setQueryData(savedSearchKeys.lists(), (old: ApiResponse<SavedSearchDto[]> | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(savedSearchKeys.lists(), (old: any) => {
+        if (!old || !old.payload || !old.payload.data) return old;
         return {
           ...old,
-          data: old.data.filter((item) =>
-             (item.saved_search_id) !== id
-          )
+          payload: {
+            ...old.payload,
+            data: old.payload.data.filter((item: any) => {
+               const itemId = item.saved_search_id || item.savedSearchId;
+               return itemId !== id;
+            })
+          }
         };
       });
 
