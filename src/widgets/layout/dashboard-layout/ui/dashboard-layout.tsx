@@ -285,6 +285,11 @@ export function DashboardLayout({
   const isPropertyDetailWhiteMain =
     pathname.startsWith(`${ROUTES.dashboard.property}/`) &&
     !pathname.startsWith(`${ROUTES.dashboard.property}/create`);
+
+  /** Property 3D Management page: uses a specific light blue background. */
+  const isProperty3dRoute = React.useMemo(() => {
+    return pathname.startsWith(ROUTES.dashboard.property) && pathname.endsWith('/3d');
+  }, [pathname]);
   const t = useTranslations('DashboardLayout');
 
   const { data: adminOverview } = useQuery({
@@ -441,9 +446,11 @@ export function DashboardLayout({
     <div
       className={cn(
         'flex h-screen w-full overflow-hidden',
-        isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
-          ? 'bg-sky-50 dark:bg-background'
-          : 'bg-muted/50 dark:bg-background',
+        isProperty3dRoute
+          ? 'bg-[#e8f2fb] dark:bg-background'
+          : isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
+            ? 'bg-sky-50 dark:bg-background'
+            : 'bg-muted/50 dark:bg-background',
         className
       )}
     >
@@ -573,14 +580,16 @@ export function DashboardLayout({
           <main
             className={cn(
               'flex min-h-0 flex-1 flex-col overflow-y-auto p-0',
-              (isOwnerWhiteMain || isPropertyDetailWhiteMain) && !isSecondaryLightBlueDashboardRoute
-                ? cn(
-                    'bg-white dark:bg-background',
-                    !isCreateListingRoute && 'lg:min-h-[calc(100svh-3.5rem)]'
-                  )
-                : isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
-                  ? 'bg-sky-50 dark:bg-background'
-                  : 'bg-muted/30 dark:bg-background',
+              isProperty3dRoute
+                ? 'bg-[#e8f2fb] dark:bg-background'
+                : (isOwnerWhiteMain || isPropertyDetailWhiteMain) && !isSecondaryLightBlueDashboardRoute
+                  ? cn(
+                      'bg-white dark:bg-background',
+                      !isCreateListingRoute && 'lg:min-h-[calc(100svh-3.5rem)]'
+                    )
+                  : isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
+                    ? 'bg-sky-50 dark:bg-background'
+                    : 'bg-muted/30 dark:bg-background',
             )}
           >
             {children}
