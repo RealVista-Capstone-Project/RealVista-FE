@@ -41,10 +41,8 @@ export function PropertyMediaStep() {
 
     appendEntries(files.length);
     files.forEach((file, i) => {
-      // Only call AI analysis for image files
-      if (file.type.startsWith('image/')) {
-        analyzeFile(file, startIndex + i);
-      }
+      // Hook skips remote AI for video but marks analysis complete (same as create listing).
+      analyzeFile(file, startIndex + i);
     });
   };
 
@@ -90,14 +88,11 @@ export function PropertyMediaStep() {
   // Enforce quality check by setting form error if any image fails
   useEffect(() => {
     const hasRejectedFile = analysisStatus.some((entry, index) => {
-      // Only check images that have finished loading
       const file = newFiles[index];
       if (!file || !file.type.startsWith('image/')) return false;
-
-      if (!entry.isLoading && entry.result && entry.result.finalScore !== undefined) {
-        return entry.result.finalScore < QUALITY_THRESHOLD;
-      }
-      return false;
+      if (!entry || entry.isLoading) return false;
+      if (!entry.result || entry.result.finalScore === undefined) return false;
+      return entry.result.finalScore < QUALITY_THRESHOLD;
     });
 
     if (hasRejectedFile) {

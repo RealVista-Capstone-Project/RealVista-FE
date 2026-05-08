@@ -30,7 +30,7 @@ export const CrmSearchInput = React.memo(function CrmSearchInput({
       <Search className='absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/50' />
       <Input
         placeholder='Tìm theo tên, SĐT, BĐS...'
-        className='pl-9'
+        className='border-border/80 bg-white pl-9 shadow-sm dark:bg-background'
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
       />

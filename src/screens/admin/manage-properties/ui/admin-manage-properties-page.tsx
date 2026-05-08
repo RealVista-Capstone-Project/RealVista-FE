@@ -7,8 +7,10 @@ import { useRouter } from '@/shared/config/i18n/navigation';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import {
-  Building2,
   Search,
+  Filter,
+  X,
+  ChevronDown,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -20,7 +22,6 @@ import {
   ImageIcon,
   Loader2,
   AlertTriangle,
-  SlidersHorizontal,
 } from 'lucide-react';
 
 import { propertyQueries } from '@/entities/property/api/property.queries';
@@ -61,6 +62,7 @@ import {
 } from '@/shared/ui/dialog';
 import { useDebounce } from '@/shared/lib/hooks';
 import { ROUTES } from '@/shared/config/routes';
+import { cn } from '@/shared/lib/utils';
 
 const STATUS_OPTIONS = ['DRAFT', 'PENDING', 'VERIFIED', 'REJECTED', 'AVAILABLE', 'RESERVED', 'SOLD', 'RENTED'] as const;
 
@@ -128,6 +130,7 @@ export function AdminManagePropertiesPage() {
   const [search, setSearch] = React.useState('');
   const debouncedSearch = useDebounce(search, 500);
   const [status, setStatus] = React.useState<string>('ALL');
+  const [flaggedOnly, setFlaggedOnly] = React.useState(false);
   const [propertyTypeId, setPropertyTypeId] = React.useState<string>('ALL');
   const [cityId, setCityId] = React.useState<string>('ALL');
   const [districtId, setDistrictId] = React.useState<string>('ALL');
@@ -136,6 +139,7 @@ export function AdminManagePropertiesPage() {
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null);
   const [ownerDialogProperty, setOwnerDialogProperty] = React.useState<PropertySummaryResponse | null>(null);
   const [ownerEmailInput, setOwnerEmailInput] = React.useState('');
+  const [filterOpen, setFilterOpen] = React.useState(false);
 
   const [pagination, setPagination] = React.useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const debouncedOwnerEmail = useDebounce(ownerEmailInput, 600);
@@ -145,7 +149,7 @@ export function AdminManagePropertiesPage() {
 
   React.useEffect(() => {
     setPagination((p) => ({ ...p, pageIndex: 0 }));
-  }, [debouncedSearch, status, propertyTypeId, finalLocationId]);
+  }, [debouncedSearch, status, propertyTypeId, finalLocationId, flaggedOnly]);
 
   // Delete confirmation
   const [propertyToDelete, setPropertyToDelete] = React.useState<{ id: string; address: string } | null>(null);
@@ -179,14 +183,25 @@ export function AdminManagePropertiesPage() {
 
   const criteria = {
     keyword: debouncedSearch || undefined,
-    status: status === 'ALL' ? undefined : status,
+    status: flaggedOnly ? 'PENDING' : status === 'ALL' ? undefined : status,
     propertyTypeId: propertyTypeId === 'ALL' ? undefined : propertyTypeId,
     locationId: finalLocationId,
     page: pagination.pageIndex,
     size: pagination.pageSize,
   };
 
-  const activeFilterCount = [status !== 'ALL', propertyTypeId !== 'ALL', !!finalLocationId].filter(Boolean).length;
+  const panelFilterCount = [
+    status !== 'ALL',
+    propertyTypeId !== 'ALL',
+    !!finalLocationId,
+  ].filter(Boolean).length;
+
+  const activeFilterCount = [
+    status !== 'ALL',
+    propertyTypeId !== 'ALL',
+    !!finalLocationId,
+    flaggedOnly,
+  ].filter(Boolean).length;
 
   const { data, isLoading } = useQuery(propertyQueries.adminList(criteria));
 
@@ -270,9 +285,17 @@ export function AdminManagePropertiesPage() {
         cell: ({ row }) => (
           <div className='flex items-center gap-2'>
             <MapPin className='h-3.5 w-3.5 text-muted-foreground shrink-0' />
-            <span className='font-medium text-sm truncate max-w-[220px]' title={row.original.street_address}>
-              {row.original.street_address || '—'}
-            </span>
+            <div className='flex flex-col min-w-0'>
+              <span className='font-medium text-sm truncate max-w-[220px]' title={row.original.street_address}>
+                {row.original.street_address || '—'}
+              </span>
+              {row.original.flagged_for_admin_review && (
+                <span className='inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-100 rounded-full px-1.5 py-0.5 w-fit mt-0.5'>
+                  <AlertTriangle className='h-2.5 w-2.5' />
+                  Cần duyệt
+                </span>
+              )}
+            </div>
           </div>
         ),
       },
@@ -393,21 +416,7 @@ export function AdminManagePropertiesPage() {
   );
 
   return (
-    <div className='flex min-h-full flex-col gap-6 bg-background p-6'>
-      {/* Page header */}
-      <div className='flex items-start justify-between gap-4'>
-        <div className='flex items-center gap-3'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0'>
-            <Building2 className='h-5 w-5 text-primary' />
-          </div>
-          <div>
-            <h1 className='text-xl font-semibold leading-tight'>{t('title')}</h1>
-            <p className='text-sm text-muted-foreground mt-0.5'>{t('description')}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Table */}
+    <div className='flex min-h-full flex-col gap-6 p-6'>
       <DataTable
         columns={columns}
         data={properties}
@@ -420,32 +429,72 @@ export function AdminManagePropertiesPage() {
         emptyTitle={t('table.empty.title')}
         emptyDescription={t('table.empty.description')}
         toolbar={
-          <div className='flex flex-col gap-3 px-2 py-1 sm:flex-row'>
-            <div className='relative w-full min-w-[220px] sm:max-w-md'>
-              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none' />
-              <Input
-                placeholder={t('filters.searchPlaceholder')}
+          <div className='flex flex-wrap items-center gap-3 px-2 py-1'>
+            <div className='relative min-w-0 flex-1 basis-full sm:min-w-[220px] sm:max-w-md sm:basis-auto'>
+              <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+                <Search className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
+              </div>
+              <input
+                type='text'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className='pl-9'
+                placeholder={t('filters.searchPlaceholder')}
+                className='h-9 w-full rounded-full border-2 border-primary/14 bg-[#e8f2fb] pl-10 pr-9 text-sm font-medium text-foreground shadow-sm shadow-primary/[0.04] placeholder:text-muted-foreground/65 transition-colors focus:border-primary/28 focus:bg-[#dfeef9] focus:outline-none focus:ring-2 focus:ring-primary/15'
               />
+              {search ? (
+                <button
+                  type='button'
+                  onClick={() => setSearch('')}
+                  className='absolute inset-y-0 right-0 flex items-center pr-3.5 text-muted-foreground/60 hover:text-foreground focus-visible:outline-none'
+                  aria-label={t('filters.clearSearch')}
+                >
+                  <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+                </button>
+              ) : null}
             </div>
 
-            <Popover>
+            <button
+              type='button'
+              onClick={() => setFlaggedOnly((prev) => !prev)}
+              className={cn(
+                'flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-2 px-3 text-xs font-semibold shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1',
+                flaggedOnly
+                  ? 'border-amber-400/50 bg-amber-50 text-amber-900 hover:bg-amber-100/90'
+                  : 'border-primary/14 bg-white text-foreground hover:border-primary/20 hover:bg-muted/30'
+              )}
+            >
+              <AlertTriangle
+                className={cn('h-4 w-4 shrink-0', flaggedOnly ? 'text-amber-600' : 'text-primary/55')}
+                strokeWidth={2.5}
+              />
+              {t('filters.pendingToggle')}
+            </button>
+
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
               <PopoverTrigger asChild>
-                <Button variant='outline' className='justify-between sm:w-[170px]'>
-                  <span className='inline-flex items-center gap-2'>
-                    <SlidersHorizontal className='h-4 w-4' />
-                    {t('filters.title')}
-                  </span>
-                  {activeFilterCount > 0 && (
-                    <span className='rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground'>
-                      {activeFilterCount}
-                    </span>
+                <button
+                  type='button'
+                  className={cn(
+                    'relative flex h-9 min-w-[7.5rem] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 px-2.5 text-xs font-semibold shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1 sm:px-3',
+                    panelFilterCount > 0
+                      ? 'border-primary/24 bg-primary/5 text-primary'
+                      : 'border-primary/14 bg-white text-foreground hover:border-primary/20 hover:bg-muted/30'
                   )}
-                </Button>
+                >
+                  <Filter className='h-4 w-4 shrink-0 text-primary/55' strokeWidth={2.5} />
+                  <span className='max-w-[5.5rem] truncate sm:max-w-none'>{t('filters.title')}</span>
+                  <ChevronDown
+                    className={cn('h-3.5 w-3.5 shrink-0 text-primary/50 transition-transform', filterOpen && 'rotate-180')}
+                    strokeWidth={2.5}
+                  />
+                  {panelFilterCount > 0 ? (
+                    <span className='absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-0.5 text-[10px] font-bold text-white'>
+                      {panelFilterCount}
+                    </span>
+                  ) : null}
+                </button>
               </PopoverTrigger>
-              <PopoverContent align='end' className='w-[320px] space-y-4'>
+              <PopoverContent align='end' className='w-[320px] space-y-4 rounded-xl border-primary/20 shadow-lg'>
                 <div className='flex items-center justify-between gap-3'>
                   <div>
                     <p className='text-sm font-medium'>{t('filters.title')}</p>
@@ -461,6 +510,7 @@ export function AdminManagePropertiesPage() {
                         setCityId('ALL');
                         setDistrictId('ALL');
                         setWardId('ALL');
+                        setFlaggedOnly(false);
                       }}
                     >
                       {t('filters.reset')}

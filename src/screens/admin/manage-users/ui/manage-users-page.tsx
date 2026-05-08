@@ -11,6 +11,7 @@ import {
   Search,
   Filter,
   MoreHorizontal,
+  Copy,
   Mail,
   Shield,
   Calendar,
@@ -282,9 +283,9 @@ export function ManageUsersPage() {
                 <Badge
                   key={r}
                   variant='outline'
-                  className='border-primary/20 bg-secondary/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider'
+                  className='border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary'
                 >
-                  <Shield className='mr-1 h-3 w-3 text-primary/50' />
+                  <Shield className='mr-1 h-3 w-3 text-primary/60' />
                   {t(`roles.${r}` as any) || r}
                 </Badge>
               ))}
@@ -356,43 +357,48 @@ export function ManageUsersPage() {
                   <MoreHorizontal className='h-4 w-4' />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-[200px]'>
-                <DropdownMenuLabel>{t('table.columns.actions')}</DropdownMenuLabel>
+              <DropdownMenuContent
+                align='end'
+                className='min-w-[18rem] max-w-[min(calc(100vw-1.5rem),22rem)] p-1.5'
+              >
+                <DropdownMenuLabel className='text-foreground'>
+                  {t('table.columns.actions')}
+                </DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() => {
                     navigator.clipboard.writeText(row.original.user_id);
                     toast.success(t('actions.copyIdSuccess'));
                   }}
-                  className='gap-2'
+                  className='gap-2 whitespace-nowrap'
                 >
-                  <Mail className='h-4 w-4 opacity-70' />
+                  <Copy className='h-4 w-4 text-muted-foreground' />
                   {t('actions.copyId')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => handleViewDetails(row.original.user_id)}
-                  className='gap-2'
+                  className='gap-2 whitespace-nowrap'
                 >
-                  <Users className='h-4 w-4 opacity-70' />
+                  <Users className='h-4 w-4 text-muted-foreground' />
                   {t('actions.viewDetails')}
                 </DropdownMenuItem>
 
                 {row.original.status !== 'SUSPENDED' && row.original.status !== 'BANNED' ? (
                   <DropdownMenuItem
                     onClick={() => handleOpenSuspendConfirm(row.original.user_id, row.original.full_name || row.original.email)}
-                    className='text-amber-600 font-medium gap-2'
+                    className='gap-2 whitespace-nowrap'
                     disabled={isDeleted || suspendMutation.isPending || banMutation.isPending || deleteMutation.isPending}
                   >
-                    <UserX className='h-4 w-4' />
+                    <UserX className='h-4 w-4 text-muted-foreground' />
                     {t('actions.suspend')}
                   </DropdownMenuItem>
                 ) : row.original.status === 'SUSPENDED' ? (
                   <DropdownMenuItem
                     onClick={() => activateMutation.mutate(row.original.user_id)}
-                    className='text-emerald-600 font-medium gap-2'
+                    className='gap-2 whitespace-nowrap'
                     disabled={isDeleted || activateMutation.isPending || banMutation.isPending || deleteMutation.isPending}
                   >
-                    <UserCheck className='h-4 w-4' />
+                    <UserCheck className='h-4 w-4 text-muted-foreground' />
                     {t('actions.activate')}
                   </DropdownMenuItem>
                 ) : null}
@@ -401,8 +407,9 @@ export function ManageUsersPage() {
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
+                      variant='destructive'
                       onClick={() => handleOpenBanConfirm(row.original.user_id, row.original.full_name || row.original.email, row.original.email)}
-                      className='text-red-600 font-bold gap-2'
+                      className='gap-2 whitespace-nowrap'
                       disabled={banMutation.isPending || deleteMutation.isPending}
                     >
                       <Ban className='h-4 w-4' />
@@ -414,8 +421,9 @@ export function ManageUsersPage() {
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
+                      variant='destructive'
                       onClick={() => handleOpenDeleteConfirm(row.original.user_id, row.original.full_name || row.original.email, row.original.email)}
-                      className='text-red-700 font-bold gap-2'
+                      className='gap-2 whitespace-nowrap'
                       disabled={deleteMutation.isPending || banMutation.isPending}
                     >
                       <Trash2 className='h-4 w-4' />
@@ -436,7 +444,7 @@ export function ManageUsersPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className='relative mx-auto flex h-full min-h-[calc(100vh-140px)] max-w-[1700px] flex-col gap-6 overflow-x-hidden overflow-y-auto px-4 py-6 sm:px-6 lg:px-8'
+      className='relative flex h-full min-h-[calc(100vh-140px)] w-full min-w-0 flex-col gap-4 overflow-x-hidden overflow-y-auto px-4 py-6 sm:px-6 lg:px-8'
     >
       {/* Subtle Background Orbs */}
       <div className='pointer-events-none absolute inset-0 overflow-hidden'>
@@ -444,22 +452,8 @@ export function ManageUsersPage() {
         <div className='absolute -right-[10%] top-[-10%] h-[24rem] w-[24rem] rounded-full bg-emerald-500/5 blur-[120px] dark:bg-emerald-500/10' />
       </div>
 
-      <header className='relative z-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
-        <div className='flex items-start gap-4 sm:items-center'>
-          <div className='rounded-[1.75rem] border border-slate-200/70 bg-white/80 p-3.5 shadow-xl shadow-primary/5 backdrop-blur-xl'>
-            <div className='bg-primary p-3 rounded-2xl shadow-xl shadow-primary/20'>
-              <Users className='h-7 w-7 text-white' />
-            </div>
-          </div>
-          <div className='space-y-1'>
-            <h1 className='text-2xl font-bold tracking-tight text-foreground sm:text-[1.75rem]'>{t('title')}</h1>
-            <p className='max-w-3xl text-sm leading-relaxed text-muted-foreground'>{t('description')}</p>
-          </div>
-        </div>
-      </header>
-
       {/* Main content - shadow and rounded borders added in DataTable wrapper */}
-      <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <div className='relative z-10 flex min-h-0 min-w-0 flex-1 flex-col gap-4'>
         <DataTable
           columns={columns}
           data={pageData?.content || []}
@@ -467,11 +461,11 @@ export function ManageUsersPage() {
           isLoading={isLoading}
           pagination={pagination}
           onPaginationChange={setPagination}
-          className='flex h-full min-h-0 flex-col'
+          className='flex h-full min-h-0 min-w-0 w-full flex-col'
           tableContainerClassName='min-h-0 flex-1 overflow-y-auto'
           toolbar={
             <div className='flex flex-col gap-3 border-b border-border/60 p-4 md:flex-row md:items-center md:justify-between'>
-              <div className='group relative w-full max-w-xl flex-1'>
+              <div className='group relative min-w-0 w-full flex-1 md:max-w-none'>
                 <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50 transition-colors group-focus-within:text-primary' />
                 <Input
                   placeholder={t('search.placeholder')}

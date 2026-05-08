@@ -124,16 +124,25 @@ function sortedWorkingAreaTagsKey(tags: string[]): string {
 }
 
 export interface SettingsPageProps {
-  /** Agent dashboard uses the same flows but hides buyer customer profiles and adds professional fields. */
+  /**
+   * Agent variant hides buyer customer profiles and surfaces professional fields.
+   * When omitted, the variant is auto-derived from the signed-in user's role
+   * (AGENT → 'agentDashboard', otherwise → 'default') so the same `/settings`
+   * route can serve both audiences.
+   */
   variant?: 'default' | 'agentDashboard';
 }
 
-export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
+export function SettingsPage({ variant }: SettingsPageProps) {
   const t = useTranslations('Settings');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isAgentDashboard = variant === 'agentDashboard';
+  const { data: session } = useSession();
+  const sessionUser = (session as { user?: { role?: string; backendRoles?: string[]; accessToken?: string } })?.user;
+  const isAgentRole =
+    sessionUser?.role === 'AGENT' || (sessionUser?.backendRoles ?? []).includes('AGENT');
+  const isAgentDashboard = variant ? variant === 'agentDashboard' : isAgentRole;
   const phoneRecaptchaContainerId = isAgentDashboard
     ? 'agent-dashboard-phone-recaptcha'
     : 'settings-phone-recaptcha';
@@ -196,8 +205,7 @@ export function SettingsPage({ variant = 'default' }: SettingsPageProps) {
 
   const queryClient = useQueryClient();
 
-  const { data: session } = useSession();
-  const isAuthenticated = !!(session as { user?: { accessToken?: string } })?.user?.accessToken;
+  const isAuthenticated = !!sessionUser?.accessToken;
   const auth = getFirebaseAuth();
 
   // Data queries

@@ -10,7 +10,6 @@ import {
   SheetFooter,
 } from '@/shared/ui/sheet/sheet';
 import { Label } from '@/shared/ui/label/label';
-import { Input } from '@/shared/ui/input/input';
 import { VndAmountInput } from '@/shared/ui/vnd-amount-input/vnd-amount-input';
 import { formatVND } from '@/shared/lib/utils/format-currency';
 
@@ -60,25 +59,22 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side='right' className='w-full sm:max-w-md flex flex-col'>
-        <SheetHeader className='px-6 py-6 border-b'>
-          <SheetTitle className='text-xl font-bold tracking-tight text-foreground'>
+      <SheetContent side='right' className='w-full sm:max-w-md flex flex-col h-full overflow-hidden'>
+        <SheetHeader className='px-6 py-4 border-b shrink-0'>
+          <SheetTitle className='text-lg font-bold tracking-tight text-foreground'>
             Tính toán khoản vay
           </SheetTitle>
-          <SheetDescription>
+          <SheetDescription className='text-xs'>
             Ước tính chi phí hàng tháng cho khoản vay mua nhà của bạn
           </SheetDescription>
         </SheetHeader>
 
-        <div className='flex-1 overflow-y-auto px-6 py-6 space-y-6'>
+        <div className='flex-1 min-h-0 overflow-hidden px-6 py-4 space-y-4 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]'>
           {/* Listing Price - Editable */}
-          <div className='space-y-2'>
-            <Label className='text-sm font-semibold text-muted-foreground'>
+          <div className='space-y-1.5'>
+            <Label className='text-xs font-semibold text-muted-foreground'>
               Giá bất động sản
             </Label>
-            <div className='text-2xl font-bold text-primary'>
-              {formatVND(propertyPrice)}
-            </div>
             <VndAmountInput
               value={propertyPrice}
               onChange={setPropertyPrice}
@@ -90,7 +86,7 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
           {/* Down Payment */}
           <div className='space-y-2'>
             <div className='flex items-center justify-between'>
-              <Label className='text-sm font-semibold text-muted-foreground'>
+              <Label className='text-xs font-semibold text-muted-foreground'>
                 Trả trước
               </Label>
               <span className='text-sm font-bold text-foreground'>
@@ -108,7 +104,7 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
           {/* Interest Rate */}
           <div className='space-y-2'>
             <div className='flex items-center justify-between'>
-              <Label className='text-sm font-semibold text-muted-foreground'>
+              <Label className='text-xs font-semibold text-muted-foreground'>
                 Lãi suất / năm
               </Label>
               <span className='text-sm font-bold text-foreground'>
@@ -127,8 +123,8 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
           {/* Loan Term */}
           <div className='space-y-2'>
             <div className='flex items-center justify-between'>
-              <Label className='text-sm font-semibold text-muted-foreground'>
-                Thổi hạn vay
+              <Label className='text-xs font-semibold text-muted-foreground'>
+                Thời hạn vay
               </Label>
               <span className='text-sm font-bold text-foreground'>
                 {loanTerm} năm
@@ -143,22 +139,22 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
           </div>
 
           {/* Results */}
-          <div className='bg-muted/50 rounded-xl p-4 space-y-3'>
+          <div className='bg-muted/50 rounded-xl p-3 space-y-2'>
             <div className='flex items-center justify-between'>
-              <span className='text-sm text-muted-foreground'>Số tiền vay</span>
+              <span className='text-xs text-muted-foreground'>Số tiền vay</span>
               <span className='text-sm font-bold text-foreground'>
                 {formatVND(loanAmount)}
               </span>
             </div>
             <div className='flex items-center justify-between'>
-              <span className='text-sm text-muted-foreground'>Tổng lãi phải trả</span>
+              <span className='text-xs text-muted-foreground'>Tổng lãi phải trả</span>
               <span className='text-sm font-bold text-foreground'>
                 {formatVND(totalInterest)}
               </span>
             </div>
-            <div className='border-t border-border pt-3'>
+            <div className='border-t border-border pt-2'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm text-muted-foreground'>Tổng chi phí</span>
+                <span className='text-xs text-muted-foreground'>Tổng chi phí</span>
                 <span className='text-sm font-bold text-primary'>
                   {formatVND(totalCost)}
                 </span>
@@ -167,15 +163,15 @@ export function MortgageCalculator({ open, onOpenChange, listingPrice }: Mortgag
           </div>
         </div>
 
-        <SheetFooter className='p-6 border-t bg-white'>
-          <div className='w-full space-y-2'>
+        <SheetFooter className='px-6 py-4 border-t bg-white shrink-0'>
+          <div className='w-full space-y-1'>
             <div className='flex items-center justify-between'>
               <span className='text-sm text-muted-foreground'>Trả hàng tháng</span>
-              <span className='text-2xl font-bold text-primary'>
+              <span className='text-xl font-bold text-primary'>
                 {formatVND(monthlyPayment)}
               </span>
             </div>
-            <p className='text-xs text-muted-foreground'>
+            <p className='text-[11px] text-muted-foreground leading-snug'>
               Đây là ước tính. Chi phí thực tế có thể khác tùy theo ngân hàng và điều kiện vay.
             </p>
           </div>

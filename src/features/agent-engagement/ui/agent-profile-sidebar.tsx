@@ -170,9 +170,9 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
 
   return (
     <>
-      <div className='bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden sticky top-4'>
+      <div className='sticky top-4 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm'>
         {/* Profile header */}
-        <div className='px-6 pt-6 pb-5 flex flex-col items-center bg-gradient-to-br from-primary/5 via-primary/5 to-white border-b border-gray-100 relative'>
+        <div className='relative border-b border-border/80 bg-gradient-to-br from-primary/5 via-primary/5 to-card px-6 pb-5 pt-6'>
           <div className='relative mb-3'>
             <Avatar className='h-20 w-20 ring-4 ring-white shadow-md'>
               <AvatarImage src={agent.agent_avatar_url ?? undefined} alt={agent.agent_full_name} />
@@ -190,17 +190,17 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
                     ? 'bg-amber-400'
                     : status === 'COMPLETED'
                       ? 'bg-blue-400'
-                      : 'bg-gray-300'
+                      : 'bg-muted-foreground/40'
               )}
             />
           </div>
 
-          <h2 className='text-base font-bold text-gray-900 text-center leading-tight'>
+          <h2 className='text-base font-bold text-foreground text-center leading-tight'>
             {agent.agent_full_name}
           </h2>
 
           {agent.agent_service_areas && toStringArray(agent.agent_service_areas).length > 0 && (
-            <p className='text-xs text-gray-400 mt-0.5 text-center'>
+            <p className='text-xs text-muted-foreground mt-0.5 text-center'>
               {toStringArray(agent.agent_service_areas)[0]}
             </p>
           )}
@@ -214,11 +214,11 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
                     'h-3.5 w-3.5',
                     i < Math.round(agent.agent_rating ?? 0)
                       ? 'text-amber-400 fill-amber-400'
-                      : 'text-gray-200 fill-gray-200'
+                      : 'fill-muted/35 text-muted/35'
                   )}
                 />
               ))}
-              <span className='text-xs text-gray-500 ml-1.5 font-medium'>
+              <span className='text-xs text-muted-foreground ml-1.5 font-medium'>
                 {agent.agent_rating.toFixed(1)}
               </span>
             </div>
@@ -244,10 +244,10 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
                   <Mail className='h-3.5 w-3.5 text-primary/80' />
                 </div>
                 <div className='min-w-0'>
-                  <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
+                  <p className='text-[10px] text-muted-foreground font-medium uppercase tracking-wide'>
                     {t('detailPanel.email')}
                   </p>
-                  <p className='text-sm font-semibold text-gray-800 truncate'>
+                  <p className='text-sm font-semibold text-foreground truncate'>
                     {agent.agent_email}
                   </p>
                 </div>
@@ -259,10 +259,10 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
                   <Phone className='h-3.5 w-3.5 text-green-500' />
                 </div>
                 <div className='min-w-0'>
-                  <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
+                  <p className='text-[10px] text-muted-foreground font-medium uppercase tracking-wide'>
                     {t('detailPanel.phone')}
                   </p>
-                  <p className='text-sm font-semibold text-gray-800'>{agent.agent_phone}</p>
+                  <p className='text-sm font-semibold text-foreground'>{agent.agent_phone}</p>
                 </div>
               </div>
             )}
@@ -272,10 +272,10 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
                   <MapPin className='h-3.5 w-3.5 text-orange-500' />
                 </div>
                 <div className='min-w-0'>
-                  <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
+                  <p className='text-[10px] text-muted-foreground font-medium uppercase tracking-wide'>
                     {t('detailPanel.serviceAreas')}
                   </p>
-                  <p className='text-sm font-semibold text-gray-800 truncate'>
+                  <p className='text-sm font-semibold text-foreground truncate'>
                     {toStringArray(agent.agent_service_areas).join(', ')}
                   </p>
                 </div>
@@ -283,35 +283,35 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
             )}
           </section>
 
-          <Separator className='bg-gray-100' />
+          <Separator className='bg-border' />
 
           {/* Professional stats */}
           <section>
             <div className='grid grid-cols-3 gap-2.5 text-center'>
-              <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
+              <div className='rounded-xl border border-border/70 bg-primary/[0.04] p-3'>
                 <Briefcase className='h-4 w-4 text-primary/70 mx-auto mb-1.5' />
-                <p className='text-base font-bold text-gray-900 tabular-nums'>
+                <p className='text-base font-bold text-foreground tabular-nums'>
                   {agent.agent_years_of_experience ?? '—'}
                 </p>
-                <p className='text-[10px] text-gray-400 leading-tight mt-0.5'>
+                <p className='text-[10px] text-muted-foreground leading-tight mt-0.5'>
                   {t('detailPanel.experience')}
                 </p>
               </div>
-              <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
-                <Home className='h-4 w-4 text-blue-400 mx-auto mb-1.5' />
-                <p className='text-base font-bold text-gray-900 tabular-nums'>
+              <div className='rounded-xl border border-border/70 bg-primary/[0.04] p-3'>
+                <Home className='h-4 w-4 text-sky-500 mx-auto mb-1.5' />
+                <p className='text-base font-bold text-foreground tabular-nums'>
                   {agent.agent_properties_sold ?? '—'}
                 </p>
-                <p className='text-[10px] text-gray-400 leading-tight mt-0.5'>
+                <p className='text-[10px] text-muted-foreground leading-tight mt-0.5'>
                   {t('detailPanel.propertiesSold')}
                 </p>
               </div>
-              <div className='bg-gray-50 rounded-xl p-3 border border-gray-100'>
+              <div className='rounded-xl border border-border/70 bg-primary/[0.04] p-3'>
                 <Award className='h-4 w-4 text-primary/60 mx-auto mb-1.5' />
-                <p className='text-[11px] font-bold text-gray-900 truncate'>
+                <p className='text-[11px] font-bold text-foreground truncate'>
                   {getEngagementTypeLabel(agent.engagement_type, t)}
                 </p>
-                <p className='text-[10px] text-gray-400 leading-tight mt-0.5'>
+                <p className='text-[10px] text-muted-foreground leading-tight mt-0.5'>
                   {t('detailPanel.engagementType')}
                 </p>
               </div>
@@ -321,7 +321,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
           {/* Specialties */}
           {toStringArray(agent.agent_specialties).length > 0 && (
             <section>
-              <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2'>
+              <p className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2'>
                 {t('detailPanel.specialties')}
               </p>
               <div className='flex flex-wrap gap-1.5'>
@@ -341,10 +341,10 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
           {/* Bio */}
           {agent.agent_bio && (
             <section>
-              <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2'>
+              <p className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2'>
                 {t('detailPanel.about')}
               </p>
-              <p className='text-sm text-gray-600 leading-relaxed bg-gray-50/80 p-3 rounded-xl border border-gray-100 line-clamp-4'>
+              <p className='line-clamp-4 rounded-xl border border-border/70 bg-primary/[0.04] p-3 text-sm leading-relaxed text-muted-foreground'>
                 {agent.agent_bio}
               </p>
             </section>
@@ -353,7 +353,7 @@ export function AgentProfileSidebar({ agent, onAgentUpdate }: AgentProfileSideba
           {/* Action buttons */}
           {actionButtons && (
             <>
-              <Separator className='bg-gray-100' />
+              <Separator className='bg-border' />
               {actionButtons}
             </>
           )}

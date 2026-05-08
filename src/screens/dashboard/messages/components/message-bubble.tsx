@@ -2,7 +2,6 @@ import { cn } from '@/shared/lib/utils';
 import { ChatListingCard } from '@/features/chat-listing-card';
 import type { Message } from '../types';
 import type { ChatListingData } from '@/entities/contact';
-import { AvatarCircle } from './avatar-circle';
 
 interface MessageBubbleProps {
   msg: Message;
@@ -44,13 +43,7 @@ export function MessageBubble({ msg, onListingClick, onCreateContract, currentUs
 
   return (
     <div className={cn('flex gap-3', isMe && 'flex-row-reverse')}>
-      {!isMe && (
-        <AvatarCircle initials={msg.sender.initials} avatarBg={msg.sender.avatarBg} src={msg.sender.avatar} size='md' />
-      )}
-
       <div className={cn('flex max-w-[65%] flex-col gap-1', isMe && 'items-end')}>
-        {!isMe && <span className='text-xs font-semibold text-slate-700'>{msg.sender.name}</span>}
-
         {msg.text && (
           <div
             className={cn(

@@ -1,6 +1,6 @@
 import http from '@/shared/lib/http';
 import type { ApiResponse } from '../model/types';
-import type { ListingAnalytics } from '../model/analytics.types';
+import type { ListingAnalytics, ListingWeeklyViews } from '../model/analytics.types';
 
 /**
  * Listing Analytics API
@@ -14,4 +14,10 @@ export const listingAnalyticsApi = {
    */
   getAnalytics: (listingId: string) =>
     http.get<ApiResponse<ListingAnalytics>>(`/listings/${listingId}/analytics`),
+
+  /** Seven-day (Mon–Sun) view counts; week anchored by Monday {@link weekStartIso} (yyyy-MM-dd). */
+  getViewsByWeek: (listingId: string, weekStartIso: string) =>
+    http.get<ApiResponse<ListingWeeklyViews>>(
+      `/listings/${listingId}/analytics/views-by-day?week_start=${encodeURIComponent(weekStartIso)}`
+    ),
 } as const;

@@ -83,7 +83,7 @@ export default function PropertyEditPage({ id }: Props) {
   }
 
   return (
-    <div className='container py-8 max-w-5xl mx-auto'>
+    <div className='container py-8 max-w-6xl mx-auto'>
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
         <PropertyForm
           initialData={initialData}

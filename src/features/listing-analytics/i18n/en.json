@@ -7,6 +7,14 @@
       "tourBookings": "Tour Bookings",
       "conversionRate": "Conversion Rate",
       "conversionRateTooltip": "The percentage of viewers who booked a tour"
+    },
+    "weeklyViews": {
+      "title": "Views by day",
+      "prevWeek": "Previous week",
+      "nextWeek": "Next week",
+      "range": "{start} – {end}",
+      "tooltipLabel": "views",
+      "empty": "No views recorded for this week."
     }
   }
 }

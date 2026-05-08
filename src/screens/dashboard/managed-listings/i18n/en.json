@@ -3,7 +3,16 @@
     "title": "Listings",
     "draftRuleTooltip": "Listings unpublished for more than 24 hours will have their associated active appointments automatically cancelled.",
     "createButton": "Create Listing",
+    "quotaNoticeTriggerAria": "View posting quota notice",
     "filter": "Filter",
+    "creatorFilter": {
+      "label": "Created By",
+      "options": {
+        "all": "All",
+        "self": "Created by me",
+        "agent": "Created by agent"
+      }
+    },
     "filterPanel": {
       "status": "Status",
       "statusOptions": {
@@ -30,7 +39,8 @@
       "forSale": "For Sale"
     },
     "search": {
-      "placeholder": "Search..."
+      "placeholder": "Search...",
+      "clear": "Clear search"
     },
     "loading": "Loading...",
     "error": {
@@ -39,7 +49,9 @@
     },
     "empty": {
       "noProperties": "No properties found",
-      "selectProperty": "Select a property to view details"
+      "selectProperty": "Select a property to view details",
+      "noResults": "No listings match your filters",
+      "noResultsHint": "Try adjusting your search or filters"
     }
   },
   "ListingCard": {
@@ -58,6 +70,10 @@
     "actions": "Actions",
     "editListing": "Edit Listing",
     "backToList": "Back to list",
+    "hero": {
+      "prevImage": "Previous media",
+      "nextImage": "Next media"
+    },
     "agent": {
       "title": "Listing Agent",
       "subtitle": "This listing is managed by an agent",
@@ -67,6 +83,12 @@
       "verified": "Verified Agent",
       "contact": "Contact Agent"
     },
+    "owner": {
+      "title": "Landlord information",
+      "subtitle": "Reach out to the property owner here",
+      "verified": "Verified owner",
+      "contact": "Contact the owner"
+    },
     "deleteListing": "Delete Listing",
     "deleteConfirmTitle": "Delete Listing",
     "deleteConfirmDescription": "Are you sure you want to delete this listing? This action cannot be undone.",
@@ -74,6 +96,44 @@
     "deleteConfirmApprove": "Delete",
     "deleting": "Deleting...",
     "aboutThisListing": "About this listing",
+    "detailTabs": {
+      "performance": "Performance",
+      "description": "Listing description",
+      "property": "Property details"
+    },
+    "propertyInfo": {
+      "priceSale": "Listed sale price",
+      "priceRent": "Listed rent price",
+      "listedPrice": "Listed price on posting",
+      "propertyOwnerExpectedPrice": "Expected price when the property was created",
+      "listingNegotiationRange": "Negotiation range on this posting",
+      "priceFrom": "From {amount}",
+      "priceUpTo": "Up to {amount}",
+      "negotiable": "Price is negotiable",
+      "deposit": "Security deposit",
+      "serviceFeesTitle": "Service fees (estimate)",
+      "baseRentLabel": "Rent shown on posting",
+      "requiredFeesLabel": "Required fees",
+      "optionalFeesLabel": "Optional fees",
+      "requiredFeesSubtotal": "Required fees subtotal",
+      "optionalFeesSubtotal": "Optional fees subtotal",
+      "totalEstimatedLabel": "Estimated monthly total",
+      "tour3dTitle": "3D tour",
+      "tour3dRooms": "3D spaces",
+      "unnamed3dRoom": "3D space {index}",
+      "tour3dMissingTitle": "No 3D tour yet",
+      "tour3dMissingDescription": "Add a 3D tour so customers can explore your space.",
+      "add3dCta": "Add / manage 3D",
+      "featuresTitle": "Property specifications",
+      "amenitiesTitle": "Amenities",
+      "dimensionsTitle": "Area & dimensions",
+      "landSize": "Land area",
+      "usableSize": "Usable area",
+      "width": "Width",
+      "length": "Length",
+      "mapTitle": "Location on map",
+      "emptyDescription": "This listing does not have a description yet."
+    },
     "features": {
       "properties": "Properties",
       "rooms": "Rooms",
@@ -89,7 +149,9 @@
       "title": "Listing Boosts",
       "subtitle": "Boost your listing visibility",
       "featured": "Featured",
+      "featuredTooltip": "Your listing will be pinned to the top of search results, maximizing exposure to buyers and renters.",
       "hotBadge": "Hot Badge",
+      "hotBadgeTooltip": "Adds a HOT label to your listing, instantly grabbing attention from potential buyers.",
       "remaining": "{count} remaining",
       "apply": "Apply",
       "remove": "Remove",
@@ -105,6 +167,17 @@
       "removing": "Removing...",
       "applyError": "Failed to Apply Boost",
       "removeError": "Failed to Remove Boost"
+    },
+    "appointments": {
+      "title": "Viewing Appointments",
+      "noAppointments": "No appointments on this day",
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "canceled": "Canceled",
+        "completed": "Completed"
+      }
     },
     "lifetime": {
       "title": "Listing Lifetime",

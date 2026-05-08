@@ -1,7 +1,12 @@
 import http from '@/shared/lib/http';
 import { env } from '@/shared/lib/env';
 import type {
+  AddressDuplicateCheckRequest,
+  AddressDuplicateCheckResponse,
   ApiResponse,
+  ClaimPropertyRequest,
+  ClaimPropertyResponse,
+  CreatePropertyFeeRequest,
   CreatePropertyRequest,
   MyPropertiesResponse,
   Property3dOperation,
@@ -11,10 +16,25 @@ import type {
   OwnerAvailablePropertiesResponse,
   PropertyAttributeDefinition,
   PropertyDetailResponse,
+  PropertyFeeResponse,
   PropertySearchResponse,
+  PropertySummaryMetricsData,
   PropertyTypesResponse,
+  SyncPropertyFeesRequest,
   UpdatePropertyRequest,
 } from './property-api.types';
+
+/** Backend uses Jackson SNAKE_CASE; fee DTOs expect snake_case in JSON bodies. */
+function toPropertyFeeApiBody(fee: CreatePropertyFeeRequest) {
+  return {
+    fee_type: fee.feeType,
+    fee_name: fee.feeName,
+    amount: fee.amount,
+    billing_cycle: fee.billingCycle,
+    is_optional: fee.isOptional ?? false,
+    ...(fee.description != null && fee.description !== '' ? { description: fee.description } : {}),
+  };
+}
 
 export const propertyApi = {
   search: (params: {
@@ -70,10 +90,18 @@ export const propertyApi = {
     if (criteria?.keyword) queryParams.append('keyword', criteria.keyword);
     if (criteria?.status) queryParams.append('status', criteria.status);
     criteria?.statuses?.forEach((status) => queryParams.append('statuses', status));
+    if (criteria?.property_type_id) queryParams.append('propertyTypeId', criteria.property_type_id);
+    if (criteria?.sort_by) queryParams.append('sortBy', criteria.sort_by);
     queryParams.append('page', page.toString());
     queryParams.append('size', size.toString());
 
     return http.get<MyPropertiesResponse>(`properties/me?${queryParams.toString()}`, {
+      baseUrl: env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  getMyPropertiesSummary: () => {
+    return http.get<ApiResponse<PropertySummaryMetricsData>>('properties/me/summary', {
       baseUrl: env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },
@@ -241,6 +269,54 @@ export const propertyApi = {
 
   adminDeleteProperty: (propertyId: string) => {
     return http.delete<ApiResponse<void>>(`properties/admin/${propertyId}`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  // ── Duplicate address check ──────────────────────────────────────────────
+
+  checkAddressDuplicate: (request: AddressDuplicateCheckRequest) => {
+    return http.post<ApiResponse<AddressDuplicateCheckResponse>>(
+      'properties/check-address-duplicate',
+      request,
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  claimProperty: (propertyId: string, request: ClaimPropertyRequest) => {
+    return http.post<ApiResponse<ClaimPropertyResponse>>(
+      `properties/${propertyId}/claim`,
+      request,
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  // ── Service fees ────────────────────────────────────────────────────────
+
+  getFees: (propertyId: string) => {
+    return http.get<ApiResponse<PropertyFeeResponse[]>>(`properties/${propertyId}/fees`, {
+      baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    });
+  },
+
+  addFee: (propertyId: string, request: CreatePropertyFeeRequest) => {
+    return http.post<ApiResponse<PropertyFeeResponse>>(
+      `properties/${propertyId}/fees`,
+      toPropertyFeeApiBody(request),
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  syncFees: (propertyId: string, request: SyncPropertyFeesRequest) => {
+    return http.put<ApiResponse<PropertyFeeResponse[]>>(
+      `properties/${propertyId}/fees`,
+      { fees: request.fees.map(toPropertyFeeApiBody) },
+      { baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT }
+    );
+  },
+
+  deleteFee: (propertyId: string, feeId: string) => {
+    return http.delete<ApiResponse<void>>(`properties/${propertyId}/fees/${feeId}`, {
       baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
     });
   },

@@ -18,10 +18,11 @@ import {
   type NotificationPageResponse,
 } from '@/entities/notification';
 import { ROUTES } from '@/shared/config/routes';
+import { cn } from '@/shared/lib/utils';
 import { useNotificationWebSocket } from '../hooks/use-notification-websocket';
 import { NotificationDropdown } from './notification-dropdown';
 
-export function NotificationDropdownContainer() {
+export function NotificationDropdownContainer({ className }: { className?: string }) {
   const { data: session } = useSession();
   const token = session?.user?.accessToken;
 
@@ -102,6 +103,13 @@ export function NotificationDropdownContainer() {
       router.push(`/${locale}${ROUTES.dashboard.manageAgent}`);
     } else if (n.eventType.includes('TOUR')) {
       router.push(`/${locale}/appointments`);
+    } else if (n.eventType === NotificationEventType.PRICE_CHANGE) {
+      const slug = n.metadata?.listing_slug;
+      if (slug) {
+        router.push(`/${locale}/listing/${slug}`);
+      } else if (n.entityId) {
+        router.push(`/${locale}/listing/${n.entityId}`);
+      }
     } else if (n.metadata?.listing_id) {
       router.push(`/${locale}/property/${n.metadata.listing_id}`);
     }
@@ -138,7 +146,10 @@ export function NotificationDropdownContainer() {
   useNotificationWebSocket({
     token,
     toastViewLabel: t('toastView'),
+    toastOpenListingLabel: t('toastViewListing'),
     onNewNotification,
+    onOpenListing: (listingId, listingSlug) =>
+      router.push(`/${locale}/listing/${listingSlug ?? listingId}`),
     onNotificationAction: (incoming) => {
       if (
         (incoming.eventType === NotificationEventType.PROPERTY_3D_GENERATED ||
@@ -155,7 +166,10 @@ export function NotificationDropdownContainer() {
     return (
       <button
         type='button'
-        className='relative flex size-10 items-center justify-center rounded-lg bg-primary/5 text-foreground'
+        className={cn(
+          'relative flex size-10 items-center justify-center rounded-lg bg-primary/5 text-foreground',
+          className
+        )}
         disabled
       >
         <span className='h-6 w-6 animate-pulse rounded bg-muted' />
@@ -171,6 +185,7 @@ export function NotificationDropdownContainer() {
       onNotificationClick={handleNotificationClick}
       onDelete={handleDelete}
       onViewAll={() => router.push(`/${locale}/notifications`)}
+      className={className}
     />
   );
 }

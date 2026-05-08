@@ -1,31 +1,35 @@
 'use client';
 
 import * as React from 'react';
-import Image from 'next/image';
 import {
   Calendar,
-  Columns,
-  FileText,
-  Handshake,
-  LayoutDashboard,
-  MessageCircle,
-  Users,
-  Building2,
-  Search,
+  ClipboardList,
+  Compass,
   ContactRound,
+  FileSignature,
+  Handshake,
+  Inbox,
+  LayoutDashboard,
+  LayoutTemplate,
   MapPin,
   Package,
+  PanelLeftClose,
+  Send,
   ShieldCheck,
   Flag,
-  FileUser,
+  UserCog,
+  Building2,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
+import RealVistaLogo from '@/shared/assets/logo/logo';
 import { ChatWindowRenderer } from '@/widgets/floating-chat-window';
 import { useAuthSession } from '@/features/auth/model';
 import { ROUTES } from '@/shared/config/routes';
 import { TopNavContainer } from '@/shared/ui/top-nav/top-nav-container';
+import { DashboardTopNavBadgeContext } from '@/shared/lib/dashboard-top-nav-badge-context';
+import { formatNumber } from '@/shared/lib/utils/format-currency';
 import { useQuery } from '@tanstack/react-query';
 import { adminQueries } from '@/entities/admin/api';
 
@@ -51,11 +55,12 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
       href: ROUTES.dashboard.root,
       icon: LayoutDashboard,
     },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
       id: 'listings',
       label: t('menu.listings'),
       href: ROUTES.dashboard.managedListings,
-      icon: Columns,
+      icon: ClipboardList,
     },
     {
       id: 'appointments',
@@ -63,19 +68,18 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
       href: ROUTES.dashboard.appointments,
       icon: Calendar,
     },
-    // { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: Users },
+    // { id: 'tenants', label: t('menu.tenants'), href: ROUTES.dashboard.tenants, icon: UserCog },
     {
       id: 'rental-contracts',
       label: t('menu.rentalContracts'),
       href: ROUTES.dashboard.rentalContracts,
-      icon: FileText,
+      icon: FileSignature,
     },
-    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
       id: 'manage-agent',
       label: t('menu.manageAgent'),
       href: ROUTES.dashboard.manageAgent,
-      icon: Users,
+      icon: UserCog,
     },
     {
       id: 'my-engagements',
@@ -87,7 +91,7 @@ function getOwnerSidebarItems(t: TFn): SidebarMenuItem[] {
       id: 'messages',
       label: t('menu.messages'),
       href: ROUTES.dashboard.messages,
-      icon: MessageCircle,
+      icon: Inbox,
     },
   ];
 }
@@ -104,13 +108,13 @@ function getTenantSidebarItems(t: TFn): SidebarMenuItem[] {
       id: 'my-contracts',
       label: t('menu.myContracts'),
       href: ROUTES.dashboard.myContracts,
-      icon: FileText,
+      icon: FileSignature,
     },
     {
       id: 'messages',
       label: t('menu.messages'),
       href: ROUTES.dashboard.messages,
-      icon: MessageCircle,
+      icon: Inbox,
     },
     { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
   ];
@@ -128,13 +132,14 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       id: 'property-feed',
       label: t('menu.propertyFeed'),
       href: ROUTES.dashboard.propertyFeed,
-      icon: Search,
+      icon: Compass,
     },
+    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
       id: 'listings',
       label: t('menu.listings'),
       href: ROUTES.dashboard.managedListings,
-      icon: Columns,
+      icon: ClipboardList,
     },
     {
       id: 'appointments',
@@ -148,18 +153,17 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       href: ROUTES.dashboard.crm,
       icon: ContactRound,
     },
-    { id: 'property', label: t('menu.property'), href: ROUTES.dashboard.property, icon: Building2 },
     {
       id: 'proposals',
       label: t('menu.proposals'),
       href: ROUTES.dashboard.manageProposals,
-      icon: FileUser,
+      icon: Send,
     },
     {
       id: 'my-contracts',
       label: t('menu.myContracts'),
       href: ROUTES.dashboard.myContracts,
-      icon: FileText,
+      icon: FileSignature,
     },
     {
       id: 'my-engagements',
@@ -171,7 +175,7 @@ function getAgentSidebarItems(t: TFn): SidebarMenuItem[] {
       id: 'messages',
       label: t('menu.messages'),
       href: ROUTES.dashboard.messages,
-      icon: MessageCircle,
+      icon: Inbox,
     },
   ];
 }
@@ -184,7 +188,7 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       href: ROUTES.dashboard.root,
       icon: LayoutDashboard,
     },
-    { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
+    { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: UserCog },
     { id: 'policies', label: t('menu.policies'), href: ROUTES.dashboard.managePolicies, icon: ShieldCheck },
     {
       id: 'reports',
@@ -194,7 +198,7 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       badge: badges.reports,
       badgeVariant: 'danger'
     },
-    { id: 'templates', label: t('menu.templates'), href: ROUTES.dashboard.manageTemplates, icon: FileText },
+    { id: 'templates', label: t('menu.templates'), href: ROUTES.dashboard.manageTemplates, icon: LayoutTemplate },
 
     {
       id: 'locations',
@@ -227,10 +231,65 @@ export function DashboardLayout({
   const { data: session } = useAuthSession();
   const backendRoles: string[] = React.useMemo(() => session?.user?.backendRoles ?? [], [session?.user?.backendRoles]);
   const isAgent = session?.user?.role === 'AGENT' || backendRoles.includes('AGENT');
+  const isAdmin =
+    session?.user?.role === 'admin' || backendRoles.includes('ADMIN') || backendRoles.includes('moderator');
   const isTenant = backendRoles.includes('TENANT') && !backendRoles.includes('OWNER');
+  /** Owner role: white main content area (not agent/admin). */
+  const isOwnerWhiteMain =
+    (session?.user?.role === 'owner' || backendRoles.includes('OWNER')) && !isAgent && !isAdmin;
 
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [pageCountBadge, setPageCountBadgeState] = React.useState<number | null>(null);
+  const setPageCountBadge = React.useCallback((n: number | null) => {
+    setPageCountBadgeState(n);
+  }, []);
+  const badgeContextValue = React.useMemo(
+    () => ({ setPageCountBadge }),
+    [setPageCountBadge]
+  );
+
   const pathname = usePathname();
+
+  /**
+   * Owner secondary flows (appointments, contracts, broker, engagements, inbox): same light blue shell as agent/admin.
+   */
+  const isSecondaryLightBlueDashboardRoute = React.useMemo(() => {
+    const bases = [
+      ROUTES.dashboard.appointments,
+      ROUTES.dashboard.rentalContracts,
+      ROUTES.dashboard.manageAgent,
+      ROUTES.dashboard.myEngagements,
+      ROUTES.dashboard.messages,
+      ROUTES.dashboard.crm,
+    ] as const;
+    return bases.some((base) => pathname === base || pathname.startsWith(`${base}/`));
+  }, [pathname]);
+
+  /** Agent role + manage-agent / manage-proposals: light blue shell (aligned with admin), not gray muted. */
+  const isAgentLightBlueShell = React.useMemo(() => {
+    if (isAgent) return true;
+    if (
+      pathname === ROUTES.dashboard.manageAgent ||
+      pathname.startsWith(`${ROUTES.dashboard.manageAgent}/`)
+    )
+      return true;
+    if (
+      pathname === ROUTES.dashboard.manageProposals ||
+      pathname.startsWith(`${ROUTES.dashboard.manageProposals}/`)
+    )
+      return true;
+    return false;
+  }, [isAgent, pathname]);
+
+  /** Property detail (and sub-routes like /edit, /3d): white main — avoids gray behind cards for agents/delegates. */
+  const isPropertyDetailWhiteMain =
+    pathname.startsWith(`${ROUTES.dashboard.property}/`) &&
+    !pathname.startsWith(`${ROUTES.dashboard.property}/create`);
+
+  /** Property 3D Management page: uses a specific light blue background. */
+  const isProperty3dRoute = React.useMemo(() => {
+    return pathname.startsWith(ROUTES.dashboard.property) && pathname.endsWith('/3d');
+  }, [pathname]);
   const t = useTranslations('DashboardLayout');
 
   const { data: adminOverview } = useQuery({
@@ -296,12 +355,6 @@ export function DashboardLayout({
       return t('pageTitle.propertyFeed');
     }
     if (
-      pathname === ROUTES.dashboard.agentSetting ||
-      pathname.startsWith(ROUTES.dashboard.agentSetting)
-    ) {
-      return t('pageTitle.agentSetting');
-    }
-    if (
       pathname === ROUTES.dashboard.myEngagements ||
       pathname.startsWith(ROUTES.dashboard.myEngagements)
     ) {
@@ -362,10 +415,9 @@ export function DashboardLayout({
     return pathname.startsWith(href + '/');
   };
 
-  const settingsHref = backendRoles.includes('AGENT')
-    ? ROUTES.dashboard.agentSetting
-    : ROUTES.settings;
-  const isSettingsFooterActive = isItemActive(settingsHref);
+  React.useEffect(() => {
+    setPageCountBadgeState(null);
+  }, [pathname]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -385,14 +437,29 @@ export function DashboardLayout({
     };
   }, []);
 
+  /** Full-page forms (e.g. create listing): drop owner main min-height so scroll height tracks content — avoids a dead white band above the footer. */
+  const isCreateListingRoute =
+    pathname === ROUTES.dashboard.createListing ||
+    pathname.startsWith(`${ROUTES.dashboard.createListing}/`);
+
   return (
-    <div className={cn('flex h-screen w-full overflow-hidden bg-muted/50', className)}>
+    <div
+      className={cn(
+        'flex h-screen w-full overflow-hidden',
+        isProperty3dRoute
+          ? 'bg-[#e8f2fb] dark:bg-background'
+          : isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
+            ? 'bg-sky-50 dark:bg-background'
+            : 'bg-muted/50 dark:bg-background',
+        className
+      )}
+    >
       <ChatWindowRenderer />
 
       {/* Sidebar - Now part of the flex flow on desktop */}
       <aside
         className={cn(
-          'relative z-20 flex h-screen flex-col border-primary/20 bg-white transition-all duration-300 ease-in-out shrink-0',
+          'relative z-20 flex h-screen flex-col border-r border-primary/20 bg-white transition-all duration-300 ease-in-out shrink-0',
           isCollapsed ? 'w-20' : 'w-[280px]'
         )}
       >
@@ -407,28 +474,16 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={() => setIsCollapsed(false)}
-              className='flex size-8 items-center justify-center rounded-xl bg-primary transition-opacity hover:opacity-90 shadow-sm shadow-primary/10'
+              className='flex size-8 items-center justify-center transition-opacity hover:opacity-90'
               aria-label='Expand sidebar'
             >
-              <Image
-                src='/logo.png'
-                alt='RealVista Logo'
-                width={32}
-                height={32}
-                className='shrink-0'
-              />
+              <RealVistaLogo />
             </button>
           ) : (
             <>
               <Link href={`/buy`} className='flex items-center gap-3 group'>
-                <div className='flex items-center justify-center rounded-xl bg-primary p-2 transition-transform group-hover:scale-105 shadow-sm shadow-primary/10'>
-                  <Image
-                    src='/logo.png'
-                    alt='RealVista Logo'
-                    width={32}
-                    height={32}
-                    className='shrink-0'
-                  />
+                <div className='transition-transform group-hover:scale-105'>
+                  <RealVistaLogo />
                 </div>
                 <div className='flex flex-col'>
                   <span className='text-base font-bold leading-tight text-foreground'>
@@ -445,7 +500,7 @@ export function DashboardLayout({
                 className='flex size-8 items-center justify-center rounded-lg border-primary/20 bg-background text-muted-foreground/40 transition-all hover:bg-muted/50 hover:text-foreground hover:border-border hover:shadow-sm'
                 aria-label='Collapse sidebar'
               >
-                <Columns className='h-4 w-4' strokeWidth={2} />
+                <PanelLeftClose className='h-4 w-4' strokeWidth={2} />
               </button>
             </>
           )}
@@ -501,42 +556,45 @@ export function DashboardLayout({
             );
           })}
         </nav>
-
-        {/* Footer */}
-        <div className='border-t border-primary/20 p-3'>
-          <Link
-            href={settingsHref}
-            className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all',
-              isSettingsFooterActive
-                ? 'bg-primary/5 text-primary font-semibold ring-1 ring-primary/10'
-                : 'text-muted-foreground/60 hover:bg-primary/5 hover:text-foreground',
-              isCollapsed ? 'justify-center' : 'justify-start'
-            )}
-            title={isCollapsed ? 'Settings' : undefined}
-          >
-            <svg
-              className='h-5 w-5 shrink-0'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth={2}
-              viewBox='0 0 24 24'
-            >
-              <path d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z' />
-              <circle cx='12' cy='12' r='3' />
-            </svg>
-            {!isCollapsed && <span className='text-sm font-medium'>Settings</span>}
-          </Link>
-        </div>
       </aside>
 
       {/* Main Content Area - Properly fills space without margin hacks */}
       <div className='flex-1 flex flex-col min-w-0 overflow-hidden'>
-        {/* Top Nav */}
-        <TopNavContainer variant='dashboard' pageTitle={pageTitle} />
+        <DashboardTopNavBadgeContext.Provider value={badgeContextValue}>
+          {/* Top Nav */}
+          <TopNavContainer
+            variant='dashboard'
+            pageTitle={pageTitle}
+            dashboardTitleActions={
+              pageCountBadge != null ? (
+                <span className='inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-2 py-0.5'>
+                  <span className='text-xs font-bold tabular-nums text-white sm:text-sm'>
+                    {formatNumber(pageCountBadge)}
+                  </span>
+                </span>
+              ) : undefined
+            }
+          />
 
-        {/* Page Content - fills remaining height, scrollable */}
-        <main className='flex-1 overflow-y-auto bg-muted/30 p-0'>{children}</main>
+          {/* Page Content - fills remaining height, scrollable */}
+          <main
+            className={cn(
+              'flex min-h-0 flex-1 flex-col overflow-y-auto p-0',
+              isProperty3dRoute
+                ? 'bg-[#e8f2fb] dark:bg-background'
+                : (isOwnerWhiteMain || isPropertyDetailWhiteMain) && !isSecondaryLightBlueDashboardRoute
+                  ? cn(
+                      'bg-white dark:bg-background',
+                      !isCreateListingRoute && 'lg:min-h-[calc(100svh-3.5rem)]'
+                    )
+                  : isAdmin || isAgentLightBlueShell || isSecondaryLightBlueDashboardRoute
+                    ? 'bg-sky-50 dark:bg-background'
+                    : 'bg-muted/30 dark:bg-background',
+            )}
+          >
+            {children}
+          </main>
+        </DashboardTopNavBadgeContext.Provider>
       </div>
     </div>
   );

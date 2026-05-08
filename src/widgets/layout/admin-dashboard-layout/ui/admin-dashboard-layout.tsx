@@ -3,16 +3,16 @@
 import * as React from 'react';
 import Image from 'next/image';
 import {
-  Columns,
-  FileText,
-  LayoutDashboard,
-  MessageCircle,
-  Users,
   Building2,
+  Flag,
+  Inbox,
+  LayoutDashboard,
+  LayoutTemplate,
   MapPin,
   Package,
+  PanelLeftClose,
   ShieldCheck,
-  Flag,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -42,7 +42,7 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       href: ROUTES.dashboard.root,
       icon: LayoutDashboard,
     },
-    { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: Users },
+    { id: 'users', label: t('menu.users'), href: ROUTES.dashboard.manageUsers, icon: UserCog },
     { id: 'policies', label: t('menu.policies'), href: ROUTES.dashboard.managePolicies, icon: ShieldCheck },
     {
       id: 'reports',
@@ -52,7 +52,7 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
       badge: badges.reports,
       badgeVariant: 'danger'
     },
-    { id: 'templates', label: t('menu.templates'), href: ROUTES.dashboard.manageTemplates, icon: FileText },
+    { id: 'templates', label: t('menu.templates'), href: ROUTES.dashboard.manageTemplates, icon: LayoutTemplate },
 
     {
       id: 'locations',
@@ -69,18 +69,18 @@ function getAdminSidebarItems(t: TFn, badges: { reports?: number; listings?: num
 
     {
       id: 'property',
-      label: t('menu.property'),
+      label: t('menu.propertyAdminSidebar'),
       href: ROUTES.dashboard.property,
       icon: Building2,
       badge: badges.totalListings,
-      badgeVariant: 'info'
+      badgeVariant: 'info',
     },
 
     {
       id: 'messages',
       label: t('menu.messages'),
       href: ROUTES.dashboard.messages,
-      icon: MessageCircle,
+      icon: Inbox,
     },
   ];
 }
@@ -197,7 +197,7 @@ export function AdminDashboardLayout({
                 </div>
               </Link>
               <button onClick={() => setIsCollapsed(true)} className='text-muted-foreground/40'>
-                <Columns className='h-4 w-4' />
+                <PanelLeftClose className='h-4 w-4' />
               </button>
             </>
           )}

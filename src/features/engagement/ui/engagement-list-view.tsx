@@ -9,8 +9,8 @@ import { Engagement } from '@/entities/engagement/model/types';
 import { DataTable } from '@/shared/ui/data-table';
 import { Spinner } from '@/shared/ui/spinner';
 import { cn } from '@/shared/lib/utils';
-import { formatNumber } from '@/shared/lib/utils/format-currency';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
+import { useSyncDashboardTopNavCountBadge } from '@/shared/lib/dashboard-top-nav-badge-context';
 
 import { useEngagementColumns } from './engagement-columns';
 import { EngagementDetailPanel } from './engagement-detail-panel';
@@ -66,6 +66,8 @@ export const EngagementListView = ({
   onSelect,
 }: EngagementListViewProps) => {
   const t = useTranslations('Engagement');
+
+  useSyncDashboardTopNavCountBadge(isError || isLoading ? null : totalElements);
 
   const [inputValue, setInputValue] = React.useState(search);
   const debouncedInput = useDebounce(inputValue, 400);
@@ -129,32 +131,21 @@ export const EngagementListView = ({
 
   const toolbar = (
     <div className='flex flex-col gap-4 p-4 sm:p-5'>
-      {/* Title row */}
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <h2 className='text-xl font-bold text-foreground'>{t('page.title')}</h2>
-          {/* Count badge */}
-          <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-            <span className='text-sm font-bold text-white'>{formatNumber(totalElements ?? 0)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Search + filter row */}
+      {/* Search + filter row — match managed listings / manage agent */}
       <div className='flex items-center gap-3'>
-        <div className='relative flex-1 max-w-md'>
-          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-            <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
+        <div className='relative min-w-0 flex-1'>
+          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+            <Search className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
           </div>
           <input
             type='text'
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={t('filter.searchPlaceholder')}
-            className='h-11 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-10 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
+            className='h-9 w-full rounded-full border-2 border-primary/14 bg-[#e8f2fb] pl-10 pr-9 text-sm font-medium text-foreground placeholder:text-muted-foreground/65 shadow-sm shadow-primary/[0.04] transition-colors focus:border-primary/28 focus:bg-[#dfeef9] focus:outline-none focus:ring-2 focus:ring-primary/15'
           />
           {isSearchPending && (
-            <span className='pointer-events-none absolute inset-y-0 right-4 flex items-center'>
+            <span className='pointer-events-none absolute inset-y-0 right-3.5 flex items-center'>
               <Spinner className='size-4 text-primary' />
             </span>
           )}
@@ -166,15 +157,18 @@ export const EngagementListView = ({
             type='button'
             onClick={() => setIsFilterOpen((prev) => !prev)}
             className={cn(
-              'flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+              'flex h-9 min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 px-2.5 text-xs font-medium bg-white shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1',
               hasActiveFilter
-                ? 'border-primary bg-primary/5 text-primary'
-                : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
+                ? 'border-primary/24 bg-primary/5 text-primary'
+                : 'border-primary/14 text-foreground hover:border-primary/20 hover:bg-muted/30'
             )}
           >
-            <Filter className='h-5 w-5' strokeWidth={2} />
+            <Filter className='h-4 w-4 shrink-0 text-primary' strokeWidth={2} />
             <ChevronDown
-              className={cn('h-4 w-4 transition-transform', isFilterOpen && 'rotate-180')}
+              className={cn(
+                'h-3.5 w-3.5 shrink-0 text-primary transition-transform',
+                isFilterOpen && 'rotate-180'
+              )}
               strokeWidth={2}
             />
             {hasActiveFilter && (
@@ -198,7 +192,7 @@ export const EngagementListView = ({
                   {t('filter.reset')}
                 </button>
               </div>
-              <div className='p-3 flex flex-col gap-4'>
+              <div className='flex flex-col gap-4 p-4'>
                 {/* Direction (tab) section */}
                 <div>
                   <p className='mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
@@ -263,7 +257,7 @@ export const EngagementListView = ({
 
   if (isError) {
     return (
-      <div className='p-4 sm:p-6 flex h-full items-center justify-center'>
+      <div className='flex min-h-0 flex-1 items-center justify-center p-4 sm:p-6'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
             <FileSearch className='h-6 w-6 text-primary' />
@@ -275,39 +269,45 @@ export const EngagementListView = ({
   }
 
   return (
-    <div className='p-4 sm:p-6 flex gap-4 items-start'>
-      <div className='flex-1 min-w-0'>
-        <DataTable
-          columns={columns}
-          data={engagements}
-          isLoading={isLoading}
-          pageCount={totalPages}
-          pagination={pagination}
-          onPaginationChange={(updater) => {
-            const next = typeof updater === 'function' ? updater(pagination) : updater;
-            onPageChange(next.pageIndex + 1);
-          }}
-          toolbar={toolbar}
-          emptyIcon={<FileSearch className='h-10 w-10 text-primary/40 mb-2' />}
-          emptyTitle={t('table.empty')}
-          pageInfoText={(current) => {
-            const from = (current - 1) * itemsPerPage + 1;
-            const to = Math.min(current * itemsPerPage, totalElements);
-            return t('pagination.showing', { from, to, total: totalElements });
-          }}
-          onRowClick={onSelect}
-          isRowSelected={(row) => row.engagementId === selectedEngagement?.engagementId}
-        />
-      </div>
+    <div className='flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6'>
+      <div className='flex min-h-0 flex-1 gap-6'>
+        <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
+          <DataTable
+            className='flex min-h-0 flex-1 flex-col overflow-hidden'
+            bodyClassName='mx-4 sm:mx-5'
+            columns={columns}
+            data={engagements}
+            isLoading={isLoading}
+            pageCount={totalPages}
+            pagination={pagination}
+            onPaginationChange={(updater) => {
+              const next = typeof updater === 'function' ? updater(pagination) : updater;
+              onPageChange(next.pageIndex + 1);
+            }}
+            toolbar={toolbar}
+            emptyIcon={<FileSearch className='h-10 w-10 text-primary/40 mb-2' />}
+            emptyTitle={t('table.empty')}
+            pageInfoText={(current) => {
+              const from = (current - 1) * itemsPerPage + 1;
+              const to = Math.min(current * itemsPerPage, totalElements);
+              return t('pagination.showing', { from, to, total: totalElements });
+            }}
+            onRowClick={onSelect}
+            isRowSelected={(row) => row.engagementId === selectedEngagement?.engagementId}
+          />
+        </div>
 
-      {selectedEngagement && onSelect && (
-        <EngagementDetailPanel
-          engagement={selectedEngagement}
-          onClose={() => onSelect(selectedEngagement)}
-          onCancel={onCancel}
-          currentUserId={currentUserId}
-        />
-      )}
+        {selectedEngagement && onSelect && (
+          <div className='flex min-h-0 w-[380px] shrink-0 flex-col self-stretch'>
+            <EngagementDetailPanel
+              engagement={selectedEngagement}
+              onClose={() => onSelect(selectedEngagement)}
+              onCancel={onCancel}
+              currentUserId={currentUserId}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

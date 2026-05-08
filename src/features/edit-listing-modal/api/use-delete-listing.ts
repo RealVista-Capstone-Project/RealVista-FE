@@ -12,6 +12,9 @@ export function useDeleteListing() {
         queryKey: listingKeys.managed(),
       });
       queryClient.invalidateQueries({
+        queryKey: listingKeys.managedInfiniteLists(),
+      });
+      queryClient.invalidateQueries({
         queryKey: listingKeys.managedSummary(),
       });
     },

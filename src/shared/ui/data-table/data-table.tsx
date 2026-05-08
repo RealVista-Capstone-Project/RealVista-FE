@@ -33,7 +33,11 @@ export interface DataTableProps<TData> {
   /** Check if a row is selected (for highlighting). */
   isRowSelected?: (row: TData) => boolean;
   className?: string;
+  /** Applied to the flex column wrapper around the bordered table + pagination (below toolbar). */
+  bodyClassName?: string;
   tableContainerClassName?: string;
+  /** Merged into the inner `<table>` element (e.g. `table-fixed` for full-width column layout). */
+  tableClassName?: string;
 }
 
 export function DataTable<TData>({
@@ -51,7 +55,9 @@ export function DataTable<TData>({
   onRowClick,
   isRowSelected,
   className,
+  bodyClassName,
   tableContainerClassName,
+  tableClassName,
 }: DataTableProps<TData>) {
   const t = useTranslations('DataTable');
   const table = useReactTable({
@@ -67,84 +73,112 @@ export function DataTable<TData>({
     onPaginationChange: onPaginationChange,
   });
 
+  const isEmpty = !isLoading && table.getRowModel().rows.length === 0;
+
   return (
     <div
       className={cn(
-        'space-y-2 rounded-2xl border border-border bg-background p-2 shadow-sm',
+        'flex min-h-0 flex-col gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm',
         className
       )}
     >
       {/* Toolbar */}
-      {toolbar && toolbar}
-      {/* Table */}
-      <div className={cn('overflow-hidden rounded-xl border border-border', tableContainerClassName)}>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              /* Skeleton loading rows */
-              Array.from({ length: pagination?.pageSize ?? 10 }).map((_, i) => (
-                <TableRow key={`skeleton-${i}`}>
-                  {columns.map((_, j) => (
-                    <TableCell key={`skeleton-${i}-${j}`}>
-                      <div className='h-4 w-full animate-pulse rounded bg-muted' />
-                    </TableCell>
+      {toolbar && <div className='shrink-0'>{toolbar}</div>}
+      <div
+        className={cn(
+          'flex min-h-0 min-w-0 flex-1 flex-col gap-2',
+          bodyClassName
+        )}
+      >
+      {/* Table — scroll inside so parent flex layout avoids page scrollbar */}
+      <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border', tableContainerClassName)}>
+        {isEmpty ? (
+          <>
+            <div className='shrink-0 overflow-x-auto'>
+              <Table className={tableClassName}>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => {
-                const isSelected = isRowSelected ? isRowSelected(row.original) : false;
-                return (
-                  <TableRow
-                    key={row.id}
-                    className={cn(
-                      onRowClick && 'cursor-pointer transition-colors hover:bg-muted/50',
-                      isSelected && 'bg-primary/5'
-                    )}
-                    onClick={() => onRowClick?.(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+                </TableHeader>
+              </Table>
+            </div>
+            <div className='relative min-h-[220px] flex-1'>
+              <div className='absolute inset-0 flex flex-col items-center justify-center px-6 py-10 text-center'>
+                {emptyIcon ?? <Inbox className='mb-2 h-10 w-10 text-muted-foreground' />}
+                <p className='text-sm font-medium text-muted-foreground'>{emptyTitle}</p>
+                {emptyDescription && (
+                  <p className='mt-1 text-xs text-muted-foreground'>{emptyDescription}</p>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className='min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto'>
+            <Table className={tableClassName}>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
                     ))}
                   </TableRow>
-                );
-              })
-            ) : (
-              /* Empty state */
-              <TableRow>
-                <TableCell colSpan={columns.length} className='h-48'>
-                  <div className='flex flex-col items-center justify-center text-center'>
-                    {emptyIcon ?? <Inbox className='h-10 w-10 text-muted-foreground mb-2' />}
-                    <p className='text-sm font-medium text-muted-foreground'>{emptyTitle}</p>
-                    {emptyDescription && (
-                      <p className='text-xs text-muted-foreground mt-1'>{emptyDescription}</p>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  /* Skeleton loading rows */
+                  Array.from({ length: pagination?.pageSize ?? 10 }).map((_, i) => (
+                    <TableRow key={`skeleton-${i}`}>
+                      {columns.map((_, j) => (
+                        <TableCell key={`skeleton-${i}-${j}`}>
+                          <div className='h-4 w-full animate-pulse rounded bg-muted' />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  table.getRowModel().rows.map((row) => {
+                    const isSelected = isRowSelected ? isRowSelected(row.original) : false;
+                    return (
+                      <TableRow
+                        key={row.id}
+                        className={cn(
+                          onRowClick && 'cursor-pointer transition-colors hover:bg-muted/50',
+                          isSelected && 'bg-primary/5'
+                        )}
+                        onClick={() => onRowClick?.(row.original)}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
       {pageCount != null && pageCount >= 1 && (
-        <div className='flex items-center justify-between px-6'>
+        <div className='flex shrink-0 items-center justify-between px-4 sm:px-5'>
           <p className='text-sm text-muted-foreground'>
             {pageInfoText
               ? pageInfoText((pagination?.pageIndex ?? 0) + 1, pageCount!)
@@ -199,6 +233,7 @@ export function DataTable<TData>({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

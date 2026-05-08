@@ -2,6 +2,7 @@ import http from '@/shared/lib/http';
 import type {
   DashboardApiResponse,
   DashboardStatsResponse,
+  OwnerHeroInsightsResponse,
   PerformancePeriod,
   PerformanceMetric,
   PerformanceResponse,
@@ -42,6 +43,13 @@ export function mapBackendStatusToUiStatus(status: string): Exclude<PropertyFilt
 export const ownerDashboardApi = {
   async getStats() {
     const response = await http.get<DashboardApiResponse<DashboardStatsResponse>>(`${DASHBOARD_BASE}/stats`);
+    return response.payload.data;
+  },
+
+  async getHeroInsights() {
+    const response = await http.get<DashboardApiResponse<OwnerHeroInsightsResponse>>(
+      `${DASHBOARD_BASE}/hero-insights`,
+    );
     return response.payload.data;
   },
 

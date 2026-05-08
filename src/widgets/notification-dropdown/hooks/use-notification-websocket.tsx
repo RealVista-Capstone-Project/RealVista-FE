@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/shared/lib/websocket';
@@ -22,6 +22,13 @@ interface UseNotificationWebSocketOptions {
   onNotificationAction?: (notification: Notification) => void;
   /** Localized label for the toast action button shown on 3D notifications */
   toastViewLabel: string;
+  /**
+   * Optional: navigate when user taps toast action on PRICE_CHANGE.
+   * Receives `(listingId, listingSlug?)` so the caller can build a slug-based URL.
+   */
+  onOpenListing?: (listingId: string, listingSlug?: string) => void;
+  /** Localized label for PRICE_CHANGE toast action */
+  toastOpenListingLabel?: string;
 }
 
 /**
@@ -37,6 +44,8 @@ export function useNotificationWebSocket({
   onNewNotification,
   onNotificationAction,
   toastViewLabel,
+  onOpenListing,
+  toastOpenListingLabel,
 }: UseNotificationWebSocketOptions) {
   const seenIds = useRef<Set<string>>(new Set());
   const queryClient = useQueryClient();
@@ -45,6 +54,8 @@ export function useNotificationWebSocket({
   onNewNotificationRef.current = onNewNotification;
   const onNotificationActionRef = useRef(onNotificationAction);
   onNotificationActionRef.current = onNotificationAction;
+  const onOpenListingRef = useRef(onOpenListing);
+  onOpenListingRef.current = onOpenListing;
 
   const { subscribe, isConnected } = useWebSocket({
     endpoint: WS_ENDPOINT,
@@ -52,6 +63,10 @@ export function useNotificationWebSocket({
   });
 
   useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
+
     const unsubscribe = subscribe({
       destination: NOTIFICATION_DESTINATION,
       onMessage: (frame) => {
@@ -70,18 +85,48 @@ export function useNotificationWebSocket({
             notification.eventType === NotificationEventType.PROPERTY_3D_GENERATED ||
             notification.eventType === NotificationEventType.PROPERTY_3D_FAILED;
 
-          toast.info(notification.title, {
-            description: notification.message,
-            duration: 5000,
-            ...(is3dEvent && onNotificationActionRef.current
-              ? {
-                  action: {
-                    label: toastViewLabel,
-                    onClick: () => onNotificationActionRef.current!(notification),
-                  },
-                }
-              : {}),
-          });
+          const isPriceChange = notification.eventType === NotificationEventType.PRICE_CHANGE;
+          const listingId = notification.entityId?.trim();
+          const listingSlug = notification.metadata?.listing_slug?.trim() || undefined;
+
+          if (is3dEvent && onNotificationActionRef.current) {
+            toast.info(notification.title, {
+              description: notification.message,
+              duration: 5000,
+              action: {
+                label: toastViewLabel,
+                onClick: () => onNotificationActionRef.current!(notification),
+              },
+            });
+          } else if (
+            isPriceChange &&
+            listingId &&
+            onOpenListingRef.current &&
+            toastOpenListingLabel
+          ) {
+            // Sonner's `action` sits beside the text; stack message + CTA vertically instead.
+            toast.info(notification.title, {
+              description: (
+                <Fragment>
+                  <span className='block text-sm leading-snug opacity-90'>{notification.message}</span>
+                  <button
+                    type='button'
+                    className='mt-2 block w-full text-left text-sm font-semibold text-primary underline-offset-2 hover:underline'
+                    onClick={() => onOpenListingRef.current!(listingId, listingSlug)}
+                  >
+                    {toastOpenListingLabel}
+                  </button>
+                </Fragment>
+              ),
+              duration: 5000,
+              className: 'items-start',
+            });
+          } else {
+            toast.info(notification.title, {
+              description: notification.message,
+              duration: 5000,
+            });
+          }
 
           if (is3dEvent) {
             queryClient.invalidateQueries({ queryKey: billingKeys.mySubscriptions() });
@@ -97,5 +142,5 @@ export function useNotificationWebSocket({
     return () => {
       unsubscribe();
     };
-  }, [subscribe, isConnected, queryClient, toastViewLabel]);
+  }, [subscribe, isConnected, queryClient, toastViewLabel, toastOpenListingLabel]);
 }

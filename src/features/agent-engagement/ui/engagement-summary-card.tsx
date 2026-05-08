@@ -44,7 +44,7 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
   const displayMessage = parsedContent?.message || parsedContent?.pitchContent;
 
   return (
-    <Card className='border border-gray-100 shadow-sm rounded-2xl overflow-hidden'>
+    <Card className='overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm'>
       {/* Property Image Banner */}
       <div className='relative h-40 bg-gradient-to-br from-primary/5 via-primary/5 to-blue-50/30 flex items-center justify-center overflow-hidden'>
         {/* Decorative blobs */}
@@ -79,11 +79,11 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
       <CardContent className='p-5'>
         {/* Title + message */}
         <div className='mb-5'>
-          <h3 className='text-sm font-bold text-gray-900'>
+          <h3 className='text-sm font-bold text-foreground'>
             {parsedContent?.title || t('detailPage.summaryTitle')}
           </h3>
           {displayMessage && (
-            <p className='text-sm text-gray-500 mt-1.5 leading-relaxed'>
+            <p className='mt-1.5 text-sm leading-relaxed text-muted-foreground'>
               {displayMessage}
             </p>
           )}
@@ -97,10 +97,10 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
                 <MapPin className='h-3.5 w-3.5 text-primary/80' />
               </div>
               <div>
-                <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-0.5'>
+                <p className='mb-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground'>
                   {t('detailPage.propertyAddress')}
                 </p>
-                <p className='text-sm font-semibold text-gray-900'>{agent.property_address}</p>
+                <p className='text-sm font-semibold text-foreground'>{agent.property_address}</p>
               </div>
             </div>
           )}
@@ -111,10 +111,10 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
                 <MapPin className='h-3.5 w-3.5 text-orange-500' />
               </div>
               <div>
-                <p className='text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-0.5'>
+                <p className='mb-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground'>
                   {t('detailPage.propertyLocation')}
                 </p>
-                <p className='text-sm font-semibold text-gray-900'>{agent.property_location_name}</p>
+                <p className='text-sm font-semibold text-foreground'>{agent.property_location_name}</p>
               </div>
             </div>
           )}
@@ -122,24 +122,24 @@ export function EngagementSummaryCard({ agent }: EngagementSummaryCardProps) {
 
         {/* Info tiles */}
         <div className='grid grid-cols-2 gap-3'>
-          <div className='bg-gray-50 rounded-xl p-3.5 border border-gray-100'>
-            <div className='flex items-center gap-1.5 mb-1.5'>
+          <div className='rounded-xl border border-border/70 bg-primary/[0.04] p-3.5'>
+            <div className='mb-1.5 flex items-center gap-1.5'>
               <Award className='h-3.5 w-3.5 text-primary/60' />
-              <span className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
+              <span className='text-[10px] font-medium uppercase tracking-wide text-muted-foreground'>
                 {t('detailPage.engagementType')}
               </span>
             </div>
-            <p className='text-sm font-bold text-gray-900'>{getEngagementTypeLabel(agent.engagement_type, t)}</p>
+            <p className='text-sm font-bold text-foreground'>{getEngagementTypeLabel(agent.engagement_type, t)}</p>
           </div>
 
-          <div className='bg-gray-50 rounded-xl p-3.5 border border-gray-100'>
-            <div className='flex items-center gap-1.5 mb-1.5'>
-              <CalendarDays className='h-3.5 w-3.5 text-blue-400' />
-              <span className='text-[10px] text-gray-400 font-medium uppercase tracking-wide'>
+          <div className='rounded-xl border border-border/70 bg-primary/[0.04] p-3.5'>
+            <div className='mb-1.5 flex items-center gap-1.5'>
+              <CalendarDays className='h-3.5 w-3.5 text-sky-500' />
+              <span className='text-[10px] font-medium uppercase tracking-wide text-muted-foreground'>
                 {t('detailPage.hiredDate')}
               </span>
             </div>
-            <p className='text-sm font-bold text-gray-900'>
+            <p className='text-sm font-bold text-foreground'>
               {formatDate(agent.hired_at, 'dd/MM/yyyy', locale)}
             </p>
           </div>

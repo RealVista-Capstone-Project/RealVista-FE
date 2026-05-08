@@ -1,7 +1,11 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { conversationApi } from './conversation.api';
 import { conversationKeys } from './keys';
-import type { SendMessageRequest, SendMessageResponse } from '../model/types';
+import type {
+  ConversationListItemResponse,
+  SendMessageRequest,
+  SendMessageResponse,
+} from '../model/types';
 import type { HttpResponse, ApiResponse } from '@/shared/types/api';
 import { unwrapApiResponse } from '@/shared/types/api';
 
@@ -16,7 +20,10 @@ export const conversationQueries = {
   list: () =>
     queryOptions({
       queryKey: conversationKeys.list(),
-      queryFn: () => conversationApi.listConversations(),
+      queryFn: async () => {
+        const res = await conversationApi.listConversations();
+        return unwrapApiResponse(res) as ConversationListItemResponse[];
+      },
       staleTime: 2 * 60 * 1000,
     }),
 

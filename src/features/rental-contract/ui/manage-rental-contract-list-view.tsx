@@ -11,8 +11,8 @@ import { type RentalContract, RentalContractStatus } from '@/entities/rental-con
 import { DataTable } from '@/shared/ui/data-table';
 import { Spinner } from '@/shared/ui/spinner';
 import { cn } from '@/shared/lib/utils';
-import { formatNumber } from '@/shared/lib/utils/format-currency';
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
+import { useSyncDashboardTopNavCountBadge } from '@/shared/lib/dashboard-top-nav-badge-context';
 
 import { useContractColumns } from './contract-columns';
 
@@ -47,6 +47,8 @@ export const ManageRentalContractListView = ({
 }: ManageRentalContractListViewProps) => {
   const t = useTranslations('ManageRentalContract');
   const router = useRouter();
+
+  useSyncDashboardTopNavCountBadge(isError || isLoading ? null : totalElements);
 
   const [inputValue, setInputValue] = React.useState(search);
   const debouncedInput = useDebounce(inputValue, 400);
@@ -94,73 +96,51 @@ export const ManageRentalContractListView = ({
   };
 
   const toolbar = (
-    <div className='flex flex-col gap-4 p-4 sm:p-5'>
-      {/* Title row */}
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <h2 className='text-xl font-bold text-foreground'>{t('hero.shortTitle')}</h2>
-          {/* Count badge */}
-          <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-            <span className='text-sm font-bold text-white'>{formatNumber(totalElements ?? 0)}</span>
-          </div>
+    <div className='flex items-center gap-3 p-4 sm:p-5'>
+      {/* Search */}
+      <div className='relative min-w-0 flex-1 max-w-md'>
+        <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+          <Search className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
         </div>
-
-        {/* Create Button */}
-        <button
-          type='button'
-          onClick={() => router.push(ROUTES.dashboard.createRentalContract)}
-          className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-        >
-          <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
-          <span>{t('hero.createButton')}</span>
-        </button>
+        <input
+          type='text'
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={t('filter.searchPlaceholder')}
+          className='h-9 w-full rounded-full border-2 border-primary/14 bg-[#e8f2fb] pl-10 pr-9 text-sm font-medium text-foreground placeholder:text-muted-foreground/65 shadow-sm shadow-primary/[0.04] transition-colors focus:border-primary/28 focus:bg-[#dfeef9] focus:outline-none focus:ring-0'
+        />
+        {isSearchPending && (
+          <span className='pointer-events-none absolute inset-y-0 right-3.5 flex items-center'>
+            <Spinner className='size-4 text-primary' />
+          </span>
+        )}
       </div>
 
-      {/* Search + filter row */}
-      <div className='flex items-center gap-3'>
-        <div className='relative flex-1 max-w-md'>
-          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-            <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
-          </div>
-          <input
-            type='text'
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={t('filter.searchPlaceholder')}
-            className='h-11 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-10 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
+      {/* Filter Button */}
+      <div ref={filterRef} className='relative shrink-0'>
+        <button
+          type='button'
+          onClick={() => setIsFilterOpen((prev) => !prev)}
+          className={cn(
+            'flex h-9 min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 px-2.5 text-xs font-medium bg-white shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1',
+            hasActiveStatus
+              ? 'border-primary/24 bg-primary/5 text-primary'
+              : 'border-primary/14 text-foreground hover:border-primary/20 hover:bg-muted/30'
+          )}
+        >
+          <Filter className='h-4 w-4 shrink-0 text-primary' strokeWidth={2} />
+          <ChevronDown
+            className={cn('h-3.5 w-3.5 shrink-0 text-primary transition-transform', isFilterOpen && 'rotate-180')}
+            strokeWidth={2}
           />
-          {isSearchPending && (
-            <span className='pointer-events-none absolute inset-y-0 right-4 flex items-center'>
-              <Spinner className='size-4 text-primary' />
+          {hasActiveStatus && (
+            <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
+              {activeFilterCount}
             </span>
           )}
-        </div>
+        </button>
 
-        {/* Filter Button */}
-        <div ref={filterRef} className='relative shrink-0'>
-          <button
-            type='button'
-            onClick={() => setIsFilterOpen((prev) => !prev)}
-            className={cn(
-              'flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-              hasActiveStatus
-                ? 'border-primary bg-primary/5 text-primary'
-                : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
-            )}
-          >
-            <Filter className='h-5 w-5' strokeWidth={2} />
-            <ChevronDown
-              className={cn('h-4 w-4 transition-transform', isFilterOpen && 'rotate-180')}
-              strokeWidth={2}
-            />
-            {hasActiveStatus && (
-              <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-
-          {isFilterOpen && (
+        {isFilterOpen && (
             <div className='absolute right-0 top-full z-30 mt-2 w-56 rounded-xl border border-primary/20 bg-white shadow-lg'>
               <div className='flex items-center justify-between border-b border-primary/20 px-4 py-3'>
                 <span className='text-sm font-semibold text-foreground'>{t('filter.filterTitle')}</span>
@@ -203,13 +183,22 @@ export const ManageRentalContractListView = ({
             </div>
           )}
         </div>
-      </div>
+
+      {/* Create Button */}
+      <button
+        type='button'
+        onClick={() => router.push(ROUTES.dashboard.createRentalContract)}
+        className='ml-auto flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+      >
+        <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
+        <span>{t('hero.createButton')}</span>
+      </button>
     </div>
   );
 
   if (isError) {
     return (
-      <div className='p-4 sm:p-6 flex h-full items-center justify-center'>
+      <div className='m-4 flex h-full items-center justify-center'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
             <FileSearch className='h-6 w-6 text-primary' />
@@ -221,28 +210,28 @@ export const ManageRentalContractListView = ({
   }
 
   return (
-    <div className='p-4 sm:p-6 flex gap-4 items-start'>
-      <div className='flex-1 min-w-0'>
-        <DataTable
-          columns={columns}
-          data={contracts}
-          isLoading={isLoading}
-          pageCount={totalPages}
-          pagination={pagination}
-          onPaginationChange={(updater) => {
-            const next = typeof updater === 'function' ? updater(pagination) : updater;
-            onPageChange(next.pageIndex + 1);
-          }}
-          toolbar={toolbar}
-          emptyIcon={<FileSearch className='h-10 w-10 text-primary/40 mb-2' />}
-          emptyTitle={t('empty.title')}
-          pageInfoText={(current) => {
-            const from = (current - 1) * itemsPerPage + 1;
-            const to = Math.min(current * itemsPerPage, totalElements);
-            return t('pagination.showing', { from, to, total: totalElements });
-          }}
-        />
-      </div>
+    <div className='m-4'>
+      <DataTable
+        columns={columns}
+        data={contracts}
+        isLoading={isLoading}
+        pageCount={totalPages}
+        pagination={pagination}
+        onPaginationChange={(updater) => {
+          const next = typeof updater === 'function' ? updater(pagination) : updater;
+          onPageChange(next.pageIndex + 1);
+        }}
+        toolbar={toolbar}
+        emptyIcon={<FileSearch className='h-10 w-10 text-primary/40 mb-2' />}
+        emptyTitle={t('empty.title')}
+        pageInfoText={(current) => {
+          const from = (current - 1) * itemsPerPage + 1;
+          const to = Math.min(current * itemsPerPage, totalElements);
+          return t('pagination.showing', { from, to, total: totalElements });
+        }}
+        className='min-h-[calc(100vh-6rem)]'
+        bodyClassName='mx-4 sm:mx-5'
+      />
     </div>
   );
 };

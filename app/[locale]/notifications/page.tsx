@@ -4,10 +4,17 @@ import { useState, useMemo, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { notificationApi, notificationKeys, mapToNotification } from '@/entities/notification';
+import { useParams, useRouter } from 'next/navigation';
+import {
+  notificationApi,
+  notificationKeys,
+  mapToNotification,
+  NotificationEventType,
+} from '@/entities/notification';
 import type { NotificationResponse, NotificationPageResponse, Notification } from '@/entities/notification';
 import { NotificationItem } from '@/widgets/notification-dropdown/ui/notification-item';
 import { Pagination } from '@/shared/ui/realvista-pagination';
+import { useNotificationWebSocket } from '@/widgets/notification-dropdown/hooks/use-notification-websocket';
 
 const PAGE_SIZE = 20;
 
@@ -16,8 +23,12 @@ export default function NotificationsPage() {
   const token = session?.user?.accessToken;
   const queryClient = useQueryClient();
   const t = useTranslations('Notifications');
+  const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string | undefined) ?? 'en';
 
   const [page, setPage] = useState(0);
+  const [wsNotifications, setWsNotifications] = useState<Notification[]>([]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [...notificationKeys.list(), 'full-page', page],
@@ -36,10 +47,32 @@ export default function NotificationsPage() {
     return (data as NotificationPageResponse | undefined)?.data?.totalPages ?? 1;
   }, [data]);
 
-  const notifications: Notification[] = useMemo(
-    () => rawItems.map(mapToNotification),
-    [rawItems]
+  const notifications: Notification[] = useMemo(() => {
+    const httpMapped = rawItems.map(mapToNotification);
+    const httpIds = new Set(httpMapped.map((n) => n.id));
+    const wsOnly = wsNotifications.filter((n) => !httpIds.has(n.id));
+    return [...wsOnly, ...httpMapped];
+  }, [rawItems, wsNotifications]);
+
+  const onNewWsNotification = useCallback(
+    (n: Notification) => {
+      setWsNotifications((prev) => {
+        if (prev.some((x) => x.id === n.id)) return prev;
+        return [n, ...prev];
+      });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.list() });
+    },
+    [queryClient]
   );
+
+  useNotificationWebSocket({
+    token,
+    toastViewLabel: t('toastView'),
+    toastOpenListingLabel: t('toastViewListing'),
+    onNewNotification: onNewWsNotification,
+    onOpenListing: (listingId, listingSlug) =>
+      router.push(`/${locale}/listing/${listingSlug ?? listingId}`),
+  });
 
   const handleMarkRead = useCallback(
     async (id: string) => {
@@ -119,6 +152,14 @@ export default function NotificationsPage() {
                 notification={n}
                 onClick={(notif) => {
                   if (!notif.isRead) handleMarkRead(notif.id);
+                  if (notif.eventType === NotificationEventType.PRICE_CHANGE) {
+                    const slug = notif.metadata?.listing_slug;
+                    if (slug) {
+                      router.push(`/${locale}/listing/${slug}`);
+                    } else if (notif.entityId) {
+                      router.push(`/${locale}/listing/${notif.entityId}`);
+                    }
+                  }
                 }}
                 onDelete={handleDelete}
               />

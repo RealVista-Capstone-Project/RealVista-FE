@@ -8,7 +8,7 @@ interface CrmContentSkeletonProps {
 export function CrmContentSkeleton({ view }: CrmContentSkeletonProps) {
   if (view === 'table') {
     return (
-      <Card className='border-border/60 shadow-sm'>
+      <Card className='border-border/60 bg-white shadow-sm dark:bg-card'>
         <CardContent className='space-y-3 p-4'>
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className='grid grid-cols-[1.4fr_1fr_1fr_0.8fr] items-center gap-4'>
@@ -26,7 +26,7 @@ export function CrmContentSkeleton({ view }: CrmContentSkeletonProps) {
   return (
     <div className='grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-5'>
       {Array.from({ length: 5 }).map((_, columnIndex) => (
-        <Card key={columnIndex} className='border-border/60 shadow-sm'>
+        <Card key={columnIndex} className='border-border/60 bg-white shadow-sm dark:bg-card'>
           <CardContent className='space-y-3 p-3'>
             <div className='flex items-center justify-between'>
               <Skeleton className='h-5 w-24' />
