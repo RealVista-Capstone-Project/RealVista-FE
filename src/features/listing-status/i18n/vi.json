@@ -10,7 +10,7 @@
     },
     "actions": {
       "publish": "Đăng bài",
-      "unpublish": "Gỡ bài",
+      "unpublish": "Gỡ bài đăng",
       "markAsSold": "Đánh dấu đã bán",
       "markAsRented": "Đánh dấu đã cho thuê"
     },
@@ -22,17 +22,23 @@
       "propertyNotAvailable": "Bất động sản liên quan chưa ở trạng thái sẵn sàng để đăng tin."
     },
     "confirm": {
+      "addressUnknown": "Chưa có địa chỉ đầy đủ trên hệ thống",
+      "detailLabel": "Thông tin xác nhận",
       "markAsSold": {
-        "title": "Đánh dấu đã bán",
-        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã bán? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các môi giới khác."
+        "title": "Xác nhận đã bán",
+        "intro": "Xác nhận giao dịch bán đã hoàn tất cho bất động sản dưới đây.",
+        "consequence": "Hành động này sẽ đóng các tin đăng khác cùng bất động sản và thông báo tới các môi giới liên quan."
       },
       "markAsRented": {
-        "title": "Đánh dấu đã cho thuê",
-        "description": "Bạn có chắc muốn đánh dấu bất động sản này là đã cho thuê? Hành động này sẽ đóng tất cả các tin đăng khác cho bất động sản này và thông báo cho các môi giới khác."
+        "title": "Xác nhận đã cho thuê",
+        "intro": "Xác nhận giao dịch cho thuê đã hoàn tất cho bất động sản dưới đây.",
+        "consequence": "Hành động này sẽ đóng các tin đăng khác cùng bất động sản và thông báo tới các môi giới liên quan."
       },
       "unpublish": {
         "title": "Gỡ bài đăng",
-        "description": "Bạn có chắc muốn gỡ bài đăng này? Các lịch hẹn đang hoạt động sẽ bị hủy nếu tin đăng tạm ẩn quá 24h."
+        "description": "Bạn có chắc muốn gỡ bài đăng này? Các lịch hẹn đang hoạt động sẽ bị hủy nếu tin đăng tạm ẩn quá 24h.",
+        "noteLabel": "Lưu ý",
+        "note": "Các lịch hẹn đang hoạt động sẽ bị hủy nếu tin đăng tạm ẩn quá 24h."
       },
       "cancel": "Hủy",
       "proceed": "Xác nhận"

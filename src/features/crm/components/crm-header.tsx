@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shared/ui/tooltip';
 
 type TranslationFn = ReturnType<typeof useTranslations>;
-type ViewMode = 'kanban' | 'table';
+export type ViewMode = 'kanban' | 'table';
 
 const DATE_PRESETS = [
   { key: 'today', getRange: () => ({ from: startOfDay(new Date()), to: startOfDay(new Date()) }) },
@@ -82,7 +82,7 @@ function isSameRange(left: DateRange, right: DateRange) {
   );
 }
 
-const DateRangePicker = React.memo(function DateRangePicker({
+export const DateRangePicker = React.memo(function DateRangePicker({
   value,
   onChange,
   t,
@@ -96,7 +96,10 @@ const DateRangePicker = React.memo(function DateRangePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant='outline' className='h-10 justify-start gap-2 rounded-xl px-3'>
+        <Button
+          variant='outline'
+          className='h-9 shrink-0 justify-start gap-2 rounded-lg border-border/80 bg-white px-3 shadow-sm dark:bg-background'
+        >
           <CalendarIcon className='size-4 text-muted-foreground' />
           {formatDisplayRange(value, t('dateRange.select'))}
         </Button>
@@ -111,7 +114,7 @@ const DateRangePicker = React.memo(function DateRangePicker({
               key={preset.key}
               variant='ghost'
               className={cn(
-                'justify-start rounded-xl text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary',
+                'justify-start rounded-lg text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary',
                 isSameRange(value, preset.getRange()) &&
                   'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
               )}
@@ -154,67 +157,61 @@ const DateRangePicker = React.memo(function DateRangePicker({
   );
 });
 
-interface CrmHeaderProps {
-  title: string;
-  dateRange: DateRange;
-  onDateRangeChange: (value: DateRange) => void;
-  view: ViewMode;
-  onViewChange: (view: ViewMode) => void;
-  onAddLead: () => void;
-  t: TranslationFn;
-}
-
-export function CrmHeader({
-  title,
-  dateRange,
-  onDateRangeChange,
+export function CrmViewModeToggle({
   view,
   onViewChange,
-  onAddLead,
-  t,
-}: CrmHeaderProps) {
+}: {
+  view: ViewMode;
+  onViewChange: (view: ViewMode) => void;
+}) {
   return (
-    <div className='flex items-center justify-between gap-4 flex-wrap'>
-      <h1 className='text-xl font-semibold tracking-tight'>{title}</h1>
-      <div className='flex items-center gap-2 flex-wrap justify-end'>
-        <DateRangePicker value={dateRange} onChange={onDateRangeChange} t={t} />
+    <div className='flex shrink-0 items-center gap-0.5 rounded-lg border border-border/80 bg-white p-0.5 shadow-sm dark:bg-background'>
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='ghost'
+              size='icon'
+              className={cn(
+                'size-8 rounded-md',
+                view === 'kanban' && 'bg-primary/10 text-primary'
+              )}
+              onClick={() => onViewChange('kanban')}
+            >
+              <LayoutGrid className='size-4' />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Kanban</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='ghost'
+              size='icon'
+              className={cn('size-8 rounded-md', view === 'table' && 'bg-primary/10 text-primary')}
+              onClick={() => onViewChange('table')}
+            >
+              <List className='size-4' />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Bảng</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+}
 
-        <div className='flex items-center gap-1 rounded-lg border border-border bg-background p-1'>
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className={cn('size-7', view === 'kanban' && 'bg-primary/10 text-primary')}
-                  onClick={() => onViewChange('kanban')}
-                >
-                  <LayoutGrid className='size-4' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Kanban</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className={cn('size-7', view === 'table' && 'bg-primary/10 text-primary')}
-                  onClick={() => onViewChange('table')}
-                >
-                  <List className='size-4' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Bảng</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+interface CrmHeaderProps {
+  onAddLead: () => void;
+}
 
-        <Button className='gap-1.5' onClick={onAddLead}>
-          <Plus className='size-4' data-icon='inline-start' />
-          Thêm khách hàng
-        </Button>
-      </div>
+export function CrmHeader({ onAddLead }: CrmHeaderProps) {
+  return (
+    <div className='flex justify-end'>
+      <Button className='gap-1.5 rounded-lg' onClick={onAddLead}>
+        <Plus className='size-4' data-icon='inline-start' />
+        Thêm khách hàng
+      </Button>
     </div>
   );
 }

@@ -7,6 +7,8 @@
       "description": "Lọc theo trạng thái, loại và khu vực.",
       "reset": "Đặt lại",
       "searchPlaceholder": "Tìm địa chỉ, chủ sở hữu, SĐT...",
+      "clearSearch": "Xóa ô tìm kiếm",
+      "pendingToggle": "Cần duyệt",
       "statusPlaceholder": "Trạng thái",
       "allStatuses": "Tất cả trạng thái",
       "propertyTypePlaceholder": "Loại bất động sản",

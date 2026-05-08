@@ -11,6 +11,7 @@ import type {
 export const ownerDashboardKeys = {
   all: ['owner-dashboard'] as const,
   stats: () => [...ownerDashboardKeys.all, 'stats'] as const,
+  heroInsights: () => [...ownerDashboardKeys.all, 'hero-insights'] as const,
   performance: (period: PerformancePeriod, metric: PerformanceMetric) =>
     [...ownerDashboardKeys.all, 'performance', period, metric] as const,
   featuredProperty: () => [...ownerDashboardKeys.all, 'featured-property'] as const,
@@ -27,6 +28,14 @@ export function useDashboardStats() {
   return useQuery({
     queryKey: ownerDashboardKeys.stats(),
     queryFn: () => ownerDashboardApi.getStats(),
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useOwnerHeroInsights() {
+  return useQuery({
+    queryKey: ownerDashboardKeys.heroInsights(),
+    queryFn: () => ownerDashboardApi.getHeroInsights(),
     staleTime: 30 * 1000,
   });
 }

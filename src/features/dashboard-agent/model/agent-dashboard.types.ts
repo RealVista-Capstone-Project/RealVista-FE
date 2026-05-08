@@ -44,6 +44,14 @@ export interface PropertySummaryMetrics {
   pendingProperties: number;
   verifiedProperties: number;
   rejectedProperties: number;
+  /** Extended owner-dashboard metrics (optional; present when API returns them) */
+  totalLandAreaM2?: number;
+  averageLandAreaM2?: number;
+  estimatedPortfolioValueVnd?: number;
+  estimatedPortfolioValueYoyPercent?: number | null;
+  publishedListingsCount?: number;
+  listingsExpiringSoonCount?: number;
+  showcaseTypeCounts?: Record<string, number>;
 }
 
 export interface AppointmentSummaryMetrics {

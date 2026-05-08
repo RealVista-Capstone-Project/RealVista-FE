@@ -21,3 +21,8 @@ export { useThreeDQuota } from './hooks/use-three-d-quota';
 export type { ThreeDQuota } from './hooks/use-three-d-quota';
 export { useListingQuota } from './hooks/use-listing-quota';
 export type { ListingQuota } from './hooks/use-listing-quota';
+export {
+  packageTierLevelFromCode,
+  isActivePaid3dTourSubscription,
+  hasPaidActive3dTourPlan,
+} from './lib/feature-package-tier';

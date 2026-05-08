@@ -7,6 +7,80 @@
       "addListing": "Thêm tin đăng",
       "title": "Trang chủ chủ nhà"
     },
+    "contracts": {
+      "title": "Danh sách hợp đồng",
+      "viewAll": "Xem tất cả",
+      "empty": "Chưa có hợp đồng cho thuê."
+    },
+    "hero": {
+      "welcomePrefix": "Chào mừng,",
+      "welcomeSuffix": "đã quay lại!",
+      "welcomeGuest": "bạn",
+      "contactTouches": "Lượt liên hệ",
+      "listingViews": "Lượt xem tin đăng",
+      "completedContracts": "Hợp đồng hoàn tất",
+      "contactBreakdownTitle": "Chi tiết liên hệ",
+      "chatMessagesLine": "{count} tin nhắn liên quan tin của bạn",
+      "appointmentsLine": "{count} lịch hẹn trên tin/BĐS của bạn"
+    },
+    "listingBoard": {
+      "title": "Bảng tin đăng",
+      "recentListed": "Đăng gần đây",
+      "sortViews": "Lượt xem",
+      "sortLeads": "Khách tiềm năng",
+      "sortCost": "Giá",
+      "moreOptions": "Tùy chọn",
+      "empty": "Chưa có tin đăng.",
+      "noImage": "Không có ảnh",
+      "perMonth": "/ tháng",
+      "viewsLabel": "lượt xem",
+      "leadsLabel": "lead",
+      "bd": "PN",
+      "bt": "PT",
+      "sqft": "m²"
+    },
+    "appointmentStat": {
+      "title": "Thống kê lịch hẹn",
+      "thisWeek": "Tuần này",
+      "totalAppointments": "Tổng lịch hẹn",
+      "completedAppointments": "Đã hoàn thành",
+      "rate": "Tỉ lệ",
+      "visitStatistic": "Thống kê lượt xem lịch",
+      "totalProfit": "Tổng lợi nhuận",
+      "visitors": "Khách ghé thăm"
+    },
+    "messages": {
+      "title": "Tin nhắn",
+      "menu": "Mở menu",
+      "openFull": "Mở tin nhắn",
+      "empty": "Chưa có cuộc trò chuyện.",
+      "noPreview": "Không có nội dung"
+    },
+    "purchasedPackages": {
+      "title": "Gói đã mua",
+      "viewAll": "Xem gói",
+      "loading": "Đang tải gói đăng ký…",
+      "empty": "Bạn chưa có gói đang hoạt động.",
+      "expires": "Hết hạn: {date}",
+      "noExpiry": "Không thời hạn",
+      "quota": "Đã dùng {used}/{total}",
+      "unlimited": "Không giới hạn quota",
+      "featureType": {
+        "LISTING": "Tin đăng",
+        "3D_TOUR": "Tour 3D",
+        "AI_REQUEST": "AI"
+      }
+    },
+    "dailyViews": {
+      "title": "Lượt xem tin theo ngày",
+      "subtitle": "7 ngày gần nhất",
+      "weekTotal": "Tổng tuần"
+    },
+    "verve": {
+      "label": "verve",
+      "title": "Tìm phân tích và truy cập nhanh ngay.",
+      "description": "Một bộ giải pháp toàn diện mang tên One Platform sẽ tiên phong trong việc số hóa doanh nghiệp của bạn."
+    },
     "stats": {
       "activeLeads": "Khách hàng tiềm năng",
       "totalViews": "Lượt xem",

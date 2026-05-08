@@ -25,23 +25,23 @@ export function ManageAgentDetailPage({ initialAgent }: ManageAgentDetailPagePro
   const [agent, setAgent] = useState<AgentEngagement>(initialAgent);
 
   return (
-    <div className='h-full bg-primary/5 font-sans'>
+    <div className='h-full bg-sky-50/40 dark:bg-background font-sans'>
       {/* Page Header */}
-      <div className='bg-white border-b border-gray-100'>
+      <div className='border-b border-border/80 bg-card'>
         <div className='container mx-auto px-6 py-4 flex items-center gap-3'>
           <Button
             variant='ghost'
             size='icon'
-            className='h-8 w-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg flex-shrink-0'
+            className='h-8 w-8 shrink-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60'
             onClick={() => router.back()}
           >
             <ArrowLeft className='h-4 w-4' />
           </Button>
           <div>
-            <h1 className='text-lg font-bold text-gray-900 tracking-tight'>
+            <h1 className='text-lg font-bold tracking-tight text-foreground'>
               {agent.agent_full_name}
             </h1>
-            <p className='text-xs text-gray-400 mt-0.5'>
+            <p className='mt-0.5 text-xs text-muted-foreground'>
               {t('detailPage.backToList')}
             </p>
           </div>

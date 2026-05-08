@@ -82,12 +82,12 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
         <div className='flex min-w-0 flex-1 flex-col gap-2'>
           {/* Name & Listing Type */}
           <div className='flex items-center gap-2'>
-            <h3 className='line-clamp-1 text-base sm:text-lg font-medium leading-snug tracking-[-0.09px] text-foreground'>
+            <h3 className='line-clamp-1 text-sm sm:text-base font-medium leading-snug tracking-[-0.09px] text-foreground'>
               {listing.name}
             </h3>
             <span
               className={cn(
-                'shrink-0 rounded px-2 py-0.5 text-xs font-semibold',
+                'shrink-0 rounded-md px-2 py-1 text-xs font-semibold',
                 listing.listing_type === 'RENT'
                   ? 'bg-blue-50 text-blue-600'
                   : 'bg-orange-50 text-orange-600'
@@ -98,17 +98,17 @@ export function ListingCard({ listing, isSelected, onClick }: ListingCardProps) 
           </div>
 
           {/* Location */}
-          <p className='line-clamp-1 text-sm font-normal leading-normal text-foreground/70'>
+          <p className='line-clamp-1 text-xs font-normal leading-normal text-foreground/70'>
             {address}
           </p>
 
           {/* Price, Status & Area */}
-          <div className='flex items-center gap-2 text-sm'>
+          <div className='flex items-center gap-2 text-xs sm:text-sm'>
             <span className='font-semibold text-primary'>{formattedPrice}</span>
             <span className='text-foreground/50'>•</span>
             <div className='flex items-center gap-1.5'>
-              <div className={cn('rounded-full px-2 py-0.5', status.className)}>
-                <span className='text-xs font-bold leading-tight'>{tStatus(status.labelKey)}</span>
+              <div className={cn('rounded-full px-2.5 py-1', status.className)}>
+                <span>{tStatus(status.labelKey)}</span>
               </div>
               {(listing.status === ListingStatus.DRAFT || listing.status === ListingStatus.ARCHIVED) && (
                 <Tooltip>

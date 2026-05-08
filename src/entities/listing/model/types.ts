@@ -14,6 +14,20 @@ export interface ApiResponse<T> {
   timestamp: string;
 }
 
+// ============ Property nested in listing detail API ============
+
+/** Expected price bands the owner entered when creating the property (maps to backend `properties.price_range`). */
+export interface ListingPropertyPriceRange {
+  rent?: {
+    min: number | null;
+    max: number | null;
+  };
+  buy?: {
+    min: number | null;
+    max: number | null;
+  };
+}
+
 // ============ Property Nested Object ============
 export interface PropertyNested {
   description: string;
@@ -24,6 +38,7 @@ export interface PropertyNested {
   width_m: number;
   length_m: number;
   media?: MediaItem[];
+  price_range?: ListingPropertyPriceRange | null;
 }
 
 // ============ Location ============
@@ -137,6 +152,8 @@ export interface ListingData {
   is_created_by_owner?: boolean;
   security_deposit?: number | null;
   listing_type: ListingType;
+  /** One entry per THREE_D media; empty string = unnamed room in metadata. */
+  three_d_room_names?: string[];
 }
 
 // ============ Cost Breakdown (API format - snake_case) ============

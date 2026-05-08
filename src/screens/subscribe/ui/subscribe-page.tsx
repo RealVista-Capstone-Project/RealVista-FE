@@ -1,17 +1,46 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronLeft } from 'lucide-react';
-import { BillingReturnQueryEffects } from '@/widgets/billing/ui/billing-return-query-effects';
+import {
+  BillingReturnQueryEffects,
+  BILLING_VNPAY_RETURN_TAB_KEY,
+} from '@/widgets/billing/ui/billing-return-query-effects';
 import { SubscriptionTab } from '@/widgets/billing/ui/subscription-tab';
 import { TopNavContainer } from '@/shared/ui/top-nav';
 import { Button } from '@/shared/ui/button';
 import { useRouter } from '@/shared/config/i18n/navigation';
+import { ROUTES } from '@/shared/config/routes';
 
 function SubscribePageContent() {
   const t = useTranslations('Subscribe');
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      try {
+        sessionStorage.removeItem(BILLING_VNPAY_RETURN_TAB_KEY);
+      } catch {
+        /* non-fatal */
+      }
+    };
+  }, []);
+
+  const handleBack = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (sessionStorage.getItem(BILLING_VNPAY_RETURN_TAB_KEY) === '1') {
+          sessionStorage.removeItem(BILLING_VNPAY_RETURN_TAB_KEY);
+          router.push(ROUTES.homePage);
+          return;
+        }
+      } catch {
+        /* fall through */
+      }
+    }
+    router.back();
+  };
 
   return (
     <>
@@ -26,7 +55,7 @@ function SubscribePageContent() {
               variant='ghost'
               size='sm'
               className='mb-4 -ml-2 gap-1 text-primary hover:bg-primary/10 hover:text-primary'
-              onClick={() => router.back()}
+              onClick={handleBack}
             >
               <ChevronLeft className='h-4 w-4 shrink-0' />
               {t('backButton')}

@@ -217,11 +217,11 @@ function Field({
   return (
     <div className='space-y-1.5'>
       <div className='flex items-center justify-between'>
-        <label className='text-sm font-medium text-slate-700'>
+        <label className='text-sm font-medium text-foreground'>
           {label}
           {required && <span className='ml-0.5 text-red-500'>*</span>}
         </label>
-        {hint && !error && <span className='text-xs text-slate-400'>{hint}</span>}
+        {hint && !error && <span className='text-xs text-muted-foreground'>{hint}</span>}
         {error && <span className='text-xs text-red-500'>{error}</span>}
       </div>
       {children}
@@ -230,8 +230,8 @@ function Field({
 }
 
 const INPUT_CLASS =
-  'w-full min-w-0 rounded-lg border bg-white px-3 py-2 text-sm tabular-nums text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all';
-const INPUT_DEFAULT = `${INPUT_CLASS} border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20`;
+  'w-full min-w-0 rounded-lg border bg-card px-3 py-2 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all';
+const INPUT_DEFAULT = `${INPUT_CLASS} border-border/70 focus:border-primary focus:ring-primary/20`;
 const INPUT_ERROR = `${INPUT_CLASS} border-red-300 focus:border-red-500 focus:ring-red-500/20`;
 
 /* ─── Main Component ─── */
@@ -392,18 +392,18 @@ export function ProposalFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='w-[calc(100vw-1.5rem)] max-w-[min(100vw-1.5rem,52rem)] sm:w-full sm:max-w-[52rem] p-0 gap-0 rounded-2xl border border-slate-200 shadow-2xl overflow-hidden bg-white'>
+      <DialogContent className='w-[calc(100vw-1.5rem)] max-w-[min(100vw-1.5rem,52rem)] sm:w-full sm:max-w-[52rem] p-0 gap-0 rounded-2xl border border-border/70 shadow-2xl overflow-hidden bg-card'>
         {/* ── Dialog Header ── */}
-        <DialogHeader className='px-6 pt-6 pb-4 border-b border-slate-100'>
+        <DialogHeader className='px-6 pt-6 pb-4 border-b border-border/70'>
           <div className='flex items-center gap-3'>
-            <div className='flex size-9 items-center justify-center rounded-xl bg-indigo-50 text-primary'>
+            <div className='flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary'>
               {mode === 'create' ? <Plus size={18} strokeWidth={2.5} /> : <Edit3 size={18} />}
             </div>
             <div>
-              <DialogTitle className='text-base font-bold text-slate-900'>
+              <DialogTitle className='text-base font-bold text-foreground'>
                 {mode === 'create' ? t('formCreateTitle') : t('formEditTitle')}
               </DialogTitle>
-              <DialogDescription className='text-xs text-slate-400 mt-0.5'>
+              <DialogDescription className='text-xs text-muted-foreground mt-0.5'>
                 {mode === 'create' ? t('formCreateSubtitle') : t('formEditSubtitle')}
               </DialogDescription>
             </div>
@@ -448,7 +448,7 @@ export function ProposalFormDialog({
                     className={cn(errors.commission_rate ? INPUT_ERROR : INPUT_DEFAULT, 'pr-8')}
                   />
                   <Percent
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none'
                     size={14}
                   />
                 </div>
@@ -473,7 +473,7 @@ export function ProposalFormDialog({
                     className={cn(errors.experience_years ? INPUT_ERROR : INPUT_DEFAULT, 'pr-8')}
                   />
                   <Award
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none'
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none'
                     size={14}
                   />
                 </div>
@@ -494,7 +494,7 @@ export function ProposalFormDialog({
                 <SelectContent>
                   {PROPERTY_TYPES.map((cat) => (
                     <SelectGroup key={cat.code}>
-                      <SelectLabel className='text-[10px] font-bold text-slate-400 px-2 py-1.5 uppercase tracking-wider'>
+                      <SelectLabel className='text-[10px] font-bold text-muted-foreground px-2 py-1.5 uppercase tracking-wider'>
                         {cat.label}
                       </SelectLabel>
                       {cat.types.map((type) => (
@@ -512,30 +512,30 @@ export function ProposalFormDialog({
             <div className='space-y-3.5'>
               <div>
                 <div className='flex items-start justify-between gap-2 mb-1'>
-                  <label className='text-sm font-medium text-slate-700'>
+                  <label className='text-sm font-medium text-foreground'>
                     {t('fieldPriceRange')}
                   </label>
                   {errors.price_range && (
                     <span className='text-xs text-red-500 shrink-0'>{errors.price_range}</span>
                   )}
                 </div>
-                <p className='text-[11px] text-slate-400 mb-1 leading-relaxed'>
+                <p className='text-[11px] text-muted-foreground mb-1 leading-relaxed'>
                   {t('fieldPriceRangeDescription')}
                 </p>
-                <p className='text-[11px] text-slate-500 mb-3 leading-relaxed'>
+                <p className='text-[11px] text-muted-foreground mb-3 leading-relaxed'>
                   {t('fieldPriceRangeHint')}
                 </p>
               </div>
 
               <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5'>
                 {/* Rent Range */}
-                <div className='space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 min-w-0'>
+                <div className='space-y-3 rounded-xl border border-border/70 bg-sky-50/55 dark:bg-muted/25 p-4 min-w-0'>
                   <span className='text-[11px] font-bold text-primary uppercase tracking-wider'>
                     {t('rentRange')}
                   </span>
                   <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4'>
                     <div className='min-w-0'>
-                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                      <span className='text-[10px] font-medium text-muted-foreground block mb-1.5'>
                         {t('minPrice')}
                       </span>
                       <VndAmountInput
@@ -550,7 +550,7 @@ export function ProposalFormDialog({
                       />
                     </div>
                     <div className='min-w-0'>
-                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                      <span className='text-[10px] font-medium text-muted-foreground block mb-1.5'>
                         {t('maxPrice')}
                       </span>
                       <VndAmountInput
@@ -568,13 +568,13 @@ export function ProposalFormDialog({
                 </div>
 
                 {/* Sale Range */}
-                <div className='space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 min-w-0'>
+                <div className='space-y-3 rounded-xl border border-border/70 bg-sky-50/55 dark:bg-muted/25 p-4 min-w-0'>
                   <span className='text-[11px] font-bold text-violet-600 uppercase tracking-wider'>
                     {t('saleRange')}
                   </span>
                   <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4'>
                     <div className='min-w-0'>
-                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                      <span className='text-[10px] font-medium text-muted-foreground block mb-1.5'>
                         {t('minPrice')}
                       </span>
                       <VndAmountInput
@@ -589,7 +589,7 @@ export function ProposalFormDialog({
                       />
                     </div>
                     <div className='min-w-0'>
-                      <span className='text-[10px] font-medium text-slate-500 block mb-1.5'>
+                      <span className='text-[10px] font-medium text-muted-foreground block mb-1.5'>
                         {t('maxPrice')}
                       </span>
                       <VndAmountInput
@@ -621,17 +621,17 @@ export function ProposalFormDialog({
                 onBlur={() => setTouched((prev) => ({ ...prev, pitch_content: true }))}
                 placeholder={t('fieldPitchPlaceholder')}
                 className={cn(
-                  'w-full rounded-lg border px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all min-h-[160px] resize-y leading-relaxed',
+                  'w-full rounded-lg border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all min-h-[160px] resize-y leading-relaxed',
                   errors.pitch_content
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
-                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20'
+                    : 'border-border/70 focus:border-primary focus:ring-primary/20'
                 )}
               />
               {/* Character progress */}
               <div className='flex justify-between mt-1'>
-                <span className='text-[10px] text-slate-400'>Min. 50 ký tự</span>
+                <span className='text-[10px] text-muted-foreground'>Min. 50 ký tự</span>
                 <div className='flex items-center gap-2'>
-                  <div className='w-24 h-1 rounded-full bg-slate-100 overflow-hidden'>
+                  <div className='h-1 w-24 overflow-hidden rounded-full bg-muted'>
                     <div
                       className={cn(
                         'h-full rounded-full transition-all',
@@ -649,7 +649,7 @@ export function ProposalFormDialog({
                   <span
                     className={cn(
                       'text-[10px] font-medium',
-                      form.pitch_content.length > 2000 ? 'text-red-500' : 'text-slate-400'
+                      form.pitch_content.length > 2000 ? 'text-red-500' : 'text-muted-foreground'
                     )}
                   >
                     {form.pitch_content.length}/2000
@@ -660,12 +660,12 @@ export function ProposalFormDialog({
           </div>
 
           {/* ── Footer ── */}
-          <div className='flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 bg-slate-50/60 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4'>
+          <div className='flex flex-wrap items-center justify-end gap-2 border-t border-border/70 bg-sky-50/70 px-4 py-3 dark:bg-muted/30 sm:gap-3 sm:px-6 sm:py-4'>
             <DialogClose asChild>
               <Button
                 type='button'
                 variant='ghost'
-                className='h-9 rounded-lg px-4 text-sm font-medium text-slate-600 hover:bg-slate-100'
+                className='h-9 rounded-lg px-4 text-sm font-medium text-muted-foreground hover:bg-primary/10'
               >
                 {t('btnCancel')}
               </Button>
@@ -675,14 +675,14 @@ export function ProposalFormDialog({
               variant='outline'
               disabled={isLoading}
               onClick={handleSaveDraft}
-              className='h-9 rounded-lg border-slate-200 px-4 text-sm font-medium text-slate-700 hover:bg-slate-100'
+              className='h-9 rounded-lg border-border/70 px-4 text-sm font-medium text-foreground hover:bg-primary/10'
             >
               {t('btnSaveDraft')}
             </Button>
             <Button
               type='submit'
               disabled={isLoading || !isFormValid}
-              className='h-9 rounded-lg px-5 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed'
+              className='h-9 rounded-lg px-5 text-sm font-semibold bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50'
             >
               {isLoading ? (
                 <span className='flex items-center gap-2'>

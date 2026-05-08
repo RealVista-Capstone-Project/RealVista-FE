@@ -1,15 +1,26 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Filter, X, ChevronDown, Plus, Building2, Lock } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import {
+  Search,
+  Filter,
+  X,
+  ChevronDown,
+  Plus,
+  Building2,
+  Lock,
+  Users,
+  User,
+  Briefcase,
+  Sparkles,
+} from 'lucide-react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import { ListingCard } from './components/listing-card';
 import { listingQueries } from '@/entities/listing/api';
 import { ListingDetailPanel } from './components/listing-detail-panel';
-import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
 import { Spinner } from '@/shared/ui/spinner';
 import { formatNumber } from '@/shared/lib/utils/format-currency';
 import type { Listing } from '@/entities/listing';
@@ -17,10 +28,14 @@ import { ListingStatus, ListingType } from '../types/managed-listing';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce, useIsMobile } from '@/shared/lib/hooks';
 import { useListingQuota } from '@/entities/billing';
+import { useAuthSession } from '@/features/auth/model';
+import { ROUTES } from '@/shared/config/routes';
+import { Dialog, DialogContent, DialogTitle } from '@/shared/ui/dialog';
 
 type TabType = ListingType | 'ALL';
 type SortOption = 'newest' | 'oldest' | 'priceAsc' | 'priceDesc';
 type StatusFilter = ListingStatus | 'ALL';
+type CreatorFilter = 'ALL' | 'SELF' | 'AGENT';
 
 /**
  * Managed Listings Page
@@ -31,13 +46,13 @@ type StatusFilter = ListingStatus | 'ALL';
  * - Tabs to filter by listing type (All, Rent, Sale)
  * - Search functionality
  * - Status filter & sort via filter panel
+ * - Infinite scroll on the list column (loads more as you scroll down)
  * - Detailed property view
  */
 export function ManagedListingsPage() {
   const searchParams = useSearchParams();
   const initialListingId = searchParams.get('listingId');
   const router = useRouter();
-  const locale = useLocale();
 
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -45,38 +60,59 @@ export function ManagedListingsPage() {
   const [activeTab, setActiveTab] = React.useState<TabType>('ALL');
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('ALL');
   const [sortBy, setSortBy] = React.useState<SortOption>('newest');
-  const [page, setPage] = React.useState(0);
+  const [creatorFilter, setCreatorFilter] = React.useState<CreatorFilter>('ALL');
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
+  const [isCreatorFilterOpen, setIsCreatorFilterOpen] = React.useState(false);
+  const [quotaNoticeOpen, setQuotaNoticeOpen] = React.useState(false);
   const filterRef = React.useRef<HTMLDivElement>(null);
+  const creatorFilterRef = React.useRef<HTMLDivElement>(null);
+  const listScrollRef = React.useRef<HTMLDivElement>(null);
+  const loadMoreRef = React.useRef<HTMLDivElement>(null);
   const t = useTranslations('ManagedListings');
   const tDetail = useTranslations('ListingDetailPanel');
   const isMobile = useIsMobile();
   const { isLocked, isLoading: quotaLoading } = useListingQuota();
+  const createBlocked = quotaLoading || isLocked;
+  const showQuotaNoticeTrigger = !quotaLoading && isLocked;
+  const { data: session } = useAuthSession();
+  // Backend role 'AGENT' is mapped to 'moderator' in session.user.role,
+  // so we check backendRoles directly for the raw backend role.
+  const isAgent = (session?.user as { backendRoles?: string[] } | undefined)?.backendRoles?.includes('AGENT') ?? false;
 
   const handleCreateListing = () => {
-    router.push(`/${locale}/dashboard/listings/create`);
+    router.push('/dashboard/listings/create');
   };
 
   // Fetch summary counts for tabs
   const { data: summary } = useQuery(listingQueries.managedSummary());
 
-  // Fetch paginated, filtered, and sorted listings
-  const {
-    data: listingPage,
-    isLoading,
-    error,
-  } = useQuery(
-    listingQueries.managed({
-      page,
+  // Fetch managed listings (infinite scroll)
+  const infiniteParams = React.useMemo(
+    () => ({
       size: 10,
-      search: debouncedSearchQuery,
+      search: debouncedSearchQuery.trim() || undefined,
       listingType: activeTab,
       status: statusFilter,
-      sortBy: sortBy,
-    })
+      sortBy,
+      createdBy: creatorFilter,
+    }),
+    [debouncedSearchQuery, activeTab, statusFilter, sortBy, creatorFilter]
   );
 
-  const listings = React.useMemo(() => listingPage?.content || [], [listingPage]);
+  const {
+    data: infiniteData,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(listingQueries.managedInfinite(infiniteParams));
+
+  const listings = React.useMemo(
+    () => infiniteData?.pages.flatMap((p) => p.content) ?? [],
+    [infiniteData?.pages]
+  );
 
   // Use centralized listing query
   const { data: listingResponse, isLoading: isDetailLoading } = useQuery({
@@ -104,8 +140,42 @@ export function ManagedListingsPage() {
   }, [isFilterOpen]);
 
   React.useEffect(() => {
-    setPage(0);
-  }, [debouncedSearchQuery, activeTab, statusFilter, sortBy]);
+    function handleClickOutside(e: MouseEvent) {
+      if (creatorFilterRef.current && !creatorFilterRef.current.contains(e.target as Node)) {
+        setIsCreatorFilterOpen(false);
+      }
+    }
+    if (isCreatorFilterOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCreatorFilterOpen]);
+
+  React.useEffect(() => {
+    const root = listScrollRef.current;
+    const target = loadMoreRef.current;
+    if (!root || !target || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          void fetchNextPage();
+        }
+      },
+      { root, rootMargin: '100px', threshold: 0 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // If the selected listing is not in the current result set (e.g. after filter), pick the first row
+  React.useEffect(() => {
+    if (listings.length === 0 || !selectedListingId) return;
+    if (!listings.some((l) => l.listing_id === selectedListingId)) {
+      setSelectedListingId(!isMobile ? listings[0].listing_id : null);
+    }
+  }, [listings, selectedListingId, isMobile]);
 
   // Count listings by type from summary API
   const listingCounts = React.useMemo(() => {
@@ -116,14 +186,18 @@ export function ManagedListingsPage() {
     };
   }, [summary]);
 
-  // Whether any filter is active (beyond defaults)
-  const hasActiveFilters = statusFilter !== 'ALL' || sortBy !== 'newest';
+  // Whether any filter is active (beyond defaults) — creator filter uses its own control next to search
+  const hasActiveFilters = statusFilter !== 'ALL' || sortBy !== 'newest' || creatorFilter !== 'ALL';
 
   const resetFilters = () => {
     setStatusFilter('ALL');
     setSortBy('newest');
+    setCreatorFilter('ALL');
     setIsFilterOpen(false);
+    setIsCreatorFilterOpen(false);
   };
+
+  const creatorOptions: CreatorFilter[] = ['ALL', 'SELF', 'AGENT'];
 
   // Select first listing by default (only on desktop)
   React.useEffect(() => {
@@ -132,19 +206,6 @@ export function ManagedListingsPage() {
     }
   }, [listings, selectedListingId, isMobile]);
 
-  // Clear selection if listing is not in current page
-  React.useEffect(() => {
-    if (
-      selectedListingId &&
-      listings.length > 0 &&
-      !listings.find((l) => l.listing_id === selectedListingId)
-    ) {
-      // Don't auto-reset selection when paginating if possible,
-      // but here we keep the original logic adapted to pages
-      // setSelectedListingId(listings[0].listing_id);
-    }
-  }, [listings, selectedListingId]);
-
   const statusOptions: StatusFilter[] = [
     'ALL',
     ListingStatus.DRAFT,
@@ -152,7 +213,6 @@ export function ManagedListingsPage() {
     ListingStatus.PUBLISHED,
     ListingStatus.SOLD,
     ListingStatus.RENTED,
-    ListingStatus.ARCHIVED,
   ];
 
   const sortOptions: SortOption[] = ['newest', 'oldest', 'priceAsc', 'priceDesc'];
@@ -167,138 +227,111 @@ export function ManagedListingsPage() {
         )}
       >
         <div className='flex h-full flex-col'>
-          {/* Header */}
-          <div className='border-b border-primary/20 p-4 sm:p-6'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-2'>
-                <h2 className='text-xl font-bold text-foreground'>{t('title')}</h2>
-                <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-                  <span className='text-sm font-bold text-white'>
-                    {formatNumber(listingCounts.all)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Create Button at the end of header */}
-              <button
-                type='button'
-                onClick={handleCreateListing}
-                className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-                aria-label={t('createButton')}
-              >
-                <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
-                <span>{t('createButton')}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Subscription Gate */}
-          {isLocked && !quotaLoading && (
-            <div className='border-b border-purple-92/50 px-4 sm:px-6 py-4'>
-              <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
-                <Lock className='w-8 h-8 text-amber-500 mx-auto mb-3' />
-                <h3 className='text-sm font-semibold text-main-black mb-1'>
-                  {tDetail('subscriptionGate.title')}
-                </h3>
-                <p className='text-xs text-grey-500 mb-4'>
-                  {tDetail('subscriptionGate.description')}
-                </p>
+          {/* Create + search row (inside list column, below page chrome) */}
+          <div className='px-4 pb-3 pt-3 sm:px-6 sm:pb-5 sm:pt-4'>
+            <div className='mb-3 flex justify-end'>
+              <div className='relative inline-flex'>
                 <button
                   type='button'
-                  onClick={() => router.push(`/${locale}/subscribe`)}
-                  className='inline-flex items-center justify-center rounded-lg bg-main-black text-white text-xs font-semibold px-6 py-2 hover:bg-main-black/80 transition-colors cursor-pointer'
+                  disabled={createBlocked}
+                  onClick={handleCreateListing}
+                  className='inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-sm shadow-primary/15 transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45 disabled:hover:bg-primary sm:px-4'
+                  aria-label={t('createButton')}
                 >
-                  {tDetail('subscriptionGate.cta')}
+                  <Plus className='h-3.5 w-3.5 shrink-0' strokeWidth={2.5} />
+                  <span>{t('createButton')}</span>
                 </button>
+                {showQuotaNoticeTrigger ? (
+                  <button
+                    type='button'
+                    onClick={() => setQuotaNoticeOpen(true)}
+                    className='absolute -right-1 -top-1 z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-0.5 text-[11px] font-black leading-none text-white shadow-sm ring-2 ring-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
+                    aria-label={t('quotaNoticeTriggerAria')}
+                  >
+                    !
+                  </button>
+                ) : null}
               </div>
             </div>
-          )}
-
-          {/* Tabs */}
-          <div className='border-b border-primary/20 px-4 sm:px-6 pt-4 overflow-x-auto no-scrollbar'>
-            <div className='flex gap-1 min-w-max'>
-              <button
-                type='button'
-                onClick={() => setActiveTab('ALL')}
-                className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                  activeTab === 'ALL'
-                    ? 'bg-primary text-white'
-                    : 'bg-transparent text-foreground/70 hover:bg-primary/5'
-                )}
-              >
-                {t('tabs.all')}
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-xs font-bold',
-                    activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
-                  )}
-                >
-                  {formatNumber(listingCounts.all)}
-                </span>
-              </button>
-              <button
-                type='button'
-                onClick={() => setActiveTab(ListingType.RENT)}
-                className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                  activeTab === ListingType.RENT
-                    ? 'bg-primary text-white'
-                    : 'bg-transparent text-foreground/70 hover:bg-primary/5'
-                )}
-              >
-                {t('tabs.forRent')}
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-xs font-bold',
-                    activeTab === ListingType.RENT
-                      ? 'bg-white/20 text-white'
-                      : 'bg-primary/15 text-foreground'
-                  )}
-                >
-                  {formatNumber(listingCounts.rent)}
-                </span>
-              </button>
-              <button
-                type='button'
-                onClick={() => setActiveTab(ListingType.SALE)}
-                className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
-                  activeTab === ListingType.SALE
-                    ? 'bg-primary text-white'
-                    : 'bg-transparent text-foreground/70 hover:bg-primary/5'
-                )}
-              >
-                {t('tabs.forSale')}
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-xs font-bold',
-                    activeTab === ListingType.SALE
-                      ? 'bg-white/20 text-white'
-                      : 'bg-primary/15 text-foreground'
-                  )}
-                >
-                  {formatNumber(listingCounts.sale)}
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Search bar + Filter */}
-          <div className='border-b border-primary/20 p-4 sm:p-6'>
             <div className='flex items-center gap-3'>
-              <div className='relative flex-1'>
-                <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-                  <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
+              <div className='relative min-w-0 flex-1'>
+                <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+                  <Search className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
                 </div>
                 <input
                   type='text'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('search.placeholder')}
-                  className='h-12 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-4 text-base font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0'
+                  className='h-9 w-full rounded-full border-2 border-primary/14 bg-[#e8f2fb] pl-10 pr-9 text-sm font-medium text-foreground shadow-sm shadow-primary/[0.04] placeholder:text-muted-foreground/65 transition-colors focus:border-primary/28 focus:bg-[#dfeef9] focus:outline-none focus:ring-2 focus:ring-primary/15'
                 />
+                {searchQuery && (
+                  <button
+                    type='button'
+                    onClick={() => setSearchQuery('')}
+                    className='absolute inset-y-0 right-0 flex items-center pr-3.5 text-muted-foreground/60 hover:text-foreground focus-visible:outline-none'
+                    aria-label={t('search.clear')}
+                  >
+                    <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+                  </button>
+                )}
               </div>
+
+              {/* Creator Filter Button — hidden for agents (they only create their own listings) */}
+              {!isAgent && <div ref={creatorFilterRef} className='relative shrink-0'>
+                <button
+                  type='button'
+                  onClick={() => setIsCreatorFilterOpen((prev) => !prev)}
+                  className={cn(
+                    'flex h-9 min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 px-2.5 text-xs font-medium bg-white shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1',
+                    creatorFilter !== 'ALL'
+                      ? 'border-primary/24 bg-primary/5 text-primary'
+                      : 'border-primary/14 text-foreground hover:border-primary/20 hover:bg-muted/30'
+                  )}
+                  aria-label={t('creatorFilter.label')}
+                >
+                  {creatorFilter === 'SELF' ? (
+                    <User className='h-4 w-4 text-primary' strokeWidth={2.5} />
+                  ) : creatorFilter === 'AGENT' ? (
+                    <Briefcase className='h-4 w-4 text-primary' strokeWidth={2.5} />
+                  ) : (
+                    <Users className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
+                  )}
+                  <ChevronDown
+                    className={cn('h-3.5 w-3.5 text-primary/50 transition-transform', isCreatorFilterOpen && 'rotate-180')}
+                    strokeWidth={2.5}
+                  />
+                </button>
+
+                {isCreatorFilterOpen && (
+                  <div className='absolute right-0 top-full z-30 mt-2 w-52 rounded-xl border border-primary/20 bg-white shadow-lg'>
+                    <div className='border-b border-primary/20 px-4 py-3'>
+                      <span className='text-sm font-semibold text-foreground'>{t('creatorFilter.label')}</span>
+                    </div>
+                    <div className='p-2'>
+                      {creatorOptions.map((c) => {
+                        const labelKey = `creatorFilter.options.${c.toLowerCase()}` as Parameters<typeof t>[0];
+                        return (
+                          <button
+                            key={c}
+                            type='button'
+                            onClick={() => { setCreatorFilter(c); setIsCreatorFilterOpen(false); }}
+                            className={cn(
+                              'flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                              creatorFilter === c
+                                ? 'bg-primary/5 font-medium text-primary'
+                                : 'text-foreground hover:bg-primary/5'
+                            )}
+                          >
+                            {t(labelKey)}
+                            {creatorFilter === c && <X className='h-3.5 w-3.5' strokeWidth={2.5} />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>}
 
               {/* Filter Button next to search bar */}
               <div ref={filterRef} className='relative shrink-0'>
@@ -306,21 +339,23 @@ export function ManagedListingsPage() {
                   type='button'
                   onClick={() => setIsFilterOpen((prev) => !prev)}
                   className={cn(
-                    'flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                    'flex h-9 min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 px-2.5 text-xs font-medium bg-white shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1',
                     hasActiveFilters
-                      ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
+                      ? 'border-primary/24 bg-primary/5 text-primary'
+                      : 'border-primary/14 text-foreground hover:border-primary/20 hover:bg-muted/30'
                   )}
                   aria-label={t('filter')}
                 >
-                  <Filter className='h-5 w-5' strokeWidth={2} />
+                  <Filter className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
                   <ChevronDown
-                    className={cn('h-4 w-4 transition-transform', isFilterOpen && 'rotate-180')}
-                    strokeWidth={2}
+                    className={cn('h-3.5 w-3.5 text-primary/50 transition-transform', isFilterOpen && 'rotate-180')}
+                    strokeWidth={2.5}
                   />
                   {hasActiveFilters && (
                     <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
-                      {(statusFilter !== 'ALL' ? 1 : 0) + (sortBy !== 'newest' ? 1 : 0)}
+                      {(statusFilter !== 'ALL' ? 1 : 0) +
+                        (sortBy !== 'newest' ? 1 : 0) +
+                        (creatorFilter !== 'ALL' ? 1 : 0)}
                     </span>
                   )}
                 </button>
@@ -355,7 +390,7 @@ export function ManagedListingsPage() {
                               <button
                                 key={s}
                                 type='button'
-                                onClick={() => setStatusFilter(s)}
+                                onClick={() => { setStatusFilter(s); setIsFilterOpen(false); }}
                                 className={cn(
                                   'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                                   statusFilter === s
@@ -387,7 +422,7 @@ export function ManagedListingsPage() {
                               <button
                                 key={s}
                                 type='button'
-                                onClick={() => setSortBy(s)}
+                                onClick={() => { setSortBy(s); setIsFilterOpen(false); }}
                                 className={cn(
                                   'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                                   sortBy === s
@@ -409,13 +444,83 @@ export function ManagedListingsPage() {
             </div>
           </div>
 
+          {/* Tabs — All / Rent / Sale; single bottom rule, flush to listing list */}
+          <div className='border-b border-primary/20 px-4 sm:px-6 pt-1 pb-0 overflow-x-auto no-scrollbar'>
+            <div className='flex min-w-max items-end gap-1.5'>
+              <button
+                type='button'
+                onClick={() => setActiveTab('ALL')}
+                className={cn(
+                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                  activeTab === 'ALL'
+                    ? 'relative z-[1] -mb-px border-b-2 border-primary bg-primary text-white'
+                    : 'mb-0 border-b-2 border-transparent text-foreground/70 hover:bg-primary/5'
+                )}
+              >
+                {t('tabs.all')}
+                <span
+                  className={cn(
+                    'rounded-full px-2.5 py-1 text-xs font-bold',
+                    activeTab === 'ALL' ? 'bg-white/20 text-white' : 'bg-primary/15 text-foreground'
+                  )}
+                >
+                  {formatNumber(listingCounts.all)}
+                </span>
+              </button>
+              <button
+                type='button'
+                onClick={() => setActiveTab(ListingType.RENT)}
+                className={cn(
+                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                  activeTab === ListingType.RENT
+                    ? 'relative z-[1] -mb-px border-b-2 border-primary bg-primary text-white'
+                    : 'mb-0 border-b-2 border-transparent text-foreground/70 hover:bg-primary/5'
+                )}
+              >
+                {t('tabs.forRent')}
+                <span
+                  className={cn(
+                    'rounded-full px-2.5 py-1 text-xs font-bold',
+                    activeTab === ListingType.RENT
+                      ? 'bg-white/20 text-white'
+                      : 'bg-primary/15 text-foreground'
+                  )}
+                >
+                  {formatNumber(listingCounts.rent)}
+                </span>
+              </button>
+              <button
+                type='button'
+                onClick={() => setActiveTab(ListingType.SALE)}
+                className={cn(
+                  'flex cursor-pointer items-center gap-2 rounded-t-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                  activeTab === ListingType.SALE
+                    ? 'relative z-[1] -mb-px border-b-2 border-primary bg-primary text-white'
+                    : 'mb-0 border-b-2 border-transparent text-foreground/70 hover:bg-primary/5'
+                )}
+              >
+                {t('tabs.forSale')}
+                <span
+                  className={cn(
+                    'rounded-full px-2.5 py-1 text-xs font-bold',
+                    activeTab === ListingType.SALE
+                      ? 'bg-white/20 text-white'
+                      : 'bg-primary/15 text-foreground'
+                  )}
+                >
+                  {formatNumber(listingCounts.sale)}
+                </span>
+              </button>
+            </div>
+          </div>
+
           {/* Properties List */}
-          <div className='flex-1 overflow-y-auto flex flex-col'>
+          <div ref={listScrollRef} className='flex-1 overflow-y-auto flex flex-col'>
             {isLoading ? (
               <div className='flex flex-1 items-center justify-center'>
                 <Spinner className='size-8 text-primary' />
               </div>
-            ) : error ? (
+            ) : isError && error ? (
               <div className='flex flex-1 items-center justify-center'>
                 <div className='text-center'>
                   <p className='text-lg font-semibold text-foreground'>{t('error.title')}</p>
@@ -427,15 +532,47 @@ export function ManagedListingsPage() {
                 <div className='flex h-12 w-14 items-center justify-center rounded-full bg-primary/10'>
                   <Building2 className='h-7 w-7 text-primary' strokeWidth={1.5} />
                 </div>
-                <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
-                <button
-                  type='button'
-                  onClick={handleCreateListing}
-                  className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-                >
-                  <Plus className='h-4 w-4' strokeWidth={2.5} />
-                  <span>{t('createButton')}</span>
-                </button>
+                {hasActiveFilters || creatorFilter !== 'ALL' || debouncedSearchQuery ? (
+                  <>
+                    <p className='text-sm font-medium text-foreground'>{t('empty.noResults')}</p>
+                    <p className='text-xs text-muted-foreground'>{t('empty.noResultsHint')}</p>
+                    <button
+                      type='button'
+                      onClick={resetFilters}
+                      className='flex cursor-pointer items-center gap-2 rounded-lg border border-primary/20 bg-white px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                    >
+                      <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+                      <span>{t('filterPanel.reset')}</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className='text-sm text-muted-foreground'>{t('empty.noProperties')}</p>
+                    <div className='flex flex-wrap items-center justify-center'>
+                      <div className='relative inline-flex'>
+                        <button
+                          type='button'
+                          disabled={createBlocked}
+                          onClick={handleCreateListing}
+                          className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45 disabled:hover:bg-primary'
+                        >
+                          <Plus className='h-4 w-4' strokeWidth={2.5} />
+                          <span>{t('createButton')}</span>
+                        </button>
+                        {showQuotaNoticeTrigger ? (
+                          <button
+                            type='button'
+                            onClick={() => setQuotaNoticeOpen(true)}
+                            className='absolute -right-1 -top-1 z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-0.5 text-[11px] font-black leading-none text-white shadow-sm ring-2 ring-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
+                            aria-label={t('quotaNoticeTriggerAria')}
+                          >
+                            !
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <div className='divide-y divide-border'>
@@ -447,16 +584,17 @@ export function ManagedListingsPage() {
                     onClick={() => setSelectedListingId(listing.listing_id)}
                   />
                 ))}
-                {/* Pagination Controls */}
-                {listingPage && listingPage.total_pages > 1 && (
-                  <div className='py-6 bg-white border-t border-primary/20'>
-                    <RealVistaPagination
-                      currentPage={page + 1}
-                      totalPages={listingPage.total_pages}
-                      onPageChange={(p) => setPage(p - 1)}
-                    />
+                {hasNextPage ? (
+                  <div
+                    ref={loadMoreRef}
+                    className='flex min-h-12 items-center justify-center py-3'
+                    aria-hidden
+                  >
+                    {isFetchingNextPage ? (
+                      <Spinner className='size-6 text-primary' />
+                    ) : null}
                   </div>
-                )}
+                ) : null}
               </div>
             )}
           </div>
@@ -486,6 +624,77 @@ export function ManagedListingsPage() {
           </div>
         )}
       </main>
+
+      <Dialog open={quotaNoticeOpen} onOpenChange={setQuotaNoticeOpen}>
+        <DialogContent
+          showCloseButton
+          className='gap-0 border-none bg-transparent p-4 pt-6 shadow-none sm:max-w-md [&_[data-slot=dialog-close]]:text-white [&_[data-slot=dialog-close]]:opacity-90 [&_[data-slot=dialog-close]]:hover:opacity-100'
+        >
+          <DialogTitle className='sr-only'>{tDetail('subscriptionGate.title')}</DialogTitle>
+          <div className='mx-auto mt-8 w-full max-w-sm'>
+            <div className='border border-dashed border-amber-300 rounded-lg bg-amber-50 p-6 text-center'>
+              <Lock className='mx-auto mb-3 h-8 w-8 text-amber-500' />
+              <h3 className='mb-1 text-sm font-semibold text-main-black'>
+                {tDetail('subscriptionGate.title')}
+              </h3>
+              <p className='mb-4 text-xs text-grey-500'>{tDetail('subscriptionGate.description')}</p>
+              <button
+                type='button'
+                onClick={() => {
+                  setQuotaNoticeOpen(false);
+                  router.push(ROUTES.subscribe);
+                }}
+                className='group relative mt-0.5 inline-flex cursor-pointer items-center gap-1.5 overflow-hidden rounded-2xl px-5 py-2 text-xs font-semibold transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2'
+                style={{
+                  background:
+                    'linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(254,243,199,0.9) 42%, rgba(253,224,71,0.75) 100%)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(253,224,71,0.85)',
+                  boxShadow:
+                    '0 0 0 1px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.85)',
+                  animation: 'managedListingsSubGateBorderBlink 2.5s ease-in-out infinite',
+                }}
+              >
+                <style>{`
+                  @keyframes managedListingsSubGateBorderBlink {
+                    0%, 100% {
+                      box-shadow: 0 0 0 1px rgba(245,158,11,0.25), 0 0 8px 2px rgba(251,191,36,0.2),
+                        inset 0 1px 0 rgba(255,255,255,0.85);
+                      border-color: rgba(253,224,71,0.75);
+                    }
+                    50% {
+                      box-shadow: 0 0 0 1.5px rgba(217,119,6,0.55), 0 0 18px 5px rgba(251,191,36,0.4),
+                        inset 0 1px 0 rgba(255,255,255,0.95);
+                      border-color: rgba(252,211,77,0.95);
+                    }
+                  }
+                  @keyframes managedListingsSubGateShimmer {
+                    0% { transform: translateX(-100%) skewX(-15deg); }
+                    100% { transform: translateX(300%) skewX(-15deg); }
+                  }
+                  @keyframes managedListingsSubGateIconBlink {
+                    0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                    50% { opacity: 0.65; transform: scale(1.18) rotate(12deg); }
+                  }
+                `}</style>
+                <span
+                  className='pointer-events-none absolute inset-0 w-1/4'
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent)',
+                    animation: 'managedListingsSubGateShimmer 2.4s ease-in-out infinite',
+                  }}
+                />
+                <Sparkles
+                  className='relative h-3.5 w-3.5 shrink-0 text-amber-700'
+                  style={{ animation: 'managedListingsSubGateIconBlink 1.6s ease-in-out infinite' }}
+                />
+                <span className='relative text-amber-950'>{tDetail('subscriptionGate.cta')}</span>
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

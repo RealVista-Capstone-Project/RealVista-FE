@@ -2,11 +2,10 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { ChevronRight, MapPin, Maximize2, Home, Check } from 'lucide-react';
+import { ArrowLeft, ChevronRight, MapPin, Maximize2, Home, Check, Plus } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useTranslations } from 'next-intl';
-import { RealVistaPagination } from '@/shared/ui/realvista-pagination/realvista-pagination';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { mediaApi } from '@/entities/media/api/media.api';
 import type {
@@ -17,9 +16,16 @@ import type {
 import { useCreateListing } from '@/features/create-listing-modal/api/use-create-listing';
 import { ListingInformationStep } from '@/features/create-listing-modal/ui/listing-information-step';
 import { useRouter } from '@/shared/config/i18n/navigation';
+import { Link } from '@/shared/config/i18n/navigation';
 import { propertyQueries } from '@/entities/property';
 import { usePropertyDetail } from '@/entities/property/api/use-property-detail';
 import { handleErrorApi } from '@/shared/lib/utils/handle-error';
+import type {
+  PropertySummaryResponse,
+  PropertyMediaItem,
+  PropertyAttributeItem,
+  PropertyAmenityItem,
+} from '@/entities/property/api/property-api.types';
 
 function PropertyStatusBadge({ status }: { status: UserProperty['status'] | string }) {
   const t = useTranslations('CreateListingModal');
@@ -67,7 +73,7 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] | stri
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium',
         config.className
       )}
     >
@@ -158,7 +164,7 @@ function PropertyCard({
         </div>
 
         {isRented && (
-          <p className='rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs leading-5 text-teal-800'>
+          <p className='rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs leading-snug text-teal-800'>
             {property.allowRentListingWhenRented
               ? t('rentedPropertyRentAllowed')
               : t('rentedPropertySaleOnly')}
@@ -190,10 +196,10 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   ];
 
   return (
-    <div className='flex items-center gap-4'>
+    <div className='flex items-center gap-3'>
       {steps.map((step, index) => (
         <React.Fragment key={step.number}>
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-1.5'>
             <div
               className={cn(
                 'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
@@ -206,7 +212,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             </div>
             <span
               className={cn(
-                'text-sm md:text-base font-medium hidden sm:block',
+                'text-sm font-medium hidden sm:inline',
                 step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
@@ -214,7 +220,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             </span>
           </div>
           {index < steps.length - 1 && (
-            <ChevronRight className='h-5 w-5 text-muted-foreground/70' />
+            <ChevronRight className='h-[18px] w-[18px] shrink-0 text-muted-foreground/70' />
           )}
         </React.Fragment>
       ))}
@@ -222,65 +228,43 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   );
 }
 
-/**
- * Calculates how many property cards fit in the viewport.
- * Each card is ~112px tall + gap. We subtract estimated heights for
- * header (~160px), step indicator (~56px), footer (~72px), card padding/border (~48px).
- */
-function useItemsPerPage(): number {
-  const [itemsPerPage, setItemsPerPage] = React.useState(4);
-
-  React.useEffect(() => {
-    function calculate() {
-      const viewportHeight = window.innerHeight;
-      // estimated overhead: outer padding + card header + card padding + footer
-      const overhead = 520;
-      const available = viewportHeight - overhead;
-      // each card is ~112px + 12px gap
-      const cardHeight = 124;
-      const count = Math.max(2, Math.floor(available / cardHeight));
-      setItemsPerPage(count);
-    }
-
-    calculate();
-    window.addEventListener('resize', calculate);
-    return () => window.removeEventListener('resize', calculate);
-  }, []);
-
-  return itemsPerPage;
-}
+const MY_PROPERTIES_PAGE_SIZE = 20;
 
 export function CreateListingPage() {
   const t = useTranslations('CreateListingModal');
   const tGlobal = useTranslations();
   const router = useRouter();
-  const itemsPerPage = useItemsPerPage();
-  const [currentPage, setCurrentPage] = React.useState(1);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [selectedProperty, setSelectedProperty] = React.useState<UserProperty | null>(null);
 
-  // Reset to page 1 when the number of items per page changes (e.g. on resize)
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [itemsPerPage]);
-
-  const { data, isLoading } = useQuery({
-    ...propertyQueries.myProperties({
-      page: currentPage - 1,
-      size: itemsPerPage,
-      statuses: ['AVAILABLE', 'RENTED'],
+  const myPropertiesInfiniteCriteria = React.useMemo(
+    () => ({
+      size: MY_PROPERTIES_PAGE_SIZE,
+      statuses: ['AVAILABLE', 'RENTED'] as string[],
     }),
+    []
+  );
+
+  const {
+    data: propertiesInfiniteData,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
+    ...propertyQueries.myPropertiesInfinite(myPropertiesInfiniteCriteria),
     enabled: currentStep === 1,
   });
 
-  const propertiesResponse = data?.payload?.data;
-  const rawProperties = propertiesResponse?.content || [];
-  const totalPages = propertiesResponse?.total_pages || 0;
+  const rawProperties = React.useMemo(
+    () => propertiesInfiniteData?.pages.flatMap((p) => p.payload?.data?.content ?? []) ?? [],
+    [propertiesInfiniteData?.pages]
+  );
 
-  const properties: UserProperty[] = rawProperties.map((p: any) => {
-    const standardMedia = (p.media ?? []).filter((m: any) => m.is_property_standard);
+  const properties: UserProperty[] = rawProperties.map((p: PropertySummaryResponse) => {
+    const standardMedia = (p.media ?? []).filter((m: PropertyMediaItem) => m.is_property_standard);
     const primaryMedia =
-      standardMedia.find((m: any) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
+      standardMedia.find((m: PropertyMediaItem) => m.is_primary) ?? standardMedia[0] ?? p.media?.[0];
 
     return {
       propertyId: p.property_id,
@@ -303,13 +287,13 @@ export function CreateListingPage() {
         longitude: p.location_info?.longitude ?? null,
       },
       propertyType: {
-        propertyTypeId: p.property_type_info?.property_type_id ?? p.property_type_id,
+        propertyTypeId: p.property_type_info?.property_type_id ?? p.property_type_id ?? '',
         propertyTypeName: p.property_type_info?.property_type_name ?? '',
         propertyTypeCode: p.property_type_info?.property_type_code ?? '',
         propertyCategoryName: p.property_type_info?.property_category_name ?? '',
         propertyCategoryCode: p.property_type_info?.property_category_code ?? '',
       },
-      attributes: (p.attributes ?? []).map((attr: any) => ({
+      attributes: (p.attributes ?? []).map((attr: PropertyAttributeItem) => ({
         attributeId: attr.attribute_id,
         attributeCode: attr.attribute_code,
         attributeName: attr.attribute_name,
@@ -319,22 +303,23 @@ export function CreateListingPage() {
         valueNumber: attr.value_number,
         valueText: attr.value_text,
         valueBoolean: attr.value_boolean,
-        displayValue: attr.display_value,
+        displayValue: attr.display_value ?? null,
       })),
-      amenities: (p.amenities ?? []).map((a: any) => ({
+      amenities: (p.amenities ?? []).map((a: PropertyAmenityItem) => ({
         amenityId: a.amenity_id,
         amenityName: a.amenity_name,
       })),
-      media: (p.media ?? []).map((m: any) => ({
-        mediaId: m.media_id,
-        mediaType: m.media_type,
-        mediaUrl: m.media_url,
-        thumbnailUrl: m.thumbnail_url,
-        isPrimary: m.is_primary,
-        isPropertyStandard: m.is_property_standard,
-        displayOrder: m.display_order,
+      media: (p.media ?? []).map((m: PropertyMediaItem) => ({
+        mediaId: m.media_id ?? '',
+        mediaType: m.media_type ?? 'IMAGE',
+        mediaUrl: m.media_url ?? '',
+        thumbnailUrl: m.thumbnail_url ?? null,
+        isPrimary: m.is_primary ?? false,
+        isPropertyStandard: m.is_property_standard ?? false,
+        displayOrder: m.display_order ?? 0,
         roomName: m.metadata?.room_name ?? null,
       })),
+      priceRange: p.price_range ?? null,
     };
   });
 
@@ -363,6 +348,7 @@ export function CreateListingPage() {
       allowRentListingWhenRented: Boolean(
         propertyDetail.allow_rent_listing_when_rented ?? selectedProperty.allowRentListingWhenRented
       ),
+      priceRange: propertyDetail.price_range ?? selectedProperty.priceRange,
       attributes: propertyDetail.attributes
         ? propertyDetail.attributes.map((attr) => ({
             attributeId: attr.attribute_id,
@@ -456,21 +442,41 @@ export function CreateListingPage() {
   };
 
   return (
-    <div className='h-full overflow-hidden flex flex-col p-4 md:p-6'>
-      <div className='rounded-2xl border border-primary/20 overflow-hidden bg-white shadow-lg flex flex-col flex-1 max-w-5xl mx-auto w-full min-h-0'>
+    <div
+      className={cn(
+        'flex flex-col px-4 pt-2 md:px-6 md:pt-3',
+        currentStep === 1 ? 'min-h-0 flex-1 pb-4 md:pb-5' : 'pb-2 md:pb-3'
+      )}
+    >
+      <div
+        className={cn(
+          'mx-auto flex w-full max-w-5xl flex-col',
+          currentStep === 1 ? 'min-h-0 flex-1 overflow-hidden' : ''
+        )}
+      >
         {/* Header - Fixed */}
         <div className='shrink-0'>
-          <div className='space-y-3 px-4 md:px-8 pt-6 md:pt-8 pb-0 text-center'>
-            <h1 className='text-2xl md:text-[28px] font-bold leading-tight tracking-[-0.28px] text-foreground'>
-              {t('title')}
-            </h1>
-            <p className='mx-auto max-w-md text-sm md:text-base leading-relaxed text-muted-foreground/70'>
-              {t('subtitle')}
-            </p>
+          <div className='px-0 md:px-2 pt-0'>
+            <button
+              type='button'
+              onClick={() => router.back()}
+              className='mb-1 flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2'
+            >
+              <ArrowLeft className='size-4' />
+              <span>{t('goBack')}</span>
+            </button>
+            <div className='mx-auto max-w-xl space-y-1.5 text-center'>
+              <h1 className='text-lg font-bold leading-snug tracking-tight text-foreground md:text-xl'>
+                {t('title')}
+              </h1>
+              <p className='text-xs leading-relaxed text-muted-foreground/70 md:text-sm'>
+                {t('subtitle')}
+              </p>
+            </div>
           </div>
 
           {/* Step indicator */}
-          <div className='flex justify-center border-b border-primary/20 px-4 md:px-8 pb-4 md:pb-6 mt-4'>
+          <div className='mt-2 flex justify-center border-b border-primary/20 px-2 pb-2 md:pb-3'>
             <StepIndicator currentStep={currentStep} />
           </div>
         </div>
@@ -478,61 +484,82 @@ export function CreateListingPage() {
         {/* Step 1: Property Selection */}
         {currentStep === 1 && (
           <>
-            {/* Scrollable content - Flex 1 */}
-            <div className='flex-1 overflow-y-auto px-4 md:px-8 py-5 md:py-6'>
-              {/* Property Selection */}
-              <div className='rounded-xl border-[1.5px] border-primary/20 p-4 md:p-6'>
-                <h3 className='mb-4 text-lg font-bold leading-snug tracking-tight text-foreground'>
-                  {t('selectProperty')}
-                </h3>
+            {/* Single inner scroll: fills space between header and footer so main does not scroll */}
+            <div className='flex min-h-0 flex-1 flex-col overflow-hidden py-4 md:py-5'>
+              <h3 className='mb-3 shrink-0 text-base font-bold leading-snug tracking-tight text-foreground'>
+                {t('selectProperty')}
+              </h3>
 
-                <div className='flex flex-col gap-3'>
-                  {isLoading ? (
-                    <div className='flex justify-center py-8'>
-                      <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
-                    </div>
-                  ) : properties.length === 0 ? (
-                    <div className='flex justify-center py-8'>
-                      <span className='text-muted-foreground/70'>
-                        {t('noProperties', { fallback: 'No properties found' })}
-                      </span>
-                    </div>
-                  ) : (
-                    properties.map((property) => (
-                      <PropertyCard
-                        key={property.propertyId}
-                        property={property}
-                        isSelected={selectedProperty?.propertyId === property.propertyId}
-                        onSelect={() => setSelectedProperty(property)}
-                      />
-                    ))
-                  )}
+              {isLoading ? (
+                <div className='flex min-h-0 flex-1 items-center justify-center py-8'>
+                  <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
                 </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className='mt-6 flex justify-center'>
-                    <RealVistaPagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
-                    />
+              ) : properties.length === 0 ? (
+                <div className='flex min-h-0 flex-1 flex-col items-center justify-center gap-4 py-8 text-center'>
+                  <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
+                    <Home className='h-6 w-6 text-primary' strokeWidth={1.5} />
                   </div>
-                )}
-              </div>
+                  <div>
+                    <p className='text-xs font-semibold text-foreground'>
+                      {t('noProperties')}
+                    </p>
+                    <p className='mt-1 text-xs text-muted-foreground'>
+                      {t('noPropertiesDesc')}
+                    </p>
+                  </div>
+                  <Link
+                    href='/dashboard/property/create'
+                    className='flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary/90'
+                  >
+                    <Plus className='h-4 w-4' strokeWidth={2.5} />
+                    {t('createPropertyCta')}
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <div className='min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-1 [-webkit-overflow-scrolling:touch]'>
+                    <div className='flex flex-col gap-3'>
+                      {properties.map((property) => (
+                        <PropertyCard
+                          key={property.propertyId}
+                          property={property}
+                          isSelected={selectedProperty?.propertyId === property.propertyId}
+                          onSelect={() => setSelectedProperty(property)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {hasNextPage ? (
+                    <div className='mt-3 flex shrink-0 justify-center'>
+                      <button
+                        type='button'
+                        onClick={() => void fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                        className={cn(
+                          'rounded-lg border border-primary/30 bg-primary/5 px-5 py-2 text-sm font-semibold text-primary transition-colors',
+                          'hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-60'
+                        )}
+                      >
+                        {isFetchingNextPage ? t('loadMoreLoading') : t('loadMore')}
+                      </button>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </div>
 
             {/* Footer — Next button - Fixed */}
-            <div className='shrink-0 flex justify-end border-t border-primary/20 px-4 md:px-8 py-4 md:py-5 bg-white'>
+            <div className='flex shrink-0 justify-end border-t border-primary/20 py-3 md:py-4'>
               <button
                 type='button'
                 disabled={!selectedProperty}
                 onClick={handleNextStep}
                 className={cn(
-                  'flex w-full sm:min-w-[160px] sm:w-auto items-center justify-center rounded-lg px-8 py-3 md:py-4 text-base font-bold transition-all text-white',
+                  'flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-[15px] font-semibold transition-all sm:w-auto sm:min-w-[128px]',
                   selectedProperty
-                    ? 'bg-primary hover:bg-primary/90 shadow-[0px_4px_16px_0px_color-mix(in_oklch,var(--primary)_30%,transparent)]'
-                    : 'bg-primary/30 cursor-not-allowed'
+                    ? 'bg-primary text-white shadow-sm shadow-primary/20 hover:bg-primary/90'
+                    : 'cursor-not-allowed bg-primary/30 text-white'
                 )}
               >
                 {t('next')}
@@ -548,6 +575,7 @@ export function CreateListingPage() {
             onPrevious={handlePreviousStep}
             onSubmit={handleSubmit}
             isSubmitting={createListingMutation.isPending}
+            nestedInScrollableRoute
           />
         )}
       </div>

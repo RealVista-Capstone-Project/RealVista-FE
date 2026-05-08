@@ -10,6 +10,15 @@ export interface RentalFeaturesProps {
 }
 
 /**
+ * Check if an amenity has a valid name (not null, undefined, or empty)
+ */
+const hasValidAmenity = (amenity: Amenity): boolean => {
+  return amenity.amenity_name !== undefined &&
+         amenity.amenity_name !== null &&
+         amenity.amenity_name.trim() !== '';
+};
+
+/**
  * RentalFeatures component displays property amenities
  * split into On-site and Off-site sections with bullet lists
  * - Mobile: single column per section
@@ -17,7 +26,10 @@ export interface RentalFeaturesProps {
  */
 export function RentalFeatures({ property }: RentalFeaturesProps) {
   const t = useTranslations('RentalFeatures');
-  const amenities: Amenity[] = property.amenities || [];
+  const allAmenities: Amenity[] = property.amenities || [];
+
+  // Filter out amenities with invalid names
+  const amenities = allAmenities.filter(hasValidAmenity);
 
   if (amenities.length === 0) {
     return null;

@@ -128,8 +128,14 @@ export function MessagesPage({ conversationId }: MessagesPageProps = {}) {
   const { data: convData, isLoading } = useQuery(conversationQueries.list());
 
   const conversations: Conversation[] = useMemo(() => {
-    // http.get returns HttpResponse<ApiResponse<T>>, so conversations are at payload.data
-    const raw = (convData as any)?.payload?.data ?? (convData as any)?.data ?? [];
+    if (Array.isArray(convData)) {
+      return convData.map(mapConversation);
+    }
+    const legacy = convData as unknown as
+      | { payload?: { data?: ConversationListItemResponse[] }; data?: ConversationListItemResponse[] }
+      | undefined;
+    const raw =
+      legacy?.payload?.data ?? legacy?.data ?? [];
     if (!Array.isArray(raw)) return [];
     return raw.map(mapConversation);
   }, [convData]);

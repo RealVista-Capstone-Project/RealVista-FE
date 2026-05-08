@@ -164,13 +164,13 @@ export const AgentLeadChannelsCard = memo(function AgentLeadChannelsCard() {
   };
 
   return (
-    <Card className='border-border/70 bg-card shadow-sm xl:col-span-4'>
+    <Card className='border-border/70 bg-white shadow-sm dark:bg-card xl:col-span-4'>
       <CardHeader className='space-y-4'>
         <div className='space-y-1'>
           <CardTitle>{t('sections.channels.title')}</CardTitle>
           <CardDescription>{t('sections.channels.description')}</CardDescription>
         </div>
-        <div className='space-y-3 rounded-xl border border-border/70 bg-muted/20 p-3'>
+        <div className='space-y-3 rounded-xl border border-border/70 bg-white p-3 dark:bg-muted/20'>
           <div className='flex flex-wrap items-center gap-2'>
             {presetButtons.map((preset) => (
               <Button

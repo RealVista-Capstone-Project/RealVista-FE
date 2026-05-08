@@ -55,6 +55,13 @@ const DEFAULT_METRICS_PAYLOAD: AgentDashboardMetrics = {
     pendingProperties: 0,
     verifiedProperties: 0,
     rejectedProperties: 0,
+    totalLandAreaM2: 0,
+    averageLandAreaM2: 0,
+    estimatedPortfolioValueVnd: 0,
+    estimatedPortfolioValueYoyPercent: null,
+    publishedListingsCount: 0,
+    listingsExpiringSoonCount: 0,
+    showcaseTypeCounts: {},
   },
   appointmentSummary: {
     totalAppointments: 0,
@@ -143,6 +150,22 @@ function readNullableStr(v: unknown): string | null {
   return typeof v === 'string' ? v : null;
 }
 
+function readNullableFiniteNum(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === 'string' ? Number(v) : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function readRecordNum(v: unknown): Record<string, number> {
+  if (!v || typeof v !== 'object') return {};
+  const out: Record<string, number> = {};
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    const n = readNullableFiniteNum(val);
+    if (n !== null) out[k] = n;
+  }
+  return out;
+}
+
 function normalizeTopListingRow(row: unknown): AgentListingAnalyticsRow | null {
   if (!row || typeof row !== 'object') return null;
   const o = row as LooseRecord;
@@ -228,6 +251,33 @@ function normalizePropertySummary(payload: unknown): AgentDashboardMetrics['prop
     rejectedProperties: readNum(
       o.rejectedProperties ?? o.rejected_properties ?? fallback.rejectedProperties
     ),
+    totalLandAreaM2: readNum(o.totalLandAreaM2 ?? o.total_land_area_m2 ?? fallback.totalLandAreaM2 ?? 0),
+    averageLandAreaM2: readNum(
+      o.averageLandAreaM2 ?? o.average_land_area_m2 ?? fallback.averageLandAreaM2 ?? 0
+    ),
+    estimatedPortfolioValueVnd: readNum(
+      o.estimatedPortfolioValueVnd ??
+        o.estimated_portfolio_value_vnd ??
+        fallback.estimatedPortfolioValueVnd ??
+        0
+    ),
+    estimatedPortfolioValueYoyPercent:
+      readNullableFiniteNum(
+        o.estimatedPortfolioValueYoyPercent ?? o.estimated_portfolio_value_yoy_percent
+      ) ?? fallback.estimatedPortfolioValueYoyPercent ?? null,
+    publishedListingsCount: readNum(
+      o.publishedListingsCount ?? o.published_listings_count ?? fallback.publishedListingsCount ?? 0
+    ),
+    listingsExpiringSoonCount: readNum(
+      o.listingsExpiringSoonCount ??
+        o.listings_expiring_soon_count ??
+        fallback.listingsExpiringSoonCount ??
+        0
+    ),
+    showcaseTypeCounts: {
+      ...(fallback.showcaseTypeCounts ?? {}),
+      ...readRecordNum(o.showcaseTypeCounts ?? o.showcase_type_counts),
+    },
   };
 }
 

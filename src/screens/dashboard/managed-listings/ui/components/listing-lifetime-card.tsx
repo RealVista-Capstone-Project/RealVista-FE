@@ -2,14 +2,15 @@
 
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
-import { Clock, Info } from 'lucide-react';
-import { differenceInHours, parseISO } from 'date-fns';
+import { Timer } from 'lucide-react';
 
 import type { Listing } from '@/entities/listing';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui/tooltip/tooltip';
+import {
+  LISTING_PUBLISHED_MAX_LIFETIME_HOURS,
+  computePublishedHoursRemaining,
+} from '@/entities/listing/lib/listing-published-lifetime';
 
-const LISTING_MAX_LIFETIME_DAYS = 14;
-const LISTING_MAX_LIFETIME_HOURS = LISTING_MAX_LIFETIME_DAYS * 24;
+import { formatPublishedLifetimeLabel } from '../../lib/format-published-lifetime-label';
 
 interface ListingLifetimeCardProps {
   listing: Listing;
@@ -18,25 +19,27 @@ interface ListingLifetimeCardProps {
 export function ListingLifetimeCard({ listing }: ListingLifetimeCardProps) {
   const t = useTranslations('ListingDetailPanel');
 
-  const [timeRemaining, setTimeRemaining] = React.useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = React.useState<number | null>(() =>
+    listing.status === 'PUBLISHED' && listing.published_at
+      ? computePublishedHoursRemaining(listing.published_at, listing.status)
+      : null
+  );
 
   React.useEffect(() => {
     if (listing.status !== 'PUBLISHED' || !listing.published_at) {
+      setTimeRemaining(null);
       return;
     }
 
-    const calculateRemaining = () => {
-      const publishedDate = parseISO(listing.published_at);
-      const now = new Date();
-      return LISTING_MAX_LIFETIME_HOURS - differenceInHours(now, publishedDate);
+    const publishedDate = listing.published_at;
+
+    const tick = () => {
+      const next = computePublishedHoursRemaining(publishedDate, listing.status);
+      setTimeRemaining(next);
     };
 
-    setTimeRemaining(calculateRemaining());
-
-    const interval = setInterval(() => {
-      setTimeRemaining(calculateRemaining());
-    }, 60000);
-
+    tick();
+    const interval = setInterval(tick, 60_000);
     return () => clearInterval(interval);
   }, [listing.status, listing.published_at]);
 
@@ -44,64 +47,36 @@ export function ListingLifetimeCard({ listing }: ListingLifetimeCardProps) {
     return null;
   }
 
-  const getLifetimeColor = (hours: number) => {
-    if (hours >= 96) return 'bg-green-500';
-    if (hours >= 24) return 'bg-amber-500';
-    return 'bg-red-500';
-  };
+  const totalDays = LISTING_PUBLISHED_MAX_LIFETIME_HOURS / 24;
+  const remainingDays = Math.floor(timeRemaining / 24);
+  const pct = Math.max(0, Math.min(100, (remainingDays / totalDays) * 100));
 
-  const getLifetimeBarBg = (hours: number) => {
-    if (hours >= 96) return 'bg-green-100';
-    if (hours >= 24) return 'bg-amber-100';
-    return 'bg-red-100';
-  };
-
-  const getLifetimeText = (hours: number) => {
-    const days = Math.floor(hours / 24);
-
-    if (hours <= 0) {
-      return t('lifetime.expired');
-    }
-    if (hours < 24) {
-      return t('lifetime.hoursRemaining', { count: hours });
-    }
-    if (days === 1) {
-      return t('lifetime.oneDayRemaining');
-    }
-    return t('lifetime.daysRemaining', { count: days });
-  };
+  const isUrgent = timeRemaining < 24;
+  const isWarning = !isUrgent && timeRemaining < 72;
 
   return (
-    <div className='flex items-center gap-4'>
-      <div className='flex h-8 w-8 items-center justify-center rounded-md bg-primary/10'>
-        <Clock className='h-4 w-4 text-primary' strokeWidth={2} />
+    <>
+      {/* Header */}
+      <div className='flex items-center gap-2'>
+        <Timer className='h-4 w-4 text-primary' strokeWidth={2} />
+        <h3 className='text-base font-bold text-foreground'>{t('lifetime.title')}</h3>
       </div>
-      <div className='flex-1'>
-        <div className='mb-1 flex items-center gap-2'>
-          <span className='text-sm font-semibold text-foreground'>{t('lifetime.title')}</span>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button type='button' className='flex items-center text-muted-foreground/60 hover:text-muted-foreground transition-colors' aria-label={t('lifetime.tooltip')}>
-                <Info className='h-3 w-3' strokeWidth={2} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className='max-w-[220px] text-center text-xs'>
-              {t('lifetime.tooltip')}
-            </TooltipContent>
-          </Tooltip>
+
+      {/* Progress bar */}
+      <div className='mt-1 space-y-1'>
+        <div className={`h-2 w-full overflow-hidden rounded-full ${isUrgent ? 'bg-red-100' : 'bg-amber-100'}`}>
+          <div
+            className={`h-full rounded-full transition-all ${isUrgent ? 'bg-red-500' : 'bg-amber-400'}`}
+            style={{ width: `${pct}%` }}
+          />
         </div>
-        <div className='flex items-center gap-3'>
-          <div className={`h-2 flex-1 overflow-hidden rounded-full ${getLifetimeBarBg(timeRemaining)}`}>
-            <div
-              className={`h-full rounded-full transition-all ${getLifetimeColor(timeRemaining)}`}
-              style={{ width: `${Math.max(0, Math.min(100, (timeRemaining / LISTING_MAX_LIFETIME_HOURS) * 100))}%` }}
-            />
-          </div>
-          <span className={`text-xs font-medium whitespace-nowrap ${timeRemaining >= 96 ? 'text-green-700' : timeRemaining >= 24 ? 'text-amber-700' : 'text-red-700'}`}>
-            {getLifetimeText(timeRemaining)}
-          </span>
-        </div>
+        <p className='text-xs text-foreground'>
+          {formatPublishedLifetimeLabel(timeRemaining, t)}
+        </p>
       </div>
-    </div>
+
+      {/* Note */}
+      <p className='mt-2 text-xs italic text-muted-foreground'>{t('lifetime.tooltip')}</p>
+    </>
   );
 }

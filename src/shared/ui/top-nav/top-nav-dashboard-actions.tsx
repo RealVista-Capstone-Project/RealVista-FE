@@ -31,16 +31,21 @@ export function DashboardActions({
   if (!isUserLoggedIn) return null;
 
   return (
-    <div className='flex items-center gap-6'>
+    <div className='flex items-center gap-3 lg:gap-4'>
       {/* Notifications — always visible in dashboard */}
-      <NotificationDropdownContainer />
+      <NotificationDropdownContainer className='size-8 [&_svg]:h-5 [&_svg]:w-5' />
 
-      <div className='hidden lg:flex h-10 items-center'>
-        <Separator orientation='vertical' className='h-6' />
+      <div className='hidden lg:flex h-8 items-center'>
+        <Separator orientation='vertical' className='h-5' />
       </div>
 
       {/* Profile — dropdown */}
-      <ProfileDropdown user={user} align='end' menuItems={menuItems} />
+      <ProfileDropdown
+        user={user}
+        align='end'
+        menuItems={menuItems}
+        className='gap-1.5 px-2.5 py-1.5 text-sm shadow-sm [&_svg]:h-3.5 [&_svg]:w-3.5'
+      />
     </div>
   );
 }

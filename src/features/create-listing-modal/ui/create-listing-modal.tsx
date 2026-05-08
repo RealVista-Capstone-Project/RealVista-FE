@@ -69,7 +69,7 @@ function PropertyStatusBadge({ status }: { status: UserProperty['status'] | stri
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium',
         config.className
       )}
     >
@@ -160,7 +160,7 @@ function PropertyCard({
         </div>
 
         {isRented && (
-          <p className='rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs leading-5 text-teal-800'>
+          <p className='rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs leading-snug text-teal-800'>
             {property.allowRentListingWhenRented
               ? t('rentedPropertyRentAllowed')
               : t('rentedPropertySaleOnly')}
@@ -198,7 +198,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
           <div className='flex items-center gap-2'>
             <div
               className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
+                'flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold',
                 step.number <= currentStep
                   ? 'bg-primary text-white'
                   : 'bg-muted text-muted-foreground'
@@ -208,7 +208,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
             </div>
             <span
               className={cn(
-                'text-sm md:text-base font-medium hidden sm:block',
+                'text-base md:text-lg font-medium hidden sm:block',
                 step.number <= currentStep ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
@@ -313,6 +313,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
         displayOrder: m.display_order,
         roomName: m.metadata?.room_name ?? null,
       })),
+      priceRange: p.price_range ?? null,
     };
   });
 
@@ -352,6 +353,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
       allowRentListingWhenRented: Boolean(
         propertyDetail.allow_rent_listing_when_rented ?? selectedProperty.allowRentListingWhenRented
       ),
+      priceRange: propertyDetail.price_range ?? selectedProperty.priceRange,
       attributes: propertyDetail.attributes
         ? propertyDetail.attributes.map((attr) => ({
             attributeId: attr.attribute_id,
@@ -483,7 +485,7 @@ export function CreateListingModal({ open, onOpenChange, preselectedPropertyId }
                     </div>
                   ) : properties.length === 0 ? (
                     <div className='flex justify-center py-8'>
-                      <span className='text-muted-foreground/70'>
+                      <span className='text-xs text-muted-foreground/70'>
                         {t('noProperties', { fallback: 'No properties found' })}
                       </span>
                     </div>

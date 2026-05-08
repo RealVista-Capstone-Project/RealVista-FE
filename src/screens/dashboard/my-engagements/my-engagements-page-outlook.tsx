@@ -31,7 +31,7 @@ const MyEngagementsOutlookContent = () => {
 
   if (isLoading) {
     return (
-      <div className='flex h-full items-center justify-center'>
+      <div className='flex min-h-0 flex-1 items-center justify-center'>
         <Spinner className='size-8 text-primary' />
       </div>
     );
@@ -39,7 +39,7 @@ const MyEngagementsOutlookContent = () => {
 
   if (isError) {
     return (
-      <div className='flex h-full items-center justify-center'>
+      <div className='flex min-h-0 flex-1 items-center justify-center'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
             <FileSearch className='h-6 w-6 text-primary' />

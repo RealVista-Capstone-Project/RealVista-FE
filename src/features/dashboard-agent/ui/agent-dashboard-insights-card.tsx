@@ -13,8 +13,8 @@ export function AgentDashboardInsightsCard() {
   const trendData = performanceQuery.data?.data.trend ?? [];
 
   return (
-    <Card className='border-border/70 bg-card shadow-sm'>
-      <CardContent className='space-y-6 pt-6'>
+    <Card className='border-border/70 bg-white shadow-sm dark:bg-card'>
+      <CardContent className='space-y-6 px-6 pb-6 pt-6'>
         <AgentDashboardPerformanceChartContent
           trendData={trendData}
           selectedPeriod={selectedPeriod}

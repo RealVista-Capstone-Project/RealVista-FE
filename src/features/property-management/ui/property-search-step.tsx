@@ -3,10 +3,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Search, MapPin, Plus, Check, Loader2, User, Users, AlertCircle } from 'lucide-react';
+import {
+  Search,
+  MapPin,
+  Plus,
+  Check,
+  Loader2,
+  User,
+  Users,
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  XCircle,
+} from 'lucide-react';
 import NextImage from 'next/image';
 
 import { MapAutocomplete } from './components/map-autocomplete';
+import type { DuplicateOverrideReason } from './components/duplicate-address-modal';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { propertyApi } from '@/entities/property/api/property.api';
@@ -17,9 +31,28 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shar
 import { Input } from '@/shared/ui/input';
 import { cn } from '@/shared/lib/utils';
 import { extractStreetAddress } from '@/shared/lib/location.lib';
+import { isHoChiMinhCityRegion } from '@/shared/lib/hcm-region.lib';
+import type {
+  AddressDuplicateCheckResponse,
+  DuplicateSeverity,
+} from '@/entities/property/api/property-api.types';
 import { useAuthSession } from '@/features/auth/model/use-auth-session';
 
-export function PropertySearchStep() {
+export interface PropertySearchStepDuplicateFeedback {
+  visible: boolean;
+  isDupChecking: boolean;
+  isDupDebouncing: boolean;
+  dupSeverity: DuplicateSeverity;
+  dupCheckResult: AddressDuplicateCheckResponse | null;
+  overrideReason: DuplicateOverrideReason | null;
+  onOpenDuplicateModal: () => void;
+}
+
+export function PropertySearchStep({
+  duplicateAddressFeedback,
+}: {
+  duplicateAddressFeedback?: PropertySearchStepDuplicateFeedback;
+}) {
   const t = useTranslations('PropertyManagement');
   const { control, setValue, clearErrors } = useFormContext();
   const { data: session } = useAuthSession();
@@ -37,6 +70,7 @@ export function PropertySearchStep() {
   const ownerId = useWatch({ control, name: 'role.ownerId' });
   const ownerName = useWatch({ control, name: 'role.ownerName' });
   const ownerMaskedPhone = useWatch({ control, name: 'role.ownerMaskedPhone' });
+  const step0AddressInHcmArea = useWatch({ control, name: 'step0AddressInHcmArea' });
   const [searchUserEmail, setSearchUserEmail] = useState('');
   const {
     data: userSearchResult,
@@ -66,6 +100,14 @@ export function PropertySearchStep() {
   ) => {
     setAddress(newAddress);
     if (lat !== 0 && lng !== 0) {
+      const inHcm = isHoChiMinhCityRegion(components, newAddress);
+      setValue('step0AddressInHcmArea', inHcm);
+      if (!inHcm) {
+        console.warn(
+          `[PropertyManagement] Unsupported address region (Ho Chi Minh City only): ${newAddress}`
+        );
+      }
+
       setCoords({ lat, lng });
       performSearch(lat, lng);
       setValue('info.location', { lat, lng });
@@ -74,7 +116,7 @@ export function PropertySearchStep() {
       try {
         const locationRes = await locationApi.searchByCoordinates(lat, lng);
         if (locationRes.payload.success && locationRes.payload.data) {
-          setValue('info.locationId', locationRes.payload.data.location_id, { shouldValidate: true });
+          setValue('info.ward', locationRes.payload.data.location_id, { shouldValidate: true });
         }
       } catch (error) {
         console.error('Failed to resolve location from coordinates:', error);
@@ -85,10 +127,11 @@ export function PropertySearchStep() {
       setValue('info.streetAddress', displayAddress);
     } else {
       setCoords(null);
+      setValue('step0AddressInHcmArea', undefined);
       // Clear form state when address is deleted or invalid
       setValue('info.location', { lat: 0, lng: 0 });
       setValue('info.streetAddress', '');
-      setValue('info.locationId', undefined);
+      setValue('info.ward', '');
       setSearchResults([]);
       setSelection(null);
     }
@@ -194,6 +237,94 @@ export function PropertySearchStep() {
             size={20}
           />
         </div>
+
+        {coords && step0AddressInHcmArea === false ? (
+          <div className='mt-2 flex items-center gap-2 text-sm text-red-600'>
+            <AlertCircle className='h-4 w-4 shrink-0' aria-hidden />
+            <span>{t('step0AddressNotSupported')}</span>
+          </div>
+        ) : null}
+
+        {duplicateAddressFeedback?.visible ? (
+          <div className='mt-2'>
+            {(duplicateAddressFeedback.isDupChecking || duplicateAddressFeedback.isDupDebouncing) &&
+            step0AddressInHcmArea === true ? (
+              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                <Loader2 className='h-4 w-4 animate-spin' aria-hidden />
+                {t('step0AddressChecking')}
+              </div>
+            ) : null}
+            {!duplicateAddressFeedback.isDupChecking &&
+            !duplicateAddressFeedback.isDupDebouncing &&
+            duplicateAddressFeedback.dupSeverity === 'NONE' &&
+            duplicateAddressFeedback.dupCheckResult &&
+            step0AddressInHcmArea === true ? (
+              <div className='flex items-center gap-2 text-sm text-green-600'>
+                <CheckCircle className='h-4 w-4' aria-hidden />
+                {t('step0AddressValid')}
+              </div>
+            ) : null}
+            {!duplicateAddressFeedback.isDupChecking &&
+            !duplicateAddressFeedback.isDupDebouncing &&
+            duplicateAddressFeedback.dupSeverity === 'INFO' &&
+            step0AddressInHcmArea === true ? (
+              <div className='flex items-center gap-2 text-sm text-blue-500'>
+                <Info className='h-4 w-4' aria-hidden />
+                {t('step0DupAddressInfo')}
+              </div>
+            ) : null}
+            {!duplicateAddressFeedback.isDupChecking &&
+            !duplicateAddressFeedback.isDupDebouncing &&
+            duplicateAddressFeedback.dupSeverity === 'SOFT_WARNING' &&
+            step0AddressInHcmArea === true ? (
+              <div className='flex items-center justify-between rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800'>
+                <div className='flex items-center gap-2'>
+                  <AlertTriangle className='h-4 w-4 shrink-0' aria-hidden />
+                  {duplicateAddressFeedback.overrideReason ? (
+                    <span>{t('step0DupAddressAdminReview')}</span>
+                  ) : (
+                    <span>
+                      {duplicateAddressFeedback.dupCheckResult?.message ??
+                        t('step0DupAddressSimilar')}
+                    </span>
+                  )}
+                </div>
+                {!duplicateAddressFeedback.overrideReason ? (
+                  <button
+                    type='button'
+                    className='ml-2 shrink-0 underline text-yellow-700 hover:text-yellow-900 text-xs'
+                    onClick={duplicateAddressFeedback.onOpenDuplicateModal}
+                  >
+                    {t('step0DupAddressViewDetails')}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            {!duplicateAddressFeedback.isDupChecking &&
+            !duplicateAddressFeedback.isDupDebouncing &&
+            duplicateAddressFeedback.dupSeverity === 'HARD_BLOCK' &&
+            step0AddressInHcmArea === true ? (
+              <div className='flex items-center gap-2 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700'>
+                <XCircle className='h-4 w-4 shrink-0' aria-hidden />
+                <span>
+                  {duplicateAddressFeedback.dupCheckResult?.message ??
+                    t('step0DupAddressExists')}
+                </span>
+                {duplicateAddressFeedback.dupCheckResult?.conflicting_properties?.[0]
+                  ?.property_id ? (
+                  <a
+                    href={`/dashboard/property/${duplicateAddressFeedback.dupCheckResult.conflicting_properties[0].property_id}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='ml-auto shrink-0 underline text-xs'
+                  >
+                    {t('step0DupAddressViewProperty')}
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         {/* Search Loading */}
         {isSearching && (

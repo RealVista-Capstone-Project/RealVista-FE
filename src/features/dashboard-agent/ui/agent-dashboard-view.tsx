@@ -26,7 +26,7 @@ const AgentDashboardInsightsCard = dynamic(
     })),
   {
     loading: () => (
-      <Card className='border-border/70 bg-card shadow-sm'>
+      <Card className='border-border/70 bg-white shadow-sm dark:bg-card'>
         <CardContent className='space-y-6 pt-6'>
           <div className='space-y-4'>
             <div className='space-y-2'>
@@ -127,7 +127,7 @@ const AgentLeadChannelsCard = dynamic(
     })),
   {
     loading: () => (
-      <Card className='border-border/70 bg-card shadow-sm xl:col-span-4'>
+      <Card className='border-border/70 bg-white shadow-sm dark:bg-card xl:col-span-4'>
         <CardHeader className='space-y-4'>
           <Skeleton className='h-6 w-40 max-w-full' />
           <Skeleton className='h-20 w-full rounded-xl' />
@@ -184,7 +184,8 @@ export function AgentDashboardView() {
       trend: listingTrend.trend,
       deltaPercent: listingTrend.deltaPercent,
       unit: undefined,
-      iconBg: 'bg-emerald-100 dark:bg-emerald-500/20',
+      iconBg: 'bg-emerald-50 dark:bg-emerald-500/20',
+      iconRing: 'ring-emerald-100 dark:ring-emerald-900/30',
       icon: <Home className='h-4 w-4 text-emerald-600 dark:text-emerald-400' />,
     },
     {
@@ -193,7 +194,8 @@ export function AgentDashboardView() {
       trend: propertyTrend.trend,
       deltaPercent: propertyTrend.deltaPercent,
       unit: undefined,
-      iconBg: 'bg-amber-100 dark:bg-amber-500/20',
+      iconBg: 'bg-amber-50 dark:bg-amber-500/20',
+      iconRing: 'ring-amber-100 dark:ring-amber-900/30',
       icon: <Building2 className='h-4 w-4 text-amber-600 dark:text-amber-400' />,
     },
     {
@@ -202,7 +204,8 @@ export function AgentDashboardView() {
       trend: appointmentTrend.trend,
       deltaPercent: appointmentTrend.deltaPercent,
       unit: undefined,
-      iconBg: 'bg-sky-100 dark:bg-sky-500/20',
+      iconBg: 'bg-sky-50 dark:bg-sky-500/20',
+      iconRing: 'ring-sky-100 dark:ring-sky-900/30',
       icon: <CalendarDays className='h-4 w-4 text-sky-600 dark:text-sky-400' />,
     },
     {
@@ -211,7 +214,8 @@ export function AgentDashboardView() {
       trend: crmTrend.trend,
       deltaPercent: crmTrend.deltaPercent,
       unit: undefined,
-      iconBg: 'bg-rose-100 dark:bg-rose-500/20',
+      iconBg: 'bg-rose-50 dark:bg-rose-500/20',
+      iconRing: 'ring-rose-100 dark:ring-rose-900/30',
       icon: <Users className='h-4 w-4 text-rose-600 dark:text-rose-400' />,
     },
   ];
@@ -219,7 +223,7 @@ export function AgentDashboardView() {
   if (loading) {
     return (
       <div className='flex h-full min-h-[360px] items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-900 dark:border-slate-700 dark:border-t-slate-100' />
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary/20 border-t-primary dark:border-primary/35 dark:border-t-primary' />
       </div>
     );
   }
@@ -239,7 +243,7 @@ export function AgentDashboardView() {
   }
 
   return (
-    <div className='space-y-6 p-4 md:p-6'>
+    <div className='space-y-5 p-4 md:p-6 lg:p-8'>
       {hasPartialError && !hasError && (
         <Card className='border-amber-400/40 bg-amber-50/40 dark:bg-amber-900/10'>
           <CardHeader className='py-4'>
@@ -257,25 +261,28 @@ export function AgentDashboardView() {
         {kpis.map((kpi) => {
           const trendUp = kpi.trend === 'up';
           return (
-            <Card key={kpi.id} className='border-border/70 bg-card shadow-sm'>
+            <Card key={kpi.id} className='border-border/70 bg-white shadow-sm dark:bg-card'>
               <CardHeader className='pb-3'>
                 <div className='flex items-center justify-between gap-2'>
-                  <CardDescription>{t(`kpi.${kpi.id}`)}</CardDescription>
+                  <CardDescription className='text-xs font-medium'>
+                    {t(`kpi.${kpi.id}`)}
+                  </CardDescription>
                   <div
                     className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-xl',
-                      kpi.iconBg
+                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-4',
+                      kpi.iconBg,
+                      kpi.iconRing
                     )}
                   >
                     {kpi.icon}
                   </div>
                 </div>
-                <CardTitle className='text-2xl font-semibold'>
+                <CardTitle className='text-xl font-bold tracking-tight'>
                   {kpi.value.toLocaleString()}
                   {kpi.unit ? ` ${kpi.unit}` : ''}
                 </CardTitle>
               </CardHeader>
-              <CardContent className='flex items-center gap-2 text-sm'>
+              <CardContent className='flex items-center gap-2 text-sm font-medium'>
                 {trendUp ? (
                   <TrendingUp className='h-4 w-4 text-emerald-500' />
                 ) : (
@@ -292,7 +299,7 @@ export function AgentDashboardView() {
 
       <AgentDashboardInsightsCard />
 
-      <section className='grid grid-cols-1 gap-4 xl:grid-cols-12'>
+      <section className='grid grid-cols-1 gap-5 xl:grid-cols-12'>
         <AgentLeadChannelsCard />
 
         <AgentDashboardAppointmentsCard />

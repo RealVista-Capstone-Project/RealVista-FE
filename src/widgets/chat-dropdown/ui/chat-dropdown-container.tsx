@@ -40,8 +40,7 @@ export function ChatDropdownContainer() {
   const router = useRouter();
   const params = useParams();
 
-  // http returns { status, payload } where payload is ApiResponse { success, message, data }
-  const items = (data?.payload as any)?.data ?? [];
+  const items = Array.isArray(data) ? data : [];
   const conversations: Conversation[] = items.map(mapToConversation);
   const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
 

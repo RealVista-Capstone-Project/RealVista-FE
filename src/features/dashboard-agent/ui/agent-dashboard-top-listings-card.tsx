@@ -43,7 +43,7 @@ export function AgentDashboardTopListingsContent({
         <CardTitle>{t('sections.topListings.title')}</CardTitle>
         <CardDescription>{t('sections.topListings.description')}</CardDescription>
       </div>
-      <div className='flex items-center gap-1 rounded-xl border bg-muted/50 p-1'>
+      <div className='flex items-center gap-1 rounded-xl border border-border/70 bg-white p-1 dark:bg-muted/50'>
         {SORT_OPTIONS.map((key) => (
           <button
             key={key}
@@ -120,7 +120,7 @@ export function AgentDashboardTopListingsContent({
 
 export function AgentDashboardTopListingsCard() {
   return (
-    <Card className='border-border/70 bg-card shadow-sm'>
+    <Card className='border-border/70 bg-white shadow-sm dark:bg-card'>
       <AgentDashboardTopListingsContent variant='standalone' />
     </Card>
   );
@@ -147,7 +147,7 @@ function TopListingRow({
         <div className='flex w-8 shrink-0 justify-center pt-1'>
           <span className='text-xs font-semibold tabular-nums text-muted-foreground'>#{rank}</span>
         </div>
-        <div className='relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-border/60 bg-muted/30'>
+        <div className='relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-border/60 bg-white dark:bg-muted/30'>
           {row.thumbnail ? (
             // eslint-disable-next-line @next/next/no-img-element -- external URLs from API
             <img src={row.thumbnail} alt='' className='size-full object-cover' />
@@ -213,7 +213,8 @@ function MetricCell({
     <div
       className={cn(
         'flex items-center gap-1.5 rounded-md px-1 py-0.5 tabular-nums',
-        highlight && 'bg-primary/10 font-semibold text-primary',
+        highlight &&
+          'bg-white font-semibold text-primary ring-1 ring-inset ring-primary/25 dark:bg-primary/10 dark:ring-0',
       )}
     >
       <span className='text-muted-foreground'>{icon}</span>

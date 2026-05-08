@@ -53,20 +53,18 @@ export function AmenityMultiSelect({
     <div className='flex flex-col gap-3'>
       {/* Selected amenities as Figma-style chips */}
       {selectedAmenities.length > 0 && (
-        <div className='rounded-lg border border-primary/20 bg-white p-4'>
-          <div className='flex flex-wrap gap-3'>
-            {selectedAmenities.map((amenity) => (
-              <button
-                key={amenity.amenity_id}
-                type='button'
-                onClick={() => removeAmenity(amenity.amenity_id)}
-                className='flex items-center gap-1 rounded-md border-[1.5px] border-primary bg-primary/10 px-2.5 py-1 text-sm font-medium text-primary transition-colors hover:bg-primary/20 cursor-pointer'
-              >
-                <span className='truncate max-w-[150px]'>{amenity.amenity_name}</span>
-                <X className='size-3.5 shrink-0' />
-              </button>
-            ))}
-          </div>
+        <div className='flex flex-wrap gap-3'>
+          {selectedAmenities.map((amenity) => (
+            <button
+              key={amenity.amenity_id}
+              type='button'
+              onClick={() => removeAmenity(amenity.amenity_id)}
+              className='flex cursor-pointer items-center gap-1 rounded-full border-[1.5px] border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20'
+            >
+              <span className='max-w-[150px] truncate'>{amenity.amenity_name}</span>
+              <X className='size-3.5 shrink-0' />
+            </button>
+          ))}
         </div>
       )}
 

@@ -11,25 +11,19 @@ interface ListingMetricsCardProps {
   listingId: string;
 }
 
-/**
- * Displays listing performance metrics
- * Shows total views, unique viewers, tour bookings, and conversion rate
- */
 export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
   const { data, isLoading, isError } = useListingAnalytics(listingId);
   const t = useTranslations('ListingMetricsCard');
 
   if (isError) {
-    return null; // Gracefully hide if analytics fail to load
+    return null;
   }
 
   if (isLoading) {
     return (
-      <div className='rounded-lg border border-primary/20 p-6'>
-        <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-foreground'>
-          {t('title')}
-        </h2>
-        <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
+      <div className='flex h-full flex-col rounded-lg p-4 sm:p-5'>
+        <div className='mb-4 h-5 w-40 animate-pulse rounded bg-primary/15' />
+        <div className='grid flex-1 grid-cols-2 gap-3'>
           {[...Array(4)].map((_, i) => (
             <MetricSkeleton key={i} />
           ))}
@@ -38,38 +32,34 @@ export function ListingMetricsCard({ listingId }: ListingMetricsCardProps) {
     );
   }
 
-  const analytics = data;
-
-  if (!analytics) {
+  if (!data) {
     return null;
   }
 
   return (
-    <div className='rounded-lg border border-primary/20 p-6'>
-      <h2 className='mb-6 text-xl font-bold leading-[1.6] tracking-[-0.1px] text-foreground'>
-        {t('title')}
-      </h2>
+    <div className='flex h-full flex-col rounded-lg p-4 sm:p-5'>
+      <h2 className='mb-4 text-base font-bold text-foreground'>{t('title')}</h2>
 
-      <div className='grid grid-cols-2 gap-6 sm:grid-cols-4'>
+      <div className='grid flex-1 grid-cols-2 gap-3'>
         <MetricItem
-          icon={<Eye className='h-6 w-6' strokeWidth={2} />}
+          icon={<Eye className='h-4 w-4' strokeWidth={2} />}
           label={t('metrics.totalViews')}
-          value={formatNumber(analytics.total_views)}
+          value={formatNumber(data.total_views)}
         />
         <MetricItem
-          icon={<Users className='h-6 w-6' strokeWidth={2} />}
+          icon={<Users className='h-4 w-4' strokeWidth={2} />}
           label={t('metrics.uniqueViewers')}
-          value={formatNumber(analytics.unique_viewers)}
+          value={formatNumber(data.unique_viewers)}
         />
         <MetricItem
-          icon={<Calendar className='h-6 w-6' strokeWidth={2} />}
+          icon={<Calendar className='h-4 w-4' strokeWidth={2} />}
           label={t('metrics.tourBookings')}
-          value={formatNumber(analytics.tour_bookings)}
+          value={formatNumber(data.tour_bookings)}
         />
         <MetricItem
-          icon={<TrendingUp className='h-6 w-6' strokeWidth={2} />}
+          icon={<TrendingUp className='h-4 w-4' strokeWidth={2} />}
           label={t('metrics.conversionRate')}
-          value={`${analytics.conversion_rate}%`}
+          value={`${data.conversion_rate}%`}
           tooltip={t('metrics.conversionRateTooltip')}
         />
       </div>
@@ -86,25 +76,25 @@ interface MetricItemProps {
 
 function MetricItem({ icon, label, value, tooltip }: MetricItemProps) {
   return (
-    <div className='flex flex-col gap-4'>
-      <div className='flex items-center gap-1.5'>
-        <p className='text-base font-medium leading-[1.5] text-muted-foreground'>{label}</p>
-        {tooltip && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleHelp className='h-4 w-4 cursor-help text-muted-foreground/60 transition-colors hover:text-muted-foreground' />
-            </TooltipTrigger>
-            <TooltipContent side='top' align='start'>
-              {tooltip}
-            </TooltipContent>
-          </Tooltip>
-        )}
+    <div className='flex h-full flex-col gap-3 rounded-xl bg-primary/[0.04] px-4 py-4'>
+      <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+        {icon}
       </div>
-      <div className='flex items-center gap-2'>
-        <div className='text-foreground/50'>{icon}</div>
-        <p className='text-lg font-bold leading-[1.45] tracking-[-0.09px] text-foreground'>
-          {value}
-        </p>
+      <div className='min-w-0'>
+        <div className='flex items-center gap-1'>
+          <p className='text-xs font-medium text-muted-foreground'>{label}</p>
+          {tooltip && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CircleHelp className='h-3 w-3 shrink-0 cursor-help text-muted-foreground/50 transition-colors hover:text-muted-foreground' />
+              </TooltipTrigger>
+              <TooltipContent side='top' align='start'>
+                {tooltip}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+        <p className='text-xl font-bold leading-tight tracking-tight text-foreground'>{value}</p>
       </div>
     </div>
   );
@@ -112,11 +102,11 @@ function MetricItem({ icon, label, value, tooltip }: MetricItemProps) {
 
 function MetricSkeleton() {
   return (
-    <div className='flex flex-col gap-4'>
-      <div className='h-6 w-24 animate-pulse rounded bg-primary/15' />
-      <div className='flex items-center gap-2'>
-        <div className='h-6 w-6 animate-pulse rounded bg-primary/15' />
-        <div className='h-7 w-16 animate-pulse rounded bg-primary/15' />
+    <div className='flex items-center gap-3 rounded-xl bg-primary/[0.04] px-3 py-3'>
+      <div className='h-9 w-9 animate-pulse rounded-lg bg-primary/15' />
+      <div className='flex-1 space-y-1.5'>
+        <div className='h-3 w-16 animate-pulse rounded bg-primary/15' />
+        <div className='h-5 w-10 animate-pulse rounded bg-primary/15' />
       </div>
     </div>
   );

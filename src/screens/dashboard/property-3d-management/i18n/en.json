@@ -2,6 +2,8 @@
   "ThreeDManagement": {
     "title": "3D Room Management",
     "subtitle": "Create immersive 3D models for each room",
+    "backToList": "Back",
+    "listSectionLabel": "3D list",
     "newRoom": "New Room",
     "roomsCount": "{count, plural, =1 {# Room} other {# Rooms}}",
     "ready": "Ready",

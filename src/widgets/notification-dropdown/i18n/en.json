@@ -6,6 +6,7 @@
     "noNotifications": "No notifications yet",
     "viewAll": "View all notifications",
     "toastView": "View",
+    "toastViewListing": "View listing",
     "loading": "Loading notifications\u2026",
     "error": "Failed to load notifications.",
     "noNotificationsPage": "No notifications yet.",

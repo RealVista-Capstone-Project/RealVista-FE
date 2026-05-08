@@ -2,8 +2,6 @@
 
 import * as React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from '@/shared/config/i18n/navigation';
-import { useSearchParams } from 'next/navigation';
 import {
   useMyProposalsQuery,
   useCancelProposalMutation,
@@ -20,11 +18,10 @@ import { getAgentProposalSpecialtyCode } from '@/entities/agent-proposal/model/t
 import { PROPERTY_TYPES } from '@/shared/config/property-types';
 import { cn } from '@/shared/lib/utils';
 import { useDebounce } from '@/shared/lib/hooks';
+import { useSyncDashboardTopNavCountBadge } from '@/shared/lib/dashboard-top-nav-badge-context';
 import { Spinner } from '@/shared/ui/spinner';
 import { DataTable } from '@/shared/ui/data-table';
 import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { formatNumber } from '@/shared/lib/utils/format-currency';
 import {
   Search,
   Filter,
@@ -178,8 +175,6 @@ type StatusFilter = 'all' | AgentProposalStatus;
 export function ManageAgentProposalsScreen() {
   const t = useTranslations('ManageProposals');
   const locale = useLocale();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = React.useState('');
   const debouncedSearch = useDebounce(searchQuery, 350);
@@ -196,38 +191,6 @@ export function ManageAgentProposalsScreen() {
   const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
   const [editTarget, setEditTarget] = React.useState<AgentProposal | null>(null);
   const [selectedProposal, setSelectedProposal] = React.useState<AgentProposal | null>(null);
-
-  const [isSearchPending, setIsSearchPending] = React.useState(false);
-  const [showReturnToApplyCta, setShowReturnToApplyCta] = React.useState(false);
-
-  const returnPath = searchParams.get('returnPath');
-  const returnPropertyId = searchParams.get('returnPropertyId');
-  const returnPropertyAddress = searchParams.get('returnPropertyAddress');
-  const resumeApplyHref = React.useMemo(() => {
-    if (!returnPath) return null;
-    if (!returnPropertyId && !returnPropertyAddress) return null;
-    if (!returnPath.startsWith('/dashboard/property-feed')) return null;
-
-    try {
-      const url = new URL(returnPath, window.location.origin);
-      url.searchParams.set('openApplyModal', '1');
-      if (returnPropertyId) url.searchParams.set('propertyId', returnPropertyId);
-      if (returnPropertyAddress) url.searchParams.set('propertyAddress', returnPropertyAddress);
-      return url.pathname + url.search;
-    } catch {
-      // Fallback to manual string manipulation if URL parsing fails
-      const query = new URLSearchParams();
-      query.set('openApplyModal', '1');
-      if (returnPropertyId) query.set('propertyId', returnPropertyId);
-      if (returnPropertyAddress) query.set('propertyAddress', returnPropertyAddress);
-      const separator = returnPath.includes('?') ? '&' : '?';
-      return `${returnPath}${separator}${query.toString()}`;
-    }
-  }, [returnPath, returnPropertyId, returnPropertyAddress]);
-
-  React.useEffect(() => {
-    setIsSearchPending(searchQuery !== debouncedSearch);
-  }, [searchQuery, debouncedSearch]);
 
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -259,6 +222,8 @@ export function ManageAgentProposalsScreen() {
   const totalElements = data?.total_elements ?? 0;
   const totalPages = data?.total_pages ?? 0;
 
+  useSyncDashboardTopNavCountBadge(isLoading || isError ? null : totalElements);
+
   const filteredProposals = React.useMemo(() => {
     let result = proposals;
     if (debouncedSearch.trim()) {
@@ -276,15 +241,9 @@ export function ManageAgentProposalsScreen() {
   // ── Mutations ──
   const createMutation = useApplyProposalMutation(() => {
     setIsFormOpen(false);
-    if (resumeApplyHref) {
-      setShowReturnToApplyCta(true);
-    }
   });
   const updateMutation = useUpdateProposalMutation(() => {
     setIsFormOpen(false);
-    if (resumeApplyHref) {
-      setShowReturnToApplyCta(true);
-    }
   });
   const draftMutation = useSaveProposalDraftMutation(() => setIsFormOpen(false));
   const deleteMutation = useCancelProposalMutation(() => {
@@ -324,57 +283,29 @@ export function ManageAgentProposalsScreen() {
   const columns = ProposalColumns({ onEdit: openEdit, onDelete: openDelete });
 
   const toolbar = (
-    <div className='flex flex-col gap-4 p-4 sm:p-5'>
-      {showReturnToApplyCta && resumeApplyHref && (
-        <div className='flex flex-col gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between'>
-          <p className='text-sm font-medium text-emerald-800'>
-            {t('toastCreateSuccess')}
-          </p>
-          <Button
-            type='button'
-            size='sm'
-            className='h-8 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700'
-            onClick={() => router.push(resumeApplyHref)}
-          >
-            {t('returnToApplyCta')}
-          </Button>
-        </div>
-      )}
-
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <h2 className='text-xl font-bold text-foreground'>{t('pageTitle')}</h2>
-          <div className='flex items-center justify-center rounded-full bg-primary px-2 py-0.5'>
-            <span className='text-sm font-bold text-white'>{formatNumber(totalElements)}</span>
+    <div className='flex flex-col px-4 pb-3 pt-3 sm:px-5 sm:pb-4 sm:pt-4'>
+      <div className='flex min-w-0 flex-wrap items-center gap-3'>
+        <div className='relative min-w-0 flex-1 basis-[min(100%,20rem)] sm:max-w-md'>
+          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5'>
+            <Search className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
           </div>
-        </div>
-
-        <button
-          type='button'
-          onClick={openCreate}
-          className='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
-        >
-          <Plus className='h-3.5 w-3.5' strokeWidth={2.5} />
-          {t('createNew')}
-        </button>
-      </div>
-
-      <div className='flex items-center gap-3'>
-        <div className='relative flex-1 max-w-md'>
-          <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4'>
-            <Search className='h-5 w-5 text-muted-foreground/70' strokeWidth={2} />
-          </div>
-          <Input
+          <input
+            type='text'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className='h-11 w-full rounded-lg border-2 border-primary/20 bg-primary/5 pl-12 pr-10 text-base font-medium focus:border-primary focus:outline-none focus:ring-0'
+            className='h-9 w-full rounded-full border-2 border-primary/14 bg-[#e8f2fb] pl-10 pr-9 text-sm font-medium text-foreground shadow-sm shadow-primary/[0.04] placeholder:text-muted-foreground/65 transition-colors focus:border-primary/28 focus:bg-[#dfeef9] focus:outline-none focus:ring-2 focus:ring-primary/15'
             aria-label={t('searchPlaceholder')}
           />
-          {isSearchPending && (
-            <span className='pointer-events-none absolute inset-y-0 right-4 flex items-center'>
-              <Spinner className='size-4 text-primary' />
-            </span>
+          {searchQuery && (
+            <button
+              type='button'
+              onClick={() => setSearchQuery('')}
+              className='absolute inset-y-0 right-0 flex items-center pr-3.5 text-muted-foreground/60 hover:text-foreground focus-visible:outline-none'
+              aria-label={t('clearSearch')}
+            >
+              <X className='h-3.5 w-3.5' strokeWidth={2.5} />
+            </button>
           )}
         </div>
 
@@ -383,16 +314,17 @@ export function ManageAgentProposalsScreen() {
             type='button'
             onClick={() => setIsFilterOpen((prev) => !prev)}
             className={cn(
-              'flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+              'relative flex h-9 min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 rounded-lg border-2 px-2.5 text-xs font-medium bg-white shadow-sm shadow-primary/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-1',
               hasActiveStatus
-                ? 'border-primary bg-primary/5 text-primary'
-                : 'border-primary/20 bg-white text-foreground hover:bg-primary/5'
+                ? 'border-primary/24 bg-primary/5 text-primary'
+                : 'border-primary/14 text-foreground hover:border-primary/20 hover:bg-muted/30'
             )}
+            aria-label={t('filterTitle')}
           >
-            <Filter className='h-5 w-5' strokeWidth={2} />
+            <Filter className='h-4 w-4 text-primary/55' strokeWidth={2.5} />
             <ChevronDown
-              className={cn('h-4 w-4 transition-transform', isFilterOpen && 'rotate-180')}
-              strokeWidth={2}
+              className={cn('h-3.5 w-3.5 text-primary/50 transition-transform', isFilterOpen && 'rotate-180')}
+              strokeWidth={2.5}
             />
             {hasActiveStatus && (
               <span className='absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white'>
@@ -408,7 +340,7 @@ export function ManageAgentProposalsScreen() {
                 <button
                   type='button'
                   onClick={resetFilters}
-                  className='cursor-pointer text-xs font-medium text-primary hover:underline'
+                  className='cursor-pointer text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1'
                 >
                   {t('filterReset')}
                 </button>
@@ -427,7 +359,7 @@ export function ManageAgentProposalsScreen() {
                         setIsFilterOpen(false);
                       }}
                       className={cn(
-                        'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
+                        'flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                         statusFilter === opt.value
                           ? 'bg-primary/5 font-medium text-primary'
                           : 'text-foreground hover:bg-primary/5'
@@ -444,6 +376,15 @@ export function ManageAgentProposalsScreen() {
             </div>
           )}
         </div>
+
+        <button
+          type='button'
+          onClick={openCreate}
+          className='ml-auto inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-sm shadow-primary/15 transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:px-4'
+        >
+          <Plus className='h-3.5 w-3.5 shrink-0' strokeWidth={2.5} />
+          {t('createNew')}
+        </button>
       </div>
     </div>
   );
@@ -451,7 +392,7 @@ export function ManageAgentProposalsScreen() {
   // ── Render ──
   if (isLoading && page === 0) {
     return (
-      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
+      <div className='flex min-h-0 flex-1 items-center justify-center p-4 sm:p-6'>
         <Spinner className='size-8 text-primary' />
       </div>
     );
@@ -459,7 +400,7 @@ export function ManageAgentProposalsScreen() {
 
   if (isError) {
     return (
-      <div className='flex h-full items-center justify-center p-4 sm:p-6'>
+      <div className='flex min-h-0 flex-1 items-center justify-center p-4 sm:p-6'>
         <div className='flex max-w-xs flex-col items-center gap-3 text-center'>
           <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
             <FileSearch className='h-6 w-6 text-primary' />
@@ -471,9 +412,10 @@ export function ManageAgentProposalsScreen() {
   }
 
   return (
-    <div className='p-4 sm:p-6 flex gap-4 items-start'>
-      <div className='flex-1 min-w-0'>
+    <div className='flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-6'>
+      <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
         <DataTable
+          className='min-h-0 flex-1'
           columns={columns}
           data={filteredProposals}
           isLoading={isLoading}

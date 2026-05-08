@@ -431,12 +431,14 @@ interface MediaUploadZoneProps {
     uploadHint: string;
   };
   accept?: string;
+  compact?: boolean;
 }
 
 export function MediaUploadZone({
   onFilesSelected,
   labels,
   accept = 'image/*,video/*',
+  compact = false,
 }: MediaUploadZoneProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -475,11 +477,23 @@ export function MediaUploadZone({
             onFilesSelected(files);
           }
         }}
-        className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 px-6 py-8 text-center transition-colors hover:border-primary/40 hover:bg-primary/10 cursor-pointer w-full'
+        className={cn(
+          'flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 text-center transition-colors hover:border-primary/40 hover:bg-primary/10',
+          compact ? 'px-4 py-5' : 'px-6 py-8'
+        )}
       >
-        <Upload className='mb-2 h-7 w-7 text-primary/50' />
-        <p className='text-sm font-medium text-muted-foreground'>{labels.dragAndDrop}</p>
-        <p className='mt-0.5 text-xs text-muted-foreground/60'>{labels.uploadHint}</p>
+        <Upload className={cn('mb-2 text-primary/50', compact ? 'h-4 w-4' : 'h-7 w-7')} />
+        <p className={cn('font-medium text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+          {labels.dragAndDrop}
+        </p>
+        <p
+          className={cn(
+            'mt-0.5 text-muted-foreground/60',
+            compact ? 'text-[11px]' : 'text-xs'
+          )}
+        >
+          {labels.uploadHint}
+        </p>
       </button>
     </>
   );

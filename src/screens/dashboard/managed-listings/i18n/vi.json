@@ -3,7 +3,16 @@
     "title": "Danh sách bài đăng",
     "draftRuleTooltip": "Tin đăng tạm ẩn quá 24h sẽ bị tự động hủy các lịch hẹn đang hoạt động.",
     "createButton": "Tạo mới",
+    "quotaNoticeTriggerAria": "Xem thông báo hết lượt đăng tin",
     "filter": "Lọc",
+    "creatorFilter": {
+      "label": "Người tạo",
+      "options": {
+        "all": "Tất cả",
+        "self": "Do tôi tạo",
+        "agent": "Do môi giới tạo"
+      }
+    },
     "filterPanel": {
       "status": "Trạng thái",
       "statusOptions": {
@@ -30,7 +39,8 @@
       "forSale": "Bán"
     },
     "search": {
-      "placeholder": "Tìm kiếm..."
+      "placeholder": "Tìm kiếm...",
+      "clear": "Xóa tìm kiếm"
     },
     "loading": "Đang tải...",
     "error": {
@@ -39,7 +49,9 @@
     },
     "empty": {
       "noProperties": "Không tìm thấy bài đăng nào",
-      "selectProperty": "Chọn một bài đăng để xem chi tiết"
+      "selectProperty": "Chọn một bài đăng để xem chi tiết",
+      "noResults": "Không có bài đăng nào phù hợp với bộ lọc",
+      "noResultsHint": "Thử điều chỉnh tìm kiếm hoặc bộ lọc của bạn"
     }
   },
   "ListingCard": {
@@ -58,6 +70,10 @@
     "actions": "Hành động",
     "editListing": "Chỉnh sửa",
     "backToList": "Trở lại danh sách",
+    "hero": {
+      "prevImage": "Ảnh trước",
+      "nextImage": "Ảnh sau"
+    },
     "agent": {
       "title": "Người môi giới",
       "subtitle": "Bài đăng này được quản lý bởi môi giới",
@@ -67,6 +83,12 @@
       "verified": "Môi giới đã xác thực",
       "contact": "Liên hệ môi giới"
     },
+    "owner": {
+      "title": "Thông tin chủ nhà",
+      "subtitle": "Liên hệ chủ nhà nhé",
+      "verified": "Chủ nhà đã xác thực",
+      "contact": "Liên hệ chủ nhà nhé"
+    },
     "deleteListing": "Xóa bài đăng",
     "deleteConfirmTitle": "Xóa bài đăng",
     "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.",
@@ -74,6 +96,44 @@
     "deleteConfirmApprove": "Xóa",
     "deleting": "Đang xóa...",
     "aboutThisListing": "Thông tin bài đăng",
+    "detailTabs": {
+      "performance": "Hiệu suất",
+      "description": "Mô tả bài đăng",
+      "property": "Thông tin bất động sản"
+    },
+    "propertyInfo": {
+      "priceSale": "Giá bán niêm yết",
+      "priceRent": "Giá cho thuê",
+      "listedPrice": "Giá niêm yết bài đăng",
+      "propertyOwnerExpectedPrice": "Giá kỳ vọng khi tạo bất động sản",
+      "listingNegotiationRange": "Khoảng giá thương lượng trên tin đăng",
+      "priceFrom": "Từ {amount}",
+      "priceUpTo": "Đến {amount}",
+      "negotiable": "Có thể thương lượng",
+      "deposit": "Tiền cọc",
+      "serviceFeesTitle": "Phí dịch vụ (ước tính)",
+      "baseRentLabel": "Giá thuê trên tin",
+      "requiredFeesLabel": "Phí bắt buộc",
+      "optionalFeesLabel": "Phí tuỳ chọn",
+      "requiredFeesSubtotal": "Tổng phí bắt buộc",
+      "optionalFeesSubtotal": "Tổng phí tuỳ chọn",
+      "totalEstimatedLabel": "Tổng hàng tháng (ước tính)",
+      "tour3dTitle": "Tour 3D",
+      "tour3dRooms": "Các phòng 3D",
+      "unnamed3dRoom": "Phòng 3D {index}",
+      "tour3dMissingTitle": "Chưa có tour 3D",
+      "tour3dMissingDescription": "Thêm tour 3D để khách hàng có thể hình dung không gian căn nhà.",
+      "add3dCta": "Thêm / quản lý 3D",
+      "featuresTitle": "Thông số bất động sản",
+      "amenitiesTitle": "Tiện ích",
+      "dimensionsTitle": "Diện tích & kích thước",
+      "landSize": "Diện tích đất",
+      "usableSize": "Diện tích sử dụng",
+      "width": "Chiều ngang",
+      "length": "Chiều dài",
+      "mapTitle": "Vị trí trên bản đồ",
+      "emptyDescription": "Chưa có nội dung mô tả cho bài đăng này."
+    },
     "features": {
       "properties": "Bất động sản",
       "rooms": "Phòng",
@@ -89,7 +149,9 @@
       "title": "Đẩy tin đăng",
       "subtitle": "Tăng khả năng hiển thị tin đăng",
       "featured": "Nổi bật",
+      "featuredTooltip": "Tin đăng sẽ được ghim lên đầu danh sách tìm kiếm, tăng khả năng tiếp cận người mua/thuê.",
       "hotBadge": "Hot Badge",
+      "hotBadgeTooltip": "Gắn nhãn HOT nổi bật lên tin đăng, thu hút sự chú ý ngay lập tức từ người xem.",
       "remaining": "Còn {count}",
       "apply": "Áp dụng",
       "remove": "Gỡ bỏ",
@@ -100,11 +162,22 @@
       "noPackage": "Chưa có gói đẩy tin",
       "noPackageDescription": "Bạn cần có gói đẩy tin đang hoạt động để đẩy tin đăng.",
       "buyPackage": "Mua gói",
-      "active": "Đang hoạt động",
+      "active": "Đang sử dụng",
       "applying": "Đang áp dụng...",
       "removing": "Đang gỡ bỏ...",
       "applyError": "Không thể áp dụng đẩy tin",
       "removeError": "Không thể gỡ bỏ đẩy tin"
+    },
+    "appointments": {
+      "title": "Lịch hẹn xem nhà",
+      "noAppointments": "Không có lịch hẹn ngày này",
+      "status": {
+        "pending": "Chờ xác nhận",
+        "accepted": "Đã xác nhận",
+        "rejected": "Đã từ chối",
+        "canceled": "Đã hủy",
+        "completed": "Hoàn thành"
+      }
     },
     "lifetime": {
       "title": "Thời hạn tin đăng",
